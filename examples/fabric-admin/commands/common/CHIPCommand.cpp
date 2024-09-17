@@ -182,7 +182,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     mCredIssuerCmds->SetCredentialIssuerOption(CredentialIssuerCommands::CredentialIssuerOptions::kAllowTestCdSigningKey,
                                                allowTestCdSigningKey);
 
-    ReturnLogErrorOnFailure(PairingManager::Instance().Init(&CurrentCommissioner()));
+    PairingManager::Instance().Init(&CurrentCommissioner());
 
     return CHIP_NO_ERROR;
 }

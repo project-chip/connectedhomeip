@@ -134,7 +134,6 @@ void DeviceManager::OpenRemoteDeviceCommissioningWindow(EndpointId remoteEndpoin
     // Open the commissioning window of a device from another fabric via its fabric bridge.
     // This method constructs and sends a command to open the commissioning window for a device
     // that is part of a different fabric, accessed through a fabric bridge.
-    StringBuilder<kMaxCommandSize> commandBuilder;
 
     // Use random discriminator to have less chance of collision.
     uint16_t discriminator =

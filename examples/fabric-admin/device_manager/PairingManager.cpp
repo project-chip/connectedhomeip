@@ -24,26 +24,35 @@
 
 using namespace ::chip;
 
-Platform::UniquePtr<chip::Controller::CommissioningWindowOpener> PairingManager::mWindowOpener;
-
 PairingManager::PairingManager() :
     mOnOpenCommissioningWindowCallback(OnOpenCommissioningWindowResponse, this),
     mOnOpenCommissioningWindowVerifierCallback(OnOpenCommissioningWindowVerifierResponse, this)
 {}
 
-CHIP_ERROR PairingManager::Init(chip::Controller::DeviceCommissioner * commissioner)
+void PairingManager::Init(Controller::DeviceCommissioner * commissioner)
 {
+    VerifyOrDie(mCommissioner == nullptr);
     mCommissioner = commissioner;
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PairingManager::OpenCommissioningWindow(NodeId nodeId, EndpointId endpointId, uint16_t commissioningTimeout,
                                                    uint32_t iterations, uint16_t discriminator, const ByteSpan & salt,
                                                    const ByteSpan & verifier)
 {
-    VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    if (mCommissioner == nullptr)
+    {
+        ChipLogError(NotSpecified, "Commissioner is null, cannot open commissioning window");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
-    auto * params                      = new CommissioningWindowParams();
+    // Check if a window is already open
+    if (mWindowOpener != nullptr)
+    {
+        ChipLogError(NotSpecified, "A commissioning window is already open");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto params                        = Platform::MakeUnique<CommissioningWindowParams>();
     params->nodeId                     = nodeId;
     params->endpointId                 = endpointId;
     params->commissioningWindowTimeout = commissioningTimeout;
@@ -52,87 +61,99 @@ CHIP_ERROR PairingManager::OpenCommissioningWindow(NodeId nodeId, EndpointId end
 
     if (!salt.empty())
     {
+        if (salt.size() > Crypto::kSpake2p_Max_PBKDF_Salt_Length)
+        {
+            ChipLogError(NotSpecified, "Salt size exceeds buffer capacity");
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+
         memcpy(params->saltBuffer, salt.data(), salt.size());
         params->salt = ByteSpan(params->saltBuffer, salt.size());
     }
 
     if (!verifier.empty())
     {
+        if (verifier.size() > Crypto::kSpake2p_VerifierSerialized_Length)
+        {
+            ChipLogError(NotSpecified, "Verifier size exceeds buffer capacity");
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+
         memcpy(params->verifierBuffer, verifier.data(), verifier.size());
         params->verifier = ByteSpan(params->verifierBuffer, verifier.size());
     }
 
     // Schedule work on the Matter thread
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(OnOpenCommissioningWindow, reinterpret_cast<intptr_t>(params));
-
-    return CHIP_NO_ERROR;
+    return DeviceLayer::PlatformMgr().ScheduleWork(OnOpenCommissioningWindow, reinterpret_cast<intptr_t>(params.release()));
 }
 
 void PairingManager::OnOpenCommissioningWindow(intptr_t context)
 {
-    auto * params         = reinterpret_cast<CommissioningWindowParams *>(context);
+    Platform::UniquePtr<CommissioningWindowParams> params(reinterpret_cast<CommissioningWindowParams *>(context));
     PairingManager & self = PairingManager::Instance();
 
     if (self.mCommissioner == nullptr)
     {
-        ChipLogError(AppServer, "Commissioner is null, cannot open commissioning window");
+        ChipLogError(NotSpecified, "Commissioner is null, cannot open commissioning window");
         return;
     }
 
-    mWindowOpener = Platform::MakeUnique<Controller::CommissioningWindowOpener>(self.mCommissioner);
+    self.mWindowOpener = Platform::MakeUnique<Controller::CommissioningWindowOpener>(self.mCommissioner);
 
     if (!params->verifier.empty())
     {
         if (params->salt.empty())
         {
-            ChipLogError(AppServer, "Salt is required when verifier is set");
+            ChipLogError(NotSpecified, "Salt is required when verifier is set");
+            self.mWindowOpener.reset();
             return;
         }
 
-        CHIP_ERROR err = mWindowOpener->OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams()
-                                                                    .SetNodeId(params->nodeId)
-                                                                    .SetEndpointId(params->endpointId)
-                                                                    .SetTimeout(params->commissioningWindowTimeout)
-                                                                    .SetIteration(params->iteration)
-                                                                    .SetDiscriminator(params->discriminator)
-                                                                    .SetVerifier(params->verifier)
-                                                                    .SetSalt(params->salt)
-                                                                    .SetCallback(&self.mOnOpenCommissioningWindowVerifierCallback));
+        CHIP_ERROR err =
+            self.mWindowOpener->OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams()
+                                                            .SetNodeId(params->nodeId)
+                                                            .SetEndpointId(params->endpointId)
+                                                            .SetTimeout(params->commissioningWindowTimeout)
+                                                            .SetIteration(params->iteration)
+                                                            .SetDiscriminator(params->discriminator)
+                                                            .SetVerifier(params->verifier)
+                                                            .SetSalt(params->salt)
+                                                            .SetCallback(&self.mOnOpenCommissioningWindowVerifierCallback));
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "Failed to open commissioning window with verifier: %s", ErrorStr(err));
+            ChipLogError(NotSpecified, "Failed to open commissioning window with verifier: %s", ErrorStr(err));
+            self.mWindowOpener.reset();
         }
     }
     else
     {
         SetupPayload ignored;
-        CHIP_ERROR err = mWindowOpener->OpenCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
-                                                                    .SetNodeId(params->nodeId)
-                                                                    .SetEndpointId(params->endpointId)
-                                                                    .SetTimeout(params->commissioningWindowTimeout)
-                                                                    .SetIteration(params->iteration)
-                                                                    .SetDiscriminator(params->discriminator)
-                                                                    .SetSetupPIN(NullOptional)
-                                                                    .SetSalt(NullOptional)
-                                                                    .SetCallback(&self.mOnOpenCommissioningWindowCallback),
-                                                                ignored);
+        CHIP_ERROR err = self.mWindowOpener->OpenCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
+                                                                         .SetNodeId(params->nodeId)
+                                                                         .SetEndpointId(params->endpointId)
+                                                                         .SetTimeout(params->commissioningWindowTimeout)
+                                                                         .SetIteration(params->iteration)
+                                                                         .SetDiscriminator(params->discriminator)
+                                                                         .SetSetupPIN(NullOptional)
+                                                                         .SetSalt(NullOptional)
+                                                                         .SetCallback(&self.mOnOpenCommissioningWindowCallback),
+                                                                     ignored);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "Failed to open commissioning window with passcode: %s", ErrorStr(err));
+            ChipLogError(NotSpecified, "Failed to open commissioning window with passcode: %s", ErrorStr(err));
+            self.mWindowOpener.reset();
         }
     }
-
-    // Clean up params
-    delete params;
 }
 
-void PairingManager::OnOpenCommissioningWindowResponse(void * context, NodeId remoteId, CHIP_ERROR err, chip::SetupPayload payload)
+void PairingManager::OnOpenCommissioningWindowResponse(void * context, NodeId remoteId, CHIP_ERROR err, SetupPayload payload)
 {
+    VerifyOrDie(context != nullptr);
     PairingManager * self = static_cast<PairingManager *>(context);
     if (self->mCommissioningWindowDelegate)
     {
         self->mCommissioningWindowDelegate->OnCommissioningWindowOpened(remoteId, err, payload);
-        self->UnregisterOpenCommissioningWindowDelegate();
+        self->SetOpenCommissioningWindowDelegate(nullptr);
     }
 
     OnOpenCommissioningWindowVerifierResponse(context, remoteId, err);
@@ -140,8 +161,10 @@ void PairingManager::OnOpenCommissioningWindowResponse(void * context, NodeId re
 
 void PairingManager::OnOpenCommissioningWindowVerifierResponse(void * context, NodeId remoteId, CHIP_ERROR err)
 {
+    VerifyOrDie(context != nullptr);
+    PairingManager * self = static_cast<PairingManager *>(context);
     LogErrorOnFailure(err);
 
-    PairingManager * self = reinterpret_cast<PairingManager *>(context);
-    VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnOpenCommissioningWindowCommand: context is null"));
+    // Reset the window opener once the window operation is complete
+    self->mWindowOpener.reset();
 }

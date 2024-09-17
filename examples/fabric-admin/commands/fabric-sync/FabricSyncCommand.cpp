@@ -344,7 +344,7 @@ CHIP_ERROR FabricSyncDeviceCommand::RunCommand(EndpointId remoteId)
         return CHIP_NO_ERROR;
     }
 
-    PairingManager::Instance().RegisterOpenCommissioningWindowDelegate(this);
+    PairingManager::Instance().SetOpenCommissioningWindowDelegate(this);
 
     DeviceMgr().OpenRemoteDeviceCommissioningWindow(remoteId);
 

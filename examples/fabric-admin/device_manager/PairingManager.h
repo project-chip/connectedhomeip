@@ -29,6 +29,26 @@ public:
     virtual ~CommissioningWindowDelegate()                                                                      = default;
 };
 
+/**
+ * The PairingManager class is responsible for managing the commissioning and pairing process
+ * of Matter devices. PairingManager is designed to be used as a singleton, meaning that there
+ * should only be one instance of it running at any given time.
+ *
+ * Usage:
+ *
+ * 1. The class should be initialized when the system starts up, typically by invoking the static
+ *    instance method to get the singleton.
+ * 2. To open a commissioning window, the appropriate method should be called on the PairingManager instance.
+ * 3. The PairingManager will handle the lifecycle of the CommissioningWindowOpener and ensure that
+ *    resources are cleaned up appropriately when pairing is complete or the process is aborted.
+ *
+ * Example:
+ *
+ * @code
+ * PairingManager& manager = PairingManager::Instance();
+ * manager.OpenCommissioningWindow();
+ * @endcode
+ */
 class PairingManager
 {
 public:
@@ -38,19 +58,28 @@ public:
         return instance;
     }
 
-    CHIP_ERROR Init(chip::Controller::DeviceCommissioner * commissioner);
+    void Init(chip::Controller::DeviceCommissioner * commissioner);
 
+    /**
+     * Opens a commissioning window on the specified node and endpoint.
+     * Only one commissioning window can be active at a time. If a commissioning
+     * window is already open, this function will return an error.
+     *
+     * @param nodeId The target node ID for commissioning.
+     * @param endpointId The target endpoint ID for commissioning.
+     * @param commissioningTimeout Timeout for the commissioning window in seconds.
+     * @param iterations Iterations for PBKDF calculations.
+     * @param discriminator Discriminator for commissioning.
+     * @param salt Optional salt for verifier-based commissioning.
+     * @param verifier Optional verifier for enhanced commissioning security.
+     *
+     * @return CHIP_ERROR_INCORRECT_STATE if a commissioning window is already open.
+     */
     CHIP_ERROR OpenCommissioningWindow(chip::NodeId nodeId, chip::EndpointId endpointId, uint16_t commissioningTimeout,
                                        uint32_t iterations, uint16_t discriminator, const chip::ByteSpan & salt,
                                        const chip::ByteSpan & verifier);
 
-    void RegisterOpenCommissioningWindowDelegate(CommissioningWindowDelegate * delegate)
-    {
-        ChipLogProgress(NotSpecified, "yujuan: PairingManager::RegisterOpenCommissioningWindowDelegate");
-        mCommissioningWindowDelegate = delegate;
-    }
-
-    void UnregisterOpenCommissioningWindowDelegate() { mCommissioningWindowDelegate = nullptr; }
+    void SetOpenCommissioningWindowDelegate(CommissioningWindowDelegate * delegate) { mCommissioningWindowDelegate = delegate; }
 
 private:
     PairingManager();
@@ -76,7 +105,13 @@ private:
 
     CommissioningWindowDelegate * mCommissioningWindowDelegate = nullptr;
 
-    static chip::Platform::UniquePtr<chip::Controller::CommissioningWindowOpener> mWindowOpener;
+    /**
+     * Holds the unique_ptr to the current CommissioningWindowOpener.
+     * Only one commissioning window opener can be active at a time.
+     * The pointer is reset when the commissioning window is closed or when an error occurs.
+     */
+    chip::Platform::UniquePtr<chip::Controller::CommissioningWindowOpener> mWindowOpener;
+
     static void OnOpenCommissioningWindow(intptr_t context);
     static void OnOpenCommissioningWindowResponse(void * context, chip::NodeId deviceId, CHIP_ERROR status,
                                                   chip::SetupPayload payload);
