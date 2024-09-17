@@ -122,8 +122,8 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
-    DataModel::ActionReturnStatus Invoke(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                                         CommandHandler * handler) override;
+    std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request,
+                                                        chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     EndpointId FirstEndpoint() override;
     EndpointId NextEndpoint(EndpointId before) override;
