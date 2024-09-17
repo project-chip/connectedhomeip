@@ -70,14 +70,6 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
 void OpenCommissioningWindowCommand::OnOpenCommissioningWindowResponse(void * context, NodeId remoteId, CHIP_ERROR err,
                                                                        chip::SetupPayload payload)
 {
-    OpenCommissioningWindowCommand * self = static_cast<OpenCommissioningWindowCommand *>(context);
-    if (self->mDelegate)
-    {
-        self->mDelegate->OnCommissioningWindowOpened(remoteId, err, payload);
-        self->UnregisterDelegate();
-    }
-
-    LogErrorOnFailure(err);
     OnOpenBasicCommissioningWindowResponse(context, remoteId, err);
 }
 

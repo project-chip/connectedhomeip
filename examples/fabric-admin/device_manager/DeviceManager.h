@@ -100,12 +100,12 @@ public:
      *                             for deriving the PAKE (Password Authenticated Key Exchange) verifier.
      * @param discriminator        The device-specific discriminator, determined during commissioning, which helps
      *                             to uniquely identify the device among others.
-     * @param saltHex              The hexadecimal-encoded salt used in the cryptographic operations for commissioning.
-     * @param verifierHex          The hexadecimal-encoded PAKE verifier used to authenticate the commissioning process.
+     * @param salt                 The salt used in the cryptographic operations for commissioning.
+     * @param verifier             The PAKE verifier used to authenticate the commissioning process.
      *
      */
     void OpenDeviceCommissioningWindow(chip::NodeId nodeId, uint32_t commissioningTimeout, uint32_t iterations,
-                                       uint32_t discriminator, const char * saltHex, const char * verifierHex);
+                                       uint16_t discriminator, const chip::ByteSpan & salt, const chip::ByteSpan & verifier);
 
     /**
      * @brief Open the commissioning window of a device from another fabric via its fabric bridge.
