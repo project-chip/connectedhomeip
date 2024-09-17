@@ -101,7 +101,7 @@ private:
 
     /**
      * @brief PB1 Button event processing function
-     *        Function triggers a switch action sent to the CHIP task
+     *        Function triggers a action sent to the CHIP task // TODO:: Action for refrigerator is not decided yet 
      *
      * @param aEvent button event being processed
      */

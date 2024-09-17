@@ -48,6 +48,7 @@
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 /**********************************************************
  * Defines and Constants
@@ -83,13 +84,13 @@ CHIP_ERROR AppTask::Init()
     err = BaseApplication::Init();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("BaseApplication::Init() failed");
+        ChipLogProgress(Zcl, "BaseApplication::Init() failed");
         appError(err);
     }
     err = RefrigeratorMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("RefrigeratorMgr::Init() failed");
+        ChipLogProgress(Zcl, "RefrigeratorMgr::Init() failed");
         appError(err);
     }
 
@@ -109,7 +110,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("AppTask.Init() failed");
+        ChipLogProgress(Zcl, "AppTask.Init() failed");
         appError(err);
     }
 
@@ -117,7 +118,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     sAppTask.StartStatusLEDTimer();
 #endif
 
-    SILABS_LOG("App Task started");
+    ChipLogProgress(Zcl, "App Task started");
     while (true)
     {
         osStatus_t eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, osWaitForever);
