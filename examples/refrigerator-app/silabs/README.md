@@ -75,7 +75,7 @@ real products based on the Silicon Labs platform.
         > [Hardware Requirements](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/general/HARDWARE_REQUIREMENTS.md)
         > in the Silicon Labs Matter Github Repo
 
-    MG24 boards :
+    Silabs boards :
 
     -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
@@ -83,6 +83,8 @@ real products based on the Silicon Labs platform.
     -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    -   BRD4338A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    -   BRD4346A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
 *   Build the example application:
 
