@@ -181,7 +181,7 @@ public:
     void BoostCommandFinished();
 
 
-    CHIP_ERROR SendPowerReading(EndpointId aEndpointId, Power_mW aActivePower_mW, 
+    CHIP_ERROR SendPowerReading(EndpointId aEndpointId, Power_mW aActivePower_mW,
                                 Voltage_mV aVoltage_mV, Amperage_mA aActiveCurrent_mA);
 
     /* Implement the DEMManufacturerDelegate interface */
@@ -195,7 +195,7 @@ private:
     WaterHeaterManagementInstance * mWhmInstance;
     ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * mEPMInstance;
     PowerTopology::PowerTopologyInstance * mPTInstance;
-    DeviceEnergyManagementManager * mDEMInstance;    
+    DeviceEnergyManagementManager * mDEMInstance;
 };
 
 /** @brief Helper function to return the singleton WhmManufacturer instance

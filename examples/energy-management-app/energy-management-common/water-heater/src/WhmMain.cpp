@@ -179,7 +179,7 @@ CHIP_ERROR WhmManufacturerShutdown()
 CHIP_ERROR WhmApplicationInit()
 {
     ReturnErrorOnFailure(DeviceEnergyManagementInit());
-    
+
     CHIP_ERROR err = WhmInit();
     if (err != CHIP_NO_ERROR)
     {

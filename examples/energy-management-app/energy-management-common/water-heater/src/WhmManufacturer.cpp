@@ -171,8 +171,8 @@ WaterHeaterManagementDelegate * GetWhmDelegate()
  * @param[in]  aVoltage_mV       - Voltage measured in milli-volts
  * @param[in]  aActiveCurrent_mA - ActiveCurrent measured in milli-amps
  */
-CHIP_ERROR WhmManufacturer::SendPowerReading(EndpointId aEndpointId, 
-                                             Power_mW aActivePower_mW, 
+CHIP_ERROR WhmManufacturer::SendPowerReading(EndpointId aEndpointId,
+                                             Power_mW aActivePower_mW,
                                              Voltage_mV aVoltage_mV,
                                              Amperage_mA aActiveCurrent_mA)
 {
