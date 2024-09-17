@@ -49,7 +49,8 @@ void DeviceManager::Init()
     mLastUsedNodeId = 1;
     mInitialized    = true;
 
-    ChipLogProgress(NotSpecified, "DeviceManager initialized: last used nodeId: 0x%" PRIx64, mLastUsedNodeId);
+    ChipLogProgress(NotSpecified, "DeviceManager initialized: last used nodeId " ChipLogFormatX64,
+                    ChipLogValueX64(mLastUsedNodeId));
 }
 
 NodeId DeviceManager::GetNextAvailableNodeId()
