@@ -84,7 +84,7 @@ CHIP_ERROR AppTask::Init()
     err = BaseApplication::Init();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(Zcl, "BaseApplication::Init() failed");
+        ChipLogError(AppServer, "BaseApplication::Init() failed");
         appError(err);
     }
     err = RefrigeratorMgr().Init();
