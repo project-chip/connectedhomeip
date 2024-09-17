@@ -220,7 +220,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
-    async def get_credentials_status(self, credentialIndex: int, credentialType: drlkcluster.Enums.CredentialTypeEnum, credential_exists):
+    async def get_credentials_status(self, credentialIndex: int, credentialType: drlkcluster.Enums.CredentialTypeEnum, credential_exists, next_credential_index):
 
         try:
             credentials_struct = drlkcluster.Structs.CredentialStruct(credentialIndex=credentialIndex,
@@ -237,6 +237,9 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                 asserts.assert_true(response.userIndex == NullValue,
                                     "Error when executing GetCredentialStatus command, userIndex={}".format(
                                         str(response.userIndex)))
+            asserts.assert_true(response.nextCredentialIndex == next_credential_index,
+                                "Error when executing GetCredentialStatus command, nextCredentialIndex={}".format(
+                                    str(response.nextCredentialIndex)))
             return response
         except InteractionModelError as e:
             logging.error(e)
@@ -244,7 +247,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
 
     async def set_credential_cmd(self, credential_enum: drlkcluster.Enums.CredentialTypeEnum, statuscode, credentialIndex,
                                  operationType, userIndex, credentialData, userStatus, userType):
-        custom_stautus_code = 149
+        custom_status_code = 149
 
         credentials = drlkcluster.Structs.CredentialStruct(
             credentialType=credential_enum,
@@ -265,7 +268,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             asserts.assert_true(type_matches(response, drlkcluster.Commands.SetCredentialResponse),
                                 "Unexpected return type for SetCredential")
             asserts.assert_equal(response.userIndex, NullValue)
-            if (statuscode != custom_stautus_code):
+            if (statuscode != custom_status_code):
                 asserts.assert_true(response.status == statuscode,
                                     "Error sending SetCredential command, status={}".format(str(response.status)))
             else:
@@ -432,7 +435,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F08")
                            and self.check_pics("DRLK.S.C24.Rsp") and self.check_pics("DRLK.S.C25.Tx")):
             await self.get_credentials_status(credentialIndex=credentialIndex_1,
-                                              credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin, credential_exists=True)
+                                              credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin, credential_exists=True, next_credential_index=NullValue)
         self.step("4")
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F08")
                            and self.check_pics("DRLK.S.C22.Rsp") and self.check_pics("DRLK.S.C23.Tx")):
@@ -479,7 +482,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         self.step("9a")
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C24.Rsp")):
             await self.get_credentials_status(credentialIndex=credentialIndex_1,
-                                              credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin, credential_exists=False)
+                                              credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin, credential_exists=False, next_credential_index=NullValue)
         self.step("9b")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1d.Rsp")):
             await self.send_clear_user_cmd(user_index=1)
@@ -516,7 +519,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         self.step("13")
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C24.Rsp") and self.check_pics("DRLK.S.C25.Tx")):
             await self.get_credentials_status(credentialIndex=credentialIndex_1,
-                                              credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin, credential_exists=False)
+                                              credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin, credential_exists=False, next_credential_index=NullValue)
         self.step("14a")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C26.Rsp")):
             feature_map = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
