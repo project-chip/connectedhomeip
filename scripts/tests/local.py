@@ -696,7 +696,7 @@ def chip_tool_tests(target, target_glob, include_tags, expected_failures, runner
     if target is not None:
         cmd.extend(["--target", target])
 
-    if include_tags:
+    if include_tags is not None:
         cmd.extend(["--include-tags", include_tags])
 
     if target_glob is not None:
@@ -755,16 +755,14 @@ def chip_tool_tests(target, target_glob, include_tags, expected_failures, runner
         cmd,
         "--microwave-oven-app",
         f"./out/{target_prefix}-microwave-oven-no-ble-clang-boringssl/chip-microwave-oven-app",
-        runner, ChangedPa,
+        runner,
     )
-     listener
     _add_target_to_cmd(
         cmd,
         "--rvc-app",
         f"./out/{target_prefix}-rvc-no-ble-clang-boringssl/chip-rvc-app",
         runner,
-   , emberAfGloba )
-
+    )
 
     subprocess.run(_with_activate(cmd), check=True)
 
