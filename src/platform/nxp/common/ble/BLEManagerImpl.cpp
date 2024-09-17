@@ -28,7 +28,12 @@ messaging_t gHci2Host_TaskQueue;
 /*! Event for the Host Task Queue */
 OSA_EVENT_HANDLE_DEFINE(gHost_TaskEvent);
 
-#include <platform/nxp/mcxw71_k32w1/BLEManagerImpl.h>
+#ifdef EXTERNAL_BLEMANAGERIMPL_HEADER
+#include EXTERNAL_BLEMANAGERIMPL_HEADER
+#elif defined(CHIP_DEVICE_LAYER_TARGET)
+#define BLEMANAGERIMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/BLEManagerImpl.h>
+#include BLEMANAGERIMPL_HEADER
+#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 extern "C" bleResult_t Hci_Reset(void);
 

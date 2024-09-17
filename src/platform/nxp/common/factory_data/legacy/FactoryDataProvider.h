@@ -21,7 +21,7 @@
 #include <platform/internal/GenericDeviceInstanceInfoProvider.h>
 #include <src/lib/core/CHIPError.h>
 
-#include <platform/nxp/common/legacy/FactoryDataDriver.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataDriver.h>
 
 #include <vector>
 

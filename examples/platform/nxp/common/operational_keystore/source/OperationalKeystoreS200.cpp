@@ -1,7 +1,5 @@
 /*
- *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2020 Nest Labs, Inc.
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,18 +15,20 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation for BLE Host NVM functions
- */
+#include "OperationalKeystore.h"
+#include <platform/nxp/common/crypto/PersistentStorageOpKeystoreS200.h>
 
-#ifndef BLE_FUNCTION_MUX_H
-#define BLE_FUNCTION_MUX_H
+static chip::PersistentStorageOpKeystoreS200 sInstance;
 
-typedef enum
+chip::Crypto::OperationalKeystore * chip::NXP::App::OperationalKeystore::GetInstance()
 {
-    kBleFuncMux_AppMode_None,
-    kBleFuncMux_AppMode_Ota
-} ble_func_mux_app_mode_t;
+    return &sInstance;
+}
 
-#endif
+CHIP_ERROR chip::NXP::App::OperationalKeystore::Init(PersistentStorageDelegate * delegate)
+{
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INTERNAL);
+    sInstance.Init(delegate);
+
+    return CHIP_NO_ERROR;
+}

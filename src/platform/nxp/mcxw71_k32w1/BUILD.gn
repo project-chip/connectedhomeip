@@ -32,10 +32,10 @@ assert(chip_with_low_power == 0 ||
 
 source_set("nxp_factory_data") {
   sources = [
-    "../common/legacy/FactoryDataDriver.cpp",
-    "../common/legacy/FactoryDataProvider.cpp",
-    "FactoryDataDriverImpl.cpp",
-    "FactoryDataProviderImpl.cpp",
+    "../common/factory_data/legacy/FactoryDataDriver.cpp",
+    "../common/factory_data/legacy/FactoryDataDriverImpl.cpp",
+    "../common/factory_data/legacy/FactoryDataProvider.cpp",
+    "../common/factory_data/legacy/FactoryDataProviderImpl.cpp",
   ]
 
   public = [
@@ -43,7 +43,7 @@ source_set("nxp_factory_data") {
     "${chip_root}/src/credentials/CertificationDeclaration.h",
   ]
 
-  defines = [ "PLATFORM_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/mcxw71_k32w1/FactoryDataProviderImpl.h\"" ]
+  defines = [ "PLATFORM_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProviderImpl.h\"" ]
 
   deps = [
     ":nxp_platform",
@@ -52,23 +52,23 @@ source_set("nxp_factory_data") {
 }
 
 source_set("nxp_ota") {
-  public = [ "../common/legacy/OTAImageProcessorImpl.h" ]
+  public = [ "../common/ota/OTAImageProcessorImpl.h" ]
 
   sources = [
-    "../common/legacy/OTAImageProcessorImpl.cpp",
-    "../common/legacy/OTAImageProcessorImpl.h",
-    "../common/legacy/OTATlvProcessor.cpp",
-    "../common/legacy/OTATlvProcessor.h",
-    "OTAFirmwareProcessor.cpp",
-    "OTAFirmwareProcessor.h",
-    "OTAHooks.cpp",
+    "../common/ota/OTAFirmwareProcessor.cpp",
+    "../common/ota/OTAFirmwareProcessor.h",
+    "../common/ota/OTAHooks.cpp",
+    "../common/ota/OTAImageProcessorImpl.cpp",
+    "../common/ota/OTAImageProcessorImpl.h",
+    "../common/ota/OTATlvProcessor.cpp",
+    "../common/ota/OTATlvProcessor.h",
   ]
 
   if (chip_with_factory_data == 1 &&
       chip_enable_ota_factory_data_processor == 1) {
     sources += [
-      "../common/legacy/OTAFactoryDataProcessor.cpp",
-      "../common/legacy/OTAFactoryDataProcessor.h",
+      "../common/ota/OTAFactoryDataProcessor.cpp",
+      "../common/ota/OTAFactoryDataProcessor.h",
     ]
   }
 
@@ -78,15 +78,25 @@ source_set("nxp_ota") {
   ]
 }
 
+config("nxp_platform_config") {
+  include_dirs = [
+    ".",
+    "../common/ble",
+    "../common/crypto",
+    "../common/factory_data/legacy",
+    "../common/ota",
+  ]
+}
+
 static_library("nxp_platform") {
   deps = []
   defines = [ "CHIP_DEVICE_K32W1=1" ]
 
   sources = [
     "../../SingletonConfigurationManager.cpp",
-    "../common/legacy/BLEManagerCommon.cpp",
-    "../common/legacy/BLEManagerCommon.h",
-    "BLEManagerImpl.cpp",
+    "../common/ble/BLEManagerCommon.cpp",
+    "../common/ble/BLEManagerCommon.h",
+    "../common/ble/BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
@@ -99,7 +109,6 @@ static_library("nxp_platform") {
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
-    "ble_function_mux.c",
   ]
 
   if (chip_key_storage == "fwk_nvm") {
@@ -151,6 +160,7 @@ static_library("nxp_platform") {
     "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
     "${chip_root}/src/credentials/examples/ExampleDACs.h",
     "${chip_root}/src/credentials/examples/ExamplePAI.h",
+    "${chip_root}/src/platform/nxp/common/crypto/PersistentStorageOpKeystoreS200.h",
     "${chip_root}/src/platform/nxp/mcxw71_k32w1/BLEManagerImpl.h",
     "${chip_root}/src/platform/nxp/mcxw71_k32w1/SMU2Manager.h",
   ]
@@ -163,9 +173,9 @@ static_library("nxp_platform") {
 
   if (chip_crypto == "platform") {
     sources += [
-      "CHIPCryptoPalK32W1.cpp",
-      "K32W1PersistentStorageOpKeystore.cpp",
-      "K32W1PersistentStorageOpKeystore.h",
+      "../common/crypto/CHIPCryptoPalS200.cpp",
+      "../common/crypto/PersistentStorageOpKeystoreS200.cpp",
+      "../common/crypto/PersistentStorageOpKeystoreS200.h",
     ]
 
     if (chip_with_ot_cli == 1) {
@@ -208,4 +218,6 @@ static_library("nxp_platform") {
     "${chip_root}/src/platform:syscalls_stub",
     "${chip_root}/src/platform/logging:headers",
   ]
+
+  public_configs = [ ":nxp_platform_config" ]
 }
