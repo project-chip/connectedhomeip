@@ -18,6 +18,10 @@
 
 #include <WhmInstance.h>
 #include <WhmManufacturer.h>
+#include <EnergyReportingMain.h>
+#include <DEMDelegate.h>
+#include <device-energy-management-modes.h>
+#include <water-heater-mode.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -30,6 +34,10 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::ElectricalPowerMeasurement;
+using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
+using namespace chip::app::Clusters::PowerTopology;
+using namespace chip::app::Clusters::DeviceEnergyManagement;
 
 namespace chip {
 namespace app {
@@ -133,7 +141,8 @@ CHIP_ERROR WhmManufacturerInit()
     }
 
     /* Now create WhmManufacturer */
-    gWhmManufacturer = std::make_unique<WhmManufacturer>(gWhmInstance.get());
+    gWhmManufacturer = std::make_unique<WhmManufacturer>(gWhmInstance.get(), gEPMInstance.get(),
+                                                         gPTInstance.get(), gDEMInstance.get());
     if (!gWhmManufacturer)
     {
         ChipLogError(AppServer, "Failed to allocate memory for WhmManufacturer");
@@ -169,20 +178,61 @@ CHIP_ERROR WhmManufacturerShutdown()
 
 CHIP_ERROR WhmApplicationInit()
 {
-    ReturnErrorOnFailure(WhmInit());
+    ReturnErrorOnFailure(DeviceEnergyManagementInit());
+    
+    CHIP_ERROR err = WhmInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        DeviceEnergyManagementShutdown();
+        return err;
+    }
+
+    err = EnergyMeterInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        DeviceEnergyManagementShutdown();
+        WhmShutdown();
+        return err;
+    }
+
+    err = PowerTopologyInit();
+    if( err != CHIP_NO_ERROR)
+    {
+        DeviceEnergyManagementShutdown();
+        WhmShutdown();
+        EnergyMeterShutdown();
+        return err;
+    }
 
     /* Do this last so that the instances for other clusters can be wrapped inside */
-    ReturnErrorOnFailure(WhmManufacturerInit());
+    err = WhmManufacturerInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        DeviceEnergyManagementShutdown();
+        WhmShutdown();
+        EnergyMeterShutdown();
+        PowerTopologyShutdown();
+        return err;
+    }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WhmApplicationShutdown()
 {
+    ChipLogDetail(AppServer, "Energy Management App (WaterHeater): ApplicationShutdown()");
+
     /* Shutdown in reverse order that they were created */
     WhmManufacturerShutdown();
+    PowerTopologyShutdown();
+    EnergyMeterShutdown();
+    WhmShutdown();
+    DeviceEnergyManagementShutdown();
 
-    return WhmShutdown();
+    Clusters::DeviceEnergyManagementMode::Shutdown();
+    Clusters::WaterHeaterMode::Shutdown();
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace WaterHeaterManagement

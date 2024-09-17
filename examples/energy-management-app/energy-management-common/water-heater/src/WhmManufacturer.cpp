@@ -25,7 +25,10 @@
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>
 
 using namespace chip;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::WaterHeaterManagement;
+using namespace chip::app::Clusters::ElectricalPowerMeasurement;
+using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 
 using Protocols::InteractionModel::Status;
 
@@ -45,6 +48,14 @@ CHIP_ERROR WhmManufacturer::Init()
 
     dg->SetHeaterTypes(BitMask<WaterHeaterHeatSourceBitmap>(WaterHeaterHeatSourceBitmap::kImmersionElement1));
     dg->SetColdWaterTemperature(2000);
+
+    /* For Device Energy Management we need the ESA to be Online and ready to accept commands */
+    GetDEMDelegate()->SetESAState(ESAStateEnum::kOnline);
+    GetDEMDelegate()->SetDEMManufacturerDelegate(*GetWhmManufacturer());
+
+    // Set the abs min and max power
+    GetDEMDelegate()->SetAbsMinPower(1000000); // 1.0KW
+    GetDEMDelegate()->SetAbsMaxPower(5400000); // 5.4KW
 
     return CHIP_NO_ERROR;
 }
@@ -151,6 +162,32 @@ WaterHeaterManagementDelegate * GetWhmDelegate()
     return wg;
 }
 
+
+/**
+ * @brief   Allows a client application to send in power readings into the system
+ *
+ * @param[in]  aEndpointId       - Endpoint to send to EPM Cluster
+ * @param[in]  aActivePower_mW   - ActivePower measured in milli-watts
+ * @param[in]  aVoltage_mV       - Voltage measured in milli-volts
+ * @param[in]  aActiveCurrent_mA - ActiveCurrent measured in milli-amps
+ */
+CHIP_ERROR WhmManufacturer::SendPowerReading(EndpointId aEndpointId, 
+                                             Power_mW aActivePower_mW, 
+                                             Voltage_mV aVoltage_mV,
+                                             Amperage_mA aActiveCurrent_mA)
+{
+    WhmManufacturer * mn = GetWhmManufacturer();
+    VerifyOrReturnError(mn != nullptr, CHIP_ERROR_UNINITIALIZED);
+
+    ElectricalPowerMeasurementDelegate * dg = mn->GetEPMDelegate();
+    VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
+
+    dg->SetActivePower(MakeNullable(aActivePower_mW));
+    dg->SetVoltage(MakeNullable(aVoltage_mV));
+    dg->SetActiveCurrent(MakeNullable(aActiveCurrent_mA));
+
+    return CHIP_NO_ERROR;
+}
 // The PowerAdjustEnd event needs to report the approximate energy used by the ESA during the session.
 int64_t WhmManufacturer::GetApproxEnergyDuringSession()
 {

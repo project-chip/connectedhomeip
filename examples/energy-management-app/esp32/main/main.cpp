@@ -22,7 +22,7 @@
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-#include <WaterHeaterMain.h>
+#include <WhmMain.h>
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #include "esp_log.h"
@@ -164,7 +164,7 @@ void ApplicationInit()
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-    FullWhmApplicationInit();
+    WhmApplicationInit();
 #endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
 }
 
@@ -177,7 +177,7 @@ void ApplicationShutdown()
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-    FullWhmApplicationShutdown();
+    WhmApplicationShutdown();
 #endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
 }
 

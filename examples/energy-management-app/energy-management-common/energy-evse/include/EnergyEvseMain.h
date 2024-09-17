@@ -18,16 +18,5 @@
 
 #pragma once
 
-#include <lib/core/CHIPError.h>
-
 void EvseApplicationInit();
 void EvseApplicationShutdown();
-
-CHIP_ERROR DeviceEnergyManagementInit();
-CHIP_ERROR DeviceEnergyManagementShutdown();
-
-CHIP_ERROR EnergyMeterInit();
-CHIP_ERROR EnergyMeterShutdown();
-
-CHIP_ERROR PowerTopologyInit();
-CHIP_ERROR PowerTopologyShutdown();

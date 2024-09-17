@@ -18,7 +18,8 @@
 
 #include <AppMain.h>
 #include <EnergyEvseMain.h>
-#include <WaterHeaterMain.h>
+#include <WhmMain.h>
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/BitMask.h>
 
@@ -105,7 +106,7 @@ void ApplicationInit()
     }
     else if (strcmp(spApp, kWhmApp) == 0)
     {
-        FullWhmApplicationInit();
+        WhmApplicationInit();
     }
     else
     {
@@ -118,7 +119,7 @@ void ApplicationShutdown()
     ChipLogDetail(AppServer, "Energy Management App: ApplicationShutdown()");
 
     EvseApplicationShutdown();
-    FullWhmApplicationShutdown();
+    WhmApplicationShutdown();
 }
 
 static bool EnergyAppOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier,

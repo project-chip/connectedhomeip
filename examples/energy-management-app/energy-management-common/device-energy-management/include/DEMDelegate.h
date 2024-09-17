@@ -19,5 +19,12 @@
 #pragma once
 
 #include <DeviceEnergyManagementDelegateImpl.h>
+#include <DeviceEnergyManagementManager.h>
 
 chip::app::Clusters::DeviceEnergyManagement::DeviceEnergyManagementDelegate * GetDEMDelegate();
+// TODO investigate this why isn't in in DEM?
+extern std::unique_ptr<chip::app::Clusters::DeviceEnergyManagementManager> gDEMInstance;
+extern std::unique_ptr<chip::app::Clusters::DeviceEnergyManagement::DeviceEnergyManagementDelegate> gDEMDelegate;
+
+CHIP_ERROR DeviceEnergyManagementInit();
+CHIP_ERROR DeviceEnergyManagementShutdown();
