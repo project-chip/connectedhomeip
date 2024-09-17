@@ -1,12 +1,12 @@
-# Matter EFR32 Refrigerator and Temperature Controlled Example
+# Matter Refrigerator and Temperature Controlled Example
 
 An example showing the use of CHIP on the Silicon Labs EFR32 MG24 and SiWx917
 Wi-Fi Boards.
 
 <hr>
 
--   [Matter EFR32 Refrigerator and Temperature Controlled
-    Example](#matter-efr32-refrigerator-and-Temperature -controlled-example)
+-   [Matter Refrigerator and Temperature Controlled
+    Example](#matter-refrigerator-and-Temperature -controlled-example)
     -   [Introduction](#introduction)
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)
@@ -243,7 +243,7 @@ combination with JLinkRTTClient as follows:
         -   _Blinking slowly_ ; No implementation is present. this feature will be available in a future update.
         -   _Blinking quickly_ ; No implementation is present. this feature will be available in a future update.
 
-    **Push Button 0**  Function button and factory reset
+    **Push Button 0** Function button and factory reset
 
         -   Pressed and release: No implementation is present. this feature will be available in a future update.
 
