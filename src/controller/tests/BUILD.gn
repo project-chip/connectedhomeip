@@ -23,22 +23,22 @@ chip_test_suite("tests") {
 
   test_sources = []
 
-  #+++++x TODO: Add issue about this.
-  # undefined reference to chip::Controller::CommissionableNodeController::*
+  # Not supported on efr32.
   if (chip_device_platform != "efr32") {
     test_sources += [ "TestCommissionableNodeController.cpp" ]
   }
 
   if (chip_device_platform != "mbed" && chip_device_platform != "esp32") {
-    test_sources += [ "TestServerCommandDispatch.cpp" ]
-    test_sources += [ "TestEventChunking.cpp" ]
-    test_sources += [ "TestEventCaching.cpp" ]
-    test_sources += [ "TestReadChunking.cpp" ]
-    test_sources += [ "TestWriteChunking.cpp" ]
-    test_sources += [ "TestEventNumberCaching.cpp" ]
+    test_sources += [
+      "TestServerCommandDispatch.cpp",
+      "TestEventChunking.cpp",
+      "TestEventCaching.cpp",
+      "TestReadChunking.cpp",
+      "TestWriteChunking.cpp",
+      "TestEventNumberCaching.cpp",
+    ]
 
-    #+++++x TODO: Add issue about this.
-    # undefined reference to chip::Controller::CommissioningWindowOpener::*
+    # Not supported on efr32.
     if (chip_device_platform != "efr32") {
       test_sources += [ "TestCommissioningWindowOpener.cpp" ]
     }

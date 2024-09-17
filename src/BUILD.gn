@@ -101,8 +101,8 @@ if (chip_build_tests) {
       ]
     }
 
-    #+++++x TODO: Add issue about this.
-    # in function `_open_r': openr.c:(.text._open_r+0x10): warning: _open is not implemented and will always fail
+    # Disabled for EFR32 because _open is not implemented.
+    # https://github.com/project-chip/connectedhomeip/issues/35624
     if (chip_device_platform != "efr32") {
       tests += [
         "${chip_root}/src/credentials/tests",
