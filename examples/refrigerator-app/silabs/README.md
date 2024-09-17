@@ -254,7 +254,7 @@ combination with JLinkRTTClient as follows:
 
     **Push Button 1** Decreases either tilt or lift, or switch the cover type
 
-        -   Pressed and release: TNo implementation is present. this feature will be available in a future update.
+        -   Pressed and release: No implementation is present. this feature will be available in a future update.
 
         -   Press and hold for 3 s: No implementation is present. this feature will be available in a future update.
 
