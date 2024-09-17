@@ -637,6 +637,18 @@ format, use the `--load-from-env` flag with the `run_python_tests.py` runner.
 Ex:
 `scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDM_2_1.py'`
 
+## Running ALL or a subset of tests when changing application code
+
+`scripts/tests/local.py` is a wrapper that is able to build and run tests in a
+single command.
+
+Example to compile all prerequisites and then running all python tests:
+
+```
+./scripts/tests/local.py build         # will compile python in out/pyenv and ALL application prerequisites
+./scripts/tests/local.py python-tests  # Runs all python tests that are runnable in CI
+```
+
 ## Defining the CI test arguments
 
 Below is the format of the structured environment definition comments:
