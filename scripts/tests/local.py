@@ -442,7 +442,6 @@ def python_tests(
         "TC_CC_2_2.py": "1.5 minutes",
         "TC_DEM_2_10.py": "40 seconds",
         "TC_DeviceBasicComposition.py": "25 seconds",
-        "TC_DeviceBasicComposition.py": "25 seconds",
         "TC_DRLK_2_12.py": "30 seconds",
         "TC_DRLK_2_3.py": "30 seconds",
         "TC_EEVSE_2_6.py": "30 seconds",
@@ -594,8 +593,8 @@ def build_casting_apps(data_model_interface, asan):
         casting_args.append(f'chip_use_data_model_interface="{data_model_interface}"')
 
     if asan:
-        tv_args.append(f"is_asan=true is_clang=true")
-        casting_args.append(f"is_asan=true is_clang=true")
+        tv_args.append("is_asan=true is_clang=true")
+        casting_args.append("is_asan=true is_clang=true")
 
     tv_args = " ".join(tv_args)
     casting_args = " ".join(casting_args)
