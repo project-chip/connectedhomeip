@@ -42,39 +42,54 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
     # Map clusters to common XML template if needed
     if "ICDManagement" == clusterName:
-        clusterName = "ICD Management"
+        picsFileName = "ICD Management"
 
-    elif "OTA Software Update Provider" in clusterName or "OTA Software Update Requestor" in clusterName:
-        clusterName = "OTA Software Update"
+    elif "OTA Software Update Provider" in clusterName or \
+            "OTA Software Update Requestor" in clusterName:
+        picsFileName = "OTA Software Update"
 
     elif "On/Off" == clusterName:
-        clusterName = clusterName.replace("/", "-")
+        picsFileName = clusterName.replace("/", "-")
 
     elif "GroupKeyManagement" == clusterName:
-        clusterName = "Group Communication"
+        picsFileName = "Group Communication"
 
-    elif "Wake On LAN" == clusterName or "Low Power" == clusterName:
-        clusterName = "Media Cluster"
+    elif "Wake on LAN" == clusterName or \
+         "Low Power" == clusterName or \
+         "Keypad Input" == clusterName or \
+         "Audio Output" == clusterName or \
+         "Media Input" == clusterName or \
+         "Target Navigator" == clusterName or \
+         "Content Control" == clusterName or \
+         "Channel" == clusterName or \
+         "Media Playback" == clusterName or \
+         "Account Login" == clusterName or \
+         "Application Basic" == clusterName or \
+         "Content Launcher" == clusterName or \
+         "Content App Observer" == clusterName or \
+         "Application Launcher" == clusterName:
+
+        picsFileName = "Media Cluster"
 
     elif "Operational Credentials" == clusterName:
-        clusterName = "Node Operational Credentials"
-
-    elif "Laundry Washer Controls" == clusterName:
-        clusterName = "Washer Controls"
+        picsFileName = "Node Operational Credentials"
 
     # Workaround for naming colisions with current logic
     elif "Thermostat" == clusterName:
-        clusterName = "Thermostat Cluster"
+        picsFileName = "Thermostat Cluster"
 
     elif "Boolean State" == clusterName:
-        clusterName = "Boolean State Cluster"
+        picsFileName = "Boolean State Cluster"
 
-    if "AccessControl" in clusterName:
-        clusterName = "Access Control cluster"
+    elif "AccessControl" in clusterName:
+        picsFileName = "Access Control Cluster"
+
+    else:
+        picsFileName = clusterName
 
     # Determine if file has already been handled and use this file
     for outputFolderFileName in os.listdir(outputPathStr):
-        if clusterName in outputFolderFileName:
+        if picsFileName in outputFolderFileName:
             xmlPath = outputPathStr
             fileName = outputFolderFileName
             break
@@ -82,7 +97,7 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     # If no file is found in output folder, determine if there is a match for the cluster name in input folder
     if fileName == "":
         for file in xmlFileList:
-            if file.lower().startswith(clusterName.lower()):
+            if file.lower().startswith(picsFileName.lower()):
                 fileName = file
                 break
         else:
@@ -421,9 +436,11 @@ rootNodeEndpointID = 0
 # Load PICS XML templates
 print("Capture list of PICS XML templates")
 xmlFileList = os.listdir(xmlTemplatePathStr)
+for PICSXmlFile in xmlFileList:
+    print(f"{xmlTemplatePathStr}/{PICSXmlFile}")
 
 # Setup output path
-print(outputPathStr)
+print(f"Output path: {outputPathStr}")
 
 outputPath = pathlib.Path(outputPathStr)
 if not outputPath.exists():
