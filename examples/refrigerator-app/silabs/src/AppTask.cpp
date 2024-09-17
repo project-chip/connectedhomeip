@@ -118,7 +118,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     sAppTask.StartStatusLEDTimer();
 #endif
 
-    ChipLogProgress(Zcl, "App Task started");
+    ChipLogError(AppServer, "App Task started");
     while (true)
     {
         osStatus_t eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, osWaitForever);
