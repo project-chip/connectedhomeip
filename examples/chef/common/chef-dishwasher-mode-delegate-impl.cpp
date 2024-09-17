@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -107,7 +107,7 @@ chip::Protocols::InteractionModel::Status chefDishwasherModeWriteCallback(chip::
         ret       = gDishwasherModeInstance->UpdateCurrentMode(m);
         if (chip::Protocols::InteractionModel::Status::Success != ret)
         {
-            ChipLogError(DeviceLayer, "Invalid Attribute Update status: %d", static_cast<int>(ret));
+            ChipLogError(DeviceLayer, "Invalid Attribute Write to CurrentMode : %d", static_cast<int>(ret));
         }
     }
     break;
@@ -124,7 +124,7 @@ chip::Protocols::InteractionModel::Status chefDishwasherModeReadCallback(chip::E
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
                                                                          uint8_t * buffer, uint16_t maxReadLength)
 {
-    VerifyOrReturnValue(maxReadLength > 0, chip::Protocols::InteractionModel::Status::ResourceExhausted);
+    VerifyOrReturnValue(maxReadLength == 1 , chip::Protocols::InteractionModel::Status::ResourceExhausted);
     buffer[0] = gDishwasherModeInstance->GetCurrentMode();
 
     chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;

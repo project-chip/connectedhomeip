@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -238,6 +238,7 @@ chip::Protocols::InteractionModel::Status chefOperationalStateWriteCallback(chip
         {
             gOperationalStateDelegate->mCountDownTime.SetNonNull(
                 static_cast<uint32_t>(gOperationalStateDelegate->kExampleCountDown));
+            (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, gOperationalStateDelegate);
         }
 
         if (CHIP_NO_ERROR == err)
@@ -302,4 +303,4 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
     gOperationalStateInstance->Init();
 }
 
-#endif
+#endif  // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER

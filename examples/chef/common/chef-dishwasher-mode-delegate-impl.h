@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -87,4 +87,4 @@ chip::Protocols::InteractionModel::Status chefDishwasherModeWriteCallback(chip::
 chip::Protocols::InteractionModel::Status chefDishwasherModeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
                                                                          uint8_t * buffer, uint16_t maxReadLength);
-#endif
+#endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
