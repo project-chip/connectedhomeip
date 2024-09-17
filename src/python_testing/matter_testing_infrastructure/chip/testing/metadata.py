@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 # Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
