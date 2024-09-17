@@ -263,6 +263,28 @@ void Hash_SHA256_stream::Clear()
     psa_hash_abort(toHashOperation(&mContext));
 }
 
+CHIP_ERROR FindFreeKeySlotInRange(psa_key_id_t & keyId, psa_key_id_t start, uint32_t range)
+{
+    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+    psa_key_id_t end                = start + range;
+
+    VerifyOrReturnError(start >= PSA_KEY_ID_USER_MIN && end - 1 <= PSA_KEY_ID_USER_MAX, CHIP_ERROR_INVALID_ARGUMENT);
+
+    for (keyId = start; keyId < end; keyId++)
+    {
+        psa_status_t status = psa_get_key_attributes(keyId, &attributes);
+        if (status == PSA_ERROR_INVALID_HANDLE)
+        {
+            return CHIP_NO_ERROR;
+        }
+        else if (status != PSA_SUCCESS)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
+    return CHIP_ERROR_NOT_FOUND;
+}
+
 CHIP_ERROR PsaKdf::Init(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info)
 {
     psa_status_t status        = PSA_SUCCESS;

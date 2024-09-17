@@ -1272,6 +1272,17 @@ using namespace chip::Tracing::DarwinFramework;
 #undef MTRDeviceErrorStr
 }
 
+- (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths
+{
+#define MTRDeviceErrorStr "MTRDevice readAttributePaths: must be handled by subclasses"
+    MTR_LOG_ERROR(MTRDeviceErrorStr);
+#ifdef DEBUG
+    NSAssert(NO, @MTRDeviceErrorStr);
+#endif // DEBUG
+#undef MTRDeviceErrorStr
+    return [NSArray array];
+}
+
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID
                           commandID:(NSNumber *)commandID
@@ -1313,6 +1324,21 @@ using namespace chip::Tracing::DarwinFramework;
     // here for now.
     // TODO: https://github.com/project-chip/connectedhomeip/issues/24563
 
+    if (![commandFields isKindOfClass:NSDictionary.class]) {
+        MTR_LOG_ERROR("%@ invokeCommandWithEndpointID passed a commandFields (%@) that is not a data-value NSDictionary object",
+            self, commandFields);
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+        return;
+    }
+
+    MTRDeviceDataValueDictionary fieldsDataValue = commandFields;
+    if (fieldsDataValue[MTRTypeKey] != MTRStructureValueType) {
+        MTR_LOG_ERROR("%@ invokeCommandWithEndpointID passed a commandFields (%@) that is not a structure-typed data-value object",
+            self, commandFields);
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+        return;
+    }
+
     [self _invokeCommandWithEndpointID:endpointID
                              clusterID:clusterID
                              commandID:commandID
@@ -1328,7 +1354,7 @@ using namespace chip::Tracing::DarwinFramework;
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
                            commandID:(NSNumber *)commandID
-                       commandFields:(id)commandFields
+                       commandFields:(MTRDeviceDataValueDictionary)commandFields
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
                expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                   timedInvokeTimeout:(NSNumber * _Nullable)timeout
