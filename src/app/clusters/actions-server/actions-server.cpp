@@ -30,6 +30,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Actions;
 using namespace chip::app::Clusters::Actions::Attributes;
+using namespace chip::Protocols::InteractionModel;
 
 Instance Instance::instance;
 Instance * Instance::GetInstance()
