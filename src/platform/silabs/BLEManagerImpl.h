@@ -59,6 +59,8 @@ public:
     void HandleBootEvent(void);
 
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
+    // Used for posting the event in the BLE queue
+    void BlePostEvent(BleEvent_t * event);
     void HandleConnectEvent(sl_wfx_msg_t * evt);
     void HandleConnectionCloseEvent(sl_wfx_msg_t * evt);
     void HandleWriteEvent(sl_wfx_msg_t * evt);
@@ -93,6 +95,14 @@ private:
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend BLEManager;
+
+#if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
+    // rs91x BLE task handling 
+    osMessageQueueId_t sBleEventQueue = NULL;
+    static void sl_ble_event_handling_task(void * args);
+    void sl_ble_init();
+    void ProcessEvent(BleEvent_t inEvent);
+#endif
 
     // ===== Members that implement the BLEManager internal interface.
 

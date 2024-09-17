@@ -22,6 +22,8 @@
  */
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+// #include <platform/internal/BLEManager.h>
+#include <platform/silabs/BLEManagerImpl.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,30 +34,7 @@ extern "C" {
 #endif
 
 // Global Variables
-rsi_ble_t att_list;
 BleEvent_t bleEvent;
-static osMessageQueueId_t sBleEventQueue = NULL;
-
-void InitBleEventQueue()
-{
-    sBleEventQueue = osMessageQueueNew(WFX_QUEUE_SIZE, sizeof(WfxEvent_t), NULL);
-    VerifyOrDie(sBleEventQueue != nullptr);
-}
-
-osMessageQueueId_t GetBleEventQueue()
-{
-    return sBleEventQueue;
-}
-
-void BlePostEvent(BleEvent_t * event)
-{
-    sl_status_t status = osMessageQueuePut(sBleEventQueue, event, 0, 0);
-    if (status != osOK)
-    {
-        ChipLogError(DeviceLayer, "BlePostEvent: failed to post event: 0x%lx", status);
-        // TODO: Handle error, requeue event depending on queue size or notify relevant task, Chipdie, etc.
-    }
-}
 
 /*==============================================*/
 /**
@@ -70,7 +49,7 @@ void rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu)
 {
     bleEvent.eventType = RSI_BLE_MTU_EVENT;
     memcpy(&bleEvent.eventData->rsi_ble_mtu, rsi_ble_mtu, sizeof(rsi_ble_event_mtu_t));
-    BlePostEvent(&bleEvent);
+    chip::DeviceLayer::Internal::BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
 /*==============================================*/
@@ -88,7 +67,7 @@ void rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t * rsi_
     bleEvent.eventType           = RSI_BLE_GATT_WRITE_EVENT;
     bleEvent.eventData->event_id = event_id;
     memcpy(&bleEvent.eventData->rsi_ble_write, rsi_ble_write, sizeof(rsi_ble_event_write_t));
-    BlePostEvent(&bleEvent);
+    chip::DeviceLayer::Internal::BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
 /*==============================================*/
@@ -106,7 +85,7 @@ void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * 
     bleEvent.eventData->connectionHandle = 1;
     bleEvent.eventData->bondingHandle    = 255;
     memcpy(bleEvent.eventData->resp_enh_conn.dev_addr, resp_enh_conn->dev_addr, RSI_DEV_ADDR_LEN);
-    BlePostEvent(&bleEvent);
+    chip::DeviceLayer::Internal::BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
 /*==============================================*/
@@ -123,7 +102,7 @@ void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, u
 {
     bleEvent.eventType         = RSI_BLE_DISCONN_EVENT;
     bleEvent.eventData->reason = reason;
-    BlePostEvent(&bleEvent);
+    chip::DeviceLayer::Internal::BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
 /*==============================================*/
@@ -140,7 +119,7 @@ void rsi_ble_on_event_indication_confirmation(uint16_t resp_status, rsi_ble_set_
     bleEvent.eventType              = RSI_BLE_GATT_INDICATION_CONFIRMATION;
     bleEvent.eventData->resp_status = resp_status;
     memcpy(&bleEvent.eventData->rsi_ble_event_set_att_rsp, rsi_ble_event_set_att_rsp, sizeof(rsi_ble_set_att_resp_t));
-    BlePostEvent(&bleEvent);
+    chip::DeviceLayer::Internal::BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
 /*==============================================*/
@@ -158,7 +137,7 @@ void rsi_ble_on_read_req_event(uint16_t event_id, rsi_ble_read_req_t * rsi_ble_r
     bleEvent.eventType           = RSI_BLE_EVENT_GATT_RD;
     bleEvent.eventData->event_id = event_id;
     memcpy(&bleEvent.eventData->rsi_ble_read_req, rsi_ble_read_req, sizeof(rsi_ble_read_req_t));
-    BlePostEvent(&bleEvent);
+    chip::DeviceLayer::Internal::BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
 /*==============================================*/
@@ -260,7 +239,7 @@ void rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_t
                               uint8_t data_len, uint8_t auth_read)
 {
     rsi_ble_req_add_att_t new_att = { 0 };
-
+    rsi_ble_t att_list;
     memset(&new_att, 0, sizeof(rsi_ble_req_add_att_t));
     //! preparing the attributes
     new_att.serv_handler  = serv_handler;
