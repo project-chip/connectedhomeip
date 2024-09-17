@@ -197,7 +197,7 @@ void RefrigeratorManager::RefAlaramAttributeChangeHandler(EndpointId endpointId,
     break;
 
     default: {
-        ChipLogDetail(AppServer, "Unhandled Refrigerator Alarm attribute %ld", attributeId);
+        ChipLogError(AppServer, "Unhandled Refrigerator Alarm attribute %ld", attributeId);
         return;
     }
     break;
