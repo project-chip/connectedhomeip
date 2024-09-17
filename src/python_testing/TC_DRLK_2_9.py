@@ -212,10 +212,8 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                     if (response.credentials[response_credential_index] == credentiallist[input_credential_index]):
                         match_found = True
                         break
-                if (not match_found):
-                    asserts.assert_true(match_found == True,
-                                        "Error mismatch in expected credential from GetUserResponse command = {}".format(
-                                            str(credentiallist)))
+                asserts.assert_equal(match_found, True,  "Error mismatch in expected credential from GetUserResponse command = {}".format(
+                    str(credentiallist)))
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
