@@ -2597,20 +2597,17 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 
     // Create the base device to attempt to read from the 5th device
     __auto_type * baseDeviceReadExpectation = [self expectationWithDescription:@"BaseDevice read"];
-    // Dispatch async to get around XCTest, so that this runs after the above devices queue their subscriptions
-    dispatch_async(queue, ^{
-        __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:@(105) controller:controller];
-        __auto_type * onOffCluster = [[MTRBaseClusterOnOff alloc] initWithDevice:baseDevice endpointID:@(1) queue:queue];
-        [onOffCluster readAttributeOnOffWithCompletion:^(NSNumber * value, NSError * _Nullable error) {
-            XCTAssertNil(error);
-            // We expect the device to be off.
-            XCTAssertEqualObjects(value, @(0));
-            [baseDeviceReadExpectation fulfill];
-            os_unfair_lock_lock(&counterLock);
-            baseDeviceReadCompleted = YES;
-            os_unfair_lock_unlock(&counterLock);
-        }];
-    });
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:@(105) controller:controller];
+    __auto_type * onOffCluster = [[MTRBaseClusterOnOff alloc] initWithDevice:baseDevice endpointID:@(1) queue:queue];
+    [onOffCluster readAttributeOnOffWithCompletion:^(NSNumber * value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        // We expect the device to be off.
+        XCTAssertEqualObjects(value, @(0));
+        [baseDeviceReadExpectation fulfill];
+        os_unfair_lock_lock(&counterLock);
+        baseDeviceReadCompleted = YES;
+        os_unfair_lock_unlock(&counterLock);
+    }];
 
     // Make the wait time depend on pool size and device count (can expand number of devices in the future)
     NSArray * expectationsToWait = [subscriptionExpectations.allValues arrayByAddingObject:baseDeviceReadExpectation];
