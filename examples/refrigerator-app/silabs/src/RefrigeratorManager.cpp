@@ -163,7 +163,7 @@ void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, 
         break;
 
         default: {
-            ChipLogDetail(AppServer, "Unhandled Temprature controlled attribute %ld", attributeId);
+            ChipLogError(AppServer, "Unhandled Temperature controlled attribute %ld", attributeId);
             return;
         }
         break;
