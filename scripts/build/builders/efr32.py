@@ -30,7 +30,6 @@ class Efr32App(Enum):
     WINDOW_COVERING = auto()
     THERMOSTAT = auto()
     PUMP = auto()
-    AIR_QUALITY_SENSOR = auto()
     UNIT_TEST = auto()
 
     def ExampleName(self):
