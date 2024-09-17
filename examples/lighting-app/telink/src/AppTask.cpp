@@ -20,8 +20,8 @@
 #include <app/server/Server.h>
 
 #include "ColorFormat.h"
-#include "PWMManager.h"
 #include "LEDManager.h"
+#include "PWMManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
@@ -60,7 +60,7 @@ CHIP_ERROR AppTask::Init(void)
     SetExampleButtonCallbacks(LightingActionEventHandler);
     InitCommonParts();
 #if (!CONFIG_PWM)
-	LedManager::getInstance().linkLed(LedManager::EAppLed_App0, 1);
+    LedManager::getInstance().linkLed(LedManager::EAppLed_App0, 1);
 #endif
     Protocols::InteractionModel::Status status;
 

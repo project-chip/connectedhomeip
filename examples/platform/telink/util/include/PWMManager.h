@@ -163,7 +163,7 @@ public:
     void setPwmHWBlink(size_t pwm, size_t onMs, size_t offMs);
     void setPwmHWBreath(size_t pwm, size_t breathMs);
 
-    PwmDummy(PwmDummy const &)        = delete;
+    PwmDummy(PwmDummy const &)       = delete;
     void operator=(PwmDummy const &) = delete;
 
 private:
