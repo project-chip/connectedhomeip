@@ -1167,8 +1167,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         return;
     }
 
-    // Wait the required amount of time, then put it in the subscription pool to wait additionally for a spot, if needed
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, inNanoseconds), self.queue, ^{
+    dispatch_block_t workBlockToQueue = ^{
         // In the case where a resubscription triggering event happened and already established, running the work block should result in a no-op
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
@@ -1199,7 +1198,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }];
         [self->_deviceController.concurrentSubscriptionPool enqueueWorkItem:workItem description:description];
         MTR_LOG("%@ - enqueued in the subscription pool", self);
-    });
+    };
+
+    if (inNanoseconds > 0) {
+        // Wait the required amount of time, then put it in the subscription pool to wait additionally for a spot
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, inNanoseconds), self.queue, workBlockToQueue);
+    } else {
+        // Put in subscription pool directly if there is no wait time
+        workBlockToQueue();
+    }
 }
 
 - (void)_handleResubscriptionNeededWithDelay:(NSNumber *)resubscriptionDelayMs
