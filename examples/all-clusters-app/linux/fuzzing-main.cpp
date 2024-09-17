@@ -73,7 +73,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
     // For now, just dump the data as a UDP payload into the session manager.
     // But maybe we should try to separately extract a PeerAddress and data from
     // the incoming data?
-    Transport::PeerAddress peerAddr;
+
+    // dumping payload with random transport types
+    Transport::Type fuzzedTransportType = static_cast<Transport::Type>(*aData % 5);
+    Transport::PeerAddress peerAddr(fuzzedTransportType);
+
     System::PacketBufferHandle buf =
         System::PacketBufferHandle::NewWithData(aData, aSize, /* aAdditionalSize = */ 0, /* aReservedSize = */ 0);
     if (buf.IsNull())
@@ -84,8 +88,17 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
 
     // Ignoring the return value from OnMessageReceived, because we might be
     // passing it all sorts of garbage that will cause it to fail.
-    Server::GetInstance().GetSecureSessionManager().OnMessageReceived(peerAddr, std::move(buf));
 
+    // for TCP we need to have MessageTransportContext
+    if (fuzzedTransportType == Transport::Type::kTcp)
+    {
+        Transport::MessageTransportContext msgContext;
+        Server::GetInstance().GetSecureSessionManager().OnMessageReceived(peerAddr, std::move(buf), &msgContext);
+    }
+    else
+    {
+        Server::GetInstance().GetSecureSessionManager().OnMessageReceived(peerAddr, std::move(buf));
+    }
     // Now process pending events until our sentinel is reached.
     PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
     PlatformMgr().RunEventLoop();
