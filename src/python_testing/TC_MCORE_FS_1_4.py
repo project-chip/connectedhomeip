@@ -47,32 +47,6 @@ from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
-
-async def wait_for_server_initialization(server_port, timeout=5):
-    """Wait until the server is ready by checking if it opens the expected port."""
-    start_time = asyncio.get_event_loop().time()
-    elapsed_time = 0
-    retry_interval = 1
-
-    logging.info(f"Waiting for server to initialize on TCP port {server_port} for up to {timeout} seconds.")
-
-    while elapsed_time < timeout:
-        try:
-            # Try connecting to the server to check if it's ready
-            reader, writer = await asyncio.open_connection('::1', server_port)
-            writer.close()
-            await writer.wait_closed()
-            logging.info(f"TH_SERVER_NO_UID is initialized and ready on port {server_port}.")
-            return
-        except (ConnectionRefusedError, OSError) as e:
-            logging.warning(f"Connection to port {server_port} failed: {e}. Retrying in {retry_interval} seconds...")
-
-        await asyncio.sleep(retry_interval)
-        elapsed_time = asyncio.get_event_loop().time() - start_time
-
-    raise TimeoutError(f"Server on port {server_port} did not initialize within {timeout} seconds. "
-                       f"Total time waited: {elapsed_time} seconds.")
-
 # TODO: Make this class more generic. Issue #35348
 
 
@@ -174,15 +148,31 @@ class FabricSyncApp:
 
 class AppServer:
 
+    def _process_admin_output(self, line):
+        if self.wait_for_text_text is not None and self.wait_for_text_text in line:
+            self.wait_for_text_event.set()
+
+    def wait_for_text(self, timeout=30):
+        if not self.wait_for_text_event.wait(timeout=timeout):
+            raise Exception(f"Timeout waiting for text: {self.wait_for_text_text}")
+        self.wait_for_text_event.clear()
+        self.wait_for_text_text = None
+
     def __init__(self, app, storage_dir, port=None, discriminator=None, passcode=None):
+        self.wait_for_text_event = threading.Event()
+        self.wait_for_text_text = None
 
         args = [app]
         args.extend(["--KVS", tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")[1]])
         args.extend(['--secured-device-port', str(port)])
         args.extend(["--discriminator", str(discriminator)])
         args.extend(["--passcode", str(passcode)])
-        self.app = Subprocess(args, tag="SERVER")
+        self.app = Subprocess(args, stdout_cb=self._process_admin_output, tag="SERVER")
+        self.wait_for_text_text = "Server initialization complete"
         self.app.start()
+
+        # Wait for the server-app to be ready.
+        self.wait_for_text()
 
     def stop(self):
         self.app.stop()
@@ -264,12 +254,6 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             port=self.th_server_port,
             discriminator=self.th_server_discriminator,
             passcode=self.th_server_passcode)
-
-        # Wait for TH_SERVER_NO_UID get initialized.
-        try:
-            asyncio.run(wait_for_server_initialization(self.th_server_port))
-        except TimeoutError:
-            asserts.fail(f"TH_SERVER_NO_UID server failed to open port {self.th_server_port}")
 
     def teardown_class(self):
         if self.th_fsa_controller is not None:
