@@ -27,6 +27,8 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import random
+import string
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
@@ -34,6 +36,7 @@ from chip.interaction_model import InteractionModelError, Status
 from drlk_2_x_common import DRLK_COMMON
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
 
 logger = logging.getLogger(__name__)
 
@@ -165,17 +168,20 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
     def pics_TC_DRLK_2_9(self) -> list[str]:
         return ["DRLK.S"]
 
+    async def generate_max_pincode_len(self, maxPincodeLength):
+        return ''.join(random.choices(string.digits, k=maxPincodeLength))
+
     async def generate_code(self):
 
-        validpincodestr = await self.generate_pincode(self.maxpincodelength)
+        validpincodestr = await self.generate_max_pincode_len(self.maxpincodelength)
         self.pin_code = bytes(validpincodestr, 'ascii')
-        validpincodestr = await self.generate_pincode(self.maxpincodelength)
+        validpincodestr = await self.generate_max_pincode_len(self.maxpincodelength)
         self.pin_code1 = bytes(validpincodestr, 'ascii')
-        validpincodestr = await self.generate_pincode(self.maxpincodelength)
+        validpincodestr = await self.generate_max_pincode_len(self.maxpincodelength)
         self.pin_code2 = bytes(validpincodestr, 'ascii')
-        inavlidpincodestr = await self.generate_pincode(self.maxpincodelength+1)
+        inavlidpincodestr = await self.generate_max_pincode_len(self.maxpincodelength+1)
         self.inavlid_pincode = bytes(inavlidpincodestr, 'ascii')
-        validpincodestr = await self.generate_pincode(self.maxrfidcodelength)
+        validpincodestr = await self.generate_max_pincode_len(self.maxrfidcodelength)
         self.rfid_tag = bytes(validpincodestr, 'ascii')
 
     async def send_clear_user_cmd(self, user_index, expected_status: Status = Status.Success):
@@ -595,7 +601,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                 start_credential_index = 1
                 nextCredentialIndex = 1
                 while 1:
-                    uniquePincodeString = await self.generate_pincode(self.maxpincodelength)
+                    uniquePincodeString = await self.generate_max_pincode_len(self.maxpincodelength)
                     uniquePincode = bytes(uniquePincodeString, 'ascii')
                     logging.info("Credential Data value is %s" % (uniquePincode))
                     if start_credential_index <= (numberofcredentialsupportedperuser):
