@@ -210,7 +210,10 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                                 "Error when executing GetUserResponse command, userUniqueID={}".format(
                                     str(response.userUniqueID)))
             logging.info("Credentials value is GetUserResponse Command %s" % (str(response.credentials)))
-            # traverse  through input credentials and match each value with the resonse credential
+
+            asserts.assert_equal(len(credentiallist), len(response.credentials),  "Error mismatch in expected credential from GetUserResponse command = {}".format(
+                str(credentiallist)))
+            # traverse through input credentials and match each value with the resonse credential
             for input_credential_index in range(len(credentiallist)):
                 match_found = False
                 for response_credential_index in range(len(response.credentials)):
