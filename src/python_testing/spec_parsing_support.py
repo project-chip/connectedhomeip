@@ -27,7 +27,6 @@ from typing import Callable, Optional
 
 import chip.clusters as Clusters
 import conformance_support
-
 from chip.tlv import uint
 from conformance_support import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
                                  ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
