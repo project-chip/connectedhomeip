@@ -20,6 +20,8 @@ import coloredlogs
 import tabulate
 
 # We compile for the local architecture. Figure out what platform we need
+
+
 def _get_native_machine_target():
     """
     Returns the build prefix for applications, such as 'linux-x64'.
@@ -34,6 +36,7 @@ def _get_native_machine_target():
         arch = 'arm64'
 
     return f"{current_system_info.system.lower()}-{arch}"
+
 
 class BinaryRunner(enum.Enum):
     """
@@ -328,11 +331,14 @@ def python_tests(
                 f"""\
             ALL_CLUSTERS_APP: {as_runner(f'out/{target_prefix}-all-clusters-no-ble-clang-boringssl/chip-all-clusters-app')}
             CHIP_LOCK_APP: {as_runner(f'out/{target_prefix}-lock-no-ble-clang-boringssl/chip-lock-app')}
-            ENERGY_MANAGEMENT_APP: {as_runner(f'out/{target_prefix}-energy-management-no-ble-clang-boringssl/chip-energy-management-app')}
+            ENERGY_MANAGEMENT_APP: {
+                as_runner(f'out/{target_prefix}-energy-management-no-ble-clang-boringssl/chip-energy-management-app')}
             LIT_ICD_APP: {as_runner(f'out/{target_prefix}-lit-icd-no-ble-clang-boringssl/lit-icd-app')}
-            CHIP_MICROWAVE_OVEN_APP: {as_runner(f'out/{target_prefix}-microwave-oven-no-ble-clang-boringssl/chip-microwave-oven-app')}
+            CHIP_MICROWAVE_OVEN_APP: {
+                as_runner(f'out/{target_prefix}-microwave-oven-no-ble-clang-boringssl/chip-microwave-oven-app')}
             CHIP_RVC_APP: {as_runner(f'out/{target_prefix}-rvc-no-ble-clang-boringssl/chip-rvc-app')}
-            NETWORK_MANAGEMENT_APP: {as_runner(f'out/{target_prefix}-network-manager-ipv6only-no-ble-clang-boringssl/matter-network-manager-app')}
+            NETWORK_MANAGEMENT_APP: {
+                as_runner(f'out/{target_prefix}-network-manager-ipv6only-no-ble-clang-boringssl/matter-network-manager-app')}
             TRACE_APP: out/trace_data/app-{{SCRIPT_BASE_NAME}}
             TRACE_TEST_JSON: out/trace_data/test-{{SCRIPT_BASE_NAME}}
             TRACE_TEST_PERFETTO: out/trace_data/test-{{SCRIPT_BASE_NAME}}
@@ -690,9 +696,8 @@ def chip_tool_tests(target, target_glob, include_tags, expected_failures, runner
     if target is not None:
         cmd.extend(["--target", target])
 
-    if include_tags ChangedPathLi
-        cmd.extend(["--include-ta
-                     *listener);gs", include_tags])
+    if include_tags:
+        cmd.extend(["--include-tags", include_tags])
 
     if target_glob is not None:
         cmd.extend(["--target-glob", target_glob])
@@ -764,6 +769,5 @@ def chip_tool_tests(target, target_glob, include_tags, expected_failures, runner
     subprocess.run(_with_activate(cmd), check=True)
 
 
-if _
-_name__ == "__main__":
+if __name__ == "__main__":
     cli()
