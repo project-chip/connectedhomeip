@@ -252,7 +252,7 @@ combination with JLinkRTTClient as follows:
             procedure. **LEDs** blink in unison when the factory reset procedure is
             initiated.
 
-    **Push Button 1** Decreases either tilt or lift, or switch the cover type
+    **Push Button 1** Application button
 
         -   Pressed and release: No implementation is present. this feature will be available in a future update.
 
