@@ -832,7 +832,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return NO;
     }
 
-    MTR_LOG("Setting up commissioning session for device ID 0x%016llX with setup payload %@", newNodeID.unsignedLongLongValue, payload);
+    MTR_LOG("%@ Setting up commissioning session for device ID 0x%016llX with setup payload %@", self, newNodeID.unsignedLongLongValue, payload);
 
     [[MTRMetricsCollector sharedInstance] resetMetrics];
 
