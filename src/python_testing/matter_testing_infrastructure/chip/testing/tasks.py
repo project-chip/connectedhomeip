@@ -14,9 +14,9 @@
 
 import logging
 import subprocess
-import typing
 import sys
 import threading
+import typing
 
 
 def forward_f(prefix: bytes,
