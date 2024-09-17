@@ -68,12 +68,14 @@ public:
     HkdfKeyAttributes() : KeyAttributesBase(PSA_KEY_TYPE_DERIVE, PSA_ALG_HKDF(PSA_ALG_SHA_256), PSA_KEY_USAGE_DERIVE, 0) {}
 };
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
 void SetKeyId(Symmetric128BitsKeyHandle & key, psa_key_id_t newKeyId)
 {
     auto & KeyId = key.AsMutable<psa_key_id_t>();
 
     KeyId = newKeyId;
 }
+#endif
 } // namespace
 
 CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key)
