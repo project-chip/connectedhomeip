@@ -32,11 +32,11 @@
 
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
 #include "chef-dishwasher-mode-delegate-impl.h"
-#endif  // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
+#endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
 
 #ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
 #include "chef-operational-state-delegate-impl.h"
-#endif  // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
+#endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
 
 using chip::app::DataModel::Nullable;
 
@@ -96,11 +96,11 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
     case chip::app::Clusters::DishwasherMode::Id:
         return chefDishwasherModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
-#endif  // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
+#endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
 #ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::OperationalState::Id:
         return chefOperationalStateReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
-#endif  // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
+#endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
     default:
         break;
     }
@@ -169,11 +169,11 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
     case chip::app::Clusters::DishwasherMode::Id:
         return chefDishwasherModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
-#endif  // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
+#endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
 #ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::OperationalState::Id:
         return chefOperationalStateWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
-#endif  // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
+#endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
     default:
         break;
     }

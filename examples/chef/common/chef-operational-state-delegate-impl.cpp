@@ -238,7 +238,8 @@ chip::Protocols::InteractionModel::Status chefOperationalStateWriteCallback(chip
         {
             gOperationalStateDelegate->mCountDownTime.SetNonNull(
                 static_cast<uint32_t>(gOperationalStateDelegate->kExampleCountDown));
-            (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, gOperationalStateDelegate);
+            (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick,
+                                                         gOperationalStateDelegate);
         }
 
         if (CHIP_NO_ERROR == err)
@@ -303,4 +304,4 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
     gOperationalStateInstance->Init();
 }
 
-#endif  // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
+#endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
