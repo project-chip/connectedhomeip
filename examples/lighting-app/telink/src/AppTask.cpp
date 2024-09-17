@@ -59,7 +59,7 @@ CHIP_ERROR AppTask::Init(void)
 {
     SetExampleButtonCallbacks(LightingActionEventHandler);
     InitCommonParts();
-#if (!CONFIG_PWM) 
+#if (!CONFIG_PWM)
 	LedManager::getInstance().linkLed(LedManager::EAppLed_App0, 1);
 #endif
     Protocols::InteractionModel::Status status;

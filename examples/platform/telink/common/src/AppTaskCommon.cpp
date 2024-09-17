@@ -422,7 +422,7 @@ void AppTaskCommon::LinkPwms(PwmManager & pwmManager)
     pwmManager.linkPwm(PwmManager::EAppPwm_Red, 0);
     pwmManager.linkPwm(PwmManager::EAppPwm_Green, 1);
     pwmManager.linkPwm(PwmManager::EAppPwm_Blue, 2);
-#elif CONFIG_PWM 
+#elif CONFIG_PWM
     pwmManager.linkPwm(PwmManager::EAppPwm_Indication, 0);
     pwmManager.linkPwm(PwmManager::EAppPwm_Red, 1);
     pwmManager.linkPwm(PwmManager::EAppPwm_Green, 2);

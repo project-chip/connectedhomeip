@@ -150,7 +150,7 @@ private:
     PwmPool(){};
 };
 
-#else 
+#else
 
 class PwmDummy : public PwmBackend
 {
