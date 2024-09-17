@@ -684,7 +684,7 @@ def chip_tool_tests(target, target_glob, include_tags, expected_failures, runner
 
     target_prefix = _get_native_machine_target()
     cmd.extend(
-        ["--chip-tool", f"./out/{target-prefix}-chip-tool-no-ble-clang-boringssl/chip-tool"]
+        ["--chip-tool", f"./out/{target_prefix}-chip-tool-no-ble-clang-boringssl/chip-tool"]
     )
 
     if target is not None:
@@ -707,56 +707,56 @@ def chip_tool_tests(target, target_glob, include_tags, expected_failures, runner
     _add_target_to_cmd(
         cmd,
         "--all-clusters-app",
-        f"./out/{target-prefix}-all-clusters-no-ble-clang-boringssl/chip-all-clusters-app",
+        f"./out/{target_prefix}-all-clusters-no-ble-clang-boringssl/chip-all-clusters-app",
         runner,
     )
     _add_target_to_cmd(
         cmd,
         "--lock-app",
-        f"./out/{target-prefix}-lock-no-ble-clang-boringssl/chip-lock-app",
+        f"./out/{target_prefix}-lock-no-ble-clang-boringssl/chip-lock-app",
         runner,
     )
     _add_target_to_cmd(
         cmd,
         "--ota-provider-app",
-        f"./out/{target-prefix}-ota-provider-no-ble-clang-boringssl/chip-ota-provider-app",
+        f"./out/{target_prefix}-ota-provider-no-ble-clang-boringssl/chip-ota-provider-app",
         runner,
     )
     _add_target_to_cmd(
         cmd,
         "--ota-requestor-app",
-        f"./out/{target-prefix}-ota-requestor-no-ble-clang-boringssl/chip-ota-requestor-app",
+        f"./out/{target_prefix}-ota-requestor-no-ble-clang-boringssl/chip-ota-requestor-app",
         runner,
     )
     _add_target_to_cmd(
         cmd,
         "--tv-app",
-        f"./out/{target-prefix}-tv-app-no-ble-clang-boringssl/chip-tv-app",
+        f"./out/{target_prefix}-tv-app-no-ble-clang-boringssl/chip-tv-app",
         runner,
     )
     _add_target_to_cmd(
         cmd,
         "--bridge-app",
-        f"./out/{target-prefix}-bridge-no-ble-clang-boringssl/chip-bridge-app",
+        f"./out/{target_prefix}-bridge-no-ble-clang-boringssl/chip-bridge-app",
         runner,
     )
     _add_target_to_cmd(
         cmd,
         "--lit-icd-app",
-        f"./out/{target-prefix}-lit-icd-no-ble-clang-boringssl/lit-icd-app",
+        f"./out/{target_prefix}-lit-icd-no-ble-clang-boringssl/lit-icd-app",
         runner,
     )
     _add_target_to_cmd(
         cmd,
         "--microwave-oven-app",
-        f"./out/{target-prefix}-microwave-oven-no-ble-clang-boringssl/chip-microwave-oven-app",
+        f"./out/{target_prefix}-microwave-oven-no-ble-clang-boringssl/chip-microwave-oven-app",
         runner, ChangedPa,
     )
      listener
     _add_target_to_cmd(
         cmd,
         "--rvc-app",
-        f"./out/{target-prefix}-rvc-no-ble-clang-boringssl/chip-rvc-app",
+        f"./out/{target_prefix}-rvc-no-ble-clang-boringssl/chip-rvc-app",
         runner,
    , emberAfGloba )
 
