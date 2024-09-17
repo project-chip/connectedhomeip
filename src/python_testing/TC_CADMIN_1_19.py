@@ -25,7 +25,6 @@
 
 import logging
 import random
-from time import sleep
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
@@ -57,21 +56,21 @@ class TC_CADMIN_1_19(MatterBaseTest):
             self, setupPinCode: int, thnum: int, th: str, fail: bool):
 
         logging.info(f"-----------------Commissioning with TH_CR{str(thnum)}-------------------------")
-        if fail == True:
+        if fail:
             ctx = asserts.assert_raises(ChipStackError)
             self.print_step(0, ctx)
             with ctx:
                 await th.CommissionOnNetwork(
-                    nodeId=self.dut_node_id, setupPinCode=setup_code,
+                    nodeId=self.dut_node_id, setupPinCode=setupPinCode,
                     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
                 errcode = PyChipError.from_code(ctx.exception.err)
-            logging.info('Commissioning complete done. Successful? {}, errorcode = {}, cycle={}'.format(
-                errcode.is_success, errcode, (cycle+1)))
+            logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(
+                errcode.is_success, errcode))
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
             asserts.assert_true(errcode.sdk_code == 0x0000000B,
                                 'Unexpected error code returned from CommissioningComplete')
 
-        elif fail == False:
+        elif not fail:
             await th.CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=setupPinCode,
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
