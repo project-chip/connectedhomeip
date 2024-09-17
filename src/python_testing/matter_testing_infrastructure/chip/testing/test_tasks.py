@@ -12,10 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[metadata]
-name = chip-testing
-version = 1.0.0
-author = Project CHIP Authors
-license-expression = Apache-2.0
-description = Various helpers associated with the python_testing scripts
-url = https://github.com/project-chip/connectedhomeip
+import unittest
+
+from tasks import Subprocess
+
+
+class TestSubprocess(unittest.TestCase):
+
+    def test_expected_output(self):
+        p = Subprocess("python3", "--help")
+        p.start(expected_output="Other environment variables", timeout=1)
+        p.terminate()
+
+    def test_expected_output_timeout(self):
+        p = Subprocess("python3", "--help")
+        with self.assertRaises(TimeoutError):
+            p.start(expected_output="Non-existing output 1234", timeout=1)
+        p.terminate()
+
+
+if __name__ == "__main__":
+    unittest.main()
