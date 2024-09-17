@@ -639,7 +639,8 @@ Ex:
 
 ## Running ALL or a subset of tests when changing application code
 
-`scripts/tests/local.py` is a wrapper that is able to build and run tests in a single command.
+`scripts/tests/local.py` is a wrapper that is able to build and run tests in a
+single command.
 
 Example to compile all prerequisites and then running all python tests:
 
