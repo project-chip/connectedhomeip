@@ -544,8 +544,6 @@ enum class OnOffControlBitmap : uint8_t
 };
 } // namespace OnOff
 
-namespace OnOffSwitchConfiguration {} // namespace OnOffSwitchConfiguration
-
 namespace LevelControl {
 
 // Enum for MoveModeEnum
@@ -587,8 +585,6 @@ enum class OptionsBitmap : uint8_t
     kCoupleColorTempToLevel = 0x2,
 };
 } // namespace LevelControl
-
-namespace BinaryInputBasic {} // namespace BinaryInputBasic
 
 namespace PulseWidthModulation {} // namespace PulseWidthModulation
 
@@ -3914,24 +3910,6 @@ enum class SafetyStatus : uint16_t
 };
 } // namespace WindowCovering
 
-namespace BarrierControl {
-
-// Bitmap for BarrierControlCapabilities
-enum class BarrierControlCapabilities : uint8_t
-{
-    kPartialBarrier = 0x1,
-};
-
-// Bitmap for BarrierControlSafetyStatus
-enum class BarrierControlSafetyStatus : uint16_t
-{
-    kRemoteLockout       = 0x1,
-    kTemperDetected      = 0x2,
-    kFailedCommunication = 0x4,
-    kPositionFailure     = 0x8,
-};
-} // namespace BarrierControl
-
 namespace ServiceArea {
 
 // Enum for OperationalStatusEnum
@@ -5424,8 +5402,6 @@ enum class SupportedDeviceCategoryBitmap : uint32_t
     kFabricSynchronization = 0x1,
 };
 } // namespace CommissionerControl
-
-namespace ElectricalMeasurement {} // namespace ElectricalMeasurement
 
 namespace UnitTesting {
 

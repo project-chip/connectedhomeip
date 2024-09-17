@@ -34,15 +34,9 @@ static constexpr ClusterId Id = 0x00000004;
 namespace OnOff {
 static constexpr ClusterId Id = 0x00000006;
 } // namespace OnOff
-namespace OnOffSwitchConfiguration {
-static constexpr ClusterId Id = 0x00000007;
-} // namespace OnOffSwitchConfiguration
 namespace LevelControl {
 static constexpr ClusterId Id = 0x00000008;
 } // namespace LevelControl
-namespace BinaryInputBasic {
-static constexpr ClusterId Id = 0x0000000F;
-} // namespace BinaryInputBasic
 namespace PulseWidthModulation {
 static constexpr ClusterId Id = 0x0000001C;
 } // namespace PulseWidthModulation
@@ -262,9 +256,6 @@ static constexpr ClusterId Id = 0x00000101;
 namespace WindowCovering {
 static constexpr ClusterId Id = 0x00000102;
 } // namespace WindowCovering
-namespace BarrierControl {
-static constexpr ClusterId Id = 0x00000103;
-} // namespace BarrierControl
 namespace ServiceArea {
 static constexpr ClusterId Id = 0x00000150;
 } // namespace ServiceArea
@@ -391,9 +382,6 @@ static constexpr ClusterId Id = 0x00000750;
 namespace CommissionerControl {
 static constexpr ClusterId Id = 0x00000751;
 } // namespace CommissionerControl
-namespace ElectricalMeasurement {
-static constexpr ClusterId Id = 0x00000B04;
-} // namespace ElectricalMeasurement
 namespace UnitTesting {
 static constexpr ClusterId Id = 0xFFF1FC05;
 } // namespace UnitTesting
