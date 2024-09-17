@@ -149,7 +149,7 @@ void RefrigeratorUI::DrawFooter(GLIB_Context_t * glibContext, bool autoMode)
         break;
     case SUPPORTED_MODES::ENERGY_SAVE:
         DrawSetPoint(glibContext, 0, false);
-        GLIB_drawStringOnLine(glibContext, "Mode : Energy save", 11, GLIB_ALIGN_LEFT, 0, 0, true);
+        GLIB_drawStringOnLine(glibContext, "Mode : Energy Save", 11, GLIB_ALIGN_LEFT, 0, 0, true);
         DrawSetPoint(glibContext, mCurrentTempCelsius, false);
         break;
     default:
