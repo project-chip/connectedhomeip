@@ -19,6 +19,21 @@ import click
 import coloredlogs
 import tabulate
 
+# We compile for the local architecture. Figure out what platform we need
+def _get_native_machine_target():
+    """
+    Returns the build prefix for applications, such as 'linux-x64'.
+    """
+    current_system_info = uname()
+    arch = current_system_info.machine
+    if arch == 'x86_64':
+        arch = 'x64'
+    elif arch == 'i386' or arch == 'i686':
+        arch = 'x86'
+    elif arch in ('aarch64', 'aarch64_be', 'armv8b', 'armv8l'):
+        arch = 'arm64'
+
+    return f"{current_system_info.system.lower()}-{arch}"
 
 class BinaryRunner(enum.Enum):
     """
@@ -125,19 +140,21 @@ def _do_build_apps():
     This builds a LOT of apps (significant storage usage).
     """
     logging.info("Building example apps...")
+
+    target_prefix = _get_native_machine_target()
     targets = [
-        "linux-x64-chip-tool-no-ble-clang-boringssl",
-        "linux-x64-all-clusters-no-ble-clang-boringssl",
-        "linux-x64-bridge-no-ble-clang-boringssl",
-        "linux-x64-energy-management-no-ble-clang-boringssl",
-        "linux-x64-lit-icd-no-ble-clang-boringssl",
-        "linux-x64-lock-no-ble-clang-boringssl",
-        "linux-x64-microwave-oven-no-ble-clang-boringssl",
-        "linux-x64-ota-provider-no-ble-clang-boringssl",
-        "linux-x64-ota-requestor-no-ble-clang-boringssl",
-        "linux-x64-rvc-no-ble-clang-boringssl",
-        "linux-x64-tv-app-no-ble-clang-boringssl",
-        "linux-x64-network-manager-ipv6only-no-ble-clang-boringssl",
+       f"{target_prefix}-chip-tool-no-ble-clang-boringssl",
+       f"{target_prefix}-all-clusters-no-ble-clang-boringssl",
+       f"{target_prefix}-bridge-no-ble-clang-boringssl",
+       f"{target_prefix}-energy-management-no-ble-clang-boringssl",
+       f"{target_prefix}-lit-icd-no-ble-clang-boringssl",
+       f"{target_prefix}-lock-no-ble-clang-boringssl",
+       f"{target_prefix}-microwave-oven-no-ble-clang-boringssl",
+       f"{target_prefix}-ota-provider-no-ble-clang-boringssl",
+       f"{target_prefix}-ota-requestor-no-ble-clang-boringssl",
+       f"{target_prefix}-rvc-no-ble-clang-boringssl",
+       f"{target_prefix}-tv-app-no-ble-clang-boringssl",
+       f"{target_prefix}-network-manager-ipv6only-no-ble-clang-boringssl",
     ]
 
     cmd = ["./scripts/build/build_examples.py"]
@@ -155,9 +172,10 @@ def _do_build_basic_apps():
     all-clusters and chip-tool only, for basic tests.
     """
     logging.info("Building example apps...")
+    target_prefix = _get_native_machine_target()
     targets = [
-        "linux-x64-chip-tool-no-ble-clang-boringssl",
-        "linux-x64-all-clusters-no-ble-clang-boringssl",
+        f"{target_prefix}-chip-tool-no-ble-clang-boringssl",
+        f"{target_prefix}-all-clusters-no-ble-clang-boringssl",
     ]
 
     cmd = ["./scripts/build/build_examples.py"]
@@ -303,17 +321,18 @@ def python_tests(
         return _maybe_with_runner(os.path.basename(path), path, runner)
 
     # create an env file
+    target_prefix = _get_native_machine_target()
     with open("out/test_env.yaml", "wt") as f:
         f.write(
             textwrap.dedent(
                 f"""\
-            ALL_CLUSTERS_APP: {as_runner('out/linux-x64-all-clusters-no-ble-clang-boringssl/chip-all-clusters-app')}
-            CHIP_LOCK_APP: {as_runner('out/linux-x64-lock-no-ble-clang-boringssl/chip-lock-app')}
-            ENERGY_MANAGEMENT_APP: {as_runner('out/linux-x64-energy-management-no-ble-clang-boringssl/chip-energy-management-app')}
-            LIT_ICD_APP: {as_runner('out/linux-x64-lit-icd-no-ble-clang-boringssl/lit-icd-app')}
-            CHIP_MICROWAVE_OVEN_APP: {as_runner('out/linux-x64-microwave-oven-no-ble-clang-boringssl/chip-microwave-oven-app')}
-            CHIP_RVC_APP: {as_runner('out/linux-x64-rvc-no-ble-clang-boringssl/chip-rvc-app')}
-            NETWORK_MANAGEMENT_APP: {as_runner('out/linux-x64-network-manager-ipv6only-no-ble-clang-boringssl/matter-network-manager-app')}
+            ALL_CLUSTERS_APP: {as_runner(f'out/{target_prefix}-all-clusters-no-ble-clang-boringssl/chip-all-clusters-app')}
+            CHIP_LOCK_APP: {as_runner(f'out/{target_prefix}-lock-no-ble-clang-boringssl/chip-lock-app')}
+            ENERGY_MANAGEMENT_APP: {as_runner(f'out/{target_prefix}-energy-management-no-ble-clang-boringssl/chip-energy-management-app')}
+            LIT_ICD_APP: {as_runner(f'out/{target_prefix}-lit-icd-no-ble-clang-boringssl/lit-icd-app')}
+            CHIP_MICROWAVE_OVEN_APP: {as_runner(f'out/{target_prefix}-microwave-oven-no-ble-clang-boringssl/chip-microwave-oven-app')}
+            CHIP_RVC_APP: {as_runner(f'out/{target_prefix}-rvc-no-ble-clang-boringssl/chip-rvc-app')}
+            NETWORK_MANAGEMENT_APP: {as_runner(f'out/{target_prefix}-network-manager-ipv6only-no-ble-clang-boringssl/matter-network-manager-app')}
             TRACE_APP: out/trace_data/app-{{SCRIPT_BASE_NAME}}
             TRACE_TEST_JSON: out/trace_data/test-{{SCRIPT_BASE_NAME}}
             TRACE_TEST_PERFETTO: out/trace_data/test-{{SCRIPT_BASE_NAME}}
@@ -512,10 +531,11 @@ def _do_build_fabric_sync_apps():
     """
     Build applications used for fabric sync tests
     """
+    target_prefix = _get_native_machine_target()
     targets = [
-        "linux-x64-fabric-bridge-boringssl-rpc-no-ble",
-        "linux-x64-fabric-admin-boringssl-rpc",
-        "linux-x64-all-clusters-boringssl-no-ble",
+        f"{target_prefix}-fabric-bridge-boringssl-rpc-no-ble",
+        f"{target_prefix}-fabric-admin-boringssl-rpc",
+        f"{target_prefix}-all-clusters-boringssl-no-ble",
     ]
 
     build_cmd = ["./scripts/build/build_examples.py"]
@@ -662,15 +682,17 @@ def chip_tool_tests(target, target_glob, include_tags, expected_failures, runner
         "chip_tool_python",
     ]
 
+    target_prefix = _get_native_machine_target()
     cmd.extend(
-        ["--chip-tool", "./out/linux-x64-chip-tool-no-ble-clang-boringssl/chip-tool"]
+        ["--chip-tool", f"./out/{target-prefix}-chip-tool-no-ble-clang-boringssl/chip-tool"]
     )
 
     if target is not None:
         cmd.extend(["--target", target])
 
-    if include_tags is not None:
-        cmd.extend(["--include-tags", include_tags])
+    if include_tags ChangedPathLi
+        cmd.extend(["--include-ta
+                     *listener);gs", include_tags])
 
     if target_glob is not None:
         cmd.extend(["--target-glob", target_glob])
@@ -685,60 +707,63 @@ def chip_tool_tests(target, target_glob, include_tags, expected_failures, runner
     _add_target_to_cmd(
         cmd,
         "--all-clusters-app",
-        "./out/linux-x64-all-clusters-no-ble-clang-boringssl/chip-all-clusters-app",
+        f"./out/{target-prefix}-all-clusters-no-ble-clang-boringssl/chip-all-clusters-app",
         runner,
     )
     _add_target_to_cmd(
         cmd,
         "--lock-app",
-        "./out/linux-x64-lock-no-ble-clang-boringssl/chip-lock-app",
+        f"./out/{target-prefix}-lock-no-ble-clang-boringssl/chip-lock-app",
         runner,
     )
     _add_target_to_cmd(
         cmd,
         "--ota-provider-app",
-        "./out/linux-x64-ota-provider-no-ble-clang-boringssl/chip-ota-provider-app",
+        f"./out/{target-prefix}-ota-provider-no-ble-clang-boringssl/chip-ota-provider-app",
         runner,
     )
     _add_target_to_cmd(
         cmd,
         "--ota-requestor-app",
-        "./out/linux-x64-ota-requestor-no-ble-clang-boringssl/chip-ota-requestor-app",
+        f"./out/{target-prefix}-ota-requestor-no-ble-clang-boringssl/chip-ota-requestor-app",
         runner,
     )
     _add_target_to_cmd(
         cmd,
         "--tv-app",
-        "./out/linux-x64-tv-app-no-ble-clang-boringssl/chip-tv-app",
+        f"./out/{target-prefix}-tv-app-no-ble-clang-boringssl/chip-tv-app",
         runner,
     )
     _add_target_to_cmd(
         cmd,
         "--bridge-app",
-        "./out/linux-x64-bridge-no-ble-clang-boringssl/chip-bridge-app",
+        f"./out/{target-prefix}-bridge-no-ble-clang-boringssl/chip-bridge-app",
         runner,
     )
     _add_target_to_cmd(
         cmd,
         "--lit-icd-app",
-        "./out/linux-x64-lit-icd-no-ble-clang-boringssl/lit-icd-app",
+        f"./out/{target-prefix}-lit-icd-no-ble-clang-boringssl/lit-icd-app",
         runner,
     )
     _add_target_to_cmd(
         cmd,
         "--microwave-oven-app",
-        "./out/linux-x64-microwave-oven-no-ble-clang-boringssl/chip-microwave-oven-app",
-        runner,
+        f"./out/{target-prefix}-microwave-oven-no-ble-clang-boringssl/chip-microwave-oven-app",
+        runner, ChangedPa,
     )
+     listener
     _add_target_to_cmd(
         cmd,
         "--rvc-app",
-        "./out/linux-x64-rvc-no-ble-clang-boringssl/chip-rvc-app",
+        f"./out/{target-prefix}-rvc-no-ble-clang-boringssl/chip-rvc-app",
         runner,
-    )
+   , emberAfGloba )
+
 
     subprocess.run(_with_activate(cmd), check=True)
 
 
-if __name__ == "__main__":
+if _
+_name__ == "__main__":
     cli()
