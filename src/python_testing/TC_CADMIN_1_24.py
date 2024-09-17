@@ -84,14 +84,15 @@ class TC_CADMIN_1_24(MatterBaseTest):
     def steps_TC_CADMIN_1_24(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 180 seconds", 
-                    "DUT_CE opens its Commissioning window to allow a second commissioning"),
+            TestStep(2, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 180 seconds",
+                     "DUT_CE opens its Commissioning window to allow a second commissioning"),
             TestStep(3, "TH_CR1 sends an RevokeCommissioning command to the DUT"),
-            TestStep(4, "TH_CR1 reads the window status to verify the DUT_CE window is closed", 
-                    "DUT_CE windows status shows the window is closed"),
-            TestStep(5, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 179 seconds", 
-                    "DUT_CE does not open its Commissioning window to allow a second commissioning. DUT_CE shows 'Failed to open commissioning window. Global status 0x85'"),
-            TestStep(6, "TH_CR1 reads the window status to verify the DUT_CE window is closed", "DUT_CE windows status shows the window is closed"),
+            TestStep(4, "TH_CR1 reads the window status to verify the DUT_CE window is closed",
+                     "DUT_CE windows status shows the window is closed"),
+            TestStep(5, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 179 seconds",
+                     "DUT_CE does not open its Commissioning window to allow a second commissioning. DUT_CE shows 'Failed to open commissioning window. Global status 0x85'"),
+            TestStep(6, "TH_CR1 reads the window status to verify the DUT_CE window is closed",
+                     "DUT_CE windows status shows the window is closed"),
         ]
 
     def pics_TC_CADMIN_1_24(self) -> list[str]:
@@ -119,15 +120,15 @@ class TC_CADMIN_1_24(MatterBaseTest):
             asserts.fail(f"Commissioning window is expected to be closed, but was found to be open")
 
         self.step(5)
-        try: 
+        try:
             params = await self.th1.OpenCommissioningWindow(
                 nodeid=self.dut_node_id, timeout=179, iteration=10000, discriminator=self.discriminator, option=1)
 
         except ChipStackError as e:
-            # Since we provided 901 seconds as the timeout duration, 
+            # Since we provided 901 seconds as the timeout duration,
             # we should not be able to open comm window as duration is too long.
             asserts.assert_equal(e.err,  0x00000585,
-                                "Expected to error as we provided failure value for opening commissioning window")
+                                 "Expected to error as we provided failure value for opening commissioning window")
 
         self.step(6)
         window_status2 = await self.get_window_status()
