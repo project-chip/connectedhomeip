@@ -55,7 +55,6 @@ public:
     void RefAndTempCtrlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size);
     void TempCtrlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size);
     void RefAlaramAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size);
-    void HandleTemperatureAttribute(int16_t& target, const int16_t* value, const auto& attributeSetFunc, EndpointId endpointId)
     uint8_t GetMode();
     int8_t GetCurrentTemp();
     int8_t SetMode();

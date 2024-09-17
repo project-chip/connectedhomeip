@@ -117,7 +117,7 @@ void RefrigeratorManager::RefAndTempCtrlAttributeChangeHandler(EndpointId endpoi
     break;
 
     default: {
-        ChipLogDetail(AppServer, "Unhandled Refrigerator and Temprature attribute %x", attributeId);
+        ChipLogDetail(AppServer, "Unhandled Refrigerator and Temprature attribute %d", attributeId);
         return;
     }
     break;
@@ -128,37 +128,47 @@ void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, 
 {
     switch (attributeId)
     {
-        case TempCtrlAttr::TemperatureSetpoint::Id:
-            HandleTemperatureAttribute(mTemperatureSetpoint, static_cast<int16_t*>(value), TempCtrlAttr::TemperatureSetpoint::Set, endpointId);
-            break;
+        case TempCtrlAttr::TemperatureSetpoint::Id: {
+            int16_t temperatureSetpoint = ConvertToPrintableTemp(static_cast<int16_t>(*value));
+            mTemperatureSetpoint        = temperatureSetpoint;
+            TempCtrlAttr::TemperatureSetpoint::Set(endpointId, temperatureSetpoint);
+        }
+        break;
 
-        case TempCtrlAttr::MinTemperature::Id:
-            HandleTemperatureAttribute(mMinTemperature, static_cast<int16_t*>(value), TempCtrlAttr::MinTemperature::Set, endpointId);
-            break;
+        case TempCtrlAttr::MinTemperature::Id: {
+            int16_t minTemperature = ConvertToPrintableTemp(static_cast<int16_t>(*value));
+            mMinTemperature        = minTemperature;
+            TempCtrlAttr::MinTemperature::Set(endpointId, minTemperature);
+        }
+        break;
 
-        case TempCtrlAttr::MaxTemperature::Id:
-            HandleTemperatureAttribute(mMaxTemperature, static_cast<int16_t*>(value), TempCtrlAttr::MaxTemperature::Set, endpointId);
-            break;
+        case TempCtrlAttr::MaxTemperature::Id: {
+            int16_t maxTemperature = ConvertToPrintableTemp(static_cast<int16_t>(*value));
+            mMaxTemperature        = maxTemperature;
+            TempCtrlAttr::MaxTemperature::Set(endpointId, maxTemperature);
+        }
+        break;
 
-        case TempCtrlAttr::SelectedTemperatureLevel::Id:
-            HandleTemperatureAttribute(mSelectedTemperatureLevel, static_cast<int16_t*>(value), TempCtrlAttr::SelectedTemperatureLevel::Set, endpointId);
-            break;
+        case TempCtrlAttr::SelectedTemperatureLevel::Id: {
+            int16_t selectedTemperatureLevel = ConvertToPrintableTemp(static_cast<int16_t>(*value));
+            mSelectedTemperatureLevel        = selectedTemperatureLevel;
+            TempCtrlAttr::SelectedTemperatureLevel::Set(endpointId, selectedTemperatureLevel);
+        }
+        break;
 
-        case TempCtrlAttr::Step::Id:
-            int16_t step = ConvertToPrintableTemp(*static_cast<int16_t*>(value));
-            TempCtrlAttr::Step::Set(endpointId, step);
-            break;
+        case TempCtrlAttr::Step::Id: {
+            int16_t step = ConvertToPrintableTemp(static_cast<int16_t>(*value));
+            TempCtrlAttr::MaxTemperature::Set(endpointId, step);
+        }
+        break;
 
-        default:
-            ChipLogDetail(AppServer, "Unhandled Temperature-controlled attribute %x", attributeId);
+        default: {
+            ChipLogDetail(AppServer, "Unhandled Temprature controlled attribute %d", attributeId);
             return;
+        }
+        break;
     }
-}
 
-void HandleTemperatureAttribute(int16_t& target, const int16_t* value, const auto& attributeSetFunc, EndpointId endpointId) {
-    int16_t tempValue = ConvertToPrintableTemp(*value);
-    target            = tempValue;
-    attributeSetFunc(endpointId, tempValue);
 }
 
 void RefrigeratorManager::RefAlaramAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size)
