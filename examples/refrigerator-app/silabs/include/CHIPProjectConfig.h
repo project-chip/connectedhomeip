@@ -54,7 +54,7 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x8005: example refigerator app
+ * 0x800E: example refrigerator app
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x800E
 
