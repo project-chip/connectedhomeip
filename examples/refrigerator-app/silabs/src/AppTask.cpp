@@ -110,7 +110,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(Zcl, "AppTask.Init() failed");
+        ChipLogError(AppServer, "AppTask.Init() failed");
         appError(err);
     }
 
