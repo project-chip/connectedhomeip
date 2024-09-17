@@ -146,18 +146,18 @@ def _do_build_apps():
 
     target_prefix = _get_native_machine_target()
     targets = [
-       f"{target_prefix}-chip-tool-no-ble-clang-boringssl",
-       f"{target_prefix}-all-clusters-no-ble-clang-boringssl",
-       f"{target_prefix}-bridge-no-ble-clang-boringssl",
-       f"{target_prefix}-energy-management-no-ble-clang-boringssl",
-       f"{target_prefix}-lit-icd-no-ble-clang-boringssl",
-       f"{target_prefix}-lock-no-ble-clang-boringssl",
-       f"{target_prefix}-microwave-oven-no-ble-clang-boringssl",
-       f"{target_prefix}-ota-provider-no-ble-clang-boringssl",
-       f"{target_prefix}-ota-requestor-no-ble-clang-boringssl",
-       f"{target_prefix}-rvc-no-ble-clang-boringssl",
-       f"{target_prefix}-tv-app-no-ble-clang-boringssl",
-       f"{target_prefix}-network-manager-ipv6only-no-ble-clang-boringssl",
+        f"{target_prefix}-chip-tool-no-ble-clang-boringssl",
+        f"{target_prefix}-all-clusters-no-ble-clang-boringssl",
+        f"{target_prefix}-bridge-no-ble-clang-boringssl",
+        f"{target_prefix}-energy-management-no-ble-clang-boringssl",
+        f"{target_prefix}-lit-icd-no-ble-clang-boringssl",
+        f"{target_prefix}-lock-no-ble-clang-boringssl",
+        f"{target_prefix}-microwave-oven-no-ble-clang-boringssl",
+        f"{target_prefix}-ota-provider-no-ble-clang-boringssl",
+        f"{target_prefix}-ota-requestor-no-ble-clang-boringssl",
+        f"{target_prefix}-rvc-no-ble-clang-boringssl",
+        f"{target_prefix}-tv-app-no-ble-clang-boringssl",
+        f"{target_prefix}-network-manager-ipv6only-no-ble-clang-boringssl",
     ]
 
     cmd = ["./scripts/build/build_examples.py"]
