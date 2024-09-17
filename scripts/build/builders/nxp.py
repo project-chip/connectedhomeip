@@ -34,6 +34,7 @@ class NxpOsUsed(Enum):
         else:
             raise Exception('Unknown OS type: %r' % self)
 
+
 class NxpBuildSystem(Enum):
     GN = auto()
     CMAKE = auto()
@@ -45,6 +46,7 @@ class NxpBuildSystem(Enum):
             return 'cmake'
         else:
             raise Exception('Unknown build system: %r' % self)
+
 
 class NxpBoard(Enum):
     K32W0 = auto()
@@ -86,10 +88,11 @@ class NxpBoard(Enum):
         else:
             raise Exception('Unknown board type: %r' % self)
 
+
 class NxpBoardVariant(Enum):
     RD = auto()
     FRDM = auto()
-    
+
     def BoardVariantName(self, board):
         if board == NxpBoard.RW61X:
             if self == NxpBoardVariant.RD:
@@ -98,6 +101,7 @@ class NxpBoardVariant(Enum):
                 return "frdm"
         else:
             raise Exception('Unkown board variant: %r' % self)
+
 
 class NxpApp(Enum):
     LIGHTING = auto()
@@ -266,7 +270,7 @@ class NxpBuilder(GnBuilder):
         if self.has_sw_version_2:
             flags.append("-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2")
             flags.append("-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING=\"2.0\"")
-        
+
         if self.data_model_interface:
             # NOTE: this is not supporting "check"
             enabled = "y" if self.data_model_interface.lower() == "enabled" else "n"
