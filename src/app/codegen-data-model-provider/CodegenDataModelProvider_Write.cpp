@@ -330,10 +330,22 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     // path. We apply this everywhere as a shortcut, although realistically this is only for AccessControl cluster
     if (checkAcl && request.previousSuccessPath.has_value())
     {
-        // NOTE: compare here relies that previousSuccessPath is a ConcreteAttributePath (i.e. NOT data,
-        //       so the list index is not considered) as well as that `mExpanded` is NOT considered
-        //       for comparison.
-        checkAcl = (request.path != request.previousSuccessPath);
+        // NOTE: explicit cast/check only for attribute path and nothing else.
+        //       
+        //       In particular `request.path` is a DATA path (contains a list index)
+        //       and we do not want request.previousSuccessPath to be auto-cast to a 
+        //       data path with a empty list and fail the compare.
+        //
+        //       This could be `request.previousSuccessPath != request.path` (where order
+        //       is important) however that would seem more brittle (relying that a != b 
+        //       behaves differently than b != a due to casts). Overall Data paths are not
+        //       the same as attribute paths. 
+        //
+        //       Also note that Concrete path have a mExpanded that is not used in compares.
+        const ConcreteAttributePath & attributePathA = request.path;
+        const ConcreteAttributePath & attributePathB = *request.previousSuccessPath;
+
+        checkAcl = (attributePathA != attributePathB);
     }
 
     if (checkAcl)
