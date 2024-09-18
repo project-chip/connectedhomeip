@@ -63,8 +63,8 @@ config("nxp_platform_config") {
       defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/FactoryDataProviderFwkImpl.h\"" ]
     }
   }
-  if (chip_enable_wifi && chip_enable_openthread) {
-    # Disable thread nwk commissioning instance on endpoint 0, when OTBR is enabled
+  # When OTBR is enabled Thread network commissioning cluster is enabled using chip_enable_secondary_nwk_if  
+  if (chip_enable_wifi && chip_enable_openthread && !chip_enable_secondary_nwk_if) {
     defines += [ "_NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_" ]
   }
 }
@@ -157,14 +157,29 @@ static_library("nxp_platform") {
       "../../../OpenThread/OpenThreadUtils.cpp",
       "../../common/ThreadStackManagerImpl.cpp",
       "../../common/ThreadStackManagerImpl.h",
+      "../../../OpenThread/GenericThreadBorderRouterDelegate.cpp",
+      "../../../OpenThread/GenericThreadBorderRouterDelegate.h",
+      # Temporary fix, to be revert once PR #34662 is merged, build issue when using GN check argument
+      "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
     ]
-
-    deps += [ "${chip_root}/third_party/openthread:openthread" ]
-    public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
+    
+    deps += ["${chip_root}/src/app/common:ids",]
+  
+    if (!nxp_build_matter_standalone_lib) {
+      deps += [ "${chip_root}/third_party/openthread:openthread" ]
+      public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
+    }
 
     if (chip_mdns == "platform") {
       if (chip_enable_wifi) {
-        sources += [ "../../common/DnssdImpl.cpp" ]
+        sources += [ 
+          "../../common/DnssdImpl.cpp",
+          "../../common/DnssdImplBr.cpp",
+          "../../common/DnssdImplBr.h",
+          "../../../OpenThread/DnssdImpl.cpp",
+          "../../../OpenThread/OpenThreadDnssdImpl.cpp",
+          "../../../OpenThread/OpenThreadDnssdImpl.h",
+        ]
       } else {
         sources += [
           "../../../OpenThread/DnssdImpl.cpp",
