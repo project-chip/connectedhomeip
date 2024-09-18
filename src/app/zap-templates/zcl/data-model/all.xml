@@ -36,7 +36,7 @@
    <xi:include href="chip/door-lock-cluster.xml" />
    <xi:include href="chip/ecosystem-information-cluster.xml" />
    <xi:include href="chip/energy-evse-cluster.xml" />
-   <xi:include href="chip/energy-evse-mode-cluster.xml" />   
+   <xi:include href="chip/energy-evse-mode-cluster.xml" />
    <xi:include href="chip/energy-preference-cluster.xml" />
    <xi:include href="chip/ethernet-network-diagnostics-cluster.xml" />
    <xi:include href="chip/electrical-energy-measurement-cluster.xml" />
@@ -63,7 +63,7 @@
    <xi:include href="chip/low-power-cluster.xml" />
    <xi:include href="chip/media-input-cluster.xml" />
    <xi:include href="chip/media-playback-cluster.xml" />
-   <xi:include href="chip/messages-cluster.xml" />   
+   <xi:include href="chip/messages-cluster.xml" />
    <xi:include href="chip/mode-base-cluster.xml" />
    <xi:include href="chip/mode-select-cluster.xml" />
    <xi:include href="chip/semantic-tag-namespace-enums.xml" />
@@ -88,7 +88,6 @@
    <xi:include href="chip/relative-humidity-measurement-cluster.xml" />
    <xi:include href="chip/rvc-clean-mode-cluster.xml"  />
    <xi:include href="chip/rvc-run-mode-cluster.xml" />
-   <xi:include href="chip/replacable-monitoring-cluster.xml.xml" />
    <xi:include href="chip/resource-monitoring-cluster.xml" />
    <xi:include href="chip/scene.xml" />
    <xi:include href="chip/service-area-cluster.xml" />
@@ -120,9 +119,15 @@
    <xi:include href="chip/temperature-control-cluster.xml" />
    <xi:include href="chip/refrigerator-alarm.xml" />
    <xi:include href="chip/matter-devices.xml" />
-   <xi:include href="draft/barrier-control.xml" />
+   <xi:include href="draft/barrier-control-cluster.xml" />
    <xi:include href="draft/electrical-measurement-cluster.xml" />
    <xi:include href="draft/input-output-value-clusters.xml" />
    <xi:include href="draft/onoff-switch-configuration-cluster.xml" />
+   <xi:include href="draft/camera-av-stream-management-cluster.xml" />
+   <xi:include href="draft/camera-av-settings-user-level-management-cluster.xml" />
+   <xi:include href="draft/web-rtc-transport-provider-cluster.xml" />
+   <xi:include href="draft/web-rtc-transport-requester-cluster.xml" />
+   <xi:include href="draft/push-av-stream-transport-cluster.xml" />
+   <xi:include href="draft/chime.xml" />
    <xi:include href="chip/sample-mei-cluster.xml" />
 </all>
