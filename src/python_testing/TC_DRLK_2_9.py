@@ -171,7 +171,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         return ''.join(random.choices(string.digits, k=maxPincodeLength))
 
     async def generate_code(self):
-        if (self.maxpincodelength != None):
+        if (self.maxpincodelength is not None):
             validpincodestr = await self.generate_max_pincode_len(self.maxpincodelength)
             self.pin_code = bytes(validpincodestr, 'ascii')
             validpincodestr = await self.generate_max_pincode_len(self.maxpincodelength)
@@ -180,7 +180,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             self.pin_code2 = bytes(validpincodestr, 'ascii')
             inavlidpincodestr = await self.generate_max_pincode_len(self.maxpincodelength+1)
             self.inavlid_pincode = bytes(inavlidpincodestr, 'ascii')
-        if (self.maxrfidcodelength != None):
+        if (self.maxrfidcodelength is not None):
             validpincodestr = await self.generate_max_pincode_len(self.maxrfidcodelength)
             self.rfid_tag = bytes(validpincodestr, 'ascii')
 
