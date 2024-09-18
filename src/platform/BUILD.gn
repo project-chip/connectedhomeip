@@ -403,6 +403,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "${chip_root}/src/ble:ble_config_header",
       "${chip_root}/src/system:system_config_header",
     ]
+
+    public_deps = [ "${chip_root}/src/app/icd/server:icd-server-config" ]
   }
 } else if (chip_device_platform == "none") {
   buildconfig_header("platform_buildconfig") {
