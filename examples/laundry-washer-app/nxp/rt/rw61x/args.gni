@@ -17,3 +17,9 @@ import("//build_overrides/chip.gni")
 # SDK target definitions
 nxp_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 nxp_sdk_driver_target = get_label_info(":sdk_driver", "label_no_toolchain")
+
+# ICDM
+chip_enable_icd_server = true
+chip_persist_subscriptions = true
+chip_subscription_timeout_resumption = true
+chip_enable_icd_checkin = true
