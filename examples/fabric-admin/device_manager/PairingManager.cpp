@@ -35,7 +35,7 @@ void PairingManager::Init(Controller::DeviceCommissioner * commissioner)
     mCommissioner = commissioner;
 }
 
-CHIP_ERROR PairingManager::OpenCommissioningWindow(NodeId nodeId, EndpointId endpointId, uint16_t commissioningTimeout,
+CHIP_ERROR PairingManager::OpenCommissioningWindow(NodeId nodeId, EndpointId endpointId, uint16_t commissioningTimeoutSec,
                                                    uint32_t iterations, uint16_t discriminator, const ByteSpan & salt,
                                                    const ByteSpan & verifier)
 {
@@ -55,13 +55,13 @@ CHIP_ERROR PairingManager::OpenCommissioningWindow(NodeId nodeId, EndpointId end
     auto params                        = Platform::MakeUnique<CommissioningWindowParams>();
     params->nodeId                     = nodeId;
     params->endpointId                 = endpointId;
-    params->commissioningWindowTimeout = commissioningTimeout;
+    params->commissioningWindowTimeout = commissioningTimeoutSec;
     params->iteration                  = iterations;
     params->discriminator              = discriminator;
 
     if (!salt.empty())
     {
-        if (salt.size() > Crypto::kSpake2p_Max_PBKDF_Salt_Length)
+        if (salt.size() > sizeof(params->saltBuffer))
         {
             ChipLogError(NotSpecified, "Salt size exceeds buffer capacity");
             return CHIP_ERROR_BUFFER_TOO_SMALL;
@@ -73,7 +73,7 @@ CHIP_ERROR PairingManager::OpenCommissioningWindow(NodeId nodeId, EndpointId end
 
     if (!verifier.empty())
     {
-        if (verifier.size() > Crypto::kSpake2p_VerifierSerialized_Length)
+        if (verifier.size() > sizeof(params->verifierBuffer))
         {
             ChipLogError(NotSpecified, "Verifier size exceeds buffer capacity");
             return CHIP_ERROR_BUFFER_TOO_SMALL;

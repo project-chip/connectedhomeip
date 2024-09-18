@@ -67,7 +67,7 @@ public:
      *
      * @param nodeId The target node ID for commissioning.
      * @param endpointId The target endpoint ID for commissioning.
-     * @param commissioningTimeout Timeout for the commissioning window in seconds.
+     * @param commissioningTimeoutSec Timeout for the commissioning window in seconds.
      * @param iterations Iterations for PBKDF calculations.
      * @param discriminator Discriminator for commissioning.
      * @param salt Optional salt for verifier-based commissioning.

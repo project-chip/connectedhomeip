@@ -115,14 +115,14 @@ void DeviceManager::RemoveSyncedDevice(NodeId nodeId)
                     ChipLogValueX64(device->GetNodeId()), device->GetEndpointId());
 }
 
-void DeviceManager::OpenDeviceCommissioningWindow(NodeId nodeId, uint32_t commissioningTimeout, uint32_t iterations,
+void DeviceManager::OpenDeviceCommissioningWindow(NodeId nodeId, uint32_t commissioningTimeoutSec, uint32_t iterations,
                                                   uint16_t discriminator, const ByteSpan & salt, const ByteSpan & verifier)
 {
     ChipLogProgress(NotSpecified, "Opening commissioning window for Node ID: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
     // Open the commissioning window of a device within its own fabric.
-    CHIP_ERROR err = PairingManager::Instance().OpenCommissioningWindow(nodeId, kRootEndpointId, commissioningTimeout, iterations,
-                                                                        discriminator, salt, verifier);
+    CHIP_ERROR err = PairingManager::Instance().OpenCommissioningWindow(nodeId, kRootEndpointId, commissioningTimeoutSec,
+                                                                        iterations, discriminator, salt, verifier);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to open commissioning window: %s", ErrorStr(err));

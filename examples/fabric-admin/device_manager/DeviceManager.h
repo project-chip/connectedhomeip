@@ -94,7 +94,7 @@ public:
      * This function initiates the process to open the commissioning window for a device identified by the given node ID.
      *
      * @param nodeId               The ID of the node that should open the commissioning window.
-     * @param commissioningTimeout The time in seconds before the commissioning window closes. This value determines
+     * @param commissioningTimeoutSec The time in seconds before the commissioning window closes. This value determines
      *                             how long the commissioning window remains open for incoming connections.
      * @param iterations           The number of PBKDF (Password-Based Key Derivation Function) iterations to use
      *                             for deriving the PAKE (Password Authenticated Key Exchange) verifier.
@@ -104,7 +104,7 @@ public:
      * @param verifier             The PAKE verifier used to authenticate the commissioning process.
      *
      */
-    void OpenDeviceCommissioningWindow(chip::NodeId nodeId, uint32_t commissioningTimeout, uint32_t iterations,
+    void OpenDeviceCommissioningWindow(chip::NodeId nodeId, uint32_t commissioningTimeoutSec, uint32_t iterations,
                                        uint16_t discriminator, const chip::ByteSpan & salt, const chip::ByteSpan & verifier);
 
     /**
