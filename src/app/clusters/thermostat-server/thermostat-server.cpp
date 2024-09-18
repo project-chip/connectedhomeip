@@ -779,7 +779,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         }
         auto RequestedSystemMode = static_cast<SystemModeEnum>(*value);
         if (ControlSequenceOfOperation > ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat ||
-            RequestedSystemMode > SystemModeEnum::kSleep)
+            RequestedSystemMode > SystemModeEnum::kFanOnly)
         {
             return Status::InvalidValue;
         }
