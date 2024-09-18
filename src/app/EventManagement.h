@@ -29,6 +29,7 @@
 #include "EventLoggingDelegate.h"
 #include <access/SubjectDescriptor.h>
 #include <app/EventLoggingTypes.h>
+#include <app/EventScheduler.h>
 #include <app/MessageDef/EventDataIB.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/util/basic-types.h>
@@ -224,11 +225,14 @@ public:
      *                                   time 0" for cases when we use
      *                                   system-time event timestamps.
      *
+     * @param[in] apEventScheduler       Scheduler to deliver the event, default is the reporting
+     *                                   engine in InteractionModelEngine.
+     *
      */
     void Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
               const LogStorageResources * const apLogStorageResources,
               MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
-              System::Clock::Milliseconds64 aMonotonicStartupTime);
+              System::Clock::Milliseconds64 aMonotonicStartupTime, EventScheduler * apEventScheduler = nullptr);
 
     static EventManagement & GetInstance();
 
@@ -558,6 +562,8 @@ private:
     Timestamp mLastEventTimestamp;    ///< The timestamp of the last event in this buffer
 
     System::Clock::Milliseconds64 mMonotonicStartupTime;
+
+    EventScheduler * mpEventScheduler = nullptr;
 };
 } // namespace app
 } // namespace chip

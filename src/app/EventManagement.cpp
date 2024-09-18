@@ -83,7 +83,7 @@ struct CopyAndAdjustDeltaTimeContext
 void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
                            CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources,
                            MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
-                           System::Clock::Milliseconds64 aMonotonicStartupTime)
+                           System::Clock::Milliseconds64 aMonotonicStartupTime, EventScheduler * apEventScheduler)
 {
     CircularEventBuffer * current = nullptr;
     CircularEventBuffer * prev    = nullptr;
@@ -124,6 +124,15 @@ void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint3
     mBytesWritten = 0;
 
     mMonotonicStartupTime = aMonotonicStartupTime;
+
+    if (apEventScheduler == nullptr)
+    {
+        mpEventScheduler = &InteractionModelEngine::GetInstance()->GetReportingEngine();
+    }
+    else
+    {
+        mpEventScheduler = apEventScheduler;
+    }
 }
 
 CHIP_ERROR EventManagement::CopyToNextBuffer(CircularEventBuffer * apEventBuffer)
@@ -490,7 +499,10 @@ exit:
                       opts.mTimestamp.mType == Timestamp::Type::kSystem ? "Sys" : "Epoch", ChipLogValueX64(opts.mTimestamp.mValue));
 #endif // CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
 
-        err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleEventDelivery(opts.mPath, mBytesWritten);
+        if (mpEventScheduler)
+        {
+            err = mpEventScheduler->ScheduleEventDelivery(opts.mPath, mBytesWritten);
+        }
     }
 
     return err;
