@@ -111,8 +111,7 @@ static_library("nxp_zephyr") {
       "ota/OTAImageProcessorImpl.h",
     ]
   }
-  if (chip_enable_wifi || chip_enable_ethernet)
-  {
+  if (chip_enable_wifi || chip_enable_ethernet) {
     sources += [
       "../../Zephyr/InetUtils.cpp",
       "../../Zephyr/InetUtils.h",
