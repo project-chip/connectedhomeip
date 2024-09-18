@@ -31,12 +31,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "Groups";
     case chip::app::Clusters::OnOff::Id:
         return "OnOff";
-    case chip::app::Clusters::OnOffSwitchConfiguration::Id:
-        return "OnOffSwitchConfiguration";
     case chip::app::Clusters::LevelControl::Id:
         return "LevelControl";
-    case chip::app::Clusters::BinaryInputBasic::Id:
-        return "BinaryInputBasic";
     case chip::app::Clusters::PulseWidthModulation::Id:
         return "PulseWidthModulation";
     case chip::app::Clusters::Descriptor::Id:
@@ -183,8 +179,6 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "DoorLock";
     case chip::app::Clusters::WindowCovering::Id:
         return "WindowCovering";
-    case chip::app::Clusters::BarrierControl::Id:
-        return "BarrierControl";
     case chip::app::Clusters::ServiceArea::Id:
         return "ServiceArea";
     case chip::app::Clusters::PumpConfigurationAndControl::Id:
@@ -269,8 +263,6 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "EcosystemInformation";
     case chip::app::Clusters::CommissionerControl::Id:
         return "CommissionerControl";
-    case chip::app::Clusters::ElectricalMeasurement::Id:
-        return "ElectricalMeasurement";
     case chip::app::Clusters::UnitTesting::Id:
         return "UnitTesting";
     case chip::app::Clusters::FaultInjection::Id:
@@ -359,29 +351,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
-    case chip::app::Clusters::OnOffSwitchConfiguration::Id: {
-        switch (id)
-        {
-        case chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchType::Id:
-            return "SwitchType";
-        case chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchActions::Id:
-            return "SwitchActions";
-        case chip::app::Clusters::OnOffSwitchConfiguration::Attributes::GeneratedCommandList::Id:
-            return "GeneratedCommandList";
-        case chip::app::Clusters::OnOffSwitchConfiguration::Attributes::AcceptedCommandList::Id:
-            return "AcceptedCommandList";
-        case chip::app::Clusters::OnOffSwitchConfiguration::Attributes::EventList::Id:
-            return "EventList";
-        case chip::app::Clusters::OnOffSwitchConfiguration::Attributes::AttributeList::Id:
-            return "AttributeList";
-        case chip::app::Clusters::OnOffSwitchConfiguration::Attributes::FeatureMap::Id:
-            return "FeatureMap";
-        case chip::app::Clusters::OnOffSwitchConfiguration::Attributes::ClusterRevision::Id:
-            return "ClusterRevision";
-        default:
-            return "Unknown";
-        }
-    }
     case chip::app::Clusters::LevelControl::Id: {
         switch (id)
         {
@@ -424,43 +393,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::LevelControl::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::LevelControl::Attributes::ClusterRevision::Id:
-            return "ClusterRevision";
-        default:
-            return "Unknown";
-        }
-    }
-    case chip::app::Clusters::BinaryInputBasic::Id: {
-        switch (id)
-        {
-        case chip::app::Clusters::BinaryInputBasic::Attributes::ActiveText::Id:
-            return "ActiveText";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::Description::Id:
-            return "Description";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::InactiveText::Id:
-            return "InactiveText";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::Id:
-            return "OutOfService";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::Polarity::Id:
-            return "Polarity";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::Id:
-            return "PresentValue";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::Reliability::Id:
-            return "Reliability";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::Id:
-            return "StatusFlags";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::ApplicationType::Id:
-            return "ApplicationType";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::GeneratedCommandList::Id:
-            return "GeneratedCommandList";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::AcceptedCommandList::Id:
-            return "AcceptedCommandList";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::EventList::Id:
-            return "EventList";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::AttributeList::Id:
-            return "AttributeList";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::FeatureMap::Id:
-            return "FeatureMap";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -2937,45 +2869,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
-    case chip::app::Clusters::BarrierControl::Id: {
-        switch (id)
-        {
-        case chip::app::Clusters::BarrierControl::Attributes::BarrierMovingState::Id:
-            return "BarrierMovingState";
-        case chip::app::Clusters::BarrierControl::Attributes::BarrierSafetyStatus::Id:
-            return "BarrierSafetyStatus";
-        case chip::app::Clusters::BarrierControl::Attributes::BarrierCapabilities::Id:
-            return "BarrierCapabilities";
-        case chip::app::Clusters::BarrierControl::Attributes::BarrierOpenEvents::Id:
-            return "BarrierOpenEvents";
-        case chip::app::Clusters::BarrierControl::Attributes::BarrierCloseEvents::Id:
-            return "BarrierCloseEvents";
-        case chip::app::Clusters::BarrierControl::Attributes::BarrierCommandOpenEvents::Id:
-            return "BarrierCommandOpenEvents";
-        case chip::app::Clusters::BarrierControl::Attributes::BarrierCommandCloseEvents::Id:
-            return "BarrierCommandCloseEvents";
-        case chip::app::Clusters::BarrierControl::Attributes::BarrierOpenPeriod::Id:
-            return "BarrierOpenPeriod";
-        case chip::app::Clusters::BarrierControl::Attributes::BarrierClosePeriod::Id:
-            return "BarrierClosePeriod";
-        case chip::app::Clusters::BarrierControl::Attributes::BarrierPosition::Id:
-            return "BarrierPosition";
-        case chip::app::Clusters::BarrierControl::Attributes::GeneratedCommandList::Id:
-            return "GeneratedCommandList";
-        case chip::app::Clusters::BarrierControl::Attributes::AcceptedCommandList::Id:
-            return "AcceptedCommandList";
-        case chip::app::Clusters::BarrierControl::Attributes::EventList::Id:
-            return "EventList";
-        case chip::app::Clusters::BarrierControl::Attributes::AttributeList::Id:
-            return "AttributeList";
-        case chip::app::Clusters::BarrierControl::Attributes::FeatureMap::Id:
-            return "FeatureMap";
-        case chip::app::Clusters::BarrierControl::Attributes::ClusterRevision::Id:
-            return "ClusterRevision";
-        default:
-            return "Unknown";
-        }
-    }
     case chip::app::Clusters::ServiceArea::Id: {
         switch (id)
         {
@@ -4526,281 +4419,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
-    case chip::app::Clusters::ElectricalMeasurement::Id: {
-        switch (id)
-        {
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::MeasurementType::Id:
-            return "MeasurementType";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::DcVoltage::Id:
-            return "DcVoltage";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::DcVoltageMin::Id:
-            return "DcVoltageMin";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::DcVoltageMax::Id:
-            return "DcVoltageMax";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::DcCurrent::Id:
-            return "DcCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::DcCurrentMin::Id:
-            return "DcCurrentMin";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::DcCurrentMax::Id:
-            return "DcCurrentMax";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::DcPower::Id:
-            return "DcPower";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::DcPowerMin::Id:
-            return "DcPowerMin";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::DcPowerMax::Id:
-            return "DcPowerMax";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::DcVoltageMultiplier::Id:
-            return "DcVoltageMultiplier";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::DcVoltageDivisor::Id:
-            return "DcVoltageDivisor";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::DcCurrentMultiplier::Id:
-            return "DcCurrentMultiplier";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::DcCurrentDivisor::Id:
-            return "DcCurrentDivisor";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::DcPowerMultiplier::Id:
-            return "DcPowerMultiplier";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::DcPowerDivisor::Id:
-            return "DcPowerDivisor";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AcFrequency::Id:
-            return "AcFrequency";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AcFrequencyMin::Id:
-            return "AcFrequencyMin";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AcFrequencyMax::Id:
-            return "AcFrequencyMax";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::NeutralCurrent::Id:
-            return "NeutralCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::TotalActivePower::Id:
-            return "TotalActivePower";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::TotalReactivePower::Id:
-            return "TotalReactivePower";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::TotalApparentPower::Id:
-            return "TotalApparentPower";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::Measured1stHarmonicCurrent::Id:
-            return "Measured1stHarmonicCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::Measured3rdHarmonicCurrent::Id:
-            return "Measured3rdHarmonicCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::Measured5thHarmonicCurrent::Id:
-            return "Measured5thHarmonicCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::Measured7thHarmonicCurrent::Id:
-            return "Measured7thHarmonicCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::Measured9thHarmonicCurrent::Id:
-            return "Measured9thHarmonicCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::Measured11thHarmonicCurrent::Id:
-            return "Measured11thHarmonicCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::MeasuredPhase1stHarmonicCurrent::Id:
-            return "MeasuredPhase1stHarmonicCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::MeasuredPhase3rdHarmonicCurrent::Id:
-            return "MeasuredPhase3rdHarmonicCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::MeasuredPhase5thHarmonicCurrent::Id:
-            return "MeasuredPhase5thHarmonicCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::MeasuredPhase7thHarmonicCurrent::Id:
-            return "MeasuredPhase7thHarmonicCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::MeasuredPhase9thHarmonicCurrent::Id:
-            return "MeasuredPhase9thHarmonicCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::MeasuredPhase11thHarmonicCurrent::Id:
-            return "MeasuredPhase11thHarmonicCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AcFrequencyMultiplier::Id:
-            return "AcFrequencyMultiplier";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AcFrequencyDivisor::Id:
-            return "AcFrequencyDivisor";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::PowerMultiplier::Id:
-            return "PowerMultiplier";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::PowerDivisor::Id:
-            return "PowerDivisor";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::HarmonicCurrentMultiplier::Id:
-            return "HarmonicCurrentMultiplier";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::PhaseHarmonicCurrentMultiplier::Id:
-            return "PhaseHarmonicCurrentMultiplier";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::InstantaneousVoltage::Id:
-            return "InstantaneousVoltage";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::InstantaneousLineCurrent::Id:
-            return "InstantaneousLineCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::InstantaneousActiveCurrent::Id:
-            return "InstantaneousActiveCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::InstantaneousReactiveCurrent::Id:
-            return "InstantaneousReactiveCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::InstantaneousPower::Id:
-            return "InstantaneousPower";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltage::Id:
-            return "RmsVoltage";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageMin::Id:
-            return "RmsVoltageMin";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageMax::Id:
-            return "RmsVoltageMax";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrent::Id:
-            return "RmsCurrent";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrentMin::Id:
-            return "RmsCurrentMin";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrentMax::Id:
-            return "RmsCurrentMax";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePower::Id:
-            return "ActivePower";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePowerMin::Id:
-            return "ActivePowerMin";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePowerMax::Id:
-            return "ActivePowerMax";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ReactivePower::Id:
-            return "ReactivePower";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ApparentPower::Id:
-            return "ApparentPower";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::PowerFactor::Id:
-            return "PowerFactor";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriod::Id:
-            return "AverageRmsVoltageMeasurementPeriod";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounter::Id:
-            return "AverageRmsUnderVoltageCounter";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriod::Id:
-            return "RmsExtremeOverVoltagePeriod";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriod::Id:
-            return "RmsExtremeUnderVoltagePeriod";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageSagPeriod::Id:
-            return "RmsVoltageSagPeriod";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageSwellPeriod::Id:
-            return "RmsVoltageSwellPeriod";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AcVoltageMultiplier::Id:
-            return "AcVoltageMultiplier";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AcVoltageDivisor::Id:
-            return "AcVoltageDivisor";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AcCurrentMultiplier::Id:
-            return "AcCurrentMultiplier";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AcCurrentDivisor::Id:
-            return "AcCurrentDivisor";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AcPowerMultiplier::Id:
-            return "AcPowerMultiplier";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AcPowerDivisor::Id:
-            return "AcPowerDivisor";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::OverloadAlarmsMask::Id:
-            return "OverloadAlarmsMask";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::VoltageOverload::Id:
-            return "VoltageOverload";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::CurrentOverload::Id:
-            return "CurrentOverload";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AcOverloadAlarmsMask::Id:
-            return "AcOverloadAlarmsMask";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AcVoltageOverload::Id:
-            return "AcVoltageOverload";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AcCurrentOverload::Id:
-            return "AcCurrentOverload";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AcActivePowerOverload::Id:
-            return "AcActivePowerOverload";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AcReactivePowerOverload::Id:
-            return "AcReactivePowerOverload";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AverageRmsOverVoltage::Id:
-            return "AverageRmsOverVoltage";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AverageRmsUnderVoltage::Id:
-            return "AverageRmsUnderVoltage";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsExtremeOverVoltage::Id:
-            return "RmsExtremeOverVoltage";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsExtremeUnderVoltage::Id:
-            return "RmsExtremeUnderVoltage";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageSag::Id:
-            return "RmsVoltageSag";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageSwell::Id:
-            return "RmsVoltageSwell";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::LineCurrentPhaseB::Id:
-            return "LineCurrentPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ActiveCurrentPhaseB::Id:
-            return "ActiveCurrentPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ReactiveCurrentPhaseB::Id:
-            return "ReactiveCurrentPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltagePhaseB::Id:
-            return "RmsVoltagePhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageMinPhaseB::Id:
-            return "RmsVoltageMinPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageMaxPhaseB::Id:
-            return "RmsVoltageMaxPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrentPhaseB::Id:
-            return "RmsCurrentPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrentMinPhaseB::Id:
-            return "RmsCurrentMinPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrentMaxPhaseB::Id:
-            return "RmsCurrentMaxPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePowerPhaseB::Id:
-            return "ActivePowerPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePowerMinPhaseB::Id:
-            return "ActivePowerMinPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePowerMaxPhaseB::Id:
-            return "ActivePowerMaxPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ReactivePowerPhaseB::Id:
-            return "ReactivePowerPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ApparentPowerPhaseB::Id:
-            return "ApparentPowerPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::PowerFactorPhaseB::Id:
-            return "PowerFactorPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriodPhaseB::Id:
-            return "AverageRmsVoltageMeasurementPeriodPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AverageRmsOverVoltageCounterPhaseB::Id:
-            return "AverageRmsOverVoltageCounterPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounterPhaseB::Id:
-            return "AverageRmsUnderVoltageCounterPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriodPhaseB::Id:
-            return "RmsExtremeOverVoltagePeriodPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriodPhaseB::Id:
-            return "RmsExtremeUnderVoltagePeriodPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageSagPeriodPhaseB::Id:
-            return "RmsVoltageSagPeriodPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageSwellPeriodPhaseB::Id:
-            return "RmsVoltageSwellPeriodPhaseB";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::LineCurrentPhaseC::Id:
-            return "LineCurrentPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ActiveCurrentPhaseC::Id:
-            return "ActiveCurrentPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ReactiveCurrentPhaseC::Id:
-            return "ReactiveCurrentPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltagePhaseC::Id:
-            return "RmsVoltagePhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageMinPhaseC::Id:
-            return "RmsVoltageMinPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageMaxPhaseC::Id:
-            return "RmsVoltageMaxPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrentPhaseC::Id:
-            return "RmsCurrentPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrentMinPhaseC::Id:
-            return "RmsCurrentMinPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrentMaxPhaseC::Id:
-            return "RmsCurrentMaxPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePowerPhaseC::Id:
-            return "ActivePowerPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePowerMinPhaseC::Id:
-            return "ActivePowerMinPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePowerMaxPhaseC::Id:
-            return "ActivePowerMaxPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ReactivePowerPhaseC::Id:
-            return "ReactivePowerPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ApparentPowerPhaseC::Id:
-            return "ApparentPowerPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::PowerFactorPhaseC::Id:
-            return "PowerFactorPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriodPhaseC::Id:
-            return "AverageRmsVoltageMeasurementPeriodPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AverageRmsOverVoltageCounterPhaseC::Id:
-            return "AverageRmsOverVoltageCounterPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounterPhaseC::Id:
-            return "AverageRmsUnderVoltageCounterPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriodPhaseC::Id:
-            return "RmsExtremeOverVoltagePeriodPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriodPhaseC::Id:
-            return "RmsExtremeUnderVoltagePeriodPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageSagPeriodPhaseC::Id:
-            return "RmsVoltageSagPeriodPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageSwellPeriodPhaseC::Id:
-            return "RmsVoltageSwellPeriodPhaseC";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::GeneratedCommandList::Id:
-            return "GeneratedCommandList";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AcceptedCommandList::Id:
-            return "AcceptedCommandList";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::EventList::Id:
-            return "EventList";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::AttributeList::Id:
-            return "AttributeList";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::FeatureMap::Id:
-            return "FeatureMap";
-        case chip::app::Clusters::ElectricalMeasurement::Attributes::ClusterRevision::Id:
-            return "ClusterRevision";
-        default:
-            return "Unknown";
-        }
-    }
     case chip::app::Clusters::UnitTesting::Id: {
         switch (id)
         {
@@ -5780,17 +5398,6 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
-    case chip::app::Clusters::BarrierControl::Id: {
-        switch (id)
-        {
-        case chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::Id:
-            return "BarrierControlGoToPercent";
-        case chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::Id:
-            return "BarrierControlStop";
-        default:
-            return "Unknown";
-        }
-    }
     case chip::app::Clusters::ServiceArea::Id: {
         switch (id)
         {
@@ -6101,17 +5708,6 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "RequestCommissioningApproval";
         case chip::app::Clusters::CommissionerControl::Commands::CommissionNode::Id:
             return "CommissionNode";
-        default:
-            return "Unknown";
-        }
-    }
-    case chip::app::Clusters::ElectricalMeasurement::Id: {
-        switch (id)
-        {
-        case chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoCommand::Id:
-            return "GetProfileInfoCommand";
-        case chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileCommand::Id:
-            return "GetMeasurementProfileCommand";
         default:
             return "Unknown";
         }
@@ -6633,17 +6229,6 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::CommissionerControl::Commands::ReverseOpenCommissioningWindow::Id:
             return "ReverseOpenCommissioningWindow";
-        default:
-            return "Unknown";
-        }
-    }
-    case chip::app::Clusters::ElectricalMeasurement::Id: {
-        switch (id)
-        {
-        case chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::Id:
-            return "GetProfileInfoResponseCommand";
-        case chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::Id:
-            return "GetMeasurementProfileResponseCommand";
         default:
             return "Unknown";
         }

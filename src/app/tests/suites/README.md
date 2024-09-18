@@ -3,25 +3,30 @@
 -   [CHIP Test Suites](#chip-test-suites)
 -   [Controllers](#controllers)
 -   [Automatic conversion process](#automatic-conversion-process)
--   [List](#list)
-    -   [chip_tests](#list-chiptests)
-        -   [Property: test](#property-test)
-        -   [Property: config](#property-config)
-        -   [Property: {variable_name}](#property-variable_name)
-    -   [chip_tests_items](#list-chip_tests_items)
-        -   [Property: tests](#property-tests)
-        -   [Property: arguments](#property-arguments)
-        -   [Property: values](#property-values)
-        -   [Property: response](#property-response)
-        -   [Property: constraints](#property-constraints)
-    -   [chip_tests_item_parameters](#list-chip_tests_item_parameters)
-    -   [chip_tests_item_response_parameters](#list-chip_tests_item_response_parameters)
-    -   [chip_tests_pics](#list-chip_tests_pics)
+-   [Lists](#lists)
+    -   [List: _chip_tests_](#list-chip_tests)
+        -   [Property: _test_](#property-test)
+        -   [Property: _config_](#property-config)
+            -   [Property: _{variable_name}_](#property-variable_name)
+    -   [List: _chip_tests_items_](#list-chip_tests_items)
+        -   [Property: _tests_](#property-tests)
+            -   [Property: _arguments_](#property-arguments)
+            -   [Property: _values_](#property-values)
+            -   [Property: _response_](#property-response)
+            -   [Property: _constraints_](#property-constraints)
+    -   [List: _chip_tests_item_parameters_](#list-chip_tests_item_parameters)
+    -   [List: _chip_tests_item_response_parameters_](#list-chip_tests_item_response_parameters)
+    -   [List: _chip_tests_pics_](#list-chip_tests_pics)
+    -   [List: _chip_tests_config_](#list-chip_tests_config)
 -   [YAML Test Definition](#yaml-test-definition)
--   [PICS Usage](#pics-usage)
+    -   [Location of Test Definitions](#location-of-test-definitions)
+-   [PICS Usage](#pics-usage) - [Required Files](#required-files) -
+    [Example PICS Command](#example-pics-command)
 -   [Examples](#examples)
     -   [YAML Examples](#yaml-examples)
     -   [ZAP Example](#zap-example)
+        -   [Required Files](#required-files-1)
+        -   [Generate Example Script](#generate-example-script)
 -   [Index](#index)
 
 This directory contains a set of tests describing interactions between nodes,
@@ -373,50 +378,5 @@ src/app/tests/suites/examples/gen_readme_example.sh
 | ipv6pre           |      | IPV6PRE           | 0xFD | IPv6 Prefix              | uint8_t \* |
 | hwadr             |      | HWADR             | 0xFE | Hardware Address         | uint8_t \* |
 | unknown           | 0    | UNKNOWN           | 0xFF | Unknown                  | uint8_t \* |
-
-</details>
-
-<details><summary>Cluster Names</summary><p>
-
-|                                |                                          |                                               |
-| ------------------------------ | ---------------------------------------- | --------------------------------------------- |
-| PowerConfiguration             | AdministratorCommissioning               | DissolvedOxygenConcentrationMeasurement       |
-| DeviceTemperatureConfiguration | OperationalCredentials                   | BromateConcentrationMeasurement               |
-| Identify                       | GroupKeyManagement                       | ChloraminesConcentrationMeasurement           |
-| Groups                         | FixedLabel                               | ChlorineConcentrationMeasurement              |
-| Scenes                         | UserLabel                                | FecalColiformAndEColiConcentrationMeasurement |
-| OnOff                          | ProxyConfiguration                       | FluorideConcentrationMeasurement              |
-| OnOffSwitchConfiguration       | ProxyDiscovery                           | HaloaceticAcidsConcentrationMeasurement       |
-| LevelControl                   | ProxyValid                               | TotalTrihalomethanesConcentrationMeasurement  |
-| Alarms                         | BooleanState                             | TotalColiformBacteriaConcentrationMeasurement |
-| Time                           | ModeSelect                               | TurbidityConcentrationMeasurement             |
-| BinaryInputBasic               | ShadeConfiguration                       | CopperConcentrationMeasurement                |
-| PowerProfile                   | DoorLock                                 | LeadConcentrationMeasurement                  |
-| ApplianceControl               | WindowCovering                           | ManganeseConcentrationMeasurement             |
-| PulseWidthModulation           | BarrierControl                           | SulfateConcentrationMeasurement               |
-| Descriptor                     | PumpConfigurationAndControl              | BromodichloromethaneConcentrationMeasurement  |
-| Binding                        | Thermostat                               | BromoformConcentrationMeasurement             |
-| AccessControl                  | FanControl                               | ChlorodibromomethaneConcentrationMeasurement  |
-| PollControl                    | DehumidificationControl                  | ChloroformConcentrationMeasurement            |
-| Actions                        | ThermostatUserInterfaceConfiguration     | SodiumConcentrationMeasurement                |
-| Basic                          | ColorControl                             | IasZone                                       |
-| OtaSoftwareUpdateProvider      | BallastConfiguration                     | IasAce                                        |
-| OtaSoftwareUpdateRequestor     | IlluminanceMeasurement                   | IasWd                                         |
-| LocalizationConfiguration      | TemperatureMeasurement                   | WakeOnLan                                     |
-| TimeFormatLocalization         | PressureMeasurement                      | Channel                                       |
-| UnitLocalization               | FlowMeasurement                          | TargetNavigator                               |
-| PowerSourceConfiguration       | RelativeHumidityMeasurement              | MediaPlayback                                 |
-| PowerSource                    | OccupancySensing                         | MediaInput                                    |
-| GeneralCommissioning           | CarbonMonoxideConcentrationMeasurement   | LowPower                                      |
-| NetworkCommissioning           | CarbonDioxideConcentrationMeasurement    | KeypadInput                                   |
-| DiagnosticLogs                 | EthyleneConcentrationMeasurement         | ContentLauncher                               |
-| GeneralDiagnostics             | EthyleneOxideConcentrationMeasurement    | AudioOutput                                   |
-| SoftwareDiagnostics            | HydrogenConcentrationMeasurement         | ApplicationLauncher                           |
-| ThreadNetworkDiagnostics       | HydrogenSulphideConcentrationMeasurement | ApplicationBasic                              |
-| WiFiNetworkDiagnostics         | NitricOxideConcentrationMeasurement      | AccountLogin                                  |
-| EthernetNetworkDiagnostics     | NitrogenDioxideConcentrationMeasurement  | TestCluster                                   |
-| TimeSynchronization            | OxygenConcentrationMeasurement           | Messaging                                     |
-| BridgedDeviceBasicInformation  | OzoneConcentrationMeasurement            | ApplianceIdentification                       |
-| Switch                         | SulfurDioxideConcentrationMeasurement    | MeterIdentification                           |
 
 </details>
