@@ -97,12 +97,6 @@ def main(search_directory, env_file):
         "test_plan_table_generator.py"  # Code/Test not being used or not shared code for any other tests
     }
 
-    # Explanation for excluded files:
-    # The above list of files are excluded from the tests as they are either not app-specific tests
-    # or are run through a different block of tests mentioned in tests.yaml.
-    # This is to ensure that only relevant test scripts are executed, avoiding redundancy and ensuring
-    # the correctness of the test suite.
-
     # Get all .py files in the directory
     all_python_files = glob.glob(os.path.join(search_directory, "*.py"))
 
