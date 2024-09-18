@@ -75,7 +75,7 @@ public:
      *
      * @return CHIP_ERROR_INCORRECT_STATE if a commissioning window is already open.
      */
-    CHIP_ERROR OpenCommissioningWindow(chip::NodeId nodeId, chip::EndpointId endpointId, uint16_t commissioningTimeout,
+    CHIP_ERROR OpenCommissioningWindow(chip::NodeId nodeId, chip::EndpointId endpointId, uint16_t commissioningTimeoutSec,
                                        uint32_t iterations, uint16_t discriminator, const chip::ByteSpan & salt,
                                        const chip::ByteSpan & verifier);
 
