@@ -93,8 +93,7 @@ mcxw71_k32w1_sdk("sdk") {
     ]
   }
 
-  if (nxp_multiple_ble_connections)
-  {
+  if (nxp_multiple_ble_connections) {
     include_dirs += [ "${example_platform_dir}/app_ble/include" ]
     defines += [
       "EXTRA_GATT_DB_HEADER=\"extra_gatt_db.h\"",
@@ -199,13 +198,13 @@ mcxw71_k32w1_executable("lock_app") {
     deps += [ "${chip_root}/src/platform/nxp:nxp_ota" ]
   }
 
-  if (nxp_multiple_ble_connections)
-  {
-    sources += [ "${example_platform_dir}/app_ble/source/BLEApplicationManager.cpp", ]
-  }
-  else
-  {
-    sources += [ "${common_example_dir}/app_ble/source/BLEApplicationManagerEmpty.cpp", ]
+  if (nxp_multiple_ble_connections) {
+    sources +=
+        [ "${example_platform_dir}/app_ble/source/BLEApplicationManager.cpp" ]
+  } else {
+    sources += [
+      "${common_example_dir}/app_ble/source/BLEApplicationManagerEmpty.cpp",
+    ]
   }
 
   if (chip_with_diag_logs_demo) {
