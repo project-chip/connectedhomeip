@@ -41,7 +41,7 @@ def generate_new_cipd_package_json(input, output, extra):
         file_packages = packages.get('packages')
         new_file_packages = [x for x in file_packages if include_package(x)]
 
-    # Extra is a list of platform:json. 
+    # Extra is a list of platform:json.
     # Filter it for the given platform and append any resulting packages
     my_platform = platform.system().lower()
     for item in extra:
@@ -53,7 +53,6 @@ def generate_new_cipd_package_json(input, output, extra):
         with open(path) as ins:
             for package in json.load(ins).get('packages'):
                 new_file_packages.append(package)
-
 
     new_packages = {'packages': new_file_packages}
     with open(output, 'w') as f:
