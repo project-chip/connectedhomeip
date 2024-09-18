@@ -24,6 +24,7 @@
 #include "dmd.h"
 #include "glib.h"
 #include "lcd.h"
+#include <lib/support/logging/CHIPLogging.h>
 
 #if SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)
 // Only needed for wifi NCP devices
@@ -63,7 +64,7 @@ void RefrigeratorUI::DrawUI(GLIB_Context_t * glibContext)
 {
     if (glibContext == nullptr)
     {
-        SILABS_LOG("Context is null");
+        ChipLogDetail(AppServer, "App Task started");
         return;
     }
 

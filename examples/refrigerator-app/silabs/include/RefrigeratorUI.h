@@ -26,13 +26,6 @@ class RefrigeratorUI
 {
 
 public:
-    enum SUPPORTED_MODES
-    {
-        NORMAL       = 0x0000,
-        ENERGY_SAVE  = 0x0004,
-        RAPID_COOL   = 0x4000,
-        RAPID_FREEZE = 0x4001,
-    };
 
     static void DrawUI(GLIB_Context_t * glibContext);
     static void SetCurrentTemp(int8_t temp);
