@@ -107,5 +107,4 @@ private:
      * @param aEvent button event being processed
      */
     static void RefrigeratorActionEventHandler(AppEvent * aEvent);
-
 };

@@ -36,10 +36,10 @@ const uint8_t ModeRapidFreeze = 1;
 class RefrigeratorAndTemperatureControlledCabinetModeDelegate : public ModeBase::Delegate
 {
 private:
-    using ModeTagStructType                     = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType modeTagsRapidCool[1]      = { { .value = to_underlying(ModeTag::kRapidCool) } };
-    ModeTagStructType modeTagsRapidFreeze[2]    = { { .value = to_underlying(ModeBase::ModeTag::kMax) },
-                                              { .value = to_underlying(ModeTag::kRapidFreeze) } };
+    using ModeTagStructType                  = detail::Structs::ModeTagStruct::Type;
+    ModeTagStructType modeTagsRapidCool[1]   = { { .value = to_underlying(ModeTag::kRapidCool) } };
+    ModeTagStructType modeTagsRapidFreeze[2] = { { .value = to_underlying(ModeBase::ModeTag::kMax) },
+                                                 { .value = to_underlying(ModeTag::kRapidFreeze) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[2] = {
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Rapid Cool"),
@@ -64,7 +64,7 @@ ModeBase::Instance * Instance();
 
 void Shutdown();
 
-} // namespace LaundryWasherMode
+} // namespace RefrigeratorAndTemperatureControlledCabinetMode
 
 } // namespace Clusters
 } // namespace app

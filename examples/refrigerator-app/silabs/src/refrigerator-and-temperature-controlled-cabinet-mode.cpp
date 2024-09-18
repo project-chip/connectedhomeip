@@ -26,19 +26,21 @@ using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
 static RefrigeratorAndTemperatureControlledCabinetModeDelegate * gRefrigeratorAndTemperatureControlledCabinetModeDelegate = nullptr;
-static ModeBase::Instance * gRefrigeratorAndTemperatureControlledCabinetModeInstance        = nullptr;
+static ModeBase::Instance * gRefrigeratorAndTemperatureControlledCabinetModeInstance                                      = nullptr;
 
 CHIP_ERROR RefrigeratorAndTemperatureControlledCabinetModeDelegate::Init()
 {
     return CHIP_NO_ERROR;
 }
 
-void RefrigeratorAndTemperatureControlledCabinetModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
+void RefrigeratorAndTemperatureControlledCabinetModeDelegate::HandleChangeToMode(
+    uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
-CHIP_ERROR RefrigeratorAndTemperatureControlledCabinetModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
+CHIP_ERROR RefrigeratorAndTemperatureControlledCabinetModeDelegate::GetModeLabelByIndex(uint8_t modeIndex,
+                                                                                        chip::MutableCharSpan & label)
 {
     if (modeIndex >= ArraySize(kModeOptions))
     {
@@ -57,7 +59,8 @@ CHIP_ERROR RefrigeratorAndTemperatureControlledCabinetModeDelegate::GetModeValue
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR RefrigeratorAndTemperatureControlledCabinetModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
+CHIP_ERROR RefrigeratorAndTemperatureControlledCabinetModeDelegate::GetModeTagsByIndex(uint8_t modeIndex,
+                                                                                       List<ModeTagStructType> & tags)
 {
     if (modeIndex >= ArraySize(kModeOptions))
     {
@@ -97,9 +100,12 @@ void RefrigeratorAndTemperatureControlledCabinetMode::Shutdown()
 void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gRefrigeratorAndTemperatureControlledCabinetModeDelegate == nullptr && gRefrigeratorAndTemperatureControlledCabinetModeInstance == nullptr);
-    gRefrigeratorAndTemperatureControlledCabinetModeDelegate = new RefrigeratorAndTemperatureControlledCabinetMode::RefrigeratorAndTemperatureControlledCabinetModeDelegate;
+    VerifyOrDie(gRefrigeratorAndTemperatureControlledCabinetModeDelegate == nullptr &&
+                gRefrigeratorAndTemperatureControlledCabinetModeInstance == nullptr);
+    gRefrigeratorAndTemperatureControlledCabinetModeDelegate =
+        new RefrigeratorAndTemperatureControlledCabinetMode::RefrigeratorAndTemperatureControlledCabinetModeDelegate;
     gRefrigeratorAndTemperatureControlledCabinetModeInstance =
-        new ModeBase::Instance(gRefrigeratorAndTemperatureControlledCabinetModeDelegate, 0x1, RefrigeratorAndTemperatureControlledCabinetMode::Id, chip::to_underlying(Feature::kOnOff));
+        new ModeBase::Instance(gRefrigeratorAndTemperatureControlledCabinetModeDelegate, 0x1,
+                               RefrigeratorAndTemperatureControlledCabinetMode::Id, chip::to_underlying(Feature::kOnOff));
     gRefrigeratorAndTemperatureControlledCabinetModeInstance->Init();
 }
