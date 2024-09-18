@@ -214,6 +214,7 @@ ALL_ATTRIBUTES: typing.Dict = {}
 # These need to be separate because there can be overlap in command ids for commands and responses.
 ALL_ACCEPTED_COMMANDS: typing.Dict = {}
 ALL_GENERATED_COMMANDS: typing.Dict = {}
+ALL_EVENTS: typing.Dict = {}
 
 
 class ClusterCommand(ClusterObject):
@@ -369,6 +370,19 @@ class ClusterAttributeDescriptor:
 
 
 class ClusterEvent(ClusterObject):
+    def __init_subclass__(cls, *args, **kwargs) -> None:
+        """Register a subclass."""
+        super().__init_subclass__(*args, **kwargs)
+        try:
+            if cls.event_id not in ALL_EVENTS:
+                ALL_EVENTS[cls.event_id] = {}
+            # register this clusterattribute in the ALL_ATTRIBUTES dict for quick lookups
+            ALL_EVENTS[cls.cluster_id][cls.event_id] = cls
+        except NotImplementedError:
+            # handle case where the ClusterAttribute class is not (fully) subclassed
+            # and accessing the id property throws a NotImplementedError.
+            pass
+
     @ChipUtility.classproperty
     def cluster_id(self) -> int:
         raise NotImplementedError()
