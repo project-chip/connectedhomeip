@@ -171,17 +171,18 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         return ''.join(random.choices(string.digits, k=maxPincodeLength))
 
     async def generate_code(self):
-
-        validpincodestr = await self.generate_max_pincode_len(self.maxpincodelength)
-        self.pin_code = bytes(validpincodestr, 'ascii')
-        validpincodestr = await self.generate_max_pincode_len(self.maxpincodelength)
-        self.pin_code1 = bytes(validpincodestr, 'ascii')
-        validpincodestr = await self.generate_max_pincode_len(self.maxpincodelength)
-        self.pin_code2 = bytes(validpincodestr, 'ascii')
-        inavlidpincodestr = await self.generate_max_pincode_len(self.maxpincodelength+1)
-        self.inavlid_pincode = bytes(inavlidpincodestr, 'ascii')
-        validpincodestr = await self.generate_max_pincode_len(self.maxrfidcodelength)
-        self.rfid_tag = bytes(validpincodestr, 'ascii')
+        if (self.maxpincodelength != None):
+            validpincodestr = await self.generate_max_pincode_len(self.maxpincodelength)
+            self.pin_code = bytes(validpincodestr, 'ascii')
+            validpincodestr = await self.generate_max_pincode_len(self.maxpincodelength)
+            self.pin_code1 = bytes(validpincodestr, 'ascii')
+            validpincodestr = await self.generate_max_pincode_len(self.maxpincodelength)
+            self.pin_code2 = bytes(validpincodestr, 'ascii')
+            inavlidpincodestr = await self.generate_max_pincode_len(self.maxpincodelength+1)
+            self.inavlid_pincode = bytes(inavlidpincodestr, 'ascii')
+        if (self.maxrfidcodelength != None):
+            validpincodestr = await self.generate_max_pincode_len(self.maxrfidcodelength)
+            self.rfid_tag = bytes(validpincodestr, 'ascii')
 
     async def send_clear_user_cmd(self, user_index, expected_status: Status = Status.Success):
         try:
@@ -259,8 +260,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             credentialType=credential_enum,
             credentialIndex=credentialIndex)
         try:
-            logging.info("maxpincodelength value is %s" % (self.maxpincodelength))
-            logging.info("maxrfidcodelength value is %s" % (self.maxrfidcodelength))
+
             logging.info("Credential Data is %s" % (credentialData))
             response = await self.send_single_cmd(cmd=drlkcluster.Commands.SetCredential(
                 operationType=operationType,
@@ -365,6 +365,11 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         self.pin_code2 = b""
         self.inavlid_pincode = b""
         self.rfid_tag = b""
+
+        self.minpincodelength = None
+        self.maxpincodelength = None
+        self.maxrfidcodelength = None
+        self.minrfidcodelength = None
 
         self.endpoint = self.user_params.get("endpoint", 1)
         print("endpoint", self.endpoint)
@@ -532,20 +537,21 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                                                               cluster=drlkcluster,
                                                               attribute=Clusters.DoorLock.Attributes.FeatureMap)
             aliro_enabled = feature_map & Clusters.DoorLock.Bitmaps.Feature.kAliroProvisioning
-        if (aliro_enabled):
             credentials = drlkcluster.Structs.CredentialStruct(credentialIndex=credentialIndex_1,
                                                                credentialType=drlkcluster.Enums.CredentialTypeEnum.kAliroNonEvictableEndpointKey)
-            await self.clear_credentials_cmd(credential=credentials)
-        else:
-            try:
-                await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearCredential(credential=credentials),
-                                           endpoint=self.app_cluster_endpoint,
-                                           timedRequestTimeoutMs=1000)
-                asserts.fail("Unexpected success in sending ClearCredential Command  with invalid CredentialTpe")
+            if (aliro_enabled):
 
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.InvalidCommand,
-                                     "Unexpected error sending ClearCredential Command  with invalid CredentialTpe")
+                await self.clear_credentials_cmd(credential=credentials)
+            else:
+                try:
+                    await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearCredential(credential=credentials),
+                                               endpoint=self.app_cluster_endpoint,
+                                               timedRequestTimeoutMs=1000)
+                    asserts.fail("Unexpected success in sending ClearCredential Command  with invalid CredentialTpe")
+
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.InvalidCommand,
+                                         "Unexpected error sending ClearCredential Command  with invalid CredentialTpe")
 
         self.step("14b")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C26.Rsp")):
