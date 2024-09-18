@@ -15,11 +15,7 @@
 name: Build example - Open IoT SDK
 
 on:
-    push:
-        branches-ignore:
-            - 'dependabot/**'
-    pull_request:
-    merge_group:
+    # Workflow disabled due to lack of maintainer
     workflow_dispatch:
 
 concurrency:
