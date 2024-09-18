@@ -39,6 +39,7 @@ class NxpBoard(Enum):
     K32W0 = auto()
     K32W1 = auto()
     RW61X = auto()
+    RW61X_ETH = auto()
     MCXW71 = auto()
 
     def Name(self, os_env):
@@ -46,9 +47,12 @@ class NxpBoard(Enum):
             return 'k32w0x'
         elif self == NxpBoard.K32W1:
             return 'k32w1'
-        elif self == NxpBoard.RW61X:
+        elif (self == NxpBoard.RW61X) or (self == NxpBoard.RW61X_ETH):
             if os_env == NxpOsUsed.ZEPHYR:
-                return 'rd_rw612_bga'
+                if self == NxpBoard.RW61X_ETH:
+                    return 'rd_rw612_bga/rw612/ethernet'
+                else:
+                    return 'rd_rw612_bga'
             else:
                 return 'rw61x'
         elif self == NxpBoard.MCXW71:
@@ -61,7 +65,7 @@ class NxpBoard(Enum):
             return 'k32w0'
         elif self == NxpBoard.K32W1:
             return 'k32w1'
-        elif self == NxpBoard.RW61X:
+        elif (self == NxpBoard.RW61X) or (self == NxpBoard.RW61X_ETH):
             if os_env == NxpOsUsed.ZEPHYR:
                 return 'zephyr'
             else:
@@ -135,6 +139,7 @@ class NxpBuilder(GnBuilder):
                  disable_ble: bool = False,
                  enable_thread: bool = False,
                  enable_wifi: bool = False,
+                 enable_ethernet: bool = False,
                  disable_ipv4: bool = False,
                  enable_shell: bool = False,
                  enable_ota: bool = False,
@@ -159,6 +164,7 @@ class NxpBuilder(GnBuilder):
         self.disable_ble = disable_ble
         self.enable_thread = enable_thread
         self.enable_wifi = enable_wifi
+        self.enable_ethernet = enable_ethernet
         self.enable_ota = enable_ota
         self.enable_shell = enable_shell
         self.data_model_interface = data_model_interface
@@ -220,6 +226,9 @@ class NxpBuilder(GnBuilder):
         args = []
         if self.enable_factory_data:
             args.append('-DFILE_SUFFIX=fdata')
+
+        if self.enable_ethernet:
+            args.append('-DEXTRA_CONF_FILE="prj_ethernet.conf"')
 
         if self.has_sw_version_2:
             args.append('-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2')
