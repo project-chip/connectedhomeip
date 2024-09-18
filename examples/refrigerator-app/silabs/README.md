@@ -340,6 +340,10 @@ For the description of Software Update process with EFR32 example applications
 see
 [EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
 
+For the description of Software Update process with SiWx917 example applications
+see
+[SiWx917 OTA Software Update](https://docs.silabs.com/matter/latest/matter-ota/04-ota-software-update-soc)
+
 ## Building options
 
 All of Silabs's examples within the Matter repo have all the features enabled by
