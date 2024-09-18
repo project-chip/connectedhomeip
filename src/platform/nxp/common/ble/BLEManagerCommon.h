@@ -27,6 +27,8 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include <set>
+
 #include "fsl_os_abstraction.h"
 
 #include "ble_conn_manager.h"
@@ -59,6 +61,15 @@ struct BLECallbackDelegate
     GattServerCallback gattCallback = nullptr;
 };
 
+typedef enum service_mode_t
+{
+    kCHIPoBLE_NotSupported = 0,
+    kCHIPoBLE_Enabled,
+    kCHIPoBLE_Disabled,
+    kMultipleBLE_Enabled,
+    kMultipleBLE_Disabled,
+} service_mode_t;
+
 /**
  * Base class for different platform implementations (K32W0 and K32W1 for now).
  */
@@ -69,7 +80,6 @@ protected:
 
     CHIP_ERROR _Init(void);
     CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
-    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
@@ -114,6 +124,11 @@ protected:
     {
         kMaxDeviceNameLength = 16,
         kUnusedIndex         = 0xFF,
+    };
+
+    enum
+    {
+        kMaxHandles = 5,
     };
 
     typedef enum
@@ -175,14 +190,18 @@ protected:
         uint16_t handle;
     } blekw_att_read_data_t;
 
-    CHIPoBLEServiceMode mServiceMode;
+    service_mode_t mServiceMode;
     char mDeviceName[kMaxDeviceNameLength + 1];
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     chip::System::PacketBufferHandle c3AdditionalDataBufferHandle;
 #endif
-    uint8_t mDeviceId;
+    std::set<uint8_t> mDeviceIds;
     bool mDeviceSubscribed = false;
-    bool mDeviceConnected  = false;
+
+    uint8_t mReadHandleSize  = 0;
+    uint8_t mWriteHandleSize = 0;
+    uint16_t mReadNotificationHandle[kMaxHandles];
+    uint16_t mWriteNotificationHandle[kMaxHandles];
 
     void DriveBLEState(void);
     CHIP_ERROR ConfigureAdvertising(void);
@@ -235,12 +254,13 @@ public:
     BLECallbackDelegate callbackDelegate;
     void RegisterAppCallbacks(BLECallbackDelegate::GapGenericCallback gapCallback,
                               BLECallbackDelegate::GattServerCallback gattCallback);
-};
 
-inline BLEManager::CHIPoBLEServiceMode BLEManagerCommon::_GetCHIPoBLEServiceMode(void)
-{
-    return mServiceMode;
-}
+    CHIP_ERROR AddWriteNotificationHandle(uint16_t name);
+    CHIP_ERROR AddReadNotificationHandle(uint16_t name);
+
+    service_mode_t GetBLEServiceMode(void) { return mServiceMode; }
+    void SetBLEServiceMode(service_mode_t mode) { mServiceMode = mode; };
+};
 
 } // namespace Internal
 } // namespace DeviceLayer

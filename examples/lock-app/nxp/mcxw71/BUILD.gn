@@ -92,6 +92,14 @@ mcxw71_k32w1_sdk("sdk") {
       "${example_platform_dir}/board/peripherals.h",
     ]
   }
+
+  if (nxp_multiple_ble_connections) {
+    include_dirs += [ "${example_platform_dir}/app_ble/include" ]
+    defines += [
+      "EXTRA_GATT_DB_HEADER=\"extra_gatt_db.h\"",
+      "EXTRA_GATT_UUID_HEADER=\"extra_gatt_uuid128.h\"",
+    ]
+  }
 }
 
 mcxw71_k32w1_executable("lock_app") {
@@ -140,6 +148,7 @@ mcxw71_k32w1_executable("lock_app") {
     "${common_example_dir}/low_power/include",
     "${common_example_dir}/operational_keystore/include",
     "${common_example_dir}/ui_feedback/include",
+    "${common_example_dir}/app_ble/include",
   ]
 
   sources += [
@@ -187,6 +196,15 @@ mcxw71_k32w1_executable("lock_app") {
     include_dirs += [ "${common_example_dir}/ota_requestor/include" ]
     sources += [ "${common_example_dir}/ota_requestor/source/OTARequestorInitiatorMultiImage.cpp" ]
     deps += [ "${chip_root}/src/platform/nxp:nxp_ota" ]
+  }
+
+  if (nxp_multiple_ble_connections) {
+    sources +=
+        [ "${example_platform_dir}/app_ble/source/BLEApplicationManager.cpp" ]
+  } else {
+    sources += [
+      "${common_example_dir}/app_ble/source/BLEApplicationManagerEmpty.cpp",
+    ]
   }
 
   if (chip_with_diag_logs_demo) {

@@ -146,9 +146,11 @@ mcxw71_k32w1_executable("light_app") {
     "${common_example_dir}/operational_keystore/include",
     "${common_example_dir}/rpc/include",
     "${common_example_dir}/ui_feedback/include",
+    "${common_example_dir}/app_ble/include",
   ]
 
   sources += [
+    "${common_example_dir}/app_ble/source/BLEApplicationManagerEmpty.cpp",
     "${common_example_dir}/app_task/source/AppTaskBase.cpp",
     "${common_example_dir}/app_task/source/AppTaskFreeRTOS.cpp",
     "${common_example_dir}/clusters/source/ZclCallbacks.cpp",
