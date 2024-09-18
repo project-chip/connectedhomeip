@@ -72,7 +72,6 @@ def main(search_directory, env_file):
         "TC_OpstateCommon.py",
         "TC_pics_checker.py",
         "TC_TMP_2_1.py",
-        "TC_MCORE_FS_1_1.py",
         "TC_MCORE_FS_1_2.py",
         "TC_MCORE_FS_1_5.py",
         "TC_OCC_3_1.py",
