@@ -19,6 +19,7 @@
  */
 
 #include "AppTask.h"
+#include "BLEApplicationManager.h"
 #include "CHIPDeviceManager.h"
 #include "LockManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -26,7 +27,6 @@
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/data-model/Nullable.h>
 #include <app/util/attribute-storage.h>
-#include "BLEApplicationManager.h"
 
 #if !CHIP_CONFIG_ENABLE_ICD_SERVER
 #include "ICDUtil.h"
