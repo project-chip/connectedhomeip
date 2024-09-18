@@ -28,7 +28,7 @@ namespace app {
 namespace Clusters {
 
 namespace RefrigeratorAndTemperatureControlledCabinetMode {
-    
+
 const uint8_t ModeRapidCool   = 0;
 const uint8_t ModeRapidFreeze = 1;
 
