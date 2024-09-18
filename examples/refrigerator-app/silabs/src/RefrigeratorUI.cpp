@@ -64,7 +64,7 @@ void RefrigeratorUI::DrawUI(GLIB_Context_t * glibContext)
 {
     if (glibContext == nullptr)
     {
-        ChipLogDetail(AppServer, "App Task started");
+        ChipLogError(AppServer, "App Task started");
         return;
     }
 
