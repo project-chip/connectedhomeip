@@ -115,6 +115,9 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
 app::Clusters::NetworkCommissioning::Instance sNetworkCommissioningInstance(0,
                                                                             chip::NXP::App::GetAppTask().GetWifiDriverInstance());
+#elif CONFIG_CHIP_ETHERNET
+app::Clusters::NetworkCommissioning::Instance
+    sNetworkCommissioningInstance(0, chip::NXP::App::GetAppTask().GetEthernetDriverInstance());
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER || (CONFIG_CHIP_TEST_EVENT && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
@@ -288,6 +291,8 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
 #ifdef ENABLE_CHIP_SHELL
     Shell::SetWiFiDriver(chip::NXP::App::GetAppTask().GetWifiDriverInstance());
 #endif
+#elif CONFIG_CHIP_ETHERNET
+    sNetworkCommissioningInstance.Init();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     if (err == CHIP_NO_ERROR)

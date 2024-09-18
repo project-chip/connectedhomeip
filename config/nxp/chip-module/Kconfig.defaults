@@ -252,10 +252,6 @@ choice SCHED_ALGORITHM
 	default SCHED_MULTIQ
 endchoice
 
-choice LIBC_IMPLEMENTATION
-	default NEWLIB_LIBC
-endchoice
-
 choice WIFI_NM_WPA_SUPPLICANT_LOG_LEVEL_CHOICE
 	default WIFI_NM_WPA_SUPPLICANT_LOG_LEVEL_INF
 endchoice
@@ -323,6 +319,22 @@ config HEAP_MEM_POOL_SIZE
 
 config CHIP_MALLOC_SYS_HEAP_SIZE
 	default 28672 # 28 kB
+
+endif
+
+if CHIP_ETHERNET || CHIP_WIFI
+
+choice LIBC_IMPLEMENTATION
+	default NEWLIB_LIBC
+endchoice
+
+endif
+
+if CHIP_ETHERNET
+
+choice NXP_ENET_DRIVER
+	default ETH_NXP_ENET
+endchoice
 
 endif
 
