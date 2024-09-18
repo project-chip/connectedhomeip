@@ -75,7 +75,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
     // the incoming data?
 
     // dumping payload with fuzzed transport types
-    constexpr uint8_t numberOfTypes = static_cast<int>(Transport::Type::kLast) + 1;
+    constexpr uint8_t numberOfTypes     = static_cast<int>(Transport::Type::kLast) + 1;
     Transport::Type fuzzedTransportType = static_cast<Transport::Type>(aData[0] % numberOfTypes);
     Transport::PeerAddress peerAddr(fuzzedTransportType);
 
