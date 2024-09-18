@@ -212,6 +212,8 @@ private:
         mNodeId      = kUndefinedNodeId;
     }
 
+    void SetShouldAdvertiseIdentity(bool advertiseIdentity) { mShouldAdvertiseIdentity = advertiseIdentity; }
+
     static constexpr size_t MetadataTLVMaxSize()
     {
         return TLV::EstimateStructOverhead(sizeof(uint16_t), kFabricLabelMaxLengthInBytes);
@@ -1026,6 +1028,18 @@ public:
      * Returns an error if the |fabricIndex| is already in use.
      */
     CHIP_ERROR SetFabricIndexForNextAddition(FabricIndex fabricIndex);
+
+    /**
+     * @brief Set the advertising behavior for the fabric identified by `fabricIndex`.
+     *
+     * It is the caller's responsibility to actually restart DNS-SD advertising
+     * as needed after updating this state.
+     *
+     * @param fabricIndex - Fabric Index for which to set the label
+     * @param advertiseIdentity - whether the identity for this fabric should be advertised.
+     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if fabricIndex does not refer to a fabric in the table
+     */
+    CHIP_ERROR SetShouldAdvertiseIdentity(FabricIndex fabricIndex, AdvertiseIdentity advertiseIdentity);
 
 private:
     enum class StateFlags : uint16_t
