@@ -558,27 +558,6 @@ cluster LevelControl = 8 {
   command MoveToClosestFrequency(MoveToClosestFrequencyRequest): DefaultSuccess = 8;
 }
 
-/** An interface for reading the value of a binary measurement and accessing various characteristics of that measurement. */
-deprecated cluster BinaryInputBasic = 15 {
-  revision 1; // NOTE: Default/not specifically set
-
-  attribute optional char_string<16> activeText = 4;
-  attribute optional char_string<16> description = 28;
-  attribute optional char_string<16> inactiveText = 46;
-  attribute boolean outOfService = 81;
-  readonly attribute optional enum8 polarity = 84;
-  attribute boolean presentValue = 85;
-  attribute optional enum8 reliability = 103;
-  readonly attribute bitmap8 statusFlags = 111;
-  readonly attribute optional int32u applicationType = 256;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
   revision 2;
@@ -3218,14 +3197,6 @@ endpoint 1 {
     handle command RemoveGroupResponse;
     handle command RemoveAllGroups;
     handle command AddGroupIfIdentifying;
-  }
-
-  server cluster BinaryInputBasic {
-    ram      attribute outOfService default = 0x00;
-    ram      attribute presentValue;
-    ram      attribute statusFlags default = 0x00;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
   }
 
   server cluster Descriptor {

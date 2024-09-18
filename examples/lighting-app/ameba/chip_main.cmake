@@ -166,7 +166,6 @@ add_library(
 )
 
 chip_configure_data_model(chip_main
-    INCLUDE_SERVER
     ZAP_FILE ${matter_example_path}/../lighting-common/lighting-app.zap
 )
 

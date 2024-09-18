@@ -2460,7 +2460,7 @@ TEST(TestCodegenModelViaMocks, EmberInvokeTest)
         const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
 
         // Using a handler set to nullptr as it is not used by the impl
-        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ nullptr), CHIP_NO_ERROR);
+        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ nullptr), std::nullopt);
 
         EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre + 1); // single dispatch
         EXPECT_EQ(chip::Test::GetLastDispatchPath(), kCommandPath);    // for the right path
@@ -2474,7 +2474,7 @@ TEST(TestCodegenModelViaMocks, EmberInvokeTest)
         const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
 
         // Using a handler set to nullpotr as it is not used by the impl
-        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ nullptr), CHIP_NO_ERROR);
+        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ nullptr), std::nullopt);
 
         EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre + 1); // single dispatch
         EXPECT_EQ(chip::Test::GetLastDispatchPath(), kCommandPath);    // for the right path

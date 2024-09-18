@@ -314,14 +314,17 @@ class AttributeCache:
     returnClusterObject: bool = False
     attributeTLVCache: Dict[int, Dict[int, Dict[int, bytes]]] = field(
         default_factory=lambda: {})
-    attributeCache: Dict[int, List[Cluster]] = field(
-        default_factory=lambda: {})
     versionList: Dict[int, Dict[int, Dict[int, int]]] = field(
+        default_factory=lambda: {})
+
+    _attributeCacheUpdateNeeded: set[AttributePath] = field(
+        default_factory=lambda: set())
+    _attributeCache: Dict[int, List[Cluster]] = field(
         default_factory=lambda: {})
 
     def UpdateTLV(self, path: AttributePath, dataVersion: int,  data: Union[bytes, ValueDecodeFailure]):
         ''' Store data in TLV since that makes it easiest to eventually convert to either the
-            cluster or attribute view representations (see below in UpdateCachedData).
+            cluster or attribute view representations (see below in GetUpdatedAttributeCache()).
         '''
         if (path.EndpointId not in self.attributeTLVCache):
             self.attributeTLVCache[path.EndpointId] = {}
@@ -344,7 +347,10 @@ class AttributeCache:
 
         clusterCache[path.AttributeId] = data
 
-    def UpdateCachedData(self, changedPathSet: set[AttributePath]):
+        # For this path the attribute cache still requires an update.
+        self._attributeCacheUpdateNeeded.add(path)
+
+    def GetUpdatedAttributeCache(self) -> Dict[int, List[Cluster]]:
         ''' This converts the raw TLV data into a cluster object format.
 
             Two formats are available:
@@ -381,12 +387,12 @@ class AttributeCache:
             except Exception as ex:
                 return ValueDecodeFailure(value, ex)
 
-        for attributePath in changedPathSet:
+        for attributePath in self._attributeCacheUpdateNeeded:
             endpointId, clusterId, attributeId = attributePath.EndpointId, attributePath.ClusterId, attributePath.AttributeId
 
-            if endpointId not in self.attributeCache:
-                self.attributeCache[endpointId] = {}
-            endpointCache = self.attributeCache[endpointId]
+            if endpointId not in self._attributeCache:
+                self._attributeCache[endpointId] = {}
+            endpointCache = self._attributeCache[endpointId]
 
             if clusterId not in _ClusterIndex:
                 #
@@ -414,6 +420,8 @@ class AttributeCache:
 
                 attributeType = _AttributeIndex[(clusterId, attributeId)][0]
                 clusterCache[attributeType] = handle_attribute_view(endpointId, clusterId, attributeId, attributeType)
+        self._attributeCacheUpdateNeeded.clear()
+        return self._attributeCache
 
 
 class SubscriptionTransaction:
@@ -434,12 +442,12 @@ class SubscriptionTransaction:
     def GetAttributes(self):
         ''' Returns the attribute value cache tracking the latest state on the publisher.
         '''
-        return self._readTransaction._cache.attributeCache
+        return self._readTransaction._cache.GetUpdatedAttributeCache()
 
     def GetAttribute(self, path: TypedAttributePath) -> Any:
         ''' Returns a specific attribute given a TypedAttributePath.
         '''
-        data = self._readTransaction._cache.attributeCache
+        data = self._readTransaction._cache.GetUpdatedAttributeCache()
 
         if (self._readTransaction._cache.returnClusterObject):
             return eval(f'data[path.Path.EndpointId][path.ClusterType].{path.AttributeName}')
@@ -650,6 +658,18 @@ class AsyncReadTransaction:
     def GetAllEventValues(self):
         return self._events
 
+    def GetReadResponse(self) -> AsyncReadTransaction.ReadResponse:
+        """Prepares and returns the ReadResponse object."""
+        return self.ReadResponse(
+            attributes=self._cache.GetUpdatedAttributeCache(),
+            events=self._events,
+            tlvAttributes=self._cache.attributeTLVCache
+        )
+
+    def GetSubscriptionHandler(self) -> SubscriptionTransaction | None:
+        """Returns subscription transaction."""
+        return self._subscription_handler
+
     def handleAttributeData(self, path: AttributePath, dataVersion: int, status: int, data: bytes):
         try:
             imStatus = chip.interaction_model.Status(status)
@@ -716,7 +736,7 @@ class AsyncReadTransaction:
         if not self._future.done():
             self._subscription_handler = SubscriptionTransaction(
                 self, subscriptionId, self._devCtrl)
-            self._future.set_result(self._subscription_handler)
+            self._future.set_result(self)
         else:
             self._subscription_handler._subscriptionId = subscriptionId
             if self._subscription_handler._onResubscriptionSucceededCb is not None:
@@ -745,8 +765,6 @@ class AsyncReadTransaction:
         pass
 
     def _handleReportEnd(self):
-        self._cache.UpdateCachedData(self._changedPathSet)
-
         if (self._subscription_handler is not None):
             for change in self._changedPathSet:
                 try:
@@ -772,8 +790,7 @@ class AsyncReadTransaction:
             if self._resultError is not None:
                 self._future.set_exception(self._resultError.to_exception())
             else:
-                self._future.set_result(AsyncReadTransaction.ReadResponse(
-                    attributes=self._cache.attributeCache, events=self._events, tlvAttributes=self._cache.attributeTLVCache))
+                self._future.set_result(self)
 
         #
         # Decrement the ref on ourselves to match the increment that happened at allocation.
@@ -1001,9 +1018,9 @@ _ReadParams = construct.Struct(
 )
 
 
-def Read(future: Future, eventLoop, device, devCtrl,
+def Read(transaction: AsyncReadTransaction, device,
          attributes: Optional[List[AttributePath]] = None, dataVersionFilters: Optional[List[DataVersionFilter]] = None,
-         events: Optional[List[EventPath]] = None, eventNumberFilter: Optional[int] = None, returnClusterObject: bool = True,
+         events: Optional[List[EventPath]] = None, eventNumberFilter: Optional[int] = None,
          subscriptionParameters: Optional[SubscriptionParameters] = None,
          fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True) -> PyChipError:
     if (not attributes) and dataVersionFilters:
@@ -1011,8 +1028,6 @@ def Read(future: Future, eventLoop, device, devCtrl,
             "Must provide valid attribute list when data version filters is not null")
 
     handle = chip.native.GetLibraryHandle()
-    transaction = AsyncReadTransaction(
-        future, eventLoop, devCtrl, returnClusterObject)
 
     attributePathsForCffi = None
     if attributes is not None:
@@ -1117,25 +1132,6 @@ def Read(future: Future, eventLoop, device, devCtrl,
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res
-
-
-def ReadAttributes(future: Future, eventLoop, device, devCtrl,
-                   attributes: List[AttributePath], dataVersionFilters: Optional[List[DataVersionFilter]] = None,
-                   returnClusterObject: bool = True,
-                   subscriptionParameters: Optional[SubscriptionParameters] = None, fabricFiltered: bool = True) -> int:
-    return Read(future=future, eventLoop=eventLoop, device=device,
-                devCtrl=devCtrl, attributes=attributes, dataVersionFilters=dataVersionFilters,
-                events=None, returnClusterObject=returnClusterObject,
-                subscriptionParameters=subscriptionParameters, fabricFiltered=fabricFiltered)
-
-
-def ReadEvents(future: Future, eventLoop, device, devCtrl,
-               events: List[EventPath], eventNumberFilter=None, returnClusterObject: bool = True,
-               subscriptionParameters: Optional[SubscriptionParameters] = None, fabricFiltered: bool = True) -> int:
-    return Read(future=future, eventLoop=eventLoop, device=device, devCtrl=devCtrl, attributes=None,
-                dataVersionFilters=None, events=events, eventNumberFilter=eventNumberFilter,
-                returnClusterObject=returnClusterObject,
-                subscriptionParameters=subscriptionParameters, fabricFiltered=fabricFiltered)
 
 
 def Init():

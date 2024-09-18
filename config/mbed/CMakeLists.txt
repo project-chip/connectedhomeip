@@ -112,6 +112,9 @@ if (CONFIG_MBED_BSD_SOCKET_TRACE)
     matter_add_flags(-DMBED_BSD_SOCKET_TRACE=1)
 endif()
 
+# Option can be set with `-DCHIP_DATA_MODEL_INTERFACE=enabled` or similar on the command line
+set(CHIP_DATA_MODEL_INTERFACE "disabled" CACHE STRING "Data model interface option to use: enabled or disabled")
+
 # ==============================================================================
 # Generate configuration for CHIP GN build system
 # ==============================================================================
@@ -121,6 +124,7 @@ matter_common_gn_args(
     LIB_TESTS       CONFIG_CHIP_BUILD_TESTS
     LIB_PW_RPC      CONFIG_CHIP_PW_RPC
     PROJECT_CONFIG  ${CONFIG_CHIP_PROJECT_CONFIG}
+    DATA_MODEL_INTERFACE ${CHIP_DATA_MODEL_INTERFACE}
 )
 if (CONFIG_CHIP_PW_RPC)
     matter_add_gn_arg_import("${GN_ROOT_TARGET}/lib/pw_rpc/pw_rpc.gni")

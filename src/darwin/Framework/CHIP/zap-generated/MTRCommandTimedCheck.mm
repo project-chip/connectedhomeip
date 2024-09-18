@@ -50,27 +50,9 @@ static BOOL CommandNeedsTimedInvokeInOnOffCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInOnOffSwitchConfigurationCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::OnOffSwitchConfiguration;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL CommandNeedsTimedInvokeInLevelControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::LevelControl;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL CommandNeedsTimedInvokeInBinaryInputBasicCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::BinaryInputBasic;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -767,15 +749,6 @@ static BOOL CommandNeedsTimedInvokeInWindowCoveringCluster(AttributeId aAttribut
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInBarrierControlCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::BarrierControl;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL CommandNeedsTimedInvokeInServiceAreaCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ServiceArea;
@@ -1169,15 +1142,6 @@ static BOOL CommandNeedsTimedInvokeInCommissionerControlCluster(AttributeId aAtt
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInElectricalMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::ElectricalMeasurement;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL CommandNeedsTimedInvokeInUnitTestingCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::UnitTesting;
@@ -1215,14 +1179,8 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::OnOff::Id: {
         return CommandNeedsTimedInvokeInOnOffCluster(commandID);
     }
-    case Clusters::OnOffSwitchConfiguration::Id: {
-        return CommandNeedsTimedInvokeInOnOffSwitchConfigurationCluster(commandID);
-    }
     case Clusters::LevelControl::Id: {
         return CommandNeedsTimedInvokeInLevelControlCluster(commandID);
-    }
-    case Clusters::BinaryInputBasic::Id: {
-        return CommandNeedsTimedInvokeInBinaryInputBasicCluster(commandID);
     }
     case Clusters::PulseWidthModulation::Id: {
         return CommandNeedsTimedInvokeInPulseWidthModulationCluster(commandID);
@@ -1434,9 +1392,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::WindowCovering::Id: {
         return CommandNeedsTimedInvokeInWindowCoveringCluster(commandID);
     }
-    case Clusters::BarrierControl::Id: {
-        return CommandNeedsTimedInvokeInBarrierControlCluster(commandID);
-    }
     case Clusters::ServiceArea::Id: {
         return CommandNeedsTimedInvokeInServiceAreaCluster(commandID);
     }
@@ -1562,9 +1517,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::CommissionerControl::Id: {
         return CommandNeedsTimedInvokeInCommissionerControlCluster(commandID);
-    }
-    case Clusters::ElectricalMeasurement::Id: {
-        return CommandNeedsTimedInvokeInElectricalMeasurementCluster(commandID);
     }
     case Clusters::UnitTesting::Id: {
         return CommandNeedsTimedInvokeInUnitTestingCluster(commandID);

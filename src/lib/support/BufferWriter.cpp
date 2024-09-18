@@ -73,8 +73,9 @@ LittleEndian::BufferWriter & LittleEndian::BufferWriter::EndianPutSigned(int64_t
 
 BigEndian::BufferWriter & BigEndian::BufferWriter::EndianPut(uint64_t x, size_t size)
 {
-    while (size-- > 0)
+    while (size > 0)
     {
+        size--;
         Put(static_cast<uint8_t>((x >> (size * 8)) & 0xff));
     }
     return *this;
@@ -82,8 +83,9 @@ BigEndian::BufferWriter & BigEndian::BufferWriter::EndianPut(uint64_t x, size_t 
 
 BigEndian::BufferWriter & BigEndian::BufferWriter::EndianPutSigned(int64_t x, size_t size)
 {
-    while (size-- > 0)
+    while (size > 0)
     {
+        size--;
         Put(static_cast<uint8_t>((x >> (size * 8)) & 0xff));
     }
     return *this;

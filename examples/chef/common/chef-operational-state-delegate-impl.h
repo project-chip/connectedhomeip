@@ -138,6 +138,7 @@ public:
 };
 
 Instance * GetOperationalStateInstance();
+OperationalStateDelegate * GetOperationalStateDelegate();
 
 void Shutdown();
 

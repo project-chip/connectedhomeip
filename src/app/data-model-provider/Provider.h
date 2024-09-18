@@ -88,18 +88,20 @@ public:
     virtual ActionReturnStatus WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder) = 0;
 
     /// `handler` is used to send back the reply.
+    ///    - returning `std::nullopt` means that return value was placed in handler directly.
+    ///      This includes cases where command handling and value return will be done asynchronously.
     ///    - returning a value other than Success implies an error reply (error and data are mutually exclusive)
     ///
-    /// Returning anything other than CHIP_NO_ERROR or Status::Success (i.e. success without a return code)
-    /// means that the invoke will be considered to be returning the given path-specific status WITHOUT any data (any data
-    /// that was sent via CommandHandler is to be rolled back/discarded).
-    ///
-    /// This is because only one of the following may be encoded in a response:
-    ///    - data (as CommandDataIB) which is assumed a "response as a success"
-    ///    - status (as a CommandStatusIB) which is considered a final status, usually an error however
-    ///      cluster-specific success statuses also exist.
-    virtual ActionReturnStatus Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                                      CommandHandler * handler) = 0;
+    /// Return value expectations:
+    ///   - if a response has been placed into `handler` then std::nullopt MUST be returned. In particular
+    ///     note that CHIP_NO_ERROR is NOT the same as std::nullopt:
+    ///        > CHIP_NO_ERROR means handler had no status set and we expect the caller to AddStatus(success)
+    ///        > std::nullopt means that handler has added an appropriate data/status response
+    ///   - if a value is returned (not nullopt) then the handler response MUST NOT be filled. The caller
+    ///     will then issue `handler->AddStatus(request.path, <return_value>->GetStatusCode())`. This is a
+    ///     convenience to make writing Invoke calls easier.
+    virtual std::optional<ActionReturnStatus> Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
+                                                     CommandHandler * handler) = 0;
 
 private:
     InteractionModelContext mContext = { nullptr };

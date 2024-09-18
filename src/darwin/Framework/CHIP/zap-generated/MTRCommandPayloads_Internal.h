@@ -1420,18 +1420,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBarrierControlClusterBarrierControlGoToPercentParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRBarrierControlClusterBarrierControlStopParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
 @interface MTRServiceAreaClusterSelectAreasParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -2059,30 +2047,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRCommissionerControlClusterReverseOpenCommissioningWindowParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CommissionerControl::Commands::ReverseOpenCommissioningWindow::DecodableType &)decodableStruct;
-
-@end
-
-@interface MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType &)decodableStruct;
-
-@end
-
-@interface MTRElectricalMeasurementClusterGetProfileInfoCommandParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType &)decodableStruct;
-
-@end
-
-@interface MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 

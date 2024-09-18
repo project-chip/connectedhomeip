@@ -77,7 +77,6 @@ target_sources(app PRIVATE
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp)
 
 chip_configure_data_model(app
-    INCLUDE_SERVER
     ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
 )
 

@@ -51,6 +51,10 @@ ButtonManager ButtonManager::sInstance;
 
 TimerHandle_t resetTimer;
 
+#if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
+static bool sitModeRequested;
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS
+
 CHIP_ERROR ButtonManager::Init()
 {
     resetTimer = xTimerCreate("FnTmr", 1, false, (void *) this, [](TimerHandle_t xTimer) {
@@ -59,6 +63,10 @@ CHIP_ERROR ButtonManager::Init()
         chip::NXP::App::GetAppTask().PostEvent(event);
     });
     VerifyOrReturnError(resetTimer != NULL, APP_ERROR_CREATE_TIMER_FAILED);
+
+#if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
+    static bool sitModeRequested;
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS
 
     return CHIP_NO_ERROR;
 }
@@ -76,6 +84,13 @@ button_status_t ButtonManager::BleCallback(void * handle, button_callback_messag
     case kBUTTON_EventLongPress:
         event.Handler = ButtonManager::ResetActionEventHandler;
         break;
+
+#if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
+    case kBUTTON_EventDoubleClick:
+        event.Handler = ButtonManager::DSLSActionEventHandler;
+        break;
+#endif
+
     default:
         /* No action required */
         break;
@@ -144,10 +159,8 @@ void ButtonManager::AppActionEventHandler(const AppEvent & event)
 {
     chip::DeviceLayer::PlatformMgr().ScheduleWork(
         [](intptr_t arg) {
-            bool val = false;
-            APP_CLUSTER_ATTRIBUTE::Get(APP_DEVICE_TYPE_ENDPOINT, &val);
-            auto status = APP_CLUSTER_ATTRIBUTE::Set(APP_DEVICE_TYPE_ENDPOINT, (bool) !val);
-            if (status != chip::Protocols::InteractionModel::Status::Success)
+            auto status = chip::NXP::App::GetAppTask().ProcessSetStateClusterHandler();
+            if (status != CHIP_NO_ERROR)
             {
                 ChipLogProgress(DeviceLayer, "Error when updating cluster attribute");
             }
@@ -188,6 +201,27 @@ void ButtonManager::BleHandler(const AppEvent & event)
 
     chip::NXP::App::GetAppTask().SwitchCommissioningStateHandler();
 }
+
+#if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
+void ButtonManager::DSLSActionEventHandler(const AppEvent & event)
+{
+    if (chip::DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
+    {
+        if (!sitModeRequested)
+        {
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(
+                [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification(); }, 0);
+            sitModeRequested = true;
+        }
+        else
+        {
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(
+                [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal(); }, 0);
+            sitModeRequested = false;
+        }
+    }
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS
 
 void ButtonManager::CancelTimer()
 {

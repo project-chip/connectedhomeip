@@ -42,7 +42,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <src/platform/nxp/common/legacy/OTAImageProcessorImpl.h>
+#include <src/platform/nxp/common/ota/OTAImageProcessorImpl.h>
 #endif
 
 #include <src/platform/nxp/k32w0/BLEManagerImpl.h>

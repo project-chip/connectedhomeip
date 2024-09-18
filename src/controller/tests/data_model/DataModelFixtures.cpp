@@ -525,10 +525,10 @@ ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest &
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-ActionReturnStatus CustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                                           CommandHandler * handler)
+std::optional<ActionReturnStatus> CustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
+                                                          CommandHandler * handler)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return std::make_optional<ActionReturnStatus>(CHIP_ERROR_NOT_IMPLEMENTED);
 }
 
 EndpointId CustomDataModel::FirstEndpoint()

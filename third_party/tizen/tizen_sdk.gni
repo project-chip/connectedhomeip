@@ -250,6 +250,9 @@ template("tizen_qemu_run") {
       args += [ "--virtio-net" ]
     }
 
+    # Use console pool to print QEMU output in real-time.
+    pool = "//:console"
+
     script = tizen_qemu
   }
 }

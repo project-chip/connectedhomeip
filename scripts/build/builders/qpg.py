@@ -14,6 +14,7 @@
 
 import os
 from enum import Enum, auto
+from typing import Optional
 
 from .builder import BuilderOutput
 from .gn import GnBuilder
@@ -108,7 +109,9 @@ class QpgBuilder(GnBuilder):
                  board: QpgBoard = QpgBoard.QPG6105,
                  flavour: QpgFlavour = QpgFlavour.EXT_FLASH,
                  enable_rpcs: bool = False,
-                 update_image: bool = False):
+                 update_image: bool = False,
+                 data_model_interface: Optional[str] = None,
+                 ):
         super(QpgBuilder, self).__init__(
             root=app.BuildRoot(root),
             runner=runner)
@@ -117,6 +120,7 @@ class QpgBuilder(GnBuilder):
         self.flavour = flavour
         self.enable_rpcs = enable_rpcs
         self.update_image = update_image
+        self.data_model_interface = data_model_interface
 
     def GnBuildArgs(self):
         args = ['qpg_target_ic=\"%s\" qpg_flavour=\"%s\"' % (self.board.GnArgName(), self.flavour.GnFlavourName())]
@@ -124,6 +128,8 @@ class QpgBuilder(GnBuilder):
             args.append('import("//with_pw_rpc.gni")')
         if self.update_image:
             args.append('matter_ota_test_image=true')
+        if self.data_model_interface:
+            args.append(f'chip_use_data_model_interface="{self.data_model_interface}"')
         return args
 
     def build_outputs(self):

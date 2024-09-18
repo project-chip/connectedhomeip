@@ -17,6 +17,7 @@
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <app-common/zap-generated/attribute-type.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/RequiredPrivilege.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/attribute-storage.h>
@@ -229,20 +230,28 @@ bool CodegenDataModelProvider::EmberCommandListIterator::Exists(const CommandId 
     return (*mCurrentHint == toCheck);
 }
 
-DataModel::ActionReturnStatus CodegenDataModelProvider::Invoke(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments, CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(const DataModel::InvokeRequest & request,
+                                                                              TLV::TLVReader & input_arguments,
+                                                                              CommandHandler * handler)
 {
-    // TODO: CommandHandlerInterface support is currently
-    //       residing in InteractionModelEngine itself. We may want to separate this out
-    //       into its own registry, similar to attributes, so that IM is decoupled from actual storage of things.
-    //
-    //       Open issue at https://github.com/project-chip/connectedhomeip/issues/34258
+    CommandHandlerInterface * handler_interface =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
 
-    // Ember dispatching automatically uses `handler` to set an appropriate result or status
-    // This never fails (as handler error is encoded as needed).
+    if (handler_interface)
+    {
+        CommandHandlerInterface::HandlerContext context(*handler, request.path, input_arguments);
+        handler_interface->InvokeCommand(context);
+
+        // If the command was handled, don't proceed any further and return successfully.
+        if (context.mCommandHandled)
+        {
+            return std::nullopt;
+        }
+    }
+
+    // Ember always sets the return in the handler
     DispatchSingleClusterCommand(request.path, input_arguments, handler);
-
-    return CHIP_NO_ERROR;
+    return std::nullopt;
 }
 
 EndpointId CodegenDataModelProvider::FirstEndpoint()

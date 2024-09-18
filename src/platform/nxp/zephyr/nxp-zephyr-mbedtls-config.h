@@ -24,7 +24,7 @@
 
 #define MBEDTLS_CIPHER_PADDING_PKCS7
 
-#if CONFIG_WIFI_NXP && CONFIG_WPA_SUPP
+#if CONFIG_WIFI_NXP
 #include "wpa_supp_els_pkc_mbedtls_config.h"
 #endif /* CONFIG_WIFI_NXP && CONFIG_WPA_SUPP */
 

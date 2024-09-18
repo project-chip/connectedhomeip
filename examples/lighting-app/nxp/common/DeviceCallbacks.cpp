@@ -69,13 +69,6 @@ void LightingApp::DeviceCallbacks::PostAttributeChangeCallback(chip::EndpointId 
 
         // WIP Apply attribute change to Light
     }
-    else if (clusterId == OnOffSwitchConfiguration::Id)
-    {
-        ChipLogProgress(Zcl, "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(attributeId), type, *value, size);
-
-        // WIP Apply attribute change to Light
-    }
     else
     {
         ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));

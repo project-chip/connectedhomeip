@@ -306,7 +306,6 @@ using namespace chip::Tracing::DarwinFramework;
         _delegates = [NSMutableSet set];
         _deviceController = controller;
         _nodeID = nodeID;
-        _accessedViaPublicAPI = NO;
         _state = MTRDeviceStateUnknown;
     }
 
@@ -322,7 +321,6 @@ using namespace chip::Tracing::DarwinFramework;
         _nodeID = [nodeID copy];
         _fabricIndex = controller.fabricIndex;
         _deviceController = controller;
-        _accessedViaPublicAPI = NO;
         _queue
             = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _asyncWorkQueue = [[MTRAsyncWorkQueue alloc] initWithContext:self];
@@ -362,19 +360,9 @@ using namespace chip::Tracing::DarwinFramework;
     MTR_LOG("MTRDevice dealloc: %p", self);
 }
 
-+ (MTRDevice *)_deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
-{
-    return [controller deviceForNodeID:nodeID];
-}
-
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
-    auto * device = [self _deviceWithNodeID:nodeID controller:controller];
-    if (device) {
-        std::lock_guard lock(device->_lock);
-        device->_accessedViaPublicAPI = YES;
-    }
-    return device;
+    return [controller deviceForNodeID:nodeID];
 }
 
 #pragma mark - Time Synchronization
@@ -1170,7 +1158,7 @@ using namespace chip::Tracing::DarwinFramework;
 
     // Page in the stored value for the data.
     MTRDeviceClusterData * data = [_deviceController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
-    MTR_LOG("%@ cluster path %@ cache miss - load from storage success %@", self, clusterPath, YES_NO(data));
+    MTR_LOG("%@ cluster path %@ cache miss - load from storage success %@", self, clusterPath, MTR_YES_NO(data));
     if (data != nil) {
         [_persistedClusterData setObject:data forKey:clusterPath];
     } else {
@@ -1284,6 +1272,17 @@ using namespace chip::Tracing::DarwinFramework;
 #undef MTRDeviceErrorStr
 }
 
+- (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths
+{
+#define MTRDeviceErrorStr "MTRDevice readAttributePaths: must be handled by subclasses"
+    MTR_LOG_ERROR(MTRDeviceErrorStr);
+#ifdef DEBUG
+    NSAssert(NO, @MTRDeviceErrorStr);
+#endif // DEBUG
+#undef MTRDeviceErrorStr
+    return [NSArray array];
+}
+
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID
                           commandID:(NSNumber *)commandID
@@ -1325,6 +1324,21 @@ using namespace chip::Tracing::DarwinFramework;
     // here for now.
     // TODO: https://github.com/project-chip/connectedhomeip/issues/24563
 
+    if (![commandFields isKindOfClass:NSDictionary.class]) {
+        MTR_LOG_ERROR("%@ invokeCommandWithEndpointID passed a commandFields (%@) that is not a data-value NSDictionary object",
+            self, commandFields);
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+        return;
+    }
+
+    MTRDeviceDataValueDictionary fieldsDataValue = commandFields;
+    if (fieldsDataValue[MTRTypeKey] != MTRStructureValueType) {
+        MTR_LOG_ERROR("%@ invokeCommandWithEndpointID passed a commandFields (%@) that is not a structure-typed data-value object",
+            self, commandFields);
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+        return;
+    }
+
     [self _invokeCommandWithEndpointID:endpointID
                              clusterID:clusterID
                              commandID:commandID
@@ -1340,7 +1354,7 @@ using namespace chip::Tracing::DarwinFramework;
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
                            commandID:(NSNumber *)commandID
-                       commandFields:(id)commandFields
+                       commandFields:(MTRDeviceDataValueDictionary)commandFields
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
                expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                   timedInvokeTimeout:(NSNumber * _Nullable)timeout

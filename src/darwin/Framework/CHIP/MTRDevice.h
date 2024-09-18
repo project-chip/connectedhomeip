@@ -187,6 +187,20 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                    timedWriteTimeout:(NSNumber * _Nullable)timeout;
 
 /**
+ * Read the attributes identified by the provided attribute paths.  The paths
+ * can include wildcards.
+ *
+ * Paths that do not correspond to any existing attributes, or that the
+ * MTRDevice does not have attribute values for, will not be present in the
+ * return value from this function.
+ *
+ * @return an array of response-value dictionaries as described in the
+ *         documentation for MTRDeviceResponseHandler.  Each one will have an
+ *         MTRAttributePathKey and an MTRDataKey.
+ */
+- (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths MTR_NEWLY_AVAILABLE;
+
+/**
  * Invoke a command with a designated command path
  *
  * @param commandFields command fields object. If not nil, the object must be a data-value

@@ -311,8 +311,8 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
     _deviceController = controller;
 
-    MTR_LOG("Associated %@, cluster count %llu, with controller",
-        self, static_cast<unsigned long long>(clusterCount));
+    MTR_LOG("Associated %@, cluster count %llu, with controller %@",
+        self, static_cast<unsigned long long>(clusterCount), controller);
 
     return YES;
 }

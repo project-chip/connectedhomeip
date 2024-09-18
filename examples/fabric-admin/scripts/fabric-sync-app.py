@@ -79,12 +79,11 @@ async def forward_stdin(f_out: asyncio.StreamWriter):
 
 class Subprocess:
 
-    def __init__(self, tag: str, program: str, *args, stdout_cb=None):
+    def __init__(self, tag: str, program: str, *args):
         self.event = asyncio.Event()
         self.tag = tag.encode()
         self.program = program
         self.args = args
-        self.stdout_cb = stdout_cb
         self.expected_output = None
 
     def _check_output(self, line: bytes):
@@ -122,8 +121,7 @@ class Subprocess:
         self.p.terminate()
 
 
-async def run_admin(program, stdout_cb=None, storage_dir=None,
-                    rpc_admin_port=None, rpc_bridge_port=None,
+async def run_admin(program, storage_dir=None, rpc_admin_port=None, rpc_bridge_port=None,
                     paa_trust_store_path=None, commissioner_name=None,
                     commissioner_node_id=None, commissioner_vendor_id=None):
     args = []
@@ -141,8 +139,7 @@ async def run_admin(program, stdout_cb=None, storage_dir=None,
         args.extend(["--commissioner-nodeid", str(commissioner_node_id)])
     if commissioner_vendor_id is not None:
         args.extend(["--commissioner-vendor-id", str(commissioner_vendor_id)])
-    p = Subprocess("[FS-ADMIN]", program, "interactive", "start", *args,
-                   stdout_cb=stdout_cb)
+    p = Subprocess("[FS-ADMIN]", program, "interactive", "start", *args)
     await p.run()
     return p
 

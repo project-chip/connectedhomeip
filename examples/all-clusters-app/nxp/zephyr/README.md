@@ -31,7 +31,9 @@ NXP/Zephyr SDK.
 
 The example supports:
 
--   Matter over Wi-Fi
+-   Matter over Wi-Fi with BLE commissioning
+-   Matter OTA requestor
+-   Matter Factory Data
 
 The supported boards are:
 
@@ -49,18 +51,21 @@ Prerequisites:
 -   Follow instruction from [BUILDING.md](../../../../docs/guides/BUILDING.md)
     to setup the Matter environment
 -   Follow instruction from
-    [Getting Started Guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html)
+    [Getting Started Guide](https://docs.zephyrproject.org/3.7.0/develop/getting_started/index.html)
     to setup a Zephyr workspace, however, the west init command to use is as
     follows:
 
 ```shell
-$ west init zephyrproject -m https://github.com/nxp-zephyr-ear/zephyr.git --mr zephyr_rw61x_v3.6_RFP
+$ west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp-v3.7.0
 ```
 
-> **Note**: Currently, supported NXP platforms in Zephyr targeting Matter are
-> not available in the official Zephyr repo, you'll have to use the NXP fork
-> `https://github.com/nxp-zephyr-ear/zephyr` github repo. Reach to your NXP
-> contact for more details.
+> **Note**: While some of NXP platforms are supported in Zephyr upstream, we
+> recommend using nxp-zsdk downstream to get access to all NXP features that are
+> not upstream yet. While you can decide to use nxp-zsdk top of tree, we
+> recommend using a proper release tag delivered by NXP. This will ensure a
+> certain level of quality of the nxp-zsdk in use. Currently, we highly
+> recommend using the `nxp-v3.7.0` tag, based on Zephyr 3.7 LTS release. Reach
+> to your NXP contact for more details.
 
 Steps to build the example, targeting `rd_rw612_bga` board:
 
@@ -79,15 +84,17 @@ source <path to zephyr repo>/zephyr-env.sh
 3. Run west build command:
 
 ```shell
-west build -b rd_rw612_bga -p  <path to example folder>
+west build -b rd_rw612_bga -p auto -d build_zephyr <path to example folder>
 ```
 
-By default, a folder `build` will be created in the same folder you run the
-command from. The binaries will be created in `build/zephyr` with the name
-`zephyr.elf` and `zephyr.bin`.
+A folder `build_zephyr` will be created in the same folder you run the command
+from. The binaries will be created in `build_zephyr/zephyr` with the name
+`zephyr.elf` and `zephyr.bin`. We recommend using the `-d build_zephyr` if you
+are building from Matter repo root folder as a build folder already exists and
+is tracked by git.
 
 You can get more details on `west build` with
-[Zephyr's building guide](https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#building-west-build)
+[Zephyr's building guide](https://docs.zephyrproject.org/3.7.0/develop/west/build-flash-debug.html#building-west-build)
 
 <a name="flashing-and-debugging"></a>
 
@@ -102,7 +109,7 @@ west flash -i <J-Link serial number>
 ```
 
 You can get more details on `west flash` with
-[Zephyr's flashing guide](https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#flashing-west-flash)
+[Zephyr's flashing guide](https://docs.zephyrproject.org/3.7.0/develop/west/build-flash-debug.html#flashing-west-flash)
 
 > **Note**: `west flash` will not start a debug session, it will only flash and
 > reset the device
@@ -113,7 +120,7 @@ To debug a Matter with Zephyr application, you could use several methods:
 
 -   [MCUXpresso IDE (version >= 11.6.0)](https://www.nxp.com/design/software/development-software/mcuxpresso-software-and-tools-/mcuxpresso-integrated-development-environment-ide:MCUXpresso-IDE)
 -   `west debug`
-    [Zephyr's debugging guide](https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#id29)
+    [Zephyr's debugging guide](https://docs.zephyrproject.org/3.7.0/develop/west/build-flash-debug.html#id29)
 
 > **Note**: As the build provides an elf file, any compatible debugging tool can
 > be used.

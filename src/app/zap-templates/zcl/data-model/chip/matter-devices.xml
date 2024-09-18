@@ -2475,10 +2475,6 @@ limitations under the License.
             <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="false">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Barrier Control" client="true" server="true" clientLocked="true" serverLocked="true">
-                <requireCommand>BarrierControlGoToPercent</requireCommand>
-                <requireCommand>BarrierControlStop</requireCommand>
-            </include>
             <include cluster="Color Control" client="true" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>COLOR_CONTROL_CURRENT_HUE</requireAttribute>
                 <requireAttribute>COLOR_CONTROL_CURRENT_SATURATION</requireAttribute>

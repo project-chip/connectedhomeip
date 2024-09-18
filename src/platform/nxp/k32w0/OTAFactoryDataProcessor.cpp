@@ -18,8 +18,8 @@
 
 #include <lib/core/TLV.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/nxp/common/legacy/CHIPDevicePlatformRamStorageConfig.h>
 #include <platform/nxp/k32w0/CHIPDevicePlatformConfig.h>
+#include <platform/nxp/k32w0/CHIPDevicePlatformRamStorageConfig.h>
 #include <platform/nxp/k32w0/FactoryDataProviderImpl.h>
 #include <platform/nxp/k32w0/OTAFactoryDataProcessor.h>
 

@@ -61,8 +61,6 @@ void LedManager::Init()
 #endif
     /* The parameters will not be used by the dimmer init. */
     lightLed.Init(LED_MANAGER_LIGHT_LED_INDEX, false);
-
-    RestoreState();
 }
 
 void LedManager::DisplayInLoop()
@@ -97,7 +95,7 @@ void LedManager::RestoreState()
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t arg) {
         bool val = false;
-        APP_CLUSTER_ATTRIBUTE::Get(APP_DEVICE_TYPE_ENDPOINT, &val);
+        val      = chip::NXP::App::GetAppTask().CheckStateClusterHandler();
         if (val)
             LightingMgr().ApplyTurnOn();
         else

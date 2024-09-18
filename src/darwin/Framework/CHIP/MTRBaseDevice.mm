@@ -2333,6 +2333,57 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         params.SetWildcardAttributeId();
     }
 }
+
+static NSString * const sEndpointIDKey = @"endpointIDKey";
+static NSString * const sClusterIDKey = @"clusterIDKey";
+static NSString * const sAttributeIDKey = @"attributeIDKey";
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)decoder
+{
+    self = [super init];
+    if (self == nil) {
+        return nil;
+    }
+
+    _endpoint = [decoder decodeObjectOfClass:[NSNumber class] forKey:sEndpointIDKey];
+    if (_endpoint && ![_endpoint isKindOfClass:[NSNumber class]]) {
+        MTR_LOG_ERROR("MTRAttributeRequestPath decoded %@ for endpoint, not NSNumber.", _attribute);
+        return nil;
+    }
+
+    _cluster = [decoder decodeObjectOfClass:[NSNumber class] forKey:sClusterIDKey];
+    if (_cluster && ![_cluster isKindOfClass:[NSNumber class]]) {
+        MTR_LOG_ERROR("MTRAttributeRequestPath decoded %@ for cluster, not NSNumber.", _attribute);
+        return nil;
+    }
+
+    _attribute = [decoder decodeObjectOfClass:[NSNumber class] forKey:sAttributeIDKey];
+    if (_attribute && ![_attribute isKindOfClass:[NSNumber class]]) {
+        MTR_LOG_ERROR("MTRAttributeRequestPath decoded %@ for attribute, not NSNumber.", _attribute);
+        return nil;
+    }
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    if (_endpoint) {
+        [coder encodeObject:_endpoint forKey:sEndpointIDKey];
+    }
+    if (_cluster) {
+        [coder encodeObject:_cluster forKey:sClusterIDKey];
+    }
+    if (_attribute) {
+        [coder encodeObject:_attribute forKey:sAttributeIDKey];
+    }
+}
+
 @end
 
 @implementation MTREventRequestPath
@@ -2406,6 +2457,56 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         params.SetWildcardEventId();
     }
 }
+static NSString * const sEventEndpointIDKey = @"endpointIDKey";
+static NSString * const sEventClusterIDKey = @"clusterIDKey";
+static NSString * const sEventAttributeIDKey = @"attributeIDKey";
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)decoder
+{
+    self = [super init];
+    if (self == nil) {
+        return nil;
+    }
+
+    _endpoint = [decoder decodeObjectOfClass:[NSNumber class] forKey:sEventEndpointIDKey];
+    if (_endpoint && ![_endpoint isKindOfClass:[NSNumber class]]) {
+        MTR_LOG_ERROR("MTREventRequestPath decoded %@ for endpoint, not NSNumber.", _endpoint);
+        return nil;
+    }
+
+    _cluster = [decoder decodeObjectOfClass:[NSNumber class] forKey:sEventClusterIDKey];
+    if (_cluster && ![_cluster isKindOfClass:[NSNumber class]]) {
+        MTR_LOG_ERROR("MTREventRequestPath decoded %@ for cluster, not NSNumber.", _cluster);
+        return nil;
+    }
+
+    _event = [decoder decodeObjectOfClass:[NSNumber class] forKey:sEventAttributeIDKey];
+    if (_event && ![_event isKindOfClass:[NSNumber class]]) {
+        MTR_LOG_ERROR("MTREventRequestPath decoded %@ for event, not NSNumber.", _event);
+        return nil;
+    }
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    if (_endpoint) {
+        [coder encodeObject:_endpoint forKey:sEventEndpointIDKey];
+    }
+    if (_cluster) {
+        [coder encodeObject:_cluster forKey:sEventClusterIDKey];
+    }
+    if (_event) {
+        [coder encodeObject:_event forKey:sEventAttributeIDKey];
+    }
+}
+
 @end
 
 @implementation MTRClusterPath

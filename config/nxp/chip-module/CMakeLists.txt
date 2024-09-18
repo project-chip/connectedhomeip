@@ -91,6 +91,13 @@ endif()
 
 get_property(CHIP_COMPILER_LAUNCHER GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
 
+if (CONFIG_USE_CHIP_DATA_MODEL_INTERFACE)
+    set(DATA_MODEL_INTERFACE "enabled")
+else()
+    set(DATA_MODEL_INTERFACE "disabled")
+endif()
+
+
 # ==============================================================================
 # Generate configuration for CHIP GN build system
 # ==============================================================================
@@ -101,6 +108,7 @@ matter_common_gn_args(
     LIB_TESTS       CONFIG_CHIP_BUILD_TESTS
     PROJECT_CONFIG  ${CONFIG_CHIP_PROJECT_CONFIG}
     DEVICE_INFO_EXAMPLE_PROVIDER CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+    DATA_MODEL_INTERFACE ${DATA_MODEL_INTERFACE}
 )
 matter_add_gn_arg_string("zephyr_ar"                              ${CMAKE_AR})
 matter_add_gn_arg_string("zephyr_cc"                              ${CMAKE_C_COMPILER})
@@ -174,14 +182,7 @@ endif()
 # ==============================================================================
 # Define 'chip-ota-image' target for building CHIP OTA image
 # ==============================================================================
-if(EXISTS "${CHIP_ROOT}/src/platform/nxp/zephyr/boards/${BOARD}/${BOARD}.overlay")
-  set(DTC_BOARD_OVERLAY "${CHIP_ROOT}/src/platform/nxp/zephyr/boards/${BOARD}/${BOARD}.overlay")
-else()
-  set(DTC_BOARD_OVERLAY "")
-  message(STATUS "No board overlay found")
-endif()
-
-if (CONFIG_CHIP_OTA_REQUESTOR)
+if(CONFIG_CHIP_OTA_REQUESTOR)
     if(CONFIG_MCUBOOT_SIGNATURE_KEY_FILE STREQUAL "")
         set(ZEPHYR_OUTPUT_NAME "zephyr")
     else()
@@ -193,7 +194,8 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
     add_custom_target(build_mcuboot ALL
         COMMAND
         west build -b ${BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
-            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE} -DEXTRA_DTC_OVERLAY_FILE=${DTC_BOARD_OVERLAY}
+            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE}
+            -DEXTRA_DTC_OVERLAY_FILE="${DTC_OVERLAY_FILE};${EXTRA_DTC_OVERLAY_FILE}"
         COMMAND
         cp ${PROJECT_BINARY_DIR}/../modules/connectedhomeip/build_mcuboot/zephyr/zephyr.bin ${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin
     )

@@ -43,6 +43,10 @@
 #include <lib/support/FibonacciUtils.h>
 
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+#include <app/data-model-provider/ActionReturnStatus.h>
+
+// TODO: defaulting to codegen should eventually be an application choice and not
+//       hard-coded in the interaction model
 #include <app/codegen-data-model-provider/Instance.h>
 #endif
 
@@ -1699,6 +1703,21 @@ CHIP_ERROR InteractionModelEngine::PushFront(SingleLinkedListNode<T> *& aObjectL
 void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                              TLV::TLVReader & apPayload)
 {
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+
+    DataModel::InvokeRequest request;
+    request.path = aCommandPath;
+
+    std::optional<DataModel::ActionReturnStatus> status = GetDataModelProvider()->Invoke(request, apPayload, &apCommandObj);
+
+    // Provider indicates that handler status or data was already set (or will be set asynchronously) by
+    // returning std::nullopt. If any other value is returned, it is requesting that a status is set. This
+    // includes CHIP_NO_ERROR: in this case CHIP_NO_ERROR would mean set a `status success on the command`
+    if (status.has_value())
+    {
+        apCommandObj.AddStatus(aCommandPath, status->GetStatusCode());
+    }
+#else
     CommandHandlerInterface * handler =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 
@@ -1717,6 +1736,7 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
     }
 
     DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
+#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 }
 
 Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)

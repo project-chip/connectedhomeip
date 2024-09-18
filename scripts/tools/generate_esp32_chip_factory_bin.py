@@ -25,6 +25,7 @@ from enum import Enum
 from types import SimpleNamespace
 
 import cryptography.x509
+import esp_idf_nvs_partition_gen.nvs_partition_gen as nvs_partition_gen
 from esp_secure_cert.tlv_format import generate_partition_ds, generate_partition_no_ds, tlv_priv_key_t, tlv_priv_key_type_t
 
 CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('scripts', 'tools'))]
@@ -33,15 +34,6 @@ from spake2p import generate_verifier  # noqa: E402 isort:skip
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'src', 'setup_payload', 'python'))
 from SetupPayload import CommissioningFlow, SetupPayload  # noqa: E402 isort:skip
 
-if os.getenv('IDF_PATH'):
-    sys.path.insert(0, os.path.join(os.getenv('IDF_PATH'),
-                                    'components',
-                                    'nvs_flash',
-                                    'nvs_partition_generator'))
-    import nvs_partition_gen
-else:
-    sys.stderr.write("Please set the IDF_PATH environment variable.")
-    exit(0)
 
 INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
                      66666666, 77777777, 88888888, 99999999, 12345678, 87654321]
