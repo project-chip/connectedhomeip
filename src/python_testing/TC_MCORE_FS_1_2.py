@@ -52,7 +52,7 @@ def _generate_verifier(passcode: int, salt: bytes, iterations: int) -> bytes:
 
 
 @dataclass
-class _SetupParamters:
+class _SetupParameters:
     setup_qr_code: str
     manual_code: int
     discriminator: int
@@ -83,8 +83,8 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
     async def _create_th_server(self, port):
         # These are default testing values
-        setup_params = _SetupParamters(setup_qr_code="MT:-24J0AFN00KA0648G00",
-                                       manual_code=34970112332, discriminator=3840, passcode=20202021)
+        setup_params = _SetupParameters(setup_qr_code="MT:-24J0AFN00KA0648G00",
+                                        manual_code=34970112332, discriminator=3840, passcode=20202021)
         kvs = f'kvs_{str(uuid.uuid4())}'
 
         cmd = [self._th_server_app_path]
@@ -101,7 +101,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         time.sleep(3)
         return setup_params
 
-    def _ask_for_vendor_commissioning_ux_operation(self, setup_params: _SetupParamters):
+    def _ask_for_vendor_commissioning_ux_operation(self, setup_params: _SetupParameters):
         self.wait_for_user_input(
             prompt_msg=f"Using the DUT vendor's provided interface, commission the ICD device using the following parameters:\n"
             f"- discriminator: {setup_params.discriminator}\n"
