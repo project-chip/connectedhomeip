@@ -43,7 +43,7 @@ constexpr char kInteractiveModeHistoryFileName[] = "chip_tool_history";
 constexpr char kInteractiveModeStopCommand[]     = "quit()";
 
 #if defined(PW_RPC_ENABLED)
-constexpr uint16_t kRetryIntervalS = 5;
+constexpr uint16_t kRetryIntervalS = 3;
 #endif
 
 // File pointer for the log file
