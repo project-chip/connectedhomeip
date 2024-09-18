@@ -398,7 +398,7 @@ config CHIP_ICD_ACTIVE_MODE_THRESHOLD
 	  For LIT devices it cannot be set to a value smaller than 5000 ms.
 
 config CHIP_ICD_LIT_SUPPORT
-	bool "Intermittenly Connected Device Long Idle Time support"
+	bool "Intermittently Connected Device Long Idle Time support"
 	imply CHIP_ICD_CHECK_IN_SUPPORT
 	imply CHIP_ICD_UAT_SUPPORT
 	help
@@ -406,16 +406,23 @@ config CHIP_ICD_LIT_SUPPORT
 	  It also implies the ICD Check-In and UAT features support that are mandatory for LIT device.
 
 config CHIP_ICD_CHECK_IN_SUPPORT
-	bool "Intermittenly Connected Device Check-In protocol support"
+	bool "Intermittently Connected Device Check-In protocol support"
 	help
 	  Enables the Check-In protocol support in Matter. It allows an ICD device to notify the registered
 	  ICD clients that it is available for communication.
 
 config CHIP_ICD_UAT_SUPPORT
-	bool "Intermittenly Connected Device User Active Mode Trigger support"
+	bool "Intermittently Connected Device User Active Mode Trigger support"
 	help
 	  Enables the User Active Mode Trigger (UAT) support in Matter. It allows the User to use application specific
 	  means (e.g. button press) to trigger an ICD device to enter the active mode and become responsive.
+
+config CHIP_ICD_DSLS_SUPPORT
+	bool "Intermittenttly Connected Device Dynamic SIT LIT support"
+	depends on CHIP_ICD_LIT_SUPPORT
+	help
+	  Enables the Dynamic SIT LIT support in Matter. It allows the application to dynamically switch between
+	  SIT and LIT modes, as long as the requirements for these modes are met (e.g. device has at least one active ICD client).
 
 config CHIP_ICD_CLIENTS_PER_FABRIC
 	int "Intermittently Connected Device number of clients per fabric"
