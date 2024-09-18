@@ -140,6 +140,7 @@ silabs_executable("refrigerator_app") {
     "src/AppTask.cpp",
     "src/RefrigeratorManager.cpp",
     "src/ZclCallbacks.cpp",
+    "src/refrigerator-and-temperature-controlled-cabinet-mode.cpp",
   ]
 
   if (use_temp_sensor) {

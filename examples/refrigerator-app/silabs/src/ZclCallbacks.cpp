@@ -70,17 +70,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
 }
 
-/** @brief Refrigerator And TemperatureControlled Cabinet Mode Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(EndpointId endpoint) {}
-
 /** @brief Refrigerator Alarm Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the
@@ -102,25 +91,3 @@ void emberAfRefrigeratorAlarmClusterInitCallback(EndpointId endpoint) {}
  *
  */
 void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint) {}
-
-// /**
-//  * @brief Handles the SetTemperature command for the Temperature Control Cluster.
-//  *
-//  * This function is called when the SetTemperature command is received from a client.
-//  * It is responsible for setting the temperature for the cabinet as per the command data.
-//  *
-//  * @param CommandHandler commandObj Pointer to the command handler object.
-//  * @param const ConcreteCommandPath commandPath The path of the command received.
-//  * @param const DecodableType & commandData
-//  *        The data decoded from the SetTemperature command, which includes the desired temperature.
-//  *
-//  * @return bool Returns true if the command was handled successfully, false otherwise.
-//  *
-//  * @note The actual implementation to set the temperature is yet to be added.
-//  */
-// bool emberAfTemperatureControlClusterSetTemperatureCallback(
-//     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-//     const chip::app::Clusters::TemperatureControl::Commands::SetTemperature::DecodableType & commandData)  {
-//         // TODO: Add implementation to set the temperature for the cabinet
-//         return true;
-// }
