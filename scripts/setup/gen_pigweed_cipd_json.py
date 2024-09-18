@@ -17,7 +17,6 @@
 import argparse
 import json
 import platform
-from collections import defaultdict
 
 _LIST_OF_PACKAGES_TO_EXCLUDE = ['fuchsia/third_party/rust/']
 
