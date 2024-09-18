@@ -1,20 +1,21 @@
 # Thread Border Router usage
 
-This document describes the use of the Thread Border router and secondary netwok
+This document describes the use of the Thread Border router and secondary network
 interface for a Matter application
 
 <hr>
 
--   [Thread Border Router overwiew](#thread-border-router-overwiew)
--   [Using the Thread Border Router Management cluster](#using-the-thread-border-router-management-cluster)
--   [Using the Secondary Network commissioning interface](#using-the-secondary-network-commissioning-interface)
--   [Using the Thread credential sharing mechanism](#using-the-thread-credential-sharing-mechanism)
+- [Thread Border Router usage](#thread-border-router-usage)
+  - [Thread Border Router overview](#thread-border-router-overview)
+  - [Using the Thread Border Router management cluster](#using-the-thread-border-router-management-cluster)
+  - [Using the Secondary Network commissioning interface](#using-the-secondary-network-commissioning-interface)
+  - [Using the Thread credential sharing mechanism](#using-the-thread-credential-sharing-mechanism)
 
 <hr>
 
-<a name="thread-border-router-overwiew"></a>
+<a name="thread-border-router-overview"></a>
 
-## Thread Border Router overwiew
+## Thread Border Router overview
 
 This section contains an overview of the Border Router architecture and
 describes the general use cases.
@@ -103,4 +104,4 @@ border router application
 See `Ephemeral Key functionality` section.
 
 Note that all OpenThread commands executed from then Matter CLI must have
-`otcli` prepended before the command.
+`otcli` added before the command.
