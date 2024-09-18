@@ -60,13 +60,13 @@ public:
 
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
     // Used for posting the event in the BLE queue
-    void BlePostEvent(BleEvent_t * event);
-    void HandleConnectEvent(sl_wfx_msg_t * evt);
-    void HandleConnectionCloseEvent(sl_wfx_msg_t * evt);
-    void HandleWriteEvent(sl_wfx_msg_t * evt);
-    void UpdateMtu(sl_wfx_msg_t * evt);
+    void BlePostEvent(SilabsBleWrapper::BleEvent_t * event);
+    void HandleConnectEvent(SilabsBleWrapper::sl_wfx_msg_t * evt);
+    void HandleConnectionCloseEvent(SilabsBleWrapper::sl_wfx_msg_t * evt);
+    void HandleWriteEvent(SilabsBleWrapper::sl_wfx_msg_t * evt);
+    void UpdateMtu(SilabsBleWrapper::sl_wfx_msg_t * evt);
     void HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId);
-    void HandleTXCharCCCDWrite(sl_wfx_msg_t * evt);
+    void HandleTXCharCCCDWrite(SilabsBleWrapper::sl_wfx_msg_t * evt);
     void HandleSoftTimerEvent(void);
     int32_t SendBLEAdvertisementCommand(void);
 #else
@@ -83,7 +83,7 @@ public:
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-    static void HandleC3ReadRequest(sl_wfx_msg_t * rsi_ble_read_req);
+    static void HandleC3ReadRequest(SilabsBleWrapper::sl_wfx_msg_t * rsi_ble_read_req);
 #else
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     static void HandleC3ReadRequest(volatile sl_bt_msg_t * evt);
@@ -101,7 +101,7 @@ private:
     osMessageQueueId_t sBleEventQueue = NULL;
     static void sl_ble_event_handling_task(void * args);
     void sl_ble_init();
-    void ProcessEvent(BleEvent_t inEvent);
+    void ProcessEvent(SilabsBleWrapper::BleEvent_t inEvent);
 #endif
 
     // ===== Members that implement the BLEManager internal interface.
@@ -197,7 +197,7 @@ private:
 #endif
 
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-    void HandleRXCharWrite(sl_wfx_msg_t * evt);
+    void HandleRXCharWrite(SilabsBleWrapper::sl_wfx_msg_t * evt);
 #else
     void HandleRXCharWrite(volatile sl_bt_msg_t * evt);
 #endif

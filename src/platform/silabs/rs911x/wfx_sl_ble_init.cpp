@@ -22,19 +22,13 @@
  */
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
-// #include <platform/internal/BLEManager.h>
 #include <platform/silabs/BLEManagerImpl.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 #include "wfx_sl_ble_init.h"
-#ifdef __cplusplus
-}
-#endif
+
+using namespace chip::DeviceLayer::Internal;
 
 // Global Variables
-BleEvent_t bleEvent;
+SilabsBleWrapper::BleEvent_t bleEvent;
 
 /*==============================================*/
 /**
@@ -45,11 +39,11 @@ BleEvent_t bleEvent;
  * @section description
  * This callback function is invoked when  mtu exhange event is received
  */
-void rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu)
+void SilabsBleWrapper::rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu)
 {
-    bleEvent.eventType = RSI_BLE_MTU_EVENT;
+    bleEvent.eventType = BleEventType_e::RSI_BLE_MTU_EVENT;
     memcpy(&bleEvent.eventData->rsi_ble_mtu, rsi_ble_mtu, sizeof(rsi_ble_event_mtu_t));
-    chip::DeviceLayer::Internal::BLEMgrImpl().BlePostEvent(&bleEvent);
+    BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
 /*==============================================*/
@@ -62,12 +56,12 @@ void rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu)
  * @section description
  * This callback function is invoked when write/notify/indication events are received
  */
-void rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t * rsi_ble_write)
+void SilabsBleWrapper::rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t * rsi_ble_write)
 {
-    bleEvent.eventType           = RSI_BLE_GATT_WRITE_EVENT;
+    bleEvent.eventType           = BleEventType_e::RSI_BLE_GATT_WRITE_EVENT;
     bleEvent.eventData->event_id = event_id;
     memcpy(&bleEvent.eventData->rsi_ble_write, rsi_ble_write, sizeof(rsi_ble_event_write_t));
-    chip::DeviceLayer::Internal::BLEMgrImpl().BlePostEvent(&bleEvent);
+    BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
 /*==============================================*/
@@ -79,13 +73,13 @@ void rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t * rsi_
  * @section description
  * This callback function indicates the status of the connection
  */
-void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * resp_enh_conn)
+void SilabsBleWrapper::rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * resp_enh_conn)
 {
-    bleEvent.eventType                   = RSI_BLE_CONN_EVENT;
+    bleEvent.eventType                   = BleEventType_e::RSI_BLE_CONN_EVENT;
     bleEvent.eventData->connectionHandle = 1;
     bleEvent.eventData->bondingHandle    = 255;
     memcpy(bleEvent.eventData->resp_enh_conn.dev_addr, resp_enh_conn->dev_addr, RSI_DEV_ADDR_LEN);
-    chip::DeviceLayer::Internal::BLEMgrImpl().BlePostEvent(&bleEvent);
+    BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
 /*==============================================*/
@@ -98,11 +92,11 @@ void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * 
  * @section description
  * This callback function indicates disconnected device information and status
  */
-void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, uint16_t reason)
+void SilabsBleWrapper::rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, uint16_t reason)
 {
-    bleEvent.eventType         = RSI_BLE_DISCONN_EVENT;
+    bleEvent.eventType         = BleEventType_e::RSI_BLE_DISCONN_EVENT;
     bleEvent.eventData->reason = reason;
-    chip::DeviceLayer::Internal::BLEMgrImpl().BlePostEvent(&bleEvent);
+    BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
 /*==============================================*/
@@ -114,12 +108,12 @@ void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, u
  * @return     none
  * @section description
  */
-void rsi_ble_on_event_indication_confirmation(uint16_t resp_status, rsi_ble_set_att_resp_t * rsi_ble_event_set_att_rsp)
+void SilabsBleWrapper::rsi_ble_on_event_indication_confirmation(uint16_t resp_status, rsi_ble_set_att_resp_t * rsi_ble_event_set_att_rsp)
 {
-    bleEvent.eventType              = RSI_BLE_GATT_INDICATION_CONFIRMATION;
+    bleEvent.eventType              = BleEventType_e::RSI_BLE_GATT_INDICATION_CONFIRMATION;
     bleEvent.eventData->resp_status = resp_status;
     memcpy(&bleEvent.eventData->rsi_ble_event_set_att_rsp, rsi_ble_event_set_att_rsp, sizeof(rsi_ble_set_att_resp_t));
-    chip::DeviceLayer::Internal::BLEMgrImpl().BlePostEvent(&bleEvent);
+    BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
 /*==============================================*/
@@ -132,12 +126,12 @@ void rsi_ble_on_event_indication_confirmation(uint16_t resp_status, rsi_ble_set_
  * @section description
  * This callback function is invoked when read events are received
  */
-void rsi_ble_on_read_req_event(uint16_t event_id, rsi_ble_read_req_t * rsi_ble_read_req)
+void SilabsBleWrapper::rsi_ble_on_read_req_event(uint16_t event_id, rsi_ble_read_req_t * rsi_ble_read_req)
 {
-    bleEvent.eventType           = RSI_BLE_EVENT_GATT_RD;
+    bleEvent.eventType           = BleEventType_e::RSI_BLE_EVENT_GATT_RD;
     bleEvent.eventData->event_id = event_id;
     memcpy(&bleEvent.eventData->rsi_ble_read_req, rsi_ble_read_req, sizeof(rsi_ble_read_req_t));
-    chip::DeviceLayer::Internal::BLEMgrImpl().BlePostEvent(&bleEvent);
+    BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
 /*==============================================*/
@@ -153,7 +147,7 @@ void rsi_ble_on_read_req_event(uint16_t event_id, rsi_ble_read_req_t * rsi_ble_r
  * @section description
  * This function is used to store all attribute records
  */
-void rsi_gatt_add_attribute_to_list(rsi_ble_t * p_val, uint16_t handle, uint16_t data_len, uint8_t * data, uuid_t uuid,
+void SilabsBleWrapper::rsi_gatt_add_attribute_to_list(rsi_ble_t * p_val, uint16_t handle, uint16_t data_len, uint8_t * data, uuid_t uuid,
                                     uint8_t char_prop)
 {
     if ((p_val->DATA_ix + data_len) >= BLE_ATT_REC_SIZE)
@@ -187,7 +181,7 @@ void rsi_gatt_add_attribute_to_list(rsi_ble_t * p_val, uint16_t handle, uint16_t
  * @section description
  * This function is used at application to add characteristic attribute
  */
-void rsi_ble_add_char_serv_att(void * serv_handler, uint16_t handle, uint8_t val_prop, uint16_t att_val_handle, uuid_t att_val_uuid)
+void SilabsBleWrapper::rsi_ble_add_char_serv_att(void * serv_handler, uint16_t handle, uint8_t val_prop, uint16_t att_val_handle, uuid_t att_val_uuid)
 {
     rsi_ble_req_add_att_t new_att = { 0 };
 
@@ -235,7 +229,7 @@ void rsi_ble_add_char_serv_att(void * serv_handler, uint16_t handle, uint8_t val
  * This function is used at application to create new service.
  */
 
-void rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_type_uuid, uint8_t val_prop, uint8_t * data,
+void SilabsBleWrapper::rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_type_uuid, uint8_t val_prop, uint8_t * data,
                               uint8_t data_len, uint8_t auth_read)
 {
     rsi_ble_req_add_att_t new_att = { 0 };
@@ -297,7 +291,7 @@ void rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_t
  * This function is used at application to create new service.
  */
 
-uint32_t rsi_ble_add_matter_service(void)
+uint32_t SilabsBleWrapper::rsi_ble_add_matter_service(void)
 {
     uuid_t custom_service                                   = { RSI_BLE_MATTER_CUSTOM_SERVICE_UUID };
     custom_service.size                                     = RSI_BLE_MATTER_CUSTOM_SERVICE_SIZE;

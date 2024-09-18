@@ -20,14 +20,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#pragma once
 
 /**
  * Include files
  * */
-
-#ifndef WFX_SL_BLE_INIT
-#define WFX_SL_BLE_INIT
-
 // BLE include file to refer BLE APIs
 #include "ble_config.h"
 #include "cmsis_os2.h"
@@ -48,41 +45,6 @@
 #include <rsi_common_apis.h>
 #include <stdbool.h>
 #include <string.h>
-
-typedef enum
-{
-    RSI_BLE_CONN_EVENT,
-    RSI_BLE_DISCONN_EVENT,
-    RSI_BLE_GATT_WRITE_EVENT,
-    RSI_BLE_MTU_EVENT,
-    RSI_BLE_GATT_INDICATION_CONFIRMATION,
-    RSI_BLE_RESP_ATT_VALUE,
-    RSI_BLE_EVENT_GATT_RD
-} BleEventType_e;
-
-typedef struct sl_wfx_msg_s
-{
-    uint8_t connectionHandle;
-    uint8_t bondingHandle;
-    uint16_t reason;
-    uint16_t event_id;
-    uint16_t resp_status;
-    rsi_ble_event_mtu_t rsi_ble_mtu;
-    rsi_ble_event_write_t rsi_ble_write;
-    rsi_ble_event_enhance_conn_status_t resp_enh_conn;
-    rsi_ble_event_disconnect_t * resp_disconnect;
-    rsi_ble_read_req_t * rsi_ble_read_req;
-    rsi_ble_set_att_resp_t rsi_ble_event_set_att_rsp;
-    uint16_t rsi_ble_measurement_hndl;
-    uint16_t rsi_ble_gatt_server_client_config_hndl;
-    uint16_t subscribed;
-} sl_wfx_msg_t;
-
-typedef struct BleEvent_s
-{
-    BleEventType_e eventType;
-    sl_wfx_msg_t * eventData;
-} BleEvent_t;
 
 #define ATT_REC_IN_HOST (0)
 #define WFX_QUEUE_SIZE 10
@@ -118,27 +80,65 @@ typedef struct BleEvent_s
 #define RSI_BLE_CHARACTERISTIC_TX_MEASUREMENT_HANDLE_LOCATION (4)
 #define RSI_BLE_CHARACTERISTIC_TX_GATT_SERVER_CLIENT_HANDLE_LOCATION (5)
 
-// ALL Ble functions
-void InitBleEventQueue();
-osMessageQueueId_t GetBleEventQueue();
-void rsi_ble_on_connect_event(rsi_ble_event_conn_status_t * resp_conn);
-void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, uint16_t reason);
-void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * resp_enh_conn);
-void rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t * rsi_ble_write);
-void rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu);
-void rsi_ble_on_event_indication_confirmation(uint16_t resp_status, rsi_ble_set_att_resp_t * rsi_ble_event_set_att_rsp);
-void rsi_ble_on_read_req_event(uint16_t event_id, rsi_ble_read_req_t * rsi_ble_read_req);
-void rsi_gatt_add_attribute_to_list(rsi_ble_t * p_val, uint16_t handle, uint16_t data_len, uint8_t * data, uuid_t uuid,
-                                    uint8_t char_prop);
-void rsi_ble_add_char_serv_att(void * serv_handler, uint16_t handle, uint8_t val_prop, uint16_t att_val_handle,
-                               uuid_t att_val_uuid);
-void rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_type_uuid, uint8_t val_prop, uint8_t * data,
-                              uint8_t data_len, uint8_t auth_read);
-uint32_t rsi_ble_add_matter_service(void);
-void rsi_ble_app_set_event(uint32_t event_num);
-int32_t rsi_ble_app_get_event(void);
-void rsi_ble_app_clear_event(uint32_t event_num);
-void rsi_ble_app_init_events();
-void rsi_ble_event_handling_task(void);
+namespace chip {
+namespace DeviceLayer {
+namespace Internal {
 
-#endif
+class SilabsBleWrapper {
+public:
+    typedef enum BleEventType
+    {
+        RSI_BLE_CONN_EVENT,
+        RSI_BLE_DISCONN_EVENT,
+        RSI_BLE_GATT_WRITE_EVENT,
+        RSI_BLE_MTU_EVENT,
+        RSI_BLE_GATT_INDICATION_CONFIRMATION,
+        RSI_BLE_RESP_ATT_VALUE,
+        RSI_BLE_EVENT_GATT_RD
+    } BleEventType_e;
+
+    typedef struct sl_wfx_msg_s
+    {
+        uint8_t connectionHandle;
+        uint8_t bondingHandle;
+        uint16_t reason;
+        uint16_t event_id;
+        uint16_t resp_status;
+        rsi_ble_event_mtu_t rsi_ble_mtu;
+        rsi_ble_event_write_t rsi_ble_write;
+        rsi_ble_event_enhance_conn_status_t resp_enh_conn;
+        rsi_ble_event_disconnect_t * resp_disconnect;
+        rsi_ble_read_req_t * rsi_ble_read_req;
+        rsi_ble_set_att_resp_t rsi_ble_event_set_att_rsp;
+        uint16_t rsi_ble_measurement_hndl;
+        uint16_t rsi_ble_gatt_server_client_config_hndl;
+        uint16_t subscribed;
+    } sl_wfx_msg_t;
+
+    typedef struct BleEvent_s
+    {
+        BleEventType_e eventType;
+        sl_wfx_msg_t * eventData;
+    } BleEvent_t;
+
+// ALL Ble functions
+static void rsi_ble_on_connect_event(rsi_ble_event_conn_status_t * resp_conn);
+static void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, uint16_t reason);
+static void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * resp_enh_conn);
+static void rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t * rsi_ble_write);
+static void rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu);
+static void rsi_ble_on_event_indication_confirmation(uint16_t resp_status, rsi_ble_set_att_resp_t * rsi_ble_event_set_att_rsp);
+static void rsi_ble_on_read_req_event(uint16_t event_id, rsi_ble_read_req_t * rsi_ble_read_req);
+static void rsi_gatt_add_attribute_to_list(rsi_ble_t * p_val, uint16_t handle, uint16_t data_len, uint8_t * data, uuid_t uuid,
+                                    uint8_t char_prop);
+static void rsi_ble_add_char_serv_att(void * serv_handler, uint16_t handle, uint8_t val_prop, uint16_t att_val_handle,
+                               uuid_t att_val_uuid);
+static void rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_type_uuid, uint8_t val_prop, uint8_t * data,
+                              uint8_t data_len, uint8_t auth_read);
+static uint32_t rsi_ble_add_matter_service(void);
+
+};
+
+} // namespace Internal
+} // namespace DeviceLayer
+} // namespace chip
