@@ -60,15 +60,15 @@ def main(search_directory, env_file):
         "TC_CCTRL_2_1.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
         "TC_CCTRL_2_2.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
         "TC_CCTRL_2_3.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
-        "TC_DGGEN_3_2.py",  # Unit test/shared code of src/python_testing/test_testing/test_TC_DGGEN_3_2.py
+        "TC_DGGEN_3_2.py",  # src/python_testing/test_testing/test_TC_DGGEN_3_2.py is the Unit test of this test
         "TC_EEVSE_Utils.py",  # Shared code for TC_EEVSE, not a standalone test
         "TC_ECOINFO_2_1.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
         "TC_ECOINFO_2_2.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
         "TC_EWATERHTRBase.py",  # Shared code for TC_EWATERHTR, not a standalone test
         "TC_EnergyReporting_Utils.py",  # Shared code for TC_EEM and TC_EPM, not a standalone test
         "TC_OpstateCommon.py",  # Shared code for TC_OPSTATE, not a standalone test
-        "TC_pics_checker.py",  # Unit test/shared code of src/python_testing/test_testing/test_IDM_10_4.py
-        "TC_TMP_2_1.py",  # Unit test/shared code of src/python_testing/test_testing/test_TC_TMP_2_1.py
+        "TC_pics_checker.py",  # Currently isn't enabled because we don't have any examples with conformant PICS
+        "TC_TMP_2_1.py",  # src/python_testing/test_testing/test_TC_TMP_2_1.py is the Unit test of this test
         "TC_MCORE_FS_1_1.py",  # This test requires a TH_SERVER application, hence not ready run with CI
         "TC_MCORE_FS_1_2.py",  # This test requires a TH_SERVER application, hence not ready run with CI
         "TC_MCORE_FS_1_3.py",  # This test requires a TH_SERVER application, hence not ready run with CI
