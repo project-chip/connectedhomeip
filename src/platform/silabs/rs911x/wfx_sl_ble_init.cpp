@@ -20,10 +20,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "wfx_sl_ble_init.h"
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/silabs/BLEManagerImpl.h>
-#include "wfx_sl_ble_init.h"
 
 using namespace chip::DeviceLayer::Internal;
 
@@ -108,7 +108,8 @@ void SilabsBleWrapper::rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * 
  * @return     none
  * @section description
  */
-void SilabsBleWrapper::rsi_ble_on_event_indication_confirmation(uint16_t resp_status, rsi_ble_set_att_resp_t * rsi_ble_event_set_att_rsp)
+void SilabsBleWrapper::rsi_ble_on_event_indication_confirmation(uint16_t resp_status,
+                                                                rsi_ble_set_att_resp_t * rsi_ble_event_set_att_rsp)
 {
     bleEvent.eventType              = BleEventType_e::RSI_BLE_GATT_INDICATION_CONFIRMATION;
     bleEvent.eventData->resp_status = resp_status;
@@ -147,8 +148,8 @@ void SilabsBleWrapper::rsi_ble_on_read_req_event(uint16_t event_id, rsi_ble_read
  * @section description
  * This function is used to store all attribute records
  */
-void SilabsBleWrapper::rsi_gatt_add_attribute_to_list(rsi_ble_t * p_val, uint16_t handle, uint16_t data_len, uint8_t * data, uuid_t uuid,
-                                    uint8_t char_prop)
+void SilabsBleWrapper::rsi_gatt_add_attribute_to_list(rsi_ble_t * p_val, uint16_t handle, uint16_t data_len, uint8_t * data,
+                                                      uuid_t uuid, uint8_t char_prop)
 {
     if ((p_val->DATA_ix + data_len) >= BLE_ATT_REC_SIZE)
     { //! Check for max data length for the characteristic value
@@ -181,7 +182,8 @@ void SilabsBleWrapper::rsi_gatt_add_attribute_to_list(rsi_ble_t * p_val, uint16_
  * @section description
  * This function is used at application to add characteristic attribute
  */
-void SilabsBleWrapper::rsi_ble_add_char_serv_att(void * serv_handler, uint16_t handle, uint8_t val_prop, uint16_t att_val_handle, uuid_t att_val_uuid)
+void SilabsBleWrapper::rsi_ble_add_char_serv_att(void * serv_handler, uint16_t handle, uint8_t val_prop, uint16_t att_val_handle,
+                                                 uuid_t att_val_uuid)
 {
     rsi_ble_req_add_att_t new_att = { 0 };
 
@@ -229,8 +231,8 @@ void SilabsBleWrapper::rsi_ble_add_char_serv_att(void * serv_handler, uint16_t h
  * This function is used at application to create new service.
  */
 
-void SilabsBleWrapper::rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_type_uuid, uint8_t val_prop, uint8_t * data,
-                              uint8_t data_len, uint8_t auth_read)
+void SilabsBleWrapper::rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_type_uuid, uint8_t val_prop,
+                                                uint8_t * data, uint8_t data_len, uint8_t auth_read)
 {
     rsi_ble_req_add_att_t new_att = { 0 };
     rsi_ble_t att_list;

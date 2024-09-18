@@ -210,13 +210,14 @@ void BLEManagerImpl::sl_ble_init()
     randomAddrBLE[(RSI_BLE_ADDR_LENGTH - 1)] |= 0xC0;
 
     // registering the GAP callback functions
-    rsi_ble_gap_register_callbacks(NULL, NULL, SilabsBleWrapper::rsi_ble_on_disconnect_event, NULL, NULL, NULL, SilabsBleWrapper::rsi_ble_on_enhance_conn_status_event,
-                                   NULL, NULL, NULL);
+    rsi_ble_gap_register_callbacks(NULL, NULL, SilabsBleWrapper::rsi_ble_on_disconnect_event, NULL, NULL, NULL,
+                                   SilabsBleWrapper::rsi_ble_on_enhance_conn_status_event, NULL, NULL, NULL);
 
     // registering the GATT call back functions
-    rsi_ble_gatt_register_callbacks(NULL, NULL, NULL, NULL, NULL, NULL, NULL, SilabsBleWrapper::rsi_ble_on_gatt_write_event, NULL, NULL,
-                                    SilabsBleWrapper::rsi_ble_on_read_req_event, SilabsBleWrapper::rsi_ble_on_mtu_event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                                    NULL, SilabsBleWrapper::rsi_ble_on_event_indication_confirmation, NULL);
+    rsi_ble_gatt_register_callbacks(NULL, NULL, NULL, NULL, NULL, NULL, NULL, SilabsBleWrapper::rsi_ble_on_gatt_write_event, NULL,
+                                    NULL, SilabsBleWrapper::rsi_ble_on_read_req_event, SilabsBleWrapper::rsi_ble_on_mtu_event, NULL,
+                                    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                                    SilabsBleWrapper::rsi_ble_on_event_indication_confirmation, NULL);
 
     //  Exchange of GATT info with BLE stack
     SilabsBleWrapper::rsi_ble_add_matter_service();
