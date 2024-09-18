@@ -21,6 +21,7 @@
 #include "IcdManager.h"
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
+#include <device_manager/PairingManager.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
@@ -180,6 +181,8 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     bool allowTestCdSigningKey = !mOnlyAllowTrustedCdKeys.ValueOr(false);
     mCredIssuerCmds->SetCredentialIssuerOption(CredentialIssuerCommands::CredentialIssuerOptions::kAllowTestCdSigningKey,
                                                allowTestCdSigningKey);
+
+    PairingManager::Instance().Init(&CurrentCommissioner());
 
     return CHIP_NO_ERROR;
 }
