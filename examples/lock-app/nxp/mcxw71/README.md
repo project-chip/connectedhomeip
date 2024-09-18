@@ -199,9 +199,12 @@ Please see
 
 ## Multiple BLE connections
 
-To compile with the Multiple BLE connections support demo example add the gn argument
-`nxp_multiple_ble_connections=true`.
+To compile with the Multiple BLE connections support demo example add the gn
+argument `nxp_multiple_ble_connections=true`.
 
-The application will accept multiple BLE connections after commissioning, by pressing the BLE advertise button again. Once discovered by a BLE central, a custom GATT service will be visible on the device.
+The application will accept multiple BLE connections after commissioning, by
+pressing the BLE advertise button again. Once discovered by a BLE central, a
+custom GATT service will be visible on the device.
 
-The user can change the default behavior by implementing the class defined in [BLEApplicationManager.h](../../../platform/nxp/common/app_ble/include/BLEApplicationManager.h)
+The user can change the default behavior by implementing the class defined in
+[BLEApplicationManager.h](../../../platform/nxp/common/app_ble/include/BLEApplicationManager.h)
