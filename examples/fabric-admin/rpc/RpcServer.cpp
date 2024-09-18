@@ -86,18 +86,18 @@ public:
     pw::Status OpenCommissioningWindow(const chip_rpc_DeviceCommissioningWindowInfo & request,
                                        chip_rpc_OperationStatus & response) override
     {
-        NodeId nodeId                 = request.node_id;
-        uint32_t commissioningTimeout = request.commissioning_timeout;
-        uint32_t iterations           = request.iterations;
-        uint16_t discriminator        = request.discriminator;
+        NodeId nodeId                    = request.node_id;
+        uint32_t commissioningTimeoutSec = request.commissioning_timeout;
+        uint32_t iterations              = request.iterations;
+        uint16_t discriminator           = request.discriminator;
 
         // Log the request details for debugging
         ChipLogProgress(NotSpecified,
                         "Received OpenCommissioningWindow request: NodeId 0x%lx, Timeout: %u, Iterations: %u, Discriminator: %u",
-                        static_cast<unsigned long>(nodeId), commissioningTimeout, iterations, discriminator);
+                        static_cast<unsigned long>(nodeId), commissioningTimeoutSec, iterations, discriminator);
 
         // Open the device commissioning window using raw binary data for salt and verifier
-        DeviceMgr().OpenDeviceCommissioningWindow(nodeId, commissioningTimeout, iterations, discriminator,
+        DeviceMgr().OpenDeviceCommissioningWindow(nodeId, commissioningTimeoutSec, iterations, discriminator,
                                                   ByteSpan(request.salt.bytes, request.salt.size),
                                                   ByteSpan(request.verifier.bytes, request.verifier.size));
 
