@@ -1244,6 +1244,22 @@ MTR_DIRECT_MEMBERS
     return _operationalBrowser.get();
 }
 
+- (FabricTable * _Nullable)fabricTable
+{
+    assertChipStackLockedByCurrentThread();
+
+    if (_controllerFactory == nullptr) {
+        return nullptr;
+    }
+
+    auto systemState = _controllerFactory->GetSystemState();
+    if (systemState == nullptr) {
+        return nullptr;
+    }
+
+    return systemState->Fabrics();
+}
+
 @end
 
 @interface MTRDummyStorage : NSObject <MTRStorage>

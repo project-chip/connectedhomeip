@@ -113,6 +113,9 @@ using namespace chip::Tracing::DarwinFramework;
 
 @property (nonatomic, readonly) MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration;
 
+// Whether we should be advertising our operational identity when we are not suspended.
+@property (nonatomic, readonly) BOOL shouldAdvertiseOperational;
+
 @end
 
 @implementation MTRDeviceController_Concrete {
@@ -358,6 +361,15 @@ using namespace chip::Tracing::DarwinFramework;
     MTRDeviceControllerFactory * factory = _factory;
     dispatch_async(_chipWorkQueue, ^{
         factory.operationalBrowser->ControllerDeactivated();
+
+        if (self.shouldAdvertiseOperational) {
+            auto * fabricTable = factory.fabricTable;
+            if (fabricTable) {
+                // We don't care about errors here. If our fabric is gone, nothing to do.
+                fabricTable->SetShouldAdvertiseIdentity(self->_storedFabricIndex, chip::FabricTable::AdvertiseIdentity::No);
+                [factory resetOperationalAdvertising];
+            }
+        }
     });
 }
 
@@ -366,6 +378,15 @@ using namespace chip::Tracing::DarwinFramework;
     MTRDeviceControllerFactory * factory = _factory;
     dispatch_async(_chipWorkQueue, ^{
         factory.operationalBrowser->ControllerActivated();
+
+        if (self.shouldAdvertiseOperational) {
+            auto * fabricTable = factory.fabricTable;
+            if (fabricTable) {
+                // We don't care about errors here. If our fabric is gone, nothing to do.
+                fabricTable->SetShouldAdvertiseIdentity(self->_storedFabricIndex, chip::FabricTable::AdvertiseIdentity::Yes);
+                [factory resetOperationalAdvertising];
+            }
+        }
     });
 }
 
@@ -668,7 +689,8 @@ using namespace chip::Tracing::DarwinFramework;
             commissionerParams.controllerNOC = noc;
         }
         commissionerParams.controllerVendorId = static_cast<chip::VendorId>([startupParams.vendorID unsignedShortValue]);
-        commissionerParams.enableServerInteractions = startupParams.advertiseOperational;
+        _shouldAdvertiseOperational = startupParams.advertiseOperational;
+        commissionerParams.enableServerInteractions = !self.suspended && self.shouldAdvertiseOperational;
 
         // We never want plain "removal" from the fabric table since this leaves
         // the in-memory state out of sync with what's in storage. In per-controller
