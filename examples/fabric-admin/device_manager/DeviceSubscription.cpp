@@ -67,7 +67,7 @@ void DeviceSubscription::OnAttributeData(const ConcreteDataAttributePath & path,
 #if defined(PW_RPC_ENABLED)
         mCurrentAdministratorCommissioningAttributes.window_status = static_cast<uint32_t>(windowStatus);
 #endif
-        mChangeDetected                                            = true;
+        mChangeDetected = true;
         break;
     }
     case Clusters::AdministratorCommissioning::Attributes::AdminFabricIndex::Id: {
