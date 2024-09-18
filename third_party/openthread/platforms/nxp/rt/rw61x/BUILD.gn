@@ -61,7 +61,7 @@ config("openthread_rw61x_config") {
       "OPENTHREAD_CONFIG_BORDER_AGENT_EPHEMERAL_KEY_ENABLE=1",
       "OT_APP_BR_LWIP_HOOKS_EN=1",
       "OT_APP_CLI_EPHEMERAL_KEY_ADDON=1",
-      "OT_APP_CLI_LWIP_ADDON=1"
+      "OT_APP_CLI_LWIP_ADDON=1",
     ]
   }
 
@@ -86,6 +86,9 @@ source_set("libopenthread-rw61x") {
 
   if (chip_enable_wifi && chip_enable_openthread) {
     sources += [
+      "${openthread_nxp_root}/examples/utils/cli_addons/addons_cli.c",
+      "${openthread_nxp_root}/examples/utils/cli_addons/ephemeral_key/ephemeral_key_cli.c",
+      "${openthread_nxp_root}/examples/utils/cli_addons/lwip/lwip_cli.c",
       "${openthread_nxp_root}/src/common/br/border_agent.c",
       "${openthread_nxp_root}/src/common/br/br_rtos_manager.c",
       "${openthread_nxp_root}/src/common/br/infra_if.c",
@@ -94,9 +97,6 @@ source_set("libopenthread-rw61x") {
       "${openthread_nxp_root}/src/common/br/mdns_socket.c",
       "${openthread_nxp_root}/src/common/br/udp_plat.c",
       "${openthread_nxp_root}/src/common/br/utils.c",
-      "${openthread_nxp_root}/examples/utils/cli_addons/addons_cli.c",
-      "${openthread_nxp_root}/examples/utils/cli_addons/ephemeral_key/ephemeral_key_cli.c",
-      "${openthread_nxp_root}/examples/utils/cli_addons/lwip/lwip_cli.c",
     ]
     deps += [ "${nxp_sdk_build_root}:nxp_lwip" ]
   }

@@ -35,7 +35,7 @@ assert(target_os == "freertos")
 assert(nxp_platform == "rt/rw61x")
 
 declare_args() {
- # Allows to connect to a predefine Wi-Fi network at boot
+  # Allows to connect to a predefine Wi-Fi network at boot
   wifi_auto_connect_at_boot = false
   wifi_auto_connect_at_boot_ssid = ""
   wifi_auto_connect_at_boot_password = ""
@@ -210,7 +210,8 @@ rt_executable("laundry-washer") {
   }
 
   if (wifi_auto_connect_at_boot) {
-    assert(wifi_auto_connect_at_boot_ssid != "" && wifi_auto_connect_at_boot_password != "",
+    assert(wifi_auto_connect_at_boot_ssid != "" &&
+               wifi_auto_connect_at_boot_password != "",
            "WiFi SSID and password must be specified at build time!")
 
     defines += [

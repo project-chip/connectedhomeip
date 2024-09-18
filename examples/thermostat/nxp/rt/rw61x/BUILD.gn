@@ -105,7 +105,7 @@ rt_sdk("sdk") {
       "CHIP_DEVICE_CONFIG_ENABLE_TBR=1",
     ]
   }
-    
+
   defines += [
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
   ]
@@ -223,7 +223,8 @@ rt_executable("thermostat") {
   }
 
   if (wifi_auto_connect_at_boot) {
-    assert(wifi_auto_connect_at_boot_ssid != "" && wifi_auto_connect_at_boot_password != "",
+    assert(wifi_auto_connect_at_boot_ssid != "" &&
+               wifi_auto_connect_at_boot_password != "",
            "WiFi SSID and password must be specified at build time!")
 
     defines += [
