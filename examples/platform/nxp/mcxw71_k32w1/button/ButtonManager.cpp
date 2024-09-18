@@ -20,6 +20,7 @@
 #include "AppConfig.h"
 #include "AppMatterButton.h"
 #include "AppTask.h"
+#include "BLEApplicationManager.h"
 #include "UserInterfaceFeedback.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -200,6 +201,8 @@ void ButtonManager::BleHandler(const AppEvent & event)
 #endif
 
     chip::NXP::App::GetAppTask().SwitchCommissioningStateHandler();
+
+    chip::NXP::App::BleAppMgr().EnableMultipleConnectionsHandler();
 }
 
 #if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
