@@ -19,7 +19,10 @@
 #include "DeviceSynchronization.h"
 
 #include "DeviceSubscriptionManager.h"
+
+#if defined(PW_RPC_ENABLED)
 #include "rpc/RpcClient.h"
+#endif
 
 #include <app/InteractionModelEngine.h>
 #include <app/server/Server.h>
@@ -44,6 +47,7 @@ void OnDeviceConnectionFailureWrapper(void * context, const ScopedNodeId & peerI
     reinterpret_cast<DeviceSynchronizer *>(context)->OnDeviceConnectionFailure(peerId, error);
 }
 
+#if defined(PW_RPC_ENABLED)
 bool SuccessOrLog(CHIP_ERROR err, const char * name)
 {
     if (err == CHIP_NO_ERROR)
@@ -55,6 +59,7 @@ bool SuccessOrLog(CHIP_ERROR err, const char * name)
 
     return false;
 }
+#endif
 
 } // namespace
 
@@ -82,6 +87,7 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
 
     switch (path.mAttributeId)
     {
+#if defined(PW_RPC_ENABLED)
     case Clusters::BasicInformation::Attributes::UniqueID::Id:
         mCurrentDeviceData.has_unique_id =
             SuccessOrLog(data->GetString(mCurrentDeviceData.unique_id, sizeof(mCurrentDeviceData.unique_id)), "UniqueId");
@@ -120,6 +126,7 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
             data->GetString(mCurrentDeviceData.software_version_string, sizeof(mCurrentDeviceData.software_version_string)),
             "SoftwareVersionString");
         break;
+#endif // #if defined(PW_RPC_ENABLED)
     default:
         break;
     }
@@ -134,7 +141,7 @@ void DeviceSynchronizer::OnReportEnd()
 void DeviceSynchronizer::OnDone(chip::app::ReadClient * apReadClient)
 {
 #if defined(PW_RPC_ENABLED)
-    if (mState == State::ReceivedResponse && !DeviceMgr().IsCurrentBridgeDevice(mCurrentDeviceData.node_id))
+    if (mState == State::ReceivedResponse && !DeviceMgr().IsCurrentBridgeDevice(mNodeId))
     {
         GetUniqueId();
         if (mState == State::GettingUid)
@@ -197,10 +204,14 @@ void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceCont
         return;
     }
 
+    mNodeId = nodeId;
+
+#if defined(PW_RPC_ENABLED)
     mCurrentDeviceData            = chip_rpc_SynchronizedDevice_init_default;
     mCurrentDeviceData.node_id    = nodeId;
     mCurrentDeviceData.has_is_icd = true;
     mCurrentDeviceData.is_icd     = deviceIsIcd;
+#endif
 
     ReturnOnFailure(controller->GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback));
     mController = controller;
@@ -212,10 +223,12 @@ void DeviceSynchronizer::GetUniqueId()
     VerifyOrDie(mState == State::ReceivedResponse);
     VerifyOrDie(mController);
 
+#if defined(PW_RPC_ENABLED)
     // If we have a UniqueId we can return leaving state in ReceivedResponse.
     VerifyOrReturn(!mCurrentDeviceData.has_unique_id, ChipLogDetail(NotSpecified, "We already have UniqueId"));
+#endif
 
-    auto * device = DeviceMgr().FindDeviceByNode(mCurrentDeviceData.node_id);
+    auto * device = DeviceMgr().FindDeviceByNode(mNodeId);
     // If there is no associated remote Fabric Sync Aggregator there is no other place for us to try
     // getting the UniqueId from and can return leaving the state in ReceivedResponse.
     VerifyOrReturn(device, ChipLogDetail(NotSpecified, "No remote Fabric Sync Aggregator to get UniqueId from"));
@@ -231,8 +244,10 @@ void DeviceSynchronizer::GetUniqueId()
             [this](std::optional<CharSpan> aUniqueId) {
                 if (aUniqueId.has_value())
                 {
+#if defined(PW_RPC_ENABLED)
                     this->mCurrentDeviceData.has_unique_id = true;
                     memcpy(this->mCurrentDeviceData.unique_id, aUniqueId.value().data(), aUniqueId.value().size());
+#endif
                 }
                 else
                 {
@@ -255,19 +270,22 @@ void DeviceSynchronizer::GetUniqueId()
 void DeviceSynchronizer::SynchronizationCompleteAddDevice()
 {
     VerifyOrDie(mState == State::ReceivedResponse || mState == State::GettingUid);
+
+#if defined(PW_RPC_ENABLED)
     AddSynchronizedDevice(mCurrentDeviceData);
     // TODO(#35077) Figure out how we should reflect CADMIN values of ICD.
     if (!mCurrentDeviceData.is_icd)
     {
         VerifyOrDie(mController);
         // TODO(#35333) Figure out how we should recover in this circumstance.
-        CHIP_ERROR err = DeviceSubscriptionManager::Instance().StartSubscription(*mController, mCurrentDeviceData.node_id);
+        CHIP_ERROR err = DeviceSubscriptionManager::Instance().StartSubscription(*mController, mNodeId);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(NotSpecified, "Failed start subscription to NodeId:" ChipLogFormatX64,
-                         ChipLogValueX64(mCurrentDeviceData.node_id));
+            ChipLogError(NotSpecified, "Failed start subscription to NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
         }
     }
+#endif
+
     MoveToState(State::Idle);
 }
 
