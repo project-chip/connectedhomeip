@@ -84,3 +84,9 @@ tests:
       command: GetPendingDatasetRequest
       response:
           error: UNSUPPORTED_ACCESS
+
+    - label: "Cleanup: Close the commissioning window"
+      endpoint: 0
+      cluster: Administrator Commissioning
+      command: RevokeCommissioning
+      timedInteractionTimeoutMs: 2000
