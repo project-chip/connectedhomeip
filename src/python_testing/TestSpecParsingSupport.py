@@ -272,7 +272,8 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_equal(set(in_progress.keys())-set(tot_xml_clusters.keys()),
                              set(), "There are some in_progress clusters that are not included in the TOT spec")
 
-        str_path = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'master', 'clusters'))
+        str_path = str(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                       '..', '..', 'data_model', 'in_progress', 'clusters'))
         string_override_check, problems = build_xml_clusters(str_path)
         asserts.assert_equal(string_override_check.keys(), self.spec_xml_clusters.keys(), "Mismatched cluster generation")
 
