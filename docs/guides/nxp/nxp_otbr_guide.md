@@ -1,15 +1,15 @@
 # Thread Border Router usage
 
-This document describes the use of the Thread Border router and secondary network
-interface for a Matter application
+This document describes the use of the Thread Border router and secondary
+network interface for a Matter application
 
 <hr>
 
-- [Thread Border Router usage](#thread-border-router-usage)
-  - [Thread Border Router overview](#thread-border-router-overview)
-  - [Using the Thread Border Router management cluster](#using-the-thread-border-router-management-cluster)
-  - [Using the Secondary Network commissioning interface](#using-the-secondary-network-commissioning-interface)
-  - [Using the Thread credential sharing mechanism](#using-the-thread-credential-sharing-mechanism)
+-   [Thread Border Router usage](#thread-border-router-usage)
+    -   [Thread Border Router overview](#thread-border-router-overview)
+    -   [Using the Thread Border Router management cluster](#using-the-thread-border-router-management-cluster)
+    -   [Using the Secondary Network commissioning interface](#using-the-secondary-network-commissioning-interface)
+    -   [Using the Thread credential sharing mechanism](#using-the-thread-credential-sharing-mechanism)
 
 <hr>
 
