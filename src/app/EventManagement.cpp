@@ -867,6 +867,12 @@ void EventManagement::SetScheduledEventInfo(EventNumber & aEventNumber, uint32_t
     aInitialWrittenEventBytes = mBytesWritten;
 }
 
+CHIP_ERROR EventManagement::GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
+                                          EventNumber & generatedEventNumber)
+{
+    return LogEvent(eventPayloadWriter, options, generatedEventNumber);
+}
+
 void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev,
                                CircularEventBuffer * apNext, PriorityLevel aPriorityLevel)
 {
@@ -926,5 +932,6 @@ CHIP_ERROR CircularEventBufferWrapper::GetNextBuffer(TLVReader & aReader, const 
 exit:
     return err;
 }
+
 } // namespace app
 } // namespace chip
