@@ -262,7 +262,7 @@ class NxpBuilder(GnBuilder):
                 flags.append('-DFILE_SUFFIX=fdata')
             else:
                 flags.append("-DCONFIG_CHIP_FACTORY_DATA=true")
-        
+
         if self.enable_ethernet:
             if self.os_env == NxpOsUsed.ZEPHYR:
                 flags.append('-DEXTRA_CONF_FILE="prj_ethernet.conf"')
