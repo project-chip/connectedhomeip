@@ -515,6 +515,7 @@ def BuildNxpTarget():
         TargetPart('k32w0', board=NxpBoard.K32W0),
         TargetPart('k32w1', board=NxpBoard.K32W1),
         TargetPart('rw61x', board=NxpBoard.RW61X),
+        TargetPart('rw61x_eth', board=NxpBoard.RW61X_ETH),
         TargetPart('mcxw71', board=NxpBoard.MCXW71)
     ])
 
@@ -544,6 +545,7 @@ def BuildNxpTarget():
     target.AppendModifier(name="sw-v2", has_sw_version_2=True)
     target.AppendModifier(name="ota", enable_ota=True).ExceptIfRe('zephyr')
     target.AppendModifier(name="wifi", enable_wifi=True).OnlyIfRe('rw61x')
+    target.AppendModifier(name="ethernet", enable_ethernet=True).OnlyIfRe('rw61x_eth-zephyr')
     target.AppendModifier(name="thread", enable_thread=True).ExceptIfRe('zephyr')
     target.AppendModifier(name="matter-shell", enable_shell=True).ExceptIfRe('k32w0|k32w1')
     target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')

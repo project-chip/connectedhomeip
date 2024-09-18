@@ -274,7 +274,7 @@ jobs:
               with:
                 platform-name: RW61X
     zephyr:
-        name: ZEPHYR_RW61X
+        name: ZEPHYR
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -290,12 +290,13 @@ jobs:
               with:
                 platform: nxp
 
-            - name: Build RW61x Zephyr examples
+            - name: Build NXP Zephyr examples
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target nxp-rw61x-zephyr-all-clusters \
                       --target nxp-rw61x-zephyr-thermostat \
                       --target nxp-rw61x-zephyr-laundry-washer-factory \
+                      --target nxp-rw61x_eth-zephyr-thermostat-ethernet \
                       build \
                   "
