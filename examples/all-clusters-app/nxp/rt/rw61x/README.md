@@ -16,7 +16,7 @@ commissioning and different cluster control.
 -   [Testing the example](#testing-the-example)
 -   [Matter Shell](#testing-the-all-clusters-application-with-matter-cli-enabled)
 -   [OTA Software Update](#ota-software-update)
--   [Thread Border Router overwiew](#thread-border-router-overwiew)
+-   [Thread Border Router overview](#thread-border-router-overview)
 
 <hr>
 
@@ -409,9 +409,9 @@ The process to follow in order to perform a software update is described in the
 dedicated guide
 ['Matter Over-The-Air Software Update with NXP RW61x example applications'](../../../../../docs/guides/nxp/nxp_rw61x_ota_software_update.md).
 
-<a name="thread-border-router-overwiew"></a>
+<a name="thread-border-router-overview"></a>
 
-## Thread Border Router overwiew
+## Thread Border Router overview
 
 To enable Thread Border Router support see the [build](README.md#building)
 section.
