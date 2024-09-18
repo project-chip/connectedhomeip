@@ -216,7 +216,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #endif
 
 #if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
-    WifiConnectAtboot();
+    VerifyOrDie(WifiConnectAtboot(chip::NXP::App::GetAppTask().GetWifiDriverInstance()) == CHIP_NO_ERROR);
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_TBR
