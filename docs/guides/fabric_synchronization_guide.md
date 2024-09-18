@@ -96,6 +96,10 @@ Run the Fabric Synchronization script:
 
 ### Fabric Sync Setup
 
+Fabric Sync Setup is the process of enabling two ecosystems that support the Fabric
+Synchronization feature to commission each other's Fabric Bridge nodes into their 
+respective private fabrics.
+
 In Ecosystem 1 Fabric-Admin console:
 
 Pair the local bridge of Ecosystem 1 with node ID 1:
