@@ -27,7 +27,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     k32w0:
         name: K32W0
@@ -39,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-k32w:74
+            image: ghcr.io/project-chip/chip-build-k32w:77
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -120,6 +120,7 @@ jobs:
                       ./scripts/build/build_examples.py \
                       --target nxp-k32w1-freertos-lighting \
                       --target nxp-k32w1-freertos-contact-sensor-low-power \
+                      --target nxp-k32w1-freertos-lock-app \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -134,6 +135,12 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp k32w1+release contact \
                     out/artifacts/nxp-k32w1-freertos-contact-sensor-low-power/chip-k32w1-contact-example.elf \
+                    /tmp/bloat_reports/
+            - name: Get lock app size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    nxp k32w1+release lock \
+                    out/artifacts/nxp-k32w1-freertos-lock-app/chip-k32w1-lock-example.elf \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
@@ -174,6 +181,7 @@ jobs:
                       ./scripts/build/build_examples.py \
                       --target nxp-mcxw71-freertos-lighting \
                       --target nxp-mcxw71-freertos-contact-sensor-low-power \
+                      --target nxp-mcxw71-freertos-lock-app \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -188,6 +196,12 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp mcxw71+release contact \
                     out/artifacts/nxp-mcxw71-freertos-contact-sensor-low-power/chip-mcxw71-contact-example.elf \
+                    /tmp/bloat_reports/
+            - name: Get lock app size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    nxp mcxw71+release lock \
+                    out/artifacts/nxp-mcxw71-freertos-lock-app/chip-mcxw71-lock-example.elf \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
@@ -204,7 +218,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:74
+            image: ghcr.io/project-chip/chip-build-nxp:77
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -232,7 +246,7 @@ jobs:
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
-            
+
             - name: Build RW61X thermostat example app
               run: |
                   scripts/run_in_build_env.sh "\
@@ -243,7 +257,7 @@ jobs:
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
-            
+
             - name: Build RW61X laundry-washer example app
               run: |
                   scripts/run_in_build_env.sh "\
@@ -266,7 +280,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:74
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:77
 
         steps:
             - name: Checkout

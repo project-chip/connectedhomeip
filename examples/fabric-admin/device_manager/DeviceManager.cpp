@@ -47,6 +47,10 @@ void DeviceManager::Init()
 {
     // TODO: (#34113) Init mLastUsedNodeId from chip config file
     mLastUsedNodeId = 1;
+    mInitialized    = true;
+
+    ChipLogProgress(NotSpecified, "DeviceManager initialized: last used nodeId " ChipLogFormatX64,
+                    ChipLogValueX64(mLastUsedNodeId));
 }
 
 NodeId DeviceManager::GetNextAvailableNodeId()
@@ -61,8 +65,8 @@ void DeviceManager::UpdateLastUsedNodeId(NodeId nodeId)
 {
     if (nodeId > mLastUsedNodeId)
     {
-        ChipLogProgress(NotSpecified, "Updating last used NodeId to " ChipLogFormatX64, ChipLogValueX64(nodeId));
         mLastUsedNodeId = nodeId;
+        ChipLogProgress(NotSpecified, "Updating last used NodeId to " ChipLogFormatX64, ChipLogValueX64(mLastUsedNodeId));
     }
 }
 

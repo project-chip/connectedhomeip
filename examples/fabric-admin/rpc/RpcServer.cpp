@@ -47,7 +47,7 @@ class FabricAdmin final : public rpc::FabricAdmin, public IcdManager::Delegate
 public:
     void OnCheckInCompleted(const chip::app::ICDClientInfo & clientInfo) override
     {
-        // Needs for accessing mPendingCheckIn
+        // Accessing mPendingCheckIn should only be done while holding ChipStackLock
         assertChipStackLockedByCurrentThread();
         NodeId nodeId = clientInfo.peer_node.GetNodeId();
         auto it       = mPendingCheckIn.find(nodeId);
@@ -68,9 +68,12 @@ public:
             return;
         }
 
-        // TODO(#33221): If there is a failure in sending the message this request just gets dropped.
-        // Work to see if there should be update to spec on whether some sort of failure later on
-        // Should be indicated in some manner, or identify a better recovery mechanism here.
+        // TODO https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/10448. Spec does
+        // not define what to do if we fail to send the StayActiveRequest. We are assuming that any
+        // further attempts to send a StayActiveRequest will result in a similar failure. Because
+        // there is no mechanism for us to communicate with the client that sent out the KeepActive
+        // command that there was a failure, we simply fail silently. After spec issue is
+        // addressed, we can implement what spec defines here.
         auto onDone    = [=](uint32_t promisedActiveDuration) { ActiveChanged(nodeId, promisedActiveDuration); };
         CHIP_ERROR err = StayActiveSender::SendStayActiveCommand(checkInData.mStayActiveDurationMs, clientInfo.peer_node,
                                                                  chip::app::InteractionModelEngine::GetInstance(), onDone);
@@ -160,7 +163,7 @@ public:
 
     void ScheduleSendingKeepActiveOnCheckIn(NodeId nodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs)
     {
-        // Needs for accessing mPendingCheckIn
+        // Accessing mPendingCheckIn should only be done while holding ChipStackLock
         assertChipStackLockedByCurrentThread();
 
         auto timeNow                             = System::SystemClock().GetMonotonicTimestamp();

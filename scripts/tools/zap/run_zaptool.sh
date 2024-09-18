@@ -16,6 +16,9 @@
 # limitations under the License.
 #
 
+readonly ZAP_CMD_DEFAULT="zap"
+
+ZAP_CMD="$ZAP_CMD_DEFAULT"
 ZAP_FILE=""
 
 function _get_fullpath() {
@@ -39,6 +42,22 @@ function _print_usage() {
         echo " General Options:"
         echo ""
         echo "  -h, --help                  Display this help, then exit."
+        echo "  --zap ZAP                   Use the zap program ZAP as the zap executable "
+        echo "                              to run (default: $ZAP_CMD_DEFAULT)."
+        echo ""
+        echo " Some influential environment variables:"
+        echo ""
+        echo "  ZAP_DEVELOPMENT_PATH        The path to a zap development environment. This "
+        echo "                              is likely a zap checkout, used for local "
+        echo "                              development (current: \"${ZAP_DEVELOPMENT_PATH:-<null>}\")."
+        echo ""
+        echo "                              If set, this overrides both the '--zap' option "
+        echo "                              and the 'ZAP_INTALL_PATH' environment variable."
+        echo "  ZAP_INSTALL_PATH            The path where the 'zap' executable exists. "
+        echo "                              This may be used if 'zap' is NOT in the current "
+        echo "                              PATH (current: \"${ZAP_INSTALL_PATH:-<null>}\")."
+        echo ""
+        echo "                              If set, this overrides the '--zap' option."
         echo ""
     fi
 
@@ -57,6 +76,11 @@ while [ "${#}" -gt 0 ]; do
 
         -h | --help)
             _print_usage 0
+            ;;
+
+        --zap)
+            ZAP_CMD="${2}"
+            shift 2
             ;;
 
         -*)
@@ -101,13 +125,14 @@ elif [ -n "$ZAP_INSTALL_PATH" ]; then
     fi
     WORKING_DIR="$CHIP_ROOT"
 else
-    ZAP_CMD="zap"
+    [ -z "$ZAP_CMD" ] && ZAP_CMD="$ZAP_CMD_DEFAULT"
     WORKING_DIR="$CHIP_ROOT"
 fi
 
 (
     cd "$WORKING_DIR"
 
+    echo "CMD: $ZAP_CMD"
     echo "ARGS: $ZAP_ARGS"
 
     if [[ "${ZAP_ARGS[*]}" == *"/all-clusters-app.zap"* ]]; then
