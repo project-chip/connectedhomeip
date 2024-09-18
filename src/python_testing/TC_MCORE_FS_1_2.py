@@ -34,8 +34,8 @@ from chip import ChipDeviceCtrl
 from ecdsa.curves import NIST256p
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
-from TC_SC_3_6 import AttributeChangeAccumulator
 from TC_MCORE_FS_1_1 import AppServer
+from TC_SC_3_6 import AttributeChangeAccumulator
 
 # Length of `w0s` and `w1s` elements
 WS_LENGTH = NIST256p.baselen + 8
