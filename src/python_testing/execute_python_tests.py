@@ -55,45 +55,46 @@ def main(search_directory, env_file):
 
     # Define the files and patterns to exclude
     excluded_patterns = {
-        "MinimalRepresentation.py", # Code/Test not being used or not shared code for any other tests
-        "TC_CNET_4_4.py", # It has no CI execution block, is not executed in CI
-        "TC_CCTRL_2_1.py", # They rely on example applications that inter-communicate and there is no example app that works right now
-        "TC_CCTRL_2_2.py", # They rely on example applications that inter-communicate and there is no example app that works right now
-        "TC_CCTRL_2_3.py", # They rely on example applications that inter-communicate and there is no example app that works right now
-        "TC_DGGEN_3_2.py", # Unit test/shared code of src/python_testing/test_testing/test_TC_DGGEN_3_2.py
-        "TC_EEVSE_Utils.py", # Shared code for TC_EEVSE, not a standalone test
-        "TC_ECOINFO_2_1.py", # They rely on example applications that inter-communicate and there is no example app that works right now
-        "TC_ECOINFO_2_2.py", # They rely on example applications that inter-communicate and there is no example app that works right now
-        "TC_EWATERHTRBase.py", # Shared code for TC_EWATERHTR, not a standalone test
-        "TC_EnergyReporting_Utils.py", # Shared code for TC_EEM and TC_EPM, not a standalone test
-        "TC_OpstateCommon.py", # Shared code for TC_OPSTATE, not a standalone test
-        "TC_pics_checker.py", # Unit test/shared code of src/python_testing/test_testing/test_IDM_10_4.py
-        "TC_TMP_2_1.py", # Unit test/shared code of src/python_testing/test_testing/test_TC_TMP_2_1.py
-        "TC_MCORE_FS_1_1.py", # This test requires a TH_SERVER application, hence not ready run with CI
-        "TC_MCORE_FS_1_2.py", # This test requires a TH_SERVER application, hence not ready run with CI
-        "TC_MCORE_FS_1_3.py", # This test requires a TH_SERVER application, hence not ready run with CI
-        "TC_MCORE_FS_1_4.py", # This test requires a TH_SERVER application, hence not ready run with CI
-        "TC_MCORE_FS_1_5.py", # This test requires a TH_SERVER application, hence not ready run with CI
-        "TC_OCC_3_1.py", # There are CI issues for the test cases that implements manually controlling sensor device for the occupancy state ON/OFF change
-        "TC_OCC_3_2.py", # There are CI issues for the test cases that implements manually controlling sensor device for the occupancy state ON/OFF change
-        "TC_BRBINFO_4_1.py", # This test requires a TH_ICD_SERVER application, hence not ready run with CI
-        "TestCommissioningTimeSync.py", # Code/Test not being used or not shared code for any other tests
-        "TestConformanceSupport.py", # Unit test - does not run against an app
-        "TestChoiceConformanceSupport.py", # Unit test - does not run against an app
-        "TC_DEMTestBase.py", # Shared code for TC_DEM, not a standalone test
+        "MinimalRepresentation.py",  # Code/Test not being used or not shared code for any other tests
+        "TC_CNET_4_4.py",  # It has no CI execution block, is not executed in CI
+        "TC_CCTRL_2_1.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
+        "TC_CCTRL_2_2.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
+        "TC_CCTRL_2_3.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
+        "TC_DGGEN_3_2.py",  # Unit test/shared code of src/python_testing/test_testing/test_TC_DGGEN_3_2.py
+        "TC_EEVSE_Utils.py",  # Shared code for TC_EEVSE, not a standalone test
+        "TC_ECOINFO_2_1.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
+        "TC_ECOINFO_2_2.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
+        "TC_EWATERHTRBase.py",  # Shared code for TC_EWATERHTR, not a standalone test
+        "TC_EnergyReporting_Utils.py",  # Shared code for TC_EEM and TC_EPM, not a standalone test
+        "TC_OpstateCommon.py",  # Shared code for TC_OPSTATE, not a standalone test
+        "TC_pics_checker.py",  # Unit test/shared code of src/python_testing/test_testing/test_IDM_10_4.py
+        "TC_TMP_2_1.py",  # Unit test/shared code of src/python_testing/test_testing/test_TC_TMP_2_1.py
+        "TC_MCORE_FS_1_1.py",  # This test requires a TH_SERVER application, hence not ready run with CI
+        "TC_MCORE_FS_1_2.py",  # This test requires a TH_SERVER application, hence not ready run with CI
+        "TC_MCORE_FS_1_3.py",  # This test requires a TH_SERVER application, hence not ready run with CI
+        "TC_MCORE_FS_1_4.py",  # This test requires a TH_SERVER application, hence not ready run with CI
+        "TC_MCORE_FS_1_5.py",  # This test requires a TH_SERVER application, hence not ready run with CI
+        "TC_OCC_3_1.py",  # There are CI issues for the test cases that implements manually controlling sensor device for the occupancy state ON/OFF change
+        "TC_OCC_3_2.py",  # There are CI issues for the test cases that implements manually controlling sensor device for the occupancy state ON/OFF change
+        "TC_BRBINFO_4_1.py",  # This test requires a TH_ICD_SERVER application, hence not ready run with CI
+        "TestCommissioningTimeSync.py",  # Code/Test not being used or not shared code for any other tests
+        "TestConformanceSupport.py",  # Unit test - does not run against an app
+        "TestChoiceConformanceSupport.py",  # Unit test - does not run against an app
+        "TC_DEMTestBase.py",  # Shared code for TC_DEM, not a standalone test
         "TestConformanceTest.py",  # Unit test of the conformance test (TC_DeviceConformance) - does not run against an app
-        "TestIdChecks.py", # Unit test - does not run against an app
-        "TestSpecParsingDeviceType.py", # Unit test - does not run against an app
-        "TestConformanceTest.py", # Unit test - does not run against an app
-        "TestMatterTestingSupport.py", # Unit test - does not run against an app
-        "TestSpecParsingSupport.py", # Unit test - does not run against an app
-        "TestTimeSyncTrustedTimeSource.py", # Unit test and shared code for scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py
-        "drlk_2_x_common.py", # Shared code for TC_DRLK, not a standalone test
-        "execute_python_tests.py", # Python code that runs all the python tests from src/python_testing (This code itself run via tests.yaml)
-        "hello_external_runner.py", # Code/Test not being used or not shared code for any other tests
-        "hello_test.py", # Is a template for tests
-        "test_plan_support.py", # Shared code for TC_*, not a standalone test
-        "test_plan_table_generator.py" # Code/Test not being used or not shared code for any other tests
+        "TestIdChecks.py",  # Unit test - does not run against an app
+        "TestSpecParsingDeviceType.py",  # Unit test - does not run against an app
+        "TestConformanceTest.py",  # Unit test - does not run against an app
+        "TestMatterTestingSupport.py",  # Unit test - does not run against an app
+        "TestSpecParsingSupport.py",  # Unit test - does not run against an app
+        "TestTimeSyncTrustedTimeSource.py",  # Unit test and shared code for scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py
+        "drlk_2_x_common.py",  # Shared code for TC_DRLK, not a standalone test
+        # Python code that runs all the python tests from src/python_testing (This code itself run via tests.yaml)
+        "execute_python_tests.py",
+        "hello_external_runner.py",  # Code/Test not being used or not shared code for any other tests
+        "hello_test.py",  # Is a template for tests
+        "test_plan_support.py",  # Shared code for TC_*, not a standalone test
+        "test_plan_table_generator.py"  # Code/Test not being used or not shared code for any other tests
     }
 
     # Explanation for excluded files:
