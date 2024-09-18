@@ -22,6 +22,8 @@
 #import <Matter/MTRDeviceController.h>
 #import <Matter/MTROperationalCertificateIssuer.h>
 
+#import "MTRDeviceControllerDelegate.h"
+
 @class MTRBaseDevice;
 @class MTRServerEndpoint; // Defined in MTRServerEndpoint.h, which imports MTRAccessGrant.h, which imports MTRBaseClusters.h, which imports this file, so we can't import it.
 
@@ -36,9 +38,8 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @class MTRCommissionableBrowserResult;
 @class MTRSetupPayload;
 @protocol MTRDevicePairingDelegate;
-@protocol MTRDeviceControllerDelegate;
 
-@interface MTRDeviceController_Concrete : MTRDeviceController
+@interface MTRDeviceController_Concrete : MTRDeviceController <MTRDeviceControllerDelegate>
 
 /**
  * Initialize a device controller with the provided parameters.  This will:
