@@ -1248,12 +1248,7 @@ using namespace chip::Tracing::DarwinFramework;
                                                             attributeID:(NSNumber *)attributeID
                                                                  params:(MTRReadParams * _Nullable)params
 {
-#define MTRDeviceErrorStr "MTRDevice readAttributeWithEndpointID:clusterID:attributeID:params: must be handled by subclasses"
-    MTR_LOG_ERROR(MTRDeviceErrorStr);
-#ifdef DEBUG
-    NSAssert(NO, @MTRDeviceErrorStr);
-#endif // DEBUG
-#undef MTRDeviceErrorStr
+    MTR_ABSTRACT_METHOD();
     return nil;
 }
 
@@ -1264,22 +1259,12 @@ using namespace chip::Tracing::DarwinFramework;
                expectedValueInterval:(NSNumber *)expectedValueInterval
                    timedWriteTimeout:(NSNumber * _Nullable)timeout
 {
-#define MTRDeviceErrorStr "MTRDevice writeAttributeWithEndpointID:clusterID:attributeID:value:expectedValueInterval:timedWriteTimeout: must be handled by subclasses"
-    MTR_LOG_ERROR(MTRDeviceErrorStr);
-#ifdef DEBUG
-    NSAssert(NO, @MTRDeviceErrorStr);
-#endif // DEBUG
-#undef MTRDeviceErrorStr
+    MTR_ABSTRACT_METHOD();
 }
 
 - (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths
 {
-#define MTRDeviceErrorStr "MTRDevice readAttributePaths: must be handled by subclasses"
-    MTR_LOG_ERROR(MTRDeviceErrorStr);
-#ifdef DEBUG
-    NSAssert(NO, @MTRDeviceErrorStr);
-#endif // DEBUG
-#undef MTRDeviceErrorStr
+    MTR_ABSTRACT_METHOD();
     return [NSArray array];
 }
 
@@ -1362,12 +1347,7 @@ using namespace chip::Tracing::DarwinFramework;
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {
-#define MTRDeviceErrorStr "MTRDevice _invokeCommandWithEndpointID: must be handled by subclasses"
-    MTR_LOG_ERROR(MTRDeviceErrorStr);
-#ifdef DEBUG
-    NSAssert(NO, @MTRDeviceErrorStr);
-#endif // DEBUG
-#undef MTRDeviceErrorStr
+    MTR_ABSTRACT_METHOD();
 }
 
 - (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
@@ -1476,12 +1456,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (NSArray<NSDictionary<NSString *, id> *> *)getAllAttributesReport
 {
-#define MTRDeviceErrorStr "MTRDevice getAllAttributesReport must be handled by subclasses that support it"
-    MTR_LOG_ERROR(MTRDeviceErrorStr);
-#ifdef DEBUG
-    NSAssert(NO, @MTRDeviceErrorStr);
-#endif // DEBUG
-#undef MTRDeviceErrorStr
+    MTR_ABSTRACT_METHOD();
     return nil;
 }
 
