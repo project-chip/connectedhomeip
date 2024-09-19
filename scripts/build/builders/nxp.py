@@ -304,7 +304,7 @@ class NxpBuilder(GnBuilder):
             flag_board_variant = "-DCONFIG_BOARD_VARIANT=\"%s\"" % self.board_variant.BoardVariantName(self.board)
             flags.append(flag_board_variant)
 
-        build_flags = " ".join(flags) if len(flags) > 0 else ""
+        build_flags = " ".join(flags)
 
         return build_flags
 
