@@ -27,7 +27,7 @@
 # test-runner-run/run1/factoryreset: true
 # test-runner-run/run1/script-args: --PICS src/app/tests/suites/certification/ci-pics-values --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_server_app_path:${ALL_CLUSTERS_APP} --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # test-runner-run/run1/script-start-delay: 5
-# test-runner-run/run1/quiet: false
+# test-runner-run/run1/quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
