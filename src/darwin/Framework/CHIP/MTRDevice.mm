@@ -55,18 +55,6 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 // Disabling pending crashes
 #define ENABLE_CONNECTIVITY_MONITORING 0
 
-#ifdef DEBUG
-#define MTR_REQUIRE_SUBCLASS_IMPL_PASTED(message) \
-    MTR_LOG_ERROR(message);                       \
-    NSAssert(NO, @message)
-#else // DEBUG
-#debug MTR_REQUIRE_SUBCLASS_IMPL_PASTED(message) \
-    MTR_LOG_ERROR(message)
-#endif // DEBUG
-
-#define MTR_REQUIRE_SUBCLASS_IMPL(selectorString) \
-    MTR_REQUIRE_SUBCLASS_IMPL_PASTED("MTRDevice " selectorString " must be handled by subclasses")
-
 @implementation MTRDeviceDelegateInfo
 - (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
 {
@@ -1260,7 +1248,7 @@ using namespace chip::Tracing::DarwinFramework;
                                                             attributeID:(NSNumber *)attributeID
                                                                  params:(MTRReadParams * _Nullable)params
 {
-    MTR_REQUIRE_SUBCLASS_IMPL("readAttributeWithEndpointID:clusterID:attributeID:params:");
+    MTR_ABSTRACT_METHOD();
     return nil;
 }
 
@@ -1271,12 +1259,12 @@ using namespace chip::Tracing::DarwinFramework;
                expectedValueInterval:(NSNumber *)expectedValueInterval
                    timedWriteTimeout:(NSNumber * _Nullable)timeout
 {
-    MTR_REQUIRE_SUBCLASS_IMPL("writeAttributeWithEndpointID:clusterID:attributeID:value:expectedValueInterval:timedWriteTimeout:");
+    MTR_ABSTRACT_METHOD();
 }
 
 - (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths
 {
-    MTR_REQUIRE_SUBCLASS_IMPL("readAttributePaths:");
+    MTR_ABSTRACT_METHOD();
     return [NSArray array];
 }
 
@@ -1359,7 +1347,7 @@ using namespace chip::Tracing::DarwinFramework;
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {
-    MTR_REQUIRE_SUBCLASS_IMPL("_invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:serverSideProcessingTimeout:queue:completion:");
+    MTR_ABSTRACT_METHOD();
 }
 
 - (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
@@ -1468,7 +1456,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (NSArray<NSDictionary<NSString *, id> *> *)getAllAttributesReport
 {
-    MTR_REQUIRE_SUBCLASS_IMPL("getAllAttributesReport");
+    MTR_ABSTRACT_METHOD();
     return nil;
 }
 
