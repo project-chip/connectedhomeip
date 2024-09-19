@@ -69,12 +69,12 @@ namespace Inet {
 
 CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr)
 {
-    CHIP_ERROR res = GetSocket(addrType);
+    ReturnErrorOnFailure(GetSocket(addrType));
 
     // need to be in a connected state to be able to bind
     VerifyOrReturnValue(mSocket >= 0, CHIP_ERROR_INCORRECT_STATE);
 
-    if (res == CHIP_NO_ERROR && reuseAddr)
+    if (reuseAddr)
     {
         int n = 1;
         setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, &n, sizeof(n));
@@ -97,47 +97,41 @@ CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddr
 #endif // defined(SO_REUSEPORT)
     }
 
-    if (res == CHIP_NO_ERROR)
+    SockAddr sa;
+    memset(&sa, 0, sizeof(sa));
+    socklen_t sockaddrsize = 0;
+
+    if (addrType == IPAddressType::kIPv6)
     {
-        SockAddr sa;
-        memset(&sa, 0, sizeof(sa));
-        socklen_t sockaddrsize = 0;
+        sa.in6.sin6_family   = AF_INET6;
+        sa.in6.sin6_port     = htons(port);
+        sa.in6.sin6_flowinfo = 0;
+        sa.in6.sin6_addr     = addr.ToIPv6();
+        sa.in6.sin6_scope_id = 0;
 
-        if (addrType == IPAddressType::kIPv6)
-        {
-            sa.in6.sin6_family   = AF_INET6;
-            sa.in6.sin6_port     = htons(port);
-            sa.in6.sin6_flowinfo = 0;
-            sa.in6.sin6_addr     = addr.ToIPv6();
-            sa.in6.sin6_scope_id = 0;
-
-            sockaddrsize = sizeof(sa.in6);
-        }
+        sockaddrsize = sizeof(sa.in6);
+    }
 #if INET_CONFIG_ENABLE_IPV4
-        else if (addrType == IPAddressType::kIPv4)
-        {
-            sa.in.sin_family = AF_INET;
-            sa.in.sin_port   = htons(port);
-            sa.in.sin_addr   = addr.ToIPv4();
+    else if (addrType == IPAddressType::kIPv4)
+    {
+        sa.in.sin_family = AF_INET;
+        sa.in.sin_port   = htons(port);
+        sa.in.sin_addr   = addr.ToIPv4();
 
-            sockaddrsize = sizeof(sa.in);
-        }
+        sockaddrsize = sizeof(sa.in);
+    }
 #endif // INET_CONFIG_ENABLE_IPV4
-        else
-        {
-            res = INET_ERROR_WRONG_ADDRESS_TYPE;
-        }
-
-        if (res == CHIP_NO_ERROR)
-        {
-            if (bind(mSocket, &sa.any, sockaddrsize) != 0)
-            {
-                res = CHIP_ERROR_POSIX(errno);
-            }
-        }
+    else
+    {
+        return INET_ERROR_WRONG_ADDRESS_TYPE;
     }
 
-    return res;
+    if (bind(mSocket, &sa.any, sockaddrsize) != 0)
+    {
+        return CHIP_ERROR_POSIX(errno);
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TCPEndPointImplSockets::ListenImpl(uint16_t backlog)
@@ -812,7 +806,7 @@ void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
 #else  // __MBED__
        // On Mbed OS, connect blocks and never returns EINPROGRESS
        // The socket option SO_ERROR is not available.
-            int osConRes     = 0;
+            int osConRes = 0;
 #endif // !__MBED__
             CHIP_ERROR conRes = CHIP_ERROR_POSIX(osConRes);
 
