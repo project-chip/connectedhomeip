@@ -66,11 +66,32 @@
     NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
     [allowedClasses addObjectsFromArray:@[
         [MTRCommandPath class],
-        [MTRAttributePath class]
+        [MTRAttributePath class],
     ]];
 
     [interface setClasses:allowedClasses
               forSelector:@selector(deviceController:nodeID:invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:serverSideProcessingTimeout:completion:)
+            argumentIndex:0
+                  ofReply:YES];
+
+    // readAttributePaths: gets handed an array of MTRAttributeRequestPath.
+    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray:@[
+        [MTRAttributeRequestPath class],
+    ]];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:readAttributePaths:withReply:)
+            argumentIndex:2
+                  ofReply:NO];
+
+    // readAttributePaths: returns response-value dictionaries that have
+    // attribute paths and values.
+    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray:@[
+        [MTRAttributePath class],
+    ]];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:readAttributePaths:withReply:)
             argumentIndex:0
                   ofReply:YES];
 
@@ -82,7 +103,7 @@
     NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
     NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
     [allowedClasses addObjectsFromArray:@[
-        [MTRAttributePath class]
+        [MTRAttributePath class],
     ]];
 
     [interface setClasses:allowedClasses
@@ -92,7 +113,7 @@
 
     allowedClasses = [MTRDeviceController_XPC _allowedClasses];
     [allowedClasses addObjectsFromArray:@[
-        [MTREventPath class]
+        [MTREventPath class],
     ]];
 
     [interface setClasses:allowedClasses

@@ -65,7 +65,6 @@ target_sources(${APP_TARGET} PRIVATE
 )
 
 chip_configure_data_model(${APP_TARGET}
-    INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../all-clusters-common/all-clusters-minimal-app.zap
 )
 

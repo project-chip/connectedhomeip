@@ -43,7 +43,7 @@ constexpr char kInteractiveModeHistoryFileName[] = "chip_tool_history";
 constexpr char kInteractiveModeStopCommand[]     = "quit()";
 
 #if defined(PW_RPC_ENABLED)
-constexpr uint16_t kRetryIntervalS = 5;
+constexpr uint16_t kRetryIntervalS = 3;
 #endif
 
 // File pointer for the log file
@@ -119,11 +119,13 @@ void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
 {
     if (StartRpcClient() == CHIP_NO_ERROR)
     {
-        ChipLogProgress(NotSpecified, "Connected to Fabric-Bridge");
+        // print to console
+        fprintf(stderr, "Connected to Fabric-Bridge\n");
     }
     else
     {
-        ChipLogError(NotSpecified, "Failed to connect to Fabric-Bridge, retry in %d seconds....", kRetryIntervalS);
+        // print to console
+        fprintf(stderr, "Failed to connect to Fabric-Bridge, retry in %d seconds....\n", kRetryIntervalS);
         systemLayer->StartTimer(System::Clock::Seconds16(kRetryIntervalS), AttemptRpcClientConnect, nullptr);
     }
 }
