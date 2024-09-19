@@ -98,6 +98,10 @@ class ClangTidyEntry:
         if compiler in ['gcc', 'g++'] and gcc_sysroot:
             self.clang_arguments.insert(0, '--sysroot='+gcc_sysroot)
 
+        # Recent clang complains about "-c" not being used. Silence that
+        # This may silence more, howver generally tidy should still work.
+        self.clang_arguments.append("-Wno-unused-command-line-argument")
+
     @property
     def full_path(self):
         return os.path.abspath(os.path.join(self.directory, self.file))

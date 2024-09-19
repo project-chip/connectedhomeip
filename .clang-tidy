@@ -46,6 +46,5 @@ Checks: >
   -clang-analyzer-security.insecureAPI.strcpy,
   -clang-analyzer-unix.Malloc,
   -clang-diagnostic-implicit-int-conversion
-  -clang-diagnostic-unused-command-line-argument
 WarningsAsErrors: '*'
 HeaderFilterRegex: '(src|examples|zzz_generated|credentials).*(?<!third_party.*repo)'
