@@ -286,12 +286,12 @@ CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, Sy
     // Ensure packet buffer is not null
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    // have to have a valid socket to send something with
-    VerifyOrReturnValue(mSocket >= 0, CHIP_ERROR_INCORRECT_STATE);
-
     // Make sure we have the appropriate type of socket based on the
     // destination address.
     ReturnErrorOnFailure(GetSocket(aPktInfo->DestAddress.Type()));
+
+    // have to have a valid socket to send something with. Generally GetSocket ensures that
+    VerifyOrReturnValue(mSocket >= 0, CHIP_ERROR_INCORRECT_STATE);
 
     // Ensure the destination address type is compatible with the endpoint address type.
     VerifyOrReturnError(mAddrType == aPktInfo->DestAddress.Type(), CHIP_ERROR_INVALID_ARGUMENT);
