@@ -85,6 +85,19 @@ private:
 class TestWrite : public chip::Test::AppContext
 {
 public:
+    void SetUp() override
+    {
+        chip::Test::AppContext::SetUp();
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&CustomDataModel::Instance());
+    }
+
+    // Performs teardown for each individual test in the test suite
+    void TearDown() override
+    {
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+        chip::Test::AppContext::TearDown();
+    }
+
     void ResetCallback() { mSingleWriteCallback.reset(); }
 
     void PrepareWriteCallback(ConcreteAttributePath path) { mSingleWriteCallback = std::make_unique<SingleWriteCallback>(path); }
@@ -93,6 +106,7 @@ public:
 
 protected:
     std::unique_ptr<SingleWriteCallback> mSingleWriteCallback;
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
 TEST_F(TestWrite, TestDataResponse)
@@ -128,7 +142,8 @@ TEST_F(TestWrite, TestDataResponse)
 
     DrainAndServiceIO();
 
-    EXPECT_TRUE(onSuccessCbInvoked && !onFailureCbInvoked);
+    EXPECT_TRUE(onSuccessCbInvoked);
+    EXPECT_FALSE(onFailureCbInvoked);
     EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
