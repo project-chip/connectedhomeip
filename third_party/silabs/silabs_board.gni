@@ -62,7 +62,8 @@ if (silabs_board == "") {
 assert(silabs_board != "", "silabs_board must be specified")
 
 # Si917 WIFI board ----------
-if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A" || silabs_board == "BRD4342A") {
+if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A" ||
+    silabs_board == "BRD4342A") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
   wifi_soc = true
