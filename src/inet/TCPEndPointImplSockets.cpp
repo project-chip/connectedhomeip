@@ -71,9 +71,6 @@ CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddr
 {
     ReturnErrorOnFailure(GetSocket(addrType));
 
-    // need to be in a connected state to be able to bind
-    VerifyOrReturnError(mSocket >= 0, CHIP_ERROR_INCORRECT_STATE);
-
     if (reuseAddr)
     {
         int n = 1;
@@ -126,6 +123,7 @@ CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddr
         return INET_ERROR_WRONG_ADDRESS_TYPE;
     }
 
+    // NOLINTNEXTLINE(clang-analyzer-unix.StdCLibraryFunctions): GetSocket calls ensure mSocket is valid
     if (bind(mSocket, &sa.any, sockaddrsize) != 0)
     {
         return CHIP_ERROR_POSIX(errno);
@@ -161,9 +159,6 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
     IPAddressType addrType = addr.Type();
 
     ReturnErrorOnFailure(GetSocket(addrType));
-
-    // have to have a valid socket to send something with. Generally GetSocket ensures that
-    VerifyOrReturnValue(mSocket >= 0, CHIP_ERROR_INCORRECT_STATE);
 
     if (!intfId.IsPresent())
     {
@@ -248,6 +243,7 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
         return INET_ERROR_WRONG_ADDRESS_TYPE;
     }
 
+    // NOLINTNEXTLINE(clang-analyzer-unix.StdCLibraryFunctions): GetSocket calls ensure mSocket is valid
     int conRes = connect(mSocket, &sa.any, sockaddrsize);
 
     if (conRes == -1 && errno != EINPROGRESS)
