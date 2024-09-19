@@ -325,7 +325,7 @@ class NxpBuilder(GnBuilder):
                 board_name=self.board.Name(self.os_env),
                 out_folder=self.output_dir,
                 example_folder=self.app.BuildRoot(self.code_root, self.board, self.os_env),
-                build_flags=self.CmakeBuildFlags())
+                build_flags=build_flags)
             self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
         else:
             cmd = ''
