@@ -146,11 +146,11 @@ class TC_DRLK_2_13(MatterBaseTest):
                      "Verify that the DUT responds with SetCredentialResponse command and Status success. This step will fill the last slot with credentialType as AliroEvictableEndpointKey"),
             TestStep("31",
                      "TH sends SetCredential Command to DUT with CredentialType as AliroNonEvictableEndpointKey and number of credentials for 'alirouser' exceeds the max_aliro_keys_supported",
-                     "Verify that the DUT responds with SetCredentialResponse command and Status success."),
-            TestStep("32", "TH sends GetCredentialStatus Command with Credential as 7 startcredentialindex+1",
-                     "DUT responds with GetCredentialStatusResponse Command and CredentialExists is false"),
-            TestStep("33", "TH sends GetCredentialStatus Command with Credential as 8 startcredentialindex+2",
-                     "Verify DUT responds with GetCredentialStatusResponse having CredentialExists is true and UserIndex as 1"),
+                     "Verify that the DUT responds with SetCredentialResponse command and Status ResourceExhausted"),
+            TestStep("32", "TH sends GetCredentialStatus Command with Credential as 7 1",
+                     "DUT responds with GetCredentialStatusResponse Command and CredentialExists is True"),
+            TestStep("33", "TH sends GetCredentialStatus Command with Credential as 8 max_aliro_keys_supported",
+                     "Verify DUT responds with GetCredentialStatusResponse having CredentialExists is false and UserIndex as 1"),
             TestStep("34", "TH sends ClearCredential Command to DUT to clear the ALIRO CredentialType",
                      "Verify that the DUT sends SUCCESS response"),
             TestStep("35", "TH sends ClearUser Command to DUT with the UserIndex as 1",
@@ -250,7 +250,7 @@ class TC_DRLK_2_13(MatterBaseTest):
             self.step(step)
         try:
             flags = ["DRLK.S.F0d", "DRLK.S.C24.Rsp", "DRLK.S.C25.Tx"]
-            if not self.pics_guard(all([self.check_pics(p) for p in flags])):
+            if self.pics_guard(all([self.check_pics(p) for p in flags])):
                 credentials_struct = cluster.Structs.CredentialStruct(credentialIndex=credentialIndex,
                                                                       credentialType=credentialType)
                 response = await self.send_single_cmd(endpoint=self.app_cluster_endpoint, timedRequestTimeoutMs=1000,
@@ -270,7 +270,7 @@ class TC_DRLK_2_13(MatterBaseTest):
 
     async def set_credential_cmd(self, credential_enum: Clusters.DoorLock.Enums.CredentialTypeEnum, credentialIndex,
                                  operationType, userIndex, credentialData, userStatus, userType, step=None,
-                                 expected_status: list[Status] = [Status.Success]):
+                                 expected_status: Status = Status.Success):
         if step:
             self.step(step)
         credentials = cluster.Structs.CredentialStruct(
@@ -289,7 +289,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                     timedRequestTimeoutMs=1000)
                 asserts.assert_true(type_matches(response, Clusters.Objects.DoorLock.Commands.SetCredentialResponse),
                                     "Unexpected return type for SetCredential")
-                asserts.assert_true(response.status in expected_status,
+                asserts.assert_true(response.status == expected_status,
                                     "Error sending SetCredential command, status={}".format(str(response.status)))
             except InteractionModelError as e:
                 logging.exception(e)
@@ -618,40 +618,29 @@ class TC_DRLK_2_13(MatterBaseTest):
                         start_credential_index += 1
                         logging.info(f"The updated value of start_credential_index is {start_credential_index}")
                     else:
-                        # we are adding these codes to improve readability
-                        start_credential_index -= 1
                         break
-                # we are adding these codes to improve readability
-                start_credential_index_for_evictable_endpoint = start_credential_index + 1
-                start_credential_index_for_non_evictable_endpoint = start_credential_index + 2
-                # step 30
-                logging.info(
-                    f"the value of start_credential_index for evictable_endpoint is "
-                    f"{start_credential_index_for_evictable_endpoint} of step 30")
                 self.step("30")
                 await self.set_credential_cmd(credentialData=self.alirononevictableendpointkey,
                                               operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
                                               credential_enum=cluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey,
-                                              credentialIndex=start_credential_index_for_evictable_endpoint, userIndex=1, userStatus=NullValue,
+                                              credentialIndex=1, userIndex=1, userStatus=NullValue,
                                               userType=NullValue)
-                logging.info(
-                    f"the value of start_credential_index for non_evictable_endpoint is "
-                    f"{start_credential_index_for_non_evictable_endpoint} of step 31")
+
                 # step 31
                 self.step("31")
                 await self.set_credential_cmd(credentialData=self.alirononevictableendpointkey1,
                                               operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
                                               credential_enum=cluster.Enums.CredentialTypeEnum.kAliroNonEvictableEndpointKey,
-                                              credentialIndex=start_credential_index_for_non_evictable_endpoint, userIndex=1, userStatus=NullValue,
+                                              credentialIndex=self.max_aliro_keys_supported, userIndex=1, userStatus=NullValue,
                                               userType=NullValue,
-                                              expected_status=[Status.InvalidCommand, Status.ResourceExhausted])
+                                              expected_status=Status.ResourceExhausted)
                 # step 32
-                await self.get_credentials_status(step="32", credentialIndex=start_credential_index_for_evictable_endpoint,
+                await self.get_credentials_status(step="32", credentialIndex=1,
                                                   credentialType=cluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey,
                                                   credential_exists=True, userIndex=1)
 
                 # step 33
-                await self.get_credentials_status(step="33", credentialIndex=start_credential_index_for_non_evictable_endpoint,
+                await self.get_credentials_status(step="33", credentialIndex=self.max_aliro_keys_supported,
                                                   credentialType=cluster.Enums.CredentialTypeEnum.kAliroNonEvictableEndpointKey,
                                                   credential_exists=False, userIndex=NullValue)
                 # step 34
