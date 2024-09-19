@@ -347,7 +347,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -450,15 +450,8 @@
               "included": 1
             },
             {
-              "name": "AccessRestrictionEntryChanged",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
               "name": "FabricRestrictionReviewUpdate",
-              "code": 3,
+              "code": 2,
               "mfgCode": null,
               "side": "server",
               "included": 1
@@ -2294,16 +2287,7 @@
           "define": "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [
-            {
-              "name": "ResetCounts",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 0
-            }
-          ],
+          "commands": [],
           "attributes": [
             {
               "name": "GeneratedCommandList",

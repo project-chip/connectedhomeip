@@ -43,6 +43,10 @@
 #include <lib/support/FibonacciUtils.h>
 
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+#include <app/data-model-provider/ActionReturnStatus.h>
+
+// TODO: defaulting to codegen should eventually be an application choice and not
+//       hard-coded in the interaction model
 #include <app/codegen-data-model-provider/Instance.h>
 #endif
 
@@ -891,7 +895,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnWriteRequest(Messa
     {
         if (writeHandler.IsFree())
         {
-            VerifyOrReturnError(writeHandler.Init(this) == CHIP_NO_ERROR, Status::Busy);
+            VerifyOrReturnError(writeHandler.Init(GetDataModelProvider(), this) == CHIP_NO_ERROR, Status::Busy);
             return writeHandler.OnWriteRequest(apExchangeContext, std::move(aPayload), aIsTimedWrite);
         }
     }
@@ -991,6 +995,9 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     using namespace Protocols::InteractionModel;
 
     Protocols::InteractionModel::Status status = Status::Failure;
+
+    // Ensure that DataModel::Provider has access to the exchange the message was received on.
+    CurrentExchangeValueScope scopedExchangeContext(*this, apExchangeContext);
 
     // Group Message can only be an InvokeCommandRequest or WriteRequest
     if (apExchangeContext->IsGroupExchangeContext() &&
@@ -1699,6 +1706,21 @@ CHIP_ERROR InteractionModelEngine::PushFront(SingleLinkedListNode<T> *& aObjectL
 void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                              TLV::TLVReader & apPayload)
 {
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+
+    DataModel::InvokeRequest request;
+    request.path = aCommandPath;
+
+    std::optional<DataModel::ActionReturnStatus> status = GetDataModelProvider()->Invoke(request, apPayload, &apCommandObj);
+
+    // Provider indicates that handler status or data was already set (or will be set asynchronously) by
+    // returning std::nullopt. If any other value is returned, it is requesting that a status is set. This
+    // includes CHIP_NO_ERROR: in this case CHIP_NO_ERROR would mean set a `status success on the command`
+    if (status.has_value())
+    {
+        apCommandObj.AddStatus(aCommandPath, status->GetStatusCode());
+    }
+#else
     CommandHandlerInterface * handler =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 
@@ -1717,6 +1739,7 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
     }
 
     DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
+#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 }
 
 Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
@@ -1729,16 +1752,44 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     // Alternting data model should not be done while IM is actively handling requests.
     VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
 
-    DataModel::Provider * oldModel = GetDataModelProvider();
-    mDataModelProvider             = model;
+    DataModel::Provider * oldModel = mDataModelProvider;
+    if (oldModel != nullptr)
+    {
+        CHIP_ERROR err = oldModel->Shutdown();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(InteractionModel, "Failure on interaction model shutdown: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+
+    mDataModelProvider = model;
+    if (mDataModelProvider != nullptr)
+    {
+        DataModel::InteractionModelContext context;
+
+        context.eventsGenerator         = &EventManagement::GetInstance();
+        context.dataModelChangeListener = &mReportingEngine;
+        context.actionContext           = this;
+
+        CHIP_ERROR err = mDataModelProvider->Startup(context);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(InteractionModel, "Failure on interaction model startup: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+
     return oldModel;
 }
 
-DataModel::Provider * InteractionModelEngine::GetDataModelProvider() const
+DataModel::Provider * InteractionModelEngine::GetDataModelProvider()
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-    // TODO: this should be temporary, we should fully inject the data model
-    VerifyOrReturnValue(mDataModelProvider != nullptr, CodegenDataModelProviderInstance());
+    if (mDataModelProvider == nullptr)
+    {
+        // These should be called within the CHIP processing loop.
+        assertChipStackLockedByCurrentThread();
+        SetDataModelProvider(CodegenDataModelProviderInstance());
+    }
 #endif
     return mDataModelProvider;
 }
