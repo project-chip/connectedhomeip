@@ -71,6 +71,9 @@ CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddr
 {
     CHIP_ERROR res = GetSocket(addrType);
 
+    // need to be in a connected state to be able to bind
+    VerifyOrReturnValue(mSocket >= 0, CHIP_ERROR_INCORRECT_STATE);
+
     if (res == CHIP_NO_ERROR && reuseAddr)
     {
         int n = 1;
@@ -161,6 +164,8 @@ CHIP_ERROR TCPEndPointImplSockets::ListenImpl(uint16_t backlog)
 
 CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId)
 {
+    VerifyOrReturnValue(mSocket >= 0, CHIP_ERROR_INCORRECT_STATE);
+
     IPAddressType addrType = addr.Type();
 
     ReturnErrorOnFailure(GetSocket(addrType));

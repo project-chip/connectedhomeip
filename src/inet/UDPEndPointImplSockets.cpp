@@ -93,6 +93,8 @@ namespace {
 
 CHIP_ERROR IPv6Bind(int socket, const IPAddress & address, uint16_t port, InterfaceId interface)
 {
+    VerifyOrReturnValue(socket >= 0, CHIP_ERROR_INVALID_ARGUMENT);
+
     struct sockaddr_in6 sa;
     memset(&sa, 0, sizeof(sa));
     sa.sin6_family                        = AF_INET6;
@@ -132,6 +134,8 @@ CHIP_ERROR IPv6Bind(int socket, const IPAddress & address, uint16_t port, Interf
 #if INET_CONFIG_ENABLE_IPV4
 CHIP_ERROR IPv4Bind(int socket, const IPAddress & address, uint16_t port)
 {
+    VerifyOrReturnValue(socket >= 0, CHIP_ERROR_INVALID_ARGUMENT);
+
     struct sockaddr_in sa;
     memset(&sa, 0, sizeof(sa));
     sa.sin_family = AF_INET;
@@ -281,6 +285,9 @@ CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, Sy
 {
     // Ensure packet buffer is not null
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // have to have a valid socket to send something with
+    VerifyOrReturnValue(mSocket >= 0, CHIP_ERROR_INCORRECT_STATE);
 
     // Make sure we have the appropriate type of socket based on the
     // destination address.
