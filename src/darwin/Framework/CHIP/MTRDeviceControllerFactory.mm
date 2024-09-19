@@ -1144,6 +1144,9 @@ MTR_DIRECT_MEMBERS
 {
     std::lock_guard lock(_controllersLock);
     for (MTRDeviceController * controller in _controllers) {
+        // TODO: Once we know our controllers are MTRDeviceController_Concrete, move
+        // matchesPendingShutdownControllerWithOperationalCertificate and clearPendingShutdown to that
+        // interface and remove them from base MTRDeviceController_Internal.
         if ([controller matchesPendingShutdownControllerWithOperationalCertificate:operationalCertificate andRootCertificate:rootCertificate]) {
             MTR_LOG("%@ Found existing controller %@ that is pending shutdown and matching parameters, re-using it", self, controller);
             [controller clearPendingShutdown];
