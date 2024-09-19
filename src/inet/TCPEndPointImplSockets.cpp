@@ -69,9 +69,9 @@ namespace Inet {
 
 CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr)
 {
-    ReturnErrorOnFailure(GetSocket(addrType));
+  CHIP_ERROR res = GetSocket(addrType);
 
-    if (reuseAddr)
+    if (res == CHIP_NO_ERROR && reuseAddr)
     {
         int n = 1;
         setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, &n, sizeof(n));
@@ -94,42 +94,48 @@ CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddr
 #endif // defined(SO_REUSEPORT)
     }
 
-    SockAddr sa;
-    memset(&sa, 0, sizeof(sa));
-    socklen_t sockaddrsize = 0;
-
-    if (addrType == IPAddressType::kIPv6)
+    if (res == CHIP_NO_ERROR)
     {
-        sa.in6.sin6_family   = AF_INET6;
-        sa.in6.sin6_port     = htons(port);
-        sa.in6.sin6_flowinfo = 0;
-        sa.in6.sin6_addr     = addr.ToIPv6();
-        sa.in6.sin6_scope_id = 0;
+        SockAddr sa;
+        memset(&sa, 0, sizeof(sa));
+        socklen_t sockaddrsize = 0;
 
-        sockaddrsize = sizeof(sa.in6);
-    }
+        if (addrType == IPAddressType::kIPv6)
+        {
+            sa.in6.sin6_family   = AF_INET6;
+            sa.in6.sin6_port     = htons(port);
+            sa.in6.sin6_flowinfo = 0;
+            sa.in6.sin6_addr     = addr.ToIPv6();
+            sa.in6.sin6_scope_id = 0;
+
+            sockaddrsize = sizeof(sa.in6);
+        }
 #if INET_CONFIG_ENABLE_IPV4
-    else if (addrType == IPAddressType::kIPv4)
-    {
-        sa.in.sin_family = AF_INET;
-        sa.in.sin_port   = htons(port);
-        sa.in.sin_addr   = addr.ToIPv4();
+        else if (addrType == IPAddressType::kIPv4)
+        {
+            sa.in.sin_family = AF_INET;
+            sa.in.sin_port   = htons(port);
+            sa.in.sin_addr   = addr.ToIPv4();
 
-        sockaddrsize = sizeof(sa.in);
-    }
+            sockaddrsize = sizeof(sa.in);
+        }
 #endif // INET_CONFIG_ENABLE_IPV4
-    else
-    {
-        return INET_ERROR_WRONG_ADDRESS_TYPE;
+        else
+        {
+            res = INET_ERROR_WRONG_ADDRESS_TYPE;
+        }
+
+        if (res == CHIP_NO_ERROR)
+        {
+            // NOLINTNEXTLINE(clang-analyzer-unix.StdCLibraryFunctions): GetSocket calls ensure mSocket is valid
+            if (bind(mSocket, &sa.any, sockaddrsize) != 0)
+            {
+                res = CHIP_ERROR_POSIX(errno);
+            }
+        }
     }
 
-    // NOLINTNEXTLINE(clang-analyzer-unix.StdCLibraryFunctions): GetSocket calls ensure mSocket is valid
-    if (bind(mSocket, &sa.any, sockaddrsize) != 0)
-    {
-        return CHIP_ERROR_POSIX(errno);
-    }
-
-    return CHIP_NO_ERROR;
+    return res;
 }
 
 CHIP_ERROR TCPEndPointImplSockets::ListenImpl(uint16_t backlog)
