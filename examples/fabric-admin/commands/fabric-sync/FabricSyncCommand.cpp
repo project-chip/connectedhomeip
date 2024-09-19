@@ -274,7 +274,7 @@ CHIP_ERROR FabricSyncRemoveLocalBridgeCommand::RunCommand()
     return CHIP_NO_ERROR;
 }
 
-void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_ERROR err, chip::SetupPayload payload)
+void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_ERROR err, SetupPayload payload)
 {
     ChipLogProgress(NotSpecified, "FabricSyncDeviceCommand::OnCommissioningWindowOpened");
 

@@ -138,7 +138,7 @@ void DeviceSynchronizer::OnReportEnd()
     MoveToState(State::ReceivedResponse);
 }
 
-void DeviceSynchronizer::OnDone(chip::app::ReadClient * apReadClient)
+void DeviceSynchronizer::OnDone(app::ReadClient * apReadClient)
 {
 #if defined(PW_RPC_ENABLED)
     if (mState == State::ReceivedResponse && !DeviceMgr().IsCurrentBridgeDevice(mNodeId))
@@ -163,8 +163,7 @@ void DeviceSynchronizer::OnError(CHIP_ERROR error)
     ChipLogProgress(NotSpecified, "Error fetching device data: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
-void DeviceSynchronizer::OnDeviceConnected(chip::Messaging::ExchangeManager & exchangeMgr,
-                                           const chip::SessionHandle & sessionHandle)
+void DeviceSynchronizer::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     mClient = std::make_unique<ReadClient>(app::InteractionModelEngine::GetInstance(), &exchangeMgr /* echangeMgr */,
                                            *this /* callback */, ReadClient::InteractionType::Read);
@@ -188,14 +187,13 @@ void DeviceSynchronizer::OnDeviceConnected(chip::Messaging::ExchangeManager & ex
     MoveToState(State::AwaitingResponse);
 }
 
-void DeviceSynchronizer::OnDeviceConnectionFailure(const chip::ScopedNodeId & peerId, CHIP_ERROR error)
+void DeviceSynchronizer::OnDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     ChipLogError(NotSpecified, "Device Sync failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
     MoveToState(State::Idle);
 }
 
-void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceController * controller, chip::NodeId nodeId,
-                                                    bool deviceIsIcd)
+void DeviceSynchronizer::StartDeviceSynchronization(Controller::DeviceController * controller, NodeId nodeId, bool deviceIsIcd)
 {
     VerifyOrDie(controller);
     if (mState != State::Idle)
