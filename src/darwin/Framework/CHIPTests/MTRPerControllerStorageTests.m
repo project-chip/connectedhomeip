@@ -16,6 +16,7 @@
 
 #import <Matter/Matter.h>
 
+#import <dns_sd.h>
 #import <os/lock.h>
 
 #import "MTRDeviceControllerLocalTestStorage.h"
@@ -74,6 +75,30 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     _expectation = nil;
 }
 
+@end
+
+@interface MTRPerControllerStorageTestsSuspensionDelegate : NSObject <MTRDeviceControllerDelegate>
+@property (nonatomic, strong) XCTestExpectation * expectation;
+@property (nonatomic, assign) BOOL expectedSuspensionState;
+@end
+
+@implementation MTRPerControllerStorageTestsSuspensionDelegate
+- (id)initWithExpectation:(XCTestExpectation *)expectation expectedSuspensionState:(BOOL)expectedSuspensionState
+{
+    self = [super init];
+    if (self) {
+        _expectation = expectation;
+        _expectedSuspensionState = expectedSuspensionState;
+    }
+    return self;
+}
+
+- (void)controller:(MTRDeviceController *)controller
+    suspendedChangedTo:(BOOL)suspended
+{
+    XCTAssertEqual(suspended, self.expectedSuspensionState);
+    [self.expectation fulfill];
+}
 @end
 
 @interface MTRPerControllerStorageTestsCertificateIssuer : NSObject <MTROperationalCertificateIssuer>
@@ -179,6 +204,109 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
                                                                                      rootCertificate:self.rootCertificate
                                                                                         adminSubject:nil];
     completion(certChain, nil);
+}
+
+@end
+
+@interface MTRPerControllerStorageTestsOperationalBrowser : NSObject
+
+// expectedNodeID should be a 16-char uppercase hex string encoding the 64-bit
+// node ID.
+- (instancetype)initWithNodeID:(NSString *)expectedNodeID;
+- (void)shutdown;
+
+@property (nonatomic, readwrite) NSString * expectedNodeID;
+@property (nonatomic, readwrite, nullable) XCTestExpectation * addedExpectation;
+@property (nonatomic, readwrite, nullable) XCTestExpectation * removedExpectation;
+
+- (void)onBrowse:(DNSServiceFlags)flags error:(DNSServiceErrorType)error instanceName:(const char *)instanceName;
+
+@end
+
+static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t interfaceId,
+    DNSServiceErrorType error, const char * name, const char * type, const char * domain, void * context)
+{
+    __auto_type * self = (__bridge MTRPerControllerStorageTestsOperationalBrowser *) context;
+    [self onBrowse:flags error:error instanceName:name];
+}
+
+@implementation MTRPerControllerStorageTestsOperationalBrowser {
+    DNSServiceRef _browseRef;
+}
+
+- (instancetype)initWithNodeID:(NSString *)expectedNodeID
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    _expectedNodeID = expectedNodeID;
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    __auto_type err = DNSServiceBrowse(&_browseRef, /* DNSServiceFlags = */ 0, kDNSServiceInterfaceIndexAny, "_matter._tcp", "local.", OnBrowse, (__bridge void *) self);
+    XCTAssertEqual(err, kDNSServiceErr_NoError);
+    if (err != kDNSServiceErr_NoError) {
+        return nil;
+    }
+
+    err = DNSServiceSetDispatchQueue(_browseRef, queue);
+    XCTAssertEqual(err, kDNSServiceErr_NoError);
+    if (err != kDNSServiceErr_NoError) {
+        DNSServiceRefDeallocate(_browseRef);
+        _browseRef = nil;
+        return nil;
+    }
+
+    return self;
+}
+
+- (void)shutdown
+{
+    if (_browseRef) {
+        DNSServiceRefDeallocate(_browseRef);
+        _browseRef = nil;
+    }
+}
+
+- (void)onBrowse:(DNSServiceFlags)flags error:(DNSServiceErrorType)error instanceName:(const char *)instanceName
+{
+    XCTAssertEqual(error, kDNSServiceErr_NoError);
+    if (error != kDNSServiceErr_NoError) {
+        DNSServiceRefDeallocate(_browseRef);
+        _browseRef = nil;
+        return;
+    }
+
+    __auto_type len = strlen(instanceName);
+    XCTAssertEqual(len, 33); // Matter instance names are 33 chars.
+
+    if (len != 33) {
+        return;
+    }
+
+    // Skip over compressed fabric id and dash.
+    // TODO: Consider checking the compressed fabric ID?  That's a bit hard to
+    // do, in general, since it depends on our keys.
+    const char * nodeID = &instanceName[17];
+    NSString * browsedNode = [NSString stringWithUTF8String:nodeID];
+    if (![browsedNode isEqual:self.expectedNodeID]) {
+        return;
+    }
+
+    if (flags & kDNSServiceFlagsAdd) {
+        if (self.addedExpectation) {
+            XCTestExpectation * expectation = self.addedExpectation;
+            self.addedExpectation = nil;
+            [expectation fulfill];
+        }
+    } else {
+        if (self.removedExpectation) {
+            XCTestExpectation * expectation = self.removedExpectation;
+            self.removedExpectation = nil;
+            [expectation fulfill];
+        }
+    }
 }
 
 @end
@@ -1641,6 +1769,12 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 // suspension tests to a different file.
 - (void)test012_startSuspended
 {
+    // Needs to match the 888 == 0x378 for the node ID below.
+    __auto_type * operationalBrowser = [[MTRPerControllerStorageTestsOperationalBrowser alloc] initWithNodeID:@"0000000000000378"];
+    XCTestExpectation * initialAdvertisingExpectation = [self expectationWithDescription:@"Controller advertising initially"];
+    operationalBrowser.addedExpectation = initialAdvertisingExpectation;
+    initialAdvertisingExpectation.inverted = YES; // We should not in fact advertise, since we are suspended.
+
     NSError * error;
     __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
     __auto_type * controller = [self startControllerWithRootKeys:[[MTRTestKeys alloc] init]
@@ -1651,6 +1785,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
                                            caseAuthenticatedTags:nil
                                                   paramsModifier:^(MTRDeviceControllerExternalCertificateParameters * params) {
                                                       params.startSuspended = YES;
+                                                      params.shouldAdvertiseOperational = YES;
                                                   }
                                                            error:&error];
 
@@ -1658,16 +1793,36 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     XCTAssertNotNil(controller);
     XCTAssertTrue(controller.running);
     XCTAssertTrue(controller.suspended);
+
+    // Test that a suspended controller can't set up a commissioning session.
+    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(payload);
+
+    [controller setupCommissioningSessionWithPayload:payload newNodeID:@(17) error:&error];
+    XCTAssertNotNil(error);
+
+    [self waitForExpectations:@[ initialAdvertisingExpectation ] timeout:kTimeoutInSeconds];
+
     [controller shutdown];
+
+    [operationalBrowser shutdown];
 }
 
 - (void)test013_suspendDevices
 {
+    // getMTRDevice uses "123" for the node ID of the controller, which is hex 0x7B
+    __auto_type * operationalBrowser = [[MTRPerControllerStorageTestsOperationalBrowser alloc] initWithNodeID:@"000000000000007B"];
+    XCTestExpectation * initialAdvertisingExpectation = [self expectationWithDescription:@"Controller advertising initially"];
+    operationalBrowser.addedExpectation = initialAdvertisingExpectation;
+
     NSNumber * deviceID = @(17);
     __auto_type * device = [self getMTRDevice:deviceID];
     __auto_type * controller = device.deviceController;
 
     XCTAssertFalse(controller.suspended);
+
+    [self waitForExpectations:@[ initialAdvertisingExpectation ] timeout:kTimeoutInSeconds];
 
     __auto_type queue = dispatch_get_main_queue();
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
@@ -1713,6 +1868,20 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
         [becameUnreachableExpectation fulfill];
     };
 
+    XCTestExpectation * suspendedExpectation = [self expectationWithDescription:@"Controller has been suspended"];
+    __auto_type * suspensionDelegate = [[MTRPerControllerStorageTestsSuspensionDelegate alloc] initWithExpectation:suspendedExpectation expectedSuspensionState:YES];
+    [controller addDeviceControllerDelegate:suspensionDelegate queue:queue];
+
+    XCTestExpectation * browseStoppedExpectation = [self expectationWithDescription:@"Operational browse has stopped"];
+    MTRSetLogCallback(MTRLogTypeProgress, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        if ([message containsString:@"stopping persistent operational browse"]) {
+            [browseStoppedExpectation fulfill];
+        }
+    });
+
+    XCTestExpectation * advertisingStoppedExpectation = [self expectationWithDescription:@"Controller stopped advertising"];
+    operationalBrowser.removedExpectation = advertisingStoppedExpectation;
+
     [controller suspend];
     XCTAssertTrue(controller.suspended);
 
@@ -1723,7 +1892,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
         [toggle2Expectation fulfill];
     }];
 
-    [self waitForExpectations:@[ becameUnreachableExpectation, toggle2Expectation ] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ becameUnreachableExpectation, toggle2Expectation, suspendedExpectation, browseStoppedExpectation, advertisingStoppedExpectation ] timeout:kTimeoutInSeconds];
 
     XCTestExpectation * newSubscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up again"];
     XCTestExpectation * newReachableExpectation = [self expectationWithDescription:@"Device became reachable again"];
@@ -1735,10 +1904,26 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
         [newSubscriptionExpectation fulfill];
     };
 
+    XCTestExpectation * resumedExpectation = [self expectationWithDescription:@"Controller has been resumed"];
+    suspensionDelegate.expectation = resumedExpectation;
+    suspensionDelegate.expectedSuspensionState = NO;
+
+    XCTestExpectation * browseRestartedExpectation = [self expectationWithDescription:@"Operational browse has re-started"];
+    MTRSetLogCallback(MTRLogTypeProgress, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        if ([message containsString:@"trying to start persistent operational browse"]) {
+            [browseRestartedExpectation fulfill];
+        }
+    });
+
+    XCTestExpectation * advertisingResumedExpectation = [self expectationWithDescription:@"Controller resumed advertising"];
+    operationalBrowser.addedExpectation = advertisingResumedExpectation;
+
     [controller resume];
     XCTAssertFalse(controller.suspended);
 
-    [self waitForExpectations:@[ newSubscriptionExpectation, newReachableExpectation ] timeout:kSubscriptionTimeoutInSeconds];
+    [self waitForExpectations:@[ newSubscriptionExpectation, newReachableExpectation, resumedExpectation, browseRestartedExpectation, advertisingResumedExpectation ] timeout:kSubscriptionTimeoutInSeconds];
+
+    MTRSetLogCallback(MTRLogTypeProgress, nil);
 
     // Test that sending a command works again.  Clear the delegate's onReportEnd
     // first, so reports from the command don't trigger it.
@@ -1757,6 +1942,8 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
 
     [controller shutdown];
+
+    [operationalBrowser shutdown];
 }
 
 // TODO: This might want to go in a separate test file, with some shared setup
@@ -2540,20 +2727,17 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 
     // Create the base device to attempt to read from the 5th device
     __auto_type * baseDeviceReadExpectation = [self expectationWithDescription:@"BaseDevice read"];
-    // Dispatch async to get around XCTest, so that this runs after the above devices queue their subscriptions
-    dispatch_async(queue, ^{
-        __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:@(105) controller:controller];
-        __auto_type * onOffCluster = [[MTRBaseClusterOnOff alloc] initWithDevice:baseDevice endpointID:@(1) queue:queue];
-        [onOffCluster readAttributeOnOffWithCompletion:^(NSNumber * value, NSError * _Nullable error) {
-            XCTAssertNil(error);
-            // We expect the device to be off.
-            XCTAssertEqualObjects(value, @(0));
-            [baseDeviceReadExpectation fulfill];
-            os_unfair_lock_lock(&counterLock);
-            baseDeviceReadCompleted = YES;
-            os_unfair_lock_unlock(&counterLock);
-        }];
-    });
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:@(105) controller:controller];
+    __auto_type * onOffCluster = [[MTRBaseClusterOnOff alloc] initWithDevice:baseDevice endpointID:@(1) queue:queue];
+    [onOffCluster readAttributeOnOffWithCompletion:^(NSNumber * value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        // We expect the device to be off.
+        XCTAssertEqualObjects(value, @(0));
+        [baseDeviceReadExpectation fulfill];
+        os_unfair_lock_lock(&counterLock);
+        baseDeviceReadCompleted = YES;
+        os_unfair_lock_unlock(&counterLock);
+    }];
 
     // Make the wait time depend on pool size and device count (can expand number of devices in the future)
     NSArray * expectationsToWait = [subscriptionExpectations.allValues arrayByAddingObject:baseDeviceReadExpectation];

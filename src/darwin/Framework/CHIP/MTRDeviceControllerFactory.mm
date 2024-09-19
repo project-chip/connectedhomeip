@@ -111,7 +111,7 @@ MTR_DIRECT_MEMBERS
     MTRSessionResumptionStorageBridge * _sessionResumptionStorage;
     PersistentStorageOperationalKeystore * _keystore;
     Credentials::PersistentStorageOpCertStore * _opCertStore;
-    MTROperationalBrowser * _operationalBrowser;
+    std::unique_ptr<MTROperationalBrowser> _operationalBrowser;
 
     // productAttestationAuthorityCertificates and certificationDeclarationCertificates are just copied
     // from MTRDeviceControllerFactoryParams.
@@ -222,6 +222,8 @@ MTR_DIRECT_MEMBERS
 
     _serverEndpointsLock = OS_UNFAIR_LOCK_INIT;
     _serverEndpoints = [[NSMutableArray alloc] init];
+
+    _operationalBrowser = std::make_unique<MTROperationalBrowser>(self, self->_chipWorkQueue);
 
     return self;
 }
@@ -555,12 +557,6 @@ MTR_DIRECT_MEMBERS
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
         }
         return nil;
-    }
-
-    if ([_controllers count] == 0) {
-        dispatch_sync(_chipWorkQueue, ^{
-            self->_operationalBrowser = new MTROperationalBrowser(self, self->_chipWorkQueue);
-        });
     }
 
     // Add the controller to _controllers now, so if we fail partway through its
@@ -943,9 +939,6 @@ MTR_DIRECT_MEMBERS
         // OtaProviderDelegateBridge uses some services provided by the system
         // state without retaining it.
         if (_controllers.count == 0) {
-            delete self->_operationalBrowser;
-            self->_operationalBrowser = nullptr;
-
             if (_otaProviderDelegateBridge) {
                 _otaProviderDelegateBridge->Shutdown();
                 _otaProviderDelegateBridge.reset();
@@ -1244,6 +1237,27 @@ MTR_DIRECT_MEMBERS
 - (Credentials::GroupDataProvider *)groupDataProvider
 {
     return &_groupDataProvider;
+}
+
+- (MTROperationalBrowser *)operationalBrowser
+{
+    return _operationalBrowser.get();
+}
+
+- (FabricTable * _Nullable)fabricTable
+{
+    assertChipStackLockedByCurrentThread();
+
+    if (_controllerFactory == nullptr) {
+        return nullptr;
+    }
+
+    auto systemState = _controllerFactory->GetSystemState();
+    if (systemState == nullptr) {
+        return nullptr;
+    }
+
+    return systemState->Fabrics();
 }
 
 @end

@@ -113,6 +113,9 @@ using namespace chip::Tracing::DarwinFramework;
 
 @property (nonatomic, readonly) MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration;
 
+// Whether we should be advertising our operational identity when we are not suspended.
+@property (nonatomic, readonly) BOOL shouldAdvertiseOperational;
+
 @end
 
 @implementation MTRDeviceController_Concrete {
@@ -330,18 +333,61 @@ using namespace chip::Tracing::DarwinFramework;
         self.rootPublicKey = nil;
 
         _storageBehaviorConfiguration = storageBehaviorConfiguration;
+
+        // We let the operational browser know about ourselves here, because
+        // after this point we are guaranteed to have shutDownCppController
+        // called by the factory.
+        if (!startSuspended) {
+            dispatch_async(_chipWorkQueue, ^{
+                factory.operationalBrowser->ControllerActivated();
+            });
+        }
     }
     return self;
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p uuid %@>", NSStringFromClass(self.class), self, self.uniqueIdentifier];
+    return [NSString stringWithFormat:@"<%@: %p, uuid: %@, suspended: %@>", NSStringFromClass(self.class), self, self.uniqueIdentifier, MTR_YES_NO(self.suspended)];
 }
 
 - (BOOL)isRunning
 {
     return _cppCommissioner != nullptr;
+}
+
+- (void)_controllerSuspended
+{
+    MTRDeviceControllerFactory * factory = _factory;
+    dispatch_async(_chipWorkQueue, ^{
+        factory.operationalBrowser->ControllerDeactivated();
+
+        if (self.shouldAdvertiseOperational) {
+            auto * fabricTable = factory.fabricTable;
+            if (fabricTable) {
+                // We don't care about errors here. If our fabric is gone, nothing to do.
+                fabricTable->SetShouldAdvertiseIdentity(self->_storedFabricIndex, chip::FabricTable::AdvertiseIdentity::No);
+                [factory resetOperationalAdvertising];
+            }
+        }
+    });
+}
+
+- (void)_controllerResumed
+{
+    MTRDeviceControllerFactory * factory = _factory;
+    dispatch_async(_chipWorkQueue, ^{
+        factory.operationalBrowser->ControllerActivated();
+
+        if (self.shouldAdvertiseOperational) {
+            auto * fabricTable = factory.fabricTable;
+            if (fabricTable) {
+                // We don't care about errors here. If our fabric is gone, nothing to do.
+                fabricTable->SetShouldAdvertiseIdentity(self->_storedFabricIndex, chip::FabricTable::AdvertiseIdentity::Yes);
+                [factory resetOperationalAdvertising];
+            }
+        }
+    });
 }
 
 - (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate
@@ -471,6 +517,11 @@ using namespace chip::Tracing::DarwinFramework;
             _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
         }
     }
+
+    if (!self.suspended) {
+        _factory.operationalBrowser->ControllerDeactivated();
+    }
+
     _shutdownPending = NO;
 }
 
@@ -638,7 +689,8 @@ using namespace chip::Tracing::DarwinFramework;
             commissionerParams.controllerNOC = noc;
         }
         commissionerParams.controllerVendorId = static_cast<chip::VendorId>([startupParams.vendorID unsignedShortValue]);
-        commissionerParams.enableServerInteractions = startupParams.advertiseOperational;
+        _shouldAdvertiseOperational = startupParams.advertiseOperational;
+        commissionerParams.enableServerInteractions = !self.suspended && self.shouldAdvertiseOperational;
 
         // We never want plain "removal" from the fabric table since this leaves
         // the in-memory state out of sync with what's in storage. In per-controller
@@ -761,7 +813,7 @@ using namespace chip::Tracing::DarwinFramework;
             //
             // Note that this is just an optimization to avoid throwing the information away and immediately
             // re-reading it from storage.
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kSecondsToWaitBeforeAPIClientRetainsMTRDevice * NSEC_PER_SEC)), self.chipWorkQueue, ^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kSecondsToWaitBeforeAPIClientRetainsMTRDevice * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
                 MTR_LOG("%@ un-retain devices loaded at startup %lu", self, static_cast<unsigned long>(deviceList.count));
             });
         }];
@@ -793,7 +845,16 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                                    newNodeID:(NSNumber *)newNodeID
                                        error:(NSError * __autoreleasing *)error
 {
-    MTR_LOG("Setting up commissioning session for device ID 0x%016llX with setup payload %@", newNodeID.unsignedLongLongValue, payload);
+    if (self.suspended) {
+        MTR_LOG_ERROR("%@ suspended: can't set up commissioning session for device ID 0x%016llX with setup payload %@", self, newNodeID.unsignedLongLongValue, payload);
+        // TODO: Can we do a better error here?
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+        return NO;
+    }
+
+    MTR_LOG("%@ Setting up commissioning session for device ID 0x%016llX with setup payload %@", self, newNodeID.unsignedLongLongValue, payload);
 
     [[MTRMetricsCollector sharedInstance] resetMetrics];
 
@@ -922,6 +983,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
          commissioningParams:(MTRCommissioningParameters *)commissioningParams
                        error:(NSError * __autoreleasing *)error
 {
+    if (self.suspended) {
+        MTR_LOG_ERROR("%@ suspended: can't commission device ID 0x%016llX with parameters %@", self, nodeID.unsignedLongLongValue, commissioningParams);
+        // TODO: Can we do a better error here?
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+        return NO;
+    }
+
     auto block = ^BOOL {
         chip::Controller::CommissioningParameters params;
         if (commissioningParams.csrNonce) {

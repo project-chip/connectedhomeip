@@ -66,11 +66,32 @@
     NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
     [allowedClasses addObjectsFromArray:@[
         [MTRCommandPath class],
-        [MTRAttributePath class]
+        [MTRAttributePath class],
     ]];
 
     [interface setClasses:allowedClasses
               forSelector:@selector(deviceController:nodeID:invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:serverSideProcessingTimeout:completion:)
+            argumentIndex:0
+                  ofReply:YES];
+
+    // readAttributePaths: gets handed an array of MTRAttributeRequestPath.
+    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray:@[
+        [MTRAttributeRequestPath class],
+    ]];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:readAttributePaths:withReply:)
+            argumentIndex:2
+                  ofReply:NO];
+
+    // readAttributePaths: returns response-value dictionaries that have
+    // attribute paths and values.
+    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray:@[
+        [MTRAttributePath class],
+    ]];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:readAttributePaths:withReply:)
             argumentIndex:0
                   ofReply:YES];
 
@@ -82,7 +103,7 @@
     NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
     NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
     [allowedClasses addObjectsFromArray:@[
-        [MTRAttributePath class]
+        [MTRAttributePath class],
     ]];
 
     [interface setClasses:allowedClasses
@@ -92,7 +113,7 @@
 
     allowedClasses = [MTRDeviceController_XPC _allowedClasses];
     [allowedClasses addObjectsFromArray:@[
-        [MTREventPath class]
+        [MTREventPath class],
     ]];
 
     [interface setClasses:allowedClasses
@@ -181,7 +202,7 @@
         MTR_LOG("%@ Activating new XPC connection", self);
         [self.xpcConnection activate];
 
-        [[self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+        [[self.xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
             MTR_LOG_ERROR("Checkin error: %@", error);
         }] deviceController:self.uniqueIdentifier checkInWithContext:[NSDictionary dictionary]];
 
@@ -193,7 +214,7 @@
             MTR_LOG("%@ => Registering nodeID: %@", self, nodeID);
             mtr_weakify(self);
 
-            [[self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+            [[self.xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
                 mtr_strongify(self);
                 MTR_LOG_ERROR("%@ Registration error for device nodeID: %@ : %@", self, nodeID, error);
             }] deviceController:self.uniqueIdentifier registerNodeID:nodeID];
@@ -288,7 +309,7 @@
     MTR_LOG("%s: returning XPC device for node id %@", __PRETTY_FUNCTION__, nodeID);
 
     mtr_weakify(self);
-    [[self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+    [[self.xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
         mtr_strongify(self);
         MTR_LOG_ERROR("%@ Registration error for device nodeID: %@ : %@", self, nodeID, error);
     }] deviceController:self.uniqueIdentifier registerNodeID:nodeID];

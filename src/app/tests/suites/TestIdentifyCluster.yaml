@@ -17,7 +17,7 @@ name: Identify Cluster Tests
 config:
     nodeId: 0x12344321
     cluster: "Identify"
-    endpoint: 0
+    endpoint: 1
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"

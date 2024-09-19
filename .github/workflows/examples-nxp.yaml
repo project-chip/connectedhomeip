@@ -27,7 +27,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     k32w0:
         name: K32W0
@@ -39,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-k32w:74
+            image: ghcr.io/project-chip/chip-build-k32w:77
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -120,6 +120,7 @@ jobs:
                       ./scripts/build/build_examples.py \
                       --target nxp-k32w1-freertos-lighting \
                       --target nxp-k32w1-freertos-contact-sensor-low-power \
+                      --target nxp-k32w1-freertos-lock-app \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -135,11 +136,78 @@ jobs:
                     nxp k32w1+release contact \
                     out/artifacts/nxp-k32w1-freertos-contact-sensor-low-power/chip-k32w1-contact-example.elf \
                     /tmp/bloat_reports/
+            - name: Get lock app size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    nxp k32w1+release lock \
+                    out/artifacts/nxp-k32w1-freertos-lock-app/chip-k32w1-lock-example.elf \
+                    /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
               with:
                 platform-name: K32W1
+    mcxw71:
+        name: MCXW71
+
+        env:
+            BUILD_TYPE: gn_k32w
+
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: ghcr.io/project-chip/chip-build-nxp:71
+            volumes:
+                - "/tmp/bloat_reports:/tmp/bloat_reports"
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: nxp
+                extra-submodule-parameters: --recursive
+
+            - name: Set up environment for size reports
+              uses: ./.github/actions/setup-size-reports
+              if: ${{ !env.ACT }}
+              with:
+                gh-context: ${{ toJson(github) }}
+
+            - name: Build examples
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-mcxw71-freertos-lighting \
+                      --target nxp-mcxw71-freertos-contact-sensor-low-power \
+                      --target nxp-mcxw71-freertos-lock-app \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                  "
+            - name: Get lighting app size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    nxp mcxw71+release light \
+                    out/artifacts/nxp-mcxw71-freertos-lighting/chip-mcxw71-light-example.elf \
+                    /tmp/bloat_reports/
+            - name: Get contact sensor size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    nxp mcxw71+release contact \
+                    out/artifacts/nxp-mcxw71-freertos-contact-sensor-low-power/chip-mcxw71-contact-example.elf \
+                    /tmp/bloat_reports/
+            - name: Get lock app size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    nxp mcxw71+release lock \
+                    out/artifacts/nxp-mcxw71-freertos-lock-app/chip-mcxw71-lock-example.elf \
+                    /tmp/bloat_reports/
+            - name: Uploading Size Reports
+              uses: ./.github/actions/upload-size-reports
+              if: ${{ !env.ACT }}
+              with:
+                platform-name: MCXW71
     rw61x:
         name: RW61X
 
@@ -150,7 +218,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:74
+            image: ghcr.io/project-chip/chip-build-nxp:77
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -178,7 +246,7 @@ jobs:
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
-            
+
             - name: Build RW61X thermostat example app
               run: |
                   scripts/run_in_build_env.sh "\
@@ -189,7 +257,7 @@ jobs:
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
-            
+
             - name: Build RW61X laundry-washer example app
               run: |
                   scripts/run_in_build_env.sh "\
@@ -206,13 +274,13 @@ jobs:
               with:
                 platform-name: RW61X
     zephyr:
-        name: ZEPHYR_RW61X
+        name: ZEPHYR
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:74
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:77
 
         steps:
             - name: Checkout
@@ -222,12 +290,13 @@ jobs:
               with:
                 platform: nxp
 
-            - name: Build RW61x Zephyr examples
+            - name: Build NXP Zephyr examples
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target nxp-rw61x-zephyr-all-clusters \
                       --target nxp-rw61x-zephyr-thermostat \
                       --target nxp-rw61x-zephyr-laundry-washer-factory \
+                      --target nxp-rw61x_eth-zephyr-thermostat-ethernet \
                       build \
                   "

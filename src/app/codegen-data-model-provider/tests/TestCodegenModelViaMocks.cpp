@@ -132,13 +132,13 @@ bool operator==(const Access::SubjectDescriptor & a, const Access::SubjectDescri
 class TestProviderChangeListener : public ProviderChangeListener
 {
 public:
-    void MarkDirty(const ConcreteAttributePath & path) override { mDirtyList.push_back(path); }
+    void MarkDirty(const AttributePathParams & path) override { mDirtyList.push_back(path); }
 
-    std::vector<ConcreteAttributePath> & DirtyList() { return mDirtyList; }
-    const std::vector<ConcreteAttributePath> & DirtyList() const { return mDirtyList; }
+    std::vector<AttributePathParams> & DirtyList() { return mDirtyList; }
+    const std::vector<AttributePathParams> & DirtyList() const { return mDirtyList; }
 
 private:
-    std::vector<ConcreteAttributePath> mDirtyList;
+    std::vector<AttributePathParams> mDirtyList;
 };
 
 class TestEventGenerator : public EventsGenerator
@@ -802,10 +802,30 @@ void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingT
 
         EXPECT_EQ(actual, value);
         ASSERT_EQ(model.ChangeListener().DirtyList().size(), 1u);
-        EXPECT_EQ(model.ChangeListener().DirtyList()[0], test.request.path);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[0],
+                  AttributePathParams(test.request.path.mEndpointId, test.request.path.mClusterId, test.request.path.mAttributeId));
 
         // reset for the next test
         model.ChangeListener().DirtyList().clear();
+    }
+
+    // nullable test: write null to make sure content of buffer changed (otherwise it will be a noop for dirty checking)
+    {
+        TestWriteRequest test(
+            kAdminSubjectDescriptor,
+            ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZclType)));
+
+        using NumericType             = NumericAttributeTraits<T>;
+        using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
+        AttributeValueDecoder decoder = test.DecoderFor<NullableType>(NullableType());
+
+        // write should succeed
+        ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
+
+        // dirty: we changed the value to null
+        ASSERT_EQ(model.ChangeListener().DirtyList().size(), 1u);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[0],
+                  AttributePathParams(test.request.path.mEndpointId, test.request.path.mClusterId, test.request.path.mAttributeId));
     }
 
     // nullable test
@@ -827,8 +847,10 @@ void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingT
         typename NumericAttributeTraits<T>::WorkingType actual = NumericAttributeTraits<T>::StorageToWorking(storage);
 
         ASSERT_EQ(actual, value);
-        ASSERT_EQ(model.ChangeListener().DirtyList().size(), 1u);
-        EXPECT_EQ(model.ChangeListener().DirtyList()[0], test.request.path);
+        // dirty a 2nd time when we moved from null to a real value
+        ASSERT_EQ(model.ChangeListener().DirtyList().size(), 2u);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[1],
+                  AttributePathParams(test.request.path.mEndpointId, test.request.path.mClusterId, test.request.path.mAttributeId));
     }
 }
 
@@ -1994,7 +2016,20 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteAclDeny)
     CodegenDataModelProviderWithContext model;
     ScopedMockAccessControl accessControl;
 
-    TestWriteRequest test(kDenySubjectDescriptor, ConcreteDataAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10)));
+    /* Using this path is also failing existence checks, so this cannot be enabled
+     * until we fix ordering of ACL to be done before existence checks
+
+      TestWriteRequest test(kDenySubjectDescriptor,
+                            ConcreteDataAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10)));
+      AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
+
+      ASSERT_EQ(model.WriteAttribute(test.request, decoder), Status::UnsupportedAccess);
+      ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
+    */
+
+    TestWriteRequest test(kDenySubjectDescriptor,
+                          ConcreteDataAttributePath(kMockEndpoint3, MockClusterId(4),
+                                                    MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_INT32U_ATTRIBUTE_TYPE)));
     AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
 
     ASSERT_EQ(model.WriteAttribute(test.request, decoder), Status::UnsupportedAccess);
@@ -2431,12 +2466,13 @@ TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceTest)
 
     // AAI marks dirty paths
     ASSERT_EQ(model.ChangeListener().DirtyList().size(), 1u);
-    EXPECT_EQ(model.ChangeListener().DirtyList()[0], kStructPath);
+    EXPECT_EQ(model.ChangeListener().DirtyList()[0],
+              AttributePathParams(kStructPath.mEndpointId, kStructPath.mClusterId, kStructPath.mAttributeId));
 
     // AAI does not prevent read/write of regular attributes
     // validate that once AAI is added, we still can go through writing regular bits (i.e.
     // AAI returning "unknown" has fallback to ember)
-    TestEmberScalarTypeWrite<uint32_t, ZCL_INT32U_ATTRIBUTE_TYPE>(1234);
+    TestEmberScalarTypeWrite<uint32_t, ZCL_INT32U_ATTRIBUTE_TYPE>(4321);
     TestEmberScalarNullWrite<int64_t, ZCL_INT64S_ATTRIBUTE_TYPE>();
 }
 
@@ -2460,7 +2496,7 @@ TEST(TestCodegenModelViaMocks, EmberInvokeTest)
         const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
 
         // Using a handler set to nullptr as it is not used by the impl
-        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ nullptr), CHIP_NO_ERROR);
+        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ nullptr), std::nullopt);
 
         EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre + 1); // single dispatch
         EXPECT_EQ(chip::Test::GetLastDispatchPath(), kCommandPath);    // for the right path
@@ -2474,7 +2510,7 @@ TEST(TestCodegenModelViaMocks, EmberInvokeTest)
         const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
 
         // Using a handler set to nullpotr as it is not used by the impl
-        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ nullptr), CHIP_NO_ERROR);
+        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ nullptr), std::nullopt);
 
         EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre + 1); // single dispatch
         EXPECT_EQ(chip::Test::GetLastDispatchPath(), kCommandPath);    // for the right path
