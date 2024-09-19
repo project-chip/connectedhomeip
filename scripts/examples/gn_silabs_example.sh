@@ -297,10 +297,9 @@ else
     fi
 
     # 917 exception. TODO find a more generic way
-    if [ "$SILABS_BOARD" == "BRD4338A" ]; then
+    if [ "$SILABS_BOARD" == "BRD4338A" ] || [ "$SILABS_BOARD" == "BRD2605A" ]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
-        optArgs+="chip_device_platform =\"SiWx917\" is_debug=false "
     fi
 
     if [ "$USE_GIT_SHA_FOR_VERSION" == true ]; then

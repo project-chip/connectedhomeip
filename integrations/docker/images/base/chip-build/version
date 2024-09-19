@@ -1,1 +1,1 @@
-75 : remove workaround for bloaty build, workaround involved cloning and installing abseil
+77 : [NXP] Migrate docker image to NXP Zephyr 3.7 downstream release

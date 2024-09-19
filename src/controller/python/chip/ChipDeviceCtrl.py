@@ -1433,20 +1433,23 @@ class ChipDeviceControllerBase():
                 else:
                     raise ValueError("Unsupported Attribute Path")
 
-    async def Read(self, nodeid: int, attributes: typing.Optional[typing.List[typing.Union[
-        None,  # Empty tuple, all wildcard
-        typing.Tuple[int],  # Endpoint
-        # Wildcard endpoint, Cluster id present
-        typing.Tuple[typing.Type[ClusterObjects.Cluster]],
-        # Wildcard endpoint, Cluster + Attribute present
-        typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
-        # Wildcard attribute id
-        typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
-        # Concrete path
-        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
-        # Directly specified attribute path
-        ClusterAttribute.AttributePath
-    ]]] = None,
+    async def Read(
+        self,
+        nodeid: int,
+        attributes: typing.Optional[typing.List[typing.Union[
+            None,  # Empty tuple, all wildcard
+            typing.Tuple[int],  # Endpoint
+            # Wildcard endpoint, Cluster id present
+            typing.Tuple[typing.Type[ClusterObjects.Cluster]],
+            # Wildcard endpoint, Cluster + Attribute present
+            typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+            # Wildcard attribute id
+            typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
+            # Concrete path
+            typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+            # Directly specified attribute path
+            ClusterAttribute.AttributePath
+        ]]] = None,
         dataVersionFilters: typing.Optional[typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]] = None, events: typing.Optional[typing.List[
             typing.Union[
             None,  # Empty tuple, all wildcard
@@ -1461,10 +1464,11 @@ class ChipDeviceControllerBase():
             # Concrete path
             typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent], int]
             ]]] = None,
-            eventNumberFilter: typing.Optional[int] = None,
-            returnClusterObject: bool = False, reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
-            fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
-            payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+        eventNumberFilter: typing.Optional[int] = None,
+        returnClusterObject: bool = False, reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
+        fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
+        payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD
+    ):
         '''
         Read a list of attributes and/or events from a target node
 
@@ -1534,33 +1538,43 @@ class ChipDeviceControllerBase():
         eventPaths = [self._parseEventPathTuple(
             v) for v in events] if events else None
 
-        ClusterAttribute.Read(future=future, eventLoop=eventLoop, device=device.deviceProxy, devCtrl=self,
+        transaction = ClusterAttribute.AsyncReadTransaction(future, eventLoop, self, returnClusterObject)
+        ClusterAttribute.Read(transaction, device=device.deviceProxy,
                               attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths,
-                              eventNumberFilter=eventNumberFilter, returnClusterObject=returnClusterObject,
+                              eventNumberFilter=eventNumberFilter,
                               subscriptionParameters=ClusterAttribute.SubscriptionParameters(
                                   reportInterval[0], reportInterval[1]) if reportInterval else None,
                               fabricFiltered=fabricFiltered,
                               keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe).raise_on_error()
-        return await future
+        await future
 
-    async def ReadAttribute(self, nodeid: int, attributes: typing.Optional[typing.List[typing.Union[
-        None,  # Empty tuple, all wildcard
-        typing.Tuple[int],  # Endpoint
-        # Wildcard endpoint, Cluster id present
-        typing.Tuple[typing.Type[ClusterObjects.Cluster]],
-        # Wildcard endpoint, Cluster + Attribute present
-        typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
-        # Wildcard attribute id
-        typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
-        # Concrete path
-        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
-        # Directly specified attribute path
-        ClusterAttribute.AttributePath
-    ]]], dataVersionFilters: typing.Optional[typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]] = None,
-            returnClusterObject: bool = False,
-            reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
-            fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
-            payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+        if result := transaction.GetSubscriptionHandler():
+            return result
+        else:
+            return transaction.GetReadResponse()
+
+    async def ReadAttribute(
+        self,
+        nodeid: int,
+        attributes: typing.Optional[typing.List[typing.Union[
+            None,  # Empty tuple, all wildcard
+            typing.Tuple[int],  # Endpoint
+            # Wildcard endpoint, Cluster id present
+            typing.Tuple[typing.Type[ClusterObjects.Cluster]],
+            # Wildcard endpoint, Cluster + Attribute present
+            typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+            # Wildcard attribute id
+            typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
+            # Concrete path
+            typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+            # Directly specified attribute path
+            ClusterAttribute.AttributePath
+        ]]], dataVersionFilters: typing.Optional[typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]] = None,
+        returnClusterObject: bool = False,
+        reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
+        fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
+        payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD
+    ):
         '''
         Read a list of attributes from a target node, this is a wrapper of DeviceController.Read()
 
@@ -1629,24 +1643,28 @@ class ChipDeviceControllerBase():
         else:
             return res.attributes
 
-    async def ReadEvent(self, nodeid: int, events: typing.List[typing.Union[
-        None,  # Empty tuple, all wildcard
-        typing.Tuple[str, int],  # all wildcard with urgency set
-        typing.Tuple[int, int],  # Endpoint,
-        # Wildcard endpoint, Cluster id present
-        typing.Tuple[typing.Type[ClusterObjects.Cluster], int],
-        # Wildcard endpoint, Cluster + Event present
-        typing.Tuple[typing.Type[ClusterObjects.ClusterEvent], int],
-        # Wildcard event id
-        typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int],
-        # Concrete path
-        typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent], int]
-    ]], eventNumberFilter: typing.Optional[int] = None,
-            fabricFiltered: bool = True,
-            reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
-            keepSubscriptions: bool = False,
-            autoResubscribe: bool = True,
-            payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+    async def ReadEvent(
+        self,
+        nodeid: int,
+        events: typing.List[typing.Union[
+            None,  # Empty tuple, all wildcard
+            typing.Tuple[str, int],  # all wildcard with urgency set
+            typing.Tuple[int, int],  # Endpoint,
+            # Wildcard endpoint, Cluster id present
+            typing.Tuple[typing.Type[ClusterObjects.Cluster], int],
+            # Wildcard endpoint, Cluster + Event present
+            typing.Tuple[typing.Type[ClusterObjects.ClusterEvent], int],
+            # Wildcard event id
+            typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int],
+            # Concrete path
+            typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent], int]
+        ]], eventNumberFilter: typing.Optional[int] = None,
+        fabricFiltered: bool = True,
+        reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
+        keepSubscriptions: bool = False,
+        autoResubscribe: bool = True,
+        payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD
+    ):
         '''
         Read a list of events from a target node, this is a wrapper of DeviceController.Read()
 

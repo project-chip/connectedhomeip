@@ -1,6 +1,7 @@
 {{> header}}
 
 #include <commands/clusters/DataModelLogger.h>
+#include <zap-generated/cluster/logging/EntryToText.h>
 
 using namespace chip::app::Clusters;
 

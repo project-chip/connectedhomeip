@@ -15,9 +15,7 @@ Generally regenerate using one of:
 |          3 |       0x03 | Identify                                                |
 |          4 |       0x04 | Groups                                                  |
 |          6 |       0x06 | OnOff                                                   |
-|          7 |       0x07 | OnOffSwitchConfiguration                                |
 |          8 |       0x08 | LevelControl                                            |
-|         15 |       0x0F | BinaryInputBasic                                        |
 |         28 |       0x1C | PulseWidthModulation                                    |
 |         29 |       0x1D | Descriptor                                              |
 |         30 |       0x1E | Binding                                                 |
@@ -91,7 +89,6 @@ Generally regenerate using one of:
 |        159 |       0x9F | DeviceEnergyManagementMode                              |
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |
-|        259 |      0x103 | BarrierControl                                          |
 |        336 |      0x150 | ServiceArea                                             |
 |        512 |      0x200 | PumpConfigurationAndControl                             |
 |        513 |      0x201 | Thermostat                                              |
@@ -134,7 +131,6 @@ Generally regenerate using one of:
 |       1296 |      0x510 | ContentAppObserver                                      |
 |       1872 |      0x750 | EcosystemInformation                                    |
 |       1873 |      0x751 | CommissionerControl                                     |
-|       2820 |      0xB04 | ElectricalMeasurement                                   |
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |
 | 4294048774 | 0xFFF1FC06 | FaultInjection                                          |
 | 4294048800 | 0xFFF1FC20 | SampleMei                                               |

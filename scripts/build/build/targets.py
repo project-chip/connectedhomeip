@@ -28,7 +28,7 @@ from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
-from builders.nxp import NxpApp, NxpBoard, NxpBuilder, NxpOsUsed
+from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpOsUsed
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.stm32 import stm32App, stm32Board, stm32Builder
@@ -196,6 +196,7 @@ def BuildHostTarget():
     target.AppendModifier('data-model-check', data_model_interface="check").ExceptIfRe('-data-model-(enabled|disabled)')
     target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-(check|enabled)')
     target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-(check|disabled)')
+    target.AppendModifier('check-failure-die', data_model_interface="enabled").OnlyIfRe('-data-model-check')
 
     return target
 
@@ -231,6 +232,8 @@ def BuildEsp32Target():
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('ipv6only', enable_ipv4=False)
     target.AppendModifier('tracing', enable_insights_trace=True).OnlyIfRe("light")
+    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
+    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
 
     return target
 
@@ -252,6 +255,7 @@ def BuildEfr32Target():
         TargetPart('brd4186c', board=Efr32Board.BRD4186C),
         TargetPart('brd2703a', board=Efr32Board.BRD2703A),
         TargetPart('brd4338a', board=Efr32Board.BRD4338A, enable_wifi=True, enable_917_soc=True),
+        TargetPart('brd2605a', board=Efr32Board.BRD2605A, enable_wifi=True, enable_917_soc=True),
     ])
 
     # apps
@@ -329,6 +333,8 @@ def BuildNrfTarget():
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
+    target.AppendModifier('data-model-disabled', use_data_model_interface=False).ExceptIfRe('-data-model-enabled')
+    target.AppendModifier('data-model-enabled', use_data_model_interface=True).ExceptIfRe('-data-model-disabled')
 
     return target
 
@@ -414,6 +420,8 @@ def BuildMbedTarget():
         '-(release|debug)')
     target.AppendModifier('debug', profile=MbedProfile.DEBUG).ExceptIfRe(
         '-(release|develop)')
+    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
+    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
 
     return target
 
@@ -506,7 +514,9 @@ def BuildNxpTarget():
     target.AppendFixedTargets([
         TargetPart('k32w0', board=NxpBoard.K32W0),
         TargetPart('k32w1', board=NxpBoard.K32W1),
-        TargetPart('rw61x', board=NxpBoard.RW61X)
+        TargetPart('rw61x', board=NxpBoard.RW61X),
+        TargetPart('rw61x_eth', board=NxpBoard.RW61X_ETH),
+        TargetPart('mcxw71', board=NxpBoard.MCXW71)
     ])
 
     # OS
@@ -517,8 +527,9 @@ def BuildNxpTarget():
 
     # apps
     target.AppendFixedTargets([
-        TargetPart('lighting', app=NxpApp.LIGHTING).OnlyIfRe('(k32w0|k32w1)'),
-        TargetPart('contact-sensor', app=NxpApp.CONTACT).OnlyIfRe('(k32w0|k32w1)'),
+        TargetPart('lighting', app=NxpApp.LIGHTING).OnlyIfRe('(k32w0|k32w1|mcxw71)'),
+        TargetPart('contact-sensor', app=NxpApp.CONTACT).OnlyIfRe('(k32w0|k32w1|mcxw71)'),
+        TargetPart('lock-app', app=NxpApp.LOCK_APP).OnlyIfRe('(k32w1|mcxw71)'),
         TargetPart('all-clusters', app=NxpApp.ALLCLUSTERS).OnlyIfRe('rw61x'),
         TargetPart('laundry-washer', app=NxpApp.LAUNDRYWASHER).OnlyIfRe('rw61x'),
         TargetPart('thermostat', app=NxpApp.THERMOSTAT).OnlyIfRe('rw61x')
@@ -528,14 +539,20 @@ def BuildNxpTarget():
     target.AppendModifier(name="low-power", low_power=True).OnlyIfRe('contact-sensor')
     target.AppendModifier(name="lit", enable_lit=True).OnlyIfRe('contact-sensor')
     target.AppendModifier(name="fro32k", use_fro32k=True).OnlyIfRe('k32w0')
-    target.AppendModifier(name="smu2", smu2=True).OnlyIfRe('k32w1-freertos-lighting')
+    target.AppendModifier(name="smu2", smu2=True).OnlyIfRe('(k32w1|mcxw71)-freertos-lighting')
     target.AppendModifier(name="dac-conversion", convert_dac_pk=True).OnlyIfRe('factory').ExceptIfRe('(k32w0|rw61x)')
     target.AppendModifier(name="rotating-id", enable_rotating_id=True).ExceptIfRe('rw61x')
     target.AppendModifier(name="sw-v2", has_sw_version_2=True)
     target.AppendModifier(name="ota", enable_ota=True).ExceptIfRe('zephyr')
     target.AppendModifier(name="wifi", enable_wifi=True).OnlyIfRe('rw61x')
+    target.AppendModifier(name="ethernet", enable_ethernet=True).OnlyIfRe('rw61x_eth-zephyr')
     target.AppendModifier(name="thread", enable_thread=True).ExceptIfRe('zephyr')
     target.AppendModifier(name="matter-shell", enable_shell=True).ExceptIfRe('k32w0|k32w1')
+    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
+    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
+    target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rw61x')
+    target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x')
+    target.AppendModifier(name="cmake", build_system=NxpBuildSystem.CMAKE).OnlyIfRe('rw61x')
 
     return target
 
@@ -616,6 +633,8 @@ def BuildQorvoTarget():
     ])
 
     target.AppendModifier('updateimage', update_image=True)
+    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
+    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
 
     return target
 
@@ -777,6 +796,8 @@ def BuildTelinkTarget():
     target.AppendModifier('4mb', enable_4mb_flash=True)
     target.AppendModifier('mars', mars_board_config=True)
     target.AppendModifier('usb', usb_board_config=True)
+    target.AppendModifier('data-model-disabled', use_data_model_interface=False).ExceptIfRe('-data-model-enabled')
+    target.AppendModifier('data-model-enabled', use_data_model_interface=True).ExceptIfRe('-data-model-disabled')
 
     return target
 
