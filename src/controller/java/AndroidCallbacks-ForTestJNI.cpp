@@ -50,6 +50,6 @@ JNI_METHOD(void, GetConnectedDeviceCallbackForTestJni, onDeviceConnectionFailure
 
     GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(
         connectedDeviceCallback,
-        OperationalSessionSetup::ConnectionFailureInfo(ScopedNodeId(), chip::ChipError(errorCode),
-                                                       SessionEstablishmentStage::kUnknown));
+        OperationalSessionSetup::ConnectionFailureInfo(
+            ScopedNodeId(), chip::ChipError(static_cast<ChipError::StorageType>(errorCode)), SessionEstablishmentStage::kUnknown));
 }
