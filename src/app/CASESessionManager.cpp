@@ -104,7 +104,7 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
 
             if (onSetupFailure != nullptr)
             {
-                OperationalSessionSetup::ConnnectionFailureInfo failureInfo(peerId, CHIP_ERROR_NO_MEMORY,
+                OperationalSessionSetup::ConnectionFailureInfo failureInfo(peerId, CHIP_ERROR_NO_MEMORY,
                                                                             SessionEstablishmentStage::kUnknown);
                 onSetupFailure->mCall(onSetupFailure->mContext, failureInfo);
             }

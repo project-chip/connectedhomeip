@@ -1382,7 +1382,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "GetConnectedDevice failed: %" CHIP_ERROR_FORMAT, err.Format());
-        OperationalSessionSetup::ConnnectionFailureInfo failureInfo(
+        OperationalSessionSetup::ConnectionFailureInfo failureInfo(
             chip::ScopedNodeId(static_cast<chip::NodeId>(nodeId), wrapper->Controller()->GetFabricIndex()), err,
             SessionEstablishmentStage::kUnknown);
         connectedDeviceCallback->mOnFailure.mCall(&connectedDeviceCallback->mOnFailure.mContext, failureInfo);

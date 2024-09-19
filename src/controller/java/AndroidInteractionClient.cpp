@@ -84,7 +84,8 @@ CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong dev
         for (size_t i = 0; i < numAttributePaths; i++)
         {
             jobject attributePathItem = nullptr;
-            SuccessOrExit(err = JniReferences::GetInstance().GetListItem(attributePathList, static_cast<jint>(i), attributePathItem));
+            SuccessOrExit(err =
+                              JniReferences::GetInstance().GetListItem(attributePathList, static_cast<jint>(i), attributePathItem));
 
             EndpointId endpointId;
             ClusterId clusterId;
@@ -110,7 +111,8 @@ CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong dev
         for (size_t i = 0; i < numDataVersionFilters; i++)
         {
             jobject dataVersionFilterItem = nullptr;
-            SuccessOrExit(err = JniReferences::GetInstance().GetListItem(dataVersionFilterList, static_cast<jint>(i), dataVersionFilterItem));
+            SuccessOrExit(
+                err = JniReferences::GetInstance().GetListItem(dataVersionFilterList, static_cast<jint>(i), dataVersionFilterItem));
 
             EndpointId endpointId;
             ClusterId clusterId;

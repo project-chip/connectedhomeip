@@ -221,10 +221,10 @@ if (chip_link_tests) {
     public_configs = [ "${chip_root}/src:includes" ]
 
     deps = [
-      dir_pw_unit_test,
       ":android_chip_im_jni",
       ":jni",
       "${chip_root}/src/messaging/tests:helpers",
+      dir_pw_unit_test,
     ]
 
     if (matter_enable_java_compilation) {
