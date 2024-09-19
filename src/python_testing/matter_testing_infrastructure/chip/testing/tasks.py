@@ -28,10 +28,7 @@ def forward_f(prefix: bytes,
 
     This function can optionally feed received lines to a callback function.
     """
-    while True:
-        line = f_in.readline()
-        if not line:
-            break
+    while line := f_in.readline():
         if cb is not None:
             cb(line, is_stderr)
         f_out.buffer.write(prefix)
@@ -121,4 +118,6 @@ class Subprocess(threading.Thread):
             self.expected_output = None
 
     def terminate(self):
+        """Terminate the subprocess and wait for it to finish."""
         self.p.terminate()
+        self.join()
