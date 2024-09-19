@@ -94,13 +94,13 @@ class NxpBoardVariant(Enum):
     FRDM = auto()
 
     def BoardVariantName(self, board):
-        if board == NxpBoard.RW61X:
-            if self == NxpBoardVariant.RD:
-                return "rdrw612bga"
-            elif self == NxpBoardVariant.FRDM:
-                return "frdm"
-        else:
-            raise Exception('Unkown board variant: %r' % self)
+        if board != NxpBoard.RW61X:
+            raise Exception('Board variants only supported for RW61X')
+
+        if self == NxpBoardVariant.RD:
+            return "rdrw612bga"
+        elif self == NxpBoardVariant.FRDM:
+            return "frdm"
 
 
 class NxpApp(Enum):
