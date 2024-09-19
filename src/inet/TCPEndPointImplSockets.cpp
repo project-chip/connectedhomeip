@@ -806,7 +806,7 @@ void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
 #else  // __MBED__
        // On Mbed OS, connect blocks and never returns EINPROGRESS
        // The socket option SO_ERROR is not available.
-            int osConRes = 0;
+            int osConRes     = 0;
 #endif // !__MBED__
             CHIP_ERROR conRes = CHIP_ERROR_POSIX(osConRes);
 
