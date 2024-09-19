@@ -1190,44 +1190,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return [[MTRBaseDevice alloc] initWithNodeID:nodeID controller:self];
 }
 
-// If prefetchedClusterData is not provided, load attributes individually from controller data store
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData
 {
-    os_unfair_lock_assert_owner(self.deviceMapLock);
-
-    MTRDevice * deviceToReturn = [[MTRDevice_Concrete alloc] initWithNodeID:nodeID controller:self];
-    // If we're not running, don't add the device to our map.  That would
-    // create a cycle that nothing would break.  Just return the device,
-    // which will be in exactly the state it would be in if it were created
-    // while we were running and then we got shut down.
-    if ([self isRunning]) {
-        [_nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
-    }
-
-    if (prefetchedClusterData) {
-        if (prefetchedClusterData.count) {
-            [deviceToReturn setPersistedClusterData:prefetchedClusterData];
-        }
-    } else if (_controllerDataStore) {
-        // Load persisted cluster data if they exist.
-        NSDictionary * clusterData = [_controllerDataStore getStoredClusterDataForNodeID:nodeID];
-        MTR_LOG("%@ Loaded %lu cluster data from storage for %@", self, static_cast<unsigned long>(clusterData.count), deviceToReturn);
-        if (clusterData.count) {
-            [deviceToReturn setPersistedClusterData:clusterData];
-        }
-    }
-
-    // TODO: Figure out how to get the device data as part of our bulk-read bits.
-    if (_controllerDataStore) {
-        auto * deviceData = [_controllerDataStore getStoredDeviceDataForNodeID:nodeID];
-        if (deviceData.count) {
-            [deviceToReturn setPersistedDeviceData:deviceData];
-        }
-    }
-
-    [deviceToReturn setStorageBehaviorConfiguration:_storageBehaviorConfiguration];
-
-    return deviceToReturn;
+    MTR_ABSTRACT_METHOD();
+    return nil;
 }
 
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID

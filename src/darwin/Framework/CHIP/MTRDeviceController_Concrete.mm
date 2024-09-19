@@ -1193,30 +1193,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return deviceToReturn;
 }
 
-- (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
-{
-    std::lock_guard lock(*self.deviceMapLock);
-    MTRDevice * deviceToReturn = [self.nodeIDToDeviceMap objectForKey:nodeID];
-    if (!deviceToReturn) {
-        deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
-    }
-
-    return deviceToReturn;
-}
-
-- (void)removeDevice:(MTRDevice *)device
-{
-    std::lock_guard lock(*self.deviceMapLock);
-    auto * nodeID = device.nodeID;
-    MTRDevice * deviceToRemove = [self.nodeIDToDeviceMap objectForKey:nodeID];
-    if (deviceToRemove == device) {
-        [deviceToRemove invalidate];
-        [self.nodeIDToDeviceMap removeObjectForKey:nodeID];
-    } else {
-        MTR_LOG_ERROR("%@ Error: Cannot remove device %p with nodeID %llu", self, device, nodeID.unsignedLongLongValue);
-    }
-}
-
 #ifdef DEBUG
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
 {
