@@ -94,7 +94,15 @@ def main(search_directory, env_file):
         "hello_external_runner.py",  # Code/Test not being used or not shared code for any other tests
         "hello_test.py",  # Is a template for tests
         "test_plan_support.py",  # Shared code for TC_*, not a standalone test
-        "test_plan_table_generator.py"  # Code/Test not being used or not shared code for any other tests
+        "test_plan_table_generator.py",  # Code/Test not being used or not shared code for any other tests
+        "basic_composition_support.py",  # Test support/shared code script, not a standalone test
+        "choice_conformance_support.py",  # Test support/shared code script, not a standalone test
+        "conformance_support.py",  # Test support/shared code script, not a standalone test
+        "global_attribute_ids.py",  # Test support/shared code script, not a standalone test
+        "matter_testing_support.py",  # Test support/shared code script, not a standalone test
+        "pics_support.py",  # Test support/shared code script, not a standalone test
+        "spec_parsing_support.py",  # Test support/shared code script, not a standalone test
+        "taglist_and_topology_test_support.py"  # Test support/shared code script, not a standalone test
     }
 
     # Get all .py files in the directory
