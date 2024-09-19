@@ -73,6 +73,7 @@ void FullWhmApplicationInit()
     /* For Device Energy Management we need the ESA to be Online and ready to accept commands */
 
     GetDEMDelegate()->SetESAState(ESAStateEnum::kOnline);
+    GetDEMDelegate()->SetESAType(ESATypeEnum::kWaterHeating);
     GetDEMDelegate()->SetDEMManufacturerDelegate(*GetWhmManufacturer());
 
     // Set the abs min and max power
