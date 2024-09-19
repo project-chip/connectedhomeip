@@ -89,7 +89,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
         occupiedCoolingSetpoint = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedCoolingSetpoint)
         occupiedHeatingSetpoint = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedHeatingSetpoint)
         deadband = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
-        deadband *= 10 # Unlike all the setpoints it affects, deadband is in 0.1C increments, because reasons
+        deadband *= 10  # Unlike all the setpoints it affects, deadband is in 0.1C increments, because reasons
         unoccupiedCoolingSetpoint = None
         unoccupiedHeatingSetpoint = None
 
@@ -125,7 +125,6 @@ class TC_TSTAT_2_2(MatterBaseTest):
             unoccupiedCoolingSetpoint = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.UnoccupiedCoolingSetpoint)
             asserts.assert_equal(unoccupiedCoolingSetpoint, targetCoolingSetpoint, "UnoccupiedCoolingSetpoint was not adjusted")
 
-
         self.step("7")
         if self.pics_guard(self.check_pics("TSTAT.S.F02")) and unoccupiedHeatingSetpoint > minHeat:
             targetCoolingSetpoint = (unoccupiedHeatingSetpoint + deadband) - 1
@@ -133,6 +132,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(targetCoolingSetpoint), endpoint_id=endpoint)
             unoccupiedHeatingSetpoint = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.UnoccupiedHeatingSetpoint)
             asserts.assert_equal(unoccupiedHeatingSetpoint, targetHeatingSetpoint, "UnoccupiedHeatingSetpoint was not adjusted")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
