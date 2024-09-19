@@ -162,6 +162,9 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
 
     ReturnErrorOnFailure(GetSocket(addrType));
 
+    // have to have a valid socket to send something with. Generally GetSocket ensures that
+    VerifyOrReturnValue(mSocket >= 0, CHIP_ERROR_INCORRECT_STATE);
+
     if (!intfId.IsPresent())
     {
         // The behavior when connecting to an IPv6 link-local address without specifying an outbound
