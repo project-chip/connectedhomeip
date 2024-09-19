@@ -222,25 +222,25 @@ int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoin
 
 struct SetpointLimits
 {
-    bool AutoSupported      = false;
-    bool HeatSupported      = false;
-    bool CoolSupported      = false;
-    bool OccupancySupported = false;
+    bool autoSupported      = false;
+    bool heatSupported      = false;
+    bool coolSupported      = false;
+    bool occupancySupported = false;
 
-    int16_t AbsMinHeatSetpointLimit;
-    int16_t AbsMaxHeatSetpointLimit;
-    int16_t MinHeatSetpointLimit;
-    int16_t MaxHeatSetpointLimit;
-    int16_t AbsMinCoolSetpointLimit;
-    int16_t AbsMaxCoolSetpointLimit;
-    int16_t MinCoolSetpointLimit;
-    int16_t MaxCoolSetpointLimit;
-    int8_t DeadBand      = 0;
-    int16_t DeadBandTemp = 0;
-    int16_t OccupiedCoolingSetpoint;
-    int16_t OccupiedHeatingSetpoint;
-    int16_t UnoccupiedCoolingSetpoint;
-    int16_t UnoccupiedHeatingSetpoint;
+    int16_t absMinHeatSetpointLimit;
+    int16_t absMaxHeatSetpointLimit;
+    int16_t minHeatSetpointLimit;
+    int16_t maxHeatSetpointLimit;
+    int16_t absMinCoolSetpointLimit;
+    int16_t absMaxCoolSetpointLimit;
+    int16_t minCoolSetpointLimit;
+    int16_t maxCoolSetpointLimit;
+    int8_t deadBand      = 0;
+    int16_t deadBandTemp = 0;
+    int16_t occupiedCoolingSetpoint;
+    int16_t occupiedHeatingSetpoint;
+    int16_t unoccupiedCoolingSetpoint;
+    int16_t unoccupiedHeatingSetpoint;
 };
 
 /**
@@ -250,85 +250,85 @@ struct SetpointLimits
  * @param setpointLimits The SetpointLimits to populate
  * @return Success if the limits were read completely, otherwise an error code
  */
-Status getSetpointLimits(EndpointId endpoint, SetpointLimits & setpointLimits)
+Status GetSetpointLimits(EndpointId endpoint, SetpointLimits & setpointLimits)
 {
     uint32_t flags;
     if (FeatureMap::Get(endpoint, &flags) != Status::Success)
     {
-        ChipLogError(Zcl, "getSetpointLimits: could not get feature flags");
+        ChipLogError(Zcl, "GetSetpointLimits: could not get feature flags");
         flags = FEATURE_MAP_DEFAULT;
     }
 
     auto featureMap                   = BitMask<Feature, uint32_t>(flags);
-    setpointLimits.AutoSupported      = featureMap.Has(Feature::kAutoMode);
-    setpointLimits.HeatSupported      = featureMap.Has(Feature::kHeating);
-    setpointLimits.CoolSupported      = featureMap.Has(Feature::kCooling);
-    setpointLimits.OccupancySupported = featureMap.Has(Feature::kOccupancy);
+    setpointLimits.autoSupported      = featureMap.Has(Feature::kAutoMode);
+    setpointLimits.heatSupported      = featureMap.Has(Feature::kHeating);
+    setpointLimits.coolSupported      = featureMap.Has(Feature::kCooling);
+    setpointLimits.occupancySupported = featureMap.Has(Feature::kOccupancy);
 
-    if (setpointLimits.AutoSupported)
+    if (setpointLimits.autoSupported)
     {
-        int8_t deadband = 0;
-        if (MinSetpointDeadBand::Get(endpoint, &deadband) != Status::Success)
+        setpointLimits.deadBand = 0;
+        if (MinSetpointDeadBand::Get(endpoint, &setpointLimits.deadBand) != Status::Success)
         {
-            deadband = kDefaultDeadBand;
+            setpointLimits.deadBand = kDefaultDeadBand;
         }
-        setpointLimits.DeadBandTemp = static_cast<int16_t>(deadband * 10);
+        setpointLimits.deadBandTemp = static_cast<int16_t>(setpointLimits.deadBand * 10);
     }
 
-    if (AbsMinCoolSetpointLimit::Get(endpoint, &setpointLimits.AbsMinCoolSetpointLimit) != Status::Success)
-        setpointLimits.AbsMinCoolSetpointLimit = kDefaultAbsMinCoolSetpointLimit;
+    if (AbsMinCoolSetpointLimit::Get(endpoint, &setpointLimits.absMinCoolSetpointLimit) != Status::Success)
+        setpointLimits.absMinCoolSetpointLimit = kDefaultAbsMinCoolSetpointLimit;
 
-    if (AbsMaxCoolSetpointLimit::Get(endpoint, &setpointLimits.AbsMaxCoolSetpointLimit) != Status::Success)
-        setpointLimits.AbsMaxCoolSetpointLimit = kDefaultAbsMaxCoolSetpointLimit;
+    if (AbsMaxCoolSetpointLimit::Get(endpoint, &setpointLimits.absMaxCoolSetpointLimit) != Status::Success)
+        setpointLimits.absMaxCoolSetpointLimit = kDefaultAbsMaxCoolSetpointLimit;
 
-    if (MinCoolSetpointLimit::Get(endpoint, &setpointLimits.MinCoolSetpointLimit) != Status::Success)
-        setpointLimits.MinCoolSetpointLimit = setpointLimits.AbsMinCoolSetpointLimit;
+    if (MinCoolSetpointLimit::Get(endpoint, &setpointLimits.minCoolSetpointLimit) != Status::Success)
+        setpointLimits.minCoolSetpointLimit = setpointLimits.absMinCoolSetpointLimit;
 
-    if (MaxCoolSetpointLimit::Get(endpoint, &setpointLimits.MaxCoolSetpointLimit) != Status::Success)
-        setpointLimits.MaxCoolSetpointLimit = setpointLimits.AbsMaxCoolSetpointLimit;
+    if (MaxCoolSetpointLimit::Get(endpoint, &setpointLimits.maxCoolSetpointLimit) != Status::Success)
+        setpointLimits.maxCoolSetpointLimit = setpointLimits.absMaxCoolSetpointLimit;
 
-    if (AbsMinHeatSetpointLimit::Get(endpoint, &setpointLimits.AbsMinHeatSetpointLimit) != Status::Success)
-        setpointLimits.AbsMinHeatSetpointLimit = kDefaultAbsMinHeatSetpointLimit;
+    if (AbsMinHeatSetpointLimit::Get(endpoint, &setpointLimits.absMinHeatSetpointLimit) != Status::Success)
+        setpointLimits.absMinHeatSetpointLimit = kDefaultAbsMinHeatSetpointLimit;
 
-    if (AbsMaxHeatSetpointLimit::Get(endpoint, &setpointLimits.AbsMaxHeatSetpointLimit) != Status::Success)
-        setpointLimits.AbsMaxHeatSetpointLimit = kDefaultAbsMaxHeatSetpointLimit;
+    if (AbsMaxHeatSetpointLimit::Get(endpoint, &setpointLimits.absMaxHeatSetpointLimit) != Status::Success)
+        setpointLimits.absMaxHeatSetpointLimit = kDefaultAbsMaxHeatSetpointLimit;
 
-    if (MinHeatSetpointLimit::Get(endpoint, &setpointLimits.MinHeatSetpointLimit) != Status::Success)
-        setpointLimits.MinHeatSetpointLimit = setpointLimits.AbsMinHeatSetpointLimit;
+    if (MinHeatSetpointLimit::Get(endpoint, &setpointLimits.minHeatSetpointLimit) != Status::Success)
+        setpointLimits.minHeatSetpointLimit = setpointLimits.absMinHeatSetpointLimit;
 
-    if (MaxHeatSetpointLimit::Get(endpoint, &setpointLimits.MaxHeatSetpointLimit) != Status::Success)
-        setpointLimits.MaxHeatSetpointLimit = setpointLimits.AbsMaxHeatSetpointLimit;
+    if (MaxHeatSetpointLimit::Get(endpoint, &setpointLimits.maxHeatSetpointLimit) != Status::Success)
+        setpointLimits.maxHeatSetpointLimit = setpointLimits.absMaxHeatSetpointLimit;
 
-    if (setpointLimits.CoolSupported)
+    if (setpointLimits.coolSupported)
     {
-        if (OccupiedCoolingSetpoint::Get(endpoint, &setpointLimits.OccupiedCoolingSetpoint) != Status::Success)
+        if (OccupiedCoolingSetpoint::Get(endpoint, &setpointLimits.occupiedCoolingSetpoint) != Status::Success)
         {
             ChipLogError(Zcl, "Error: Can not read Occupied Cooling Setpoint");
             return Status::Failure;
         }
     }
 
-    if (setpointLimits.HeatSupported)
+    if (setpointLimits.heatSupported)
     {
-        if (OccupiedHeatingSetpoint::Get(endpoint, &setpointLimits.OccupiedHeatingSetpoint) != Status::Success)
+        if (OccupiedHeatingSetpoint::Get(endpoint, &setpointLimits.occupiedHeatingSetpoint) != Status::Success)
         {
             ChipLogError(Zcl, "Error: Can not read Occupied Heating Setpoint");
             return Status::Failure;
         }
     }
 
-    if (setpointLimits.CoolSupported && setpointLimits.OccupancySupported)
+    if (setpointLimits.coolSupported && setpointLimits.occupancySupported)
     {
-        if (UnoccupiedCoolingSetpoint::Get(endpoint, &setpointLimits.UnoccupiedCoolingSetpoint) != Status::Success)
+        if (UnoccupiedCoolingSetpoint::Get(endpoint, &setpointLimits.unoccupiedCoolingSetpoint) != Status::Success)
         {
             ChipLogError(Zcl, "Error: Can not read Unoccupied Cooling Setpoint");
             return Status::Failure;
         }
     }
 
-    if (setpointLimits.HeatSupported && setpointLimits.OccupancySupported)
+    if (setpointLimits.heatSupported && setpointLimits.occupancySupported)
     {
-        if (UnoccupiedHeatingSetpoint::Get(endpoint, &setpointLimits.UnoccupiedHeatingSetpoint) != Status::Success)
+        if (UnoccupiedHeatingSetpoint::Get(endpoint, &setpointLimits.unoccupiedHeatingSetpoint) != Status::Success)
         {
             ChipLogError(Zcl, "Error: Can not read Unoccupied Heating Setpoint");
             return Status::Failure;
@@ -347,7 +347,7 @@ Status getSetpointLimits(EndpointId endpoint, SetpointLimits & setpointLimits)
  * @param deadband The deadband to preserve
  * @return Success if the deadband can be preserved, InvalidValue if it cannot
  */
-Status checkHeatingSetpointDeadband(bool autoSupported, int16_t newCoolingSetpoint, int16_t minHeatingSetpoint, int16_t deadband)
+Status CheckHeatingSetpointDeadband(bool autoSupported, int16_t newCoolingSetpoint, int16_t minHeatingSetpoint, int16_t deadband)
 {
     if (!autoSupported)
     {
@@ -374,7 +374,7 @@ Status checkHeatingSetpointDeadband(bool autoSupported, int16_t newCoolingSetpoi
  * @param deadband The deadband to preserve
  * @return Success if the deadband can be preserved, InvalidValue if it cannot
  */
-Status checkCoolingSetpointDeadband(bool autoSupported, int16_t newHeatingSetpoint, int16_t maxCoolingSetpoint, int16_t deadband)
+Status CheckCoolingSetpointDeadband(bool autoSupported, int16_t newHeatingSetpoint, int16_t maxCoolingSetpoint, int16_t deadband)
 {
     if (!autoSupported)
     {
@@ -391,7 +391,7 @@ Status checkCoolingSetpointDeadband(bool autoSupported, int16_t newHeatingSetpoi
     return Status::Success;
 }
 
-typedef Status (*setpointSetter)(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
+typedef Status (*SetpointSetter)(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
 
 /**
  * @brief Attempts to ensure that a change to the heating setpoint maintains the deadband with the cooling setpoint
@@ -404,8 +404,8 @@ typedef Status (*setpointSetter)(EndpointId endpoint, int16_t value, MarkAttribu
  * @param deadband The deadband to preserve
  * @param setter A function for setting the cooling setpoint
  */
-void ensureCoolingSetpointDeadband(EndpointId endpoint, int16_t currentCoolingSetpoint, int16_t newHeatingSetpoint,
-                                   int16_t maxCoolingSetpoint, int16_t deadband, setpointSetter setter)
+void EnsureCoolingSetpointDeadband(EndpointId endpoint, int16_t currentCoolingSetpoint, int16_t newHeatingSetpoint,
+                                   int16_t maxCoolingSetpoint, int16_t deadband, SetpointSetter setter)
 {
     int16_t minValidCoolingSetpoint = newHeatingSetpoint;
     minValidCoolingSetpoint += deadband;
@@ -417,7 +417,7 @@ void ensureCoolingSetpointDeadband(EndpointId endpoint, int16_t currentCoolingSe
     if (minValidCoolingSetpoint > maxCoolingSetpoint)
     {
         // Adjusting the cool setpoint to preserve the deadband would violate the max cool setpoint
-        // This should have been caught in checkCoolingSetpointDeadband, so log and exit
+        // This should have been caught in CheckCoolingSetpointDeadband, so log and exit
         ChipLogError(Zcl, "Failed ensuring cooling setpoint deadband");
         return;
     }
@@ -425,7 +425,7 @@ void ensureCoolingSetpointDeadband(EndpointId endpoint, int16_t currentCoolingSe
     auto status = setter(endpoint, minValidCoolingSetpoint, MarkAttributeDirty::kYes);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "Error: ensureCoolingSetpointDeadband failed!");
+        ChipLogError(Zcl, "Error: EnsureCoolingSetpointDeadband failed!");
     }
 }
 
@@ -440,8 +440,8 @@ void ensureCoolingSetpointDeadband(EndpointId endpoint, int16_t currentCoolingSe
  * @param deadband The deadband to preserve
  * @param setter A function for setting the heating setpoint
  */
-void ensureHeatingSetpointDeadband(EndpointId endpoint, int16_t currentHeatingSetpoint, int16_t newCoolingSetpoint,
-                                   int16_t minHeatingSetpoint, int16_t deadband, setpointSetter setter)
+void EnsureHeatingSetpointDeadband(EndpointId endpoint, int16_t currentHeatingSetpoint, int16_t newCoolingSetpoint,
+                                   int16_t minHeatingSetpoint, int16_t deadband, SetpointSetter setter)
 {
     int16_t maxValidHeatingSetpoint = newCoolingSetpoint;
     maxValidHeatingSetpoint -= deadband;
@@ -453,7 +453,7 @@ void ensureHeatingSetpointDeadband(EndpointId endpoint, int16_t currentHeatingSe
     if (maxValidHeatingSetpoint < minHeatingSetpoint)
     {
         // Adjusting the heating setpoint to preserve the deadband would violate the max cooling setpoint
-        // This should have been caught in checkHeatingSetpointDeadband, so log and exit
+        // This should have been caught in CheckHeatingSetpointDeadband, so log and exit
         ChipLogError(Zcl, "Failed ensuring heating setpoint deadband");
         return;
     }
@@ -461,7 +461,7 @@ void ensureHeatingSetpointDeadband(EndpointId endpoint, int16_t currentHeatingSe
     auto status = setter(endpoint, maxValidHeatingSetpoint, MarkAttributeDirty::kYes);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "Error: ensureHeatingSetpointDeadband failed!");
+        ChipLogError(Zcl, "Error: EnsureHeatingSetpointDeadband failed!");
     }
 }
 
@@ -473,39 +473,39 @@ void ensureHeatingSetpointDeadband(EndpointId endpoint, int16_t currentHeatingSe
  *
  * @param attributePath
  */
-void ensureDeadband(const ConcreteAttributePath & attributePath)
+void EnsureDeadband(const ConcreteAttributePath & attributePath)
 {
     auto endpoint = attributePath.mEndpointId;
     SetpointLimits setpointLimits;
-    auto status = getSetpointLimits(endpoint, setpointLimits);
+    auto status = GetSetpointLimits(endpoint, setpointLimits);
     if (status != Status::Success)
     {
         return;
     }
-    if (!setpointLimits.AutoSupported)
+    if (!setpointLimits.autoSupported)
     {
         return;
     }
     switch (attributePath.mAttributeId)
     {
     case OccupiedHeatingSetpoint::Id:
-        ensureCoolingSetpointDeadband(endpoint, setpointLimits.OccupiedCoolingSetpoint, setpointLimits.OccupiedHeatingSetpoint,
-                                      setpointLimits.MaxCoolSetpointLimit, setpointLimits.DeadBandTemp,
+        EnsureCoolingSetpointDeadband(endpoint, setpointLimits.occupiedCoolingSetpoint, setpointLimits.occupiedHeatingSetpoint,
+                                      setpointLimits.maxCoolSetpointLimit, setpointLimits.deadBandTemp,
                                       OccupiedCoolingSetpoint::Set);
         break;
     case OccupiedCoolingSetpoint::Id:
-        ensureHeatingSetpointDeadband(endpoint, setpointLimits.OccupiedHeatingSetpoint, setpointLimits.OccupiedCoolingSetpoint,
-                                      setpointLimits.MinHeatSetpointLimit, setpointLimits.DeadBandTemp,
+        EnsureHeatingSetpointDeadband(endpoint, setpointLimits.occupiedHeatingSetpoint, setpointLimits.occupiedCoolingSetpoint,
+                                      setpointLimits.minHeatSetpointLimit, setpointLimits.deadBandTemp,
                                       OccupiedHeatingSetpoint::Set);
         break;
     case UnoccupiedHeatingSetpoint::Id:
-        ensureCoolingSetpointDeadband(endpoint, setpointLimits.UnoccupiedCoolingSetpoint, setpointLimits.UnoccupiedHeatingSetpoint,
-                                      setpointLimits.MaxCoolSetpointLimit, setpointLimits.DeadBandTemp,
+        EnsureCoolingSetpointDeadband(endpoint, setpointLimits.unoccupiedCoolingSetpoint, setpointLimits.unoccupiedHeatingSetpoint,
+                                      setpointLimits.maxCoolSetpointLimit, setpointLimits.deadBandTemp,
                                       UnoccupiedCoolingSetpoint::Set);
         break;
     case UnoccupiedCoolingSetpoint::Id:
-        ensureHeatingSetpointDeadband(endpoint, setpointLimits.UnoccupiedHeatingSetpoint, setpointLimits.UnoccupiedCoolingSetpoint,
-                                      setpointLimits.MinHeatSetpointLimit, setpointLimits.DeadBandTemp,
+        EnsureHeatingSetpointDeadband(endpoint, setpointLimits.unoccupiedHeatingSetpoint, setpointLimits.unoccupiedCoolingSetpoint,
+                                      setpointLimits.minHeatSetpointLimit, setpointLimits.deadBandTemp,
                                       UnoccupiedHeatingSetpoint::Set);
         break;
     }
@@ -786,12 +786,12 @@ void MatterThermostatClusterServerAttributeChangedCallback(const ConcreteAttribu
     case OccupiedHeatingSetpoint::Id:
     case OccupiedCoolingSetpoint::Id:
         clearActivePreset = supportsPresets && occupied;
-        ensureDeadband(attributePath);
+        EnsureDeadband(attributePath);
         break;
     case UnoccupiedHeatingSetpoint::Id:
     case UnoccupiedCoolingSetpoint::Id:
         clearActivePreset = supportsPresets && !occupied;
-        ensureDeadband(attributePath);
+        EnsureDeadband(attributePath);
         break;
     }
     if (clearActivePreset)
@@ -830,7 +830,7 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
 
     // Limits will be needed for all checks
     // so we just get them all now
-    // TODO: use getSetpointLimits to fetch this information
+    // TODO: use GetSetpointLimits to fetch this information
     int16_t AbsMinHeatSetpointLimit;
     int16_t AbsMaxHeatSetpointLimit;
     int16_t MinHeatSetpointLimit;
@@ -936,7 +936,7 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
         if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit ||
             requested > MaxHeatSetpointLimit)
             return Status::InvalidValue;
-        return checkCoolingSetpointDeadband(AutoSupported, requested, std::min(MaxCoolSetpointLimit, AbsMaxCoolSetpointLimit),
+        return CheckCoolingSetpointDeadband(AutoSupported, requested, std::min(MaxCoolSetpointLimit, AbsMaxCoolSetpointLimit),
                                             DeadBandTemp);
     }
 
@@ -947,7 +947,7 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
         if (requested < AbsMinCoolSetpointLimit || requested < MinCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit ||
             requested > MaxCoolSetpointLimit)
             return Status::InvalidValue;
-        return checkHeatingSetpointDeadband(AutoSupported, requested, std::max(MinHeatSetpointLimit, AbsMinHeatSetpointLimit),
+        return CheckHeatingSetpointDeadband(AutoSupported, requested, std::max(MinHeatSetpointLimit, AbsMinHeatSetpointLimit),
                                             DeadBandTemp);
     }
 
@@ -958,7 +958,7 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
         if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit ||
             requested > MaxHeatSetpointLimit)
             return Status::InvalidValue;
-        return checkCoolingSetpointDeadband(AutoSupported, requested, std::min(MaxCoolSetpointLimit, AbsMaxCoolSetpointLimit),
+        return CheckCoolingSetpointDeadband(AutoSupported, requested, std::min(MaxCoolSetpointLimit, AbsMaxCoolSetpointLimit),
                                             DeadBandTemp);
     }
     case UnoccupiedCoolingSetpoint::Id: {
@@ -968,7 +968,7 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
         if (requested < AbsMinCoolSetpointLimit || requested < MinCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit ||
             requested > MaxCoolSetpointLimit)
             return Status::InvalidValue;
-        return checkHeatingSetpointDeadband(AutoSupported, requested, std::max(MinHeatSetpointLimit, AbsMinHeatSetpointLimit),
+        return CheckHeatingSetpointDeadband(AutoSupported, requested, std::max(MinHeatSetpointLimit, AbsMinHeatSetpointLimit),
                                             DeadBandTemp);
     }
 
