@@ -69,7 +69,7 @@ namespace Inet {
 
 CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr)
 {
-  CHIP_ERROR res = GetSocket(addrType);
+    CHIP_ERROR res = GetSocket(addrType);
 
     if (res == CHIP_NO_ERROR && reuseAddr)
     {
@@ -809,7 +809,7 @@ void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
 #else  // __MBED__
        // On Mbed OS, connect blocks and never returns EINPROGRESS
        // The socket option SO_ERROR is not available.
-            int osConRes     = 0;
+            int osConRes = 0;
 #endif // !__MBED__
             CHIP_ERROR conRes = CHIP_ERROR_POSIX(osConRes);
 
