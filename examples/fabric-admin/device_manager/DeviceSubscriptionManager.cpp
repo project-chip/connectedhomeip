@@ -53,7 +53,7 @@ CHIP_ERROR DeviceSubscriptionManager::StartSubscription(Controller::DeviceContro
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceSubscriptionManager::RemoveSubscription(chip::NodeId nodeId)
+CHIP_ERROR DeviceSubscriptionManager::RemoveSubscription(NodeId nodeId)
 {
     assertChipStackLockedByCurrentThread();
     auto it = mDeviceSubscriptionMap.find(nodeId);
