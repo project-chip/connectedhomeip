@@ -32,6 +32,7 @@
 #import "MTRDeviceControllerFactory.h"
 #import "MTROperationalBrowser.h"
 
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/PeerId.h>
@@ -110,6 +111,13 @@ MTR_DIRECT_MEMBERS
 @property (readonly) chip::PersistentStorageDelegate * storageDelegate;
 @property (readonly) chip::Credentials::GroupDataProvider * groupDataProvider;
 @property (readonly, assign) MTROperationalBrowser * operationalBrowser;
+
+// fabricTable must be gotten on the Matter queue.  May return null if there are
+// no controllers running.
+@property (readonly, nullable, assign) chip::FabricTable * fabricTable;
+
+// resetOperationalAdvertising must happen on the Matter queue.
+- (void)resetOperationalAdvertising;
 
 @end
 

@@ -274,7 +274,7 @@ CHIP_ERROR FabricSyncRemoveLocalBridgeCommand::RunCommand()
     return CHIP_NO_ERROR;
 }
 
-void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_ERROR err, chip::SetupPayload payload)
+void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_ERROR err, SetupPayload payload)
 {
     ChipLogProgress(NotSpecified, "FabricSyncDeviceCommand::OnCommissioningWindowOpened");
 
@@ -344,15 +344,7 @@ CHIP_ERROR FabricSyncDeviceCommand::RunCommand(EndpointId remoteId)
         return CHIP_NO_ERROR;
     }
 
-    OpenCommissioningWindowCommand * openCommand =
-        static_cast<OpenCommissioningWindowCommand *>(CommandMgr().GetCommandByName("pairing", "open-commissioning-window"));
-
-    if (openCommand == nullptr)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    openCommand->RegisterDelegate(this);
+    PairingManager::Instance().SetOpenCommissioningWindowDelegate(this);
 
     DeviceMgr().OpenRemoteDeviceCommissioningWindow(remoteId);
 

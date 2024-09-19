@@ -76,4 +76,27 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
 	  within range [-JITTER; +JITTER].
 
+config CHIP_ETHERNET
+	bool "Enable NXP Ethernet support"
+	default n
+	depends on !CHIP_WIFI
+	select NET_MGMT_EVENT
+	select NET_MGMT_EVENT_INFO
+	select NET_L2_ETHERNET
+	select NET_L2_ETHERNET_MGMT
+	select NET_UDP
+	select NET_IP
+	select NET_CONFIG_SETTINGS
+	select NET_MGMT
+	select NET_IPV4
+	select NET_DHCPV4
+	select NET_NATIVE_IPV4
+	select NET_NATIVE
+	select NET_TCP
+	select DNS_RESOLVER
+	select MDNS_RESOLVER
+	select MBEDTLS_PKCS5_C
+	select MBEDTLS_HKDF_C
+	select MBEDTLS_ECDSA_C
+	select PSA_CRYPTO_ENABLE_ALL
 endif # CHIP

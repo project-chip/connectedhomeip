@@ -45,7 +45,7 @@ namespace {
 class FabricAdmin final : public rpc::FabricAdmin, public IcdManager::Delegate
 {
 public:
-    void OnCheckInCompleted(const chip::app::ICDClientInfo & clientInfo) override
+    void OnCheckInCompleted(const app::ICDClientInfo & clientInfo) override
     {
         // Accessing mPendingCheckIn should only be done while holding ChipStackLock
         assertChipStackLockedByCurrentThread();
@@ -76,7 +76,7 @@ public:
         // addressed, we can implement what spec defines here.
         auto onDone    = [=](uint32_t promisedActiveDuration) { ActiveChanged(nodeId, promisedActiveDuration); };
         CHIP_ERROR err = StayActiveSender::SendStayActiveCommand(checkInData.mStayActiveDurationMs, clientInfo.peer_node,
-                                                                 chip::app::InteractionModelEngine::GetInstance(), onDone);
+                                                                 app::InteractionModelEngine::GetInstance(), onDone);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(NotSpecified, "Failed to send StayActive command %s", err.AsString());
@@ -86,21 +86,20 @@ public:
     pw::Status OpenCommissioningWindow(const chip_rpc_DeviceCommissioningWindowInfo & request,
                                        chip_rpc_OperationStatus & response) override
     {
-        NodeId nodeId                 = request.node_id;
-        uint32_t commissioningTimeout = request.commissioning_timeout;
-        uint32_t iterations           = request.iterations;
-        uint32_t discriminator        = request.discriminator;
+        NodeId nodeId                    = request.node_id;
+        uint32_t commissioningTimeoutSec = request.commissioning_timeout;
+        uint32_t iterations              = request.iterations;
+        uint16_t discriminator           = request.discriminator;
 
-        char saltHex[Crypto::kSpake2p_Max_PBKDF_Salt_Length * 2 + 1];
-        Encoding::BytesToHex(request.salt.bytes, request.salt.size, saltHex, sizeof(saltHex), Encoding::HexFlags::kNullTerminate);
+        // Log the request details for debugging
+        ChipLogProgress(NotSpecified,
+                        "Received OpenCommissioningWindow request: NodeId 0x%lx, Timeout: %u, Iterations: %u, Discriminator: %u",
+                        static_cast<unsigned long>(nodeId), commissioningTimeoutSec, iterations, discriminator);
 
-        char verifierHex[Crypto::kSpake2p_VerifierSerialized_Length * 2 + 1];
-        Encoding::BytesToHex(request.verifier.bytes, request.verifier.size, verifierHex, sizeof(verifierHex),
-                             Encoding::HexFlags::kNullTerminate);
-
-        ChipLogProgress(NotSpecified, "Received OpenCommissioningWindow request: 0x%lx", nodeId);
-
-        DeviceMgr().OpenDeviceCommissioningWindow(nodeId, commissioningTimeout, iterations, discriminator, saltHex, verifierHex);
+        // Open the device commissioning window using raw binary data for salt and verifier
+        DeviceMgr().OpenDeviceCommissioningWindow(nodeId, commissioningTimeoutSec, iterations, discriminator,
+                                                  ByteSpan(request.salt.bytes, request.salt.size),
+                                                  ByteSpan(request.verifier.bytes, request.verifier.size));
 
         response.success = true;
 
@@ -157,7 +156,7 @@ public:
         KeepActiveWorkData * data =
             Platform::New<KeepActiveWorkData>(this, request.node_id, request.stay_active_duration_ms, request.timeout_ms);
         VerifyOrReturnValue(data, pw::Status::Internal());
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
+        DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
         return pw::OkStatus();
     }
 
@@ -195,7 +194,7 @@ private:
         {}
 
         FabricAdmin * mFabricAdmin;
-        chip::NodeId mNodeId;
+        NodeId mNodeId;
         uint32_t mStayActiveDurationMs;
         uint32_t mTimeoutMs;
     };
@@ -204,7 +203,7 @@ private:
     {
         KeepActiveWorkData * data = reinterpret_cast<KeepActiveWorkData *>(arg);
         data->mFabricAdmin->ScheduleSendingKeepActiveOnCheckIn(data->mNodeId, data->mStayActiveDurationMs, data->mTimeoutMs);
-        chip::Platform::Delete(data);
+        Platform::Delete(data);
     }
 
     // Modifications to mPendingCheckIn should be done on the MatterEventLoop thread
