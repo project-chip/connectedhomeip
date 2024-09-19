@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "app/EventPathParams.h"
 #include "lib/core/CHIPError.h"
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVWriter.h>
@@ -56,6 +57,16 @@ public:
     // During the transition phase, we expect a large subset of code to require access to
     // event emitting, path marking and other operations
     virtual InteractionModelContext CurrentContext() const { return mContext; }
+
+
+    /// Validates that the given event path is supported, where path may contain wildcards.
+    ///
+    /// If any wild cards exist on the given path, the implementation is expected to validate
+    /// that a valid event path exists on some wildcard expansion.
+    ///
+    /// At the very minimum this will validate that a valid endpoint/cluster can be expanded
+    /// from the input path.
+    virtual bool EventPathSupported(const EventPathParams &path) = 0;
 
     /// TEMPORARY/TRANSITIONAL requirement for transitioning from ember-specific code
     ///   ReadAttribute is REQUIRED to perform:
