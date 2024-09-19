@@ -21,7 +21,7 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <ifstream>
+#include <fstream>
 #include <json/json.h>
 
 using namespace chip::Crypto;
