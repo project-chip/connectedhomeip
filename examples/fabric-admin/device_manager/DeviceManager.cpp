@@ -150,7 +150,7 @@ void DeviceManager::OpenRemoteDeviceCommissioningWindow(EndpointId remoteEndpoin
     }
 }
 
-void DeviceManager::PairRemoteFabricBridge(chip::NodeId nodeId, uint32_t setupPINCode, const char * deviceRemoteIp,
+void DeviceManager::PairRemoteFabricBridge(NodeId nodeId, uint32_t setupPINCode, const char * deviceRemoteIp,
                                            uint16_t deviceRemotePort)
 {
     StringBuilder<kMaxCommandSize> commandBuilder;
@@ -240,7 +240,7 @@ void DeviceManager::ReadSupportedDeviceCategories()
     PushCommand(commandBuilder.c_str());
 }
 
-void DeviceManager::HandleReadSupportedDeviceCategories(chip::TLV::TLVReader & data)
+void DeviceManager::HandleReadSupportedDeviceCategories(TLV::TLVReader & data)
 {
     ChipLogProgress(NotSpecified, "Attribute SupportedDeviceCategories detected.");
 
@@ -305,7 +305,7 @@ void DeviceManager::HandleCommissioningRequestResult(TLV::TLVReader & data)
     SendCommissionNodeRequest(value.requestID, kResponseTimeoutSeconds);
 }
 
-void DeviceManager::HandleAttributePartsListUpdate(chip::TLV::TLVReader & data)
+void DeviceManager::HandleAttributePartsListUpdate(TLV::TLVReader & data)
 {
     ChipLogProgress(NotSpecified, "Attribute PartsList change detected:");
 

@@ -45,7 +45,7 @@ namespace {
 class FabricAdmin final : public rpc::FabricAdmin, public IcdManager::Delegate
 {
 public:
-    void OnCheckInCompleted(const chip::app::ICDClientInfo & clientInfo) override
+    void OnCheckInCompleted(const app::ICDClientInfo & clientInfo) override
     {
         // Accessing mPendingCheckIn should only be done while holding ChipStackLock
         assertChipStackLockedByCurrentThread();
@@ -76,7 +76,7 @@ public:
         // addressed, we can implement what spec defines here.
         auto onDone    = [=](uint32_t promisedActiveDuration) { ActiveChanged(nodeId, promisedActiveDuration); };
         CHIP_ERROR err = StayActiveSender::SendStayActiveCommand(checkInData.mStayActiveDurationMs, clientInfo.peer_node,
-                                                                 chip::app::InteractionModelEngine::GetInstance(), onDone);
+                                                                 app::InteractionModelEngine::GetInstance(), onDone);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(NotSpecified, "Failed to send StayActive command %s", err.AsString());
@@ -156,7 +156,7 @@ public:
         KeepActiveWorkData * data =
             Platform::New<KeepActiveWorkData>(this, request.node_id, request.stay_active_duration_ms, request.timeout_ms);
         VerifyOrReturnValue(data, pw::Status::Internal());
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
+        DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
         return pw::OkStatus();
     }
 
@@ -194,7 +194,7 @@ private:
         {}
 
         FabricAdmin * mFabricAdmin;
-        chip::NodeId mNodeId;
+        NodeId mNodeId;
         uint32_t mStayActiveDurationMs;
         uint32_t mTimeoutMs;
     };
@@ -203,7 +203,7 @@ private:
     {
         KeepActiveWorkData * data = reinterpret_cast<KeepActiveWorkData *>(arg);
         data->mFabricAdmin->ScheduleSendingKeepActiveOnCheckIn(data->mNodeId, data->mStayActiveDurationMs, data->mTimeoutMs);
-        chip::Platform::Delete(data);
+        Platform::Delete(data);
     }
 
     // Modifications to mPendingCheckIn should be done on the MatterEventLoop thread
