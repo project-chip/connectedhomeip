@@ -23,6 +23,21 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceController_Concrete : MTRDeviceController
+
+/**
+ * Takes an assertion to keep the controller running. If `-[MTRDeviceController shutdown]` is called while an assertion
+ * is held, the shutdown will be honored only after all assertions are released. Invoking this method multiple times increases
+ * the number of assertions and needs to be matched with equal amount of '-[MTRDeviceController removeRunAssertion]` to release
+ * the assertion.
+ */
+- (void)addRunAssertion;
+
+/**
+ * Removes an assertion to allow the controller to shutdown once all assertions have been released.
+ * Invoking this method once all assertions have been released in a noop.
+ */
+- (void)removeRunAssertion;
+
 @end
 
 NS_ASSUME_NONNULL_END
