@@ -134,7 +134,7 @@ bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Span<const uint32_t> & 
         if (!GetInstance()->GetSupportedAreaById(selectedAreas[0], ignoredIndex, tempArea))
         {
             areaStatus = SelectAreasStatus::kUnsupportedArea;
-            CopyCharSpanToMutableCharSpan("unable to find selected area in supported areas"_span, statusText);
+            CopyCharSpanToMutableCharSpanWithTruncation("unable to find selected area in supported areas"_span, statusText);
             return false;
         }
 
@@ -145,14 +145,14 @@ bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Span<const uint32_t> & 
             if (!GetInstance()->GetSupportedAreaById(areaId, ignoredIndex, tempArea))
             {
                 areaStatus = SelectAreasStatus::kUnsupportedArea;
-                CopyCharSpanToMutableCharSpan("unable to find selected area in supported areas"_span, statusText);
+                CopyCharSpanToMutableCharSpanWithTruncation("unable to find selected area in supported areas"_span, statusText);
                 return false;
             }
 
             if (tempArea.mapID.Value() != mapId)
             {
                 areaStatus = SelectAreasStatus::kInvalidSet;
-                CopyCharSpanToMutableCharSpan("all selected areas must be in the same map"_span, statusText);
+                CopyCharSpanToMutableCharSpanWithTruncation("all selected areas must be in the same map"_span, statusText);
                 return false;
             }
         }

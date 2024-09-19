@@ -17,7 +17,10 @@
  */
 
 #include "DeviceSubscriptionManager.h"
+
+#if defined(PW_RPC_ENABLED)
 #include "rpc/RpcClient.h"
+#endif
 
 #include <app/InteractionModelEngine.h>
 #include <app/server/Server.h>

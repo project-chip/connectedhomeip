@@ -36,112 +36,32 @@ import asyncio
 import logging
 import os
 import random
-import subprocess
-import sys
 import tempfile
-import threading
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
+from chip.testing.tasks import Subprocess
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 
-async def wait_for_server_initialization(server_port, timeout=5):
-    """Wait until the server is ready by checking if it opens the expected port."""
-    start_time = asyncio.get_event_loop().time()
-    elapsed_time = 0
-    retry_interval = 1
-
-    logging.info(f"Waiting for server to initialize on TCP port {server_port} for up to {timeout} seconds.")
-
-    while elapsed_time < timeout:
-        try:
-            # Try connecting to the server to check if it's ready
-            reader, writer = await asyncio.open_connection('::1', server_port)
-            writer.close()
-            await writer.wait_closed()
-            logging.info(f"TH_SERVER_NO_UID is initialized and ready on port {server_port}.")
-            return
-        except (ConnectionRefusedError, OSError) as e:
-            logging.warning(f"Connection to port {server_port} failed: {e}. Retrying in {retry_interval} seconds...")
-
-        await asyncio.sleep(retry_interval)
-        elapsed_time = asyncio.get_event_loop().time() - start_time
-
-    raise TimeoutError(f"Server on port {server_port} did not initialize within {timeout} seconds. "
-                       f"Total time waited: {elapsed_time} seconds.")
-
-# TODO: Make this class more generic. Issue #35348
-
-
-class Subprocess(threading.Thread):
-
-    def __init__(self, args: list = [], stdout_cb=None, tag="", **kw):
-        super().__init__(**kw)
-        self.tag = f"[{tag}] " if tag else ""
-        self.stdout_cb = stdout_cb
-        self.args = args
-
-    def forward_f(self, f_in, f_out):
-        while True:
-            line = f_in.readline()
-            if not line:
-                break
-            f_out.write(f"{self.tag}{line}")
-            f_out.flush()
-            if self.stdout_cb is not None:
-                self.stdout_cb(line)
-
-    def run(self):
-        logging.info("RUN: %s", " ".join(self.args))
-        self.p = subprocess.Popen(self.args, errors="ignore", stdin=subprocess.PIPE,
-                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # Forward stdout and stderr with a tag attached.
-        forwarding_stdout_thread = threading.Thread(target=self.forward_f, args=[self.p.stdout, sys.stdout])
-        forwarding_stdout_thread.start()
-        forwarding_stderr_thread = threading.Thread(target=self.forward_f, args=[self.p.stderr, sys.stderr])
-        forwarding_stderr_thread.start()
-        # Wait for the process to finish.
-        self.p.wait()
-        forwarding_stdout_thread.join()
-        forwarding_stderr_thread.join()
-
-    def stop(self):
-        self.p.terminate()
-        self.join()
-
-
 class FabricSyncApp:
-
-    def _process_admin_output(self, line):
-        if self.wait_for_text_text is not None and self.wait_for_text_text in line:
-            self.wait_for_text_event.set()
-
-    def wait_for_text(self, timeout=30):
-        if not self.wait_for_text_event.wait(timeout=timeout):
-            raise Exception(f"Timeout waiting for text: {self.wait_for_text_text}")
-        self.wait_for_text_event.clear()
-        self.wait_for_text_text = None
 
     def __init__(self, fabric_sync_app_path, fabric_admin_app_path, fabric_bridge_app_path,
                  storage_dir, fabric_name=None, node_id=None, vendor_id=None,
                  paa_trust_store_path=None, bridge_port=None, bridge_discriminator=None,
                  bridge_passcode=None):
-
-        self.wait_for_text_event = threading.Event()
-        self.wait_for_text_text = None
-
-        args = [fabric_sync_app_path]
-        args.append(f"--app-admin={fabric_admin_app_path}")
-        args.append(f"--app-bridge={fabric_bridge_app_path}")
-        # Override default ports, so it will be possible to run
-        # our TH_FSA alongside the DUT_FSA during CI testing.
-        args.append("--app-admin-rpc-port=44000")
-        args.append("--app-bridge-rpc-port=44001")
-        # Keep the storage directory in a temporary location.
-        args.append(f"--storage-dir={storage_dir}")
+        args = [
+            f"--app-admin={fabric_admin_app_path}",
+            f"--app-bridge={fabric_bridge_app_path}",
+            # Override default ports, so it will be possible to run
+            # our TH_FSA alongside the DUT_FSA during CI testing.
+            "--app-admin-rpc-port=44000",
+            "--app-bridge-rpc-port=44001",
+            # Keep the storage directory in a temporary location.
+            f"--storage-dir={storage_dir}",
+        ]
         if paa_trust_store_path is not None:
             args.append(f"--paa-trust-store-path={paa_trust_store_path}")
         if fabric_name is not None:
@@ -153,39 +73,38 @@ class FabricSyncApp:
         args.append(f"--discriminator={bridge_discriminator}")
         args.append(f"--passcode={bridge_passcode}")
 
-        self.fabric_sync_app = Subprocess(args, stdout_cb=self._process_admin_output)
-        self.wait_for_text_text = "Successfully opened pairing window on the device"
-        self.fabric_sync_app.start()
+        self.fabric_sync_app = Subprocess(fabric_sync_app_path, *args)
 
-        # Wait for the fabric-sync-app to be ready.
-        self.wait_for_text()
+    def start(self):
+        # Start process and block until it prints the expected output.
+        self.fabric_sync_app.start(expected_output="Successfully opened pairing window on the device")
+
+    def terminate(self):
+        self.fabric_sync_app.terminate()
 
     def commission_on_network(self, node_id, setup_pin_code=None, filter_type=None, filter=None):
-        self.wait_for_text_text = f"Commissioning complete for node ID {node_id:#018x}: success"
-        # Send the commissioning command to the admin.
-        self.fabric_sync_app.p.stdin.write(f"pairing onnetwork {node_id} {setup_pin_code}\n")
-        self.fabric_sync_app.p.stdin.flush()
-        # Wait for success message.
-        self.wait_for_text()
-
-    def stop(self):
-        self.fabric_sync_app.stop()
+        self.fabric_sync_app.send(
+            f"pairing onnetwork {node_id} {setup_pin_code}",
+            expected_output=f"Commissioning complete for node ID {node_id:#018x}: success")
 
 
 class AppServer:
 
     def __init__(self, app, storage_dir, port=None, discriminator=None, passcode=None):
-
-        args = [app]
-        args.extend(["--KVS", tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")[1]])
+        args = [
+            "--KVS", tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")[1],
+        ]
         args.extend(['--secured-device-port', str(port)])
         args.extend(["--discriminator", str(discriminator)])
         args.extend(["--passcode", str(passcode)])
-        self.app = Subprocess(args, tag="SERVER")
-        self.app.start()
+        self.app = Subprocess(app, *args, prefix="[SERVER]")
 
-    def stop(self):
-        self.app.stop()
+    def start(self):
+        # Start process and block until it prints the expected output.
+        self.app.start(expected_output="Server initialization complete")
+
+    def terminate(self):
+        self.app.terminate()
 
 
 class TC_MCORE_FS_1_4(MatterBaseTest):
@@ -247,6 +166,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             bridge_discriminator=self.th_fsa_bridge_discriminator,
             bridge_passcode=self.th_fsa_bridge_passcode,
             vendor_id=0xFFF1)
+        self.th_fsa_controller.start()
 
         # Get the named pipe path for the DUT_FSA app input from the user params.
         dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe", None)
@@ -264,18 +184,13 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             port=self.th_server_port,
             discriminator=self.th_server_discriminator,
             passcode=self.th_server_passcode)
-
-        # Wait for TH_SERVER_NO_UID get initialized.
-        try:
-            asyncio.run(wait_for_server_initialization(self.th_server_port))
-        except TimeoutError:
-            asserts.fail(f"TH_SERVER_NO_UID server failed to open port {self.th_server_port}")
+        self.th_server.start()
 
     def teardown_class(self):
         if self.th_fsa_controller is not None:
-            self.th_fsa_controller.stop()
+            self.th_fsa_controller.terminate()
         if self.th_server is not None:
-            self.th_server.stop()
+            self.th_server.terminate()
         if self.storage is not None:
             self.storage.cleanup()
         super().teardown_class()
