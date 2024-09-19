@@ -1807,7 +1807,7 @@ JNI_METHOD(jobject, getNetworkLocation)(JNIEnv * env, jobject self, jlong handle
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     Transport::PeerAddress addr;
-    jobject networkLocation;
+    jobject networkLocation = nullptr;
     char addrStr[50];
 
     CHIP_ERROR err = wrapper->Controller()->GetPeerAddress(static_cast<chip::NodeId>(deviceId), addr);

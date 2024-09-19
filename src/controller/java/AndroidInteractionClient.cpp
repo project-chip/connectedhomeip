@@ -84,7 +84,7 @@ CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong dev
         for (size_t i = 0; i < numAttributePaths; i++)
         {
             jobject attributePathItem = nullptr;
-            SuccessOrExit(err = JniReferences::GetInstance().GetListItem(attributePathList, i, attributePathItem));
+            SuccessOrExit(err = JniReferences::GetInstance().GetListItem(attributePathList, static_cast<jint>(i), attributePathItem));
 
             EndpointId endpointId;
             ClusterId clusterId;
@@ -110,7 +110,7 @@ CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong dev
         for (size_t i = 0; i < numDataVersionFilters; i++)
         {
             jobject dataVersionFilterItem = nullptr;
-            SuccessOrExit(err = JniReferences::GetInstance().GetListItem(dataVersionFilterList, i, dataVersionFilterItem));
+            SuccessOrExit(err = JniReferences::GetInstance().GetListItem(dataVersionFilterList, static_cast<jint>(i), dataVersionFilterItem));
 
             EndpointId endpointId;
             ClusterId clusterId;
@@ -144,7 +144,7 @@ CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong dev
         for (size_t i = 0; i < numEventPaths; i++)
         {
             jobject eventPathItem = nullptr;
-            SuccessOrExit(err = JniReferences::GetInstance().GetListItem(eventPathList, i, eventPathItem));
+            SuccessOrExit(err = JniReferences::GetInstance().GetListItem(eventPathList, static_cast<jint>(i), eventPathItem));
 
             EndpointId endpointId;
             ClusterId clusterId;
@@ -899,7 +899,7 @@ CHIP_ERROR ParseEventPathList(jobject eventPathList, std::vector<app::EventPathP
 
     ReturnErrorOnFailure(JniReferences::GetInstance().GetListSize(eventPathList, listSize));
 
-    for (uint8_t i = 0; i < listSize; i++)
+    for (jint i = 0; i < listSize; i++)
     {
         jobject eventPathItem = nullptr;
         ReturnErrorOnFailure(JniReferences::GetInstance().GetListItem(eventPathList, i, eventPathItem));
@@ -957,7 +957,7 @@ CHIP_ERROR ParseDataVersionFilterList(jobject dataVersionFilterList, std::vector
 
     ReturnErrorOnFailure(JniReferences::GetInstance().GetListSize(dataVersionFilterList, listSize));
 
-    for (uint8_t i = 0; i < listSize; i++)
+    for (jint i = 0; i < listSize; i++)
     {
         jobject dataVersionFilterItem = nullptr;
         ReturnErrorOnFailure(JniReferences::GetInstance().GetListItem(dataVersionFilterList, i, dataVersionFilterItem));
