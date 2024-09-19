@@ -85,6 +85,15 @@ class ClangTidyEntry:
         command_items = shlex.split(command)
         compiler = os.path.basename(command_items[0])
 
+        # Clang-tidy complains about "unused argument '-c'"
+        # We could disable that with something like
+        #
+        #    self.clang_arguments.append("-Wno-unused-command-line-argument")
+        #
+        # However that seems to potentially disable a lot, so for now just filter out the
+        # offending argument
+        command_items = [arg for arg in command_items if arg != '-c']
+
         # Allow gcc/g++ invocations to also be tidied - arguments should be
         # compatible and on darwin gcc/g++ is actually a symlink to clang
         if compiler in ['clang++', 'clang', 'gcc', 'g++']:
@@ -97,10 +106,6 @@ class ClangTidyEntry:
 
         if compiler in ['gcc', 'g++'] and gcc_sysroot:
             self.clang_arguments.insert(0, '--sysroot='+gcc_sysroot)
-
-        # Recent clang complains about "-c" not being used. Silence that
-        # This may silence more, howver generally tidy should still work.
-        self.clang_arguments.append("-Wno-unused-command-line-argument")
 
     @property
     def full_path(self):
