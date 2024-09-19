@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,8 @@ import xml.etree.ElementTree as ET
 import chip.clusters as Clusters
 from rich.console import Console
 
+from pics_generator_support import pics_xml_file_list_loader, map_cluster_name_to_pics_xml
+
 # Add the path to python_testing folder, in order to be able to import from matter_testing_support
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
@@ -40,52 +42,7 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
     console.print(f"Handling PICS for {clusterName}")
 
-    # Map clusters to common XML template if needed
-    if "ICDManagement" == clusterName:
-        picsFileName = "ICD Management"
-
-    elif "OTA Software Update Provider" in clusterName or \
-            "OTA Software Update Requestor" in clusterName:
-        picsFileName = "OTA Software Update"
-
-    elif "On/Off" == clusterName:
-        picsFileName = clusterName.replace("/", "-")
-
-    elif "GroupKeyManagement" == clusterName:
-        picsFileName = "Group Communication"
-
-    elif "Wake on LAN" == clusterName or \
-         "Low Power" == clusterName or \
-         "Keypad Input" == clusterName or \
-         "Audio Output" == clusterName or \
-         "Media Input" == clusterName or \
-         "Target Navigator" == clusterName or \
-         "Content Control" == clusterName or \
-         "Channel" == clusterName or \
-         "Media Playback" == clusterName or \
-         "Account Login" == clusterName or \
-         "Application Basic" == clusterName or \
-         "Content Launcher" == clusterName or \
-         "Content App Observer" == clusterName or \
-         "Application Launcher" == clusterName:
-
-        picsFileName = "Media Cluster"
-
-    elif "Operational Credentials" == clusterName:
-        picsFileName = "Node Operational Credentials"
-
-    # Workaround for naming colisions with current logic
-    elif "Thermostat" == clusterName:
-        picsFileName = "Thermostat Cluster"
-
-    elif "Boolean State" == clusterName:
-        picsFileName = "Boolean State Cluster"
-
-    elif "AccessControl" in clusterName:
-        picsFileName = "Access Control Cluster"
-
-    else:
-        picsFileName = clusterName
+    picsFileName = map_cluster_name_to_pics_xml(clusterName, xmlFileList)
 
     # Determine if file has already been handled and use this file
     for outputFolderFileName in os.listdir(outputPathStr):
@@ -435,9 +392,7 @@ rootNodeEndpointID = 0
 
 # Load PICS XML templates
 print("Capture list of PICS XML templates")
-xmlFileList = os.listdir(xmlTemplatePathStr)
-for PICSXmlFile in xmlFileList:
-    print(f"{xmlTemplatePathStr}/{PICSXmlFile}")
+xmlFileList = pics_xml_file_list_loader(xmlTemplatePathStr, True)
 
 # Setup output path
 print(f"Output path: {outputPathStr}")
