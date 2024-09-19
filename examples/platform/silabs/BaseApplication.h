@@ -65,9 +65,12 @@
 
 class BaseApplicationDelegate : public AppDelegate, public chip::FabricTable::Delegate
 {
+public:
+    bool isCommissioningInProgress() { return isComissioningStarted; }
+
 private:
     // AppDelegate
-    bool isComissioningStarted;
+    bool isComissioningStarted = false;
     void OnCommissioningSessionStarted() override;
     void OnCommissioningSessionStopped() override;
     void OnCommissioningWindowClosed() override;
@@ -132,7 +135,7 @@ public:
      */
     static SilabsLCD & GetLCD(void);
 
-    static void UpdateLCDStatusScreen(void);
+    static void UpdateLCDStatusScreen(bool withChipStackLock = true);
 #endif
 
     /**
@@ -263,4 +266,7 @@ protected:
      * Protected Attributes declaration
      *********************************************************/
     bool mSyncClusterToButtonAction;
+
+private:
+    static void InitOTARequestorHandler(chip::System::Layer * systemLayer, void * appState);
 };

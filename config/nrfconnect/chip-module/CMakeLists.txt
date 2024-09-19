@@ -106,6 +106,13 @@ endif()
 
 get_property(CHIP_COMPILER_LAUNCHER GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
 
+
+if (CONFIG_USE_CHIP_DATA_MODEL_INTERFACE)
+    set(DATA_MODEL_INTERFACE "enabled")
+else()
+    set(DATA_MODEL_INTERFACE "disabled")
+endif()
+
 # ==============================================================================
 # Generate configuration for CHIP GN build system
 # ==============================================================================
@@ -116,6 +123,7 @@ matter_common_gn_args(
     LIB_TESTS       CONFIG_CHIP_BUILD_TESTS
     PROJECT_CONFIG  ${CONFIG_CHIP_PROJECT_CONFIG}
     DEVICE_INFO_EXAMPLE_PROVIDER CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+    DATA_MODEL_INTERFACE ${DATA_MODEL_INTERFACE}
 )
 matter_add_gn_arg_string("zephyr_ar"                              ${CMAKE_AR})
 matter_add_gn_arg_string("zephyr_cc"                              ${CMAKE_C_COMPILER})
@@ -147,6 +155,8 @@ if (CONFIG_CHIP_ENABLE_ICD_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_lit"                       CONFIG_CHIP_ICD_LIT_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_checkin"                   CONFIG_CHIP_ICD_CHECK_IN_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_user_active_mode_trigger"  CONFIG_CHIP_ICD_UAT_SUPPORT)
+    matter_add_gn_arg_bool  ("chip_enable_icd_dsls"                      CONFIG_CHIP_ICD_DSLS_SUPPORT)
+    matter_add_gn_arg_bool  ("icd_enforce_sit_slow_poll_limit"           TRUE)
 endif()
 
 if (CONFIG_CHIP_FACTORY_DATA OR CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
@@ -200,7 +210,6 @@ matter_generate_args_tmp_file()
 # ==============================================================================
 
 matter_build(chip
-    LIB_SHELL   ${CONFIG_CHIP_LIB_SHELL}
     LIB_TESTS   ${CONFIG_CHIP_BUILD_TESTS}
     DEVICE_INFO_EXAMPLE_PROVIDER ${CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER}
     GN_DEPENDENCIES kernel
@@ -222,6 +231,16 @@ if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)
         -Wl,--wrap=_calloc_r
         -Wl,--wrap=_realloc_r
         -Wl,--wrap=_free_r
+    )
+endif()
+
+if (CONFIG_CHIP_LIB_SHELL)
+    # Force pulling chip::Shell::Engine::RunMainLoop() in the final binary.
+    # Without this workaround, the linker script does not process the shell and
+    # init objects defined in MainLoopZephyr.cpp unless the Matter library or
+    # the Matter shell library is linked using the '--whole-archive' flag.
+    target_link_options(chip INTERFACE
+        -Wl,-u,_ZN4chip5Shell6Engine11RunMainLoopEv
     )
 endif()
 

@@ -770,24 +770,6 @@
               "isIncoming": 0,
               "isEnabled": 1
             }
-          ],
-          "attributes": [
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x0001",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
           ]
         },
         {
@@ -3253,6 +3235,14 @@
               "isEnabled": 1
             },
             {
+              "name": "GlobalEchoResponse",
+              "code": 14,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
               "name": "TestNullableOptionalRequest",
               "code": 15,
               "mfgCode": null,
@@ -3311,6 +3301,14 @@
             {
               "name": "TestSecondBatchHelperRequest",
               "code": 23,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "GlobalEchoRequest",
+              "code": 25,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
@@ -4087,6 +4085,38 @@
               "reportableChange": 0
             },
             {
+              "name": "global_enum",
+              "code": 51,
+              "mfgCode": null,
+              "side": "server",
+              "type": "TestGlobalEnum",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "global_struct",
+              "code": 52,
+              "mfgCode": null,
+              "side": "server",
+              "type": "TestGlobalStruct",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "nullable_boolean",
               "code": 16384,
               "mfgCode": null,
@@ -4625,6 +4655,38 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "nullable_global_enum",
+              "code": 16435,
+              "mfgCode": null,
+              "side": "server",
+              "type": "TestGlobalEnum",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "nullable_global_struct",
+              "code": 16436,
+              "mfgCode": null,
+              "side": "server",
+              "type": "TestGlobalStruct",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

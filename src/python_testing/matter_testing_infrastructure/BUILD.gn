@@ -1,0 +1,41 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/python.gni")
+
+# Python package for CHIP testing support.
+pw_python_package("chip-testing") {
+  setup = [
+    "setup.py",
+    "setup.cfg",
+    "pyproject.toml",
+  ]
+
+  inputs = [ "env_test.yaml" ]
+
+  sources = [
+    "chip/testing/__init__.py",
+    "chip/testing/metadata.py",
+    "chip/testing/tasks.py",
+  ]
+
+  tests = [
+    "chip/testing/test_metadata.py",
+    "chip/testing/test_tasks.py",
+  ]
+}

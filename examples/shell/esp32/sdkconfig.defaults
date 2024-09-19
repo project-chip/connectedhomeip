@@ -41,3 +41,6 @@ CONFIG_ENABLE_CHIP_SHELL=y
 
 # Enable HKDF in mbedtls
 CONFIG_MBEDTLS_HKDF_C=y
+
+# Disable CHIP data model
+CONFIG_ENABLE_CHIP_DATA_MODEL=n

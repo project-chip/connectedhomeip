@@ -37,52 +37,70 @@ The example supports:
 
 For Matter over Thread configuration :
 
--   [`NXP RD-RW612-BGA`] board
--   BLE/15.4 antenna (to plug in Ant1)
+-   For [`NXP RD-RW612-BGA`] board: BLE/15.4 antenna (to plug in Ant1)
+-   For [`NXP FRDM-RW612`] board: no external antenna needed (embedded PCB
+    antenna)
 
 For Matter over WiFi configuration :
 
--   [`NXP RD-RW612-BGA`] or [`NXP RD-RW610-BGA`] board
--   BLE antenna (to plug in Ant1)
--   Wi-Fi antenna (to plug in Ant2)
+-   For [`NXP RD-RW612-BGA`] or [`NXP RD-RW610-BGA`] board: BLE antenna (to plug
+    in Ant1) + Wi-Fi antenna (to plug in Ant2)
+-   For [`NXP FRDM-RW612`] board: no external antenna needed (embedded PCB
+    antenna)
 
 For Matter over Wi-Fi with OpenThread Border Router :
 
--   [`NXP RD-RW612-BGA`] board
--   BLE/15.4 antenna (to plug in Ant1)
--   Wi-Fi antenna (to plug in Ant2)
+-   For [`NXP RD-RW612-BGA`] board: BLE/15.4 antenna (to plug in Ant1) + Wi-Fi
+    antenna (to plug in Ant2)
+-   For [`NXP FRDM-RW612`] board: no external antenna needed (embedded PCB
+    antenna)
 
 <a name="building"></a>
 
 ## Building
 
 In order to build the Project CHIP example, we recommend using a Linux
-distribution (the demo-application was compiled on Ubuntu 20.04).
+distribution (supported Operating Systems are listed in
+[BUILDING.md](../../../../../docs/guides/BUILDING.md#prerequisites)).
 
--   Follow instruction in [BUILDING.md](../../../../../docs/guides/BUILDING.md)
-    to setup the environment to be able to build Matter.
-
--   Download
-    [RD-RW612 SDK for Project CHIP](https://mcuxpresso.nxp.com/en/select).
-    Creating an nxp.com account is required before being able to download the
-    SDK. Once the account is created, login and follow the steps for downloading
-    SDK. The SDK Builder UI selection should be similar with the one from the
-    image below.
-
-    ![MCUXpresso SDK Download](../../../../platform/nxp/rt/rw61x/doc/images/mcux-sdk-download.PNG)
-
-    (Note: All SDK components should be selected. If size is an issue Azure RTOS
-    component can be omitted.)
-
-    Please refer to Matter release notes for getting the latest released SDK.
-
--   Start building the application.
+-   Make sure that below prerequisites are correctly installed (as described in
+    [BUILDING.md](../../../../../docs/guides/BUILDING.md#prerequisites)))
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_SDK_ROOT=/home/user/Desktop/SDK_RW612/
+sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
+     libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
+     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
+```
+
+-   Step 1: checkout NXP specific submodules only
+
+```
 user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
-user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/bootstrap.sh
-user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
+```
+
+-   Step 2: activate local environment
+
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/activate.sh
+```
+
+If the script says the environment is out of date, you can update it by running
+the following command:
+
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/bootstrap.sh
+```
+
+-   Step 3: Init NXP SDK(s)
+
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ third_party/nxp/nxp_matter_support/scripts/update_nxp_sdk.py --platform common
+```
+
+Note: By default update_nxp_sdk.py will try to initialize all NXP SDKs. Arg "--
+help" could be used to view all available options.
+
+```
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-clusters-app/nxp/rt/rw61x/
 ```
 
@@ -91,7 +109,7 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-clusters-app/nxp/rt/r
 -   Build Matter-over-Wifi configuration with BLE commissioning (ble-wifi) :
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ gn gen --args="chip_enable_wifi=true is_sdk_package=true" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ gn gen --args="chip_enable_wifi=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ ninja -C out/debug
 ```
 
@@ -100,7 +118,7 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x
 -   Build Matter-over-Thread configuration with BLE commissioning.
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ gn gen --args="chip_enable_openthread=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true is_sdk_package=true" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ gn gen --args="chip_enable_openthread=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ ninja -C out/debug
 ```
 
@@ -113,7 +131,7 @@ Thread network on the Border Router.
     (ble-wifi) :
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ gn gen --args="chip_enable_wifi=true chip_enable_openthread=true chip_enable_matter_cli=true is_sdk_package=true openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread-br\"" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ gn gen --args="chip_enable_wifi=true chip_enable_openthread=true chip_enable_matter_cli=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ ninja -C out/debug
 ```
 
@@ -128,12 +146,9 @@ Optional GN options that can be added when building an application:
     [matter CLI](README.md#testing-the-all-clusters-application-with-matter-cli-enabled),
     the argument `chip_enable_matter_cli=true` must be added to the _gn gen_
     command.
--   To switch the SDK type used, the argument `is_<sdk_type>=true` must be added
-    to the _gn gen_ command (with <sdk_type> being either sdk_package or
-    sdk_internal).
--   By default, the RW612 A1 board revision will be chosen. To switch to an A2
-    revision, the argument `board_version=\"A2\"` must be added to the _gn gen_
-    command.
+-   By default, the `NXP RD-RW612-BGA` board revision will be chosen. To switch
+    to `NXP FRDM-RW612` board revision, the argument `board_version=\"frdm\"`
+    must be added to the _gn gen_ command.
 -   To build the application in debug mode, the argument
     `is_debug=true optimize_debug=false` must be added to the _gn gen_ command.
 -   To build with the option to have Matter certificates/keys pre-loaded in a
@@ -215,9 +230,6 @@ Right click on the Project -> C/C++ Build-> Tool Chain Editor -> NXP MCU Tools -
 Right click on the Project -> Debug -> As->SEGGER JLink probes -> OK -> Select elf file
 ```
 
-(Note : if SDK package is used, a simpler way could be duplicating the debug
-configuration from the SDK Hello World example after importing it.)
-
 -   Debug using the newly created configuration file.
 
 <a name="testing-the-example"></a>
@@ -260,6 +272,10 @@ using the matter shell, follow instructions from
 
 In this configuration, the device can be commissioned over Wi-Fi with the
 'ble-wifi' pairing method.
+
+### NVM
+
+By default the file system used by the application is NVS.
 
 ### Testing the all-clusters application without Matter CLI:
 
@@ -319,8 +335,10 @@ Here are described steps to use the all-cluster-app with the Matter CLI enabled
 
 3. The All-cluster example uses UART2 (`FlexComm0`) to print logs while running
    the server. To view raw UART output, a pin should be plugged to an USB to
-   UART adapter (connector `HD2 pin 03`), then start a terminal emulator like
-   PuTTY and connect to the used COM port with the following UART settings:
+   UART adapter (connector `HD2 pin 03` for [`NXP RD-RW612-BGA`] board and
+   `J5 pin 4` (`mikroBUS`: TX) for [`NXP FRDM-RW612`] board), then start a
+   terminal emulator like PuTTY and connect to the used COM port with the
+   following UART settings:
 
     - Baud rate: 115200
     - 8 data bits

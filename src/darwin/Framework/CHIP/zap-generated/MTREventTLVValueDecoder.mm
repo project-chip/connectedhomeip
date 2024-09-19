@@ -70,33 +70,9 @@ static id _Nullable DecodeEventPayloadForOnOffCluster(EventId aEventId, TLV::TLV
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForOnOffSwitchConfigurationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::OnOffSwitchConfiguration;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
 static id _Nullable DecodeEventPayloadForLevelControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::LevelControl;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForBinaryInputBasicCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::BinaryInputBasic;
     switch (aEventId) {
     default: {
         break;
@@ -295,6 +271,56 @@ static id _Nullable DecodeEventPayloadForAccessControlCluster(EventId aEventId, 
                 memberValue.fabricIndex = [NSNumber numberWithUnsignedChar:cppValue.latestValue.Value().fabricIndex];
             }
             value.latestValue = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+            value.fabricIndex = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::FabricRestrictionReviewUpdate::Id: {
+        Events::FabricRestrictionReviewUpdate::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRAccessControlClusterFabricRestrictionReviewUpdateEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.token];
+            value.token = memberValue;
+        } while (0);
+        do {
+            NSString * _Nullable memberValue;
+            if (cppValue.instruction.HasValue()) {
+                memberValue = AsString(cppValue.instruction.Value());
+                if (memberValue == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.instruction = memberValue;
+        } while (0);
+        do {
+            NSString * _Nullable memberValue;
+            if (cppValue.ARLRequestFlowUrl.HasValue()) {
+                memberValue = AsString(cppValue.ARLRequestFlowUrl.Value());
+                if (memberValue == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.arlRequestFlowUrl = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;
@@ -1378,6 +1404,23 @@ static id _Nullable DecodeEventPayloadForBridgedDeviceBasicInformationCluster(Ev
             NSNumber * _Nonnull memberValue;
             memberValue = [NSNumber numberWithBool:cppValue.reachableNewValue];
             value.reachableNewValue = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::ActiveChanged::Id: {
+        Events::ActiveChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRBridgedDeviceBasicInformationClusterActiveChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.promisedActiveDuration];
+            value.promisedActiveDuration = memberValue;
         } while (0);
 
         return value;
@@ -2723,6 +2766,60 @@ static id _Nullable DecodeEventPayloadForWaterHeaterManagementCluster(EventId aE
 {
     using namespace Clusters::WaterHeaterManagement;
     switch (aEventId) {
+    case Events::BoostStarted::Id: {
+        Events::BoostStarted::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRWaterHeaterManagementClusterBoostStartedEvent new];
+
+        do {
+            MTRWaterHeaterManagementClusterWaterHeaterBoostInfoStruct * _Nonnull memberValue;
+            memberValue = [MTRWaterHeaterManagementClusterWaterHeaterBoostInfoStruct new];
+            memberValue.duration = [NSNumber numberWithUnsignedInt:cppValue.boostInfo.duration];
+            if (cppValue.boostInfo.oneShot.HasValue()) {
+                memberValue.oneShot = [NSNumber numberWithBool:cppValue.boostInfo.oneShot.Value()];
+            } else {
+                memberValue.oneShot = nil;
+            }
+            if (cppValue.boostInfo.emergencyBoost.HasValue()) {
+                memberValue.emergencyBoost = [NSNumber numberWithBool:cppValue.boostInfo.emergencyBoost.Value()];
+            } else {
+                memberValue.emergencyBoost = nil;
+            }
+            if (cppValue.boostInfo.temporarySetpoint.HasValue()) {
+                memberValue.temporarySetpoint = [NSNumber numberWithShort:cppValue.boostInfo.temporarySetpoint.Value()];
+            } else {
+                memberValue.temporarySetpoint = nil;
+            }
+            if (cppValue.boostInfo.targetPercentage.HasValue()) {
+                memberValue.targetPercentage = [NSNumber numberWithUnsignedChar:cppValue.boostInfo.targetPercentage.Value()];
+            } else {
+                memberValue.targetPercentage = nil;
+            }
+            if (cppValue.boostInfo.targetReheat.HasValue()) {
+                memberValue.targetReheat = [NSNumber numberWithUnsignedChar:cppValue.boostInfo.targetReheat.Value()];
+            } else {
+                memberValue.targetReheat = nil;
+            }
+            value.boostInfo = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::BoostEnded::Id: {
+        Events::BoostEnded::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRWaterHeaterManagementClusterBoostEndedEvent new];
+
+        return value;
+    }
     default: {
         break;
     }
@@ -3614,18 +3711,6 @@ static id _Nullable DecodeEventPayloadForWindowCoveringCluster(EventId aEventId,
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForBarrierControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::BarrierControl;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
 static id _Nullable DecodeEventPayloadForServiceAreaCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ServiceArea;
@@ -3961,6 +4046,23 @@ static id _Nullable DecodeEventPayloadForOccupancySensingCluster(EventId aEventI
 {
     using namespace Clusters::OccupancySensing;
     switch (aEventId) {
+    case Events::OccupancyChanged::Id: {
+        Events::OccupancyChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTROccupancySensingClusterOccupancyChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.occupancy.Raw()];
+            value.occupancy = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         break;
     }
@@ -4441,6 +4543,18 @@ static id _Nullable DecodeEventPayloadForContentAppObserverCluster(EventId aEven
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForEcosystemInformationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::EcosystemInformation;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForCommissionerControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::CommissionerControl;
@@ -4456,13 +4570,13 @@ static id _Nullable DecodeEventPayloadForCommissionerControlCluster(EventId aEve
 
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.requestId];
-            value.requestId = memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.requestID];
+            value.requestID = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.clientNodeId];
-            value.clientNodeId = memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.clientNodeID];
+            value.clientNodeID = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;
@@ -4477,18 +4591,6 @@ static id _Nullable DecodeEventPayloadForCommissionerControlCluster(EventId aEve
 
         return value;
     }
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForElectricalMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::ElectricalMeasurement;
-    switch (aEventId) {
     default: {
         break;
     }
@@ -4541,6 +4643,11 @@ static id _Nullable DecodeEventPayloadForUnitTestingCluster(EventId aEventId, TL
             memberValue.f = [NSNumber numberWithUnsignedChar:cppValue.arg4.f.Raw()];
             memberValue.g = [NSNumber numberWithFloat:cppValue.arg4.g];
             memberValue.h = [NSNumber numberWithDouble:cppValue.arg4.h];
+            if (cppValue.arg4.i.HasValue()) {
+                memberValue.i = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.arg4.i.Value())];
+            } else {
+                memberValue.i = nil;
+            }
             value.arg4 = memberValue;
         } while (0);
         do {
@@ -4565,6 +4672,11 @@ static id _Nullable DecodeEventPayloadForUnitTestingCluster(EventId aEventId, TL
                     newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
                     newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
                     newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
+                    if (entry_0.i.HasValue()) {
+                        newElement_0.i = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.i.Value())];
+                    } else {
+                        newElement_0.i = nil;
+                    }
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -4688,14 +4800,8 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::OnOff::Id: {
         return DecodeEventPayloadForOnOffCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::OnOffSwitchConfiguration::Id: {
-        return DecodeEventPayloadForOnOffSwitchConfigurationCluster(aPath.mEventId, aReader, aError);
-    }
     case Clusters::LevelControl::Id: {
         return DecodeEventPayloadForLevelControlCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::BinaryInputBasic::Id: {
-        return DecodeEventPayloadForBinaryInputBasicCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::PulseWidthModulation::Id: {
         return DecodeEventPayloadForPulseWidthModulationCluster(aPath.mEventId, aReader, aError);
@@ -4907,9 +5013,6 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::WindowCovering::Id: {
         return DecodeEventPayloadForWindowCoveringCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::BarrierControl::Id: {
-        return DecodeEventPayloadForBarrierControlCluster(aPath.mEventId, aReader, aError);
-    }
     case Clusters::ServiceArea::Id: {
         return DecodeEventPayloadForServiceAreaCluster(aPath.mEventId, aReader, aError);
     }
@@ -5030,11 +5133,11 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::ContentAppObserver::Id: {
         return DecodeEventPayloadForContentAppObserverCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::EcosystemInformation::Id: {
+        return DecodeEventPayloadForEcosystemInformationCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::CommissionerControl::Id: {
         return DecodeEventPayloadForCommissionerControlCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::ElectricalMeasurement::Id: {
-        return DecodeEventPayloadForElectricalMeasurementCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::UnitTesting::Id: {
         return DecodeEventPayloadForUnitTestingCluster(aPath.mEventId, aReader, aError);

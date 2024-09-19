@@ -39,12 +39,11 @@ OUTPUT_ROOT="$CHIP_ROOT/out/python_lib"
 ENVIRONMENT_ROOT="$CHIP_ROOT/out/python_env"
 
 declare chip_detail_logging=false
-declare enable_pybindings=false
 declare chip_mdns
 
 help() {
 
-    echo "Usage: $file_name [ options ... ] [ -chip_detail_logging ChipDetailLoggingValue  ] [ -chip_mdns ChipMDNSValue  ] [-enable_pybindings EnableValue]"
+    echo "Usage: $file_name [ options ... ] [ -chip_detail_logging ChipDetailLoggingValue  ] [ -chip_mdns ChipMDNSValue  ]"
 
     echo "General Options:
   -h, --help                Display this information.
@@ -53,7 +52,6 @@ Input Options:
                                                             By default it is false.
   -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
                                                             By default it is minimal.
-  -p, --enable_pybindings   EnableValue                     Specify whether to enable pybindings as python controller.
 "
 }
 
@@ -73,10 +71,6 @@ while (($#)); do
             chip_mdns=$2
             shift
             ;;
-        --enable_pybindings | -p)
-            enable_pybindings=$2
-            shift
-            ;;
         -*)
             help
             echo "Unknown Option \"$1\""
@@ -87,7 +81,7 @@ while (($#)); do
 done
 
 # Print input values
-echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", enable_pybindings = $enable_pybindings"
+echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\""
 
 # Ensure we have a compilation environment
 source "$CHIP_ROOT/scripts/activate.sh"
@@ -97,30 +91,21 @@ source "$CHIP_ROOT/scripts/activate.sh"
 
 chip_data_model_arg="chip_data_model=\"///examples/lighting-app/lighting-common\""
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings $chip_mdns_arg chip_controller=false $chip_data_model_arg"
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging $chip_mdns_arg chip_controller=false $chip_data_model_arg"
 
 # Compiles python files
-# Check pybindings was requested
-if [ "$enable_pybindings" == true ]; then
-    ninja -v -C "$OUTPUT_ROOT" pycontroller
-else
-    ninja -v -C "$OUTPUT_ROOT" chip-core
-fi
+ninja -v -C "$OUTPUT_ROOT" chip-core
 
 # Create a virtual environment that has access to the built python tools
 virtualenv --clear "$ENVIRONMENT_ROOT"
 
 # Activate the new environment to register the python WHL
 
-if [ "$enable_pybindings" == true ]; then
-    WHEEL=("$OUTPUT_ROOT"/pybindings/pycontroller/pychip-*.whl)
-else
-    WHEEL=("$OUTPUT_ROOT"/controller/python/chip_core*.whl)
-fi
+WHEEL=("$OUTPUT_ROOT"/controller/python/chip_core*.whl)
 
 source "$ENVIRONMENT_ROOT"/bin/activate
-"$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
-"$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall --no-cache-dir "${WHEEL[@]}"
+"$ENVIRONMENT_ROOT"/bin/python -m ensurepip --upgrade
+"$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade --force-reinstall --no-cache-dir "${WHEEL[@]}"
 
 echo ""
 echo_green "Compilation completed and WHL package installed in: "

@@ -16,6 +16,7 @@ import logging
 import os
 import shlex
 from enum import Enum, auto
+from typing import Optional
 
 from .builder import Builder, BuilderOutput
 
@@ -151,7 +152,10 @@ class TelinkBuilder(Builder):
                  enable_rpcs: bool = False,
                  enable_factory_data: bool = False,
                  enable_4mb_flash: bool = False,
-                 mars_board_config: bool = False):
+                 mars_board_config: bool = False,
+                 usb_board_config: bool = False,
+                 use_data_model_interface: Optional[str] = None,
+                 ):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board
@@ -162,6 +166,8 @@ class TelinkBuilder(Builder):
         self.enable_factory_data = enable_factory_data
         self.enable_4mb_flash = enable_4mb_flash
         self.mars_board_config = mars_board_config
+        self.usb_board_config = usb_board_config
+        self.use_data_model_interface = use_data_model_interface
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -203,16 +209,22 @@ class TelinkBuilder(Builder):
         if self.mars_board_config:
             flags.append("-DTLNK_MARS_BOARD=y")
 
+        if self.usb_board_config:
+            flags.append("-DTLNK_USB_DONGLE=y")
+
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
+
+        if self.use_data_model_interface is not None:
+            value = 'y' if self.use_data_model_interface else 'n'
+            flags.append(f"-DCONFIG_USE_CHIP_DATA_MODEL_INTERFACE={value}")
 
         build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
         cmd = self.get_cmd_prefixes()
-        cmd += '''
-source "$ZEPHYR_BASE/zephyr-env.sh";
-west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}
-        '''.format(
+        cmd += '\nsource "$ZEPHYR_BASE/zephyr-env.sh";'
+
+        cmd += '\nwest build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}\n'.format(
             outdir=shlex.quote(self.output_dir),
             board=self.board.GnArgName(),
             sourcedir=shlex.quote(os.path.join(self.root, 'examples', self.app.ExampleName(), 'telink')),

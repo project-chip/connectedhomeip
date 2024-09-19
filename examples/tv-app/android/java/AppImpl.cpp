@@ -417,7 +417,7 @@ void refreshConnectedClientsAcl(uint16_t vendorId, uint16_t productId, ContentAp
 
     for (const auto & allowedVendor : app->GetApplicationBasicDelegate()->GetAllowedVendorList())
     {
-        std::set<NodeId> tempNodeIds = ContentAppPlatform::GetInstance().GetNodeIdsForAllowVendorId(allowedVendor);
+        std::set<NodeId> tempNodeIds = ContentAppPlatform::GetInstance().GetNodeIdsForAllowedVendorId(allowedVendor);
 
         nodeIds.insert(tempNodeIds.begin(), tempNodeIds.end());
     }
@@ -503,6 +503,18 @@ EndpointId ContentAppFactoryImpl::RemoveContentApp(EndpointId epId)
     return kInvalidEndpointId;
 }
 
+void ContentAppFactoryImpl::LogInstalledApps()
+{
+    for (auto & contentApp : mContentApps)
+    {
+        ChipLogProgress(DeviceLayer, "Content app vid=%d pid=%d id=%s is on ep=%d",
+                        contentApp->GetApplicationBasicDelegate()->HandleGetVendorId(),
+                        contentApp->GetApplicationBasicDelegate()->HandleGetProductId(),
+                        contentApp->GetApplicationBasicDelegate()->GetCatalogVendorApp()->GetApplicationId(),
+                        contentApp->GetEndpointId());
+    }
+}
+
 void ContentAppFactoryImpl::AddAdminVendorId(uint16_t vendorId)
 {
     mAdminVendorIds.push_back(vendorId);
@@ -572,7 +584,7 @@ CHIP_ERROR InitVideoPlayerPlatform(jobject contentAppEndpointManager)
     {
         ContentAppCommandDelegate * delegate =
             new ContentAppCommandDelegate(contentAppEndpointManager, contentAppClusters[i].clusterId);
-        chip::app::CommandHandlerInterfaceRegistry::RegisterCommandHandler(delegate);
+        app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(delegate);
         ChipLogProgress(AppServer, "Registered command handler delegate for cluster %d", contentAppClusters[i].clusterId);
     }
 

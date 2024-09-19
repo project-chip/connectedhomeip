@@ -60,6 +60,12 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
     } /* cluster revision */                                                                                                       \
     }
 
+// The attrMask must contain the relevant ATTRIBUTE_MASK_* bits from
+// attribute-metadata.h.  Specifically:
+//
+// * Writable attributes must have ATTRIBUTE_MASK_WRITABLE
+// * Nullable attributes (have X in the quality column in the spec) must have ATTRIBUTE_MASK_NULLABLE
+// * Attributes that have T in the Access column in the spec must have ATTRIBUTE_MASK_MUST_USE_TIMED_WRITE
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
     {                                                                                                                              \
         ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)               \
@@ -283,6 +289,27 @@ chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::Endp
 // NOTE: It is the application's responsibility to free the existing list that is being replaced if needed.
 //
 CHIP_ERROR emberAfSetDeviceTypeList(chip::EndpointId endpoint, chip::Span<const EmberAfDeviceType> deviceTypeList);
+
+/// Returns a change listener that uses the global InteractionModelEngine
+/// instance to report dirty paths
+chip::app::AttributesChangedListener * emberAfGlobalInteractionModelAttributesChangedListener();
+
+/// Mark the given attribute as having changed:
+///   - increases the cluster data version for the given cluster
+///   - uses `listener` to `MarkDirty` the given path. This is typically done to mark an
+///     attribute as dirty within the matter attribute reporting engine, so that subscriptions
+///     receive updated attribute values for a cluster.
+///
+/// This is a convenience function to make it clear when a `emberAfDataVersionStorage` increase
+/// and a `AttributesChangeListener::MarkDirty` always occur in lock-step.
+void emberAfAttributeChanged(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                             chip::app::AttributesChangedListener * listener);
+
+/// Mark attributes on the given endpoint as having changed.
+///
+/// Schedules reporting engine to consider the endpoint dirty, however does NOT increase/alter
+/// any cluster data versions.
+void emberAfEndpointChanged(chip::EndpointId endpoint, chip::app::AttributesChangedListener * listener);
 
 namespace chip {
 namespace app {

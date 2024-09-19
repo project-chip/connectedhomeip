@@ -42,7 +42,8 @@ public:
     enum class Mode
     {
         kModeLongPress,
-        kModeMultiPress
+        kModeMultiPress,
+        kModeMultiPressNonAs
     };
 
     using DoneCallback = std::function<void()>;
@@ -107,6 +108,18 @@ public:
         return *this;
     }
 
+    ButtonEventsSimulator & SetFeatureMap(uint32_t featureMap)
+    {
+        mFeatureMap = featureMap;
+        return *this;
+    }
+
+    ButtonEventsSimulator & SetMultiPressMax(uint8_t multiPressMax)
+    {
+        mMultiPressMax = multiPressMax;
+        return *this;
+    }
+
 private:
     enum class State
     {
@@ -118,6 +131,8 @@ private:
 
         kEmitStartOfMultiPress = 4,
         kEmitEndOfMultiPress   = 5,
+
+        kMultiPressButtonRelease = 6,
     };
 
     static void OnTimerDone(System::Layer * layer, void * appState);
@@ -131,9 +146,12 @@ private:
     System::Clock::Milliseconds32 mMultiPressPressedTimeMillis{};
     System::Clock::Milliseconds32 mMultiPressReleasedTimeMillis{};
     uint8_t mMultiPressNumPresses{ 1 };
+    uint8_t mMultiPressPressesDone{ 0 };
     uint8_t mIdleButtonId{ 0 };
     uint8_t mPressedButtonId{ 1 };
     EndpointId mEndpointId{ 1 };
+    uint32_t mFeatureMap{ 0 };
+    uint8_t mMultiPressMax{ 0 };
 
     Mode mMode{ Mode::kModeLongPress };
     State mState{ State::kIdle };

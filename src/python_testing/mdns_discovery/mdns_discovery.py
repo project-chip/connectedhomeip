@@ -17,6 +17,7 @@
 
 import asyncio
 import json
+import logging
 from dataclasses import asdict, dataclass
 from enum import Enum
 from time import sleep
@@ -28,6 +29,8 @@ from zeroconf._dns import DNSRecord
 from zeroconf._engine import AsyncListener
 from zeroconf._protocol.incoming import DNSIncoming
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconfServiceTypes
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -102,7 +105,7 @@ class MdnsDiscovery:
 
     DISCOVERY_TIMEOUT_SEC = 15
 
-    def __init__(self):
+    def __init__(self, verbose_logging: bool = False):
         """
         Initializes the MdnsDiscovery instance.
 
@@ -122,8 +125,14 @@ class MdnsDiscovery:
         # A list of service types
         self._service_types = []
 
+        # Filtering to apply for received data items
+        self._name_filter = None
+
         # An asyncio Event to signal when a service has been discovered
         self._event = asyncio.Event()
+
+        # Verbose logging
+        self._verbose_logging = verbose_logging
 
     # Public methods
     async def get_commissioner_service(self, log_output: bool = False,
@@ -139,6 +148,7 @@ class MdnsDiscovery:
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
         """
+        self._name_filter = None
         return await self._get_service(MdnsServiceType.COMMISSIONER, log_output, discovery_timeout_sec)
 
     async def get_commissionable_service(self, log_output: bool = False,
@@ -154,10 +164,14 @@ class MdnsDiscovery:
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
         """
+        self._name_filter = None
         return await self._get_service(MdnsServiceType.COMMISSIONABLE, log_output, discovery_timeout_sec)
 
-    async def get_operational_service(self, log_output: bool = False,
-                                      discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
+    async def get_operational_service(self,
+                                      node_id: Optional[int] = None,
+                                      compressed_fabric_id: Optional[int] = None,
+                                      discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
+                                      log_output: bool = False
                                       ) -> Optional[MdnsServiceInfo]:
         """
         Asynchronously discovers an operational mDNS service within the network.
@@ -165,10 +179,15 @@ class MdnsDiscovery:
         Args:
             log_output (bool): Logs the discovered services to the console. Defaults to False.
             discovery_timeout_sec (float): Defaults to 15 seconds.
+            node_id: the node id to create the service name from 
+            compressed_fabric_id: the fabric id to create the service name from 
 
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
         """
+        # Validation to ensure both or none of the parameters are provided
+
+        self._name_filter = f'{compressed_fabric_id:016x}-{node_id:016x}.{MdnsServiceType.OPERATIONAL.value}'.upper()
         return await self._get_service(MdnsServiceType.OPERATIONAL, log_output, discovery_timeout_sec)
 
     async def get_border_router_service(self, log_output: bool = False,
@@ -334,7 +353,7 @@ class MdnsDiscovery:
         if all_services:
             self._service_types = list(set(await AsyncZeroconfServiceTypes.async_find()))
 
-        print(f"\n\tBrowsing for MDNS service(s) of type: {self._service_types}\n")
+        logger.info(f"Browsing for MDNS service(s) of type: {self._service_types}")
 
         aiobrowser = AsyncServiceBrowser(zeroconf=self._zc,
                                          type_=self._service_types,
@@ -344,9 +363,7 @@ class MdnsDiscovery:
         try:
             await asyncio.wait_for(self._event.wait(), timeout=discovery_timeout_sec)
         except asyncio.TimeoutError:
-            for service_type in self._service_types:
-                self._discovered_services[service_type] = []
-            print(f"\n\tMDNS service discovery for {self._service_types} timed out after {discovery_timeout_sec} seconds.\n")
+            logger.error("MDNS service discovery timed out after %d seconds.", discovery_timeout_sec)
         finally:
             await aiobrowser.async_cancel()
 
@@ -375,13 +392,25 @@ class MdnsDiscovery:
         Returns:
             None: This method does not return any value.
         """
-        if state_change.value == ServiceStateChange.Added.value:
-            self._event.set()
-            asyncio.ensure_future(self._query_service_info(
-                zeroconf,
-                service_type,
-                name)
-            )
+        if self._verbose_logging:
+            logger.info("Service state change: %s on %s/%s", state_change, name, service_type)
+
+        if state_change.value == ServiceStateChange.Removed.value:
+            return
+
+        if self._name_filter is not None and name.upper() != self._name_filter:
+            if self._verbose_logging:
+                logger.info("   Name does NOT match %s", self._name_filter)
+            return
+
+        if self._verbose_logging:
+            logger.info("Received service data. Unlocking service information")
+
+        asyncio.ensure_future(self._query_service_info(
+            zeroconf,
+            service_type,
+            name)
+        )
 
     async def _query_service_info(self, zeroconf: Zeroconf, service_type: str, service_name: str) -> None:
         """
@@ -403,6 +432,9 @@ class MdnsDiscovery:
         service_info.async_clear_cache()
 
         if is_service_discovered:
+            if self._verbose_logging:
+                logger.warning("Service discovered for %s/%s.", service_name, service_type)
+
             mdns_service_info = self._to_mdns_service_info_class(service_info)
 
             if service_type not in self._discovered_services:
@@ -410,6 +442,10 @@ class MdnsDiscovery:
 
             if mdns_service_info is not None:
                 self._discovered_services[service_type].append(mdns_service_info)
+        elif self._verbose_logging:
+            logger.warning("Service information not found.")
+
+        self._event.set()
 
     def _to_mdns_service_info_class(self, service_info: AsyncServiceInfo) -> MdnsServiceInfo:
         """
@@ -461,23 +497,24 @@ class MdnsDiscovery:
                                     any. Returns None if no service of the specified type is discovered within
                                     the timeout period.
         """
-        mdns_service_info = None
         self._service_types = [service_type.value]
         await self._discover(discovery_timeout_sec, log_output)
 
-        if service_type.value in self._discovered_services:
-            if len(self._discovered_services[service_type.value]) > 0:
-                mdns_service_info = self._discovered_services[service_type.value][0]
+        if self._verbose_logging:
+            logger.info("Getting service from discovered services: %s", self._discovered_services)
 
-        return mdns_service_info
+        if service_type.value in self._discovered_services:
+            return self._discovered_services[service_type.value][0]
+        else:
+            return None
 
     def _log_output(self) -> str:
         """
-        Converts the discovered services to a JSON string and prints it.
+        Converts the discovered services to a JSON string and log it.
 
         The method is intended to be used for debugging or informational purposes, providing a clear and
         comprehensive view of all services discovered during the mDNS service discovery process.
         """
-        log_services = {key: [asdict(item) for item in value] for key, value in self._discovered_services.items()}
-        json_str = json.dumps(log_services, indent=4)
-        print(json_str)
+        converted_services = {key: [asdict(item) for item in value] for key, value in self._discovered_services.items()}
+        json_str = json.dumps(converted_services, indent=4)
+        logger.info("Discovery data:\n%s", json_str)

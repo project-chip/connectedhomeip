@@ -80,6 +80,11 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::SoftAP:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort, mRemoteAddr.interfaceId));
         break;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    case PairingMode::WiFiPAF:
+        err = Pair(remoteId, PeerAddress::WiFiPAF(remoteId));
+        break;
+#endif
     case PairingMode::AlreadyDiscovered:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort, mRemoteAddr.interfaceId));
         break;
@@ -464,7 +469,8 @@ void PairingCommand::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icd
                                sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
 
     app::ICDClientInfo clientInfo;
-    clientInfo.peer_node         = chip::ScopedNodeId(mICDCheckInNodeId.Value(), nodeId.GetFabricIndex());
+    clientInfo.check_in_node     = chip::ScopedNodeId(mICDCheckInNodeId.Value(), nodeId.GetFabricIndex());
+    clientInfo.peer_node         = nodeId;
     clientInfo.monitored_subject = mICDMonitoredSubject.Value();
     clientInfo.start_icd_counter = icdCounter;
 

@@ -551,6 +551,7 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
     FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
 
     EXPECT_EQ(fabricTable.FabricCount(), 0);
+    EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), kUndefinedFabricIndex);
 
     {
         FabricIndex nextFabricIndex = kUndefinedFabricIndex;
@@ -604,6 +605,7 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
             EXPECT_EQ(fabricTable.FetchPendingNonFabricAssociatedRootCert(fetchedSpan), CHIP_NO_ERROR);
             EXPECT_TRUE(fetchedSpan.data_equal(rcac));
         }
+        EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), kUndefinedFabricIndex);
 
         FabricIndex newFabricIndex = kUndefinedFabricIndex;
         bool keyIsExternallyOwned  = true;
@@ -614,6 +616,11 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
                   CHIP_NO_ERROR);
         EXPECT_EQ(newFabricIndex, 1);
         EXPECT_EQ(fabricTable.FabricCount(), 1);
+
+        // After adding the pending new fabric (equivalent of AddNOC processing), the new
+        // fabric must be pending.
+        EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), 1);
+
         {
             // No more pending root cert; it's associated with a fabric now.
             MutableByteSpan fetchedSpan{ rcacBuf };
@@ -661,6 +668,9 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
             EXPECT_EQ(nextFabricIndex, 2);
         }
 
+        // Fabric can't be pending anymore.
+        EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), kUndefinedFabricIndex);
+
         // Validate contents
         const auto * fabricInfo = fabricTable.FindFabricWithIndex(1);
         ASSERT_NE(fabricInfo, nullptr);
@@ -696,6 +706,7 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
                 {
                     EXPECT_EQ(iterFabricInfo.GetNodeId(), nodeId);
                     EXPECT_EQ(iterFabricInfo.GetFabricId(), fabricId);
+                    EXPECT_TRUE(iterFabricInfo.ShouldAdvertiseIdentity());
                     saw1 = true;
                 }
             }
@@ -732,12 +743,16 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
         }
 
         EXPECT_EQ(fabricTable.AddNewPendingTrustedRootCert(rcac), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), kUndefinedFabricIndex);
+
         FabricIndex newFabricIndex = kUndefinedFabricIndex;
 
         EXPECT_EQ(fabricTable.FabricCount(), 1);
         EXPECT_EQ(fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, kVendorId, &newFabricIndex), CHIP_NO_ERROR);
         EXPECT_EQ(fabricTable.FabricCount(), 2);
         EXPECT_EQ(newFabricIndex, 2);
+        EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), 2);
+
         // No storage yet
         EXPECT_EQ(storage.GetNumKeys(), numStorageAfterFirstAdd);
         // Next fabric index has not been updated yet.
@@ -803,12 +818,14 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
                 {
                     EXPECT_EQ(iterFabricInfo.GetNodeId(), 55u);
                     EXPECT_EQ(iterFabricInfo.GetFabricId(), 11u);
+                    EXPECT_TRUE(iterFabricInfo.ShouldAdvertiseIdentity());
                     saw1 = true;
                 }
                 if (iterFabricInfo.GetFabricIndex() == 2)
                 {
                     EXPECT_EQ(iterFabricInfo.GetNodeId(), 999u);
                     EXPECT_EQ(iterFabricInfo.GetFabricId(), 44u);
+                    EXPECT_TRUE(iterFabricInfo.ShouldAdvertiseIdentity());
                     saw2 = true;
                 }
             }
@@ -1090,7 +1107,9 @@ TEST_F(TestFabricTable, TestAddMultipleSameRootDifferentFabricId)
         EXPECT_EQ(fabricTable.FabricCount(), 0);
         EXPECT_EQ(fabricTable.AddNewPendingTrustedRootCert(rcac), CHIP_NO_ERROR);
         FabricIndex newFabricIndex = kUndefinedFabricIndex;
-        EXPECT_EQ(fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, kVendorId, &newFabricIndex), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, kVendorId, &newFabricIndex,
+                                                                         FabricTable::AdvertiseIdentity::No),
+                  CHIP_NO_ERROR);
         EXPECT_EQ(fabricTable.FabricCount(), 1);
         EXPECT_EQ(newFabricIndex, 1);
 
@@ -1104,6 +1123,23 @@ TEST_F(TestFabricTable, TestAddMultipleSameRootDifferentFabricId)
         EXPECT_EQ(fabricInfo->GetFabricId(), 1111u);
         EXPECT_EQ(fabricInfo->GetVendorId(), kVendorId);
         EXPECT_EQ(fabricInfo->GetFabricLabel().size(), 0u);
+        EXPECT_FALSE(fabricInfo->ShouldAdvertiseIdentity());
+
+        EXPECT_EQ(fabricTable.SetShouldAdvertiseIdentity(newFabricIndex, FabricTable::AdvertiseIdentity::Yes), CHIP_NO_ERROR);
+        EXPECT_TRUE(fabricInfo->ShouldAdvertiseIdentity());
+
+        // Check that for indices we don't have a fabric for, SetShouldAdvertiseIdentity fails.
+        EXPECT_EQ(fabricTable.SetShouldAdvertiseIdentity(kUndefinedFabricIndex, FabricTable::AdvertiseIdentity::No),
+                  CHIP_ERROR_INVALID_FABRIC_INDEX);
+        EXPECT_EQ(fabricTable.SetShouldAdvertiseIdentity(kUndefinedFabricIndex, FabricTable::AdvertiseIdentity::Yes),
+                  CHIP_ERROR_INVALID_FABRIC_INDEX);
+        EXPECT_EQ(fabricTable.SetShouldAdvertiseIdentity(2, FabricTable::AdvertiseIdentity::Yes), CHIP_ERROR_INVALID_FABRIC_INDEX);
+        EXPECT_EQ(fabricTable.SetShouldAdvertiseIdentity(2, FabricTable::AdvertiseIdentity::No), CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+        EXPECT_TRUE(fabricInfo->ShouldAdvertiseIdentity());
+
+        EXPECT_EQ(fabricTable.SetShouldAdvertiseIdentity(newFabricIndex, FabricTable::AdvertiseIdentity::No), CHIP_NO_ERROR);
+        EXPECT_FALSE(fabricInfo->ShouldAdvertiseIdentity());
     }
     size_t numStorageKeysAfterFirstAdd = storage.GetNumKeys();
     EXPECT_EQ(numStorageKeysAfterFirstAdd, 7u); // Metadata, index, 3 certs, 1 opkey, last known good time
@@ -1141,6 +1177,14 @@ TEST_F(TestFabricTable, TestAddMultipleSameRootDifferentFabricId)
         EXPECT_EQ(fabricInfo->GetFabricId(), 2222u);
         EXPECT_EQ(fabricInfo->GetVendorId(), kVendorId);
         EXPECT_EQ(fabricInfo->GetFabricLabel().size(), 0u);
+
+        EXPECT_TRUE(fabricInfo->ShouldAdvertiseIdentity());
+
+        EXPECT_EQ(fabricTable.SetShouldAdvertiseIdentity(newFabricIndex, FabricTable::AdvertiseIdentity::No), CHIP_NO_ERROR);
+        EXPECT_FALSE(fabricInfo->ShouldAdvertiseIdentity());
+
+        EXPECT_EQ(fabricTable.SetShouldAdvertiseIdentity(newFabricIndex, FabricTable::AdvertiseIdentity::Yes), CHIP_NO_ERROR);
+        EXPECT_TRUE(fabricInfo->ShouldAdvertiseIdentity());
     }
     size_t numStorageKeysAfterSecondAdd = storage.GetNumKeys();
     EXPECT_EQ(numStorageKeysAfterSecondAdd, (numStorageKeysAfterFirstAdd + 5)); // Add 3 certs, 1 metadata, 1 opkey
@@ -1897,6 +1941,8 @@ TEST_F(TestFabricTable, TestUpdateNocFailSafe)
         uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
 
+        EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), kUndefinedFabricIndex);
+
         // Make sure to tag fabric index to pending opkey: otherwise the UpdateNOC fails
         EXPECT_EQ(fabricTable.AllocatePendingOperationalKey(chip::MakeOptional(static_cast<FabricIndex>(1)), csrSpan),
                   CHIP_NO_ERROR);
@@ -1908,6 +1954,7 @@ TEST_F(TestFabricTable, TestUpdateNocFailSafe)
 
         EXPECT_EQ(fabricTable.FabricCount(), 1);
         EXPECT_EQ(fabricTable.UpdatePendingFabricWithOperationalKeystore(1, noc, ByteSpan{}), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), kUndefinedFabricIndex);
         EXPECT_EQ(fabricTable.FabricCount(), 1);
 
         // No storage yet
@@ -1936,6 +1983,7 @@ TEST_F(TestFabricTable, TestUpdateNocFailSafe)
         // Revert, should see Node ID 999 again
         fabricTable.RevertPendingFabricData();
         EXPECT_EQ(fabricTable.FabricCount(), 1);
+        EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), kUndefinedFabricIndex);
 
         EXPECT_EQ(storage.GetNumKeys(), numStorageAfterAdd);
 

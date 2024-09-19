@@ -15,11 +15,15 @@
 name: Build example - TI CC13XX_26XX
 
 on:
-    push:
-        branches-ignore:
-            - "dependabot/**"
-    pull_request:
-    merge_group:
+    workflow_dispatch:
+    # Temporarely disabled:
+    #    - TI CI runs out of disk space
+    #    - Image should be updated to an Ubuntu 24.04 or higher based one (move from :54 version)
+    # push:
+    #     branches-ignore:
+    #         - 'dependabot/**'
+    # pull_request:
+    # merge_group:
 
 concurrency:
     group:
@@ -41,7 +45,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-ti:54
+            image: ghcr.io/project-chip/chip-build-ti:77
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -101,7 +105,7 @@ jobs:
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x4_26x4 LP_EM_CC1354P10_6 lighting-app \
-                    out/artifacts/ti-cc13x4_26x4-lighting-mtd/chip-LP_EM_CC1354P10_6-lighting-example.out \
+                    out/artifacts/ti-cc13x4_26x4-lighting-ftd/chip-LP_EM_CC1354P10_6-lighting-example.out \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports

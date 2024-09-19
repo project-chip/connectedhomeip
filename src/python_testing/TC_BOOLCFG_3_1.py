@@ -15,6 +15,15 @@
 #    limitations under the License.
 #
 
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
 import logging
 from random import choice
 
@@ -36,7 +45,7 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
-            TestStep("2b", "Verify SENS feature is supported"),
+            TestStep("2b", "Verify SENSLVL feature is supported"),
             TestStep("2c", "Read AttributeList attribute"),
             TestStep(3, "Read SupportedSensitivityLevels attribute"),
             TestStep(4, "Read DefaultSensitivityLevel attribute, if supported"),
