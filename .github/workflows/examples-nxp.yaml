@@ -243,6 +243,7 @@ jobs:
                       --target nxp-rw61x-freertos-all-clusters-wifi \
                       --target nxp-rw61x-freertos-all-clusters-thread \
                       --target nxp-rw61x-freertos-all-clusters-thread-wifi \
+                      --target nxp-rw61x-freertos-all-clusters-wifi-ota-cmake \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
