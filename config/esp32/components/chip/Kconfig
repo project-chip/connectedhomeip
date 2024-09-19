@@ -768,6 +768,53 @@ menu "CHIP Device Layer"
             help
                 Set PHY address according your board schematic.
 
+        choice ETH_PHY_MODEL
+            prompt "Ethernet PHY Device"
+            default ETH_PHY_IP101
+            help
+                Select the Ethernet PHY device to use in the example.
+
+            config ETH_PHY_IP101
+                bool "IP101"
+                help
+                    IP101 is a single port 10/100 MII/RMII/TP/Fiber Fast Ethernet Transceiver.
+                    Goto http://www.icplus.com.tw/pp-IP101G.html for more information about it.
+
+            config ETH_PHY_RTL8201
+                bool "RTL8201/SR8201"
+                help
+                    RTL8201F/SR8201F is a single port 10/100Mb Ethernet Transceiver with auto MDIX.
+                    Goto http://www.corechip-sz.com/productsview.asp?id=22 for more information about it.
+
+            config ETH_PHY_LAN87XX
+                bool "LAN87xx"
+                help
+                    Below chips are supported:
+                    LAN8710A is a small footprint MII/RMII 10/100 Ethernet Transceiver with HP Auto-MDIX and
+                        flexPWR® Technology.
+                    LAN8720A is a small footprint RMII 10/100 Ethernet Transceiver with HP Auto-MDIX Support.
+                    LAN8740A/LAN8741A is a small footprint MII/RMII 10/100 Energy Efficient Ethernet Transceiver
+                        with HP Auto-MDIX and flexPWR® Technology.
+                    LAN8742A is a small footprint RMII 10/100 Ethernet Transceiver with HP Auto-MDIX and
+                        flexPWR® Technology.
+                    Goto https://www.microchip.com for more information about them.
+
+            config ETH_PHY_DP83848
+                bool "DP83848"
+                help
+                    DP83848 is a single port 10/100Mb/s Ethernet Physical Layer Transceiver.
+                    Goto http://www.ti.com/product/DP83848J for more information about it.
+
+            config ETH_PHY_KSZ80XX
+                bool "KSZ80xx"
+                help
+                    With the KSZ80xx series, Microchip offers single-chip 10BASE-T/100BASE-TX
+                    Ethernet Physical Layer Transceivers (PHY).
+                    The following chips are supported: KSZ8001, KSZ8021, KSZ8031, KSZ8041,
+                        KSZ8051, KSZ8061, KSZ8081, KSZ8091
+                    Goto https://www.microchip.com for more information about them.
+        endchoice # ETH_PHY_MODEL
+
     endmenu
 
     menu "Commissioning options"
