@@ -74,15 +74,16 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
     // But maybe we should try to separately extract a PeerAddress and data from
     // the incoming data?
 
+    // To avoid out-of-bounds access when acessing aData[1]
+    if (aSize < 2)
+    {
+        return 0;
+    }
+
     // dumping payload with fuzzed transport types
     constexpr uint8_t numberOfTypes     = static_cast<int>(Transport::Type::kLast) + 1;
     Transport::Type fuzzedTransportType = static_cast<Transport::Type>(aData[0] % numberOfTypes);
     Transport::PeerAddress peerAddr(fuzzedTransportType);
-
-    if (aSize < 1)
-    {
-        return 0;
-    }
 
     System::PacketBufferHandle buf =
         System::PacketBufferHandle::NewWithData(&aData[1], aSize - 1, /* aAdditionalSize = */ 0, /* aReservedSize = */ 0);
