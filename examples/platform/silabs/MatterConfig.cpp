@@ -332,5 +332,6 @@ extern "C" void vApplicationIdleHook(void)
 {
 #if (SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER)
     sl_si91x_invoke_btn_press_event();
+    sl_si91x_uart_power_requirement_handler();
 #endif
 }
