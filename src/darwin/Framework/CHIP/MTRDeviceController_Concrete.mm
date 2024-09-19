@@ -163,16 +163,16 @@ using namespace chip::Tracing::DarwinFramework;
     return controller;
 }
 
-- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
-                             queue:(dispatch_queue_t)queue
-                   storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
-              storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
-               otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
-          otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
-                  uniqueIdentifier:(NSUUID *)uniqueIdentifier
-    concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
-      storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
-                    startSuspended:(BOOL)startSuspended
+- (nullable instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
+                                   queue:(dispatch_queue_t)queue
+                         storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
+                    storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
+                     otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
+                otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
+                        uniqueIdentifier:(NSUUID *)uniqueIdentifier
+          concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
+            storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
+                          startSuspended:(BOOL)startSuspended
 {
     if (self = [super initForSubclasses:startSuspended]) {
         // Make sure our storage is all set up to work as early as possible,
