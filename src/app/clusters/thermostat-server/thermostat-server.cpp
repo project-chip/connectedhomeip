@@ -347,13 +347,14 @@ Status getSetpointLimits(EndpointId endpoint, SetpointLimits & setpointLimits)
  * @param deadband The deadband to preserve
  * @return Success if the deadband can be preserved, InvalidValue if it cannot
  */
-Status checkHeatingSetpointDeadband(bool autoSupported, int16_t newCoolingSetpoing, int16_t minHeatingSetpoint, int16_t deadband)
+Status checkHeatingSetpointDeadband(bool autoSupported, int16_t newCoolingSetpoint, int16_t minHeatingSetpoint, int16_t deadband)
 {
     if (!autoSupported)
     {
         return Status::Success;
     }
-    int16_t maxValidHeatingSetpoint = newCoolingSetpoing - deadband;
+    int16_t maxValidHeatingSetpoint = newCoolingSetpoint;
+    maxValidHeatingSetpoint -= deadband;
     if (maxValidHeatingSetpoint < minHeatingSetpoint)
     {
         // If we need to adjust the heating setpoint to preserve the deadband, it will go below the min heat setpoint
@@ -379,7 +380,8 @@ Status checkCoolingSetpointDeadband(bool autoSupported, int16_t newHeatingSetpoi
     {
         return Status::Success;
     }
-    int16_t minValidCoolingSetpoint = newHeatingSetpoint + deadband;
+    int16_t minValidCoolingSetpoint = newHeatingSetpoint;
+    minValidCoolingSetpoint += deadband;
     if (minValidCoolingSetpoint > maxCoolingSetpoint)
     {
         // If we need to adjust the cooling setpoint to preserve the deadband, it will go above the max cool setpoint
@@ -405,7 +407,8 @@ typedef Status (*setpointSetter)(EndpointId endpoint, int16_t value, MarkAttribu
 void ensureCoolingSetpointDeadband(EndpointId endpoint, int16_t currentCoolingSetpoint, int16_t newHeatingSetpoint,
                                    int16_t maxCoolingSetpoint, int16_t deadband, setpointSetter setter)
 {
-    int16_t minValidCoolingSetpoint = newHeatingSetpoint + deadband;
+    int16_t minValidCoolingSetpoint = newHeatingSetpoint;
+    minValidCoolingSetpoint += deadband;
     if (currentCoolingSetpoint >= minValidCoolingSetpoint)
     {
         // The current cooling setpoint doesn't violate the deadband
@@ -440,7 +443,8 @@ void ensureCoolingSetpointDeadband(EndpointId endpoint, int16_t currentCoolingSe
 void ensureHeatingSetpointDeadband(EndpointId endpoint, int16_t currentHeatingSetpoint, int16_t newCoolingSetpoint,
                                    int16_t minHeatingSetpoint, int16_t deadband, setpointSetter setter)
 {
-    int16_t maxValidHeatingSetpoint = newCoolingSetpoint - deadband;
+    int16_t maxValidHeatingSetpoint = newCoolingSetpoint;
+    maxValidHeatingSetpoint -= deadband;
     if (currentHeatingSetpoint <= maxValidHeatingSetpoint)
     {
         // The current cooling setpoint doesn't violate the deadband
