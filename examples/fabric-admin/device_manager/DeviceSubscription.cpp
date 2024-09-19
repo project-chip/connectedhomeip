@@ -85,7 +85,7 @@ void DeviceSubscription::OnAttributeData(const ConcreteDataAttributePath & path,
     }
     case Clusters::AdministratorCommissioning::Attributes::AdminVendorId::Id: {
 #if defined(PW_RPC_ENABLED)
-        chip::VendorId vendorId;
+        VendorId vendorId;
         CHIP_ERROR err                                                    = data->Get(vendorId);
         mCurrentAdministratorCommissioningAttributes.has_opener_vendor_id = err == CHIP_NO_ERROR;
         if (mCurrentAdministratorCommissioningAttributes.has_opener_vendor_id)
