@@ -24,4 +24,5 @@ FROM ghcr.io/project-chip/chip-build:${VERSION}
 
 COPY --from=build /opt/nxp/ /opt/nxp/
 
+ENV NXP_SDK_PATH=/opt/nxp
 ENV NXP_UPDATE_SDK_SCRIPT_DOCKER=/opt/nxp/nxp_matter_support/scripts/update_nxp_sdk.py
