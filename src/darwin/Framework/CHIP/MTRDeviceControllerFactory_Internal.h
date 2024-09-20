@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 MTR_DIRECT_MEMBERS
 @interface MTRDeviceControllerFactory ()
 
-- (void)controllerShuttingDown:(MTRDeviceController *)controller;
+- (void)controllerShuttingDown:(MTRDeviceController_Concrete *)controller;
 
 /**
  * Get the list of running controllers.  This will include controllers that are
