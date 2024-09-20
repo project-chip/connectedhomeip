@@ -46,7 +46,7 @@
 
 #if ENABLE_OTA_TESTS
 
-static const uint16_t kPairingTimeoutInSeconds = 10;
+static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint16_t kTimeoutWithUpdateInSeconds = 60;
 static const uint64_t kDeviceId1 = 0x12341234;

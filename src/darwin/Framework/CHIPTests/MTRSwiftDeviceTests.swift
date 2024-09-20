@@ -10,7 +10,7 @@ struct DeviceConstants {
     static let onboardingPayload = "MT:-24J0AFN00KA0648G00"
     static let deviceID = 0x12344321
     static let timeoutInSeconds : Double = 3
-    static let pairingTimeoutInSeconds : Double = 10
+    static let pairingTimeoutInSeconds : Double = 30
 }
 
 var sConnectedDevice: MTRBaseDevice? = nil

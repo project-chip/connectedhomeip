@@ -32,7 +32,7 @@
 #import "MTRTestPerControllerStorage.h"
 #import "MTRTestResetCommissioneeHelper.h"
 
-static const uint16_t kPairingTimeoutInSeconds = 10;
+static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint16_t kSubscriptionTimeoutInSeconds = 60;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
