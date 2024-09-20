@@ -403,8 +403,8 @@ This schema describes the format of the XML files, that describe the ZCL specifi
   <xs:element name="tag" type="tag"/>
   <xs:element name="domain">
     <xs:complexType>
-      <!-- TODO: Remove the mixed once all XML files properly use name instead
-      of putting the name in the content -->
+      <!-- TODO: Remove the string extension once all XML files properly use
+      name attribute instead of putting the name in the content -->
       <xs:complexContent>
         <xs:extension base="xs:string" >
           <xs:sequence>
