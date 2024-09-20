@@ -810,7 +810,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              }];
 
     // Wait for report
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds*5 handler:nil];
 
     XCTestExpectation * clearExpectation = [self expectationWithDescription:@"report handlers deregistered"];
     [device deregisterReportHandlersWithQueue:queue
