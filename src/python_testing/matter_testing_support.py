@@ -2392,3 +2392,11 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
 def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
     if not run_tests_no_exit(test_class, matter_test_config, hooks, default_controller, external_stack):
         sys.exit(1)
+
+
+def get_test_info_support(
+    test_class: MatterBaseTest, matter_test_config: MatterTestConfig
+) -> dict:
+    v = get_test_info(test_class, matter_test_config)
+
+    return json.loads(json.dumps(v, default=lambda o: o.__dict__))
