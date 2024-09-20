@@ -54,6 +54,23 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)startup:(MTRDeviceControllerStartupParamsInternal *)startupParams;
 
 /**
+ * Shut down the underlying C++ controller.  Must be called on the Matter work
+ * queue or after the Matter work queue has been shut down.
+ *
+ * Only MTRDeviceControllerFactory should be calling this.
+ */
+- (void)shutDownCppController;
+
+/**
+ * Notification that the MTRDeviceControllerFactory has finished shutting down
+ * this controller and will not be touching it anymore.  This is guaranteed to
+ * be called after initWithFactory succeeds.
+ *
+ * Only MTRDeviceControllerFactory should be calling this.
+ */
+- (void)deinitFromFactory;
+
+/**
  * Takes an assertion to keep the controller running. If `-[MTRDeviceController shutdown]` is called while an assertion
  * is held, the shutdown will be honored only after all assertions are released. Invoking this method multiple times increases
  * the number of assertions and needs to be matched with equal amount of '-[MTRDeviceController removeRunAssertion]` to release

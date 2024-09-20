@@ -906,7 +906,7 @@ MTR_DIRECT_MEMBERS
     app::DnssdServer::Instance().StartServer();
 }
 
-- (void)controllerShuttingDown:(MTRDeviceController *)controller
+- (void)controllerShuttingDown:(MTRDeviceController_Concrete *)controller
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
