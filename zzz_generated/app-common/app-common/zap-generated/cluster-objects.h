@@ -41643,6 +41643,133 @@ public:
 } // namespace CommissioningRequestResult
 } // namespace Events
 } // namespace CommissionerControl
+namespace MeterIdentification {
+
+namespace Attributes {
+
+namespace MeterType {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::MeterTypeEnum>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::MeterTypeEnum>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::MeterTypeEnum> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeterType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeterType
+namespace UtilityName {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UtilityName::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 16; }
+};
+} // namespace UtilityName
+namespace PointOfDelivery {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PointOfDelivery::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 16; }
+};
+} // namespace PointOfDelivery
+namespace PowerThreshold {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PowerThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PowerThreshold
+namespace PowerThresholdSource {
+struct TypeInfo
+{
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::PowerThresholdSourceEnum>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::PowerThresholdSourceEnum>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::PowerThresholdSourceEnum> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PowerThresholdSource::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PowerThresholdSource
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeterType::TypeInfo::DecodableType meterType;
+        Attributes::UtilityName::TypeInfo::DecodableType utilityName;
+        Attributes::PointOfDelivery::TypeInfo::DecodableType pointOfDelivery;
+        Attributes::PowerThreshold::TypeInfo::DecodableType powerThreshold;
+        Attributes::PowerThresholdSource::TypeInfo::DecodableType powerThresholdSource;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace MeterIdentification
 namespace UnitTesting {
 namespace Structs {
 namespace SimpleStruct {

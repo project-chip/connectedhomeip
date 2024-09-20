@@ -131,7 +131,6 @@ Generally regenerate using one of:
 |       1296 |      0x510 | ContentAppObserver                                      |
 |       1872 |      0x750 | EcosystemInformation                                    |
 |       1873 |      0x751 | CommissionerControl                                     |
-|       2820 |      0xB04 | ElectricalMeasurement                                   |
 |       2822 |      0xB06 | MeterIdentification                                     |
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |
 | 4294048774 | 0xFFF1FC06 | FaultInjection                                          |

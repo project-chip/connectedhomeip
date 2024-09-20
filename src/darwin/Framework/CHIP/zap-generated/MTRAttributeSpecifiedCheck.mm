@@ -5975,6 +5975,48 @@ static BOOL AttributeIsSpecifiedInCommissionerControlCluster(AttributeId aAttrib
     }
     }
 }
+static BOOL AttributeIsSpecifiedInMeterIdentificationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MeterIdentification;
+    switch (aAttributeId) {
+    case Attributes::MeterType::Id: {
+        return YES;
+    }
+    case Attributes::UtilityName::Id: {
+        return YES;
+    }
+    case Attributes::PointOfDelivery::Id: {
+        return YES;
+    }
+    case Attributes::PowerThreshold::Id: {
+        return YES;
+    }
+    case Attributes::PowerThresholdSource::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::UnitTesting;
@@ -6650,6 +6692,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::CommissionerControl::Id: {
         return AttributeIsSpecifiedInCommissionerControlCluster(aAttributeId);
+    }
+    case Clusters::MeterIdentification::Id: {
+        return AttributeIsSpecifiedInMeterIdentificationCluster(aAttributeId);
     }
     case Clusters::UnitTesting::Id: {
         return AttributeIsSpecifiedInUnitTestingCluster(aAttributeId);
