@@ -9,8 +9,6 @@ FROM ghcr.io/project-chip/chip-build-infineon:${VERSION} AS psoc6
 FROM ghcr.io/project-chip/chip-build-tizen:${VERSION} AS tizen
 FROM ghcr.io/project-chip/chip-build-crosscompile:${VERSION} AS crosscompile
 FROM ghcr.io/project-chip/chip-build-ameba:${VERSION} AS ameba
-FROM ghcr.io/project-chip/chip-build-k32w:${VERSION} AS k32w
-FROM ghcr.io/project-chip/chip-build-rw61x:${VERSION} AS rw61x
 FROM ghcr.io/project-chip/chip-build-nxp:${VERSION} AS nxp
 FROM ghcr.io/project-chip/chip-build-nxp-zephyr:${VERSION} AS nxpzephyr
 FROM ghcr.io/project-chip/chip-build-imx:${VERSION} AS imx
@@ -47,10 +45,6 @@ COPY --from=tizen /opt/tizen-sdk /opt/tizen-sdk
 COPY --from=crosscompile /opt/ubuntu-22.04.1-aarch64-sysroot /opt/ubuntu-22.04.1-aarch64-sysroot
 
 COPY --from=ameba /opt/ameba /opt/ameba
-
-COPY --from=k32w /opt/sdk /opt/k32w
-
-COPY --from=rw61x /opt/sdk /opt/nxp-sdk
 
 COPY --from=nxp /opt/nxp /opt/nxp
 
@@ -126,9 +120,6 @@ ENV IDF_TOOLS_PATH=/opt/espressif/tools
 ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/6.1-langdale
 ENV JAVA_PATH=/usr/lib/jvm/java-8-openjdk-amd64
 ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
-ENV NXP_K32W0_SDK_ROOT=/opt/k32w/core
-ENV NXP_K32W1_SDK_ROOT=/opt/k32w/k32w1
-ENV NXP_SDK_ROOT=/opt/nxp-sdk/rw61x
 ENV OPENOCD_PATH=/opt/openocd/
 ENV QEMU_ESP32=/opt/espressif/qemu/qemu-system-xtensa
 ENV QEMU_ESP32_DIR=/opt/espressif/qemu
@@ -142,6 +133,7 @@ ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 ENV ZEPHYR_NXP_BASE=/opt/nxp-zephyr/zephyrproject/zephyr
 ENV ZEPHYR_NXP_SDK_INSTALL_DIR=/opt/nxp-zephyr/zephyr-sdk-0.16.8
 ENV NXP_UPDATE_SDK_SCRIPT_DOCKER=/opt/nxp/nxp_matter_support/scripts/update_nxp_sdk.py
+ENV NXP_SDK_PATH=/opt/nxp
 
 # Places bootstrap files there instead of the default one which is `.environment`.
 # NOTE: This directory is NOT persistent.
