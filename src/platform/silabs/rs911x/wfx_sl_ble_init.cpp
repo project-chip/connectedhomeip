@@ -20,7 +20,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "wfx_sl_ble_init.h"
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/silabs/BLEManagerImpl.h>

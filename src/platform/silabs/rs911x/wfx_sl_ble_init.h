@@ -33,13 +33,6 @@
 #include <rsi_ble.h>
 #include <rsi_ble_apis.h>
 #include <rsi_ble_common_config.h>
-#if !(SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-#include <rsi_bootup_config.h>
-#include <rsi_driver.h>
-#include <rsi_wlan_apis.h>
-#include <rsi_wlan_config.h>
-#include <rsi_wlan_non_rom.h>
-#endif
 #include <rsi_bt_common.h>
 #include <rsi_bt_common_apis.h>
 #include <rsi_common_apis.h>

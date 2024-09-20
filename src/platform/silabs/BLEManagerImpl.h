@@ -31,9 +31,6 @@
 extern "C" {
 #endif // __cplusplus
 #include "wfx_sl_ble_init.h"
-#include <rsi_ble.h>
-#include <rsi_ble_apis.h>
-#include <rsi_bt_common.h>
 #ifdef __cplusplus
 }
 #endif // __cplusplus
