@@ -16,6 +16,7 @@
 
 import argparse
 import json
+import platform
 
 _LIST_OF_PACKAGES_TO_EXCLUDE = ['fuchsia/third_party/rust/']
 
@@ -32,11 +33,25 @@ def include_package(package: dict) -> bool:
     return True
 
 
-def generate_new_cipd_package_json(input, output):
+def generate_new_cipd_package_json(input, output, extra):
     with open(input) as ins:
         packages = json.load(ins)
+
         file_packages = packages.get('packages')
         new_file_packages = [x for x in file_packages if include_package(x)]
+
+    # Extra is a list of platform:json.
+    # Filter it for the given platform and append any resulting packages
+    my_platform = platform.system().lower()
+    for item in extra:
+        inject_platform, path = item.split(':', 1)
+
+        if inject_platform.lower() != my_platform:
+            continue
+
+        with open(path) as ins:
+            for package in json.load(ins).get('packages'):
+                new_file_packages.append(package)
 
     new_packages = {'packages': new_file_packages}
     with open(output, 'w') as f:
@@ -54,6 +69,11 @@ def main():
     parser.add_argument(
         '--output', '-o', required=True
     )
+    parser.add_argument(
+        '--extra', '-e', nargs='*', default=[],
+        help="Inject extra packages for specific platforms. Format is <platform>:<path_to_json>"
+    )
+
     generate_new_cipd_package_json(**vars(parser.parse_args()))
 
 
