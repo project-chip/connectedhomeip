@@ -65,7 +65,7 @@ public:
 
                     // Invoke command
                     MediaClusterBase cluster(exchangeMgr, sessionHandle, _commandContext->mEndpoint->GetId());
-                    CHIP_ERROR err = cluster.template InvokeCommand<typename RequestType::ResponseType>(
+                    CHIP_ERROR err = cluster.template InvokeCommand<typename RequestType>(
                         _commandContext->mRequest, _commandContext,
                         // Command success handler
                         [](void * __context, const typename RequestType::ResponseType & response) {
