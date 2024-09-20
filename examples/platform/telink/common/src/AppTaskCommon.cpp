@@ -407,9 +407,11 @@ void AppTaskCommon::InitPwms()
 
 #if CONFIG_WS2812_STRIP
     pwmManager.linkBackend(Ws2812Strip::getInstance());
-#else
+#elif CONFIG_PWM
     pwmManager.linkBackend(PwmPool::getInstance());
-#endif // CONFIG_WS2812_STRIP
+#else
+    pwmManager.linkBackend(PwmDummy::getInstance());
+#endif
 }
 
 void AppTaskCommon::LinkPwms(PwmManager & pwmManager)
@@ -420,7 +422,7 @@ void AppTaskCommon::LinkPwms(PwmManager & pwmManager)
     pwmManager.linkPwm(PwmManager::EAppPwm_Red, 0);
     pwmManager.linkPwm(PwmManager::EAppPwm_Green, 1);
     pwmManager.linkPwm(PwmManager::EAppPwm_Blue, 2);
-#else
+#elif CONFIG_PWM
     pwmManager.linkPwm(PwmManager::EAppPwm_Indication, 0);
     pwmManager.linkPwm(PwmManager::EAppPwm_Red, 1);
     pwmManager.linkPwm(PwmManager::EAppPwm_Green, 2);
