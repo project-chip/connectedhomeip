@@ -461,7 +461,7 @@ MTR_DIRECT_MEMBERS
  * The provided controller is expected to have just been allocated and to not be
  * initialized yet.
  */
-- (MTRDeviceController * _Nullable)_startDeviceController:(MTRDeviceController *)controller
+- (MTRDeviceController * _Nullable)_startDeviceController:(MTRDeviceController_Concrete *)controller
                                             startupParams:(id)startupParams
                                             fabricChecker:(MTRDeviceControllerStartupParamsInternal * (^)(FabricTable * fabricTable,
                                                               MTRDeviceController * controller,
@@ -834,7 +834,7 @@ MTR_DIRECT_MEMBERS
 // Returns nil on failure, the input controller on success.
 // If the provider has been initialized already, it is not considered as a failure.
 //
-- (MTRDeviceController * _Nullable)maybeInitializeOTAProvider:(MTRDeviceController * _Nonnull)controller
+- (MTRDeviceController_Concrete * _Nullable)maybeInitializeOTAProvider:(MTRDeviceController_Concrete * _Nonnull)controller
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
@@ -1144,6 +1144,9 @@ MTR_DIRECT_MEMBERS
 {
     std::lock_guard lock(_controllersLock);
     for (MTRDeviceController * controller in _controllers) {
+        // TODO: Once we know our controllers are MTRDeviceController_Concrete, move
+        // matchesPendingShutdownControllerWithOperationalCertificate and clearPendingShutdown to that
+        // interface and remove them from base MTRDeviceController_Internal.
         if ([controller matchesPendingShutdownControllerWithOperationalCertificate:operationalCertificate andRootCertificate:rootCertificate]) {
             MTR_LOG("%@ Found existing controller %@ that is pending shutdown and matching parameters, re-using it", self, controller);
             [controller clearPendingShutdown];
@@ -1153,7 +1156,7 @@ MTR_DIRECT_MEMBERS
     return nil;
 }
 
-- (nullable MTRDeviceController *)initializeController:(MTRDeviceController *)controller
+- (nullable MTRDeviceController *)initializeController:(MTRDeviceController_Concrete *)controller
                                         withParameters:(MTRDeviceControllerParameters *)parameters
                                                  error:(NSError * __autoreleasing *)error
 {

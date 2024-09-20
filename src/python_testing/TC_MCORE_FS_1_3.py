@@ -26,10 +26,10 @@
 # test-runner-runs: run1
 # test-runner-run/run1/app: examples/fabric-admin/scripts/fabric-sync-app.py
 # test-runner-run/run1/app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/script-args: --PICS src/app/tests/suites/certification/ci-pics-values --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID}
+# test-runner-run/run1/factoryreset: true
+# test-runner-run/run1/script-args: --PICS src/app/tests/suites/certification/ci-pics-values --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID} --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # test-runner-run/run1/script-start-delay: 5
-# test-runner-run/run1/quiet: false
+# test-runner-run/run1/quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -41,28 +41,9 @@ import tempfile
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
-from chip.testing.tasks import Subprocess
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
-
-
-class AppServer:
-
-    def __init__(self, app, storage_dir, port=None, discriminator=None, passcode=None):
-        args = [
-            "--KVS", tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")[1],
-        ]
-        args.extend(['--secured-device-port', str(port)])
-        args.extend(["--discriminator", str(discriminator)])
-        args.extend(["--passcode", str(passcode)])
-        self.app = Subprocess(app, *args, prefix="[SERVER]")
-
-    def start(self):
-        # Start process and block until it prints the expected output.
-        self.app.start(expected_output="Server initialization complete")
-
-    def terminate(self):
-        self.app.terminate()
+from TC_MCORE_FS_1_1 import AppServer
 
 
 class TC_MCORE_FS_1_3(MatterBaseTest):
