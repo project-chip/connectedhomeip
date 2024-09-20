@@ -125,8 +125,8 @@
    <xi:include href="draft/onoff-switch-configuration-cluster.xml" />
    <xi:include href="draft/camera-av-stream-management-cluster.xml" />
    <xi:include href="draft/camera-av-settings-user-level-management-cluster.xml" />
-   <xi:include href="draft/web-rtc-transport-provider-cluster.xml" />
-   <xi:include href="draft/web-rtc-transport-requester-cluster.xml" />
+   <xi:include href="draft/web-rtc-provider-cluster.xml" />
+   <xi:include href="draft/web-rtc-requestor-cluster.xml" />
    <xi:include href="draft/push-av-stream-transport-cluster.xml" />
    <xi:include href="draft/chime.xml" />
    <xi:include href="chip/sample-mei-cluster.xml" />

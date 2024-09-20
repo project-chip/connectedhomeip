@@ -89,12 +89,6 @@ Generally regenerate using one of:
 |        157 |       0x9D | EnergyEvseMode                                        |
 |        158 |       0x9E | WaterHeaterMode                                       |
 |        159 |       0x9F | DeviceEnergyManagementMode                            |
-|        160 |       0xA0 | CameraAvStreamManagement                              |
-|        161 |       0xA1 | CameraAvSettingsUserLevelManagement                   |
-|        162 |       0xA2 | WebRtcTransportProvider                               |
-|        163 |       0xA3 | WebRtcTransportRequester                              |
-|        164 |       0xA4 | PushAvStreamTransport                                 |
-|        164 |       0xA5 | Chime                                                 |
 |        257 |      0x101 | DoorLock                                              |
 |        258 |      0x102 | WindowCovering                                        |
 |        259 |      0x103 | BarrierControl                                        |
@@ -138,6 +132,12 @@ Generally regenerate using one of:
 |       1294 |      0x50E | AccountLogin                                          |
 |       1295 |      0x50F | ContentControl                                        |
 |       1296 |      0x510 | ContentAppObserver                                    |
+|       1361 |      0x551 | CameraAvStreamManagement                              |
+|       1362 |      0x552 | CameraAvSettingsUserLevelManagement                   |
+|       1363 |      0x553 | WebRtcTransportProvider                               |
+|       1364 |      0x554 | WebRtcTransportRequestor                              |
+|       1365 |      0x555 | PushAvStreamTransport                                 |
+|       1366 |      0x556 | Chime                                                 |
 |       1872 |      0x750 | EcosystemInformation                                  |
 |       1873 |      0x751 | CommissionerControl                                   |
 |       2820 |      0xB04 | ElectricalMeasurement                                 |
