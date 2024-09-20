@@ -153,10 +153,6 @@ This schema describes the format of the XML files, that describe the ZCL specifi
       <xs:selector xpath="./struct|enum" />
       <xs:field xpath="@name" />
     </xs:unique>
-    <xs:keyref name="attributeEntryTypeStructRef" refer="structNameKey">
-      <xs:selector xpath="./cluster/attribute" />
-      <xs:field xpath="@entryType" />
-    </xs:keyref>
   </xs:element>
   <xs:element name="deviceType">
     <xs:complexType>
