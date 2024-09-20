@@ -31,10 +31,7 @@
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
-#import "MTRDeviceControllerXPCParameters.h"
 #import "MTRDeviceController_Concrete.h"
-#import "MTRDeviceController_XPC.h"
-#import "MTRDeviceController_XPC_Internal.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -148,61 +145,34 @@ using namespace chip::Tracing::DarwinFramework;
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                       error:(NSError * __autoreleasing *)error
 {
-    /// IF YOU ARE ALARMED BY TYPES:  You are right to be alarmed, but do not panic.
-    /// _ORDER MATTERS HERE:_ XPC parameters are a subclass of `MTRDeviceControllerParameters`
-    /// because of the enormous overlap of params.
-    if ([parameters isKindOfClass:MTRDeviceControllerXPCParameters.class]) {
-        if ([parameters isKindOfClass:MTRDeviceControllerMachServiceXPCParameters.class]) {
-            MTRDeviceControllerMachServiceXPCParameters * xpcParameters = (MTRDeviceControllerMachServiceXPCParameters *) parameters;
-            MTR_LOG_DEBUG("%s: got XPC parameters, getting XPC device controller", __PRETTY_FUNCTION__);
-
-            NSString * machServiceName = xpcParameters.machServiceName;
-            MTR_LOG_DEBUG("%s: machServiceName %@", __PRETTY_FUNCTION__, machServiceName);
-
-            MTRDeviceController * xpcDeviceController = [[MTRDeviceController_XPC alloc] initWithMachServiceName:machServiceName options:xpcParameters.connectionOptions];
-
-            /// Being of sound mind, I willfully and voluntarily make this static cast.
-            return static_cast<MTRDeviceController_Concrete *>(xpcDeviceController);
-        } else {
-            MTR_LOG_ERROR("%s: unrecognized XPC parameters class %@", __PRETTY_FUNCTION__, NSStringFromClass(parameters.class));
-
-            // TODO:  there's probably a more appropriate error here.
-            if (error) {
-                *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED];
-            }
-
-            return nil;
-        }
-    } else if ([parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
-        MTR_LOG_DEBUG("%s: got standard parameters, getting standard device controller from factory", __PRETTY_FUNCTION__);
-        auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
-
-        // Start us up normally. MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary.
-        MTRDeviceControllerFactory * factory = MTRDeviceControllerFactory.sharedInstance;
-        id controller = [factory initializeController:self
-                                       withParameters:controllerParameters
-                                                error:error];
-        return controller;
-    } else {
-        // way out of our league
-        MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
+    if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
+        MTR_LOG_ERROR("Expected MTRDeviceControllerParameters but got: %@", parameters);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
         }
         return nil;
     }
+
+    auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
+
+    // Start us up normally. MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary.
+    MTRDeviceControllerFactory * factory = MTRDeviceControllerFactory.sharedInstance;
+    id controller = [factory initializeController:self
+                                   withParameters:controllerParameters
+                                            error:error];
+    return controller;
 }
 
-- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
-                             queue:(dispatch_queue_t)queue
-                   storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
-              storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
-               otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
-          otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
-                  uniqueIdentifier:(NSUUID *)uniqueIdentifier
-    concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
-      storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
-                    startSuspended:(BOOL)startSuspended
+- (nullable instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
+                                   queue:(dispatch_queue_t)queue
+                         storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
+                    storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
+                     otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
+                otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
+                        uniqueIdentifier:(NSUUID *)uniqueIdentifier
+          concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
+            storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
+                          startSuspended:(BOOL)startSuspended
 {
     if (self = [super initForSubclasses:startSuspended]) {
         // Make sure our storage is all set up to work as early as possible,
@@ -1221,30 +1191,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     [deviceToReturn setStorageBehaviorConfiguration:_storageBehaviorConfiguration];
 
     return deviceToReturn;
-}
-
-- (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
-{
-    std::lock_guard lock(*self.deviceMapLock);
-    MTRDevice * deviceToReturn = [self.nodeIDToDeviceMap objectForKey:nodeID];
-    if (!deviceToReturn) {
-        deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
-    }
-
-    return deviceToReturn;
-}
-
-- (void)removeDevice:(MTRDevice *)device
-{
-    std::lock_guard lock(*self.deviceMapLock);
-    auto * nodeID = device.nodeID;
-    MTRDevice * deviceToRemove = [self.nodeIDToDeviceMap objectForKey:nodeID];
-    if (deviceToRemove == device) {
-        [deviceToRemove invalidate];
-        [self.nodeIDToDeviceMap removeObjectForKey:nodeID];
-    } else {
-        MTR_LOG_ERROR("%@ Error: Cannot remove device %p with nodeID %llu", self, device, nodeID.unsignedLongLongValue);
-    }
 }
 
 #ifdef DEBUG

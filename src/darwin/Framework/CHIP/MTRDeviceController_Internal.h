@@ -40,13 +40,11 @@
 #import <Matter/MTRP256KeypairBridge.h>
 
 #import <Matter/MTRDefines.h>
-#import <Matter/MTRDeviceControllerStartupParams.h>
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
 #import <Matter/MTRDiagnosticLogsType.h>
 #import <Matter/MTROTAProviderDelegate.h>
 
 @class MTRDeviceControllerParameters;
-@class MTRDeviceControllerStartupParamsInternal;
 @class MTRDeviceControllerFactory;
 @class MTRDevice;
 @class MTRAsyncWorkQueue;
@@ -78,18 +76,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initForSubclasses:(BOOL)startSuspended;
 
 #pragma mark - MTRDeviceControllerFactory methods
-
-/**
- * Start a new controller.  Returns whether startup succeeded.  If this fails,
- * it guarantees that it has called controllerShuttingDown on the
- * MTRDeviceControllerFactory.
- *
- * The return value will always match [controller isRunning] for this
- * controller.
- *
- * Only MTRDeviceControllerFactory should be calling this.
- */
-- (BOOL)startup:(MTRDeviceControllerStartupParamsInternal *)startupParams;
 
 /**
  * Will return chip::kUndefinedFabricIndex if we do not have a fabric index.
@@ -134,22 +120,6 @@ NS_ASSUME_NONNULL_BEGIN
  * Root Public Key tied to controller
  */
 @property (nonatomic, retain, nullable) NSData * rootPublicKey;
-
-/**
- * Init a newly created controller.
- *
- * Only MTRDeviceControllerFactory should be calling this.
- */
-- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
-                             queue:(dispatch_queue_t)queue
-                   storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
-              storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
-               otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
-          otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
-                  uniqueIdentifier:(NSUUID *)uniqueIdentifier
-    concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
-      storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
-                    startSuspended:(BOOL)startSuspended;
 
 /**
  * Check whether this controller is running on the given fabric, as represented
@@ -298,6 +268,10 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Device-specific data and SDK access
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID;
+/**
+ * _setupDeviceForNodeID is a hook expected to be implemented by subclasses to
+ * actually allocate a device object of the right type.
+ */
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData;
 - (void)removeDevice:(MTRDevice *)device;
 
@@ -307,20 +281,6 @@ NS_ASSUME_NONNULL_BEGIN
  * makes use of the subscription pool.
  */
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
-
-/**
- * Takes an assertion to keep the controller running. If `-[MTRDeviceController shutdown]` is called while an assertion
- * is held, the shutdown will be honored only after all assertions are released. Invoking this method multiple times increases
- * the number of assertions and needs to be matched with equal amount of '-[MTRDeviceController removeRunAssertion]` to release
- * the assertion.
- */
-- (void)addRunAssertion;
-
-/**
- * Removes an assertion to allow the controller to shutdown once all assertions have been released.
- * Invoking this method once all assertions have been released in a noop.
- */
-- (void)removeRunAssertion;
 
 /**
  * This method returns TRUE if this controller matches the fabric reference and node ID as listed in the parameters.

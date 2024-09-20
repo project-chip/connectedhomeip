@@ -30,6 +30,7 @@
 
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceControllerFactory.h"
+#import "MTRDeviceController_Concrete.h"
 #import "MTROperationalBrowser.h"
 
 #include <credentials/FabricTable.h>
@@ -89,9 +90,9 @@ MTR_DIRECT_MEMBERS
                        completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
 
 /**
- * Initialize an MTRDeviceController with the given parameters.
+ * Initialize an MTRDeviceController_Concrete with the given parameters.
  */
-- (nullable MTRDeviceController *)initializeController:(MTRDeviceController *)controller
+- (nullable MTRDeviceController *)initializeController:(MTRDeviceController_Concrete *)controller
                                         withParameters:(MTRDeviceControllerParameters *)parameters
                                                  error:(NSError * __autoreleasing *)error;
 
