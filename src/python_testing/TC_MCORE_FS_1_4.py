@@ -26,10 +26,10 @@
 # test-runner-runs: run1
 # test-runner-run/run1/app: examples/fabric-admin/scripts/fabric-sync-app.py
 # test-runner-run/run1/app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/script-args: --PICS src/app/tests/suites/certification/ci-pics-values --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_fsa_app_path:examples/fabric-admin/scripts/fabric-sync-app.py th_fsa_admin_path:${FABRIC_ADMIN_APP} th_fsa_bridge_path:${FABRIC_BRIDGE_APP} th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID} dut_fsa_stdin_pipe:dut-fsa-stdin
+# test-runner-run/run1/factoryreset: true
+# test-runner-run/run1/script-args: --PICS src/app/tests/suites/certification/ci-pics-values --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_fsa_app_path:examples/fabric-admin/scripts/fabric-sync-app.py th_fsa_admin_path:${FABRIC_ADMIN_APP} th_fsa_bridge_path:${FABRIC_BRIDGE_APP} th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID} dut_fsa_stdin_pipe:dut-fsa-stdin --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # test-runner-run/run1/script-start-delay: 5
-# test-runner-run/run1/quiet: false
+# test-runner-run/run1/quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -44,14 +44,16 @@ from chip.interaction_model import Status
 from chip.testing.tasks import Subprocess
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+from TC_MCORE_FS_1_1 import AppServer
 
 
-class FabricSyncApp:
+class FabricSyncApp(Subprocess):
 
-    def __init__(self, fabric_sync_app_path, fabric_admin_app_path, fabric_bridge_app_path,
-                 storage_dir, fabric_name=None, node_id=None, vendor_id=None,
-                 paa_trust_store_path=None, bridge_port=None, bridge_discriminator=None,
-                 bridge_passcode=None):
+    def __init__(self, fabric_sync_app_path: str, fabric_admin_app_path: str,
+                 fabric_bridge_app_path: str, storage_dir: str, paa_trust_store_path: str = None,
+                 fabric_name: str = None, node_id: int = None, vendor_id: int = None,
+                 bridge_discriminator: int = None, bridge_passcode: int = None,
+                 bridge_port: int = 5540):
         args = [
             f"--app-admin={fabric_admin_app_path}",
             f"--app-bridge={fabric_bridge_app_path}",
@@ -68,43 +70,25 @@ class FabricSyncApp:
             args.append(f"--commissioner-name={fabric_name}")
         if node_id is not None:
             args.append(f"--commissioner-node-id={node_id}")
-        args.append(f"--commissioner-vendor-id={vendor_id}")
-        args.append(f"--secured-device-port={bridge_port}")
-        args.append(f"--discriminator={bridge_discriminator}")
-        args.append(f"--passcode={bridge_passcode}")
-
-        self.fabric_sync_app = Subprocess(fabric_sync_app_path, *args)
+        if vendor_id is not None:
+            args.append(f"--commissioner-vendor-id={vendor_id}")
+        if bridge_port is not None:
+            args.append(f"--secured-device-port={bridge_port}")
+        if bridge_discriminator is not None:
+            args.append(f"--discriminator={bridge_discriminator}")
+        if bridge_passcode is not None:
+            args.append(f"--passcode={bridge_passcode}")
+        # Start the FSA application with dedicated storage and RPC ports.
+        super().__init__(fabric_sync_app_path, *args)
 
     def start(self):
         # Start process and block until it prints the expected output.
-        self.fabric_sync_app.start(expected_output="Successfully opened pairing window on the device")
+        super().start(expected_output="Successfully opened pairing window on the device")
 
-    def terminate(self):
-        self.fabric_sync_app.terminate()
-
-    def commission_on_network(self, node_id, setup_pin_code=None, filter_type=None, filter=None):
-        self.fabric_sync_app.send(
+    def commission_on_network(self, node_id: int, setup_pin_code: int, filter_type=None, filter=None):
+        self.send(
             f"pairing onnetwork {node_id} {setup_pin_code}",
             expected_output=f"Commissioning complete for node ID {node_id:#018x}: success")
-
-
-class AppServer:
-
-    def __init__(self, app, storage_dir, port=None, discriminator=None, passcode=None):
-        args = [
-            "--KVS", tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")[1],
-        ]
-        args.extend(['--secured-device-port', str(port)])
-        args.extend(["--discriminator", str(discriminator)])
-        args.extend(["--passcode", str(passcode)])
-        self.app = Subprocess(app, *args, prefix="[SERVER]")
-
-    def start(self):
-        # Start process and block until it prints the expected output.
-        self.app.start(expected_output="Server initialization complete")
-
-    def terminate(self):
-        self.app.terminate()
 
 
 class TC_MCORE_FS_1_4(MatterBaseTest):
