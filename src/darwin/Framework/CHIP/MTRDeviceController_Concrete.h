@@ -17,8 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import <Matter/MTRDefines.h>
-#import <Matter/MTRDeviceController.h>
+#import <Matter/Matter.h>
 
 #import "MTRDeviceControllerStartupParams_Internal.h"
 
