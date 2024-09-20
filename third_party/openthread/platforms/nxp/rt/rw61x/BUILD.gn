@@ -65,7 +65,7 @@ config("openthread_rw61x_config") {
       defines += [
         "OPENTHREAD_CONFIG_BORDER_AGENT_EPHEMERAL_KEY_ENABLE=1",
         "OT_APP_CLI_EPHEMERAL_KEY_ADDON=1",
-        "OT_APP_CLI_LWIP_ADDON=1"
+        "OT_APP_CLI_LWIP_ADDON=1",
       ]
     }
   }
