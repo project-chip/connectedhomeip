@@ -31,10 +31,7 @@ async def forward_f(prefix: bytes, f_in: asyncio.StreamReader,
 
     This function can optionally feed received lines to a callback function.
     """
-    while True:
-        line = await f_in.readline()
-        if not line:
-            break
+    while line := await f_in.readline():
         if cb is not None:
             cb(line)
         f_out.buffer.write(prefix)
@@ -68,23 +65,18 @@ async def forward_stdin(f_out: asyncio.StreamWriter):
     reader = asyncio.StreamReader()
     protocol = asyncio.StreamReaderProtocol(reader)
     await loop.connect_read_pipe(lambda: protocol, sys.stdin)
-    while True:
-        line = await reader.readline()
-        if not line:
-            # Exit on Ctrl-D (EOF).
-            sys.exit(0)
+    while line := await reader.readline():
         f_out.write(line)
         await f_out.drain()
 
 
 class Subprocess:
 
-    def __init__(self, tag: str, program: str, *args, stdout_cb=None):
+    def __init__(self, tag: str, program: str, *args):
         self.event = asyncio.Event()
         self.tag = tag.encode()
         self.program = program
         self.args = args
-        self.stdout_cb = stdout_cb
         self.expected_output = None
 
     def _check_output(self, line: bytes):
@@ -122,8 +114,7 @@ class Subprocess:
         self.p.terminate()
 
 
-async def run_admin(program, stdout_cb=None, storage_dir=None,
-                    rpc_admin_port=None, rpc_bridge_port=None,
+async def run_admin(program, storage_dir=None, rpc_admin_port=None, rpc_bridge_port=None,
                     paa_trust_store_path=None, commissioner_name=None,
                     commissioner_node_id=None, commissioner_vendor_id=None):
     args = []
@@ -141,8 +132,7 @@ async def run_admin(program, stdout_cb=None, storage_dir=None,
         args.extend(["--commissioner-nodeid", str(commissioner_node_id)])
     if commissioner_vendor_id is not None:
         args.extend(["--commissioner-vendor-id", str(commissioner_vendor_id)])
-    p = Subprocess("[FS-ADMIN]", program, "interactive", "start", *args,
-                   stdout_cb=stdout_cb)
+    p = Subprocess("[FS-ADMIN]", program, "interactive", "start", *args)
     await p.run()
     return p
 
@@ -209,12 +199,16 @@ async def main(args):
             passcode=args.passcode,
         ))
 
-    def terminate():
-        admin.terminate()
-        bridge.terminate()
-        sys.exit(0)
-
     loop = asyncio.get_event_loop()
+
+    def terminate():
+        with contextlib.suppress(ProcessLookupError):
+            admin.terminate()
+        with contextlib.suppress(ProcessLookupError):
+            bridge.terminate()
+        loop.remove_signal_handler(signal.SIGINT)
+        loop.remove_signal_handler(signal.SIGTERM)
+
     loop.add_signal_handler(signal.SIGINT, terminate)
     loop.add_signal_handler(signal.SIGTERM, terminate)
 
@@ -241,7 +235,8 @@ async def main(args):
             cmd,
             # Wait for the log message indicating that the bridge has been
             # added to the fabric.
-            f"Commissioning complete for node ID {bridge_node_id:#018x}: success")
+            f"Commissioning complete for node ID {bridge_node_id:#018x}: success",
+            timeout=30)
 
     # Open commissioning window with original setup code for the bridge.
     cw_endpoint_id = 0
@@ -253,18 +248,23 @@ async def main(args):
                      f" {cw_option} {cw_timeout} {cw_iteration} {cw_discriminator}")
 
     try:
-        await asyncio.gather(
-            forward_pipe(pipe, admin.p.stdin) if pipe else forward_stdin(admin.p.stdin),
-            admin.wait(),
-            bridge.wait(),
-        )
-    except SystemExit:
-        admin.terminate()
-        bridge.terminate()
-    except Exception:
-        admin.terminate()
-        bridge.terminate()
-        raise
+        forward = forward_pipe(pipe, admin.p.stdin) if pipe else forward_stdin(admin.p.stdin)
+        # Wait for any of the tasks to complete.
+        _, pending = await asyncio.wait([
+            asyncio.create_task(admin.wait()),
+            asyncio.create_task(bridge.wait()),
+            asyncio.create_task(forward),
+        ], return_when=asyncio.FIRST_COMPLETED)
+        # Cancel the remaining tasks.
+        for task in pending:
+            task.cancel()
+    except Exception as e:
+        print(e, file=sys.stderr)
+
+    terminate()
+    # Make sure that we will not return until both processes are terminated.
+    await admin.wait()
+    await bridge.wait()
 
 
 if __name__ == "__main__":

@@ -26,77 +26,24 @@
 # test-runner-runs: run1
 # test-runner-run/run1/app: examples/fabric-admin/scripts/fabric-sync-app.py
 # test-runner-run/run1/app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/script-args: --PICS src/app/tests/suites/certification/ci-pics-values --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID}
+# test-runner-run/run1/factoryreset: true
+# test-runner-run/run1/script-args: --PICS src/app/tests/suites/certification/ci-pics-values --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID} --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # test-runner-run/run1/script-start-delay: 5
-# test-runner-run/run1/quiet: false
+# test-runner-run/run1/quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
 import logging
 import os
 import random
-import subprocess
-import sys
 import tempfile
-import threading
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
-
-
-# TODO: Make this class more generic. Issue #35348
-class Subprocess(threading.Thread):
-
-    def __init__(self, args: list = [], tag="", **kw):
-        super().__init__(**kw)
-        self.tag = f"[{tag}] " if tag else ""
-        self.args = args
-
-    def forward_f(self, f_in, f_out):
-        while True:
-            line = f_in.readline()
-            if not line:
-                break
-            f_out.write(f"{self.tag}{line}")
-            f_out.flush()
-
-    def run(self):
-        logging.info("RUN: %s", " ".join(self.args))
-        self.p = subprocess.Popen(self.args, errors="ignore", stdin=subprocess.PIPE,
-                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # Forward stdout and stderr with a tag attached.
-        t1 = threading.Thread(target=self.forward_f, args=[self.p.stdout, sys.stdout])
-        t1.start()
-        t2 = threading.Thread(target=self.forward_f, args=[self.p.stderr, sys.stderr])
-        t2.start()
-        # Wait for the process to finish.
-        self.p.wait()
-        t1.join()
-        t2.join()
-
-    def stop(self):
-        self.p.terminate()
-        self.join()
-
-
-class AppServer:
-
-    def __init__(self, app, storage_dir, port=None, discriminator=None, passcode=None):
-
-        args = [app]
-        args.extend(["--KVS", tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")[1]])
-        args.extend(['--secured-device-port', str(port)])
-        args.extend(["--discriminator", str(discriminator)])
-        args.extend(["--passcode", str(passcode)])
-        self.app = Subprocess(args, tag="SERVER")
-        self.app.start()
-
-    def stop(self):
-        self.app.stop()
+from TC_MCORE_FS_1_1 import AppServer
 
 
 class TC_MCORE_FS_1_3(MatterBaseTest):
@@ -134,10 +81,11 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             port=self.th_server_port,
             discriminator=self.th_server_discriminator,
             passcode=self.th_server_passcode)
+        self.th_server.start()
 
     def teardown_class(self):
         if self.th_server is not None:
-            self.th_server.stop()
+            self.th_server.terminate()
         if self.storage is not None:
             self.storage.cleanup()
         super().teardown_class()

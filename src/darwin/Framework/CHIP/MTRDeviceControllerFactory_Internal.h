@@ -30,8 +30,10 @@
 
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceControllerFactory.h"
+#import "MTRDeviceController_Concrete.h"
 #import "MTROperationalBrowser.h"
 
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/PeerId.h>
@@ -88,9 +90,9 @@ MTR_DIRECT_MEMBERS
                        completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
 
 /**
- * Initialize an MTRDeviceController with the given parameters.
+ * Initialize an MTRDeviceController_Concrete with the given parameters.
  */
-- (nullable MTRDeviceController *)initializeController:(MTRDeviceController *)controller
+- (nullable MTRDeviceController *)initializeController:(MTRDeviceController_Concrete *)controller
                                         withParameters:(MTRDeviceControllerParameters *)parameters
                                                  error:(NSError * __autoreleasing *)error;
 
@@ -110,6 +112,13 @@ MTR_DIRECT_MEMBERS
 @property (readonly) chip::PersistentStorageDelegate * storageDelegate;
 @property (readonly) chip::Credentials::GroupDataProvider * groupDataProvider;
 @property (readonly, assign) MTROperationalBrowser * operationalBrowser;
+
+// fabricTable must be gotten on the Matter queue.  May return null if there are
+// no controllers running.
+@property (readonly, nullable, assign) chip::FabricTable * fabricTable;
+
+// resetOperationalAdvertising must happen on the Matter queue.
+- (void)resetOperationalAdvertising;
 
 @end
 

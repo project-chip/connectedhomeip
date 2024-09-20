@@ -332,6 +332,10 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 #if CHIP_PROGRESS_LOGGING
         destination = kUndefinedNodeId;
         fabricIndex = kUndefinedFabricIndex;
+        if (session->GetSessionRole() == Transport::UnauthenticatedSession::SessionRole::kResponder)
+        {
+            destination = session->GetEphemeralInitiatorNodeID();
+        }
 #endif // CHIP_PROGRESS_LOGGING
     }
     break;
