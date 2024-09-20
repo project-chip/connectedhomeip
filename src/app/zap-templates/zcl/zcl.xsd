@@ -10,7 +10,7 @@ This schema describes the format of the XML files, that describe the ZCL specifi
   </xs:annotation>
   <xs:simpleType name="integerWithHex">
     <xs:restriction base="xs:string">
-      <xs:pattern value="0x[0-9A-Fa-f]+|[0-9]+"/>
+      <xs:pattern value="-?0x[0-9A-Fa-f]+|[0-9]+"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:complexType name="access">
@@ -67,6 +67,7 @@ This schema describes the format of the XML files, that describe the ZCL specifi
     <xs:attribute name="max" type="integerWithHex"/>
     <xs:attribute name="default" type="xs:string"/>
     <xs:attribute name="isNullable" type="xs:boolean"/>
+    <xs:attribute name="optional" type="xs:boolean" default="false"/>
   </xs:complexType>
   <xs:complexType name="featureBit" mixed="true">
     <xs:attribute name="tag" use="required" type="xs:string"/>
@@ -263,7 +264,11 @@ This schema describes the format of the XML files, that describe the ZCL specifi
   <xs:element name="bitmap">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" name="cluster"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="cluster">
+          <xs:complexType>
+            <xs:attribute name="code" type="integerWithHex"/>
+          </xs:complexType>
+        </xs:element>
         <xs:element maxOccurs="unbounded" ref="field"/>
       </xs:sequence>
       <xs:attribute name="name" use="required" type="xs:string"/>
