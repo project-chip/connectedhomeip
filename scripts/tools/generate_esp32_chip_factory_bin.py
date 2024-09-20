@@ -32,7 +32,7 @@ CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('sc
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'scripts', 'tools', 'spake2p'))
 from spake2p import generate_verifier  # noqa: E402 isort:skip
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'src', 'setup_payload', 'python'))
-from SetupPayload import CommissioningFlow, SetupPayload  # noqa: E402 isort:skip
+from matter_setup_payload import CommissioningFlow, SetupPayload  # noqa: E402 isort:skip
 
 
 INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
