@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "access/SubjectDescriptor.h"
 #include "app/EventPathParams.h"
 #include "lib/core/CHIPError.h"
 #include <lib/core/TLVReader.h>
@@ -65,8 +66,8 @@ public:
     /// that a valid event path exists on some wildcard expansion.
     ///
     /// At the very minimum this will validate that a valid endpoint/cluster can be expanded
-    /// from the input path.
-    virtual bool EventPathSupported(const EventPathParams &path) = 0;
+    /// from the input path and that the given descriptor has access to it.
+    virtual bool EventPathSupported(const EventPathParams &path, const Access::SubjectDescriptor &descriptor) = 0;
 
     /// TEMPORARY/TRANSITIONAL requirement for transitioning from ember-specific code
     ///   ReadAttribute is REQUIRED to perform:

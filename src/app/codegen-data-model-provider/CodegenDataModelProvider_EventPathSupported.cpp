@@ -14,15 +14,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/util/af-types.h"
-#include "lib/core/DataModelTypes.h"
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
 #include <app/EventPathParams.h>
 #include <app/RequiredPrivilege.h>
+#include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
@@ -141,13 +141,28 @@ bool HasValidEventPathForEndpoint(EndpointId endpoint, const EventPathParams & p
 
 } // namespace
 
-bool CodegenDataModelProvider::EventPathSupported(const EventPathParams & path)
+bool CodegenDataModelProvider::EventPathSupported(const EventPathParams & path, const Access::SubjectDescriptor & descriptor)
 {
-    // FIXME: implement
 
-    // if (path.HasWildcardEndpointId())
-    // if (path.HasWildcardClusterId())
-    //
+    if (path.HasWildcardEndpointId())
+    {
+        for (uint16_t endpointIndex = 0; endpointIndex < emberAfEndpointCount(); ++endpointIndex)
+        {
+            if (!emberAfEndpointIndexIsEnabled(endpointIndex))
+            {
+                continue;
+            }
+            if (HasValidEventPathForEndpoint(emberAfEndpointFromIndex(endpointIndex), path, descriptor))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // No need to check whether the endpoint is enabled, because
+    // emberAfFindEndpointType returns null for disabled endpoints.
+    return HasValidEventPathForEndpoint(path.mEndpointId, path, descriptor);
 }
 
 } // namespace app

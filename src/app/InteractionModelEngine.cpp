@@ -542,6 +542,8 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
     return err;
 }
 
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+
 #if !CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
 static bool CanAccessEvent(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteClusterPath & aPath,
                            Access::Privilege aNeededPrivilege)
@@ -641,6 +643,8 @@ static bool HasValidEventPathForEndpoint(EndpointId aEndpoint, const EventPathPa
     return HasValidEventPathForEndpointAndCluster(aEndpoint, cluster, aEventPath, aSubjectDescriptor);
 }
 
+#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL
+
 CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
                                                    EventPathIBs::Parser & aEventPathListParser, bool & aHasValidEventPath,
                                                    size_t & aRequestedEventPathCount)
@@ -668,8 +672,16 @@ CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescript
             continue;
         }
 
-        // The definition of "valid path" is "path exists and ACL allows
-        // access".  We need to do some expansion of wildcards to handle that.
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+        aHasValidEventPath = mDataModelProvider->EventPathSupported(eventPath, aSubjectDescriptor);
+#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+        bool oldValueToVerify = aHasValidEventPath;
+#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+       // The definition of "valid path" is "path exists and ACL allows
+       // access".  We need to do some expansion of wildcards to handle that.
         if (eventPath.HasWildcardEndpointId())
         {
             for (uint16_t endpointIndex = 0; !aHasValidEventPath && endpointIndex < emberAfEndpointCount(); ++endpointIndex)
@@ -688,6 +700,11 @@ CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescript
             // emberAfFindEndpointType returns null for disabled endpoints.
             aHasValidEventPath = HasValidEventPathForEndpoint(eventPath.mEndpointId, eventPath, aSubjectDescriptor);
         }
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+        VerifyOrDieWithMsg(oldValueToVerify == aHasValidEventPath, DataManagement,
+                           "Codegen data model and ember data model MUST be identical");
+#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL
     }
 
     if (err == CHIP_ERROR_END_OF_TLV)
