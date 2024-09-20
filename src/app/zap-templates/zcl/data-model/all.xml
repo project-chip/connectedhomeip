@@ -27,10 +27,8 @@
    <xi:include href="chip/diagnostic-logs-cluster.xml" />
    <xi:include href="chip/dishwasher-alarm-cluster.xml" />
    <xi:include href="chip/dishwasher-mode-cluster.xml" />
-   <xi:include href="chip/drlc.xml" />
    <xi:include href="chip/electrical-energy-measurement-cluster.xml" />
    <xi:include href="chip/electrical-power-measurement-cluster.xml" />
-   <xi:include href="chip/meas-and-sense.xml" />
    <xi:include href="chip/microwave-oven-mode-cluster.xml" />
    <xi:include href="chip/microwave-oven-control-cluster.xml" />
    <xi:include href="chip/door-lock-cluster.xml" />
@@ -128,6 +126,6 @@
    <xi:include href="draft/web-rtc-provider-cluster.xml" />
    <xi:include href="draft/web-rtc-requestor-cluster.xml" />
    <xi:include href="draft/push-av-stream-transport-cluster.xml" />
-   <xi:include href="draft/chime.xml" />
+   <xi:include href="draft/chime-cluster.xml" />
    <xi:include href="chip/sample-mei-cluster.xml" />
 </all>
