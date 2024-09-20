@@ -2986,7 +2986,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     //
     // Note that we don't use the structural attributes (PartsList, ServerList,
     // AttributeList) to determine this set, because we might be in the middle
-    // of priming right now and not have gotten those yet.  Just use the set of
+    // of priming right now and have not gotten those yet.  Just use the set of
     // attribute paths we actually have.
     NSMutableSet<MTRAttributePath *> * existentPaths = [[NSMutableSet alloc] init];
     {
