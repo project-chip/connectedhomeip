@@ -14,29 +14,84 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-
 <configurator>
   <domain name="CHIP"/>
-
   <struct name="AtomicAttributeStatusStruct">
-    <item fieldId="0" name="AttributeID" type="attrib_id" />
+    <item fieldId="0" name="AttributeID" type="attrib_id"/>
     <item fieldId="1" name="StatusCode" type="status"/>
   </struct>
 
+  <struct name="AttributionData" apiMaturity="provisional" isFabricScoped="true">
+    <item fieldId="0" name="ContextInformation" type="enum8"/>
+    <item fieldId="1" name="SourceContext" type="int32u" optional="true" isFabricSensitive="true"/>
+    <item fieldId="2" name="NodeID" type="node_id" optional="true" isFabricSensitive="true"/>
+    <item fieldId="3" name="GroupD" type="group_id" optional="true" isFabricSensitive="true"/>
+    <item fieldId="4" name="SystemTimeStamp" type="systime_ms" optional="true"/>
+    <item fieldId="5" name="EpochTimeStamp" type="posix_ms" optional="true"/>
+    <item fieldId="254" name="FabricIndex" type="fabric_idx" isNullable="true"/>
+  </struct>
+
+  <struct name="Date" apiMaturity="provisional">
+    <item fieldId="0" name="Year" type="int8u" isNullable="true"/>
+    <item fieldId="1" name="Month" type="int8u" isNullable="true" min="1" max="12"/>
+    <item fieldId="2" name="Day" type="int8u" isNullable="true" min="1" max="31"/>
+    <item fieldId="3" name="DayOfWeek" type="int8u" isNullable="true" min="1" max="7"/>
+  </struct>
+
   <struct name="LocationDescriptorStruct">
-    <item fieldId="0" name="LocationName"    type="char_string" length="128" isNullable="false" optional="false"/>
-    <item fieldId="1" name="FloorNumber"     type="int16s"                   isNullable="true"  optional="false"/>
-    <item fieldId="2" name="AreaType"        type="AreaTypeTag"              isNullable="true"  optional="false"/>
+    <item fieldId="0" name="LocationName" type="char_string" length="128"/>
+    <item fieldId="1" name="FloorNumber" type="int16s" isNullable="true"/>
+    <item fieldId="2" name="AreaType" type="tag" isNullable="true"/>
   </struct>
 
   <!--
     These are test global items (no cluster attached) for testing only.
     Their usage is defined for UnitTestCluster only.
   -->
-  
+  <struct name="MeasurementAccuracyRangeStruct" apiMaturity="provisional">
+    <item fieldId="0" name="RangeMin" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
+    <item fieldId="1" name="RangeMax" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
+    <item fieldId="2" name="PercentMax" type="percent100ths" optional="true"/>
+    <item fieldId="3" name="PercentMin" type="percent100ths" optional="true"/>
+    <item fieldId="4" name="PercentTypical" type="percent100ths" optional="true"/>
+    <item fieldId="5" name="FixedMax" type="int64u" optional="true" max="4611686018427387903"/>
+    <item fieldId="6" name="FixedMin" type="int64u" optional="true" max="4611686018427387903"/>
+    <item fieldId="7" name="FixedTypical" type="int64u" optional="true" max="4611686018427387903"/>
+  </struct>
+
+  <struct name="MeasurementAccuracyStruct" apiMaturity="provisional">
+    <item fieldId="0" name="MeasurementType" type="MeasurementTypeEnum" min="0x0000" max="0x000E"/>
+    <item fieldId="1" name="Measured" type="boolean" default="0"/>
+    <item fieldId="2" name="MinMeasuredValue" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
+    <item fieldId="3" name="MaxMeasuredValue" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
+    <item fieldId="4" name="AccuracyRanges" array="true" type="MeasurementAccuracyRangeStruct" minLength="1"/>
+  </struct>
+
+  <struct name="SemanticTagStruct" apiMaturity="provisional">
+    <item fieldId="0" name="MfgCode" type="vendor_id" isNullable="true"/>
+    <item fieldId="1" name="NamespaceID" type="namespace"/>
+    <item fieldId="2" name="Tag" type="tag"/>
+    <item fieldId="3" name="Label" type="char_string" isNullable="true" optional="true" length="64"/>
+  </struct>
+
+  <struct name="SuppliedAttributionData" apiMaturity="provisional" isFabricScoped="true">
+    <item fieldId="0" name="ContextInformation" type="enum8"/>
+    <item fieldId="1" name="SourceContext" type="int32u" optional="true"/>
+  </struct>
+
   <struct name="TestGlobalStruct">
-    <item fieldId="0" name="Name" type="char_string" length="128" isNullable="false" optional="false"/>
-    <item fieldId="1" name="MyBitmap" type="TestGlobalBitmap" isNullable="true" optional="false"/>
+    <item fieldId="0" name="Name" type="char_string" length="128"/>
+    <item fieldId="1" name="MyBitmap" type="TestGlobalBitmap" isNullable="true"/>
     <item fieldId="2" name="MyEnum" type="TestGlobalEnum" isNullable="true" optional="true"/>
+  </struct>
+
+  <struct name="WebRTCSessionStruct" apiMaturity="provisional">
+    <item fieldId="1" name="ID" type="WebRTCSessionID"/>
+    <item fieldId="2" name="PeerNodeId" type="node_id"/>
+    <item fieldId="3" name="PeerFabricIndex" type="fabric_idx"/>
+    <item fieldId="4" name="StreamType" type="StreamTypeEnum" min="0x00" max="0x03"/>
+    <item fieldId="5" name="VideoStreamID" type="VideoStreamID" isNullable="true"/>
+    <item fieldId="6" name="AudioStreamID" type="AudioStreamID" isNullable="true"/>
+    <item fieldId="7" name="MetadataOptions" type="WebRTCMetadataOptions" default="0x00" min="0x00" max="0x01"/>
   </struct>
 </configurator>
