@@ -152,7 +152,9 @@ rt_executable("laundry-washer") {
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
     "${common_example_dir}/app_task/source/AppTaskBase.cpp",
     "${common_example_dir}/app_task/source/AppTaskFreeRTOS.cpp",
-    "${common_example_dir}/matter_button/source/AppMatterButton.cpp",
+    "${common_example_dir}/matter_button/source/ButtonDefault.cpp",
+    "${common_example_dir}/matter_button/source/ButtonManager.cpp",
+    "${common_example_dir}/matter_button/source/ButtonRegistrationDefault.cpp",
     "${chip_root}/examples/platform/nxp/${nxp_platform}/factory_data/source/AppFactoryDataExample.cpp",
     
   ]
