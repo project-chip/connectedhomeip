@@ -67,7 +67,6 @@ class TC_PWRTL_2_1(MatterBaseTest):
 
         else:
             logging.info('Skipping test as available endpoints attribute ID not in attribute list on DUT')
-            return
 
         self.print_step(3, "Read ActiveEndpoints attribute")
 
@@ -83,8 +82,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
                                     "ActiveEndpoints should be a subset of AvailableEndpoints")
 
         else:
-            logging.info('Skipping test step 3 as active endpoints attribute ID not in attribute list on DUT')
-            return
+            self.mark_current_step_skipped()
 
 
 if __name__ == "__main__":
