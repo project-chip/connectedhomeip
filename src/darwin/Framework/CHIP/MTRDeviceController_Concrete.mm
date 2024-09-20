@@ -157,9 +157,9 @@ using namespace chip::Tracing::DarwinFramework;
 
     // Start us up normally. MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary.
     MTRDeviceControllerFactory * factory = MTRDeviceControllerFactory.sharedInstance;
-    id controller = [factory initializeController:self
-                                   withParameters:controllerParameters
-                                            error:error];
+    auto * controller = [factory initializeController:self
+                                       withParameters:controllerParameters
+                                                error:error];
     return controller;
 }
 
