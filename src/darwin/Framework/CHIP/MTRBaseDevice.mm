@@ -991,6 +991,8 @@ private:
                      queue:(dispatch_queue_t)queue
                 completion:(MTRDeviceResponseHandler)completion
 {
+    MTR_LOG("%@ readAttributePaths: %@, eventPaths: %@", self, attributePaths, eventPaths);
+
     [self readAttributePaths:attributePaths eventPaths:eventPaths params:params includeDataVersion:NO queue:queue completion:completion];
 }
 
@@ -1001,6 +1003,9 @@ private:
                      queue:(dispatch_queue_t)queue
                 completion:(MTRDeviceResponseHandler)completion
 {
+    // NOTE: Do not log the read here.  This is called ether from
+    // readAttributePaths:eventPaths:params:queue:completion: or MTRDevice, both
+    // of which already log, and we want to be able to tell the two codepaths apart.
     if ((attributePaths == nil || [attributePaths count] == 0) && (eventPaths == nil || [eventPaths count] == 0)) {
         // No paths, just return an empty array.
         dispatch_async(queue, ^{
@@ -1157,6 +1162,19 @@ private:
                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
+{
+    MTR_LOG("%@ write %@ 0x%llx 0x%llx: %@", self, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue, value);
+
+    [self _writeAttributeWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID value:value timedWriteTimeout:timeoutMs queue:queue completion:completion];
+}
+
+- (void)_writeAttributeWithEndpointID:(NSNumber *)endpointID
+                            clusterID:(NSNumber *)clusterID
+                          attributeID:(NSNumber *)attributeID
+                                value:(id)value
+                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                                queue:(dispatch_queue_t)queue
+                           completion:(MTRDeviceResponseHandler)completion
 {
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
@@ -1337,6 +1355,7 @@ exit:
                          commandFields:commandFields
                     timedInvokeTimeout:timeoutMs
            serverSideProcessingTimeout:nil
+                               logCall:YES
                                  queue:queue
                             completion:completion];
 }
@@ -1347,6 +1366,7 @@ exit:
                        commandFields:(id)commandFields
                   timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
          serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                             logCall:(BOOL)logCall
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {
@@ -1365,6 +1385,10 @@ exit:
     timeoutMs = [timeoutMs copy];
     if (timeoutMs != nil) {
         timeoutMs = MTRClampedNumber(timeoutMs, @(1), @(UINT16_MAX));
+    }
+
+    if (logCall) {
+        MTR_LOG("%@ invoke %@ 0x%llx 0x%llx: %@", self, endpointID, clusterID.unsignedLongLongValue, commandID.unsignedLongLongValue, commandFields);
     }
 
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
@@ -1490,6 +1514,7 @@ exit:
                          commandFields:commandFields
                     timedInvokeTimeout:timeout
            serverSideProcessingTimeout:serverSideProcessingTimeout
+                               logCall:YES
                                  queue:queue
                             completion:responseHandler];
 }
@@ -2146,6 +2171,12 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
                                          timeout:timeout
                                            queue:queue
                                       completion:completion];
+}
+
+- (NSString *)description
+{
+    return [NSString
+        stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu)>", NSStringFromClass(self.class), self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID, _nodeID];
 }
 
 @end
