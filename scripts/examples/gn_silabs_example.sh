@@ -77,6 +77,7 @@ if [ "$#" == "0" ]; then
             BRD4317A
             BRD4318A
             BRD4319A
+            BRD4350A
 
 
     <Build options> - optional noteworthy build options for EFR32
