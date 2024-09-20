@@ -10,7 +10,7 @@ This schema describes the format of the XML files, that describe the ZCL specifi
   </xs:annotation>
   <xs:simpleType name="integerWithHex">
     <xs:restriction base="xs:string">
-      <xs:pattern value="-?0x[0-9A-Fa-f]+|[0-9]+"/>
+      <xs:pattern value="[-+]?0x[0-9A-Fa-f]+|[0-9]+"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:complexType name="access">
@@ -65,6 +65,7 @@ This schema describes the format of the XML files, that describe the ZCL specifi
     <xs:attribute name="fieldId" type="integerWithHex"/>
     <xs:attribute name="min" type="integerWithHex"/>
     <xs:attribute name="max" type="integerWithHex"/>
+    <xs:attribute name="length" type="integerWithHex"/>
     <xs:attribute name="default" type="xs:string"/>
     <xs:attribute name="isNullable" type="xs:boolean"/>
     <xs:attribute name="optional" type="xs:boolean" default="false"/>
@@ -297,6 +298,7 @@ This schema describes the format of the XML files, that describe the ZCL specifi
     <xs:complexType>
       <xs:attribute name="choice" type="xs:string"/>
       <xs:attribute name="more" type="xs:boolean"/>
+      <xs:attribute name="min" type="integerWithHex"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="cluster">
