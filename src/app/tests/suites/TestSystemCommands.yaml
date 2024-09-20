@@ -18,6 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "SystemCommands"
     endpoint: 0
+    timeout: 180
     payload:
         type: char_string
         defaultValue: "MT:-24J0IX4122-.548G00" # This value needs to be generated
