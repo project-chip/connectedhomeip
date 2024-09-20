@@ -59,7 +59,6 @@ public:
     // event emitting, path marking and other operations
     virtual InteractionModelContext CurrentContext() const { return mContext; }
 
-
     /// Validates that the given event path is supported, where path may contain wildcards.
     ///
     /// If any wild cards exist on the given path, the implementation is expected to validate
@@ -67,7 +66,7 @@ public:
     ///
     /// At the very minimum this will validate that a valid endpoint/cluster can be expanded
     /// from the input path and that the given descriptor has access to it.
-    virtual bool EventPathSupported(const EventPathParams &path, const Access::SubjectDescriptor &descriptor) = 0;
+    virtual bool EventPathSupported(const EventPathParams & path, const Access::SubjectDescriptor & descriptor) = 0;
 
     /// TEMPORARY/TRANSITIONAL requirement for transitioning from ember-specific code
     ///   ReadAttribute is REQUIRED to perform:
