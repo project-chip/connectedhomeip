@@ -17,7 +17,7 @@ set(BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 SET(CODEGEN_DATA_MODEL_SOURCES
   "${BASE_DIR}/CodegenDataModelProvider.cpp"
   "${BASE_DIR}/CodegenDataModelProvider.h"
-  "${BASE_DIR}/CodegenDataModelProvider_EventPathSupported.cpp"
+  "${BASE_DIR}/CodegenDataModelProvider_EventPathReadable.cpp"
   "${BASE_DIR}/CodegenDataModelProvider_Read.cpp"
   "${BASE_DIR}/CodegenDataModelProvider_Write.cpp"
   "${BASE_DIR}/EmberMetadata.cpp"

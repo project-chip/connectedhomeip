@@ -141,7 +141,7 @@ bool HasValidEventPathForEndpoint(EndpointId endpoint, const EventPathParams & p
 
 } // namespace
 
-bool CodegenDataModelProvider::EventPathSupported(const EventPathParams & path, const Access::SubjectDescriptor & descriptor)
+bool CodegenDataModelProvider::EventPathReadable(const EventPathParams & path, const Access::SubjectDescriptor & descriptor)
 {
 
     if (path.HasWildcardEndpointId())

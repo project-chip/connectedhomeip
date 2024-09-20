@@ -673,7 +673,7 @@ CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescript
         }
 
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-        aHasValidEventPath = mDataModelProvider->EventPathSupported(eventPath, aSubjectDescriptor);
+        aHasValidEventPath = mDataModelProvider->EventPathReadable(eventPath, aSubjectDescriptor);
 #endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 
 #if CHIP_CONFIG_USE_EMBER_DATA_MODEL
