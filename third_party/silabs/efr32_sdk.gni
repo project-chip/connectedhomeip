@@ -86,6 +86,9 @@ declare_args() {
 
   # Factory Provision storage
   use_provision_flash_storage = wifi_soc
+
+  # Enable TestEventTrigger in GeneralDiagnostics cluster
+  sl_enable_test_event_trigger = false
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
