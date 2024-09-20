@@ -47,7 +47,7 @@ This schema describes the format of the XML files, that describe the ZCL specifi
     <xs:attribute name="type" use="required"/>
     <xs:attribute name="length" type="xs:int"/>
     <xs:attribute name="presentIf" type="xs:string"/>
-    <xs:attribute name="optional" type="integerWithHex"/>
+    <xs:attribute name="optional" type="xs:boolean"/>
     <xs:attribute name="fieldId" type="integerWithHex"/>
     <xs:attribute name="countArg" type="xs:string" />
     <xs:attribute name="isNullable" type="xs:boolean"/>
