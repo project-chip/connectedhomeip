@@ -69,10 +69,7 @@ def main(search_directory, env_file):
         "TC_OpstateCommon.py",  # Shared code for TC_OPSTATE, not a standalone test
         "TC_pics_checker.py",  # Currently isn't enabled because we don't have any examples with conformant PICS
         "TC_TMP_2_1.py",  # src/python_testing/test_testing/test_TC_TMP_2_1.py is the Unit test of this test
-        "TC_MCORE_FS_1_1.py",  # This test requires a TH_SERVER application, hence not ready run with CI
         "TC_MCORE_FS_1_2.py",  # This test requires a TH_SERVER application, hence not ready run with CI
-        "TC_MCORE_FS_1_3.py",  # This test requires a TH_SERVER application, hence not ready run with CI
-        "TC_MCORE_FS_1_4.py",  # This test requires a TH_SERVER application, hence not ready run with CI
         "TC_MCORE_FS_1_5.py",  # This test requires a TH_SERVER application, hence not ready run with CI
         "TC_OCC_3_1.py",  # There are CI issues for the test cases that implements manually controlling sensor device for the occupancy state ON/OFF change
         "TC_OCC_3_2.py",  # There are CI issues for the test cases that implements manually controlling sensor device for the occupancy state ON/OFF change
