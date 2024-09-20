@@ -66,7 +66,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
                                           "AvailableEndpoints length %d must be less than 21!" % len(available_endpoints))
 
         else:
-            logging.info('Skipping test as available endpoints attribute ID not in attribute list on DUT')
+            self.mark_current_step_skipped()
 
         self.print_step(3, "Read ActiveEndpoints attribute")
 
