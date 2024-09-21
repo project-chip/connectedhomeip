@@ -145,12 +145,13 @@ void PacketBufferHandle::InternalRightSize()
 
     const size_t blockSize   = usedSize + PacketBuffer::kStructureSize;
     PacketBuffer * newBuffer = reinterpret_cast<PacketBuffer *>(chip::Platform::MemoryAlloc(blockSize));
-    SYSTEM_STATS_INCREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
     if (newBuffer == nullptr)
     {
         ChipLogError(chipSystemLayer, "PacketBuffer: pool EMPTY.");
         return;
     }
+
+    SYSTEM_STATS_INCREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
 
     uint8_t * const newStart = newBuffer->ReserveStart();
     newBuffer->next          = nullptr;
