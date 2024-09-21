@@ -446,15 +446,15 @@ private:
         [download checkInteractionModelResponse:response error:error];
     };
 
-    auto * device = [MTRBaseDevice deviceWithNodeID:nodeID controller:controller];
-    auto * cluster = [[MTRBaseClusterDiagnosticLogs alloc] initWithDevice:device endpointID:@(kDiagnosticLogsEndPoint) queue:queue];
+    auto * device = [MTRDevice deviceWithNodeID:nodeID controller:controller];
+    auto * cluster = [[MTRClusterDiagnosticLogs alloc] initWithDevice:device endpointID:@(kDiagnosticLogsEndPoint) queue:queue];
 
     auto * params = [[MTRDiagnosticLogsClusterRetrieveLogsRequestParams alloc] init];
     params.intent = @(type);
     params.requestedProtocol = @(MTRDiagnosticLogsTransferProtocolBDX);
     params.transferFileDesignator = download.fileDesignator;
 
-    [cluster retrieveLogsRequestWithParams:params completion:interactionModelDone];
+    [cluster retrieveLogsRequestWithParams:params expectedValues:nil expectedValueInterval:nil completion:interactionModelDone];
 
     if (timeoutInSeconds > 0) {
         auto err = _bridge->StartBDXTransferTimeout(download, timeoutInSeconds);
