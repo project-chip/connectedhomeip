@@ -274,25 +274,53 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
         supportsHeat = self.check_pics("TSTAT.S.F00")
         supportsCool = self.check_pics("TSTAT.S.F01")
-        supportsOccupancy = self.check_pics("TSTAT.S.F02")
-
-        occupied = True
 
         if supportsHeat:
-            minHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinHeatSetpointLimit)
-            maxHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxHeatSetpointLimit)
+            # If the server supports MinHeatSetpointLimit & MaxHeatSetpointLimit, use those
+            if self.check_pics("TSTAT.S.A0015") and self.check_pics("TSTAT.S.A0016"):
+                minHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinHeatSetpointLimit)
+                maxHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxHeatSetpointLimit)
+            elif self.check_pics("TSTAT.S.A0003") and self.check_pics("TSTAT.S.A0004"):
+                # Otherwise, if the server supports AbsMinHeatSetpointLimit & AbsMaxHeatSetpointLimit, use those
+                minHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMinHeatSetpointLimit)
+                maxHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMaxHeatSetpointLimit)
+
             asserts.assert_true(minHeatSetpointLimit < maxHeatSetpointLimit, "Heat setpoint range invalid")
 
         if supportsCool:
-            minCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinCoolSetpointLimit)
-            maxCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxCoolSetpointLimit)
+            # If the server supports MinCoolSetpointLimit & MaxCoolSetpointLimit, use those
+            if self.check_pics("TSTAT.S.A0017") and self.check_pics("TSTAT.S.A0018"):
+                minCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinCoolSetpointLimit)
+                maxCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxCoolSetpointLimit)
+            elif self.check_pics("TSTAT.S.A0005") and self.check_pics("TSTAT.S.A0006"):
+                # Otherwise, if the server supports AbsMinCoolSetpointLimit & AbsMaxCoolSetpointLimit, use those
+                minCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMinCoolSetpointLimit)
+                maxCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMaxCoolSetpointLimit)
+
             asserts.assert_true(minCoolSetpointLimit < maxCoolSetpointLimit, "Cool setpoint range invalid")
 
+        # Servers that do not support occupancy are always "occupied"
+        occupied = True
+
+        supportsOccupancy = self.check_pics("TSTAT.S.F02")
         if supportsOccupancy:
             occupied = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Occupancy) & 1
 
+        # Target setpoints
         heatSetpoint = minHeatSetpointLimit + ((maxHeatSetpointLimit - minHeatSetpointLimit) / 2)
         coolSetpoint = minCoolSetpointLimit + ((maxCoolSetpointLimit - minCoolSetpointLimit) / 2)
+
+        # Set the heating and cooling setpoints to something other than the target setpoints
+        if occupied:
+            if supportsHeat:
+                await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(heatSetpoint-1), endpoint_id=endpoint)
+            if supportsCool:
+                await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedCoolingSetpoint(coolSetpoint-1), endpoint_id=endpoint)
+        else:
+            if supportsHeat:
+                await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedHeatingSetpoint(heatSetpoint-1), endpoint_id=endpoint)
+            if supportsCool:
+                await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(coolSetpoint-1), endpoint_id=endpoint)
 
         self.step("2")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050")):
