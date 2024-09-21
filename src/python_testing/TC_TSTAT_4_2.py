@@ -261,6 +261,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
 
+        secondary_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=secondary_controller, endpoint=0, cluster=Clusters.Objects.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
+
         current_presets = []
         presetTypes = []
         presetScenarioCounts = {}
@@ -643,7 +645,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_begin_command(dev_ctrl=secondary_controller)
 
             # Primary controller removes the second fabric
-            await self.send_single_cmd(Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=2),  endpoint=0)
+            await self.send_single_cmd(Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=secondary_fabric_index),  endpoint=0)
 
             # Send the AtomicRequest begin command from primary controller, which should succeed, as the secondary controller's atomic write state has been cleared
             status = await self.send_atomic_request_begin_command()
