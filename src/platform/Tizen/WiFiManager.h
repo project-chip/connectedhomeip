@@ -54,7 +54,7 @@ public:
     CHIP_ERROR SetDeviceState(wifi_manager_device_state_e deviceState);
     CHIP_ERROR GetModuleState(wifi_manager_module_state_e * moduleState);
     CHIP_ERROR GetConnectionState(wifi_manager_connection_state_e * connectionState);
-    CHIP_ERROR GetBssId(uint8_t * bssId);
+    CHIP_ERROR GetBssId(MutableByteSpan & value);
     CHIP_ERROR GetSecurityType(wifi_manager_security_type_e * securityType);
     CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & network);
     bool IsWiFiStationConnected();
@@ -105,7 +105,6 @@ private:
     wifi_manager_module_state_e mModuleState;
     wifi_manager_connection_state_e mConnectionState;
 
-    uint8_t mWiFiBSSID[kWiFiBSSIDLength];
     char mWiFiSSID[kMaxWiFiSSIDLength + 1];
     char mWiFiKey[kMaxWiFiKeyLength + 1];
     char mInterestedSSID[kMaxWiFiSSIDLength + 1];

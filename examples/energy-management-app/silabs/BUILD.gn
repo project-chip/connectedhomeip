@@ -47,18 +47,22 @@ import("${examples_common_plat_dir}/args.gni")
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
+
+
   # Enable test event triggers by default: Disable these in production devices
-  chip_enable_energy_evse_trigger = true
-  chip_enable_energy_reporting_trigger = true
-  chip_enable_water_heater_management_trigger = true
-  chip_enable_device_energy_management_trigger = true
+  sl_enable_energy_evse_trigger = true
+  sl_enable_energy_reporting_trigger = true
+  sl_enable_water_heater_management_trigger = true
+  sl_enable_device_energy_management_trigger = true
+
   # Device Energy Management feature support - only one of these can be true
   # or both can be disabled if forecasting is not supported
-  chip_dem_support_power_forecast_reporting = true
-  chip_dem_support_state_forecast_reporting = false
+  sl_dem_support_power_forecast_reporting = true
+  sl_dem_support_state_forecast_reporting = false
+
   # Only one of these examples should be enabled
-  chip_enable_example_evse_device = true
-  chip_enable_example_water_heater_device = false
+  sl_enable_example_evse_device = true
+  sl_enable_example_water_heater_device = false
 }
 
 if (slc_generate) {
@@ -148,14 +152,14 @@ silabs_executable("energy-management-app") {
   defines = []
 
   defines += [
-    "CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER=${chip_enable_energy_evse_trigger}",
-    "CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER=${chip_enable_energy_reporting_trigger}",
-    "CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER=${chip_enable_water_heater_management_trigger}",
-    "CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER=${chip_enable_device_energy_management_trigger}",
-    "CHIP_DEVICE_CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING=${chip_dem_support_power_forecast_reporting}",
-    "CHIP_DEVICE_CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING=${chip_dem_support_state_forecast_reporting}",
-    "CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE=${chip_enable_example_evse_device}",
-    "CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE=${chip_enable_example_water_heater_device}",
+    "SL_MATTER_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER=${sl_enable_energy_evse_trigger}",
+    "SL_MATTER_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER=${sl_enable_energy_reporting_trigger}",
+    "SL_MATTER_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER=${sl_enable_water_heater_management_trigger}",
+    "SL_MATTER_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER=${sl_enable_device_energy_management_trigger}",
+    "SL_MATTER_CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING=${sl_dem_support_power_forecast_reporting}",
+    "SL_MATTER_CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING=${sl_dem_support_state_forecast_reporting}",
+    "SL_MATTER_CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE=${sl_enable_example_evse_device}",
+    "SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE=${sl_enable_example_water_heater_device}",
   ]
 
   if (silabs_board == "BRD2704A") {

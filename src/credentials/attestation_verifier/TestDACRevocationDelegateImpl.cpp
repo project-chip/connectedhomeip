@@ -23,7 +23,6 @@
 
 #include <fstream>
 #include <json/json.h>
-#include <string>
 
 using namespace chip::Crypto;
 
@@ -69,10 +68,10 @@ void TestDACRevocationDelegateImpl::ClearDeviceAttestationRevocationSetPath()
 bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const CharSpan & akidHexStr, const CharSpan & issuerNameBase64Str,
                                                            const CharSpan & serialNumberHexStr)
 {
-    std::ifstream file(mDeviceAttestationRevocationSetPath.data());
+    std::ifstream file(mDeviceAttestationRevocationSetPath.c_str());
     if (!file.is_open())
     {
-        ChipLogError(NotSpecified, "Failed to open file: %s", mDeviceAttestationRevocationSetPath.data());
+        ChipLogError(NotSpecified, "Failed to open file: %s", mDeviceAttestationRevocationSetPath.c_str());
         return false;
     }
 
@@ -188,19 +187,19 @@ void TestDACRevocationDelegateImpl::CheckForRevokedDACChain(
         onCompletion->mCall(onCompletion->mContext, info, attestationError);
     }
 
-    ChipLogDetail(NotSpecified, "Checking for revoked DAC in %s", mDeviceAttestationRevocationSetPath.data());
+    ChipLogDetail(NotSpecified, "Checking for revoked DAC in %s", mDeviceAttestationRevocationSetPath.c_str());
 
     if (IsCertificateRevoked(info.dacDerBuffer))
     {
-        ChipLogProgress(NotSpecified, "Found revoked DAC in %s", mDeviceAttestationRevocationSetPath.data());
+        ChipLogProgress(NotSpecified, "Found revoked DAC in %s", mDeviceAttestationRevocationSetPath.c_str());
         attestationError = AttestationVerificationResult::kDacRevoked;
     }
 
-    ChipLogDetail(NotSpecified, "Checking for revoked PAI in %s", mDeviceAttestationRevocationSetPath.data());
+    ChipLogDetail(NotSpecified, "Checking for revoked PAI in %s", mDeviceAttestationRevocationSetPath.c_str());
 
     if (IsCertificateRevoked(info.paiDerBuffer))
     {
-        ChipLogProgress(NotSpecified, "Found revoked PAI in %s", mDeviceAttestationRevocationSetPath.data());
+        ChipLogProgress(NotSpecified, "Found revoked PAI in %s", mDeviceAttestationRevocationSetPath.c_str());
 
         if (attestationError == AttestationVerificationResult::kDacRevoked)
         {
