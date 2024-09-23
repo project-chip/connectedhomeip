@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 MTR_DIRECT_MEMBERS
 @interface MTRDeviceControllerFactory ()
 
-- (void)controllerShuttingDown:(MTRDeviceController *)controller;
+- (void)controllerShuttingDown:(MTRDeviceController_Concrete *)controller;
 
 /**
  * Get the list of running controllers.  This will include controllers that are
@@ -92,9 +92,9 @@ MTR_DIRECT_MEMBERS
 /**
  * Initialize an MTRDeviceController_Concrete with the given parameters.
  */
-- (nullable MTRDeviceController *)initializeController:(MTRDeviceController_Concrete *)controller
-                                        withParameters:(MTRDeviceControllerParameters *)parameters
-                                                 error:(NSError * __autoreleasing *)error;
+- (nullable MTRDeviceController_Concrete *)initializeController:(MTRDeviceController_Concrete *)controller
+                                                 withParameters:(MTRDeviceControllerParameters *)parameters
+                                                          error:(NSError * __autoreleasing *)error;
 
 /**
  * Add a server endpoint.  This will verify that there is no existing server

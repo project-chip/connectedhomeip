@@ -137,23 +137,6 @@ NS_ASSUME_NONNULL_BEGIN
                       isRunning:(BOOL *)isRunning;
 
 /**
- * Shut down the underlying C++ controller.  Must be called on the Matter work
- * queue or after the Matter work queue has been shut down.
- *
- * Only MTRDeviceControllerFactory should be calling this.
- */
-- (void)shutDownCppController;
-
-/**
- * Notification that the MTRDeviceControllerFactory has finished shutting down
- * this controller and will not be touching it anymore.  This is guaranteed to
- * be called after initWithFactory succeeds.
- *
- * Only MTRDeviceControllerFactory should be calling this.
- */
-- (void)deinitFromFactory;
-
-/**
  * Ensure we have a CASE session to the given node ID and then call the provided
  * connection callback.  This may be called on any queue (including the Matter
  * event queue) and on success will always call the provided connection callback

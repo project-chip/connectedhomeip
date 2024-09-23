@@ -159,7 +159,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
 
             await self.send_go_home_cmd_with_check(10, op_errors.kCommandInvalidInState)
 
-        if self.check_pics("PICS_M_ST_SEEKING_CHARGER"):
+        if self.check_pics("RVCOPSTATE.S.M.ST_SEEKING_CHARGER"):
             step_name = "Manually put the device in the SEEKING CHARGER operational state"
             self.print_step(11, step_name)
             if self.is_ci:
