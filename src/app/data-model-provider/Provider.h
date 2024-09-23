@@ -62,7 +62,7 @@ public:
     /// Validates that the given event path is supported, where path may contain wildcards.
     ///
     /// If any wild cards exist on the given path, the implementation is expected to validate
-    /// that a valid event path exists on some wildcard expansion.
+    /// that an accessible event path exists on some wildcard expansion.
     ///
     /// At the very minimum this will validate that a valid endpoint/cluster can be expanded
     /// from the input path and that the given descriptor has access to it.
