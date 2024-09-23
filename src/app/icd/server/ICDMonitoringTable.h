@@ -34,11 +34,21 @@ using SymmetricKeystore = SessionKeystore;
 
 namespace chip {
 
-inline constexpr size_t kICDMonitoringBufferSize = 60;
+static constexpr size_t MaxICDMonitoringEntrySize()
+{
+    // All the fields added together
+    return TLV::EstimateStructOverhead(
+        sizeof(NodeId) /*checkInNodeID*/, 
+        sizeof(uint64_t) /*monitoredSubject*/,
+        sizeof(Crypto::Symmetric128BitsKeyByteArray) /*aes_key_handle*/,
+        sizeof(Crypto::Symmetric128BitsKeyByteArray) /*hmac_key_handle*/, 
+        sizeof(uint8_t) /*client_type*/) * 3 / 2;
+}
+
+inline constexpr size_t kICDMonitoringBufferSize = MaxICDMonitoringEntrySize();
 
 struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
 {
-
     ICDMonitoringEntry(FabricIndex fabric = kUndefinedFabricIndex, NodeId nodeId = kUndefinedNodeId)
     {
         this->fabricIndex      = fabric;
