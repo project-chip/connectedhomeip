@@ -115,10 +115,10 @@ void SensorManager::SensorTimerEventHandler(void * arg)
 
     if ((temperature >= (lastTemperature + kMinTemperatureDelta)) || temperature <= (lastTemperature - kMinTemperatureDelta))
     {
-        lastTemperature = temperature;
+        lastTemperature            = temperature;
         AttributeUpdateInfo * data = chip::Platform::New<AttributeUpdateInfo>();
-        data->endPoint = kThermostatEndpoint;
-        data->temperature = temperature;
+        data->endPoint             = kThermostatEndpoint;
+        data->temperature          = temperature;
         // The SensorMagager shouldn't be aware of the Endpoint ID TODO Fix this.
         // TODO Per Spec we should also apply the Offset stored in the same cluster before saving the temp
 
@@ -128,7 +128,7 @@ void SensorManager::SensorTimerEventHandler(void * arg)
 
 void SensorManager::UpdateClusterState(intptr_t context)
 {
-    SensorManager::AttributeUpdateInfo * data = reinterpret_cast<SensorManager::AttributeUpdateInfo *> (context);
+    SensorManager::AttributeUpdateInfo * data = reinterpret_cast<SensorManager::AttributeUpdateInfo *>(context);
     app::Clusters::Thermostat::Attributes::LocalTemperature::Set(data->endPoint, data->temperature);
     chip::Platform::Delete(data);
 }
