@@ -17,23 +17,21 @@
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
-#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/EventPathParams.h>
 #include <app/RequiredPrivilege.h>
+#include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
-#include <app/util/IMClusterCommandHandler.h>
 #include <lib/core/DataModelTypes.h>
 
 // separated out for code-reuse
 #include <app/ember_coupling/EventPathValidity.mixin.h>
 
-
 #include <optional>
 #include <variant>
-
 
 namespace chip {
 namespace app {
@@ -555,7 +553,8 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
     return ConcreteCommandPath(before.mEndpointId, before.mClusterId, *commandId);
 }
 
-bool CodegenDataModelProvider::EventPathIncludesAccessibleConcretePath(const EventPathParams & path, const Access::SubjectDescriptor & descriptor)
+bool CodegenDataModelProvider::EventPathIncludesAccessibleConcretePath(const EventPathParams & path,
+                                                                       const Access::SubjectDescriptor & descriptor)
 {
 
     if (!path.HasWildcardEndpointId())
@@ -578,7 +577,6 @@ bool CodegenDataModelProvider::EventPathIncludesAccessibleConcretePath(const Eve
     }
     return false;
 }
-
 
 } // namespace app
 } // namespace chip

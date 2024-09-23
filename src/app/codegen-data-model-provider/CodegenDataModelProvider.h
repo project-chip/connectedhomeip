@@ -69,7 +69,8 @@ public:
     /// Generic model implementations
     CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
 
-    bool EventPathIncludesAccessibleConcretePath(const EventPathParams & path, const Access::SubjectDescriptor & descriptor) override;
+    bool EventPathIncludesAccessibleConcretePath(const EventPathParams & path,
+                                                 const Access::SubjectDescriptor & descriptor) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
