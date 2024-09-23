@@ -41,10 +41,10 @@ static constexpr size_t MaxICDMonitoringEntrySize()
                                        sizeof(Crypto::Symmetric128BitsKeyByteArray) /*aes_key_handle*/,
                                        sizeof(Crypto::Symmetric128BitsKeyByteArray) /*hmac_key_handle*/,
                                        sizeof(uint8_t) /*client_type*/) *
-         // Provide 50% extra space to make a firmware upgrade that starts storing
-         // more data followed by a downgrade work easily and reliably.
-         // The 50% number is chosen fairly randomly; storage increases larger than that are
-         // possible but need to be staged carefully.
+        // Provide 50% extra space to make a firmware upgrade that starts storing
+        // more data followed by a downgrade work easily and reliably.
+        // The 50% number is chosen fairly randomly; storage increases larger than that are
+        // possible but need to be staged carefully.
         3 / 2;
 }
 
