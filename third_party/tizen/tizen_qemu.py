@@ -19,9 +19,9 @@ import logging
 import os
 import re
 import shlex
+import shutil
 import subprocess
 import sys
-import shutil
 
 # Absolute path to Tizen Studio CLI tool.
 tizen_sdk_root = os.environ.get("TIZEN_SDK_ROOT", "")
