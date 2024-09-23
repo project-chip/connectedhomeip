@@ -189,7 +189,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             device_node_id=th_server_th_node_id)
 
         # Wait for the device to appear on the DUT_FSA_BRIDGE.
-        await asyncio.sleep(2)
+        await asyncio.sleep(30)
 
         # Get the list of endpoints on the DUT_FSA_BRIDGE after adding the TH_SERVER_NO_UID.
         dut_fsa_bridge_endpoints_new = set(await self.read_single_attribute_check_success(
