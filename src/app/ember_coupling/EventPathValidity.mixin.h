@@ -22,7 +22,7 @@ namespace chip {
 namespace app {
 namespace {
 
-bool EventAccessible(const EmberAfCluster * cluster, EventId eventId)
+bool ClusterSupportsEvent(const EmberAfCluster * cluster, EventId eventId)
 {
 #if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     for (size_t i = 0; i < cluster->eventCount; ++i)
@@ -93,7 +93,7 @@ static bool HasValidEventPathForEndpointAndCluster(EndpointId aEndpoint, const E
 #endif
     }
 
-    if (!EventAccessible(aCluster, aEventPath.mEventId))
+    if (!ClusterSupportsEvent(aCluster, aEventPath.mEventId))
     {
         // Not an existing event path.
         return false;
