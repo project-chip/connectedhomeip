@@ -69,14 +69,20 @@ class App:
         return False
 
     def factoryReset(self):
+        logging.error("FACTORY RESET: %s" % self.command)
+        logging.error("self.killed: %s" % self.killed)
         wasRunning = (not self.killed) and self.stop()
+        logging.error("wasRunning: %s" % wasRunning)
 
         for kvs in self.kvsPathSet:
             if os.path.exists(kvs):
+                logging.error("UNLINKING: %s" % kvs)
                 os.unlink(kvs)
 
         if wasRunning:
-            return self.start()
+            started = self.start()
+            logging.error("STARTED: %s" % started)
+            return started
 
         return True
 
