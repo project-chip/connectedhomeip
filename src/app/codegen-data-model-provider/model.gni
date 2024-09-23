@@ -27,7 +27,6 @@ import("//build_overrides/chip.gni")
 codegen_data_model_SOURCES = [
   "${chip_root}/src/app/codegen-data-model-provider/CodegenDataModelProvider.cpp",
   "${chip_root}/src/app/codegen-data-model-provider/CodegenDataModelProvider.h",
-  "${chip_root}/src/app/codegen-data-model-provider/CodegenDataModelProvider_EventPathReadable.cpp",
   "${chip_root}/src/app/codegen-data-model-provider/CodegenDataModelProvider_Read.cpp",
   "${chip_root}/src/app/codegen-data-model-provider/CodegenDataModelProvider_Write.cpp",
   "${chip_root}/src/app/codegen-data-model-provider/EmberMetadata.cpp",

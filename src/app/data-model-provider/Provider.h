@@ -66,7 +66,7 @@ public:
     ///
     /// At the very minimum this will validate that a valid endpoint/cluster can be expanded
     /// from the input path and that the given descriptor has access to it.
-    virtual bool EventPathReadable(const EventPathParams & path, const Access::SubjectDescriptor & descriptor) = 0;
+    virtual bool EventPathIncludesAccessibleConcretePath(const EventPathParams & path, const Access::SubjectDescriptor & descriptor) = 0;
 
     /// TEMPORARY/TRANSITIONAL requirement for transitioning from ember-specific code
     ///   ReadAttribute is REQUIRED to perform:

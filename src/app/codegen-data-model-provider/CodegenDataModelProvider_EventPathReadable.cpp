@@ -30,7 +30,7 @@
 namespace chip {
 namespace app {
 
-bool CodegenDataModelProvider::EventPathReadable(const EventPathParams & path, const Access::SubjectDescriptor & descriptor)
+bool CodegenDataModelProvider::EventPathIncludesAccessibleConcretePath(const EventPathParams & path, const Access::SubjectDescriptor & descriptor)
 {
 
     if (!path.HasWildcardEndpointId())

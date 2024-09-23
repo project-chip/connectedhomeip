@@ -574,7 +574,7 @@ CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescript
         }
 
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-        aHasValidEventPath = mDataModelProvider->EventPathReadable(eventPath, aSubjectDescriptor);
+        aHasValidEventPath = mDataModelProvider->EventPathIncludesAccessibleConcretePath(eventPath, aSubjectDescriptor);
 #else
         // The definition of "valid path" is "path exists and ACL allows
         // access".  We need to do some expansion of wildcards to handle that.

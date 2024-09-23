@@ -16,16 +16,24 @@
  */
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
-#include <app-common/zap-generated/attribute-type.h>
+#include <access/AccessControl.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app/EventPathParams.h>
 #include <app/RequiredPrivilege.h>
-#include <app/util/IMClusterCommandHandler.h>
+#include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <app/util/IMClusterCommandHandler.h>
 #include <lib/core/DataModelTypes.h>
+
+// separated out for code-reuse
+#include <app/ember_coupling/EventPathValidity.mixin.h>
+
 
 #include <optional>
 #include <variant>
+
 
 namespace chip {
 namespace app {
@@ -546,6 +554,31 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
 
     return ConcreteCommandPath(before.mEndpointId, before.mClusterId, *commandId);
 }
+
+bool CodegenDataModelProvider::EventPathIncludesAccessibleConcretePath(const EventPathParams & path, const Access::SubjectDescriptor & descriptor)
+{
+
+    if (!path.HasWildcardEndpointId())
+    {
+        // No need to check whether the endpoint is enabled, because
+        // emberAfFindEndpointType returns null for disabled endpoints.
+        return HasValidEventPathForEndpoint(path.mEndpointId, path, descriptor);
+    }
+
+    for (uint16_t endpointIndex = 0; endpointIndex < emberAfEndpointCount(); ++endpointIndex)
+    {
+        if (!emberAfEndpointIndexIsEnabled(endpointIndex))
+        {
+            continue;
+        }
+        if (HasValidEventPathForEndpoint(emberAfEndpointFromIndex(endpointIndex), path, descriptor))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 } // namespace app
 } // namespace chip
