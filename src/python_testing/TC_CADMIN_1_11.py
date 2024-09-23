@@ -26,6 +26,7 @@
 import logging
 import random
 from time import sleep
+from typing import Optional
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
