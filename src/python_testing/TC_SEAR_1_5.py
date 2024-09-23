@@ -119,7 +119,7 @@ class TC_SEAR_1_5(MatterBaseTest):
             self.print_step("3", test_step)
             if self.is_ci:
                 await self.send_single_cmd(cmd=Clusters.Objects.ServiceArea.Commands.SelectAreas(newAreas=[7]),
-                            endpoint=self.endpoint)
+                                           endpoint=self.endpoint)
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
