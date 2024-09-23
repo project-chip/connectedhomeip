@@ -29,8 +29,8 @@ namespace {
  * no way to actually tell.
  *
  * This function is functionally similar to `CheckEventSupportStatus` however
- * it avoids extra lookups to find the underlying cluster (cluster is already)
- * passed into the method.
+ * it avoids extra lookups to find the underlying cluster (cluster is already
+ * passed into the method).
  */
 bool ClusterSupportsEvent(const EmberAfCluster * cluster, EventId eventId)
 {
