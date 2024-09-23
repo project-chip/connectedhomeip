@@ -14,35 +14,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
+
 <!--
 TODO: Make these structures global rather than defining them for each cluster.
  This depends on the ability to define global structs via XML tags.
  see: https://github.com/project-chip/connectedhomeip/issues/29818
 -->
+
 <configurator>
   <domain name="CHIP"/>
+
   <!--
     These are test global items (no cluster attached) for testing only.
     Their usage is defined for UnitTestCluster only.
   -->
   <bitmap name="TestGlobalBitmap" type="bitmap32">
-    <field mask="0x00000002" name="FirstBit"/>
-    <field mask="0x00000004" name="SecondBit"/>
+    <field mask="0x01" name="FirstBit" />
+    <field mask="0x02" name="SecondBit" />
   </bitmap>
 
-  <bitmap name="WebRTCMetadataOptions" type="bitmap8">
-    <field name="DataTLV" mask="0x01"/>
-  </bitmap>
-
-  <bitmap name="WildcardPathFlagsBitmap" type="bitmap8">
-    <field name="WildcardSkipRootNode" mask="0x01"/>
-    <field name="WildcardSkipGlobalAttributes" mask="0x02"/>
-    <field name="WildcardSkipAttributeList" mask="0x04"/>
-    <field name="Reserved" mask="0x08"/>
-    <field name="WildcardSkipCommandLists" mask="0x10"/>
-    <field name="WildcardSkipCustomElements" mask="0x20"/>
-    <field name="WildcardSkipFixedAttributes" mask="0x40"/>
-    <field name="WildcardSkipChangesOmittedAttributes" mask="0x80"/>
-    <field name="WildcardSkipDiagnosticsClusters" mask="0x100"/>
-  </bitmap>
 </configurator>
