@@ -52,7 +52,7 @@
 
 #if CHIP_CONFIG_USE_EMBER_DATA_MODEL
 #include <app/ember_coupling/EventPathValidity.mixin.h>
-#endif 
+#endif
 
 namespace chip {
 namespace app {
@@ -546,7 +546,6 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
     return err;
 }
 
-
 CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
                                                    EventPathIBs::Parser & aEventPathListParser, bool & aHasValidEventPath,
                                                    size_t & aRequestedEventPathCount)
@@ -577,8 +576,8 @@ CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescript
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
         aHasValidEventPath = mDataModelProvider->EventPathReadable(eventPath, aSubjectDescriptor);
 #else
-       // The definition of "valid path" is "path exists and ACL allows
-       // access".  We need to do some expansion of wildcards to handle that.
+        // The definition of "valid path" is "path exists and ACL allows
+        // access".  We need to do some expansion of wildcards to handle that.
         if (eventPath.HasWildcardEndpointId())
         {
             for (uint16_t endpointIndex = 0; !aHasValidEventPath && endpointIndex < emberAfEndpointCount(); ++endpointIndex)

@@ -267,7 +267,7 @@ static_library("interaction-model") {
       "reporting/Read-Ember.cpp",
       "reporting/Read-Ember.h",
     ]
-    public_deps += [ 
+    public_deps += [
       "${chip_root}/src/app/data-model-provider",
       "${chip_root}/src/app/ember_coupling",
     ]

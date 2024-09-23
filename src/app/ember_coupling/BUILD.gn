@@ -19,7 +19,5 @@ import("//build_overrides/chip.gni")
 #
 # They are NOT stand-alone compilable and are rather for `#include` support.
 source_set("ember_coupling") {
-  sources = [
-    "EventPathValidity.mixin.h"
-  ]
+  sources = [ "EventPathValidity.mixin.h" ]
 }
