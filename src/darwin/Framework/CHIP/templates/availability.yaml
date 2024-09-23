@@ -9801,6 +9801,10 @@
               - GlobalEchoResponse
               - StringEchoRequest
               - StringEchoResponse
+      command fields:
+          DoorLock:
+              GetCredentialStatusResponse:
+                  - credentialData
       structs:
           AccessControl:
               # Targeting 1.4
