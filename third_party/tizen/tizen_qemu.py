@@ -85,9 +85,8 @@ def whereis(binary_name):
 
     # Search for the binary in each directory.
     for directory in path_dirs:
-        binary_path = os.path.join(directory, binary_name)
-        if os.path.isfile(binary_path) and os.access(binary_path, os.X_OK):
-            found_paths.append(binary_path)
+        if found := shutil.which(binary_name, path=directory):
+            found_paths.append(found)
 
     return found_paths
 
