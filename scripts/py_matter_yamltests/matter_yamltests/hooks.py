@@ -161,7 +161,7 @@ class TestRunnerHooks():
         request: TestStep
             The original request as defined by the test step.
         endpoint: int
-            An optional device endpoint the step will target for.
+            An optional device endpoint the step will target.
         """
         pass
 
