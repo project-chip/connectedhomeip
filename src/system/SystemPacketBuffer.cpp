@@ -151,6 +151,8 @@ void PacketBufferHandle::InternalRightSize()
         return;
     }
 
+    SYSTEM_STATS_INCREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
+
     uint8_t * const newStart = newBuffer->ReserveStart();
     newBuffer->next          = nullptr;
     newBuffer->payload       = newStart + (payload - start);
