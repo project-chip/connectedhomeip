@@ -31,8 +31,14 @@ class SensorManager
 {
 public:
     CHIP_ERROR Init();
+    struct AttributeUpdateInfo
+    {
+        int16_t temperature;
+        uint16_t endPoint;
+    };
 
 private:
+    static void UpdateClusterState(intptr_t context);
     friend SensorManager & SensorMgr();
 
     osTimerId_t mSensorTimer;
