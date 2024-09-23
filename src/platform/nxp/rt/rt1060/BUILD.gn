@@ -129,6 +129,8 @@ static_library("nxp_platform") {
       "../../../OpenThread/GenericThreadBorderRouterDelegate.h",
     ]
 
+    deps += [ "${chip_root}/src/app/common:ids" ]
+
     if (!nxp_build_matter_standalone_lib) {
       deps += [ "${chip_root}/third_party/openthread:openthread" ]
       public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
@@ -153,8 +155,8 @@ static_library("nxp_platform") {
           "../../../OpenThread/OpenThreadDnssdImpl.cpp",
           "../../../OpenThread/OpenThreadDnssdImpl.h",
         ]
-        deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
       }
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }
 
