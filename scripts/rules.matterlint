@@ -34,6 +34,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/measurement-and-sensing.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/microwave-oven-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/microwave-oven-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/ecosystem-information-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/energy-evse-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/energy-evse-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/ethernet-network-diagnostics-cluster.xml";
@@ -43,6 +44,8 @@ load "../src/app/zap-templates/zcl/data-model/chip/flow-measurement-cluster.xml"
 load "../src/app/zap-templates/zcl/data-model/chip/general-commissioning-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/general-diagnostics-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/global-attributes.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/global-bitmaps.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/global-enums.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/global-structs.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/groups-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/group-key-mgmt-cluster.xml";
@@ -94,6 +97,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/thermostat-user-interface-con
 load "../src/app/zap-templates/zcl/data-model/chip/thermostat-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/thread-border-router-management-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/thread-network-diagnostics-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/thread-network-directory-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/time-format-localization-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/time-synchronization-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/timer-cluster.xml";
@@ -113,10 +117,6 @@ load "../src/app/zap-templates/zcl/data-model/chip/resource-monitoring-cluster.x
 load "../src/app/zap-templates/zcl/data-model/chip/sample-mei-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/electrical-energy-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/electrical-power-measurement-cluster.xml";
-load "../src/app/zap-templates/zcl/data-model/draft/barrier-control-cluster.xml";
-load "../src/app/zap-templates/zcl/data-model/draft/electrical-measurement-cluster.xml";
-load "../src/app/zap-templates/zcl/data-model/draft/input-output-value-clusters.xml";
-load "../src/app/zap-templates/zcl/data-model/draft/onoff-switch-configuration-cluster.xml";
 
 all endpoints {
     // These attributes follow a different code path and do not have to be
@@ -152,10 +152,13 @@ endpoint 0 {
   require server cluster OperationalCredentials;
   require server cluster GeneralDiagnostics;
 
-  // Example rejection of clusters:
+  // It is disallowed to have Simple Device type cluster requirements on EP0.
   //
+  // TODO: Make sure for these commented rules that nothing breaks in CI
   // reject server cluster Scenes;
+  // reject server cluster ScenesManagement;
   // reject server cluster Groups;
+  reject server cluster Identify;
 
   // Required only if !CustomNetworkConfig.
   // require server cluster NetworkCommissioning;

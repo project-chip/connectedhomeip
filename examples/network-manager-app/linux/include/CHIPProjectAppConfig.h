@@ -18,8 +18,11 @@
 
 #pragma once
 
-#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 0xFFF10010 // TODO: ID-TBD
+#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 144 // 0x0090 Network Infrastructure Manager
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "Network Infrastructure Manager"
+
+// Sufficient space for ArlReviewEvent of several fabrics.
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE (32 * 1024)
 
 // Inherit defaults from config/standalone/CHIPProjectConfig.h
 #include <CHIPProjectConfig.h>

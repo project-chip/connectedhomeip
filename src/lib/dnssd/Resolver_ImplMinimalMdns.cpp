@@ -544,7 +544,17 @@ CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResol
     switch (data.type)
     {
     case DiscoveryType::kOperational:
-        qname = CheckAndAllocateQName(kOperationalServiceName, kOperationalProtocol, kLocalDomain);
+        if (data.filter.type == DiscoveryFilterType::kCompressedFabricId)
+        {
+            char subtypeStr[Common::kSubTypeMaxLength + 1];
+            ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), data.filter));
+            qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kOperationalServiceName, kOperationalProtocol,
+                                          kLocalDomain);
+        }
+        else
+        {
+            qname = CheckAndAllocateQName(kOperationalServiceName, kOperationalProtocol, kLocalDomain);
+        }
         break;
     case DiscoveryType::kCommissionableNode:
         if (data.filter.type == DiscoveryFilterType::kNone)

@@ -19,13 +19,63 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
+# test-runner-runs: run1 run2 run3 run4 run5 run6 run7 run8
 # test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 # test-runner-run/run1/script-args: --storage-path admin_storage.json --manual-code 10054912339 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#
+# test-runner-run/run2/app: ${CHIP_LOCK_APP}
+# test-runner-run/run2/factoryreset: True
+# test-runner-run/run2/quiet: True
+# test-runner-run/run2/app-args: --discriminator 1234 --KVS kvs1
+# test-runner-run/run2/script-args: --storage-path admin_storage.json --manual-code 10054912339
+#
+# test-runner-run/run3/app: ${CHIP_LOCK_APP}
+# test-runner-run/run3/factoryreset: True
+# test-runner-run/run3/quiet: True
+# test-runner-run/run3/app-args: --discriminator 1234 --KVS kvs1
+# test-runner-run/run3/script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00
+#
+# test-runner-run/run4/app: ${CHIP_LOCK_APP}
+# test-runner-run/run4/factoryreset: True
+# test-runner-run/run4/quiet: True
+# test-runner-run/run4/app-args: --discriminator 1234 --KVS kvs1
+# test-runner-run/run4/script-args: --storage-path admin_storage.json --discriminator 1234 --passcode 20202021
+#
+# test-runner-run/run5/app: ${CHIP_LOCK_APP}
+# test-runner-run/run5/factoryreset: True
+# test-runner-run/run5/quiet: True
+# test-runner-run/run5/app-args: --discriminator 1234 --KVS kvs1
+# test-runner-run/run5/script-args: --storage-path admin_storage.json --manual-code 10054912339 --commissioning-method on-network
+#
+# test-runner-run/run6/app: ${CHIP_LOCK_APP}
+# test-runner-run/run6/factoryreset: True
+# test-runner-run/run6/quiet: True
+# test-runner-run/run6/app-args: --discriminator 1234 --KVS kvs1
+# test-runner-run/run6/script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00 --commissioning-method on-network
+#
+# test-runner-run/run7/app: ${CHIP_LOCK_APP}
+# test-runner-run/run7/factoryreset: True
+# test-runner-run/run7/quiet: True
+# test-runner-run/run7/app-args: --discriminator 1234 --KVS kvs1
+# test-runner-run/run7/script-args: --storage-path admin_storage.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network
+#
+# test-runner-run/run8/app: ${CHIP_LOCK_APP}
+# test-runner-run/run8/factoryreset: False
+# test-runner-run/run8/quiet: True
+# test-runner-run/run8/app-args: --discriminator 1234 --KVS kvs1
+# test-runner-run/run8/script-args: --storage-path admin_storage.json
 # === END CI TEST ARGUMENTS ===
+
+# Run 1: runs through all tests
+# Run 2: tests PASE connection using manual code (12.1 only)
+# Run 3: tests PASE connection using QR code (12.1 only)
+# Run 4: tests PASE connection using discriminator and passcode (12.1 only)
+# Run 5: Tests CASE connection using manual code (12.1 only)
+# Run 6: Tests CASE connection using QR code (12.1 only)
+# Run 7: Tests CASE connection using manual discriminator and passcode (12.1 only)
 
 import logging
 from dataclasses import dataclass
@@ -775,7 +825,18 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         software_version = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SoftwareVersion]
         filename = f'device_dump_0x{vid:04X}_0x{pid:04X}_{software_version}.json'
         dump_device_composition_path = self.user_params.get("dump_device_composition_path", filename)
-        self.dump_wildcard(dump_device_composition_path)
+        json_str, txt_str = self.dump_wildcard(dump_device_composition_path)
+
+        # Structured dump so we can pull these back out of the logs
+        def log_structured_data(start_tag: str, dump_string):
+            lines = dump_string.splitlines()
+            logging.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
+            for line in lines:
+                logging.info(f'{start_tag}{line}')
+            logging.info(f'{start_tag}END ====')
+
+        log_structured_data('==== json: ', json_str)
+        log_structured_data('==== txt: ', txt_str)
 
 
 if __name__ == "__main__":

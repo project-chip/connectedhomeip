@@ -18,6 +18,9 @@
 #import <Foundation/Foundation.h>
 #import <Matter/Matter.h>
 
+// For MTRDeviceDataValueDictionary:
+#import "MTRDevice_Internal.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Declarations for internal methods
@@ -47,8 +50,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDevice (Test)
 - (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther;
-- (MTRDeviceClusterData *)_getClusterDataForPath:(MTRClusterPath *)path;
-- (BOOL)_clusterHasBeenPersisted:(MTRClusterPath *)path;
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
 @end
 
@@ -57,6 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
 #ifdef DEBUG
 @interface MTRDeviceController (TestDebug)
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
+- (NSUInteger)unitTestDelegateCount;
 @end
 
 @interface MTRBaseDevice (TestDebug)
@@ -79,6 +81,10 @@ NS_ASSUME_NONNULL_BEGIN
     deviceReportingExcessivelyIntervalThreshold:(NSTimeInterval)deviceReportingExcessivelyIntervalThreshold;
 - (void)unitTestSetMostRecentReportTimes:(NSMutableArray<NSDate *> *)mostRecentReportTimes;
 - (NSUInteger)unitTestNonnullDelegateCount;
+- (void)unitTestResetSubscription;
+- (MTRDeviceClusterData *)unitTestGetClusterDataForPath:(MTRClusterPath *)path;
+- (NSSet<MTRClusterPath *> *)unitTestGetPersistedClusters;
+- (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;
 @end
 #endif
 

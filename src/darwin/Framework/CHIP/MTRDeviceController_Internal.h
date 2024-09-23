@@ -29,21 +29,28 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
+#import <os/lock.h>
+
 #import "MTRBaseDevice.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerDataStore.h"
+#import "MTRDeviceControllerDelegate.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 
+#import <Matter/MTRP256KeypairBridge.h>
+
 #import <Matter/MTRDefines.h>
-#import <Matter/MTRDeviceControllerStartupParams.h>
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
 #import <Matter/MTRDiagnosticLogsType.h>
 #import <Matter/MTROTAProviderDelegate.h>
 
-@class MTRDeviceControllerStartupParamsInternal;
+@class MTRDeviceControllerParameters;
 @class MTRDeviceControllerFactory;
 @class MTRDevice;
 @class MTRAsyncWorkQueue;
+@protocol MTRDevicePairingDelegate;
+@protocol MTRDeviceControllerDelegate;
+@class MTRDevice_Concrete;
 
 namespace chip {
 class FabricTable;
@@ -57,19 +64,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceController ()
 
-#pragma mark - MTRDeviceControllerFactory methods
+@property (nonatomic, readonly) NSMapTable<NSNumber *, MTRDevice *> * nodeIDToDeviceMap;
+@property (readonly, assign) os_unfair_lock_t deviceMapLock;
 
-/**
- * Start a new controller.  Returns whether startup succeeded.  If this fails,
- * it guarantees that it has called controllerShuttingDown on the
- * MTRDeviceControllerFactory.
- *
- * The return value will always match [controller isRunning] for this
- * controller.
- *
- * Only MTRDeviceControllerFactory should be calling this.
- */
-- (BOOL)startup:(MTRDeviceControllerStartupParamsInternal *)startupParams;
+@property (readwrite, nonatomic) NSUUID * uniqueIdentifier;
+
+// queue used to serialize all work performed by the MTRDeviceController
+// (moved here so subclasses can initialize differently)
+@property (readwrite, retain) dispatch_queue_t chipWorkQueue;
+
+- (instancetype)initForSubclasses:(BOOL)startSuspended;
+
+#pragma mark - MTRDeviceControllerFactory methods
 
 /**
  * Will return chip::kUndefinedFabricIndex if we do not have a fabric index.
@@ -79,8 +85,6 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Will return the compressed fabric id of the fabric if the controller is
  * running, else nil.
- *
- * This property MUST be gotten from the Matter work queue.
  */
 @property (nonatomic, readonly, nullable) NSNumber * compressedFabricID;
 
@@ -103,19 +107,19 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
 
 /**
- * Init a newly created controller.
- *
- * Only MTRDeviceControllerFactory should be calling this.
+ * Fabric ID tied to controller
  */
-- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
-                             queue:(dispatch_queue_t)queue
-                   storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
-              storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
-               otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
-          otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
-                  uniqueIdentifier:(NSUUID *)uniqueIdentifier
-    concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
-      storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
+@property (nonatomic, retain, nullable) NSNumber * fabricID;
+
+/**
+ * Node ID tied to controller
+ */
+@property (nonatomic, retain, nullable) NSNumber * nodeID;
+
+/**
+ * Root Public Key tied to controller
+ */
+@property (nonatomic, retain, nullable) NSData * rootPublicKey;
 
 /**
  * Check whether this controller is running on the given fabric, as represented
@@ -131,23 +135,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
                     fabricIndex:(chip::FabricIndex)fabricIndex
                       isRunning:(BOOL *)isRunning;
-
-/**
- * Shut down the underlying C++ controller.  Must be called on the Matter work
- * queue or after the Matter work queue has been shut down.
- *
- * Only MTRDeviceControllerFactory should be calling this.
- */
-- (void)shutDownCppController;
-
-/**
- * Notification that the MTRDeviceControllerFactory has finished shutting down
- * this controller and will not be touching it anymore.  This is guaranteed to
- * be called after initWithFactory succeeds.
- *
- * Only MTRDeviceControllerFactory should be calling this.
- */
-- (void)deinitFromFactory;
 
 /**
  * Ensure we have a CASE session to the given node ID and then call the provided
@@ -264,9 +251,12 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Device-specific data and SDK access
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID;
+/**
+ * _setupDeviceForNodeID is a hook expected to be implemented by subclasses to
+ * actually allocate a device object of the right type.
+ */
+- (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData;
 - (void)removeDevice:(MTRDevice *)device;
-
-- (NSNumber * _Nullable)syncGetCompressedFabricID;
 
 /**
  * Since getSessionForNode now enqueues by the subscription pool for Thread
@@ -275,6 +265,46 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
 
+/**
+ * This method returns TRUE if this controller matches the fabric reference and node ID as listed in the parameters.
+ */
+- (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate;
+
+/**
+ * Clear any pending shutdown request.
+ */
+- (void)clearPendingShutdown;
+
 @end
+
+/**
+ * Shim to allow us to treat an MTRDevicePairingDelegate as an
+ * MTRDeviceControllerDelegate.
+ */
+@interface MTRDevicePairingDelegateShim : NSObject <MTRDeviceControllerDelegate>
+@property (nonatomic, readonly) id<MTRDevicePairingDelegate> delegate;
+- (instancetype)initWithDelegate:(id<MTRDevicePairingDelegate>)delegate;
+@end
+
+static NSString * const kDeviceControllerErrorCommissionerInit = @"Init failure while initializing a commissioner";
+static NSString * const kDeviceControllerErrorIPKInit = @"Init failure while initializing IPK";
+static NSString * const kDeviceControllerErrorSigningKeypairInit = @"Init failure while creating signing keypair bridge";
+static NSString * const kDeviceControllerErrorOperationalCredentialsInit = @"Init failure while creating operational credentials delegate";
+static NSString * const kDeviceControllerErrorOperationalKeypairInit = @"Init failure while creating operational keypair bridge";
+static NSString * const kDeviceControllerErrorPairingInit = @"Init failure while creating a pairing delegate";
+static NSString * const kDeviceControllerErrorPartialDacVerifierInit = @"Init failure while creating a partial DAC verifier";
+static NSString * const kDeviceControllerErrorPairDevice = @"Failure while pairing the device";
+static NSString * const kDeviceControllerErrorStopPairing = @"Failure while trying to stop the pairing process";
+static NSString * const kDeviceControllerErrorOpenPairingWindow = @"Open Pairing Window failed";
+static NSString * const kDeviceControllerErrorNotRunning = @"Controller is not running. Call startup first.";
+static NSString * const kDeviceControllerErrorSetupCodeGen = @"Generating Manual Pairing Code failed";
+static NSString * const kDeviceControllerErrorGenerateNOC = @"Generating operational certificate failed";
+static NSString * const kDeviceControllerErrorKeyAllocation = @"Generating new operational key failed";
+static NSString * const kDeviceControllerErrorCSRValidation = @"Extracting public key from CSR failed";
+static NSString * const kDeviceControllerErrorGetCommissionee = @"Failure obtaining device being commissioned";
+static NSString * const kDeviceControllerErrorGetAttestationChallenge = @"Failure getting attestation challenge";
+static NSString * const kDeviceControllerErrorSpake2pVerifierGenerationFailed = @"PASE verifier generation failed";
+static NSString * const kDeviceControllerErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
+static NSString * const kDeviceControllerErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
 
 NS_ASSUME_NONNULL_END

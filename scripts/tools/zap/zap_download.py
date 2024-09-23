@@ -23,6 +23,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+import tempfile
 import zipfile
 from typing import Optional
 
@@ -105,15 +106,21 @@ def _SetupReleaseZap(install_directory: str, zap_version: str):
 
     if sys.platform == 'linux':
         zap_platform = 'linux'
+        arch = os.uname().machine
     elif sys.platform == 'darwin':
         zap_platform = 'mac'
+        arch = os.uname().machine
+    elif sys.platform == 'win32':
+        zap_platform = 'win'
+        # os.uname is not implemented on Windows, so use an alternative instead.
+        import platform
+        arch = platform.uname().machine
     else:
         raise Exception('Unknown platform - do not know what zip file to download.')
 
-    arch = os.uname().machine
     if arch == 'arm64':
         zap_arch = 'arm64'
-    elif arch == 'x86_64':
+    elif arch == 'x86_64' or arch == 'AMD64':
         zap_arch = 'x64'
     else:
         raise Exception(f'Unknown architecture "${arch}" - do not know what zip file to download.')
@@ -123,13 +130,22 @@ def _SetupReleaseZap(install_directory: str, zap_version: str):
     logging.info("Fetching: %s", url)
 
     r = requests.get(url, stream=True)
-    z = zipfile.ZipFile(io.BytesIO(r.content))
-
-    logging.info("Data downloaded, extracting ...")
-    # extractall() does not preserve permissions (https://github.com/python/cpython/issues/59999)
-    for entry in z.filelist:
-        path = z.extract(entry, install_directory)
-        os.chmod(path, (entry.external_attr >> 16) & 0o777)
+    if zap_platform == 'mac':
+        # zipfile does not support symlinks (https://github.com/python/cpython/issues/82102),
+        # making a zap.app extracted with it unusable due to embedded frameworks.
+        with tempfile.NamedTemporaryFile(suffix='.zip') as tf:
+            for chunk in r.iter_content(chunk_size=4096):
+                tf.write(chunk)
+            tf.flush()
+            os.makedirs(install_directory, exist_ok=True)
+            _ExecuteProcess(['/usr/bin/unzip', '-oq', tf.name], install_directory)
+    else:
+        z = zipfile.ZipFile(io.BytesIO(r.content))
+        logging.info("Data downloaded, extracting ...")
+        # extractall() does not preserve permissions (https://github.com/python/cpython/issues/59999)
+        for entry in z.filelist:
+            path = z.extract(entry, install_directory)
+            os.chmod(path, (entry.external_attr >> 16) & 0o777)
     logging.info("Done extracting.")
 
 
@@ -218,17 +234,21 @@ def main(log_level: str, sdk_root: str, extract_root: str, zap_version: Optional
 
     install_directory = os.path.join(extract_root, f"zap-{zap_version}")
 
+    export_cmd = "export"
+    if sys.platform == 'win32':
+        export_cmd = "set"
+
     if zap == DownloadType.SOURCE:
         install_directory = install_directory + "-src"
         _SetupSourceZap(install_directory, zap_version)
 
         # Make sure the results can be used in scripts
-        print(f"export ZAP_DEVELOPMENT_PATH={shlex.quote(install_directory)}")
+        print(f"{export_cmd} ZAP_DEVELOPMENT_PATH={shlex.quote(install_directory)}")
     else:
         _SetupReleaseZap(install_directory, zap_version)
 
         # Make sure the results can be used in scripts
-        print(f"export ZAP_INSTALL_PATH={shlex.quote(install_directory)}")
+        print(f"{export_cmd} ZAP_INSTALL_PATH={shlex.quote(install_directory)}")
 
 
 if __name__ == '__main__':

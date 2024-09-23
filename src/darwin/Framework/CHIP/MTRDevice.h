@@ -37,13 +37,11 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * TODO: Document usage better
+ * Get an MTRDevice object representing a device with a specific node ID
+ * associated with a specific controller.
  *
- * Directly instantiate a MTRDevice with a MTRDeviceController as a shim.
- *
- * All device-specific information would be stored on the device controller, and
- * retrieved when performing actions using a combination of MTRBaseDevice
- * and MTRAsyncCallbackQueue.
+ * MTRDevice objects are stateful, and callers should hold on to the MTRDevice
+ * while they are using it.
  */
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID
                      controller:(MTRDeviceController *)controller MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
@@ -189,6 +187,20 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                    timedWriteTimeout:(NSNumber * _Nullable)timeout;
 
 /**
+ * Read the attributes identified by the provided attribute paths.  The paths
+ * can include wildcards.
+ *
+ * Paths that do not correspond to any existing attributes, or that the
+ * MTRDevice does not have attribute values for, will not be present in the
+ * return value from this function.
+ *
+ * @return an array of response-value dictionaries as described in the
+ *         documentation for MTRDeviceResponseHandler.  Each one will have an
+ *         MTRAttributePathKey and an MTRDataKey.
+ */
+- (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths MTR_NEWLY_AVAILABLE;
+
+/**
  * Invoke a command with a designated command path
  *
  * @param commandFields command fields object. If not nil, the object must be a data-value
@@ -289,90 +301,6 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                            queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
     MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
-
-/**
- *
- * This set of functions allows clients to store metadata for either an entire device or for a specific endpoint.
- *
- * Notes:
- *   • Client data will be removed automatically when devices are deleted from the fabric
- *   • Supported client data object types are currently only:
- *         NSData, NSString, NSArray, NSDictionary, NSNumber
- */
-
-/**
- *
- * List of all client data types supported
- *
- */
-- (NSArray *)supportedClientDataClasses MTR_UNSTABLE_API;
-
-/**
- *
- * List of all client data keys stored
- *
- */
-- (NSArray * _Nullable)clientDataKeys MTR_UNSTABLE_API;
-
-/**
- *
- * Retrieve client metadata for a key, returns nil if no value is set
- *
- * @param key           NSString * for the key to store the value as
- */
-- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key MTR_UNSTABLE_API;
-
-/**
- *
- * Set client metadata for a key. The value must conform to NSSecureCoding
- *
- * @param key           NSString * for the key to store the value as
- * @param value         id <NSSecureCoding> for the value to store
- */
-- (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value MTR_UNSTABLE_API;
-
-/**
- *
- * Remove client metadata for a key.
- *
- * @param key           NSString * for the key to store the value as
- */
-- (void)removeClientDataForKey:(NSString *)key MTR_UNSTABLE_API;
-
-/**
- *
- * List of all client data keys stored
- *
- */
-- (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID MTR_UNSTABLE_API;
-
-/**
- *
- * Retrieve client metadata for a key, returns nil if no value is set
- *
- * @param key           NSString * for the key to store the value as
- * @param endpointID    NSNumber * for the endpoint to associate the metadata with
- */
-- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_UNSTABLE_API;
-
-/**
- *
- * Set client metadata for a key. The value must conform to NSSecureCoding.
- *
- * @param key           NSString * for the key to store the value as.
- * @param endpointID    NSNumber * for the endpoint to associate the metadata with
- * @param value         id <NSSecureCoding> for the value to store
- */
-- (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value MTR_UNSTABLE_API;
-
-/**
- *
- * Remove client metadata for a key.
- *
- * @param key           NSString * for the key to store the value as
- * @param endpointID    NSNumber * for the endpoint to associate the metadata with
- */
-- (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_UNSTABLE_API;
 
 /**
  * Download log of the desired type from the device.

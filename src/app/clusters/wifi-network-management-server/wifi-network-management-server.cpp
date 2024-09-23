@@ -18,11 +18,11 @@
 #include "wifi-network-management-server.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
-#include <app/util/config.h>
-#include <lib/core/Global.h>
 #include <lib/support/CodeUtils.h>
+#include <system/SystemClock.h>
 
 #include <algorithm>
 #include <cctype>
@@ -32,7 +32,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WiFiNetworkManagement::Attributes;
 using namespace chip::app::Clusters::WiFiNetworkManagement::Commands;
-using namespace std::placeholders;
+using IMStatus = chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
@@ -55,34 +55,23 @@ bool IsValidWpaPersonalCredential(ByteSpan credential)
     return false;
 }
 
-Global<WiFiNetworkManagementServer> gWiFiNetworkManagementServerInstance;
-
 } // namespace
 
-WiFiNetworkManagementServer & WiFiNetworkManagementServer::Instance()
-{
-    return gWiFiNetworkManagementServerInstance.get();
-}
-
-WiFiNetworkManagementServer::WiFiNetworkManagementServer() :
-    AttributeAccessInterface(NullOptional, WiFiNetworkManagement::Id),
-    CommandHandlerInterface(NullOptional, WiFiNetworkManagement::Id)
+WiFiNetworkManagementServer::WiFiNetworkManagementServer(EndpointId endpoint) :
+    AttributeAccessInterface(MakeOptional(endpoint), WiFiNetworkManagement::Id),
+    CommandHandlerInterface(MakeOptional(endpoint), WiFiNetworkManagement::Id)
 {}
 
 WiFiNetworkManagementServer::~WiFiNetworkManagementServer()
 {
-    unregisterAttributeAccessOverride(this);
-    InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
 }
 
-CHIP_ERROR WiFiNetworkManagementServer::Init(EndpointId endpoint)
+CHIP_ERROR WiFiNetworkManagementServer::Init()
 {
-    VerifyOrReturnError(endpoint != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
-
-    mEndpointId = endpoint;
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
 }
 
@@ -92,7 +81,7 @@ CHIP_ERROR WiFiNetworkManagementServer::ClearNetworkCredentials()
 
     mSsidLen = 0;
     mPassphrase.SetLength(0);
-    MatterReportingAttributeChangeCallback(mEndpointId, WiFiNetworkManagement::Id, Ssid::Id);
+    MatterReportingAttributeChangeCallback(GetEndpointId(), WiFiNetworkManagement::Id, Ssid::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -111,10 +100,19 @@ CHIP_ERROR WiFiNetworkManagementServer::SetNetworkCredentials(ByteSpan ssid, Byt
     VerifyOrDie(mPassphrase.SetLength(passphrase.size()) == CHIP_NO_ERROR);
     memcpy(mPassphrase.Bytes(), passphrase.data(), passphrase.size());
 
-    // Note: The spec currently defines no way to signal a passphrase change
     if (ssidChanged)
     {
-        MatterReportingAttributeChangeCallback(mEndpointId, WiFiNetworkManagement::Id, Ssid::Id);
+        MatterReportingAttributeChangeCallback(GetEndpointId(), WiFiNetworkManagement::Id, Ssid::Id);
+    }
+    if (passphraseChanged)
+    {
+        mPassphraseSurrogate++;
+        System::Clock::Milliseconds64 realtime;
+        if (System::SystemClock().GetClock_RealTimeMS(realtime) == CHIP_NO_ERROR)
+        {
+            mPassphraseSurrogate = std::max(mPassphraseSurrogate, realtime.count());
+        }
+        MatterReportingAttributeChangeCallback(GetEndpointId(), WiFiNetworkManagement::Id, PassphraseSurrogate::Id);
     }
     return CHIP_NO_ERROR;
 }
@@ -125,6 +123,8 @@ CHIP_ERROR WiFiNetworkManagementServer::Read(const ConcreteReadAttributePath & a
     {
     case Ssid::Id:
         return HaveNetworkCredentials() ? aEncoder.Encode(SsidSpan()) : aEncoder.EncodeNull();
+    case PassphraseSurrogate::Id:
+        return HaveNetworkCredentials() ? aEncoder.Encode(mPassphraseSurrogate) : aEncoder.EncodeNull();
     }
     return CHIP_NO_ERROR;
 }
@@ -143,6 +143,12 @@ void WiFiNetworkManagementServer::InvokeCommand(HandlerContext & ctx)
 void WiFiNetworkManagementServer::HandleNetworkPassphraseRequest(HandlerContext & ctx,
                                                                  const NetworkPassphraseRequest::DecodableType & req)
 {
+    if (ctx.mCommandHandler.GetSubjectDescriptor().authMode != Access::AuthMode::kCase)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, IMStatus::UnsupportedAccess);
+        return;
+    }
+
     if (HaveNetworkCredentials())
     {
         NetworkPassphraseResponse::Type response;
@@ -151,8 +157,7 @@ void WiFiNetworkManagementServer::HandleNetworkPassphraseRequest(HandlerContext 
     }
     else
     {
-        // TODO: Status code TBC: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/9234
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, IMStatus::InvalidInState);
     }
 }
 
@@ -160,17 +165,4 @@ void WiFiNetworkManagementServer::HandleNetworkPassphraseRequest(HandlerContext 
 } // namespace app
 } // namespace chip
 
-#if defined(MATTER_DM_WIFI_NETWORK_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT) &&                                                    \
-    MATTER_DM_WIFI_NETWORK_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 1
-#error Only a single Wi-Fi Network Management Cluster instance is supported.
-#endif
-
 void MatterWiFiNetworkManagementPluginServerInitCallback() {}
-
-void emberAfWiFiNetworkManagementClusterServerInitCallback(EndpointId endpoint)
-{
-    // We could delay constructing the instance until this point; however it's not
-    // clear if this is inconvenient in terms of forcing the application to initialize
-    // the network credentials later than it otherwise would.
-    LogErrorOnFailure(chip::app::Clusters::WiFiNetworkManagementServer::Instance().Init(endpoint));
-}

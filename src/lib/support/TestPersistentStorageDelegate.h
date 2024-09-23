@@ -135,6 +135,11 @@ public:
     virtual void AddPoisonKey(const std::string & key) { mPoisonKeys.insert(key); }
 
     /**
+     * Allows subsequent writes to be rejected for unit testing purposes.
+     */
+    virtual void SetRejectWrites(bool rejectWrites) { mRejectWrites = rejectWrites; }
+
+    /**
      * @brief Clear all "poison keys"
      *
      */
@@ -233,8 +238,8 @@ protected:
 
     virtual CHIP_ERROR SyncSetKeyValueInternal(const char * key, const void * value, uint16_t size)
     {
-        // Make sure poison keys are not accessed
-        if (mPoisonKeys.find(std::string(key)) != mPoisonKeys.end())
+        // Make sure writes are allowed and poison keys are not accessed
+        if (mRejectWrites || mPoisonKeys.find(std::string(key)) != mPoisonKeys.end())
         {
             return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
@@ -259,8 +264,8 @@ protected:
 
     virtual CHIP_ERROR SyncDeleteKeyValueInternal(const char * key)
     {
-        // Make sure poison keys are not accessed
-        if (mPoisonKeys.find(std::string(key)) != mPoisonKeys.end())
+        // Make sure writes are allowed and poison keys are not accessed
+        if (mRejectWrites || mPoisonKeys.find(std::string(key)) != mPoisonKeys.end())
         {
             return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
@@ -273,6 +278,7 @@ protected:
 
     std::map<std::string, std::vector<uint8_t>> mStorage;
     std::set<std::string> mPoisonKeys;
+    bool mRejectWrites         = false;
     LoggingLevel mLoggingLevel = LoggingLevel::kDisabled;
 };
 

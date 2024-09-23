@@ -19,7 +19,6 @@
 
 #include "AppConfig.h"
 #include "BaseApplication.h"
-#include "OTAConfig.h"
 #include <MatterConfig.h>
 #include <cmsis_os2.h>
 
@@ -196,35 +195,15 @@ void SilabsMatterConfig::AppInit()
     appError(CHIP_ERROR_INTERNAL);
 }
 
-#if SILABS_OTA_ENABLED
-void SilabsMatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
-{
-    OTAConfig::Init();
-}
-#endif
-
-void SilabsMatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg)
-{
-    // Initialize OTA only when Thread or WiFi connectivity is established
-    if (((event->Type == DeviceEventType::kThreadConnectivityChange) &&
-         (event->ThreadConnectivityChange.Result == kConnectivity_Established)) ||
-        ((event->Type == DeviceEventType::kInternetConnectivityChange) &&
-         (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)))
-    {
-#if SILABS_OTA_ENABLED
-        SILABS_LOG("Scheduling OTA Requestor initialization")
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
-                                                    InitOTARequestorHandler, nullptr);
-#endif
-    }
-}
-
 CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 {
     CHIP_ERROR err;
-
+#ifdef SL_WIFI
+    // Because OpenThread needs to use memory allocation during its Key operations, we initialize the memory management for thread
+    // and set the allocation functions inside sl_ot_create_instance, which is called by sl_system_init in the OpenThread stack
+    // initialization.
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
-
+#endif
     SILABS_LOG("==================================================");
     SILABS_LOG("%s starting", appName);
     SILABS_LOG("==================================================");
@@ -241,11 +220,11 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     // Init Matter Stack
     //==============================================
     SILABS_LOG("Init CHIP Stack");
-    // Init Chip memory management before the stack
-    ReturnErrorOnFailure(chip::Platform::MemoryInit());
 
-// WiFi needs to be initialized after Memory Init for some reason
 #ifdef SL_WIFI
+    // Init Chip memory management before the stack
+    // See comment above about OpenThread memory allocation as to why this is WIFI only here.
+    ReturnErrorOnFailure(chip::Platform::MemoryInit());
     ReturnErrorOnFailure(InitWiFi());
 #endif
 
@@ -304,18 +283,13 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
     initParams.appDelegate = &BaseApplication::sAppDelegate;
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
     // Init Matter Server and Start Event Loop
     err = chip::Server::GetInstance().Init(initParams);
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     ReturnErrorOnFailure(err);
-
-    // OTA Requestor initialization will be triggered by the connectivity events
-    PlatformMgr().AddEventHandler(ConnectivityEventCallback, reinterpret_cast<intptr_t>(nullptr));
 
     SILABS_LOG("Starting Platform Manager Event Loop");
     ReturnErrorOnFailure(PlatformMgr().StartEventLoopTask());

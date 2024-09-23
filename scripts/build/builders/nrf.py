@@ -16,6 +16,7 @@ import logging
 import os
 import shlex
 from enum import Enum, auto
+from typing import Optional
 
 from .builder import Builder, BuilderOutput
 
@@ -139,11 +140,14 @@ class NrfConnectBuilder(Builder):
                  runner,
                  app: NrfApp = NrfApp.LIGHT,
                  board: NrfBoard = NrfBoard.NRF52840DK,
-                 enable_rpcs: bool = False):
+                 enable_rpcs: bool = False,
+                 use_data_model_interface: Optional[bool] = None,
+                 ):
         super(NrfConnectBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board
         self.enable_rpcs = enable_rpcs
+        self.use_data_model_interface = use_data_model_interface
 
     def generate(self):
         if not os.path.exists(self.output_dir):
@@ -184,25 +188,21 @@ class NrfConnectBuilder(Builder):
             if self.enable_rpcs:
                 flags.append("-DOVERLAY_CONFIG=rpc.overlay")
 
-            if (self.board == NrfBoard.NRF52840DONGLE and
-                    self.app != NrfApp.ALL_CLUSTERS and self.app != NrfApp.ALL_CLUSTERS_MINIMAL):
-                flags.append("-DCONF_FILE=prj_no_dfu.conf")
-
             if self.options.pregen_dir:
                 flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
 
+            if self.use_data_model_interface is not None:
+                value = 'y' if self.use_data_model_interface else 'n'
+                flags.append(f"-DCONFIG_USE_CHIP_DATA_MODEL_INTERFACE={value}")
+
             build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
-            cmd = '''
-source "$ZEPHYR_BASE/zephyr-env.sh";
-export ZEPHYR_TOOLCHAIN_VARIANT=zephyr;'''
-            if zephyr_sdk_dir:
-                cmd += f'''
-export ZEPHYR_SDK_INSTALL_DIR={zephyr_sdk_dir};'''
+            cmd = 'source "$ZEPHYR_BASE/zephyr-env.sh";\nexport ZEPHYR_TOOLCHAIN_VARIANT=zephyr;'
 
-            cmd += '''
-west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}
-        '''.format(
+            if zephyr_sdk_dir:
+                cmd += f'\nexport ZEPHYR_SDK_INSTALL_DIR={zephyr_sdk_dir};'
+
+            cmd += '\nwest build --cmake-only -d {outdir} -b {board} --sysbuild {sourcedir}{build_flags}\n'.format(
                 outdir=shlex.quote(self.output_dir),
                 board=self.board.GnArgName(),
                 sourcedir=shlex.quote(os.path.join(
@@ -228,21 +228,21 @@ west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}
     def _bundle(self):
         logging.info(f'Generating flashbundle at {self.output_dir}')
 
-        self._Execute(['ninja', '-C', self.output_dir, 'flashing_script'],
+        self._Execute(['ninja', '-C', os.path.join(self.output_dir, 'nrfconnect'), 'flashing_script'],
                       title='Generating flashable files of ' + self.identifier)
 
     def build_outputs(self):
         yield BuilderOutput(
-            os.path.join(self.output_dir, 'zephyr', 'zephyr.elf'),
+            os.path.join(self.output_dir, 'nrfconnect', 'zephyr', 'zephyr.elf'),
             '%s.elf' % self.app.AppNamePrefix())
         if self.options.enable_link_map_file:
             yield BuilderOutput(
-                os.path.join(self.output_dir, 'zephyr', 'zephyr.map'),
+                os.path.join(self.output_dir, 'nrfconnect', 'zephyr', 'zephyr.map'),
                 '%s.map' % self.app.AppNamePrefix())
 
     def bundle_outputs(self):
         if self.app == NrfApp.UNIT_TESTS:
             return
-        with open(os.path.join(self.output_dir, self.app.FlashBundleName())) as f:
+        with open(os.path.join(self.output_dir, 'nrfconnect', self.app.FlashBundleName())) as f:
             for line in filter(None, [x.strip() for x in f.readlines()]):
-                yield BuilderOutput(os.path.join(self.output_dir, line), line)
+                yield BuilderOutput(os.path.join(self.output_dir, 'nrfconnect', line), line)

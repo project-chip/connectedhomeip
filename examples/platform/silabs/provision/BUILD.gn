@@ -1,0 +1,64 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/silabs_board.gni")
+
+if (wifi_soc) {
+  import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
+} else {
+  import("${efr32_sdk_build_root}/efr32_sdk.gni")
+}
+
+source_set("storage") {
+  sources = [ "ProvisionStorageCustom.cpp" ]
+
+  if (use_provision_flash_storage) {
+    sources += [ "ProvisionStorageFlash.cpp" ]
+  } else {
+    sources += [ "ProvisionStorageDefault.cpp" ]
+  }
+
+  if (wifi_soc) {
+    if (sl_si91x_crypto_flavor == "psa") {
+      libs =
+          [ "${sdk_support_root}/matter/provision/lib/libProvisionPSA_si917.a" ]
+    } else {
+      libs = [ "${sdk_support_root}/matter/provision/lib/libProvision_si917.a" ]
+    }
+  } else {
+    if (use_provision_flash_storage) {
+      libs = [ "${sdk_support_root}/matter/provision/lib/libProvisionFlash_${silabs_family}.a" ]
+    } else {
+      libs = [ "${sdk_support_root}/matter/provision/lib/libProvision_${silabs_family}.a" ]
+    }
+  }
+
+  deps = [ "${chip_root}/src/lib" ]
+
+  public_deps =
+      [ "${chip_root}/src/platform/silabs/provision:provision-headers" ]
+
+  if (sl_enable_test_event_trigger) {
+    # Temporary workaround since we have duplicated configurations
+    if (wifi_soc) {
+      public_configs = [ "${chip_root}/examples/platform/silabs/SiWx917:test-event-trigger-config" ]
+    } else {
+      public_configs = [
+        "${chip_root}/examples/platform/silabs/efr32:test-event-trigger-config",
+      ]
+    }
+  }
+}

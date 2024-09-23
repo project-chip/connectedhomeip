@@ -31,6 +31,7 @@ LinuxCommissionableDataProvider gCommissionableDataProvider;
 
 void CleanShutdown()
 {
+    ApplicationShutdown();
     Server::GetInstance().Shutdown();
     PlatformMgr().Shutdown();
     // TODO: We don't Platform::MemoryShutdown because ~CASESessionManager calls
@@ -72,9 +73,20 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
     // For now, just dump the data as a UDP payload into the session manager.
     // But maybe we should try to separately extract a PeerAddress and data from
     // the incoming data?
-    Transport::PeerAddress peerAddr;
+
+    // To avoid out-of-bounds access when acessing aData[1]
+    if (aSize < 2)
+    {
+        return 0;
+    }
+
+    // dumping payload with fuzzed transport types
+    constexpr uint8_t numberOfTypes     = static_cast<int>(Transport::Type::kLast) + 1;
+    Transport::Type fuzzedTransportType = static_cast<Transport::Type>(aData[0] % numberOfTypes);
+    Transport::PeerAddress peerAddr(fuzzedTransportType);
+
     System::PacketBufferHandle buf =
-        System::PacketBufferHandle::NewWithData(aData, aSize, /* aAdditionalSize = */ 0, /* aReservedSize = */ 0);
+        System::PacketBufferHandle::NewWithData(&aData[1], aSize - 1, /* aAdditionalSize = */ 0, /* aReservedSize = */ 0);
     if (buf.IsNull())
     {
         // Too big; we couldn't represent this as a packetbuffer to start with.
@@ -83,8 +95,17 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
 
     // Ignoring the return value from OnMessageReceived, because we might be
     // passing it all sorts of garbage that will cause it to fail.
-    Server::GetInstance().GetSecureSessionManager().OnMessageReceived(peerAddr, std::move(buf));
 
+    // for TCP we need to have MessageTransportContext
+    if (fuzzedTransportType == Transport::Type::kTcp)
+    {
+        Transport::MessageTransportContext msgContext;
+        Server::GetInstance().GetSecureSessionManager().OnMessageReceived(peerAddr, std::move(buf), &msgContext);
+    }
+    else
+    {
+        Server::GetInstance().GetSecureSessionManager().OnMessageReceived(peerAddr, std::move(buf));
+    }
     // Now process pending events until our sentinel is reached.
     PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
     PlatformMgr().RunEventLoop();

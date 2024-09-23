@@ -23,8 +23,10 @@
 #include <lib/support/JniReferences.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#define PARSE_CLIENT_INFO(_clientInfo, _peerNodeId, _startCounter, _offset, _monitoredSubject, _jniICDAesKey, _jniICDHmacKey)      \
+#define PARSE_CLIENT_INFO(_clientInfo, _peerNodeId, _checkInNodeId, _startCounter, _offset, _monitoredSubject, _jniICDAesKey,      \
+                          _jniICDHmacKey)                                                                                          \
     jlong _peerNodeId       = static_cast<jlong>(_clientInfo.peer_node.GetNodeId());                                               \
+    jlong _checkInNodeId    = static_cast<jlong>(_clientInfo.check_in_node.GetNodeId());                                           \
     jlong _startCounter     = static_cast<jlong>(_clientInfo.start_icd_counter);                                                   \
     jlong _offset           = static_cast<jlong>(_clientInfo.offset);                                                              \
     jlong _monitoredSubject = static_cast<jlong>(_clientInfo.monitored_subject);                                                   \
@@ -53,24 +55,26 @@ CHIP_ERROR AndroidCheckInDelegate::SetDelegate(jobject checkInDelegateObj)
 
 void AndroidCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
 {
-    ChipLogProgress(
-        ICD, "Check In Message processing complete: start_counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId,
-        clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
+    ChipLogProgress(ICD,
+                    "Check In Message processing complete: start_counter=%" PRIu32 " offset=%" PRIu32
+                    " peernodeid=" ChipLogFormatScopedNodeId " checkinnodeid=" ChipLogFormatScopedNodeId,
+                    clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node),
+                    ChipLogValueScopedNodeId(clientInfo.check_in_node));
 
     VerifyOrReturn(mCheckInDelegate.HasValidObjectRef(), ChipLogProgress(ICD, "check-in delegate is not implemented!"));
 
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "JNIEnv is null!"));
-    PARSE_CLIENT_INFO(clientInfo, peerNodeId, startCounter, offset, monitoredSubject, jniICDAesKey, jniICDHmacKey)
+    PARSE_CLIENT_INFO(clientInfo, peerNodeId, checkInNodeId, startCounter, offset, monitoredSubject, jniICDAesKey, jniICDHmacKey)
 
     jmethodID onCheckInCompleteMethodID = nullptr;
     CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDelegate.ObjectRef(), "onCheckInComplete",
-                                                                   "(JJJJ[B[B)V", &onCheckInCompleteMethodID);
+                                                                   "(JJJJJ[B[B)V", &onCheckInCompleteMethodID);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogProgress(ICD, "onCheckInComplete - FindMethod is failed! : %" CHIP_ERROR_FORMAT, err.Format()));
 
-    env->CallVoidMethod(mCheckInDelegate.ObjectRef(), onCheckInCompleteMethodID, peerNodeId, startCounter, offset, monitoredSubject,
-                        jniICDAesKey.jniValue(), jniICDHmacKey.jniValue());
+    env->CallVoidMethod(mCheckInDelegate.ObjectRef(), onCheckInCompleteMethodID, peerNodeId, checkInNodeId, startCounter, offset,
+                        monitoredSubject, jniICDAesKey.jniValue(), jniICDHmacKey.jniValue());
 }
 
 RefreshKeySender * AndroidCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage)
@@ -84,17 +88,18 @@ RefreshKeySender * AndroidCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
         JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
         VerifyOrReturnValue(env != nullptr, nullptr, ChipLogError(Controller, "JNIEnv is null!"));
 
-        PARSE_CLIENT_INFO(clientInfo, peerNodeId, startCounter, offset, monitoredSubject, jniICDAesKey, jniICDHmacKey)
+        PARSE_CLIENT_INFO(clientInfo, peerNodeId, checkInNodeId, startCounter, offset, monitoredSubject, jniICDAesKey,
+                          jniICDHmacKey)
 
         jmethodID onKeyRefreshNeededMethodID = nullptr;
-        err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDelegate.ObjectRef(), "onKeyRefreshNeeded", "(JJJJ[B[B)V",
-                                                            &onKeyRefreshNeededMethodID);
+        err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDelegate.ObjectRef(), "onKeyRefreshNeeded",
+                                                            "(JJJJJ[B[B)[B", &onKeyRefreshNeededMethodID);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                             ChipLogProgress(ICD, "onKeyRefreshNeeded - FindMethod is failed! : %" CHIP_ERROR_FORMAT, err.Format()));
 
-        jbyteArray key = static_cast<jbyteArray>(env->CallObjectMethod(mCheckInDelegate.ObjectRef(), onKeyRefreshNeededMethodID,
-                                                                       peerNodeId, startCounter, offset, monitoredSubject,
-                                                                       jniICDAesKey.jniValue(), jniICDHmacKey.jniValue()));
+        jbyteArray key = static_cast<jbyteArray>(
+            env->CallObjectMethod(mCheckInDelegate.ObjectRef(), onKeyRefreshNeededMethodID, peerNodeId, checkInNodeId, startCounter,
+                                  offset, monitoredSubject, jniICDAesKey.jniValue(), jniICDHmacKey.jniValue()));
 
         if (key != nullptr)
         {
@@ -115,6 +120,12 @@ RefreshKeySender * AndroidCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(ICD, "Generation of new key failed: %" CHIP_ERROR_FORMAT, err.Format());
+            return nullptr;
+        }
+        err = newKey.SetLength(newKey.Capacity());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(ICD, "Fail to set new key length with error: %" CHIP_ERROR_FORMAT, err.Format());
             return nullptr;
         }
     }

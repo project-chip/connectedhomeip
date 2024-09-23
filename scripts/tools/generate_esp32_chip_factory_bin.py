@@ -21,9 +21,11 @@ import base64
 import logging
 import os
 import sys
+from enum import Enum
 from types import SimpleNamespace
 
 import cryptography.x509
+import esp_idf_nvs_partition_gen.nvs_partition_gen as nvs_partition_gen
 from esp_secure_cert.tlv_format import generate_partition_ds, generate_partition_no_ds, tlv_priv_key_t, tlv_priv_key_type_t
 
 CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('scripts', 'tools'))]
@@ -32,18 +34,43 @@ from spake2p import generate_verifier  # noqa: E402 isort:skip
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'src', 'setup_payload', 'python'))
 from SetupPayload import CommissioningFlow, SetupPayload  # noqa: E402 isort:skip
 
-if os.getenv('IDF_PATH'):
-    sys.path.insert(0, os.path.join(os.getenv('IDF_PATH'),
-                                    'components',
-                                    'nvs_flash',
-                                    'nvs_partition_generator'))
-    import nvs_partition_gen
-else:
-    sys.stderr.write("Please set the IDF_PATH environment variable.")
-    exit(0)
 
 INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
                      66666666, 77777777, 88888888, 99999999, 12345678, 87654321]
+
+
+class Product_Finish_Enum(Enum):
+    other = 0
+    matte = 1
+    satin = 2
+    polished = 3
+    rugged = 4
+    fabric = 5
+
+
+class Product_Color_Enum(Enum):
+    black = 0
+    navy = 1
+    green = 2
+    teal = 3
+    maroon = 4
+    purple = 5
+    olive = 6
+    gray = 7
+    blue = 8
+    lime = 9
+    aqua = 10
+    red = 11
+    fuchsia = 12
+    yellow = 13
+    white = 14
+    nickel = 15
+    chrome = 16
+    brass = 17
+    copper = 18
+    silver = 19
+    gold = 20
+
 
 TOOLS = {}
 
@@ -149,6 +176,36 @@ FACTORY_DATA = {
         'encoding': 'hex2bin',
         'value': None,
     },
+    'product-finish': {
+        'type': 'data',
+        'encoding': 'u32',
+        'value': None,
+    },
+    'product-color': {
+        'type': 'data',
+        'encoding': 'u32',
+        'value': None,
+    },
+    'part-number': {
+        'type': 'data',
+        'encoding': 'string',
+        'value': None,
+    },
+    'product-label': {
+        'type': 'data',
+        'encoding': 'string',
+        'value': None,
+    },
+    'product-url': {
+        'type': 'data',
+        'encoding': 'string',
+        'value': None,
+    },
+    'device-type': {
+        'type': 'data',
+        'encoding': 'u32',
+        'value': None,
+    },
 }
 
 
@@ -216,6 +273,7 @@ def validate_args(args):
     check_int_range(args.product_id, 0x0000, 0xFFFF, 'Product id')
     check_int_range(args.vendor_id, 0x0000, 0xFFFF, 'Vendor id')
     check_int_range(args.hw_ver, 0x0000, 0xFFFF, 'Hardware version')
+    check_int_range(args.discovery_mode, 0b000, 0b111, 'Discovery-Mode')
 
     check_str_range(args.serial_num, 1, 32, 'Serial number')
     check_str_range(args.vendor_name, 1, 32, 'Vendor name')
@@ -301,6 +359,18 @@ def populate_factory_data(args, spake2p_params):
         FACTORY_DATA['hardware-ver']['value'] = args.hw_ver
     if args.hw_ver_str:
         FACTORY_DATA['hw-ver-str']['value'] = args.hw_ver_str
+    if args.product_finish:
+        FACTORY_DATA['product-finish']['value'] = Product_Finish_Enum[args.product_finish].value
+    if args.product_color:
+        FACTORY_DATA['product-color']['value'] = Product_Color_Enum[args.product_color].value
+    if args.part_number:
+        FACTORY_DATA['part-number']['value'] = args.part_number
+    if args.product_url:
+        FACTORY_DATA['product-url']['value'] = args.product_url
+    if args.product_label:
+        FACTORY_DATA['product-label']['value'] = args.product_label
+    if args.device_type is not None:
+        FACTORY_DATA['device-type']['value'] = args.device_type
 
     # SupportedModes are stored as multiple entries
     #  - sm-sz/<ep>                 : number of supported modes for the endpoint
@@ -471,6 +541,20 @@ def get_args():
     parser.add_argument('--supported-modes', type=str, nargs='+', required=False,
                         help='List of supported modes, eg: mode1/label1/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode2/label2/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode3/label3/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"')
 
+    product_finish_choices = [finish.name for finish in Product_Finish_Enum]
+    parser.add_argument("--product-finish", type=str, choices=product_finish_choices,
+                        help='Product finishes choices for product appearance')
+
+    product_color_choices = [color.name for color in Product_Color_Enum]
+    parser.add_argument("--product-color", type=str, choices=product_color_choices,
+                        help='Product colors choices for product appearance')
+
+    parser.add_argument("--part-number", type=str, help='human readable product number')
+    parser.add_argument("--product-label", type=str, help='human readable product label')
+    parser.add_argument("--product-url", type=str, help='link to product specific web page')
+
+    parser.add_argument("--device-type", type=any_base_int, help='commissionable device type')
+
     parser.add_argument('-s', '--size', type=any_base_int, default=0x6000,
                         help='The size of the partition.bin, default: 0x6000')
     parser.add_argument('--target', default='esp32',
@@ -484,9 +568,10 @@ def get_args():
     parser.add_argument('-cf', '--commissioning-flow', type=any_base_int, default=0,
                         help='Device commissioning flow, 0:Standard, 1:User-Intent, 2:Custom. \
                                           Default is 0.', choices=[0, 1, 2])
-    parser.add_argument('-dm', '--discovery-mode', type=any_base_int, default=1,
-                        help='Commissionable device discovery networking technology. \
-                                         0:WiFi-SoftAP, 1:BLE, 2:On-network. Default is BLE.', choices=[0, 1, 2])
+    parser.add_argument('-dm', '--discovery-mode', type=any_base_int, default=2,
+                        help='3-bit bitmap representing discovery modes for commissionable device discovery \
+                                         Bit 0:WiFi-SoftAP, Bit 1:BLE, Bit 2:On-network. Default is BLE. Specify values between 0-7')
+
     parser.set_defaults(generate_bin=True)
 
     return parser.parse_args()
@@ -509,7 +594,8 @@ def set_up_factory_data(args):
 def generate_factory_partiton_binary(args):
     generate_nvs_csv(args.output_dir, FACTORY_PARTITION_CSV)
     if args.generate_bin:
-        generate_nvs_bin(args.encrypt, args.size, FACTORY_PARTITION_CSV, FACTORY_PARTITION_BIN, args.output_dir)
+        csv_file = os.path.join(args.output_dir, FACTORY_PARTITION_CSV)
+        generate_nvs_bin(args.encrypt, args.size, csv_file, FACTORY_PARTITION_BIN, args.output_dir)
         print_flashing_help(args.encrypt, args.output_dir, FACTORY_PARTITION_BIN)
     clean_up()
 

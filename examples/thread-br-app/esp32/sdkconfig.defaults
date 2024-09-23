@@ -1,0 +1,77 @@
+#
+#    Copyright (c) 2024 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+#    Description:
+#      Some useful defaults for the demo app configuration.
+#
+
+# Flash size and partition table
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_PARTITION_TABLE_CUSTOM=y
+
+# BLE
+CONFIG_BT_ENABLED=y
+CONFIG_BT_NIMBLE_ENABLED=y
+CONFIG_BT_NIMBLE_ENABLE_CONN_REATTEMPT=n
+
+# Increase some stack size
+CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE=7200
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=5120
+CONFIG_ESP_TIMER_TASK_STACK_SIZE=5120
+
+# USB console for Thread border board
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+
+# Disable SoftAP
+CONFIG_ESP_WIFI_SOFTAP_SUPPORT=n
+
+# LWIP
+CONFIG_LWIP_IPV6_FORWARD=y
+CONFIG_LWIP_IPV6_AUTOCONFIG=y
+CONFIG_LWIP_IPV6_NUM_ADDRESSES=12
+CONFIG_LWIP_MULTICAST_PING=y
+CONFIG_LWIP_NETIF_STATUS_CALLBACK=y
+CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT=y
+CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT=y
+CONFIG_LWIP_HOOK_IP6_INPUT_CUSTOM=y
+CONFIG_LWIP_HOOK_IP6_SELECT_SRC_ADDR_CUSTOM=y
+
+# ESP Border Router will also enable a route hook so we don't need the route hook in matter
+CONFIG_ENABLE_ROUTE_HOOK=n
+
+# mbedTLS
+CONFIG_MBEDTLS_KEY_EXCHANGE_ECJPAKE=y
+CONFIG_MBEDTLS_SSL_PROTO_DTLS=y
+CONFIG_MBEDTLS_ECJPAKE_C=y
+CONFIG_MBEDTLS_HKDF_C=y
+
+# OpenThread
+CONFIG_OPENTHREAD_ENABLED=y
+CONFIG_OPENTHREAD_LOG_LEVEL_DYNAMIC=n
+CONFIG_OPENTHREAD_LOG_LEVEL_NOTE=y
+CONFIG_OPENTHREAD_SRP_CLIENT=n
+CONFIG_OPENTHREAD_DNS_CLIENT=n
+CONFIG_OPENTHREAD_BORDER_ROUTER=y
+CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER=n
+
+# Auto update RCP firmware
+CONFIG_AUTO_UPDATE_RCP=y
+
+# Use platform mDNS
+CONFIG_USE_MINIMAL_MDNS=n
+
+# Enable Matter shell
+CONFIG_ENABLE_CHIP_SHELL=y

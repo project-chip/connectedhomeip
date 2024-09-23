@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2021 Project CHIP Authors
+Copyright (c) 2021-2024 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,6 +23,9 @@ limitations under the License.
     <item name="InvalidAuthentication" value="0x2"/>
     <item name="NoFailSafe" value="0x3"/>
     <item name="BusyWithOtherAdmin" value="0x4"/>
+    <item name="RequiredTCNotAccepted" value="0x5" apiMaturity="provisional"/>
+    <item name="TCAcknowledgementsNotReceived" value="0x6" apiMaturity="provisional"/>
+    <item name="TCMinVersionNotMet" value="0x7" apiMaturity="provisional"/>
   </enum>
   <enum name="RegulatoryLocationTypeEnum" type="enum8">
     <cluster code="0x0030"/>
@@ -41,6 +44,14 @@ limitations under the License.
     <code>0x0030</code>
     <define>GENERAL_COMMISSIONING_CLUSTER</define>
     <description>This cluster is used to manage global aspects of the Commissioning flow.</description>
+    <features>
+      <feature bit="0" code="TC" name="TermsAndConditions" summary="Supports Terms and Conditions acknowledgement" apiMaturity="provisional">
+        <otherwiseConform>
+          <provisionalConform/>
+          <optionalConform/>
+        </otherwiseConform>
+      </feature>
+    </features>
     <attribute side="server" code="0x00" define="BREADCRUMB" type="int64u" writable="true" default="0x0000000000000000" optional="false">
       <description>Breadcrumb</description>
       <access op="read" privilege="view"/>
@@ -50,7 +61,22 @@ limitations under the License.
     <attribute side="server" code="0x02" define="REGULATORY_CONFIG" type="RegulatoryLocationTypeEnum" writable="false" optional="false">RegulatoryConfig</attribute>
     <attribute side="server" code="0x03" define="LOCATION_CAPABILITY" type="RegulatoryLocationTypeEnum" writable="false" optional="false">LocationCapability</attribute>
     <attribute side="server" code="0x04" define="SUPPORTS_CONCURRENT_CONNECTION" type="boolean" writable="false" default="1" optional="false">SupportsConcurrentConnection</attribute>
-
+    <attribute side="server" code="0x05" define="TC_ACCEPTED_VERSION" type="int16u" writable="false" optional="true" apiMaturity="provisional">
+      <description>TCAcceptedVersion</description>
+      <access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x06" define="TC_MIN_REQUIRED_VERSION" type="int16u" writable="false" optional="true" apiMaturity="provisional">
+      <description>TCMinRequiredVersion</description>
+      <access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x07" define="TC_ACKNOWLEDGEMENTS" type="bitmap16" writable="false" default="0x0000" optional="true" apiMaturity="provisional">
+      <description>TCAcknowledgements</description>
+      <access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x08" define="TC_ACKNOWLEDGEMENTS_REQUIRED" type="boolean" writable="false" optional="true" apiMaturity="provisional">
+      <description>TCAcknowledgementsRequired</description>
+      <access op="read" privilege="administer"/>
+    </attribute>
     <command source="client" code="0x00" name="ArmFailSafe" response="ArmFailSafeResponse" optional="false" cli="chip fabric_commissioning armfailsafe">
       <description>Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock</description>
       <arg name="ExpiryLengthSeconds" type="int16u"/>
@@ -82,6 +108,16 @@ limitations under the License.
       <description>Indicates to client whether CommissioningComplete command succeeded</description>
       <arg name="ErrorCode" type="CommissioningErrorEnum"/>
       <arg name="DebugText" type="char_string"/>
+    </command>
+    <command source="client" code="0x06" name="SetTCAcknowledgements" optional="true" response="SetTCAcknowledgementsResponse" cli="chip fabric_commissioning settcacknowledgements" apiMaturity="provisional">
+      <description>This command sets the user acknowledgements received in the Enhanced Setup Flow Terms and Conditions into the node.</description>
+      <arg name="TCVersion" type="int16u"/>
+      <arg name="TCUserResponse" type="bitmap16"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+    <command source="server" code="0x07" name="SetTCAcknowledgementsResponse" optional="true" cli="chip fabric_commissioning settcacknowledgementsresponse" apiMaturity="provisional">
+      <description>This command is used to convey the result from SetTCAcknowledgements.</description>
+      <arg name="ErrorCode" type="CommissioningErrorEnum"/>
     </command>
   </cluster>
 </configurator>

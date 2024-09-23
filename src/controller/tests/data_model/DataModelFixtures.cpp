@@ -17,21 +17,49 @@
  */
 
 #include "DataModelFixtures.h"
+#include "app/data-model-provider/ActionReturnStatus.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeValueDecoder.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/InteractionModelEngine.h>
+#include <app/codegen-data-model-provider/Instance.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModelTests;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitTesting;
 using namespace chip::Protocols;
 
 namespace chip {
 namespace app {
+
+class TestOnlyAttributeValueEncoderAccessor
+{
+public:
+    TestOnlyAttributeValueEncoderAccessor(AttributeValueEncoder & encoder) : mEncoder(encoder) {}
+
+    AttributeReportIBs::Builder & Builder() { return mEncoder.mAttributeReportIBsBuilder; }
+
+    void SetState(const AttributeEncodeState & state) { mEncoder.mEncodeState = state; }
+
+private:
+    AttributeValueEncoder & mEncoder;
+};
+
+class TestOnlyAttributeValueDecoderAccessor
+{
+public:
+    TestOnlyAttributeValueDecoderAccessor(AttributeValueDecoder & decoder) : mDecoder(decoder) {}
+
+    TLV::TLVReader & GetTlvReader() { return mDecoder.mReader; }
+
+private:
+    AttributeValueDecoder & mDecoder;
+};
 
 namespace DataModelTests {
 
@@ -41,6 +69,11 @@ ScopedChangeOnly<CommandResponseDirective> gCommandResponseDirective(CommandResp
 
 ScopedChangeOnly<bool> gIsLitIcd(false);
 
+// TODO: usage of a global value that changes as a READ sideffect is problematic for
+//       dual-read use cases (i.e. during checked ember/datamodel tests)
+//
+//       For now see the hack "change undo" in CustomDataModel::ReadAttribute, however
+//       overall this is problematic.
 uint16_t gInt16uTotalReadCount = 0;
 CommandHandler::Handle gAsyncCommandHandle;
 
@@ -278,7 +311,8 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
     }
     if (aPath.mClusterId == Clusters::UnitTesting::Id && aPath.mAttributeId == Attributes::ListFabricScoped::Id)
     {
-        // Mock a invalid SubjectDescriptor
+        // Mock an invalid SubjectDescriptor.
+        // NOTE: completely ignores the passed-in subjectDescriptor
         AttributeValueDecoder decoder(aReader, Access::SubjectDescriptor());
         if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
         {
@@ -462,6 +496,241 @@ Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCom
     }
 
     return Status::Success;
+}
+
+CustomDataModel & CustomDataModel::Instance()
+{
+    static CustomDataModel model;
+    return model;
+}
+
+ActionReturnStatus CustomDataModel::ReadAttribute(const ReadAttributeRequest & request, AttributeValueEncoder & encoder)
+{
+    AttributeEncodeState mutableState(&encoder.GetState()); // provide a state copy to start.
+
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    if ((request.path.mEndpointId < chip::Test::kMockEndpointMin) &&
+        (gReadResponseDirective == ReadResponseDirective::kSendDataResponse) &&
+        (request.path.mClusterId == app::Clusters::UnitTesting::Id) &&
+        (request.path.mAttributeId == app::Clusters::UnitTesting::Attributes::Int16u::Id))
+    {
+        // gInt16uTotalReadCount is a global that keeps changing. Further more, encoding
+        // size differs when moving from 0xFF to 0x100, so encoding sizes in TLV differ.
+        //
+        // This is a HACKISH workaround as it relies that we ember-read before datamodel-read
+        gInt16uTotalReadCount--;
+    }
+#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+
+    CHIP_ERROR err = ReadSingleClusterData(request.subjectDescriptor.value_or(Access::SubjectDescriptor()),
+                                           request.readFlags.Has(ReadFlags::kFabricFiltered), request.path,
+                                           TestOnlyAttributeValueEncoderAccessor(encoder).Builder(), &mutableState);
+
+    // state must survive CHIP_ERRORs as it is used for chunking
+    TestOnlyAttributeValueEncoderAccessor(encoder).SetState(mutableState);
+
+    return err;
+}
+
+ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
+{
+    static ListIndex listStructOctetStringElementCount = 0;
+
+    if (request.path.mDataVersion.HasValue() && request.path.mDataVersion.Value() == kRejectedDataVersion)
+    {
+        return InteractionModel::Status::DataVersionMismatch;
+    }
+
+    if (request.path.mClusterId == Clusters::UnitTesting::Id &&
+        request.path.mAttributeId == Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
+    {
+        if (gWriteResponseDirective == WriteResponseDirective::kSendAttributeSuccess)
+        {
+            if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+            {
+
+                Attributes::ListStructOctetString::TypeInfo::DecodableType value;
+
+                ReturnErrorOnFailure(decoder.Decode(value));
+
+                auto iter                         = value.begin();
+                listStructOctetStringElementCount = 0;
+                while (iter.Next())
+                {
+                    auto & item = iter.GetValue();
+
+                    VerifyOrReturnError(item.member1 == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
+                    listStructOctetStringElementCount++;
+                }
+                return CHIP_NO_ERROR;
+            }
+
+            if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+            {
+                Structs::TestListStructOctet::DecodableType item;
+                ReturnErrorOnFailure(decoder.Decode(item));
+                VerifyOrReturnError(item.member1 == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
+                listStructOctetStringElementCount++;
+
+                return CHIP_NO_ERROR;
+            }
+
+            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        }
+
+        return CHIP_IM_GLOBAL_STATUS(Failure);
+    }
+    if (request.path.mClusterId == Clusters::UnitTesting::Id && request.path.mAttributeId == Attributes::ListFabricScoped::Id)
+    {
+        // TODO(backwards compatibility): unit tests here undoes the subject descriptor usage
+        //   - original tests were completely bypassing the passed in subject descriptor for this test
+        //     and overriding it with a invalid subject descriptor
+        //   - we do the same here, however this seems somewhat off: decoder.Decode() will fail for list
+        //     items so we could just return the error directly without this extra step
+
+        // Mock an invalid Subject Descriptor
+        AttributeValueDecoder invalidSubjectDescriptorDecoder(TestOnlyAttributeValueDecoderAccessor(decoder).GetTlvReader(),
+                                                              Access::SubjectDescriptor());
+        if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+        {
+            Attributes::ListFabricScoped::TypeInfo::DecodableType value;
+
+            ReturnErrorOnFailure(invalidSubjectDescriptorDecoder.Decode(value));
+
+            auto iter = value.begin();
+            while (iter.Next())
+            {
+                auto & item = iter.GetValue();
+                (void) item;
+            }
+        }
+        else if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+        {
+            Structs::TestFabricScoped::DecodableType item;
+            ReturnErrorOnFailure(invalidSubjectDescriptorDecoder.Decode(item));
+        }
+        else
+        {
+            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    // Boolean attribute of unit testing cluster triggers "multiple errors" case.
+    if (request.path.mClusterId == Clusters::UnitTesting::Id &&
+        request.path.mAttributeId == Attributes::Boolean::TypeInfo::GetAttributeId())
+    {
+        // TODO(IMDM): this used to send 4 responses (hence the multiple status)
+        //
+        //    for (size_t i = 0; i < 4; ++i)
+        //    {
+        //        aWriteHandler->AddStatus(request.path, status);
+        //    }
+        //
+        // which are NOT encodable by a simple response. It is unclear how this is
+        // convertible (if at all): we write path by path only. Having multiple
+        // responses for the same path within the write code makes no sense
+        //
+        // This should NOT be possible anymore when one can only return a single
+        // status (nobody has access to multiple path status updates at this level)
+        switch (gWriteResponseDirective)
+        {
+        case WriteResponseDirective::kSendMultipleSuccess:
+            return InteractionModel::Status::Success;
+        case WriteResponseDirective::kSendMultipleErrors:
+            return InteractionModel::Status::Failure;
+        default:
+            chipDie();
+        }
+    }
+
+    if (request.path.mClusterId == Clusters::UnitTesting::Id &&
+        request.path.mAttributeId == Attributes::Int8u::TypeInfo::GetAttributeId())
+    {
+        switch (gWriteResponseDirective)
+        {
+        case WriteResponseDirective::kSendClusterSpecificSuccess:
+            return InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(kExampleClusterSpecificSuccess);
+        case WriteResponseDirective::kSendClusterSpecificFailure:
+            return InteractionModel::ClusterStatusCode::ClusterSpecificFailure(kExampleClusterSpecificFailure);
+        default:
+            // this should not be reached, our tests only set up these for this test case
+            chipDie();
+        }
+    }
+
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+std::optional<ActionReturnStatus> CustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
+                                                          CommandHandler * handler)
+{
+    return std::make_optional<ActionReturnStatus>(CHIP_ERROR_NOT_IMPLEMENTED);
+}
+
+EndpointId CustomDataModel::FirstEndpoint()
+{
+    return CodegenDataModelProviderInstance()->FirstEndpoint();
+}
+
+EndpointId CustomDataModel::NextEndpoint(EndpointId before)
+{
+    return CodegenDataModelProviderInstance()->NextEndpoint(before);
+}
+
+ClusterEntry CustomDataModel::FirstCluster(EndpointId endpoint)
+{
+    return CodegenDataModelProviderInstance()->FirstCluster(endpoint);
+}
+
+ClusterEntry CustomDataModel::NextCluster(const ConcreteClusterPath & before)
+{
+    return CodegenDataModelProviderInstance()->NextCluster(before);
+}
+
+std::optional<ClusterInfo> CustomDataModel::GetClusterInfo(const ConcreteClusterPath & path)
+{
+    return CodegenDataModelProviderInstance()->GetClusterInfo(path);
+}
+
+AttributeEntry CustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
+{
+    return CodegenDataModelProviderInstance()->FirstAttribute(cluster);
+}
+
+AttributeEntry CustomDataModel::NextAttribute(const ConcreteAttributePath & before)
+{
+    return CodegenDataModelProviderInstance()->NextAttribute(before);
+}
+
+std::optional<AttributeInfo> CustomDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
+{
+    return CodegenDataModelProviderInstance()->GetAttributeInfo(path);
+}
+
+CommandEntry CustomDataModel::FirstAcceptedCommand(const ConcreteClusterPath & cluster)
+{
+    return CodegenDataModelProviderInstance()->FirstAcceptedCommand(cluster);
+}
+
+CommandEntry CustomDataModel::NextAcceptedCommand(const ConcreteCommandPath & before)
+{
+    return CodegenDataModelProviderInstance()->NextAcceptedCommand(before);
+}
+
+std::optional<CommandInfo> CustomDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
+{
+    return CodegenDataModelProviderInstance()->GetAcceptedCommandInfo(path);
+}
+
+ConcreteCommandPath CustomDataModel::FirstGeneratedCommand(const ConcreteClusterPath & cluster)
+{
+    return CodegenDataModelProviderInstance()->FirstGeneratedCommand(cluster);
+}
+
+ConcreteCommandPath CustomDataModel::NextGeneratedCommand(const ConcreteCommandPath & before)
+{
+    return CodegenDataModelProviderInstance()->NextGeneratedCommand(before);
 }
 
 } // namespace app

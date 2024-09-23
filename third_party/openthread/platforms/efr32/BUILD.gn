@@ -32,11 +32,9 @@ config("openthread_efr32_config") {
     "${sl_ot_efr32_root}",
     "${chip_root}/examples/platform/efr32",
     "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}",
+    "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/config",
     "${sl_ot_platform_abstraction}/include",
     "${sl_ot_platform_abstraction}/rtos",
-
-    #TODO this is for sl_openthread_features_config.h. should use generated one per board when sl_ot_abstraction is integrated
-    "${sl_ot_libs_path}/config",
   ]
 
   # temporarily disable check until gsdk pulls in a more recent version of openthread

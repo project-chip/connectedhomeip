@@ -74,6 +74,8 @@ public:
 
     System::Clock::Milliseconds16 GetMinLitActiveModeThreshold() { return kMinLitActiveModeThreshold; }
 
+    System::Clock::Seconds32 GetMaximumCheckInBackoff() { return mMaximumCheckInBackOff; }
+
     /**
      * If ICD_ENFORCE_SIT_SLOW_POLL_LIMIT is set to 0, function will always return the configured Slow Polling interval
      * (CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL).
@@ -150,8 +152,16 @@ private:
                   "Spec requires the minimum of supported clients per fabric be equal or greater to 1.");
     uint16_t mFabricClientsSupported = CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC;
 
+    static_assert((CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF_SEC) <= kMaxIdleModeDuration.count(),
+                  "Spec requires the MaximumCheckInBackOff to be equal or inferior to 64800s");
+    static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) <= (CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF_SEC),
+                  "Spec requires the MaximumCheckInBackOff to be equal or superior to the IdleModeDuration");
+    System::Clock::Seconds32 mMaximumCheckInBackOff = System::Clock::Seconds32(CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF_SEC);
+
     // SIT ICDs should have a SlowPollingThreshold shorter than or equal to 15s (spec 9.16.1.5)
-    static constexpr System::Clock::Milliseconds32 kSITPollingThreshold = System::Clock::Milliseconds32(15000);
+    static_assert((CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT).count() <= 15000,
+                  "Spec requires the maximum slow poll interval for the SIT device to be smaller or equal than 15 s.");
+    static constexpr System::Clock::Milliseconds32 kSITPollingThreshold = CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT;
     System::Clock::Milliseconds32 mSlowPollingInterval                  = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
     System::Clock::Milliseconds32 mFastPollingInterval                  = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
 

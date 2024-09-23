@@ -13,13 +13,12 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/openthread.gni")
-
+import("${chip_root}/config/recommended.gni")
 import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
-  # Enable server command only on linux for now.
-  chip_shell_cmd_server = current_os == "linux" || current_os == "mac"
+  chip_shell_cmd_server = matter_enable_recommended &&
+                          (current_os == "linux" || current_os == "mac")
 }
 
 config("shell_common_config") {
@@ -70,16 +69,25 @@ static_library("shell_common") {
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
-      "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
-      "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
-      "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
-      "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
-      "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/ChargingTargetsMemMgr.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EVSEManufacturerImpl.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseDelegateImpl.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseManager.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseTargetsStore.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/energy-evse-mode.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp",
     ]
 
     include_dirs = [
       "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
-      "${chip_root}/examples/energy-management-app/energy-management-common/include",
+      "${chip_root}/examples/energy-management-app/energy-management-common/common/include",
+      "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/include",
+      "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/include",
+      "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/include",
+      "${chip_root}/src/app/clusters/device-energy-management-server",
     ]
 
     public_deps +=

@@ -180,7 +180,7 @@ tests:
 
     - label:
           "Step 4b: After 10 seconds, TH reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.C01.Rsp && LVL.S.A0000
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
@@ -199,7 +199,7 @@ tests:
     - label:
           "Step 4c: After another 10 seconds, TH reads CurrentLevel attribute
           from DUT"
-      PICS: LVL.S.C01.Rsp && LVL.S.A0000
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
@@ -218,7 +218,7 @@ tests:
     - label:
           "Step 4d: After another 10 seconds, TH reads CurrentLevel attribute
           from DUT"
-      PICS: LVL.S.C01.Rsp && LVL.S.A0000
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
@@ -269,7 +269,7 @@ tests:
 
     - label:
           "Step 4h: TH sends a Move command to the DUT with MoveMode =0x00 (up)
-          and Rate =0 (units/s), expect success"
+          and Rate =0 (units/s), expect failure"
       PICS: LVL.S.C01.Rsp
       command: "Move"
       arguments:
@@ -282,6 +282,8 @@ tests:
                 value: 1
               - name: "OptionsOverride"
                 value: 1
+      response:
+          error: INVALID_COMMAND
 
     - label: "Wait 5s"
       cluster: "DelayCommands"
