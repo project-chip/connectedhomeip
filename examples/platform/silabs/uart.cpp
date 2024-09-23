@@ -40,8 +40,12 @@ extern "C" {
 #include "rsi_rom_egpio.h"
 #include "sl_si91x_usart.h"
 #else // For EFR32
+#if (_SILICON_LABS_32B_SERIES < 3)
 #include "em_core.h"
 #include "em_usart.h"
+#else
+#include "sl_hal_eusart.h"
+#endif //_SILICON_LABS_32B_SERIES
 #include "uartdrv.h"
 #ifdef SL_BOARD_NAME
 #include "sl_board_control.h"
@@ -86,11 +90,28 @@ extern "C" {
 #define USART_IRQ HELPER2(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)
 #define USART_IRQHandler HELPER4(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)
 #define vcom_handle sl_uartdrv_eusart_vcom_handle
+
+#if (_SILICON_LABS_32B_SERIES < 3)
+#define EUSART_INT_ENABLE EUSART_IntEnable
+#define EUSART_INT_CLEAR EUSART_IntClear
+#define EUSART_ENABLE(eusart) EUSART_Enable(eusart, eusartEnable)
+#else
+#define EUSART_INT_ENABLE sl_hal_eusart_enable_interrupts
+#define EUSART_INT_SET sl_hal_eusart_set_interrupts
+#define EUSART_INT_CLEAR sl_hal_eusart_clear_interrupts
+#define EUSART_ENABLE(eusart)                                                                                                      \
+    {                                                                                                                              \
+        sl_hal_eusart_enable(eusart);                                                                                              \
+        sl_hal_eusart_enable_tx(eusart);                                                                                           \
+        sl_hal_eusart_enable_rx(eusart);                                                                                           \
+    }
+#endif //_SILICON_LABS_32B_SERIES
+
 #else
 #define USART_IRQ HELPER2(SL_UARTDRV_USART_VCOM_PERIPHERAL_NO)
 #define USART_IRQHandler HELPER4(SL_UARTDRV_USART_VCOM_PERIPHERAL_NO)
 #define vcom_handle sl_uartdrv_usart_vcom_handle
-#endif // EFR32MG24
+#endif // SL_CATALOG_UARTDRV_EUSART_PRESENT
 
 namespace {
 // In order to reduce the probability of data loss during the dmaFull callback handler we use
@@ -138,13 +159,7 @@ constexpr osThreadAttr_t kUartTaskAttr = { .name       = "UART",
                                            .cb_size    = osThreadCbSize,
                                            .stack_mem  = uartStack,
                                            .stack_size = kUartTaskSize,
-#if SLI_SI91X_MCU_INTERFACE
-                                           // Reducing the priority of the UART task to avoid priority inversion
-                                           .priority = osPriorityNormal
-#else
-                                           .priority = osPriorityRealtime
-#endif // SLI_SI91X_MCU_INTERFACE
-};
+                                           .priority   = osPriorityRealtime };
 
 typedef struct
 {
@@ -309,16 +324,16 @@ void uartConsoleInit(void)
 
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
     // Clear previous RX interrupts
-    EUSART_IntClear(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
+    EUSART_INT_CLEAR(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
 
     // Enable RX interrupts
-    EUSART_IntEnable(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
+    EUSART_INT_ENABLE(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
 
     // Enable EUSART
-    EUSART_Enable(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, eusartEnable);
+    EUSART_ENABLE(SL_UARTDRV_EUSART_VCOM_PERIPHERAL);
 #else
     USART_IntEnable(SL_UARTDRV_USART_VCOM_PERIPHERAL, USART_IF_RXDATAV);
-#endif // EFR32MG24
+#endif // SL_CATALOG_UARTDRV_EUSART_PRESENT
 #endif // SLI_SI91X_MCU_INTERFACE == 0
 }
 
@@ -346,7 +361,7 @@ void USART_IRQHandler(void)
 #endif
 
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
-    EUSART_IntClear(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
+    EUSART_INT_CLEAR(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
 #endif
 }
 
