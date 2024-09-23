@@ -54,7 +54,7 @@ using ArlReviewEvent = Clusters::AccessControl::Events::FabricRestrictionReviewU
 // TODO(#13590): generated code doesn't automatically handle max length so do it manually
 constexpr int kExtensionDataMaxLength = 128;
 
-constexpr uint16_t kClusterRevision = 1;
+constexpr uint16_t kClusterRevision = 2;
 
 namespace {
 
