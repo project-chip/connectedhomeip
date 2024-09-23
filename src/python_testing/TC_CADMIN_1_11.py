@@ -32,6 +32,7 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
+from chip.native import PyChipError
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -48,7 +49,7 @@ class TC_CADMIN_1_11(MatterBaseTest):
             with ctx:
                 await th.OpenCommissioningWindow(
                     nodeid=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
-            errcode = ctx.exception.chip_error
+            errcode = PyChipError.from_code(ctx.exception.err)
             logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
             asserts.assert_true(errcode.sdk_code == expectedErrCode,
