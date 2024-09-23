@@ -19,11 +19,18 @@ import logging
 import os
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 
 # Absolute path to Tizen Studio CLI tool.
-tizen_sdk_root = os.environ["TIZEN_SDK_ROOT"]
+tizen_sdk_root = os.environ.get("TIZEN_SDK_ROOT", "")
+
+# Pigweed installation directory.
+pw_install_dir = os.environ.get("PW_PIGWEED_CIPD_INSTALL_DIR", "")
+
+# Absolute path to default qemu-system-arm binary.
+qemu_system_arm = shutil.which("qemu-system-arm")
 
 # Setup basic logging capabilities.
 logging.basicConfig(level=logging.DEBUG)
@@ -68,8 +75,30 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+
+def whereis(binary_name):
+    # Get the PATH environment variable.
+    path_dirs = os.environ.get('PATH', '').split(os.pathsep)
+
+    # List to store found paths.
+    found_paths = []
+
+    # Search for the binary in each directory.
+    for directory in path_dirs:
+        if found := shutil.which(binary_name, path=directory):
+            found_paths.append(found)
+
+    return found_paths
+
+
+# If qemu-system-arm binary is from Pigweed prefer the next one in PATH if there is one.
+if pw_install_dir != "" and qemu_system_arm.startswith(pw_install_dir):
+    binaries = whereis("qemu-system-arm")
+    if len(binaries) > 1:
+        qemu_system_arm = binaries[1]
+
 qemu_args = [
-    'qemu-system-arm',
+    qemu_system_arm,
     '-monitor', 'null',
     '-serial', 'stdio',
     '-display', 'none',

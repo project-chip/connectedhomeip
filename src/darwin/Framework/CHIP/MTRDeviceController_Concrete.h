@@ -17,8 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import <Matter/MTRDefines.h>
-#import <Matter/MTRDeviceController.h>
+#import <Matter/Matter.h>
 
 #import "MTRDeviceControllerStartupParams_Internal.h"
 
@@ -53,6 +52,23 @@ NS_ASSUME_NONNULL_BEGIN
  * Only MTRDeviceControllerFactory should be calling this.
  */
 - (BOOL)startup:(MTRDeviceControllerStartupParamsInternal *)startupParams;
+
+/**
+ * Shut down the underlying C++ controller.  Must be called on the Matter work
+ * queue or after the Matter work queue has been shut down.
+ *
+ * Only MTRDeviceControllerFactory should be calling this.
+ */
+- (void)shutDownCppController;
+
+/**
+ * Notification that the MTRDeviceControllerFactory has finished shutting down
+ * this controller and will not be touching it anymore.  This is guaranteed to
+ * be called after initWithFactory succeeds.
+ *
+ * Only MTRDeviceControllerFactory should be calling this.
+ */
+- (void)deinitFromFactory;
 
 /**
  * Takes an assertion to keep the controller running. If `-[MTRDeviceController shutdown]` is called while an assertion
