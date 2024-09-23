@@ -34,7 +34,7 @@ using SymmetricKeystore = SessionKeystore;
 
 namespace chip {
 
-inline constexpr size_t kICDMonitoringBufferSize = 60;
+inline constexpr size_t kICDMonitoringBufferSize = 63;
 
 struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
 {
@@ -129,8 +129,7 @@ struct ICDMonitoringTable
 {
     ICDMonitoringTable(PersistentStorageDelegate & storage, FabricIndex fabric, uint16_t limit,
                        Crypto::SymmetricKeystore * symmetricKeystore) :
-        mStorage(&storage),
-        mFabric(fabric), mLimit(limit), mSymmetricKeystore(symmetricKeystore)
+        mStorage(&storage), mFabric(fabric), mLimit(limit), mSymmetricKeystore(symmetricKeystore)
     {}
 
     /**
