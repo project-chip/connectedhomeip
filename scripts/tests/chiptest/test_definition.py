@@ -180,7 +180,7 @@ class App:
                 if exit_code:
                     raise Exception('Subprocess failed with exit code: %d' % exit_code)
             except subprocess.TimeoutExpired:
-                logging.debug('Subprocess did not terminate on SIGTERM, killing it now')
+                logging.error('Subprocess did not terminate on SIGTERM, killing it now')
                 self.process.kill()
                 # The exit code when using Python subprocess will be the signal used to kill it.
                 # Ideally, we would recover the original exit code, but the process was already
