@@ -38,7 +38,6 @@ import struct
 import tempfile
 import time
 from dataclasses import dataclass
-from shutil import which
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
