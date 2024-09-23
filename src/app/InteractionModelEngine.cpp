@@ -50,6 +50,10 @@
 #include <app/codegen-data-model-provider/Instance.h>
 #endif
 
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+#include <app/ember_coupling/EventPathValidity.mixin.h>
+#endif 
+
 namespace chip {
 namespace app {
 
@@ -542,108 +546,6 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
     return err;
 }
 
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-
-#if !CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-static bool CanAccessEvent(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteClusterPath & aPath,
-                           Access::Privilege aNeededPrivilege)
-{
-    Access::RequestPath requestPath{ .cluster     = aPath.mClusterId,
-                                     .endpoint    = aPath.mEndpointId,
-                                     .requestType = Access::RequestType::kEventReadRequest };
-    // leave requestPath.entityId optional value unset to indicate wildcard
-    CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, aNeededPrivilege);
-    return (err == CHIP_NO_ERROR);
-}
-#endif
-
-static bool CanAccessEvent(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteEventPath & aPath)
-{
-    Access::RequestPath requestPath{ .cluster     = aPath.mClusterId,
-                                     .endpoint    = aPath.mEndpointId,
-                                     .requestType = Access::RequestType::kEventReadRequest,
-                                     .entityId    = aPath.mEventId };
-    CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, RequiredPrivilege::ForReadEvent(aPath));
-    return (err == CHIP_NO_ERROR);
-}
-
-/**
- * Helper to handle wildcard events in the event path.
- */
-static bool HasValidEventPathForEndpointAndCluster(EndpointId aEndpoint, const EmberAfCluster * aCluster,
-                                                   const EventPathParams & aEventPath,
-                                                   const Access::SubjectDescriptor & aSubjectDescriptor)
-{
-    if (aEventPath.HasWildcardEventId())
-    {
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        for (decltype(aCluster->eventCount) idx = 0; idx < aCluster->eventCount; ++idx)
-        {
-            ConcreteEventPath path(aEndpoint, aCluster->clusterId, aCluster->eventList[idx]);
-            // If we get here, the path exists.  We just have to do an ACL check for it.
-            bool isValid = CanAccessEvent(aSubjectDescriptor, path);
-            if (isValid)
-            {
-                return true;
-            }
-        }
-
-        return false;
-#else
-        // We have no way to expand wildcards.  Just assume that we would need
-        // View permissions for whatever events are involved.
-        ConcreteClusterPath clusterPath(aEndpoint, aCluster->clusterId);
-        return CanAccessEvent(aSubjectDescriptor, clusterPath, Access::Privilege::kView);
-#endif
-    }
-
-    ConcreteEventPath path(aEndpoint, aCluster->clusterId, aEventPath.mEventId);
-    if (CheckEventSupportStatus(path) != Status::Success)
-    {
-        // Not an existing event path.
-        return false;
-    }
-    return CanAccessEvent(aSubjectDescriptor, path);
-}
-
-/**
- * Helper to handle wildcard clusters in the event path.
- */
-static bool HasValidEventPathForEndpoint(EndpointId aEndpoint, const EventPathParams & aEventPath,
-                                         const Access::SubjectDescriptor & aSubjectDescriptor)
-{
-    if (aEventPath.HasWildcardClusterId())
-    {
-        auto * endpointType = emberAfFindEndpointType(aEndpoint);
-        if (endpointType == nullptr)
-        {
-            // Not going to have any valid paths in here.
-            return false;
-        }
-
-        for (decltype(endpointType->clusterCount) idx = 0; idx < endpointType->clusterCount; ++idx)
-        {
-            bool hasValidPath =
-                HasValidEventPathForEndpointAndCluster(aEndpoint, &endpointType->cluster[idx], aEventPath, aSubjectDescriptor);
-            if (hasValidPath)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    auto * cluster = emberAfFindServerCluster(aEndpoint, aEventPath.mClusterId);
-    if (cluster == nullptr)
-    {
-        // Nothing valid here.
-        return false;
-    }
-    return HasValidEventPathForEndpointAndCluster(aEndpoint, cluster, aEventPath, aSubjectDescriptor);
-}
-
-#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL
 
 CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
                                                    EventPathIBs::Parser & aEventPathListParser, bool & aHasValidEventPath,
@@ -674,12 +576,7 @@ CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescript
 
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
         aHasValidEventPath = mDataModelProvider->EventPathReadable(eventPath, aSubjectDescriptor);
-#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-        bool oldValueToVerify = aHasValidEventPath;
-#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+#else
        // The definition of "valid path" is "path exists and ACL allows
        // access".  We need to do some expansion of wildcards to handle that.
         if (eventPath.HasWildcardEndpointId())
@@ -700,10 +597,6 @@ CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescript
             // emberAfFindEndpointType returns null for disabled endpoints.
             aHasValidEventPath = HasValidEventPathForEndpoint(eventPath.mEndpointId, eventPath, aSubjectDescriptor);
         }
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-        VerifyOrDieWithMsg(oldValueToVerify == aHasValidEventPath, DataManagement,
-                           "Codegen data model and ember data model MUST be identical");
-#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 #endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL
     }
 
