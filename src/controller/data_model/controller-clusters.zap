@@ -2956,6 +2956,25 @@
           ]
         },
         {
+          "name": "Chime",
+          "code": 1366,
+          "mfgCode": null,
+          "define": "CHIME_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional",
+          "commands": [
+            {
+              "name": "PlayChimeSound",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            }
+          ]
+        },
+        {
           "name": "Unit Testing",
           "code": 4294048773,
           "mfgCode": null,
