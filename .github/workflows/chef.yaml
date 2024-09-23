@@ -27,7 +27,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     chef_linux:
         name: Chef - Linux CI Examples
@@ -35,7 +35,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:66
+            image: ghcr.io/project-chip/chip-build:77
             options: --user root
 
         steps:
@@ -56,7 +56,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:67
+            image: ghcr.io/project-chip/chip-build-esp32:77
             options: --user root
 
         steps:
@@ -77,7 +77,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:66
+            image: ghcr.io/project-chip/chip-build-nrf-platform:77
             options: --user root
 
         steps:
@@ -98,7 +98,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:66
+            image: ghcr.io/project-chip/chip-build-telink:77
             options: --user root
 
         steps:

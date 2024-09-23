@@ -59,3 +59,13 @@ if (enable_fuzz_test_targets) {
     ]
   }
 }
+
+if (pw_enable_fuzz_test_targets) {
+  chip_pw_fuzz_target("fuzz-tlv-reader-pw") {
+    test_source = [ "FuzzTlvReaderPW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/lib/core",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
+}

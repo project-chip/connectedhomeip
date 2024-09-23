@@ -3237,9 +3237,15 @@
               - FanModeSequenceType
               - FanModeType
           ColorControl:
-              - ColorLoopAction
-              - ColorLoopDirection
-              - ColorMode
+              # ColorLoopActionEnum, ColorLoopDirectionEnum and ColorModeEnum
+              # were originally named ColorLoopAction, ColorLoopDirection, and
+              # ColorMode, but we generate the same API for the names
+              # with/without "Enum" at the end and the cluster name
+              # present/absent at the beginning, so the names can just change
+              # here.
+              - ColorLoopActionEnum
+              - ColorLoopDirectionEnum
+              - ColorModeEnum
               - HueDirection
               - HueMoveMode
               - HueStepMode
@@ -3980,14 +3986,20 @@
                   - Auto
                   - Smart
           ColorControl:
-              ColorLoopAction:
+              # ColorLoopActionEnum, ColorLoopDirectionEnum and ColorModeEnum
+              # were originally named ColorLoopAction, ColorLoopDirection, and
+              # ColorMode, but we generate the same API for the names
+              # with/without "Enum" at the end and the cluster name
+              # present/absent at the beginning, so the names can just change
+              # here.
+              ColorLoopActionEnum:
                   - Deactivate
                   - ActivateFromColorLoopStartEnhancedHue
                   - ActivateFromEnhancedCurrentHue
-              ColorLoopDirection:
+              ColorLoopDirectionEnum:
                   - DecrementHue
                   - IncrementHue
-              ColorMode:
+              ColorModeEnum:
                   - CurrentHueAndCurrentSaturation
                   - CurrentXAndCurrentY
                   - ColorTemperature
@@ -9669,19 +9681,67 @@
                   - Setpoints
                   - Presets
                   - MatterScheduleConfiguration
-          RVCRunMode:
-              Feature:
-                  # Not really part of the spec, need to think about whether to
-                  # expose this.
-                  - NoFeatures
-          RVCCleanMode:
-              Feature:
-                  # Not really part of the spec, need to think about whether to
-                  # expose this.
-                  - NoFeatures
 
 - release: "Future"
   versions: "future"
+  introduced:
+      enums:
+          ColorControl:
+              - DirectionEnum
+              - DriftCompensationEnum
+              - EnhancedColorModeEnum
+              - MoveModeEnum
+              - StepModeEnum
+      enum values:
+          ColorControl:
+              ColorLoopDirectionEnum:
+                  - Decrement
+                  - Increment
+              ColorModeEnum:
+                  - ColorTemperatureMireds
+              DirectionEnum:
+                  - Shortest
+                  - Longest
+                  - Up
+                  - Down
+              DriftCompensationEnum:
+                  - None
+                  - OtherOrUnknown
+                  - TemperatureMonitoring
+                  - OpticalLuminanceMonitoringAndFeedback
+                  - OpticalColorMonitoringAndFeedback
+              EnhancedColorModeEnum:
+                  - CurrentHueAndCurrentSaturation
+                  - CurrentXAndCurrentY
+                  - ColorTemperatureMireds
+                  - EnhancedCurrentHueAndCurrentSaturation
+              MoveModeEnum:
+                  - Stop
+                  - Up
+                  - Down
+              StepModeEnum:
+                  - Up
+                  - Down
+      bitmaps:
+          ColorControl:
+              - ColorCapabilitiesBitmap
+              - OptionsBitmap
+              - UpdateFlagsBitmap
+      bitmap values:
+          ColorControl:
+              ColorCapabilitiesBitmap:
+                  - HueSaturation
+                  - EnhancedHue
+                  - ColorLoop
+                  - XY
+                  - ColorTemperature
+              OptionsBitmap:
+                  - ExecuteIfOff
+              UpdateFlagsBitmap:
+                  - UpdateAction
+                  - UpdateDirection
+                  - UpdateTime
+                  - UpdateStartHue
   provisional:
       clusters:
           # Targeting 1.4
@@ -9694,6 +9754,13 @@
           - WaterHeaterMode
           - WiFiNetworkManagement
       attributes:
+          AccessControl:
+              # Targeting 1.4
+              - CommissioningARL
+              - ARL
+          BridgedDeviceBasicInformation:
+              # Targeting 1.4
+              - ProductID
           GeneralCommissioning:
               # Targeting 1.4
               - TCAcceptedVersion
@@ -9712,6 +9779,10 @@
               - NullableGlobalEnum
               - NullableGlobalStruct
       commands:
+          AccessControl:
+              # Targeting 1.4
+              - ReviewFabricRestrictions
+              - ReviewFabricRestrictionsResponse
           BridgedDeviceBasicInformation:
               # Targeting 1.4
               - KeepActive
@@ -9719,6 +9790,10 @@
               # Targeting 1.4
               - SetTCAcknowledgements
               - SetTCAcknowledgementsResponse
+          Thermostat:
+              # Targeting 1.4
+              - AtomicRequest
+              - AtomicResponse
           UnitTesting:
               # Ideally none of UnitTesting would be exposed as public API, but
               # for now just start doing that for new additions to it.
@@ -9727,9 +9802,17 @@
               - StringEchoRequest
               - StringEchoResponse
       structs:
+          AccessControl:
+              # Targeting 1.4
+              - AccessRestrictionEntryStruct
+              - AccessRestrictionStruct
+              - CommissioningAccessRestrictionEntryStruct
           Globals:
               # Test-only value
               - TestGlobalStruct
+              # Targeting 1.4
+              - AtomicAttributeStatusStruct
+              - LocationDescriptorStruct
           OccupancySensing:
               # Targeting 1.4
               - HoldTimeLimitsStruct
@@ -9742,21 +9825,47 @@
               NestedStruct:
                   - d
       events:
+          AccessControl:
+              # Targeting 1.4
+              - AccessRestrictionEntryChanged
+              - FabricRestrictionReviewUpdate
           BridgedDeviceBasicInformation:
               # Targeting 1.4
               - ActiveChanged
+          OccupancySensing:
+              # Targeting 1.4
+              - OccupancyChanged
       enums:
+          AccessControl:
+              # Targeting 1.4
+              - AccessRestrictionTypeEnum
           Globals:
               # Test-only value
               - TestGlobalEnum
-      enum values:
-          GeneralCommissioning:
               # Targeting 1.4
+              - AreaTypeTag
+              - AtomicRequestTypeEnum
+              - FloorSurfaceTag
+              - LandmarkTag
+              - PositionTag
+              - RelativePositionTag
+      enum values:
+          ApplicationLauncher:
+              StatusEnum:
+                  # Targeting 1.4
+                  - Downloading
+                  - Installing
+                  - PendingUserApproval
+          GeneralCommissioning:
               CommissioningErrorEnum:
+                  # Targeting 1.4
                   - RequiredTCNotAccepted
                   - TCAcknowledgementsNotReceived
                   - TCMinVersionNotMet
       bitmaps:
+          AccessControl:
+              # Targeting 1.4
+              - Feature
           BridgedDeviceBasicInformation:
               # Targeting 1.4
               - Feature
@@ -9766,8 +9875,85 @@
           OccupancySensing:
               # Targeting 1.4
               - Feature
+          Thermostat:
+              # Targeting 1.4
+              - OccupancyBitmap
       bitmap values:
           Switch:
               Feature:
                   # Targeting 1.4
                   - ActionSwitch
+          RVCCleanMode:
+              Feature:
+                  # Targeting 1.4
+                  - DirectModeChange
+          RVCRunMode:
+              Feature:
+                  # Targeting 1.4
+                  - DirectModeChange
+  renames:
+      enums:
+          ColorControl:
+              DirectionEnum: HueDirection
+              MoveModeEnum: HueMoveMode
+              StepModeEnum: HueStepMode
+      enum values:
+          ColorControl:
+              ColorLoopDirectionEnum:
+                  Decrement: DecrementHue
+                  Increment: IncrementHue
+              ColorModeEnum:
+                  ColorTemperatureMireds: ColorTemperature
+              HueDirection:
+                  Shortest: ShortestDistance
+                  Longest: LongestDistance
+      bitmaps:
+          ColorControl:
+              ColorCapabilitiesBitmap: ColorCapabilities
+              UpdateFlagsBitmap: ColorLoopUpdateFlags
+      bitmap values:
+          ColorControl:
+              ColorCapabilities:
+                  HueSaturation: HueSaturationSupported
+                  EnhancedHue: EnhancedHueSupported
+                  ColorLoop: ColorLoopSupported
+                  XY: XYAttributesSupported
+                  ColorTemperature: ColorTemperatureSupported
+  deprecated:
+      enums:
+          ColorControl:
+              - HueDirection
+              - HueMoveMode
+              - HueStepMode
+      enum values:
+          ColorControl:
+              ColorLoopDirectionEnum:
+                  - DecrementHue
+                  - IncrementHue
+              ColorModeEnum:
+                  - ColorTemperature
+      bitmaps:
+          ColorControl:
+              - ColorCapabilities
+              - ColorLoopUpdateFlags
+  removed:
+      clusters:
+          - BarrierControl
+          - BinaryInputBasic
+          - ElectricalMeasurement
+          - OnOffSwitchConfiguration
+      enum values:
+          ColorControl:
+              # Don't expose the new value names on the old enum names
+              HueDirection:
+                  - Shortest
+                  - Longest
+      bitmap values:
+          ColorControl:
+              # Don't expose the new field names on the old bitmap names
+              ColorCapabilities:
+                  - HueSaturation
+                  - EnhancedHue
+                  - ColorLoop
+                  - XY
+                  - ColorTemperature

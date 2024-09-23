@@ -24,26 +24,23 @@ ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 ENV LANG en_US.utf8
 
-# these are installed for terminal/dev convenience.  If more tooling for build is required, please
-#  add them to chip-build (in integrations/docker/images/chip-build)
+
+# These are installed for terminal/dev convenience. If more tooling for build is required, please
+# add them to chip-build (in integrations/docker/images/chip-build).
 RUN apt-get update \
     && apt-get install -y locales \
     && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
-    && apt-get -fy install git vim emacs sudo \
+    && apt-get -fy install vim emacs sudo \
     apt-utils dialog zsh \
-    iproute2 procps lsb-release \
+    lsb-release \
     bash-completion \
-    build-essential cmake cppcheck valgrind \
-    wget curl telnet \
+    valgrind \
     docker.io \
-    iputils-ping net-tools \
-    libncurses5 \
-    libncursesw5 \
-    libpython2.7 \
+    iputils-ping \
     && :
 
 RUN groupadd -g $USER_GID $USERNAME \
-    && useradd -s /bin/bash -u $USER_UID -g $USER_GID -G docker,sudo -m $USERNAME \
+    && useradd --no-log-init -s /bin/bash -u $USER_UID -g $USER_GID -G docker,sudo -m $USERNAME \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME \
     && :
@@ -55,13 +52,22 @@ RUN curl https://raw.githubusercontent.com/restyled-io/restyler/master/bin/resty
 RUN mkdir -p /opt/sdk/sdks/ \
     && chown -R $USERNAME:$USERNAME \
     /opt/sdk/sdks/ `# NXP uses a patch_sdk script to change SDK files` \
-    /opt/NordicSemiconductor/nrfconnect/ `# $USERNAME needs to own west configuration to build nRF Connect examples` \
-    $IDF_PATH `# $USERNAME needs to own the esp-idf and tools for the examples to build` \
+    $ANDROID_HOME \
     $IDF_TOOLS_PATH \
-    $SYSROOT_AARCH64 `# allow read/write access to header and libraries` \
-    $ANDROID_HOME `# allow licenses to be accepted` \
-    $AMEBA_PATH `# AmebaD requires access to change build_info.h` \
-    $IMX_SDK_ROOT \
+    && find $AMEBA_PATH -name "inc_lp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
+    && find $AMEBA_PATH -name "inc_hp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
+    && find $AMEBA_PATH -name "project_lp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
+    && find $AMEBA_PATH -name "project_hp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
+    && chmod -R +x \
+    $ANDROID_HOME/tools/bin `# sdkmanager for accepting licenses`\
+    && chmod -R +w \
+    $IDF_TOOLS_PATH \
+    && find $AMEBA_PATH -name "inc_lp" -print0 | xargs -0 chmod -R +w \
+    && find $AMEBA_PATH -name "inc_hp" -print0 | xargs -0 chmod -R +w \
+    && find $AMEBA_PATH -name "project_lp" -print0 | xargs -0 chmod -R +w \
+    && find $AMEBA_PATH -name "project_hp" -print0 | xargs -0 chmod -R +w \
+    # Safe directory is preffered over chown.
+    && git config --global --add safe.directory "*" \
     && :
 
 # Fix Tizen SDK paths for new user

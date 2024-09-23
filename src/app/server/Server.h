@@ -72,14 +72,14 @@
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <transport/raw/UDP.h>
 
-#include <app/icd/server/ICDCheckInBackOffStrategy.h>
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDManager.h> // nogncheck
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 #include <app/icd/server/DefaultICDCheckInBackOffStrategy.h> // nogncheck
-#endif
-#endif
+#include <app/icd/server/ICDCheckInBackOffStrategy.h>        // nogncheck
+#endif                                                       // CHIP_CONFIG_ENABLE_ICD_CIP
+#endif                                                       // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 namespace chip {
 
@@ -163,6 +163,13 @@ struct ServerInitParams
     // ACL storage: MUST be injected. Used to store ACL entries in persistent storage. Must NOT
     // be initialized before being provided.
     app::AclStorage * aclStorage = nullptr;
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    // Access Restriction implementation: MUST be injected if MNGD feature enabled. Used to enforce
+    // access restrictions that are managed by the device.
+    Access::AccessRestrictionProvider * accessRestrictionProvider = nullptr;
+#endif
+
     // Network native params can be injected depending on the
     // selected Endpoint implementation
     void * endpointNativeParams = nullptr;
@@ -176,9 +183,11 @@ struct ServerInitParams
     Credentials::OperationalCertificateStore * opCertStore = nullptr;
     // Required, if not provided, the Server::Init() WILL fail.
     app::reporting::ReportScheduler * reportScheduler = nullptr;
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     // Optional. Support for the ICD Check-In BackOff strategy. Must be initialized before being provided.
     // If the ICD Check-In protocol use-case is supported and no strategy is provided, server will use the default strategy.
     app::ICDCheckInBackOffStrategy * icdCheckInBackOffStrategy = nullptr;
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 };
 
 /**

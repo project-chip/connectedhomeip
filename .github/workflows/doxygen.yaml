@@ -81,7 +81,7 @@ jobs:
 
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build-doxygen:66
+            image: ghcr.io/project-chip/chip-build-doxygen:77
 
         if: github.actor != 'restyled-io[bot]'
 

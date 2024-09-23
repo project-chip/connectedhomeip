@@ -20,6 +20,7 @@
 
 #include "service-area-cluster-objects.h"
 #include "service-area-delegate.h"
+#include "service-area-storage-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include <app/AttributeAccessInterface.h>
@@ -56,7 +57,8 @@ public:
      *
      * @note the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<ServiceArea::Feature> aFeature);
+    Instance(StorageDelegate * storageDelegate, Delegate * aDelegate, EndpointId aEndpointId,
+             BitMask<ServiceArea::Feature> aFeature);
 
     ~Instance() override;
 
@@ -68,12 +70,15 @@ public:
 
     /**
      * @brief Initialise the Service Area server instance.
-     * @return an error if the given endpoint and cluster Id have not been enabled in zap or if the
-     *         CommandHandler or AttributeHandler registration fails, else CHIP_NO_ERROR.
+     * @return CHIP_NO_ERROR if there are on errors. Returns an error if
+     *   - the given endpoint and cluster ID have not been enabled in zap
+     *   - if the CommandHandler or AttributeHandler registration fails
+     *   - if the StorageDelegate or Delegate initialisation fails.
      */
     CHIP_ERROR Init();
 
 private:
+    StorageDelegate * mStorageDelegate;
     Delegate * mDelegate;
     EndpointId mEndpointId;
     ClusterId mClusterId;
@@ -124,7 +129,7 @@ private:
      *                     If the input value is invalid, returns the Interaction Model status code of INVALID_COMMAND.
      * @param[in] req the command parameters.
      */
-    void HandleSkipCurrentAreaCmd(HandlerContext & ctx, const Commands::SkipArea::DecodableType & req);
+    void HandleSkipAreaCmd(HandlerContext & ctx, const Commands::SkipArea::DecodableType & req);
 
     //*************************************************************************
     // attribute notifications
@@ -137,28 +142,23 @@ private:
     void NotifyProgressChanged();
 
     //*************************************************************************
-    // Supported Locations manipulators
+    // Supported Areas helpers
 
     /**
-     * @return true if a location with the aAreaId ID exists in the supported locations attribute. False otherwise.
+     * @brief Check if the given area adheres to the restrictions required by the supported areas attribute.
+     * @return true if the aArea meets all checks.
      */
-    bool IsSupportedLocation(uint32_t aAreaId);
+    bool IsValidSupportedArea(const AreaStructureWrapper & aArea);
 
     /**
-     * @brief Check if the given location adheres to the restrictions required by the supported locations attribute.
-     * @return true if the aLocation meets all checks.
-     */
-    bool IsValidSupportedLocation(const AreaStructureWrapper & aLocation);
-
-    /**
-     * @brief check if aLocation is unique with regard to supported locations.
-     * @param[in] aLocation the location to check.
+     * @brief check if aArea is unique with regard to supported areas.
+     * @param[in] aArea the area to check.
      * @param[out] ignoreAreaId if true, we do not check if the area ID is unique.
-     * @return true if there isn't a location in supported locations that matches aLocation.
+     * @return true if there isn't an area in supported areas that matches aArea.
      *
      * @note This method may ignore checking the MapId uniqueness. This depends on whether the SupportedMaps attribute is null.
      */
-    bool IsUniqueSupportedLocation(const AreaStructureWrapper & aLocation, bool ignoreAreaId);
+    bool IsUniqueSupportedArea(const AreaStructureWrapper & aArea, bool ignoreAreaId);
 
     /**
      * @brief Check if changing the estimated end time attribute to aEstimatedEndTime requires the change to be reported.
@@ -167,50 +167,57 @@ private:
      */
     bool ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> & aEstimatedEndTime);
 
+    /**
+     * This method will ensure that the values in the Selected Areas, Current Area and Progress attributes correspond to areas in
+     * the Supported Areas attribute.
+     * Any invalid area IDs in the Selected Areas attribute will be removed.
+     * If the Current Area is not in the Selected Areas attribute, it will be set to null.
+     * Any progres elements with area IDs not in the Selected Areas attribute will be removed.
+     */
+    virtual void HandleSupportedAreasUpdated();
+
 public:
+    //*************************************************************************
+    // Supported Areas accessors and manipulators
+
+    uint32_t GetNumberOfSupportedAreas();
+
+    /**
+     * @brief Get a supported area using the position in the list.
+     * @param[in] listIndex the position in the list.
+     * @param[out] aSupportedArea a copy of the area contents, if found.
+     * @return true if an area is found, false otherwise.
+     */
+    bool GetSupportedAreaByIndex(uint32_t listIndex, AreaStructureWrapper & aSupportedArea);
+
+    /**
+     * @brief Get a supported area that matches a areaID.
+     * @param[in] aAreaId the areaID to search for.
+     * @param[out] listIndex the area's index in the list, if found.
+     * @param[out] aSupportedArea a copy of the area contents, if found.
+     * @return true if an area is found, false otherwise.
+     */
+    bool GetSupportedAreaById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & aSupportedArea);
+
     /**
      * @brief Add new location to the supported locations list.
-     * @param[in] aAreaId unique identifier of this location.
-     * @param[in] aMapId identifier of supported map.
-     * @param[in] aLocationName human readable name for this location (empty string if not used).
-     * @param[in] aFloorNumber represents floor level - negative values for below ground.
-     * @param[in] aAreaType common namespace Area tag - indicates an association of the location with an indoor or outdoor area of a
-     * home.
-     * @param[in] aLandmarkTag common namespace Landmark tag - indicates an association of the location with a home landmark.
-     * @param[in] aRelativePositionTag common namespace Relative Position tag - indicates the position of the location with respect
-     * to the landmark.
+     * @param[in] aNewArea The area to add.
      * @return true if the new location passed validation checks and was successfully added to the list.
      *
-     * @note if aLocationName is larger than kLocationNameMaxSize, it will be truncated.
+     * @note if aNewArea is larger than kAreaNameMaxSize, it will be truncated.
      */
-    bool AddSupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aMapId, const CharSpan & aLocationName,
-                              const DataModel::Nullable<int16_t> & aFloorNumber,
-                              const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
-                              const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-                              const DataModel::Nullable<Globals::RelativePositionTag> & aRelativePositionTag);
+    bool AddSupportedArea(AreaStructureWrapper & aNewArea);
 
     /**
      * @brief Modify/replace an existing location in the supported locations list.
-     * @param[in] aAreaId unique identifier of this location.
-     * @param[in] aMapId identifier of supported map (will not be modified).
-     * @param[in] aLocationName human readable name for this location (empty string if not used).
-     * @param[in] aFloorNumber represents floor level - negative values for below ground.
-     * @param[in] aAreaType common namespace Area tag - indicates an association of the location with an indoor or outdoor area of a
-     * home.
-     * @param[in] aLandmarkTag common namespace Landmark tag - indicates an association of the location with a home landmark.
-     * @param[in] aRelativePositionTag common namespace Relative Position tag - indicates the position of the location with respect
-     * to the landmark.
+     * @param[in] aNewArea The area to add.
      * @return true if the location is a member of supported locations, the modifications pass all validation checks and the
      * location was modified.
      *
-     * @note if aLocationName is larger than kLocationNameMaxSize, it will be truncated.
+     * @note if aNewArea is larger than kAreaNameMaxSize, it will be truncated.
      * @note if mapID is changed, the delegate's HandleSupportedAreasUpdated method is called.
      */
-    bool ModifySupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aMapId, const CharSpan & aLocationName,
-                                 const DataModel::Nullable<int16_t> & aFloorNumber,
-                                 const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
-                                 const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-                                 const DataModel::Nullable<Globals::RelativePositionTag> & aRelativePositionTag);
+    bool ModifySupportedArea(AreaStructureWrapper & aNewArea);
 
     /**
      * @return true if the SupportedAreas attribute was not already null.
@@ -219,13 +226,36 @@ public:
      */
     bool ClearSupportedAreas();
 
+    /**
+     * Removes the supported area with areaId.
+     * If a supported area is removed, the Delegate's HandleSupportedAreasUpdated method is called to ensure that the
+     * SelectedAreas, CurrentArea, and Progress attributes remain valid.
+     * @param areaId The ID of the area to be removed.
+     * @return true if an area with the areaId was removed. False otherwise.
+     */
+    bool RemoveSupportedArea(uint32_t areaId);
+
     //*************************************************************************
-    // Supported Maps manipulators
+    // Supported Maps accessors and manipulators
+
+    uint32_t GetNumberOfSupportedMaps();
 
     /**
-     * @return true if a map with the aMapId ID exists in the supported maps attribute. False otherwise.
+     * @brief Get a supported map using the position in the list.
+     * @param[in] listIndex the position in the list.
+     * @param[out] aSupportedMap  copy of the map contents, if found.
+     * @return true if a supported map is found, false otherwise.
      */
-    bool IsSupportedMap(uint32_t aMapId);
+    bool GetSupportedMapByIndex(uint32_t listIndex, MapStructureWrapper & aSupportedMap);
+
+    /**
+     * @brief Get a supported map that matches a mapID.
+     * @param[in] aMapId the mapID to search for.
+     * @param[out] listIndex the map's index in the list, if found.
+     * @param[out] aSupportedMap copy of the location contents, if found.
+     * @return true if a supported map is found, false otherwise.
+     */
+    bool GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap);
 
     /**
      * @brief Add a new map to the supported maps list.
@@ -252,23 +282,47 @@ public:
      */
     bool ClearSupportedMaps();
 
+    /**
+     * Removes the supported map with mapId.
+     * If a supported map is removed, any supported areas that are no longer valid will also be removed.
+     * @param mapId the ID of the map to be removed.
+     * @return true if a map is removed. False otherwise.
+     */
+    bool RemoveSupportedMap(uint32_t mapId);
+
     //*************************************************************************
-    // Selected Locations manipulators
+    // Selected Areas accessors and manipulators
+
+    uint32_t GetNumberOfSelectedAreas();
 
     /**
-     * @brief Add a selected location.
-     * @param[in] aSelectedLocation The areaID to add.
+     * @brief Get a selected area using the position in the list.
+     * @param[in] listIndex the position in the list.
+     * @param[out] selectedArea the selected area value, if found.
+     * @return true if a selected area is found, false otherwise.
+     */
+    bool GetSelectedAreaByIndex(uint32_t listIndex, uint32_t & selectedArea);
+
+    /**
+     * @brief Add a selected area.
+     * @param[in] aSelectedArea The areaID to add.
      * @bool true if successfully added.
      */
-    bool AddSelectedLocation(uint32_t & aSelectedLocation);
+    bool AddSelectedArea(uint32_t & aSelectedArea);
 
     /**
      * @return true if the SelectedAreas attribute was not already null.
      */
     bool ClearSelectedAreas();
 
+    /**
+     * @param areaId the area ID to be removed from the SelectedAreas attribute.
+     * @return ture if this ID was removed, false otherwise.
+     */
+    bool RemoveSelectedAreas(uint32_t areaId);
+
     //*************************************************************************
-    // Current Location manipulators
+    // Current Area accessors and manipulators
 
     DataModel::Nullable<uint32_t> GetCurrentArea();
 
@@ -282,7 +336,7 @@ public:
     bool SetCurrentArea(const DataModel::Nullable<uint32_t> & aCurrentArea);
 
     //*************************************************************************
-    // Estimated End Time manipulators
+    // Estimated End Time accessors and manipulators
 
     /**
      * @return The estimated epoch time in seconds when operation at the location indicated by the CurrentArea attribute will be
@@ -298,7 +352,26 @@ public:
     bool SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstimatedEndTime);
 
     //*************************************************************************
-    // Progress list manipulators
+    // Progress list accessors and manipulators
+
+    uint32_t GetNumberOfProgressElements();
+
+    /**
+     * @brief Get a progress element using the position in the list.
+     * @param[in] listIndex the position in the list.
+     * @param[out] aProgressElement  copy of the progress element contents, if found.
+     * @return true if a progress element is found, false otherwise.
+     */
+    bool GetProgressElementByIndex(uint32_t listIndex, Structs::ProgressStruct::Type & aProgressElement);
+
+    /**
+     * @brief Get a progress element that matches a areaID.
+     * @param[in] aAreaId the areaID to search for.
+     * @param[out] listIndex the location's index in the list, if found.
+     * @param[out] aProgressElement  copy of the progress element contents, if found.
+     * @return true if a progress element is found, false otherwise.
+     */
+    bool GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement);
 
     /**
      * @brief Add a progress element in a pending status to the progress list.
@@ -337,6 +410,12 @@ public:
      * @return true if the progress list was not already null, false otherwise.
      */
     bool ClearProgress();
+
+    /**
+     * @param areaId the area ID of the progress element to be removed.
+     * @return ture if the progress element was removed, false otherwise.
+     */
+    bool RemoveProgressElement(uint32_t areaId);
 
     //*************************************************************************
     // Feature Map attribute

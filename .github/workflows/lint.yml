@@ -35,7 +35,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:66
+            image: ghcr.io/project-chip/chip-build:76
 
         steps:
             - name: Checkout
@@ -149,6 +149,8 @@ jobs:
                       if [ "$idl_file" = './examples/placeholder/linux/apps/app2/config.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/thermostat/thermostat-common/thermostat.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/window-app/common/window-app.matter' ]; then continue; fi
+                      # Example is intentionally not spe compliant for use in cert testing
+                      if [ "$idl_file" = './examples/lighting-app-data-mode-no-unique-id/lighting-common/lighting-app.matter' ]; then continue; fi
 
                       # Test files are intentionally small and not spec-compilant, just parse-compliant
                       if [ "$idl_file" = "./scripts/py_matter_idl/matter_idl/tests/inputs/cluster_struct_attribute.matter" ]; then continue; fi

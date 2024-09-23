@@ -121,12 +121,12 @@ static void stopHandler(CommandHandler * commandObj, const ConcreteCommandPath &
                         chip::Optional<BitMask<OptionsBitmap>> optionsMask, chip::Optional<BitMask<OptionsBitmap>> optionsOverride);
 
 static void setOnOffValue(EndpointId endpoint, bool onOff);
-static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs);
+static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs, bool isNewTransition = false);
 static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, chip::Optional<chip::BitMask<OptionsBitmap>> optionsMask,
                                chip::Optional<chip::BitMask<OptionsBitmap>> optionsOverride);
 
 static Status SetCurrentLevelQuietReport(EndpointId endpoint, EmberAfLevelControlState * state,
-                                         DataModel::Nullable<uint8_t> newValue, bool isStartOrEndOfTransition);
+                                         DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition);
 
 #if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 class DefaultLevelControlSceneHandler : public scenes::DefaultSceneHandlerImpl
@@ -372,23 +372,22 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
  * while respecting its defined quiet reporting quality:
  * The attribute will be reported:
  * - At most once per second, or
- * - At the start of the movement/transition, or
  * - At the end of the movement/transition, or
  * - When it changes from null to any other value and vice versa.
  *
  * @param endpoint: endpoint on which the currentLevel attribute must be updated.
  * @param state: LevelControlState struct of this given endpoint.
  * @param newValue: Value to update the attribute with
- * @param isStartOrEndOfTransition: Boolean that indicate whether the update is occuring at the start or end of a level transition
+ * @param isEndOfTransition: Boolean that indicate whether the update is occuring at the end of a level transition
  * @return Success in setting the attribute value or the IM error code for the failure.
  */
 static Status SetCurrentLevelQuietReport(EndpointId endpoint, EmberAfLevelControlState * state,
-                                         DataModel::Nullable<uint8_t> newValue, bool isStartOrEndOfTransition)
+                                         DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition)
 {
     AttributeDirtyState dirtyState;
     auto now = System::SystemClock().GetMonotonicTimestamp();
 
-    if (isStartOrEndOfTransition)
+    if (isEndOfTransition)
     {
         // At the start or end of the movement/transition we must report
         auto predicate = [](const decltype(state->quietCurrentLevel)::SufficientChangePredicateCandidate &) -> bool {
@@ -467,7 +466,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
 
     // Are we at the requested level?
     isTransitionEnd = (currentLevel.Value() == state->moveToLevel);
-    status          = SetCurrentLevelQuietReport(endpoint, state, currentLevel, (isTransitionStart || isTransitionEnd));
+    status          = SetCurrentLevelQuietReport(endpoint, state, currentLevel, isTransitionEnd);
     if (status != Status::Success)
     {
         ChipLogProgress(Zcl, "ERR: writing current level %x", to_underlying(status));
@@ -506,12 +505,12 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     else
     {
         state->callbackSchedule.runTime = System::SystemClock().GetMonotonicTimestamp() - callbackStartTimestamp;
-        writeRemainingTime(endpoint, static_cast<uint16_t>(state->transitionTimeMs - state->elapsedTimeMs));
+        writeRemainingTime(endpoint, static_cast<uint16_t>(state->transitionTimeMs - state->elapsedTimeMs), isTransitionStart);
         scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
     }
 }
 
-static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs)
+static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs, bool isNewTransition)
 {
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_LEVEL_CONTROL_REMAINING_TIME
     if (emberAfContainsAttribute(endpoint, LevelControl::Id, LevelControl::Attributes::RemainingTime::Id))
@@ -531,16 +530,36 @@ static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs)
         //
         // This is done to ensure that the attribute, in tenths of a second, only
         // goes to zero when the remaining time in milliseconds is actually zero.
-        uint16_t remainingTimeDs = static_cast<uint16_t>((remainingTimeMs + 99) / 100);
-        auto markDirty           = MarkAttributeDirty::kNo;
-        auto state               = getState(endpoint);
-        auto now                 = System::SystemClock().GetMonotonicTimestamp();
+        auto markDirty             = MarkAttributeDirty::kNo;
+        auto state                 = getState(endpoint);
+        auto now                   = System::SystemClock().GetMonotonicTimestamp();
+        uint16_t remainingTimeDs   = static_cast<uint16_t>((remainingTimeMs + 99) / 100);
+        uint16_t lastRemainingTime = state->quietRemainingTime.value().ValueOr(0);
 
-        // Establish the quiet report condition for the RemainingTime Attribute
-        // The quiet report is determined by the previously set policies:
-        // - kMarkDirtyOnChangeToFromZero : When the value changes from 0 to any other value and vice versa, or
-        // - kMarkDirtyOnIncrement : When the value increases.
-        if (state->quietRemainingTime.SetValue(remainingTimeDs, now) == AttributeDirtyState::kMustReport)
+        // RemainingTime Quiet report conditions:
+        // - When it changes to 0, or
+        // - When it changes from 0 to any value higher than 10, or
+        // - When it changes, with a delta larger than 10, caused by the invoke of a command.
+        auto predicate = [isNewTransition, lastRemainingTime](
+                             const decltype(state->quietRemainingTime)::SufficientChangePredicateCandidate & candidate) -> bool {
+            constexpr uint16_t reportDelta = 10;
+            bool isDirty                   = false;
+            if (candidate.newValue.Value() == 0 ||
+                (candidate.lastDirtyValue.Value() == 0 && candidate.newValue.Value() > reportDelta))
+            {
+                isDirty = true;
+            }
+            else if (isNewTransition &&
+                     (candidate.newValue.Value() > static_cast<uint32_t>(lastRemainingTime + reportDelta) ||
+                      static_cast<uint32_t>(candidate.newValue.Value() + reportDelta) < lastRemainingTime ||
+                      candidate.newValue.Value() > static_cast<uint32_t>(candidate.lastDirtyValue.Value() + reportDelta)))
+            {
+                isDirty = true;
+            }
+            return isDirty;
+        };
+
+        if (state->quietRemainingTime.SetValue(remainingTimeDs, now, predicate) == AttributeDirtyState::kMustReport)
         {
             markDirty = MarkAttributeDirty::kYes;
         }
@@ -1316,7 +1335,7 @@ static void stopHandler(CommandHandler * commandObj, const ConcreteCommandPath &
 
     // Cancel any currently active command.
     cancelEndpointTimerCallback(endpoint);
-    SetCurrentLevelQuietReport(endpoint, state, state->quietCurrentLevel.value(), true /*isStartOrEndOfTransition*/);
+    SetCurrentLevelQuietReport(endpoint, state, state->quietCurrentLevel.value(), true /*isEndOfTransition*/);
     writeRemainingTime(endpoint, 0);
 
 send_default_response:
@@ -1410,7 +1429,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     {
         // If newValue is OnOff::Commands::On::Id...
         // "Set CurrentLevel to minimum level allowed for the device."
-        status = SetCurrentLevelQuietReport(endpoint, state, minimumLevelAllowedForTheDevice, true /*isStartOrEndOfTransition*/);
+        status = SetCurrentLevelQuietReport(endpoint, state, minimumLevelAllowedForTheDevice, false /*isEndOfTransition*/);
         if (status != Status::Success)
         {
             ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
@@ -1453,9 +1472,6 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
         return;
     }
 
-    state->quietRemainingTime.policy()
-        .Set(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement)
-        .Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
     state->minLevel = MATTER_DM_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL;
     state->maxLevel = MATTER_DM_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL;
 
@@ -1528,18 +1544,18 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
                     }
                 }
                 // Otherwise Set the CurrentLevel attribute to its previous value which was already fetch above
-                SetCurrentLevelQuietReport(endpoint, state, currentLevel, true /*isStartOrEndOfTransition*/);
+                SetCurrentLevelQuietReport(endpoint, state, currentLevel, false /*isEndOfTransition*/);
             }
         }
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
        // In any case, we make sure that the respects min/max
         if (currentLevel.IsNull() || currentLevel.Value() < state->minLevel)
         {
-            SetCurrentLevelQuietReport(endpoint, state, state->minLevel, true /*isStartOrEndOfTransition*/);
+            SetCurrentLevelQuietReport(endpoint, state, state->minLevel, false /*isEndOfTransition*/);
         }
         else if (currentLevel.Value() > state->maxLevel)
         {
-            SetCurrentLevelQuietReport(endpoint, state, state->maxLevel, true /*isStartOrEndOfTransition*/);
+            SetCurrentLevelQuietReport(endpoint, state, state->maxLevel, false /*isEndOfTransition*/);
         }
     }
 

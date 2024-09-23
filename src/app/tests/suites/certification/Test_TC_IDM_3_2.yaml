@@ -24,6 +24,13 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          1. The Cluster and Commands should be based on the cluster implementation on the DUT.
+          2. The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
+          3. Test Steps 2, 13, 20, 21, 22 and 23 cannot be executed with V1.0 SDK
+      disabled: true
+
     - label:
           "Step 1: TH sends the WriteRequestMessage to the DUT to write one
           attribute on a given cluster and endpoint. On receipt of this message,
@@ -93,7 +100,6 @@ tests:
 
            ./chip-tool  basicinformation write local-config-disabled 1 1 0
 
-
           On TH(chip-tool), verify that DUT sends a WriteResponseMessage with the status set to Success for the data sent in the above command and verify by sending a ReadRequestMessage to read the value that was modified.
           [1686227392.013866][93552:93554] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1686227392.013876][93552:93554] CHIP:DMG: WriteResponseMessage =
@@ -144,7 +150,6 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-
           ./chip-tool  basicinformation write node-label new 1 0
 
           On TH(chip-tool), verify that DUT sends a WriteResponseMessage with the status set to Success for the data sent in the above command and veriffy by sending a ReadRequestMessage to read the value that was modified.
@@ -194,7 +199,6 @@ tests:
       PICS: MCORE.IDM.S.Attribute_W.DataType_UnsignedInteger
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
-
 
           ./chip-tool any write-by-id 0x0008 0x0010 1 1 1
 
@@ -252,7 +256,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute of data type signed integer.
 
-          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -262,7 +266,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute of data type float
 
-          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -272,7 +276,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute of data type Octet String
 
-          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -282,7 +286,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute ofdata type Struct
 
-          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -292,7 +296,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute of  data type List
 
-          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -301,6 +305,7 @@ tests:
       PICS: MCORE.IDM.S.Attribute_W.DataType_Enum
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
+
            ./chip-tool any write-by-id 0x0204 0 1 1 1
 
           On TH(chip-tool), verify that DUT sends a WriteResponseMessage with the status set to Success for the data sent in the above command and verify by sending a ReadRequestMessage to read the value that was modified.
@@ -339,9 +344,7 @@ tests:
           ./chip-tool any read-by-id 0x0204 0 1 1
 
           On TH(chip-tool), verify the attribute value that was modified in above step
-          [1686227658.643633][93610:93612] CHIP:DMG:         SuppressResponse = true,
-          [1686227658.643643][93610:93612] CHIP:DMG:         InteractionModelRevision = 1
-          [1686227658.643651][93610:93612] CHIP:DMG: }
+
           [1686227658.643729][93610:93612] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 1939013916
           [1686227658.643765][93610:93612] CHIP:TOO:   TemperatureDisplayMode: 1
           [1686227658.643826][93610:93612] CHIP:EM: <<< [E:7325i S:64158 M:55416058 (Ack:52160854)] (S) Msg TX to 1:0000000000000001 [58B9] --- Type 0000:10 (SecureChannel:StandaloneAck)
@@ -392,14 +395,10 @@ tests:
           [1686227690.827552][93615:93617] CHIP:EM: Flushed pending ack for MessageCounter:75613172 on exchange 7166i
 
 
-
            ./chip-tool colorcontrol read-by-id 0x000f 1 1
 
           On TH(chip-tool), verify the attribute value that was modified in above step
 
-          [1686227710.429709][93622:93624] CHIP:DMG:         SuppressResponse = true,
-          [1686227710.429715][93622:93624] CHIP:DMG:         InteractionModelRevision = 1
-          [1686227710.429720][93622:93624] CHIP:DMG: }
           [1686227710.429791][93622:93624] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_000F DataVersion: 861636757
           [1686227710.429832][93622:93624] CHIP:TOO:   Options: 1
           [1686227710.429882][93622:93624] CHIP:EM: <<< [E:4989i S:43440 M:30144210 (Ack:113240090)] (S) Msg TX to 1:0000000000000001 [58B9] --- Type 0000:10 (SecureChannel:StandaloneAck)
@@ -467,7 +466,6 @@ tests:
            ./chip-tool thermostat write unoccupied-heating-setpoint 1200 1 0
 
           On TH(chip-tool), Verify  that the DUT sends the status code UNSUPPORTED_CLUSTER for the data sent in the above command
-
 
           [1686229393.093998][94065:94067] CHIP:EM: Rxd Ack; Removing MessageCounter:56487501 from Retrans Table on exchange 60736i
           [1686229393.094012][94065:94067] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -591,11 +589,11 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-
           To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except identify cluster command if try to send any other command will get status as unsupported access.
 
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]' 1 0
+
           On TH(chip-tool), Verify  that the DUT sends the status code SUCCESS  for the data sent in the above command
 
           [1686228784.940429][93932:93934] CHIP:EM: Rxd Ack; Removing MessageCounter:76693936 from Retrans Table on exchange 64135i
@@ -696,6 +694,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
            ./chip-tool levelcontrol write on-level 2 1 1
+
            On TH(chip-tool), verify that DUT sends a Write Response message with a success
           [1686229097.486513][93998:94000] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1686229097.486533][93998:94000] CHIP:DMG: WriteResponseMessage =
@@ -731,8 +730,9 @@ tests:
 
 
            ./chip-tool levelcontrol read on-level 1 1
+
            On TH(chip-tool), verify the attribute value that was modified in above step.
-          [1686229128.655083][94004:94006] CHIP:DMG: }
+
           [1686229128.655203][94004:94006] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 2737039619
           [1686229128.655240][94004:94006] CHIP:TOO:   OnLevel: 2
           [1686229128.655340][94004:94006] CHIP:EM: <<< [E:43327i S:11132 M:58615041 (Ack:232232518)] (S) Msg TX to 1:0000000000000001 [58B9] --- Type 0000:10 (SecureChannel:StandaloneAck)
@@ -741,7 +741,9 @@ tests:
 
 
            ./chip-tool levelcontrol write on-level 3 1 1
+
           Verify on TH(chip-tool) receives WriteResponseMessage with the status set to Success for the data sent in the above command and verify by sending a ReadRequestMessage to read the value that was modified.
+
           [1686229150.157900][94008:94010] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1686229150.157919][94008:94010] CHIP:DMG: WriteResponseMessage =
           [1686229150.157927][94008:94010] CHIP:DMG: {
@@ -776,6 +778,7 @@ tests:
            ./chip-tool levelcontrol read on-level 1 1
 
            On TH(chip-tool), verify the attribute value that was modified in above step
+
           [1686229175.161437][94014:94016] CHIP:DMG:         InteractionModelRevision = 1
           [1686229175.161442][94014:94016] CHIP:DMG: }
           [1686229175.161512][94014:94016] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 2737039620
@@ -788,6 +791,7 @@ tests:
            ./chip-tool levelcontrol write on-level 1 1 1
 
           Verify on TH(chip-tool) receives WriteResponseMessage with the status set to Success for the data sent in the above command and verify by sending a ReadRequestMessage to read the value that was modified
+
           [1686229199.082595][94020:94022] CHIP:EM: Rxd Ack; Removing MessageCounter:90418515 from Retrans Table on exchange 55893i
           [1686229199.082606][94020:94022] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1686229199.082625][94020:94022] CHIP:DMG: WriteResponseMessage =
@@ -823,6 +827,7 @@ tests:
            ./chip-tool levelcontrol read on-level 1 1
 
            On TH(chip-tool), verify the attribute value that was modified in above step
+
           [1686229224.244504][94026:94028] CHIP:DMG: }
           [1686229224.244574][94026:94028] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 2737039621
           [1686229224.244614][94026:94028] CHIP:TOO:   OnLevel: 1
@@ -893,6 +898,7 @@ tests:
           ./chip-tool levelcontrol write on-level 3 1 1 --data-version 0xc4c9d7ae
 
            On TH(chip-tool), verify that DUT sends a Write Response message with a success
+
           [1686229590.858793][94124:94126] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1686229590.858813][94124:94126] CHIP:DMG: WriteResponseMessage =
           [1686229590.858821][94124:94126] CHIP:DMG: {
@@ -926,6 +932,7 @@ tests:
            ./chip-tool levelcontrol read on-level 1 1
 
            On TH(chip-tool), verify that TH receives the WriteResponseMessage with the status set to Success for the data sent in the above command and veriy by sending a ReadRequestMessage to read the value that was modified.
+
           [1686229613.307472][94130:94132] CHIP:DMG: }
           [1686229613.307596][94130:94132] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 2737039622
           [1686229613.307632][94130:94132] CHIP:TOO:   OnLevel: 3
@@ -945,8 +952,6 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-
-
           ./chip-tool levelcontrol read on-level 1 1
 
            On TH(chip-tool), Verify that DUT is responds with attribute value
@@ -962,7 +967,9 @@ tests:
 
 
           ./chip-tool levelcontrol write on-level 4 1 1
+
            On TH(chip-tool), DUT send a Write Response message with status code as success
+
           [1686229675.214378][94147:94149] CHIP:DMG: WriteResponseMessage =
           [1686229675.214386][94147:94149] CHIP:DMG: {
           [1686229675.214393][94147:94149] CHIP:DMG:         AttributeStatusIBs =

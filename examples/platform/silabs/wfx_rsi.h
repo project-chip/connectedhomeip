@@ -17,7 +17,9 @@
 #pragma once
 
 #include <app/icd/server/ICDServerConfig.h>
+#include <cmsis_os2.h>
 #include <event_groups.h>
+#include <sl_cmsis_os2_common.h>
 #include <wfx_host_events.h>
 
 #ifndef RSI_BLE_ENABLE
@@ -28,11 +30,8 @@
  * Interface to RSI Sapis
  */
 
-#define WFX_RSI_WLAN_TASK_SZ (1024 + 512 + 256) /* Stack for the WLAN task	 	*/
-#define WFX_RSI_TASK_SZ (1024 + 1024)           /* Stack for the WFX/RSI task		*/
-#define WFX_RSI_BUF_SZ (1024 * 10)              /* May need tweak 			*/
-#define WFX_RSI_CONFIG_MAX_JOIN (5)             /* Max join retries			*/
-// TODO: Default values are usually in minutes, but this is in ms. Confirm if this is correct
+#define WFX_RSI_WLAN_TASK_SZ (1024 + 512 + 256) /* Stack for the WLAN task	 	*/ // TODO: For rs9116
+#define WFX_RSI_BUF_SZ (1024 * 10)
 #define WFX_RSI_DHCP_POLL_INTERVAL (250) /* Poll interval in ms for DHCP		*/
 #define WFX_RSI_NUM_TIMERS (2)           /* Number of RSI timers to alloc	*/
 
@@ -62,7 +61,6 @@ typedef enum
     WFX_RSI_ST_STA_READY       = (WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE),
     WFX_RSI_ST_STARTED         = (1 << 9),  /* RSI task started			*/
     WFX_RSI_ST_SCANSTARTED     = (1 << 10), /* Scan Started				*/
-    WFX_RSI_ST_SLEEP_READY     = (1 << 11)  /* Notify the M4 to go to sleep*/
 } WfxStateType_e;
 
 typedef struct WfxEvent_s
@@ -73,20 +71,13 @@ typedef struct WfxEvent_s
 
 typedef struct wfx_rsi_s
 {
-    // TODO: Change tp WfxEventType_e once the event queue is implemented
-    EventGroupHandle_t events;
-    TaskHandle_t drv_task;
-    TaskHandle_t wlan_task;
-    TaskHandle_t init_task;
-#ifdef RSI_BLE_ENABLE
-    TaskHandle_t ble_task;
-#endif
     uint16_t dev_state;
     uint16_t ap_chan; /* The chan our STA is using	*/
     wfx_wifi_provision_t sec;
 #ifdef SL_WFX_CONFIG_SCAN
     void (*scan_cb)(wfx_wifi_scan_result_t *);
     char * scan_ssid; /* Which one are we scanning for */
+    size_t scan_ssid_length;
 #endif
 #ifdef SL_WFX_CONFIG_SOFTAP
     sl_wfx_mac_address_t softap_mac;

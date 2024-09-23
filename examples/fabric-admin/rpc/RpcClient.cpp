@@ -117,9 +117,13 @@ void RpcCompletedWithEmptyResponse(const pw_protobuf_Empty & response, pw::Statu
 
 } // namespace
 
-CHIP_ERROR InitRpcClient(uint16_t rpcServerPort)
+void SetRpcRemoteServerPort(uint16_t port)
 {
-    rpc::client::SetRpcServerPort(rpcServerPort);
+    rpc::client::SetRpcServerPort(port);
+}
+
+CHIP_ERROR StartRpcClient()
+{
     return rpc::client::StartPacketProcessing();
 }
 
@@ -140,7 +144,7 @@ CHIP_ERROR AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & data)
     return WaitForResponse(call);
 }
 
-CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId)
+CHIP_ERROR RemoveSynchronizedDevice(NodeId nodeId)
 {
     ChipLogProgress(NotSpecified, "RemoveSynchronizedDevice");
 
@@ -160,7 +164,7 @@ CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId)
     return WaitForResponse(call);
 }
 
-CHIP_ERROR ActiveChanged(chip::NodeId nodeId, uint32_t promisedActiveDurationMs)
+CHIP_ERROR ActiveChanged(NodeId nodeId, uint32_t promisedActiveDurationMs)
 {
     ChipLogProgress(NotSpecified, "ActiveChanged");
 
@@ -171,6 +175,23 @@ CHIP_ERROR ActiveChanged(chip::NodeId nodeId, uint32_t promisedActiveDurationMs)
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.
     auto call = fabricBridgeClient.ActiveChanged(parameters, RpcCompletedWithEmptyResponse);
+
+    if (!call.active())
+    {
+        // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return WaitForResponse(call);
+}
+
+CHIP_ERROR AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommissioningChanged & data)
+{
+    ChipLogProgress(NotSpecified, "AdminCommissioningAttributeChanged");
+
+    // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
+    // function and the call will complete.
+    auto call = fabricBridgeClient.AdminCommissioningAttributeChanged(data, RpcCompletedWithEmptyResponse);
 
     if (!call.active())
     {

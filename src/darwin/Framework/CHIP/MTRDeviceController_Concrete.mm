@@ -31,6 +31,7 @@
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRDeviceController_Concrete.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -45,6 +46,7 @@
 #import "MTRSetupPayload.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
+#import "MTRUtilities.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 #import <setup_payload/ManualSetupPayloadGenerator.h>
@@ -75,30 +77,10 @@
 
 #include <atomic>
 #include <dns_sd.h>
+#include <optional>
 #include <string>
 
 #import <os/lock.h>
-
-static NSString * const kErrorCommissionerInit = @"Init failure while initializing a commissioner";
-static NSString * const kErrorIPKInit = @"Init failure while initializing IPK";
-static NSString * const kErrorSigningKeypairInit = @"Init failure while creating signing keypair bridge";
-static NSString * const kErrorOperationalCredentialsInit = @"Init failure while creating operational credentials delegate";
-static NSString * const kErrorOperationalKeypairInit = @"Init failure while creating operational keypair bridge";
-static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
-static NSString * const kErrorPartialDacVerifierInit = @"Init failure while creating a partial DAC verifier";
-static NSString * const kErrorPairDevice = @"Failure while pairing the device";
-static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
-static NSString * const kErrorOpenPairingWindow = @"Open Pairing Window failed";
-static NSString * const kErrorNotRunning = @"Controller is not running. Call startup first.";
-static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code failed";
-static NSString * const kErrorGenerateNOC = @"Generating operational certificate failed";
-static NSString * const kErrorKeyAllocation = @"Generating new operational key failed";
-static NSString * const kErrorCSRValidation = @"Extracting public key from CSR failed";
-static NSString * const kErrorGetCommissionee = @"Failure obtaining device being commissioned";
-static NSString * const kErrorGetAttestationChallenge = @"Failure getting attestation challenge";
-static NSString * const kErrorSpake2pVerifierGenerationFailed = @"PASE verifier generation failed";
-static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
-static NSString * const kErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
 
 typedef void (^SyncWorkQueueBlock)(void);
 typedef id (^SyncWorkQueueBlockWithReturnValue)(void);
@@ -106,62 +88,102 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 using namespace chip::Tracing::DarwinFramework;
 
-@implementation MTRDeviceController {
-    // Atomic because it can be touched from multiple threads.
+@interface MTRDeviceController_Concrete ()
+
+// MTRDeviceController ivar internal access
+
+@property (nonatomic, readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
+@property (nonatomic, readonly) chip::Credentials::PartialDACVerifier * partialDACVerifier;
+@property (nonatomic, readonly) chip::Credentials::DefaultDACVerifier * defaultDACVerifier;
+@property (nonatomic, readonly) MTRDeviceControllerDelegateBridge * deviceControllerDelegateBridge;
+@property (nonatomic, readonly) MTROperationalCredentialsDelegate * operationalCredentialsDelegate;
+@property (nonatomic, readonly) MTRDeviceAttestationDelegateBridge * deviceAttestationDelegateBridge;
+@property (nonatomic, readonly) dispatch_queue_t chipWorkQueue;
+@property (nonatomic, readonly, nullable) MTRDeviceControllerFactory * factory;
+@property (nonatomic, readonly, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
+@property (nonatomic, readonly, nullable) dispatch_queue_t otaProviderDelegateQueue;
+@property (nonatomic, readonly, nullable) MTRCommissionableBrowser * commissionableBrowser;
+@property (nonatomic, readonly, nullable) MTRAttestationTrustStoreBridge * attestationTrustStoreBridge;
+@property (nonatomic, readonly, nullable) NSMutableArray<MTRServerEndpoint *> * serverEndpoints;
+
+@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
+
+@property (nonatomic, readonly) MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration;
+
+// Whether we should be advertising our operational identity when we are not suspended.
+@property (nonatomic, readonly) BOOL shouldAdvertiseOperational;
+
+@end
+
+@implementation MTRDeviceController_Concrete {
     std::atomic<chip::FabricIndex> _storedFabricIndex;
-
-    // queue used to serialize all work performed by the MTRDeviceController
-    dispatch_queue_t _chipWorkQueue;
-
-    chip::Controller::DeviceCommissioner * _cppCommissioner;
-    chip::Credentials::PartialDACVerifier * _partialDACVerifier;
-    chip::Credentials::DefaultDACVerifier * _defaultDACVerifier;
-    MTRDeviceControllerDelegateBridge * _deviceControllerDelegateBridge;
-    MTROperationalCredentialsDelegate * _operationalCredentialsDelegate;
+    std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
     MTRP256KeypairBridge _signingKeypairBridge;
     MTRP256KeypairBridge _operationalKeypairBridge;
-    MTRDeviceAttestationDelegateBridge * _deviceAttestationDelegateBridge;
-    MTRDeviceControllerFactory * _factory;
-    NSMapTable * _nodeIDToDeviceMap;
-    os_unfair_lock _deviceMapLock; // protects nodeIDToDeviceMap
-    MTRCommissionableBrowser * _commissionableBrowser;
-    MTRAttestationTrustStoreBridge * _attestationTrustStoreBridge;
 
-    // _serverEndpoints is only touched on the Matter queue.
-    NSMutableArray<MTRServerEndpoint *> * _serverEndpoints;
-
-    MTRDeviceStorageBehaviorConfiguration * _storageBehaviorConfiguration;
+    // Counters to track assertion status and access controlled by the _assertionLock
+    // TODO: Figure out whether they should live here or in the base class (or
+    // go away completely!), which depends on how the shutdown codepaths get set up.
+    NSUInteger _keepRunningAssertionCounter;
+    BOOL _shutdownPending;
+    os_unfair_lock _assertionLock;
 }
 
-- (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters error:(NSError * __autoreleasing *)error
+// TODO: Figure out whether the work queue storage lives here or in the superclass
+// Right now we seem to have both?
+@synthesize chipWorkQueue = _chipWorkQueue;
+@synthesize controllerDataStore = _controllerDataStore;
+// TODO: For these remaining ivars, figure out whether they should live here or
+// on the superclass. Should not be both.
+@synthesize factory = _factory;
+@synthesize otaProviderDelegate = _otaProviderDelegate;
+@synthesize otaProviderDelegateQueue = _otaProviderDelegateQueue;
+@synthesize commissionableBrowser = _commissionableBrowser;
+@synthesize concurrentSubscriptionPool = _concurrentSubscriptionPool;
+@synthesize storageBehaviorConfiguration = _storageBehaviorConfiguration;
+
+- (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
+                                      error:(NSError * __autoreleasing *)error
 {
     if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
-        MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
+        MTR_LOG_ERROR("Expected MTRDeviceControllerParameters but got: %@", parameters);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
         }
         return nil;
     }
+
     auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
 
-    // MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
-    return [MTRDeviceControllerFactory.sharedInstance initializeController:self withParameters:controllerParameters error:error];
+    // Start us up normally. MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary.
+    MTRDeviceControllerFactory * factory = MTRDeviceControllerFactory.sharedInstance;
+    auto * controller = [factory initializeController:self
+                                       withParameters:controllerParameters
+                                                error:error];
+    return controller;
 }
 
-- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
-                             queue:(dispatch_queue_t)queue
-                   storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
-              storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
-               otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
-          otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
-                  uniqueIdentifier:(NSUUID *)uniqueIdentifier
-    concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
-      storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
+- (nullable instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
+                                   queue:(dispatch_queue_t)queue
+                         storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
+                    storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
+                     otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
+                otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
+                        uniqueIdentifier:(NSUUID *)uniqueIdentifier
+          concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
+            storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
+                          startSuspended:(BOOL)startSuspended
 {
-    if (self = [super init]) {
+    if (self = [super initForSubclasses:startSuspended]) {
         // Make sure our storage is all set up to work as early as possible,
         // before we start doing anything else with the controller.
-        _uniqueIdentifier = uniqueIdentifier;
+        self.uniqueIdentifier = uniqueIdentifier;
+
+        // Setup assertion variables
+        _keepRunningAssertionCounter = 0;
+        _shutdownPending = NO;
+        _assertionLock = OS_UNFAIR_LOCK_INIT;
+
         if (storageDelegate != nil) {
             if (storageDelegateQueue == nil) {
                 MTR_LOG_ERROR("storageDelegate provided without storageDelegateQueue");
@@ -233,26 +255,23 @@ using namespace chip::Tracing::DarwinFramework;
 
         _otaProviderDelegate = otaProviderDelegate;
         _otaProviderDelegateQueue = otaProviderDelegateQueue;
-
         _chipWorkQueue = queue;
         _factory = factory;
-        _deviceMapLock = OS_UNFAIR_LOCK_INIT;
-        _nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
         _serverEndpoints = [[NSMutableArray alloc] init];
         _commissionableBrowser = nil;
 
         _deviceControllerDelegateBridge = new MTRDeviceControllerDelegateBridge();
-        if ([self checkForInitError:(_deviceControllerDelegateBridge != nullptr) logMsg:kErrorPairingInit]) {
+        if ([self checkForInitError:(_deviceControllerDelegateBridge != nullptr) logMsg:kDeviceControllerErrorPairingInit]) {
             return nil;
         }
 
         _partialDACVerifier = new chip::Credentials::PartialDACVerifier();
-        if ([self checkForInitError:(_partialDACVerifier != nullptr) logMsg:kErrorPartialDacVerifierInit]) {
+        if ([self checkForInitError:(_partialDACVerifier != nullptr) logMsg:kDeviceControllerErrorPartialDacVerifierInit]) {
             return nil;
         }
 
         _operationalCredentialsDelegate = new MTROperationalCredentialsDelegate(self);
-        if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kErrorOperationalCredentialsInit]) {
+        if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kDeviceControllerErrorOperationalCredentialsInit]) {
             return nil;
         }
 
@@ -278,15 +297,28 @@ using namespace chip::Tracing::DarwinFramework;
         _concurrentSubscriptionPool = [[MTRAsyncWorkQueue alloc] initWithContext:self width:concurrentSubscriptionPoolSize];
 
         _storedFabricIndex = chip::kUndefinedFabricIndex;
+        _storedCompressedFabricID = std::nullopt;
+        self.nodeID = nil;
+        self.fabricID = nil;
+        self.rootPublicKey = nil;
 
         _storageBehaviorConfiguration = storageBehaviorConfiguration;
+
+        // We let the operational browser know about ourselves here, because
+        // after this point we are guaranteed to have shutDownCppController
+        // called by the factory.
+        if (!startSuspended) {
+            dispatch_async(_chipWorkQueue, ^{
+                factory.operationalBrowser->ControllerActivated();
+            });
+        }
     }
     return self;
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRDeviceController: %p uuid %@>", self, _uniqueIdentifier];
+    return [NSString stringWithFormat:@"<%@: %p, uuid: %@, suspended: %@>", NSStringFromClass(self.class), self, self.uniqueIdentifier, MTR_YES_NO(self.suspended)];
 }
 
 - (BOOL)isRunning
@@ -294,15 +326,109 @@ using namespace chip::Tracing::DarwinFramework;
     return _cppCommissioner != nullptr;
 }
 
+- (void)_controllerSuspended
+{
+    MTRDeviceControllerFactory * factory = _factory;
+    dispatch_async(_chipWorkQueue, ^{
+        factory.operationalBrowser->ControllerDeactivated();
+
+        if (self.shouldAdvertiseOperational) {
+            auto * fabricTable = factory.fabricTable;
+            if (fabricTable) {
+                // We don't care about errors here. If our fabric is gone, nothing to do.
+                fabricTable->SetShouldAdvertiseIdentity(self->_storedFabricIndex, chip::FabricTable::AdvertiseIdentity::No);
+                [factory resetOperationalAdvertising];
+            }
+        }
+    });
+}
+
+- (void)_controllerResumed
+{
+    MTRDeviceControllerFactory * factory = _factory;
+    dispatch_async(_chipWorkQueue, ^{
+        factory.operationalBrowser->ControllerActivated();
+
+        if (self.shouldAdvertiseOperational) {
+            auto * fabricTable = factory.fabricTable;
+            if (fabricTable) {
+                // We don't care about errors here. If our fabric is gone, nothing to do.
+                fabricTable->SetShouldAdvertiseIdentity(self->_storedFabricIndex, chip::FabricTable::AdvertiseIdentity::Yes);
+                [factory resetOperationalAdvertising];
+            }
+        }
+    });
+}
+
+- (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate
+{
+    if (!operationalCertificate || !rootCertificate) {
+        return FALSE;
+    }
+    NSNumber * nodeID = [MTRDeviceControllerParameters nodeIDFromNOC:operationalCertificate];
+    NSNumber * fabricID = [MTRDeviceControllerParameters fabricIDFromNOC:operationalCertificate];
+    NSData * publicKey = [MTRDeviceControllerParameters publicKeyFromCertificate:rootCertificate];
+
+    std::lock_guard lock(_assertionLock);
+
+    // If any of the local above are nil, the return will be false since MTREqualObjects handles them correctly
+    return _keepRunningAssertionCounter > 0 && _shutdownPending && MTREqualObjects(nodeID, self.nodeID) && MTREqualObjects(fabricID, self.fabricID) && MTREqualObjects(publicKey, self.rootPublicKey);
+}
+
+- (void)addRunAssertion
+{
+    std::lock_guard lock(_assertionLock);
+
+    // Only take an assertion if running
+    if ([self isRunning]) {
+        ++_keepRunningAssertionCounter;
+        MTR_LOG("%@ Adding keep running assertion, total %lu", self, static_cast<unsigned long>(_keepRunningAssertionCounter));
+    }
+}
+
+- (void)removeRunAssertion;
+{
+    std::lock_guard lock(_assertionLock);
+
+    if (_keepRunningAssertionCounter > 0) {
+        --_keepRunningAssertionCounter;
+        MTR_LOG("%@ Removing keep running assertion, total %lu", self, static_cast<unsigned long>(_keepRunningAssertionCounter));
+
+        if ([self isRunning] && _keepRunningAssertionCounter == 0 && _shutdownPending) {
+            MTR_LOG("%@ All assertions removed and shutdown is pending, shutting down", self);
+            [self finalShutdown];
+        }
+    }
+}
+
+- (void)clearPendingShutdown
+{
+    std::lock_guard lock(_assertionLock);
+    _shutdownPending = NO;
+}
+
 - (void)shutdown
 {
+    std::lock_guard lock(_assertionLock);
+
+    if (_keepRunningAssertionCounter > 0) {
+        MTR_LOG("%@ Pending shutdown since %lu assertions are present", self, static_cast<unsigned long>(_keepRunningAssertionCounter));
+        _shutdownPending = YES;
+        return;
+    }
+    [self finalShutdown];
+}
+
+- (void)finalShutdown
+{
+    os_unfair_lock_assert_owner(&_assertionLock);
     MTR_LOG("%@ shutdown called", self);
     if (_cppCommissioner == nullptr) {
         // Already shut down.
         return;
     }
 
-    MTR_LOG("Shutting down MTRDeviceController: %@", self);
+    MTR_LOG("Shutting down %@: %@", NSStringFromClass(self.class), self);
     [self cleanupAfterStartup];
 }
 
@@ -314,11 +440,11 @@ using namespace chip::Tracing::DarwinFramework;
     // do the secure session shutdowns.  Since we don't want to hold the lock
     // while calling out into arbitrary invalidation code, snapshot the list of
     // devices before we start invalidating.
-    MTR_LOG("cleanupAfterStartup MTRDeviceController: %@", self);
-    os_unfair_lock_lock(&_deviceMapLock);
-    NSEnumerator * devices = [_nodeIDToDeviceMap objectEnumerator];
-    [_nodeIDToDeviceMap removeAllObjects];
-    os_unfair_lock_unlock(&_deviceMapLock);
+    MTR_LOG("%s: %@", __PRETTY_FUNCTION__, self);
+    os_unfair_lock_lock(self.deviceMapLock);
+    auto * devices = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
+    [self.nodeIDToDeviceMap removeAllObjects];
+    os_unfair_lock_unlock(self.deviceMapLock);
 
     for (MTRDevice * device in devices) {
         [device invalidate];
@@ -332,7 +458,7 @@ using namespace chip::Tracing::DarwinFramework;
 // in a very specific way that only MTRDeviceControllerFactory knows about.
 - (void)shutDownCppController
 {
-    MTR_LOG("shutDownCppController MTRDeviceController: %p", self);
+    MTR_LOG("%s: %p", __PRETTY_FUNCTION__, self);
     assertChipStackLockedByCurrentThread();
 
     // Shut down all our endpoints.
@@ -351,11 +477,22 @@ using namespace chip::Tracing::DarwinFramework;
         // shutdown completes, in case it wants to write to storage as it
         // shuts down.
         _storedFabricIndex = chip::kUndefinedFabricIndex;
+        _storedCompressedFabricID = std::nullopt;
+        self.nodeID = nil;
+        self.fabricID = nil;
+        self.rootPublicKey = nil;
+
         delete commissionerToShutDown;
         if (_operationalCredentialsDelegate != nil) {
             _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
         }
     }
+
+    if (!self.suspended) {
+        _factory.operationalBrowser->ControllerDeactivated();
+    }
+
+    _shutdownPending = NO;
 }
 
 - (void)deinitFromFactory
@@ -438,14 +575,14 @@ using namespace chip::Tracing::DarwinFramework;
         chip::Crypto::P256Keypair * signingKeypair = nullptr;
         if (startupParams.nocSigner) {
             errorCode = _signingKeypairBridge.Init(startupParams.nocSigner);
-            if ([self checkForStartError:errorCode logMsg:kErrorSigningKeypairInit]) {
+            if ([self checkForStartError:errorCode logMsg:kDeviceControllerErrorSigningKeypairInit]) {
                 return;
             }
             signingKeypair = &_signingKeypairBridge;
         }
         errorCode = _operationalCredentialsDelegate->Init(
             signingKeypair, startupParams.ipk, startupParams.rootCertificate, startupParams.intermediateCertificate);
-        if ([self checkForStartError:errorCode logMsg:kErrorOperationalCredentialsInit]) {
+        if ([self checkForStartError:errorCode logMsg:kDeviceControllerErrorOperationalCredentialsInit]) {
             return;
         }
 
@@ -469,7 +606,7 @@ using namespace chip::Tracing::DarwinFramework;
 
         if (startupParams.operationalKeypair != nil) {
             errorCode = _operationalKeypairBridge.Init(startupParams.operationalKeypair);
-            if ([self checkForStartError:errorCode logMsg:kErrorOperationalKeypairInit]) {
+            if ([self checkForStartError:errorCode logMsg:kDeviceControllerErrorOperationalKeypairInit]) {
                 return;
             }
             commissionerParams.operationalKeypair = &_operationalKeypairBridge;
@@ -494,7 +631,7 @@ using namespace chip::Tracing::DarwinFramework;
                 errorCode = _operationalCredentialsDelegate->GenerateNOC(startupParams.nodeID.unsignedLongLongValue,
                     startupParams.fabricID.unsignedLongLongValue, cats, commissionerParams.operationalKeypair->Pubkey(), noc);
 
-                if ([self checkForStartError:errorCode logMsg:kErrorGenerateNOC]) {
+                if ([self checkForStartError:errorCode logMsg:kDeviceControllerErrorGenerateNOC]) {
                     return;
                 }
             } else {
@@ -502,27 +639,28 @@ using namespace chip::Tracing::DarwinFramework;
                 uint8_t csrBuffer[chip::Crypto::kMIN_CSR_Buffer_Size];
                 chip::MutableByteSpan csr(csrBuffer);
                 errorCode = startupParams.fabricTable->AllocatePendingOperationalKey(startupParams.fabricIndex, csr);
-                if ([self checkForStartError:errorCode logMsg:kErrorKeyAllocation]) {
+                if ([self checkForStartError:errorCode logMsg:kDeviceControllerErrorKeyAllocation]) {
                     return;
                 }
 
                 chip::Crypto::P256PublicKey pubKey;
                 errorCode = VerifyCertificateSigningRequest(csr.data(), csr.size(), pubKey);
-                if ([self checkForStartError:errorCode logMsg:kErrorCSRValidation]) {
+                if ([self checkForStartError:errorCode logMsg:kDeviceControllerErrorCSRValidation]) {
                     return;
                 }
 
                 errorCode = _operationalCredentialsDelegate->GenerateNOC(
                     startupParams.nodeID.unsignedLongLongValue, startupParams.fabricID.unsignedLongLongValue, cats, pubKey, noc);
 
-                if ([self checkForStartError:errorCode logMsg:kErrorGenerateNOC]) {
+                if ([self checkForStartError:errorCode logMsg:kDeviceControllerErrorGenerateNOC]) {
                     return;
                 }
             }
             commissionerParams.controllerNOC = noc;
         }
         commissionerParams.controllerVendorId = static_cast<chip::VendorId>([startupParams.vendorID unsignedShortValue]);
-        commissionerParams.enableServerInteractions = startupParams.advertiseOperational;
+        _shouldAdvertiseOperational = startupParams.advertiseOperational;
+        commissionerParams.enableServerInteractions = !self.suspended && self.shouldAdvertiseOperational;
 
         // We never want plain "removal" from the fabric table since this leaves
         // the in-memory state out of sync with what's in storage. In per-controller
@@ -553,13 +691,13 @@ using namespace chip::Tracing::DarwinFramework;
             if (cdTrustStore == nullptr) {
                 errorCode = CHIP_ERROR_INCORRECT_STATE;
             }
-            if ([self checkForStartError:errorCode logMsg:kErrorCDCertStoreInit]) {
+            if ([self checkForStartError:errorCode logMsg:kDeviceControllerErrorCDCertStoreInit]) {
                 return;
             }
 
             for (NSData * cdSigningCert in startupParams.certificationDeclarationCertificates) {
                 errorCode = cdTrustStore->AddTrustedKey(AsByteSpan(cdSigningCert));
-                if ([self checkForStartError:errorCode logMsg:kErrorCDCertStoreInit]) {
+                if ([self checkForStartError:errorCode logMsg:kDeviceControllerErrorCDCertStoreInit]) {
                     return;
                 }
             }
@@ -570,7 +708,7 @@ using namespace chip::Tracing::DarwinFramework;
         auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
 
         errorCode = factory.SetupCommissioner(commissionerParams, *_cppCommissioner);
-        if ([self checkForStartError:errorCode logMsg:kErrorCommissionerInit]) {
+        if ([self checkForStartError:errorCode logMsg:kDeviceControllerErrorCommissionerInit]) {
             return;
         }
 
@@ -579,18 +717,31 @@ using namespace chip::Tracing::DarwinFramework;
         uint8_t compressedIdBuffer[sizeof(uint64_t)];
         chip::MutableByteSpan compressedId(compressedIdBuffer);
         errorCode = _cppCommissioner->GetCompressedFabricIdBytes(compressedId);
-        if ([self checkForStartError:errorCode logMsg:kErrorIPKInit]) {
+        if ([self checkForStartError:errorCode logMsg:kDeviceControllerErrorIPKInit]) {
             return;
         }
 
         errorCode = chip::Credentials::SetSingleIpkEpochKey(
             _factory.groupDataProvider, fabricIdx, _operationalCredentialsDelegate->GetIPK(), compressedId);
-        if ([self checkForStartError:errorCode logMsg:kErrorIPKInit]) {
+        if ([self checkForStartError:errorCode logMsg:kDeviceControllerErrorIPKInit]) {
             return;
         }
 
         self->_storedFabricIndex = fabricIdx;
+        self->_storedCompressedFabricID = _cppCommissioner->GetCompressedFabricId();
+
+        chip::Crypto::P256PublicKey rootPublicKey;
+        if (_cppCommissioner->GetRootPublicKey(rootPublicKey) == CHIP_NO_ERROR) {
+            self.rootPublicKey = [NSData dataWithBytes:rootPublicKey.Bytes() length:rootPublicKey.Length()];
+            self.nodeID = @(_cppCommissioner->GetNodeId());
+            self.fabricID = @(_cppCommissioner->GetFabricId());
+        }
+
         commissionerInitialized = YES;
+
+        // Set self as delegate, which fans out delegate callbacks to all added delegates
+        id<MTRDeviceControllerDelegate> selfDelegate = static_cast<id<MTRDeviceControllerDelegate>>(self);
+        self->_deviceControllerDelegateBridge->setDelegate(self, selfDelegate, _chipWorkQueue);
 
         MTR_LOG("%@ startup succeeded for nodeID 0x%016llX", self, self->_cppCommissioner->GetNodeId());
     });
@@ -615,9 +766,9 @@ using namespace chip::Tracing::DarwinFramework;
     if (_controllerDataStore) {
         // If the storage delegate supports the bulk read API, then a dictionary of nodeID => cluster data dictionary would be passed to the handler. Otherwise this would be a no-op, and stored attributes for MTRDevice objects will be loaded lazily in -deviceForNodeID:.
         [_controllerDataStore fetchAttributeDataForAllDevices:^(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * _Nonnull clusterDataByNode) {
-            MTR_LOG("%@ Loaded attribute values for %lu nodes from storage for controller uuid %@", self, static_cast<unsigned long>(clusterDataByNode.count), self->_uniqueIdentifier);
+            MTR_LOG("%@ Loaded attribute values for %lu nodes from storage for controller uuid %@", self, static_cast<unsigned long>(clusterDataByNode.count), self.uniqueIdentifier);
 
-            std::lock_guard lock(self->_deviceMapLock);
+            std::lock_guard lock(*self.deviceMapLock);
             NSMutableArray * deviceList = [NSMutableArray array];
             for (NSNumber * nodeID in clusterDataByNode) {
                 NSDictionary * clusterData = clusterDataByNode[nodeID];
@@ -632,12 +783,12 @@ using namespace chip::Tracing::DarwinFramework;
             //
             // Note that this is just an optimization to avoid throwing the information away and immediately
             // re-reading it from storage.
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kSecondsToWaitBeforeAPIClientRetainsMTRDevice * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kSecondsToWaitBeforeAPIClientRetainsMTRDevice * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
                 MTR_LOG("%@ un-retain devices loaded at startup %lu", self, static_cast<unsigned long>(deviceList.count));
             });
         }];
     }
-    MTR_LOG("MTRDeviceController startup: %@", self);
+    MTR_LOG("%@ startup: %@", NSStringFromClass(self.class), self);
 
     return YES;
 }
@@ -664,7 +815,16 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                                    newNodeID:(NSNumber *)newNodeID
                                        error:(NSError * __autoreleasing *)error
 {
-    MTR_LOG("Setting up commissioning session for device ID 0x%016llX with setup payload %@", newNodeID.unsignedLongLongValue, payload);
+    if (self.suspended) {
+        MTR_LOG_ERROR("%@ suspended: can't set up commissioning session for device ID 0x%016llX with setup payload %@", self, newNodeID.unsignedLongLongValue, payload);
+        // TODO: Can we do a better error here?
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+        return NO;
+    }
+
+    MTR_LOG("%@ Setting up commissioning session for device ID 0x%016llX with setup payload %@", self, newNodeID.unsignedLongLongValue, payload);
 
     [[MTRMetricsCollector sharedInstance] resetMetrics];
 
@@ -688,7 +848,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         }
         if (pairingCode == nil) {
             errorCode = CHIP_ERROR_INVALID_ARGUMENT;
-            return ![MTRDeviceController checkForError:errorCode logMsg:kErrorSetupCodeGen error:error];
+            return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorSetupCodeGen error:error];
         }
 
         chip::NodeId nodeId = [newNodeID unsignedLongLongValue];
@@ -702,7 +862,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
         }
 
-        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorPairDevice error:error];
     };
 
     auto success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
@@ -758,7 +918,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             }
             if (pairingCode == nil) {
                 errorCode = CHIP_ERROR_INVALID_ARGUMENT;
-                return ![MTRDeviceController checkForError:errorCode logMsg:kErrorSetupCodeGen error:error];
+                return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorSetupCodeGen error:error];
             }
 
             for (id key in discoveredDevice.interfaces) {
@@ -779,7 +939,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             }
         }
 
-        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorPairDevice error:error];
     };
 
     auto success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
@@ -793,6 +953,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
          commissioningParams:(MTRCommissioningParameters *)commissioningParams
                        error:(NSError * __autoreleasing *)error
 {
+    if (self.suspended) {
+        MTR_LOG_ERROR("%@ suspended: can't commission device ID 0x%016llX with parameters %@", self, nodeID.unsignedLongLongValue, commissioningParams);
+        // TODO: Can we do a better error here?
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+        return NO;
+    }
+
     auto block = ^BOOL {
         chip::Controller::CommissioningParameters params;
         if (commissioningParams.csrNonce) {
@@ -886,7 +1055,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         self->_operationalCredentialsDelegate->SetDeviceID(deviceId);
         auto errorCode = self->_cppCommissioner->Commission(deviceId, params);
         MATTER_LOG_METRIC(kMetricCommissionNode, errorCode);
-        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorPairDevice error:error];
     };
 
     return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
@@ -906,7 +1075,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess : lastAttestationResult);
         // Emit metric on stage after continuing post attestation
         MATTER_LOG_METRIC(kMetricContinueCommissioningAfterAttestation, errorCode);
-        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorPairDevice error:error];
     };
 
     return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
@@ -919,7 +1088,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         auto errorCode = self->_cppCommissioner->StopPairing([nodeID unsignedLongLongValue]);
         // Emit metric on status of cancel
         MATTER_LOG_METRIC(kMetricCancelCommissioning, errorCode);
-        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error];
+        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorStopPairing error:error];
     };
 
     return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
@@ -969,7 +1138,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(nodeID.unsignedLongLongValue, &deviceProxy);
         MATTER_LOG_METRIC(kMetricDeviceBeingCommissioned, errorCode);
 
-        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorGetCommissionee error:error], nil);
+        VerifyOrReturnValue(![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorGetCommissionee error:error], nil);
 
         return [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
     };
@@ -987,7 +1156,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 // If prefetchedClusterData is not provided, load attributes individually from controller data store
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData
 {
-    os_unfair_lock_assert_owner(&_deviceMapLock);
+    os_unfair_lock_assert_owner(self.deviceMapLock);
 
     MTRDevice * deviceToReturn = [[MTRDevice_Concrete alloc] initWithNodeID:nodeID controller:self];
     // If we're not running, don't add the device to our map.  That would
@@ -995,7 +1164,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // which will be in exactly the state it would be in if it were created
     // while we were running and then we got shut down.
     if ([self isRunning]) {
-        [_nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
+        [self.nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
     }
 
     if (prefetchedClusterData) {
@@ -1024,50 +1193,17 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return deviceToReturn;
 }
 
-- (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
-{
-    std::lock_guard lock(_deviceMapLock);
-    MTRDevice * deviceToReturn = [_nodeIDToDeviceMap objectForKey:nodeID];
-    if (!deviceToReturn) {
-        deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
-    }
-
-    return deviceToReturn;
-}
-
-- (void)removeDevice:(MTRDevice *)device
-{
-    std::lock_guard lock(_deviceMapLock);
-    auto * nodeID = device.nodeID;
-    MTRDevice * deviceToRemove = [_nodeIDToDeviceMap objectForKey:nodeID];
-    if (deviceToRemove == device) {
-        [deviceToRemove invalidate];
-        [_nodeIDToDeviceMap removeObjectForKey:nodeID];
-    } else {
-        MTR_LOG_ERROR("%@ Error: Cannot remove device %p with nodeID %llu", self, device, nodeID.unsignedLongLongValue);
-    }
-}
-
 #ifdef DEBUG
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
 {
-    std::lock_guard lock(_deviceMapLock);
+    std::lock_guard lock(*self.deviceMapLock);
     NSMutableDictionary<NSNumber *, NSNumber *> * deviceAttributeCounts = [NSMutableDictionary dictionary];
-    for (NSNumber * nodeID in _nodeIDToDeviceMap) {
-        deviceAttributeCounts[nodeID] = @([[_nodeIDToDeviceMap objectForKey:nodeID] unitTestAttributeCount]);
+    for (NSNumber * nodeID in self.nodeIDToDeviceMap) {
+        deviceAttributeCounts[nodeID] = @([[self.nodeIDToDeviceMap objectForKey:nodeID] unitTestAttributeCount]);
     }
     return deviceAttributeCounts;
 }
 #endif
-
-- (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
-{
-    [self
-        asyncDispatchToMatterQueue:^() {
-            self->_deviceControllerDelegateBridge->setDelegate(self, delegate, queue);
-        }
-                      errorHandler:nil];
-}
 
 - (BOOL)setOperationalCertificateIssuer:(nullable id<MTROperationalCertificateIssuer>)operationalCertificateIssuer
                                   queue:(nullable dispatch_queue_t)queue
@@ -1105,14 +1241,14 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
     MATTER_LOG_METRIC_SCOPE(kMetricPASEVerifierForSetupCode, err);
 
-    if ([MTRDeviceController checkForError:err logMsg:kErrorSpake2pVerifierGenerationFailed error:error]) {
+    if ([MTRDeviceController_Concrete checkForError:err logMsg:kDeviceControllerErrorSpake2pVerifierGenerationFailed error:error]) {
         return nil;
     }
 
     uint8_t serializedBuffer[chip::Crypto::kSpake2p_VerifierSerialized_Length];
     chip::MutableByteSpan serializedBytes(serializedBuffer);
     err = verifier.Serialize(serializedBytes);
-    if ([MTRDeviceController checkForError:err logMsg:kErrorSpake2pVerifierSerializationFailed error:error]) {
+    if ([MTRDeviceController_Concrete checkForError:err logMsg:kDeviceControllerErrorSpake2pVerifierSerializationFailed error:error]) {
         return nil;
     }
 
@@ -1129,13 +1265,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         MATTER_LOG_METRIC_SCOPE(kMetricAttestationChallengeForDevice, errorCode);
 
         errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned([deviceID unsignedLongLongValue], &deviceProxy);
-        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorGetCommissionee error:nil], nil);
+        VerifyOrReturnValue(![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorGetCommissionee error:nil], nil);
 
         uint8_t challengeBuffer[chip::Crypto::kAES_CCM128_Key_Length];
         chip::ByteSpan challenge(challengeBuffer);
 
         errorCode = deviceProxy->GetAttestationChallenge(challenge);
-        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorGetAttestationChallenge error:nil], nil);
+        VerifyOrReturnValue(![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorGetAttestationChallenge error:nil], nil);
 
         return AsData(challenge);
     };
@@ -1152,7 +1288,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     if (![endpoint associateWithController:self]) {
-        MTR_LOG_ERROR("%@ Failed to associate MTRServerEndpoint with MTRDeviceController", self);
+        MTR_LOG_ERROR("%@ Failed to associate MTRServerEndpoint with %@", self, NSStringFromClass(self.class));
         [_factory removeServerEndpoint:endpoint];
         return NO;
     }
@@ -1161,7 +1297,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         [self->_serverEndpoints addObject:endpoint];
         [endpoint registerMatterEndpoint];
         MTR_LOG("%@ Added server endpoint %u to controller %@", self, static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue),
-            self->_uniqueIdentifier);
+            self.uniqueIdentifier);
     }
         errorHandler:^(NSError * error) {
             MTR_LOG_ERROR("%@ Unexpected failure dispatching to Matter queue on running controller in addServerEndpoint, adding endpoint %u", self,
@@ -1188,8 +1324,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // tearing it down.
     [self asyncDispatchToMatterQueue:^() {
         [self removeServerEndpointOnMatterQueue:endpoint];
-        MTR_LOG("%@ Removed server endpoint %u from controller %@", self, static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue),
-            self->_uniqueIdentifier);
+        MTR_LOG("%@ Removed server endpoint %u from controller %@", self, static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue), self.uniqueIdentifier);
         if (queue != nil && completion != nil) {
             dispatch_async(queue, completion);
         }
@@ -1247,6 +1382,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return YES;
 }
 
+// TODO: Figure out whether this should live here or in superclass; we shouldn't
+// have two copies of this thing.  Probably after removing code from the
+// superclass that should not be there.
 + (BOOL)checkForError:(CHIP_ERROR)errorCode logMsg:(NSString *)logMsg error:(NSError * __autoreleasing *)error
 {
     if (CHIP_NO_ERROR == errorCode) {
@@ -1272,7 +1410,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return YES;
     }
 
-    MTR_LOG_ERROR("MTRDeviceController: %@ Error: %s", self, [kErrorNotRunning UTF8String]);
+    MTR_LOG_ERROR("%@: %@ Error: %s", NSStringFromClass(self.class), self, [kDeviceControllerErrorNotRunning UTF8String]);
     if (error) {
         *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
     }
@@ -1282,6 +1420,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
+    // TODO: Figure out whether the synchronization here makes sense.  What
+    // happens if this call happens mid-suspend or mid-resume?
+    if (self.suspended) {
+        MTR_LOG_ERROR("%@ suspended: can't get session for node %016llX-%016llx (%llu)", self, self.compressedFabricID.unsignedLongLongValue, nodeID, nodeID);
+        // TODO: Can we do a better error here?
+        completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
     // Get the corresponding MTRDevice object to determine if the case/subscription pool is to be used
     MTRDevice * device = [self deviceForNodeID:@(nodeID)];
 
@@ -1306,6 +1453,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
+    // TODO: Figure out whether the synchronization here makes sense.  What
+    // happens if this call happens mid-suspend or mid-resume?
+    if (self.suspended) {
+        MTR_LOG_ERROR("%@ suspended: can't get session for node %016llX-%016llx (%llu)", self, self.compressedFabricID.unsignedLongLongValue, nodeID, nodeID);
+        // TODO: Can we do a better error here?
+        completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
     [self
         asyncGetCommissionerOnMatterQueue:^(chip::Controller::DeviceCommissioner * commissioner) {
             auto connectionBridge = new MTRDeviceConnectionBridge(completion);
@@ -1440,20 +1596,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (nullable NSNumber *)compressedFabricID
 {
-    assertChipStackLockedByCurrentThread();
-
-    if (!_cppCommissioner) {
-        return nil;
-    }
-
-    return @(_cppCommissioner->GetCompressedFabricId());
-}
-
-- (NSNumber * _Nullable)syncGetCompressedFabricID
-{
-    return [self syncRunOnWorkQueueWithReturnValue:^NSNumber * {
-        return [self compressedFabricID];
-    } error:nil];
+    auto storedValue = _storedCompressedFabricID.load();
+    return storedValue.has_value() ? @(storedValue.value()) : nil;
 }
 
 - (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
@@ -1503,9 +1647,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     // Don't use deviceForNodeID here, because we don't want to create the
     // device if it does not already exist.
-    os_unfair_lock_lock(&_deviceMapLock);
-    MTRDevice * device = [_nodeIDToDeviceMap objectForKey:@(nodeID)];
-    os_unfair_lock_unlock(&_deviceMapLock);
+    os_unfair_lock_lock(self.deviceMapLock);
+    MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:@(nodeID)];
+    os_unfair_lock_unlock(self.deviceMapLock);
 
     if (device == nil) {
         return;
@@ -1583,63 +1727,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 @end
 
 /**
- * Shim to allow us to treat an MTRDevicePairingDelegate as an
- * MTRDeviceControllerDelegate.
- */
-@interface MTRDevicePairingDelegateShim : NSObject <MTRDeviceControllerDelegate>
-@property (nonatomic, readonly) id<MTRDevicePairingDelegate> delegate;
-- (instancetype)initWithDelegate:(id<MTRDevicePairingDelegate>)delegate;
-@end
-
-@implementation MTRDevicePairingDelegateShim
-- (instancetype)initWithDelegate:(id<MTRDevicePairingDelegate>)delegate
-{
-    if (self = [super init]) {
-        _delegate = delegate;
-    }
-    return self;
-}
-
-- (BOOL)respondsToSelector:(SEL)selector
-{
-    if (selector == @selector(controller:statusUpdate:)) {
-        return [self.delegate respondsToSelector:@selector(onStatusUpdate:)];
-    }
-
-    if (selector == @selector(controller:commissioningSessionEstablishmentDone:)) {
-        return [self.delegate respondsToSelector:@selector(onPairingComplete:)];
-    }
-
-    if (selector == @selector(controller:commissioningComplete:)) {
-        return [self.delegate respondsToSelector:@selector(onCommissioningComplete:)];
-    }
-
-    return [super respondsToSelector:selector];
-}
-
-- (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status
-{
-    [self.delegate onStatusUpdate:static_cast<MTRPairingStatus>(status)];
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
-{
-    [self.delegate onPairingComplete:error];
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error
-{
-    [self.delegate onCommissioningComplete:error];
-}
-
-- (void)onPairingDeleted:(NSError * _Nullable)error
-{
-    [self.delegate onPairingDeleted:error];
-}
-
-@end
-
-/**
  * Shim to allow us to treat an MTRNOCChainIssuer as an
  * MTROperationalCertificateIssuer.
  */
@@ -1649,58 +1736,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 - (instancetype)initWithIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer;
 @end
 
-@implementation MTROperationalCertificateChainIssuerShim
-- (instancetype)initWithIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer
-{
-    if (self = [super init]) {
-        _nocChainIssuer = nocChainIssuer;
-        _shouldSkipAttestationCertificateValidation = YES;
-    }
-    return self;
-}
-
-- (void)issueOperationalCertificateForRequest:(MTROperationalCSRInfo *)csrInfo
-                              attestationInfo:(MTRDeviceAttestationInfo *)attestationInfo
-                                   controller:(MTRDeviceController *)controller
-                                   completion:(void (^)(MTROperationalCertificateChain * _Nullable info,
-                                                  NSError * _Nullable error))completion
-{
-    CSRInfo * oldCSRInfo = [[CSRInfo alloc] initWithNonce:csrInfo.csrNonce
-                                                 elements:csrInfo.csrElementsTLV
-                                        elementsSignature:csrInfo.attestationSignature
-                                                      csr:csrInfo.csr];
-    NSData * _Nullable firmwareInfo = attestationInfo.firmwareInfo;
-    if (firmwareInfo == nil) {
-        firmwareInfo = [NSData data];
-    }
-    AttestationInfo * oldAttestationInfo =
-        [[AttestationInfo alloc] initWithChallenge:attestationInfo.challenge
-                                             nonce:attestationInfo.nonce
-                                          elements:attestationInfo.elementsTLV
-                                 elementsSignature:attestationInfo.elementsSignature
-                                               dac:attestationInfo.deviceAttestationCertificate
-                                               pai:attestationInfo.productAttestationIntermediateCertificate
-                          certificationDeclaration:attestationInfo.certificationDeclaration
-                                      firmwareInfo:firmwareInfo];
-    [self.nocChainIssuer
-          onNOCChainGenerationNeeded:oldCSRInfo
-                     attestationInfo:oldAttestationInfo
-        onNOCChainGenerationComplete:^(NSData * operationalCertificate, NSData * intermediateCertificate, NSData * rootCertificate,
-            NSData * _Nullable ipk, NSNumber * _Nullable adminSubject, NSError * __autoreleasing * error) {
-            auto * chain = [[MTROperationalCertificateChain alloc] initWithOperationalCertificate:operationalCertificate
-                                                                          intermediateCertificate:intermediateCertificate
-                                                                                  rootCertificate:rootCertificate
-                                                                                     adminSubject:adminSubject];
-            completion(chain, nil);
-            if (error != nil) {
-                *error = nil;
-            }
-        }];
-}
-
-@end
-
-@implementation MTRDeviceController (Deprecated)
+@implementation MTRDeviceController_Concrete (Deprecated)
 
 - (NSNumber *)controllerNodeId
 {
@@ -1768,7 +1804,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         payload.setUpPINCode = setupPINCode;
 
         errorCode = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
-        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorSetupCodeGen error:error], NO);
+        VerifyOrReturnValue(![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorSetupCodeGen error:error], NO);
 
         self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
 
@@ -1780,7 +1816,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
         }
 
-        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorPairDevice error:error];
     };
 
     auto success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
@@ -1825,7 +1861,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
         }
 
-        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorPairDevice error:error];
     };
 
     auto success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
@@ -1861,7 +1897,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
         }
 
-        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorPairDevice error:error];
     };
 
     auto success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
@@ -1904,7 +1940,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
         errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(
             self->_cppCommissioner, deviceID, chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)));
-        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorOpenPairingWindow error:error];
+        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorOpenPairingWindow error:error];
     };
 
     return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
@@ -1952,7 +1988,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             static_cast<uint16_t>(discriminator), chip::MakeOptional(static_cast<uint32_t>(setupPIN)), chip::NullOptional,
             setupPayload);
 
-        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorOpenPairingWindow error:error], nil);
+        VerifyOrReturnValue(![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorOpenPairingWindow error:error], nil);
 
         chip::ManualSetupPayloadGenerator generator(setupPayload);
         std::string outCode;

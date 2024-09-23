@@ -33,7 +33,6 @@
 #include <lib/support/CodeUtils.h>
 #if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
 #include "openthread-system.h"
-#include "ot_platform_common.h"
 #endif /* CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED */
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -121,9 +120,8 @@ void chip::NXP::App::CommonDeviceCallbacks::OnInternetConnectivityChange(const C
         char ip_addr[Inet::IPAddress::kMaxStringLength];
         event->InternetConnectivityChange.ipAddress.ToString(ip_addr);
         ChipLogProgress(DeviceLayer, "IPv6 Server ready at: [%s]:%d", ip_addr, CHIP_PORT);
-#if !CHIP_ENABLE_OPENTHREAD // No need to do this for OT mDNS server
+
         chip::app::DnssdServer::Instance().StartServer();
-#endif
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {

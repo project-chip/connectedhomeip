@@ -18,8 +18,10 @@
 
 #include "CHIPCommand.h"
 
+#include "IcdManager.h"
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
+#include <device_manager/PairingManager.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
@@ -52,7 +54,6 @@ chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGr
 // All fabrics share the same ICD client storage.
 chip::app::DefaultICDClientStorage CHIPCommand::sICDClientStorage;
 chip::Crypto::RawKeySessionKeystore CHIPCommand::sSessionKeystore;
-chip::app::DefaultCheckInDelegate CHIPCommand::sCheckInDelegate;
 chip::app::CheckInHandler CHIPCommand::sCheckInHandler;
 
 namespace {
@@ -148,9 +149,9 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
 
     auto engine = chip::app::InteractionModelEngine::GetInstance();
     VerifyOrReturnError(engine != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnLogErrorOnFailure(sCheckInDelegate.Init(&sICDClientStorage, engine));
+    ReturnLogErrorOnFailure(IcdManager::Instance().Init(&sICDClientStorage, engine));
     ReturnLogErrorOnFailure(sCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
-                                                 &sICDClientStorage, &sCheckInDelegate, engine));
+                                                 &sICDClientStorage, &IcdManager::Instance(), engine));
 
     CommissionerIdentity nullIdentity{ kIdentityNull, chip::kUndefinedNodeId };
     ReturnLogErrorOnFailure(InitializeCommissioner(nullIdentity, kIdentityNullFabricId));
@@ -180,6 +181,8 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     bool allowTestCdSigningKey = !mOnlyAllowTrustedCdKeys.ValueOr(false);
     mCredIssuerCmds->SetCredentialIssuerOption(CredentialIssuerCommands::CredentialIssuerOptions::kAllowTestCdSigningKey,
                                                allowTestCdSigningKey);
+
+    PairingManager::Instance().Init(&CurrentCommissioner());
 
     return CHIP_NO_ERROR;
 }

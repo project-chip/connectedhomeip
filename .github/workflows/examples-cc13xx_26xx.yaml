@@ -41,7 +41,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-ti:54
+            image: ghcr.io/project-chip/chip-build-ti:77
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -63,13 +63,9 @@ jobs:
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target ti-cc13x4_26x4-lighting-ftd \
-                      --target ti-cc13x4_26x4-lighting-mtd \
                       --target ti-cc13x4_26x4-lock-ftd \
-                      --target ti-cc13x4_26x4-lock-mtd \
                       --target ti-cc13x4_26x4-pump-mtd \
-                      --target ti-cc13x4_26x4-pump-ftd \
                       --target ti-cc13x4_26x4-pump-controller-mtd \
-                      --target ti-cc13x4_26x4-pump-controller-ftd \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -78,12 +74,6 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x4_26x4 LP_EM_CC1354P10_6 lock-ftd \
                     out/artifacts/ti-cc13x4_26x4-lock-ftd/chip-LP_EM_CC1354P10_6-lock-example.out \
-                    /tmp/bloat_reports/
-            - name: Get lock MTD size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    cc13x4_26x4 LP_EM_CC1354P10_6 lock-mtd \
-                    out/artifacts/ti-cc13x4_26x4-lock-mtd/chip-LP_EM_CC1354P10_6-lock-example.out \
                     /tmp/bloat_reports/
             - name: Get Pump App size stats
               run: |
@@ -101,7 +91,7 @@ jobs:
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x4_26x4 LP_EM_CC1354P10_6 lighting-app \
-                    out/artifacts/ti-cc13x4_26x4-lighting-mtd/chip-LP_EM_CC1354P10_6-lighting-example.out \
+                    out/artifacts/ti-cc13x4_26x4-lighting-ftd/chip-LP_EM_CC1354P10_6-lighting-example.out \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports

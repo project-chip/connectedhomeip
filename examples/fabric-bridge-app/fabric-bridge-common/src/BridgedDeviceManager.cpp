@@ -58,6 +58,8 @@ constexpr int kSoftwareVersionSize = 64;
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
 constexpr int kDescriptorAttributeArraySize = 254;
 
+#define ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_REVISION (1u)
+
 // ENDPOINT DEFINITIONS:
 // =================================================================================
 //
@@ -116,7 +118,6 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Ecosystem Information cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(ecosystemInformationBasicAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(EcosystemInformation::Attributes::RemovedOn::Id, EPOCH_US, kNodeLabelSize, ATTRIBUTE_MASK_NULLABLE),
     DECLARE_DYNAMIC_ATTRIBUTE(EcosystemInformation::Attributes::DeviceDirectory::Id, ARRAY, kDescriptorAttributeArraySize, 0),
     DECLARE_DYNAMIC_ATTRIBUTE(EcosystemInformation::Attributes::LocationDirectory::Id, ARRAY, kDescriptorAttributeArraySize, 0),
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
@@ -126,6 +127,7 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(AdministratorCommissioningAttrs)
   DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::WindowStatus::Id, ENUM8, 1, 0),
   DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::AdminFabricIndex::Id, FABRIC_IDX, 1, 0),
   DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::AdminVendorId::Id, VENDOR_ID, 2, 0),
+  DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::ClusterRevision::Id, INT16U, ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_REVISION, 0),
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 // clang-format on
 
@@ -141,17 +143,31 @@ constexpr CommandId administratorCommissioningCommands[] = {
     kInvalidCommandId,
 };
 
+// clang-format off
 // Declare Cluster List for Bridged Node endpoint
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedNodeClusters)
-DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, ZAP_CLUSTER_MASK(SERVER),
-                            bridgedDeviceBasicInformationCommands, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER(EcosystemInformation::Id, ecosystemInformationBasicAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER(AdministratorCommissioning::Id, AdministratorCommissioningAttrs, ZAP_CLUSTER_MASK(SERVER),
-                            administratorCommissioningCommands, nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
+                            administratorCommissioningCommands, nullptr)
+DECLARE_DYNAMIC_CLUSTER_LIST_END;
+
+DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(icdBridgedNodeClusters)
+    DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            bridgedDeviceBasicInformationCommands, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(AdministratorCommissioning::Id, AdministratorCommissioningAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            administratorCommissioningCommands, nullptr)
+DECLARE_DYNAMIC_CLUSTER_LIST_END;
+// clang-format on
 
 // Declare Bridged Node endpoint
 DECLARE_DYNAMIC_ENDPOINT(sBridgedNodeEndpoint, bridgedNodeClusters);
+DECLARE_DYNAMIC_ENDPOINT(sIcdBridgedNodeEndpoint, icdBridgedNodeClusters);
+
+// TODO: this is a single version array, however we may have many
+//       different clusters that are independent.
 DataVersion sBridgedNodeDataVersions[ArraySize(bridgedNodeClusters)];
 
 const EmberAfDeviceType sBridgedDeviceTypes[] = { { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
@@ -171,9 +187,12 @@ void BridgedDeviceManager::Init()
 std::optional<unsigned> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<BridgedDevice> dev,
                                                                 chip::EndpointId parentEndpointId)
 {
-    EmberAfEndpointType * ep                                   = &sBridgedNodeEndpoint;
+    EmberAfEndpointType * ep = dev->IsIcd() ? &sIcdBridgedNodeEndpoint : &sBridgedNodeEndpoint;
+
     const chip::Span<const EmberAfDeviceType> & deviceTypeList = Span<const EmberAfDeviceType>(sBridgedDeviceTypes);
-    const chip::Span<chip::DataVersion> & dataVersionStorage   = Span<DataVersion>(sBridgedNodeDataVersions);
+
+    // TODO: this shares data version among different clusters, which seems incorrect
+    const chip::Span<chip::DataVersion> & dataVersionStorage = Span<DataVersion>(sBridgedNodeDataVersions);
 
     if (dev->GetBridgedAttributes().uniqueId.empty())
     {
