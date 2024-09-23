@@ -92,8 +92,8 @@ RefreshKeySender * AndroidCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
                           jniICDHmacKey)
 
         jmethodID onKeyRefreshNeededMethodID = nullptr;
-        err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDelegate.ObjectRef(), "onKeyRefreshNeeded", "(JJJJJ[B[B)[B",
-                                                            &onKeyRefreshNeededMethodID);
+        err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDelegate.ObjectRef(), "onKeyRefreshNeeded",
+                                                            "(JJJJJ[B[B)[B", &onKeyRefreshNeededMethodID);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                             ChipLogProgress(ICD, "onKeyRefreshNeeded - FindMethod is failed! : %" CHIP_ERROR_FORMAT, err.Format()));
 
