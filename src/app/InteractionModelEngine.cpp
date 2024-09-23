@@ -50,7 +50,7 @@
 #include <app/codegen-data-model-provider/Instance.h>
 #endif
 
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+#if !CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 #include <app/ember_coupling/EventPathValidity.mixin.h> // nogncheck
 #endif
 
