@@ -71,6 +71,21 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)deinitFromFactory;
 
 /**
+ * Check whether this controller is running on the given fabric, as represented
+ * by the provided FabricTable and fabric index.  The provided fabric table may
+ * not be the same as the fabric table this controller is using. This method
+ * MUST be called from the Matter work queue.
+ *
+ * Might return failure, in which case we don't know whether it's running on the
+ * given fabric.  Otherwise it will set *isRunning to the right boolean value.
+ *
+ * Only MTRDeviceControllerFactory should be calling this.
+ */
+- (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
+                    fabricIndex:(chip::FabricIndex)fabricIndex
+                      isRunning:(BOOL *)isRunning;
+
+/**
  * Takes an assertion to keep the controller running. If `-[MTRDeviceController shutdown]` is called while an assertion
  * is held, the shutdown will be honored only after all assertions are released. Invoking this method multiple times increases
  * the number of assertions and needs to be matched with equal amount of '-[MTRDeviceController removeRunAssertion]` to release
@@ -83,6 +98,16 @@ NS_ASSUME_NONNULL_BEGIN
  * Invoking this method once all assertions have been released in a noop.
  */
 - (void)removeRunAssertion;
+
+/**
+ * This method returns TRUE if this controller matches the fabric reference and node ID as listed in the parameters.
+ */
+- (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate;
+
+/**
+ * Clear any pending shutdown request.
+ */
+- (void)clearPendingShutdown;
 
 @end
 
