@@ -53,8 +53,8 @@ class TC_CADMIN_1_11(MatterBaseTest):
             asserts.assert_true(errcode.sdk_code == expectedErrCode,
                                 'Unexpected error code returned from CommissioningComplete')
 
-    async def OpenBasicCommissioningWindow(self, th, expectedErrCode) -> CommissioningParameters:
-        if expectedErrCode == 0x00:
+    async def OpenBasicCommissioningWindow(self, th: ChipDeviceCtrl, expectedErrCode: Optional[Clusters.AdministratorCommissioning.Enums.StatusCode] = None) -> CommissioningParameters:
+        if not expectedErrCode:
             params = await th.OpenBasicCommissioningWindow(
                 nodeid=self.dut_node_id, timeout=self.timeout)
             return params
@@ -177,7 +177,7 @@ class TC_CADMIN_1_11(MatterBaseTest):
         if self.supports_bc:
             self.count = 0
             self.step("9a")
-            await self.OpenBasicCommissioningWindow(self.th1, 0x00)
+            await self.OpenBasicCommissioningWindow(self.th1)
 
             self.step("9b")
             await self.OpenBasicCommissioningWindow(self.th1, busy_enum)
