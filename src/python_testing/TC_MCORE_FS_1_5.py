@@ -15,8 +15,20 @@
 #    limitations under the License.
 #
 
-# TODO: add to CI. See https://github.com/project-chip/connectedhomeip/issues/34676
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: examples/fabric-admin/scripts/fabric-sync-app.py
+# test-runner-run/run1/app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+# test-runner-run/run1/factoryreset: true
+# test-runner-run/run1/script-args: --PICS src/app/tests/suites/certification/ci-pics-values --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_server_app_path:${ALL_CLUSTERS_APP} dut_fsa_stdin_pipe:dut-fsa-stdin --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-run/run1/script-start-delay: 5
+# test-runner-run/run1/quiet: false
+# === END CI TEST ARGUMENTS ===
 
+import asyncio
 import hashlib
 import logging
 import os
@@ -26,6 +38,7 @@ import struct
 import tempfile
 import time
 from dataclasses import dataclass
+from shutil import which
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
@@ -77,8 +90,13 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
         logging.info("Temporary storage directory: %s", self.storage.name)
 
+        # Get the named pipe path for the DUT_FSA app input from the user params.
+        dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe", None)
+        if dut_fsa_stdin_pipe is not None:
+            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
+
         self.th_server_port = th_server_port
-        # These are default testing values
+        # These are default testing values.
         self.th_server_setup_params = _SetupParameters(
             setup_qr_code="MT:-24J0AFN00KA0648G00",
             manual_code=34970112332,
@@ -166,7 +184,14 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         asserts.assert_true(type_matches(step_1_dut_parts_list, list), "PartsList is expected to be a list")
 
         self.step(2)
-        self._ask_for_vendor_commissioning_ux_operation(self.th_server_setup_params)
+        if not self.is_ci:
+            self._ask_for_vendor_commissioning_ux_operation(self.th_server_setup_params)
+        else:
+            self.dut_fsa_stdin.write(
+                f"pairing onnetwork 2 {self.th_server_setup_params.passcode}\n")
+            self.dut_fsa_stdin.flush()
+            # Wait for the commissioning to complete.
+            await asyncio.sleep(5)
 
         self.step(3)
         report_waiting_timeout_delay_sec = 30
