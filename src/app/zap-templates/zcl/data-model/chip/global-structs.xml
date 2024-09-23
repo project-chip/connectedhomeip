@@ -29,6 +29,16 @@ limitations under the License.
     <item fieldId="2" name="AreaType"        type="AreaTypeTag"              isNullable="true"  optional="false"/>
   </struct>
 
+  <struct name="WebRTCSessionStruct" apiMaturity="provisional">
+    <item fieldId="1" name="ID" type="WebRTCSessionID"/>
+    <item fieldId="2" name="PeerNodeId" type="node_id"/>
+    <item fieldId="3" name="PeerFabricIndex" type="fabric_idx"/>
+    <item fieldId="4" name="StreamType" type="StreamTypeEnum" min="0x00" max="0x03"/>
+    <item fieldId="5" name="VideoStreamID" type="VideoStreamID" isNullable="true"/>
+    <item fieldId="6" name="AudioStreamID" type="AudioStreamID" isNullable="true"/>
+    <item fieldId="7" name="MetadataOptions" type="WebRTCMetadataOptions" default="0x00" min="0x00" max="0x01"/>
+  </struct>
+
   <!--
     These are test global items (no cluster attached) for testing only.
     Their usage is defined for UnitTestCluster only.
