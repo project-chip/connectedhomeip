@@ -22,6 +22,16 @@ namespace chip {
 namespace app {
 namespace {
 
+/**
+ * Find out if the given EventId is reported as supported by the given cluster
+ * within its metadata. If cluster has no event metadata (i.e. no event list
+ * support is available), clusters are assumed to support any event as there is
+ * no way to actually tell.
+ *
+ * This function is functionally similar to `CheckEventSupportStatus` however
+ * it avoids extra lookups to find the underlying cluster (cluster is already)
+ * passed into the method.
+ */
 bool ClusterSupportsEvent(const EmberAfCluster * cluster, EventId eventId)
 {
 #if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
