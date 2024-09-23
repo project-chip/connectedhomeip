@@ -129,7 +129,8 @@ struct ICDMonitoringTable
 {
     ICDMonitoringTable(PersistentStorageDelegate & storage, FabricIndex fabric, uint16_t limit,
                        Crypto::SymmetricKeystore * symmetricKeystore) :
-        mStorage(&storage), mFabric(fabric), mLimit(limit), mSymmetricKeystore(symmetricKeystore)
+        mStorage(&storage),
+        mFabric(fabric), mLimit(limit), mSymmetricKeystore(symmetricKeystore)
     {}
 
     /**
