@@ -76,7 +76,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-def all_binaries(binary_name):
+def whereis(binary_name):
     # Get the PATH environment variable.
     path_dirs = os.environ.get('PATH', '').split(os.pathsep)
 
@@ -94,7 +94,7 @@ def all_binaries(binary_name):
 
 # If qemu-system-arm binary is from Pigweed prefer the next one in PATH if there is one.
 if pw_install_dir != "" and qemu_system_arm.startswith(pw_install_dir):
-    binaries = all_binaries("qemu-system-arm")
+    binaries = whereis("qemu-system-arm")
     if len(binaries) > 1:
         qemu_system_arm = binaries[1]
 
