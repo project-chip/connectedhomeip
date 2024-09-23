@@ -41,7 +41,7 @@ static constexpr size_t MaxICDMonitoringEntrySize()
                                        sizeof(Crypto::Symmetric128BitsKeyByteArray) /*aes_key_handle*/,
                                        sizeof(Crypto::Symmetric128BitsKeyByteArray) /*hmac_key_handle*/,
                                        sizeof(uint8_t) /*client_type*/) *
-        3 / 2;
+        3 / 2; // Expect to have at least 50% to make sure we can grow and then if there is a firmware upgrade/downgrade, it doesn't brick
 }
 
 inline constexpr size_t kICDMonitoringBufferSize = MaxICDMonitoringEntrySize();
