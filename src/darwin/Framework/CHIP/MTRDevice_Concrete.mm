@@ -2862,6 +2862,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                expectedValueInterval:(NSNumber *)expectedValueInterval
                    timedWriteTimeout:(NSNumber * _Nullable)timeout
 {
+    value = [value copy];
+
     if (timeout) {
         timeout = MTRClampedNumber(timeout, @(1), @(UINT16_MAX));
     }
@@ -2901,7 +2903,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     //   [ attribute path, value, timedWriteTimeout, expectedValueID ]
     //
     // where expectedValueID is stored as NSNumber and NSNull represents nil timeouts
-    auto * writeData = @[ attributePath, [value copy], timeout ?: [NSNull null], @(expectedValueID) ];
+    auto * writeData = @[ attributePath, value, timeout ?: [NSNull null], @(expectedValueID) ];
 
     NSMutableArray<NSArray *> * writeRequests = [NSMutableArray arrayWithObject:writeData];
 
@@ -2958,24 +2960,24 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
 
         [baseDevice
-            writeAttributeWithEndpointID:path.endpoint
-                               clusterID:path.cluster
-                             attributeID:path.attribute
-                                   value:request[MTRDeviceWriteRequestFieldValueIndex]
-                       timedWriteTimeout:timedWriteTimeout
-                                   queue:self.queue
-                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                  if (error) {
-                                      MTR_LOG_ERROR("Write attribute work item [%llu] failed: %@", workItemID, error);
-                                      if (useValueAsExpectedValue) {
-                                          NSNumber * expectedValueID = request[MTRDeviceWriteRequestFieldExpectedValueIDIndex];
-                                          [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID.unsignedLongLongValue];
-                                      }
-                                  }
-                                  completion(MTRAsyncWorkComplete);
-                              }];
+            _writeAttributeWithEndpointID:path.endpoint
+                                clusterID:path.cluster
+                              attributeID:path.attribute
+                                    value:request[MTRDeviceWriteRequestFieldValueIndex]
+                        timedWriteTimeout:timedWriteTimeout
+                                    queue:self.queue
+                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                   if (error) {
+                                       MTR_LOG_ERROR("Write attribute work item [%llu] failed: %@", workItemID, error);
+                                       if (useValueAsExpectedValue) {
+                                           NSNumber * expectedValueID = request[MTRDeviceWriteRequestFieldExpectedValueIDIndex];
+                                           [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID.unsignedLongLongValue];
+                                       }
+                                   }
+                                   completion(MTRAsyncWorkComplete);
+                               }];
     }];
-    [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"write %@ 0x%llx 0x%llx", endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue];
+    [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"write %@ 0x%llx 0x%llx: %@", endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue, value];
 }
 
 - (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths
@@ -2983,11 +2985,31 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // Determine the set of what the spec calls "existent paths" that correspond
     // to the request paths.  Building the whole set in-memory is OK, because
     // we're going to need all those paths for our return value anyway.
+    //
+    // Note that we don't use the structural attributes (PartsList, ServerList,
+    // AttributeList) to determine this set, because we might be in the middle
+    // of priming right now and have not gotten those yet.  Just use the set of
+    // attribute paths we actually have.
     NSMutableSet<MTRAttributePath *> * existentPaths = [[NSMutableSet alloc] init];
     {
         std::lock_guard lock(_lock);
-        for (MTRAttributeRequestPath * path in attributePaths) {
-            [self _addExistentPathsFor:path to:existentPaths];
+        for (MTRAttributeRequestPath * requestPath in attributePaths) {
+            for (MTRClusterPath * clusterPath in [self _knownClusters]) {
+                if (requestPath.endpoint != nil && ![requestPath.endpoint isEqual:clusterPath.endpoint]) {
+                    continue;
+                }
+                if (requestPath.cluster != nil && ![requestPath.cluster isEqual:clusterPath.cluster]) {
+                    continue;
+                }
+                MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
+                if (requestPath.attribute == nil) {
+                    for (NSNumber * attributeID in clusterData.attributes) {
+                        [existentPaths addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:attributeID]];
+                    }
+                } else if ([clusterData.attributes objectForKey:requestPath.attribute] != nil) {
+                    [existentPaths addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:requestPath.attribute]];
+                }
+            }
         }
     }
 
@@ -3004,51 +3026,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     return result;
-}
-
-- (void)_addExistentPathsFor:(MTRAttributeRequestPath *)path to:(NSMutableSet<MTRAttributePath *> *)set
-{
-    os_unfair_lock_assert_owner(&_lock);
-
-    if (path.endpoint != nil) {
-        [self _addExistentPathsForEndpoint:path.endpoint path:path to:set];
-        return;
-    }
-
-    NSArray<NSNumber *> * endpointList = [self _endpointList];
-    for (NSNumber * endpoint in endpointList) {
-        [self _addExistentPathsForEndpoint:endpoint path:path to:set];
-    }
-}
-
-- (void)_addExistentPathsForEndpoint:(NSNumber *)endpoint path:(MTRAttributeRequestPath *)path to:(NSMutableSet<MTRAttributePath *> *)set
-{
-    os_unfair_lock_assert_owner(&_lock);
-
-    if (path.cluster != nil) {
-        [self _addExistentPathsForEndpoint:endpoint cluster:path.cluster attribute:path.attribute to:set];
-        return;
-    }
-
-    auto * clusterList = [self _serverListForEndpointID:endpoint];
-    for (NSNumber * cluster in clusterList) {
-        [self _addExistentPathsForEndpoint:endpoint cluster:cluster attribute:path.attribute to:set];
-    }
-}
-
-- (void)_addExistentPathsForEndpoint:(NSNumber *)endpoint cluster:(NSNumber *)cluster attribute:(NSNumber * _Nullable)attribute to:(NSMutableSet<MTRAttributePath *> *)set
-{
-    os_unfair_lock_assert_owner(&_lock);
-
-    if (attribute != nil) {
-        [set addObject:[MTRAttributePath attributePathWithEndpointID:endpoint clusterID:cluster attributeID:attribute]];
-        return;
-    }
-
-    auto * attributeList = [self _attributeListForEndpointID:endpoint clusterID:cluster];
-    for (NSNumber * existentAttribute in attributeList) {
-        [set addObject:[MTRAttributePath attributePathWithEndpointID:endpoint clusterID:cluster attributeID:existentAttribute]];
-    }
 }
 
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
@@ -3070,6 +3047,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     serverSideProcessingTimeout = [serverSideProcessingTimeout copy];
     timeout = [timeout copy];
+    commandFields = [commandFields copy];
 
     if (timeout == nil && MTRCommandNeedsTimedInvoke(clusterID, commandID)) {
         timeout = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
@@ -3130,6 +3108,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                            commandFields:commandFields
                       timedInvokeTimeout:timedInvokeTimeout
              serverSideProcessingTimeout:serverSideProcessingTimeout
+                                 logCall:NO
                                    queue:self.queue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   // Log the data at the INFO level (not usually persisted permanently),
@@ -3145,7 +3124,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                   workDone(values, error);
                               }];
     }];
-    [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"invoke %@ 0x%llx 0x%llx", endpointID, clusterID.unsignedLongLongValue, commandID.unsignedLongLongValue];
+    [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"invoke %@ 0x%llx 0x%llx: %@", endpointID, clusterID.unsignedLongLongValue, commandID.unsignedLongLongValue, commandFields];
 }
 
 - (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
@@ -3652,6 +3631,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return attributesToReport;
 }
 
+// TODO: Figure out whether we can get rid of this in favor of readAttributePaths.  This differs from
+// readAttributePaths in one respect: that function will do read-through for
+// C-quality attributes, but this one does not.
 - (NSArray<NSDictionary<NSString *, id> *> *)getAllAttributesReport
 {
     std::lock_guard lock(_lock);
