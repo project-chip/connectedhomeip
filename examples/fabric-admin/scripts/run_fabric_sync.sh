@@ -106,7 +106,7 @@ fi
 
 # Start fabric-bridge-app if available and redirect its output to /dev/null
 if [ -f "$FABRIC_BRIDGE_APP_PATH" ]; then
-    "$FABRIC_BRIDGE_APP_PATH" --discriminator 1234 >"$FABRIC_BRIDGE_APP_LOG" 2>&1 &
+    "$FABRIC_BRIDGE_APP_PATH" >"$FABRIC_BRIDGE_APP_LOG" 2>&1 &
     echo "Started fabric-bridge-app"
 fi
 
