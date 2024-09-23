@@ -27,7 +27,7 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import ClusterAttributeChangeAccumulator, EventChangeCallback, TestStep
+from matter_testing_support import ClusterAttributeChangeAccumulator, EventChangeCallback, TestStep, MatterBaseTest
 from mobly import asserts
 
 
@@ -247,7 +247,7 @@ class TC_OPSTATE_BASE():
             attributes.ClusterRevision.attribute_id
         ]
 
-        if attributes.CountdownTime.attribute_id in attribute_list:
+        if self.attributes_guard(attributes.CountdownTime):
             expected_value.append(attributes.CountdownTime.attribute_id)
 
         await self.read_and_expect_array_contains(endpoint=endpoint,
@@ -338,8 +338,7 @@ class TC_OPSTATE_BASE():
     async def TEST_TC_OPSTATE_BASE_2_1(self, endpoint=1):
         cluster = self.test_info.cluster
         attributes = cluster.Attributes
-        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attributes.AttributeList)
-
+         
         self.init_test()
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
@@ -347,7 +346,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 2: TH reads from the DUT the PhaseList attribute
         self.step(2)
-        if attributes.PhaseList.attribute_id in attribute_list:
+        if self.attributes_guard(attributes.PhaseList):
             phase_list = await self.read_expect_success(endpoint=endpoint,
                                                         attribute=attributes.PhaseList)
             if phase_list is not NullValue:
@@ -357,7 +356,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 3: TH reads from the DUT the CurrentPhase attribute
         self.step(3)
-        if attributes.CurrentPhase.attribute_id in attribute_list:
+        if self.attributes_guard(attributes.CurrentPhase):
             current_phase = await self.read_expect_success(endpoint=endpoint,
                                                            attribute=attributes.CurrentPhase)
             if (phase_list == NullValue) or (not phase_list):
@@ -369,7 +368,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 4: TH reads from the DUT the CountdownTime attribute
         self.step(4)
-        if attributes.CountdownTime.attribute_id in attribute_list:
+        if self.attributes_guard(attributes.CountdownTime):
             countdown_time = await self.read_expect_success(endpoint=endpoint,
                                                             attribute=attributes.CountdownTime)
             if countdown_time is not NullValue:
@@ -378,7 +377,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 5: TH reads from the DUT the OperationalStateList attribute
         self.step(5)
-        if attributes.OperationalStateList.attribute_id in attribute_list:
+        if self.attributes_guard(attributes.OperationalStateList):
             operational_state_list = await self.read_expect_success(endpoint=endpoint,
                                                                     attribute=attributes.OperationalStateList)
             defined_states = [state.value for state in cluster.Enums.OperationalStateEnum
@@ -464,7 +463,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 7: TH reads from the DUT the OperationalError attribute
         self.step(7)
-        if attributes.OperationalError.attribute_id in attribute_list:
+        if self.attributes_guard(attributes.OperationalError):
             operational_error = await self.read_expect_success(endpoint=endpoint,
                                                                attribute=attributes.OperationalError)
             # Defined Errors
@@ -568,7 +567,6 @@ class TC_OPSTATE_BASE():
     async def TEST_TC_OPSTATE_BASE_2_2(self, endpoint=1):
         cluster = self.test_info.cluster
         attributes = cluster.Attributes
-        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attributes.AttributeList)
 
         commands = cluster.Commands
         accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attributes.AcceptedCommandList)
@@ -601,7 +599,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 3: TH reads from the DUT the OperationalStateList attribute
         self.step(3)
-        if attributes.OperationalStateList.attribute_id in attribute_list:
+        if self.attributes_guard(attributes.OperationalStateList):
             operational_state_list = await self.read_expect_success(endpoint=endpoint,
                                                                     attribute=attributes.OperationalStateList)
 
@@ -629,7 +627,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 6: TH reads from the DUT the OperationalError attribute
         self.step(6)
-        if attributes.OperationalError.attribute_id in attribute_list:
+        if self.attributes_guard(attributes.OperationalError):
             await self.read_and_expect_property_value(endpoint=endpoint,
                                                       attribute=attributes.OperationalError,
                                                       attr_property="errorStateID",
@@ -637,7 +635,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 7: TH reads from the DUT the CountdownTime attribute
         self.step(7)
-        if attributes.CountdownTime.attribute_id in attribute_list:
+        if self.attributes_guard(attributes.CountdownTime):
             initial_countdown_time = await self.read_expect_success(endpoint=endpoint,
                                                                     attribute=attributes.CountdownTime)
             if initial_countdown_time is not NullValue:
@@ -646,7 +644,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 8: TH reads from the DUT the PhaseList attribute
         self.step(8)
-        if attributes.PhaseList.attribute_id in attribute_list:
+        if self.attributes_guard(attributes.PhaseList):
             phase_list = await self.read_expect_success(endpoint=endpoint,
                                                         attribute=attributes.PhaseList)
             phase_list_len = 0
@@ -657,7 +655,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 9: TH reads from the DUT the CurrentPhase attribute
         self.step(9)
-        if attributes.CurrentPhase.attribute_id in attribute_list:
+        if self.attributes_guard(attributes.CurrentPhase):
             current_phase = await self.read_expect_success(endpoint=endpoint,
                                                            attribute=attributes.CurrentPhase)
             if (phase_list == NullValue) or (not phase_list):
@@ -670,12 +668,12 @@ class TC_OPSTATE_BASE():
 
         # STEP 10: TH waits for {PIXIT.WAITTIME.COUNTDOWN}
         self.step(10)
-        if attributes.CountdownTime.attribute_id in attribute_list:
+        if self.attributes_guard(attributes.CountdownTime):
             time.sleep(wait_time)
 
         # STEP 11: TH reads from the DUT the CountdownTime attribute
         self.step(11)
-        if attributes.CountdownTime.attribute_id in attribute_list:
+        if self.attributes_guard(attributes.CountdownTime):
             countdown_time = await self.read_expect_success(endpoint=endpoint,
                                                             attribute=attributes.CountdownTime)
 
@@ -757,7 +755,6 @@ class TC_OPSTATE_BASE():
     async def TEST_TC_OPSTATE_BASE_2_3(self, endpoint=1):
         cluster = self.test_info.cluster
         attributes = cluster.Attributes
-        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attributes.AttributeList)
 
         commands = cluster.Commands
         accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attributes.AcceptedCommandList)
@@ -817,7 +814,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 6: TH reads from the DUT the CountdownTime attribute
         self.step(6)
-        if attributes.CountdownTime.attribute_id in attribute_list:
+        if self.attributes_guard(attributes.CountdownTime):
             initial_countdown_time = await self.read_expect_success(endpoint=endpoint,
                                                                     attribute=attributes.CountdownTime)
             if initial_countdown_time is not NullValue:
@@ -831,7 +828,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 8: TH reads from the DUT the CountdownTime attribute
         self.step(8)
-        if attributes.CountdownTime.attribute_id in attribute_list:
+        if self.attributes_guard(attributes.CountdownTime):
             countdown_time = await self.read_expect_success(endpoint=endpoint,
                                                             attribute=attributes.CountdownTime)
 
@@ -1011,7 +1008,6 @@ class TC_OPSTATE_BASE():
     async def TEST_TC_OPSTATE_BASE_2_5(self, endpoint=1):
         cluster = self.test_info.cluster
         attributes = cluster.Attributes
-        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attributes.AttributeList)
 
         commands = cluster.Commands
         accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attributes.AcceptedCommandList)
@@ -1062,7 +1058,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 5: TH reads from the DUT the CountdownTime attribute
         self.step(5)
-        if attributes.CountdownTime.attribute_id in attribute_list:
+        if self.attributes_guard(attributes.CountdownTime):
             initial_countdown_time = await self.read_expect_success(endpoint=endpoint,
                                                                     attribute=attributes.CountdownTime)
 
