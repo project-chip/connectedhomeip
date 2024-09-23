@@ -87,7 +87,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
         cluster = Clusters.RvcOperationalState
         attributes = cluster.Attributes
-        
+
         self.print_step(1, "Commissioning, already done")
 
         # Ensure that the device is in the correct state

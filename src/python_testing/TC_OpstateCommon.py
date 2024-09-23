@@ -338,7 +338,7 @@ class TC_OPSTATE_BASE():
     async def TEST_TC_OPSTATE_BASE_2_1(self, endpoint=1):
         cluster = self.test_info.cluster
         attributes = cluster.Attributes
-         
+
         self.init_test()
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
