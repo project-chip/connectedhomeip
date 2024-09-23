@@ -43,7 +43,13 @@ struct GenericContext
 {
     ContextType type;
     void * context;
-    DNSServiceRef serviceRef;
+    // When using a GenericContext, if a DNSServiceRef is created successfully
+    // API consumers must ensure that it gets set as serviceRef on the context
+    // immediately, before any other operations that might fail can happen.
+    //
+    // In all cases, once a context has been created, Finalize() must be called
+    // on it to clean it up properly.
+    DNSServiceRef serviceRef = nullptr;
 
     virtual ~GenericContext() {}
 
@@ -69,7 +75,8 @@ public:
     ~MdnsContexts();
     static MdnsContexts & GetInstance() { return sInstance.get(); }
 
-    CHIP_ERROR Add(GenericContext * context, DNSServiceRef sdRef);
+    // The context being added is expected to have a valid serviceRef.
+    CHIP_ERROR Add(GenericContext * context);
     CHIP_ERROR Remove(GenericContext * context);
     CHIP_ERROR RemoveAllOfType(ContextType type);
     CHIP_ERROR Has(GenericContext * context);
