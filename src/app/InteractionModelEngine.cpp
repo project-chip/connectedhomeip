@@ -51,7 +51,7 @@
 #endif
 
 #if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-#include <app/ember_coupling/EventPathValidity.mixin.h>
+#include <app/ember_coupling/EventPathValidity.mixin.h> // nogncheck
 #endif
 
 namespace chip {
