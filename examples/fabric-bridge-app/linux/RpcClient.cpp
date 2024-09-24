@@ -119,7 +119,7 @@ CHIP_ERROR StartRpcClient()
 
 CHIP_ERROR OpenCommissioningWindow(chip_rpc_DeviceCommissioningWindowInfo device)
 {
-    ChipLogProgress(NotSpecified, "OpenCommissioningWindow with Node Id 0x" ChipLogFormatX64, ChipLogValueX64(device.node_id));
+    ChipLogProgress(NotSpecified, "OpenCommissioningWindow with HandleId 0x" ChipLogFormatX64, ChipLogValueX64(device.device_handle_id));
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.
@@ -135,22 +135,10 @@ CHIP_ERROR OpenCommissioningWindow(chip_rpc_DeviceCommissioningWindowInfo device
 }
 
 CHIP_ERROR
-OpenCommissioningWindow(chip::Controller::CommissioningWindowPasscodeParams params)
+OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams params, uint64_t handleId)
 {
     chip_rpc_DeviceCommissioningWindowInfo device;
-    device.node_id               = params.GetNodeId();
-    device.commissioning_timeout = params.GetTimeout().count();
-    device.discriminator         = params.GetDiscriminator();
-    device.iterations            = params.GetIteration();
-
-    return OpenCommissioningWindow(device);
-}
-
-CHIP_ERROR
-OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams params)
-{
-    chip_rpc_DeviceCommissioningWindowInfo device;
-    device.node_id               = params.GetNodeId();
+    device.device_handle_id      = handleId;
     device.commissioning_timeout = params.GetTimeout().count();
     device.discriminator         = params.GetDiscriminator();
     device.iterations            = params.GetIteration();
@@ -193,10 +181,10 @@ CommissionNode(chip::Controller::CommissioningWindowPasscodeParams params, Vendo
     return WaitForResponse(call);
 }
 
-CHIP_ERROR KeepActive(chip::NodeId nodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs)
+CHIP_ERROR KeepActive(uint64_t handleId, uint32_t stayActiveDurationMs, uint32_t timeoutMs)
 {
     chip_rpc_KeepActiveParameters params;
-    params.node_id                 = nodeId;
+    params.device_handle_id        = handleId;
     params.stay_active_duration_ms = stayActiveDurationMs;
     params.timeout_ms              = timeoutMs;
 

@@ -122,20 +122,6 @@ void BridgePollingThread()
                 ChipLogProgress(NotSpecified, "Exiting.....");
                 exit(0);
             }
-#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
-            else if (ch == 'o')
-            {
-                CHIP_ERROR err = OpenCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
-                                                             .SetNodeId(0x1234)
-                                                             .SetTimeout(300)
-                                                             .SetDiscriminator(3840)
-                                                             .SetIteration(1000));
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(NotSpecified, "Failed to call OpenCommissioningWindow RPC: %" CHIP_ERROR_FORMAT, err.Format());
-                }
-            }
-#endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
             continue;
         }
 
@@ -201,19 +187,18 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
     // TODO: issues:#33784, need to make OpenCommissioningWindow synchronous
     if (device != nullptr &&
         OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams()
-                                    .SetNodeId(device->GetNodeId())
                                     .SetTimeout(commandData.commissioningTimeout)
                                     .SetDiscriminator(commandData.discriminator)
                                     .SetIteration(commandData.iterations)
                                     .SetSalt(commandData.salt)
-                                    .SetVerifier(commandData.PAKEPasscodeVerifier)) == CHIP_NO_ERROR)
+                                    .SetVerifier(commandData.PAKEPasscodeVerifier), device->GetHandleId()) == CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "Commissioning window is now open");
         status = Status::Success;
     }
     else
     {
-        ChipLogProgress(NotSpecified, "Commissioning window is failed to open");
+        ChipLogProgress(NotSpecified, "Commissioning window failed to open");
     }
 #else
     ChipLogProgress(NotSpecified, "Commissioning window failed to open: PW_RPC_FABRIC_BRIDGE_SERVICE not defined");
@@ -268,7 +253,7 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
     Status status = Status::Failure;
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
-    if (KeepActive(device->GetNodeId(), commandData.stayActiveDuration, commandData.timeoutMs) == CHIP_NO_ERROR)
+    if (KeepActive(device->GetHandleId(), commandData.stayActiveDuration, commandData.timeoutMs) == CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "KeepActive successfully processed");
         status = Status::Success;

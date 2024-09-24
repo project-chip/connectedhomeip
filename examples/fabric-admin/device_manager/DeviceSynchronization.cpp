@@ -19,6 +19,7 @@
 #include "DeviceSynchronization.h"
 
 #include "DeviceSubscriptionManager.h"
+#include "BridgeAdminDeviceMapper.h"
 
 #if defined(PW_RPC_ENABLED)
 #include "rpc/RpcClient.h"
@@ -206,7 +207,6 @@ void DeviceSynchronizer::StartDeviceSynchronization(Controller::DeviceController
 
 #if defined(PW_RPC_ENABLED)
     mCurrentDeviceData            = chip_rpc_SynchronizedDevice_init_default;
-    mCurrentDeviceData.node_id    = nodeId;
     mCurrentDeviceData.has_is_icd = true;
     mCurrentDeviceData.is_icd     = deviceIsIcd;
 #endif
@@ -270,13 +270,17 @@ void DeviceSynchronizer::SynchronizationCompleteAddDevice()
     VerifyOrDie(mState == State::ReceivedResponse || mState == State::GettingUid);
 
 #if defined(PW_RPC_ENABLED)
+    VerifyOrDie(mController);
+    ScopedNodeId scopedNodeId(mNodeId, mController->GetFabricIndex());
+    auto handleId = DeviceMgr().BridgeToAdminDeviceMapper().AddScopedNodeId(scopedNodeId);
+    VerifyOrDie(handleId.has_value());
+    mCurrentDeviceData.device_handle_id = handleId.value();
     AddSynchronizedDevice(mCurrentDeviceData);
     // TODO(#35077) Figure out how we should reflect CADMIN values of ICD.
     if (!mCurrentDeviceData.is_icd)
     {
-        VerifyOrDie(mController);
         // TODO(#35333) Figure out how we should recover in this circumstance.
-        CHIP_ERROR err = DeviceSubscriptionManager::Instance().StartSubscription(*mController, mNodeId);
+        CHIP_ERROR err = DeviceSubscriptionManager::Instance().StartSubscription(*mController, mNodeId, handleId.value());
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(NotSpecified, "Failed start subscription to NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));

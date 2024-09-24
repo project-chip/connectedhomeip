@@ -49,7 +49,7 @@ public:
         std::optional<chip::VendorId> openerVendorId       = std::nullopt;
     };
 
-    BridgedDevice(chip::NodeId nodeId);
+    BridgedDevice(uint64_t handleId);
     virtual ~BridgedDevice() = default;
 
     [[nodiscard]] bool IsReachable() const { return mReachable; }
@@ -62,7 +62,7 @@ public:
 
     inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
     inline chip::EndpointId GetEndpointId() { return mEndpointId; };
-    inline chip::NodeId GetNodeId() { return mNodeId; };
+    inline uint64_t GetHandleId() { return mHandleId; };
     inline void SetParentEndpointId(chip::EndpointId id) { mParentEndpointId = id; };
     inline chip::EndpointId GetParentEndpointId() { return mParentEndpointId; };
 
@@ -80,7 +80,7 @@ protected:
     bool mReachable = false;
     bool mIsIcd     = false;
 
-    chip::NodeId mNodeId               = 0;
+    uint64_t mHandleId                 = 0;
     chip::EndpointId mEndpointId       = 0;
     chip::EndpointId mParentEndpointId = 0;
 

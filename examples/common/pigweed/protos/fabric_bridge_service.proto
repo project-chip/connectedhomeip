@@ -6,7 +6,9 @@ package chip.rpc;
 
 // Define the message for a synchronized end device with necessary fields
 message SynchronizedDevice {
-  uint64 node_id = 1;
+  // Using device_handle_id instead of node_id because over multiple fabrics
+  // there can be overlapping node_ids that are not unique.
+  uint64 device_handle_id = 1;
 
   optional string unique_id = 2;
   optional string vendor_name = 3;
@@ -22,12 +24,12 @@ message SynchronizedDevice {
 }
 
 message KeepActiveChanged {
-  uint64 node_id = 1;
+  uint64 device_handle_id = 1;
   uint32 promised_active_duration_ms = 2;
 }
 
 message AdministratorCommissioningChanged {
-  uint64 node_id = 1;
+  uint64 device_handle_id = 1;
   uint32 window_status = 2;
   optional uint32 opener_fabric_index = 3;
   optional uint32 opener_vendor_id = 4;

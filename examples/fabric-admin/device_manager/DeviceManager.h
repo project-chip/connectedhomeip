@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "BridgeAdminDeviceMapper.h"
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <commands/pairing/PairingCommand.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -174,6 +176,8 @@ public:
     Device * FindDeviceByEndpoint(chip::EndpointId endpointId);
     Device * FindDeviceByNode(chip::NodeId nodeId);
 
+    BridgeAdminDeviceMapper & BridgeToAdminDeviceMapper() { return mLocalBridgeToAdminDeviceMapper; }
+
 private:
     friend DeviceManager & DeviceMgr();
 
@@ -206,6 +210,7 @@ private:
     chip::NodeId mLocalBridgeNodeId = chip::kUndefinedNodeId;
 
     std::set<Device> mSyncedDevices;
+    BridgeAdminDeviceMapper mLocalBridgeToAdminDeviceMapper;
     bool mAutoSyncEnabled = false;
     bool mInitialized     = false;
     uint64_t mRequestId   = 0;

@@ -82,10 +82,10 @@ void ReportAttributeChangedWork(intptr_t arg)
 
 using namespace chip::app::Clusters::Actions;
 
-BridgedDevice::BridgedDevice(chip::NodeId nodeId)
+BridgedDevice::BridgedDevice(uint64_t handleId)
 {
     mReachable  = false;
-    mNodeId     = nodeId;
+    mHandleId  = handleId;
     mEndpointId = chip::kInvalidEndpointId;
 }
 

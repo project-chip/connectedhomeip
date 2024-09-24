@@ -44,7 +44,7 @@ public:
     DeviceSubscription();
 
     CHIP_ERROR StartSubscription(OnDoneCallback onDoneCallback, chip::Controller::DeviceController & controller,
-                                 chip::NodeId nodeId);
+                                 chip::NodeId nodeId, uint64_t handleId);
 
     /// This will trigger stopping the subscription. Once subscription is stopped the OnDoneCallback
     /// provided in StartSubscription will be called to indicate that subscription have been terminated.

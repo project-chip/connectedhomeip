@@ -32,7 +32,7 @@ public:
 
     /// Usually called after we have added a synchronized device to fabric-bridge to monitor
     /// for any changes that need to be propagated to fabric-bridge.
-    CHIP_ERROR StartSubscription(chip::Controller::DeviceController & controller, chip::NodeId nodeId);
+    CHIP_ERROR StartSubscription(chip::Controller::DeviceController & controller, chip::NodeId nodeId, uint64_t handleId);
 
     CHIP_ERROR RemoveSubscription(chip::NodeId nodeId);
 
