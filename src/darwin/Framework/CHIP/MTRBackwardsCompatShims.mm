@@ -73,49 +73,32 @@ public:
 
 - (void)readAttributeSwitchTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::SwitchType::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeSwitchTypeWithParams:(MTRSubscribeParams * _Nonnull)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::SwitchType::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeSwitchTypeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::SwitchType::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeSwitchActionsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeSwitchActionsWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -124,232 +107,140 @@ public:
 }
 - (void)writeAttributeSwitchActionsWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeSwitchActionsWithParams:(MTRSubscribeParams * _Nonnull)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeSwitchActionsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::GeneratedCommandList::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::GeneratedCommandList::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeGeneratedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::GeneratedCommandList::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::AcceptedCommandList::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::AcceptedCommandList::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcceptedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::AcceptedCommandList::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::AttributeList::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams * _Nonnull)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::AttributeList::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAttributeListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::AttributeList::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::FeatureMap::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams * _Nonnull)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::FeatureMap::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeFeatureMapWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::FeatureMap::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::ClusterRevision::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams * _Nonnull)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::ClusterRevision::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeClusterRevisionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = OnOffSwitchConfiguration::Attributes::ClusterRevision::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 @end
@@ -683,13 +574,9 @@ public:
 
 - (void)readAttributeActiveTextWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::ActiveText::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeActiveTextWithValue:(NSString * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -698,63 +585,32 @@ public:
 }
 - (void)writeAttributeActiveTextWithValue:(NSString * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = BinaryInputBasic::Attributes::ActiveText::TypeInfo;
-        TypeInfo::Type cppValue;
-          cppValue = AsCharSpan(value);
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeActiveTextWithParams:(MTRSubscribeParams * _Nonnull)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BinaryInputBasic::Attributes::ActiveText::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeActiveTextWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::ActiveText::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeDescriptionWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::Description::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeDescriptionWithValue:(NSString * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -763,63 +619,32 @@ public:
 }
 - (void)writeAttributeDescriptionWithValue:(NSString * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = BinaryInputBasic::Attributes::Description::TypeInfo;
-        TypeInfo::Type cppValue;
-          cppValue = AsCharSpan(value);
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeDescriptionWithParams:(MTRSubscribeParams * _Nonnull)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BinaryInputBasic::Attributes::Description::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeDescriptionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::Description::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeInactiveTextWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::InactiveText::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeInactiveTextWithValue:(NSString * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -828,63 +653,32 @@ public:
 }
 - (void)writeAttributeInactiveTextWithValue:(NSString * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = BinaryInputBasic::Attributes::InactiveText::TypeInfo;
-        TypeInfo::Type cppValue;
-          cppValue = AsCharSpan(value);
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeInactiveTextWithParams:(MTRSubscribeParams * _Nonnull)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BinaryInputBasic::Attributes::InactiveText::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeInactiveTextWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::InactiveText::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeOutOfServiceWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::OutOfService::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeOutOfServiceWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -893,99 +687,55 @@ public:
 }
 - (void)writeAttributeOutOfServiceWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = BinaryInputBasic::Attributes::OutOfService::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeOutOfServiceWithParams:(MTRSubscribeParams * _Nonnull)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BinaryInputBasic::Attributes::OutOfService::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeOutOfServiceWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::OutOfService::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributePolarityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::Polarity::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributePolarityWithParams:(MTRSubscribeParams * _Nonnull)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BinaryInputBasic::Attributes::Polarity::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributePolarityWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::Polarity::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributePresentValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::PresentValue::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributePresentValueWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -994,63 +744,32 @@ public:
 }
 - (void)writeAttributePresentValueWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = BinaryInputBasic::Attributes::PresentValue::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributePresentValueWithParams:(MTRSubscribeParams * _Nonnull)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BinaryInputBasic::Attributes::PresentValue::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributePresentValueWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::PresentValue::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeReliabilityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::Reliability::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeReliabilityWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -1059,304 +778,186 @@ public:
 }
 - (void)writeAttributeReliabilityWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = BinaryInputBasic::Attributes::Reliability::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeReliabilityWithParams:(MTRSubscribeParams * _Nonnull)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BinaryInputBasic::Attributes::Reliability::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeReliabilityWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::Reliability::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeStatusFlagsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::StatusFlags::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeStatusFlagsWithParams:(MTRSubscribeParams * _Nonnull)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BinaryInputBasic::Attributes::StatusFlags::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeStatusFlagsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::StatusFlags::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeApplicationTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::ApplicationType::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeApplicationTypeWithParams:(MTRSubscribeParams * _Nonnull)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BinaryInputBasic::Attributes::ApplicationType::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeApplicationTypeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::ApplicationType::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::GeneratedCommandList::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BinaryInputBasic::Attributes::GeneratedCommandList::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeGeneratedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::GeneratedCommandList::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::AcceptedCommandList::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BinaryInputBasic::Attributes::AcceptedCommandList::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcceptedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::AcceptedCommandList::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::AttributeList::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams * _Nonnull)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BinaryInputBasic::Attributes::AttributeList::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAttributeListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::AttributeList::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::FeatureMap::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams * _Nonnull)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BinaryInputBasic::Attributes::FeatureMap::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeFeatureMapWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::FeatureMap::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::ClusterRevision::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams * _Nonnull)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BinaryInputBasic::Attributes::ClusterRevision::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeClusterRevisionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BinaryInputBasic::Attributes::ClusterRevision::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 @end
@@ -2065,27 +1666,9 @@ public:
 
 - (void)barrierControlGoToPercentWithParams:(MTRBarrierControlClusterBarrierControlGoToPercentParams *)params completion:(MTRStatusCompletion)completion
 {
-    if (params == nil) {
-        params = [[MTRBarrierControlClusterBarrierControlGoToPercentParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = BarrierControl::Commands::BarrierControlGoToPercent::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 - (void)barrierControlStopWithCompletion:(MTRStatusCompletion)completion
 {
@@ -2093,146 +1676,85 @@ public:
 }
 - (void)barrierControlStopWithParams:(MTRBarrierControlClusterBarrierControlStopParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    if (params == nil) {
-        params = [[MTRBarrierControlClusterBarrierControlStopParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = BarrierControl::Commands::BarrierControlStop::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeBarrierMovingStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierMovingState::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeBarrierMovingStateWithParams:(MTRSubscribeParams * _Nonnull)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierMovingState::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeBarrierMovingStateWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierMovingState::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeBarrierSafetyStatusWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierSafetyStatus::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeBarrierSafetyStatusWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierSafetyStatus::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeBarrierSafetyStatusWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierSafetyStatus::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeBarrierCapabilitiesWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierCapabilities::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeBarrierCapabilitiesWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierCapabilities::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeBarrierCapabilitiesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierCapabilities::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeBarrierOpenEventsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierOpenEvents::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeBarrierOpenEventsWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -2241,63 +1763,32 @@ public:
 }
 - (void)writeAttributeBarrierOpenEventsWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = BarrierControl::Attributes::BarrierOpenEvents::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeBarrierOpenEventsWithParams:(MTRSubscribeParams * _Nonnull)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierOpenEvents::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeBarrierOpenEventsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierOpenEvents::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeBarrierCloseEventsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierCloseEvents::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeBarrierCloseEventsWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -2306,63 +1797,32 @@ public:
 }
 - (void)writeAttributeBarrierCloseEventsWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = BarrierControl::Attributes::BarrierCloseEvents::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeBarrierCloseEventsWithParams:(MTRSubscribeParams * _Nonnull)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierCloseEvents::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeBarrierCloseEventsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierCloseEvents::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeBarrierCommandOpenEventsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierCommandOpenEvents::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeBarrierCommandOpenEventsWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -2371,63 +1831,32 @@ public:
 }
 - (void)writeAttributeBarrierCommandOpenEventsWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = BarrierControl::Attributes::BarrierCommandOpenEvents::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeBarrierCommandOpenEventsWithParams:(MTRSubscribeParams * _Nonnull)params
                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierCommandOpenEvents::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeBarrierCommandOpenEventsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierCommandOpenEvents::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeBarrierCommandCloseEventsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierCommandCloseEvents::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeBarrierCommandCloseEventsWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -2436,63 +1865,32 @@ public:
 }
 - (void)writeAttributeBarrierCommandCloseEventsWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = BarrierControl::Attributes::BarrierCommandCloseEvents::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeBarrierCommandCloseEventsWithParams:(MTRSubscribeParams * _Nonnull)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierCommandCloseEvents::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeBarrierCommandCloseEventsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierCommandCloseEvents::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeBarrierOpenPeriodWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierOpenPeriod::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeBarrierOpenPeriodWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -2501,63 +1899,32 @@ public:
 }
 - (void)writeAttributeBarrierOpenPeriodWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = BarrierControl::Attributes::BarrierOpenPeriod::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeBarrierOpenPeriodWithParams:(MTRSubscribeParams * _Nonnull)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierOpenPeriod::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeBarrierOpenPeriodWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierOpenPeriod::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeBarrierClosePeriodWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierClosePeriod::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeBarrierClosePeriodWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -2566,268 +1933,163 @@ public:
 }
 - (void)writeAttributeBarrierClosePeriodWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = BarrierControl::Attributes::BarrierClosePeriod::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeBarrierClosePeriodWithParams:(MTRSubscribeParams * _Nonnull)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierClosePeriod::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeBarrierClosePeriodWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierClosePeriod::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeBarrierPositionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierPosition::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeBarrierPositionWithParams:(MTRSubscribeParams * _Nonnull)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierPosition::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeBarrierPositionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::BarrierPosition::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::GeneratedCommandList::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BarrierControl::Attributes::GeneratedCommandList::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeGeneratedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::GeneratedCommandList::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::AcceptedCommandList::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BarrierControl::Attributes::AcceptedCommandList::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcceptedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::AcceptedCommandList::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::AttributeList::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams * _Nonnull)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BarrierControl::Attributes::AttributeList::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAttributeListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::AttributeList::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::FeatureMap::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams * _Nonnull)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BarrierControl::Attributes::FeatureMap::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeFeatureMapWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::FeatureMap::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::ClusterRevision::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams * _Nonnull)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = BarrierControl::Attributes::ClusterRevision::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeClusterRevisionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = BarrierControl::Attributes::ClusterRevision::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 @end
@@ -3435,29 +2697,9 @@ public:
 
 - (void)barrierControlGoToPercentWithParams:(MTRBarrierControlClusterBarrierControlGoToPercentParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    if (params == nil) {
-        params = [[MTRBarrierControlClusterBarrierControlGoToPercentParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = BarrierControl::Commands::BarrierControlGoToPercent::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)barrierControlStopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -3466,29 +2708,9 @@ public:
 }
 - (void)barrierControlStopWithParams:(MTRBarrierControlClusterBarrierControlStopParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    if (params == nil) {
-        params = [[MTRBarrierControlClusterBarrierControlStopParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = BarrierControl::Commands::BarrierControlStop::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeBarrierMovingStateWithParams:(MTRReadParams * _Nullable)params
@@ -3704,27 +2926,7 @@ public:
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.percentOpen = self.percentOpen.unsignedCharValue;
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
@@ -3780,24 +2982,7 @@ public:
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::Type encodableStruct;
-    ListFreer listFreer;
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
@@ -3831,2150 +3016,1356 @@ public:
 }
 - (void)getProfileInfoCommandWithParams:(MTRElectricalMeasurementClusterGetProfileInfoCommandParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    if (params == nil) {
-        params = [[MTRElectricalMeasurementClusterGetProfileInfoCommandParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = ElectricalMeasurement::Commands::GetProfileInfoCommand::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 - (void)getMeasurementProfileCommandWithParams:(MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams *)params completion:(MTRStatusCompletion)completion
 {
-    if (params == nil) {
-        params = [[MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = ElectricalMeasurement::Commands::GetMeasurementProfileCommand::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeMeasurementTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasurementType::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeMeasurementTypeWithParams:(MTRSubscribeParams * _Nonnull)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasurementType::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeMeasurementTypeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasurementType::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeDcVoltageWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcVoltage::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeDcVoltageWithParams:(MTRSubscribeParams * _Nonnull)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcVoltage::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeDcVoltageWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcVoltage::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeDcVoltageMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcVoltageMin::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeDcVoltageMinWithParams:(MTRSubscribeParams * _Nonnull)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcVoltageMin::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeDcVoltageMinWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcVoltageMin::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeDcVoltageMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcVoltageMax::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeDcVoltageMaxWithParams:(MTRSubscribeParams * _Nonnull)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcVoltageMax::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeDcVoltageMaxWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcVoltageMax::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeDcCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeDcCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeDcCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeDcCurrentMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcCurrentMin::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeDcCurrentMinWithParams:(MTRSubscribeParams * _Nonnull)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcCurrentMin::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeDcCurrentMinWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcCurrentMin::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeDcCurrentMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcCurrentMax::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeDcCurrentMaxWithParams:(MTRSubscribeParams * _Nonnull)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcCurrentMax::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeDcCurrentMaxWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcCurrentMax::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeDcPowerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcPower::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeDcPowerWithParams:(MTRSubscribeParams * _Nonnull)params
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcPower::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeDcPowerWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcPower::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeDcPowerMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcPowerMin::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeDcPowerMinWithParams:(MTRSubscribeParams * _Nonnull)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcPowerMin::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeDcPowerMinWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcPowerMin::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeDcPowerMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcPowerMax::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeDcPowerMaxWithParams:(MTRSubscribeParams * _Nonnull)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcPowerMax::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeDcPowerMaxWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcPowerMax::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeDcVoltageMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcVoltageMultiplier::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeDcVoltageMultiplierWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcVoltageMultiplier::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeDcVoltageMultiplierWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcVoltageMultiplier::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeDcVoltageDivisorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcVoltageDivisor::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeDcVoltageDivisorWithParams:(MTRSubscribeParams * _Nonnull)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcVoltageDivisor::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeDcVoltageDivisorWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcVoltageDivisor::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeDcCurrentMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcCurrentMultiplier::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeDcCurrentMultiplierWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcCurrentMultiplier::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeDcCurrentMultiplierWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcCurrentMultiplier::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeDcCurrentDivisorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcCurrentDivisor::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeDcCurrentDivisorWithParams:(MTRSubscribeParams * _Nonnull)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcCurrentDivisor::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeDcCurrentDivisorWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcCurrentDivisor::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeDcPowerMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcPowerMultiplier::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeDcPowerMultiplierWithParams:(MTRSubscribeParams * _Nonnull)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcPowerMultiplier::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeDcPowerMultiplierWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcPowerMultiplier::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeDcPowerDivisorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcPowerDivisor::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeDcPowerDivisorWithParams:(MTRSubscribeParams * _Nonnull)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcPowerDivisor::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeDcPowerDivisorWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::DcPowerDivisor::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcFrequencyWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcFrequency::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcFrequencyWithParams:(MTRSubscribeParams * _Nonnull)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcFrequency::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcFrequencyWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcFrequency::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcFrequencyMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcFrequencyMin::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcFrequencyMinWithParams:(MTRSubscribeParams * _Nonnull)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcFrequencyMin::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcFrequencyMinWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcFrequencyMin::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcFrequencyMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcFrequencyMax::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcFrequencyMaxWithParams:(MTRSubscribeParams * _Nonnull)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcFrequencyMax::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcFrequencyMaxWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcFrequencyMax::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeNeutralCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::NeutralCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeNeutralCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::NeutralCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeNeutralCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::NeutralCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeTotalActivePowerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::TotalActivePower::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeTotalActivePowerWithParams:(MTRSubscribeParams * _Nonnull)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::TotalActivePower::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeTotalActivePowerWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::TotalActivePower::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeTotalReactivePowerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::TotalReactivePower::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeTotalReactivePowerWithParams:(MTRSubscribeParams * _Nonnull)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::TotalReactivePower::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeTotalReactivePowerWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::TotalReactivePower::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeTotalApparentPowerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::TotalApparentPower::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeTotalApparentPowerWithParams:(MTRSubscribeParams * _Nonnull)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::TotalApparentPower::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeTotalApparentPowerWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::TotalApparentPower::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeMeasured1stHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured1stHarmonicCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeMeasured1stHarmonicCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured1stHarmonicCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeMeasured1stHarmonicCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured1stHarmonicCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeMeasured3rdHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured3rdHarmonicCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeMeasured3rdHarmonicCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured3rdHarmonicCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeMeasured3rdHarmonicCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured3rdHarmonicCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeMeasured5thHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured5thHarmonicCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeMeasured5thHarmonicCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured5thHarmonicCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeMeasured5thHarmonicCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured5thHarmonicCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeMeasured7thHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured7thHarmonicCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeMeasured7thHarmonicCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured7thHarmonicCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeMeasured7thHarmonicCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured7thHarmonicCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeMeasured9thHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured9thHarmonicCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeMeasured9thHarmonicCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured9thHarmonicCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeMeasured9thHarmonicCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured9thHarmonicCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeMeasured11thHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured11thHarmonicCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeMeasured11thHarmonicCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured11thHarmonicCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeMeasured11thHarmonicCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::Measured11thHarmonicCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeMeasuredPhase1stHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase1stHarmonicCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeMeasuredPhase1stHarmonicCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase1stHarmonicCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeMeasuredPhase1stHarmonicCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase1stHarmonicCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeMeasuredPhase3rdHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase3rdHarmonicCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeMeasuredPhase3rdHarmonicCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase3rdHarmonicCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeMeasuredPhase3rdHarmonicCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase3rdHarmonicCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeMeasuredPhase5thHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase5thHarmonicCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeMeasuredPhase5thHarmonicCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase5thHarmonicCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeMeasuredPhase5thHarmonicCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase5thHarmonicCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeMeasuredPhase7thHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase7thHarmonicCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeMeasuredPhase7thHarmonicCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase7thHarmonicCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeMeasuredPhase7thHarmonicCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase7thHarmonicCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeMeasuredPhase9thHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase9thHarmonicCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeMeasuredPhase9thHarmonicCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase9thHarmonicCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeMeasuredPhase9thHarmonicCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase9thHarmonicCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeMeasuredPhase11thHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase11thHarmonicCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeMeasuredPhase11thHarmonicCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase11thHarmonicCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeMeasuredPhase11thHarmonicCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase11thHarmonicCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcFrequencyMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcFrequencyMultiplier::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcFrequencyMultiplierWithParams:(MTRSubscribeParams * _Nonnull)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcFrequencyMultiplier::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcFrequencyMultiplierWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcFrequencyMultiplier::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcFrequencyDivisorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcFrequencyDivisor::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcFrequencyDivisorWithParams:(MTRSubscribeParams * _Nonnull)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcFrequencyDivisor::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcFrequencyDivisorWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcFrequencyDivisor::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributePowerMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PowerMultiplier::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributePowerMultiplierWithParams:(MTRSubscribeParams * _Nonnull)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PowerMultiplier::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributePowerMultiplierWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PowerMultiplier::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributePowerDivisorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PowerDivisor::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributePowerDivisorWithParams:(MTRSubscribeParams * _Nonnull)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PowerDivisor::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributePowerDivisorWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PowerDivisor::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeHarmonicCurrentMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::HarmonicCurrentMultiplier::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeHarmonicCurrentMultiplierWithParams:(MTRSubscribeParams * _Nonnull)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::HarmonicCurrentMultiplier::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeHarmonicCurrentMultiplierWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::HarmonicCurrentMultiplier::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributePhaseHarmonicCurrentMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PhaseHarmonicCurrentMultiplier::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributePhaseHarmonicCurrentMultiplierWithParams:(MTRSubscribeParams * _Nonnull)params
                                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PhaseHarmonicCurrentMultiplier::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributePhaseHarmonicCurrentMultiplierWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PhaseHarmonicCurrentMultiplier::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeInstantaneousVoltageWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousVoltage::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeInstantaneousVoltageWithParams:(MTRSubscribeParams * _Nonnull)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousVoltage::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeInstantaneousVoltageWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousVoltage::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeInstantaneousLineCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousLineCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeInstantaneousLineCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousLineCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeInstantaneousLineCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousLineCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeInstantaneousActiveCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousActiveCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeInstantaneousActiveCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousActiveCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeInstantaneousActiveCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousActiveCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeInstantaneousReactiveCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousReactiveCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeInstantaneousReactiveCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousReactiveCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeInstantaneousReactiveCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousReactiveCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeInstantaneousPowerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousPower::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeInstantaneousPowerWithParams:(MTRSubscribeParams * _Nonnull)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousPower::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeInstantaneousPowerWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousPower::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsVoltageWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltage::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsVoltageWithParams:(MTRSubscribeParams * _Nonnull)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltage::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsVoltageWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltage::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsVoltageMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMin::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsVoltageMinWithParams:(MTRSubscribeParams * _Nonnull)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMin::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsVoltageMinWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMin::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsVoltageMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMax::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsVoltageMaxWithParams:(MTRSubscribeParams * _Nonnull)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMax::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsVoltageMaxWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMax::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrent::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsCurrentWithParams:(MTRSubscribeParams * _Nonnull)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrent::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsCurrentWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrent::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsCurrentMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMin::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsCurrentMinWithParams:(MTRSubscribeParams * _Nonnull)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMin::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsCurrentMinWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMin::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsCurrentMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMax::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsCurrentMaxWithParams:(MTRSubscribeParams * _Nonnull)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMax::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsCurrentMaxWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMax::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeActivePowerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePower::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeActivePowerWithParams:(MTRSubscribeParams * _Nonnull)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePower::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeActivePowerWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePower::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeActivePowerMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMin::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeActivePowerMinWithParams:(MTRSubscribeParams * _Nonnull)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMin::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeActivePowerMinWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMin::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeActivePowerMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMax::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeActivePowerMaxWithParams:(MTRSubscribeParams * _Nonnull)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMax::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeActivePowerMaxWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMax::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeReactivePowerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ReactivePower::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeReactivePowerWithParams:(MTRSubscribeParams * _Nonnull)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ReactivePower::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeReactivePowerWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ReactivePower::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeApparentPowerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ApparentPower::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeApparentPowerWithParams:(MTRSubscribeParams * _Nonnull)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ApparentPower::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeApparentPowerWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ApparentPower::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributePowerFactorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PowerFactor::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributePowerFactorWithParams:(MTRSubscribeParams * _Nonnull)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PowerFactor::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributePowerFactorWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PowerFactor::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAverageRmsVoltageMeasurementPeriodWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriod::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeAverageRmsVoltageMeasurementPeriodWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -5983,63 +4374,32 @@ public:
 }
 - (void)writeAttributeAverageRmsVoltageMeasurementPeriodWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriod::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAverageRmsVoltageMeasurementPeriodWithParams:(MTRSubscribeParams * _Nonnull)params
                                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                          reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriod::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAverageRmsVoltageMeasurementPeriodWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriod::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAverageRmsUnderVoltageCounterWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounter::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeAverageRmsUnderVoltageCounterWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -6048,63 +4408,32 @@ public:
 }
 - (void)writeAttributeAverageRmsUnderVoltageCounterWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounter::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAverageRmsUnderVoltageCounterWithParams:(MTRSubscribeParams * _Nonnull)params
                                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounter::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAverageRmsUnderVoltageCounterWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounter::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsExtremeOverVoltagePeriodWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriod::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeRmsExtremeOverVoltagePeriodWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -6113,63 +4442,32 @@ public:
 }
 - (void)writeAttributeRmsExtremeOverVoltagePeriodWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriod::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsExtremeOverVoltagePeriodWithParams:(MTRSubscribeParams * _Nonnull)params
                                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriod::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsExtremeOverVoltagePeriodWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriod::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsExtremeUnderVoltagePeriodWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriod::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeRmsExtremeUnderVoltagePeriodWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -6178,63 +4476,32 @@ public:
 }
 - (void)writeAttributeRmsExtremeUnderVoltagePeriodWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriod::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsExtremeUnderVoltagePeriodWithParams:(MTRSubscribeParams * _Nonnull)params
                                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriod::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsExtremeUnderVoltagePeriodWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriod::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsVoltageSagPeriodWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSagPeriod::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeRmsVoltageSagPeriodWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -6243,63 +4510,32 @@ public:
 }
 - (void)writeAttributeRmsVoltageSagPeriodWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSagPeriod::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsVoltageSagPeriodWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSagPeriod::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsVoltageSagPeriodWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSagPeriod::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsVoltageSwellPeriodWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSwellPeriod::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeRmsVoltageSwellPeriodWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -6308,279 +4544,170 @@ public:
 }
 - (void)writeAttributeRmsVoltageSwellPeriodWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSwellPeriod::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsVoltageSwellPeriodWithParams:(MTRSubscribeParams * _Nonnull)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSwellPeriod::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsVoltageSwellPeriodWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSwellPeriod::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcVoltageMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcVoltageMultiplier::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcVoltageMultiplierWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcVoltageMultiplier::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcVoltageMultiplierWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcVoltageMultiplier::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcVoltageDivisorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcVoltageDivisor::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcVoltageDivisorWithParams:(MTRSubscribeParams * _Nonnull)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcVoltageDivisor::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcVoltageDivisorWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcVoltageDivisor::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcCurrentMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcCurrentMultiplier::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcCurrentMultiplierWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcCurrentMultiplier::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcCurrentMultiplierWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcCurrentMultiplier::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcCurrentDivisorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcCurrentDivisor::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcCurrentDivisorWithParams:(MTRSubscribeParams * _Nonnull)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcCurrentDivisor::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcCurrentDivisorWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcCurrentDivisor::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcPowerMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcPowerMultiplier::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcPowerMultiplierWithParams:(MTRSubscribeParams * _Nonnull)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcPowerMultiplier::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcPowerMultiplierWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcPowerMultiplier::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcPowerDivisorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcPowerDivisor::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcPowerDivisorWithParams:(MTRSubscribeParams * _Nonnull)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcPowerDivisor::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcPowerDivisorWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcPowerDivisor::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeOverloadAlarmsMaskWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::OverloadAlarmsMask::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeOverloadAlarmsMaskWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -6589,135 +4716,78 @@ public:
 }
 - (void)writeAttributeOverloadAlarmsMaskWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = ElectricalMeasurement::Attributes::OverloadAlarmsMask::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeOverloadAlarmsMaskWithParams:(MTRSubscribeParams * _Nonnull)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::OverloadAlarmsMask::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeOverloadAlarmsMaskWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::OverloadAlarmsMask::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeVoltageOverloadWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::VoltageOverload::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeVoltageOverloadWithParams:(MTRSubscribeParams * _Nonnull)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::VoltageOverload::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeVoltageOverloadWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::VoltageOverload::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeCurrentOverloadWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::CurrentOverload::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeCurrentOverloadWithParams:(MTRSubscribeParams * _Nonnull)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::CurrentOverload::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeCurrentOverloadWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::CurrentOverload::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcOverloadAlarmsMaskWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcOverloadAlarmsMask::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)writeAttributeAcOverloadAlarmsMaskWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
@@ -6726,2176 +4796,1382 @@ public:
 }
 - (void)writeAttributeAcOverloadAlarmsMaskWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(
-        self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = ElectricalMeasurement::Attributes::AcOverloadAlarmsMask::TypeInfo;
-        TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcOverloadAlarmsMaskWithParams:(MTRSubscribeParams * _Nonnull)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcOverloadAlarmsMask::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcOverloadAlarmsMaskWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcOverloadAlarmsMask::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcVoltageOverloadWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcVoltageOverload::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcVoltageOverloadWithParams:(MTRSubscribeParams * _Nonnull)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcVoltageOverload::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcVoltageOverloadWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcVoltageOverload::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcCurrentOverloadWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcCurrentOverload::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcCurrentOverloadWithParams:(MTRSubscribeParams * _Nonnull)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcCurrentOverload::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcCurrentOverloadWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcCurrentOverload::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcActivePowerOverloadWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcActivePowerOverload::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcActivePowerOverloadWithParams:(MTRSubscribeParams * _Nonnull)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcActivePowerOverload::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcActivePowerOverloadWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcActivePowerOverload::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcReactivePowerOverloadWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcReactivePowerOverload::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcReactivePowerOverloadWithParams:(MTRSubscribeParams * _Nonnull)params
                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcReactivePowerOverload::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcReactivePowerOverloadWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcReactivePowerOverload::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAverageRmsOverVoltageWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsOverVoltage::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAverageRmsOverVoltageWithParams:(MTRSubscribeParams * _Nonnull)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsOverVoltage::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAverageRmsOverVoltageWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsOverVoltage::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAverageRmsUnderVoltageWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsUnderVoltage::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAverageRmsUnderVoltageWithParams:(MTRSubscribeParams * _Nonnull)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsUnderVoltage::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAverageRmsUnderVoltageWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsUnderVoltage::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsExtremeOverVoltageWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeOverVoltage::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsExtremeOverVoltageWithParams:(MTRSubscribeParams * _Nonnull)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeOverVoltage::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsExtremeOverVoltageWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeOverVoltage::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsExtremeUnderVoltageWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeUnderVoltage::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsExtremeUnderVoltageWithParams:(MTRSubscribeParams * _Nonnull)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeUnderVoltage::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsExtremeUnderVoltageWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeUnderVoltage::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsVoltageSagWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSag::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsVoltageSagWithParams:(MTRSubscribeParams * _Nonnull)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSag::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsVoltageSagWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSag::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsVoltageSwellWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSwell::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsVoltageSwellWithParams:(MTRSubscribeParams * _Nonnull)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSwell::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsVoltageSwellWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSwell::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeLineCurrentPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::LineCurrentPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeLineCurrentPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::LineCurrentPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeLineCurrentPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::LineCurrentPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeActiveCurrentPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActiveCurrentPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeActiveCurrentPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActiveCurrentPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeActiveCurrentPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActiveCurrentPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeReactiveCurrentPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ReactiveCurrentPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeReactiveCurrentPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ReactiveCurrentPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeReactiveCurrentPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ReactiveCurrentPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsVoltagePhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltagePhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsVoltagePhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltagePhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsVoltagePhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltagePhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsVoltageMinPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMinPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsVoltageMinPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMinPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsVoltageMinPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMinPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsVoltageMaxPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMaxPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsVoltageMaxPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMaxPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsVoltageMaxPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMaxPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsCurrentPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsCurrentPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsCurrentPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsCurrentMinPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMinPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsCurrentMinPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMinPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsCurrentMinPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMinPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsCurrentMaxPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMaxPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsCurrentMaxPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMaxPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsCurrentMaxPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMaxPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeActivePowerPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeActivePowerPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeActivePowerPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeActivePowerMinPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMinPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeActivePowerMinPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMinPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeActivePowerMinPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMinPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeActivePowerMaxPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMaxPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeActivePowerMaxPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMaxPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeActivePowerMaxPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMaxPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeReactivePowerPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ReactivePowerPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeReactivePowerPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ReactivePowerPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeReactivePowerPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ReactivePowerPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeApparentPowerPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ApparentPowerPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeApparentPowerPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ApparentPowerPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeApparentPowerPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ApparentPowerPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributePowerFactorPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PowerFactorPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributePowerFactorPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PowerFactorPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributePowerFactorPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PowerFactorPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriodPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriodPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriodPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAverageRmsOverVoltageCounterPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsOverVoltageCounterPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAverageRmsOverVoltageCounterPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                          reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsOverVoltageCounterPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAverageRmsOverVoltageCounterPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsOverVoltageCounterPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAverageRmsUnderVoltageCounterPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounterPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAverageRmsUnderVoltageCounterPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounterPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAverageRmsUnderVoltageCounterPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounterPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsExtremeOverVoltagePeriodPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriodPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsExtremeOverVoltagePeriodPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriodPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsExtremeOverVoltagePeriodPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriodPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsExtremeUnderVoltagePeriodPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriodPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsExtremeUnderVoltagePeriodPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                          reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriodPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsExtremeUnderVoltagePeriodPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriodPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsVoltageSagPeriodPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSagPeriodPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsVoltageSagPeriodPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSagPeriodPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsVoltageSagPeriodPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSagPeriodPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsVoltageSwellPeriodPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSwellPeriodPhaseB::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsVoltageSwellPeriodPhaseBWithParams:(MTRSubscribeParams * _Nonnull)params
                                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSwellPeriodPhaseB::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsVoltageSwellPeriodPhaseBWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSwellPeriodPhaseB::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeLineCurrentPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::LineCurrentPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeLineCurrentPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::LineCurrentPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeLineCurrentPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::LineCurrentPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeActiveCurrentPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActiveCurrentPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeActiveCurrentPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActiveCurrentPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeActiveCurrentPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActiveCurrentPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeReactiveCurrentPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ReactiveCurrentPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeReactiveCurrentPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ReactiveCurrentPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeReactiveCurrentPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ReactiveCurrentPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsVoltagePhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltagePhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsVoltagePhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltagePhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsVoltagePhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltagePhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsVoltageMinPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMinPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsVoltageMinPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMinPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsVoltageMinPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMinPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsVoltageMaxPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMaxPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsVoltageMaxPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMaxPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsVoltageMaxPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMaxPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsCurrentPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsCurrentPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsCurrentPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsCurrentMinPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMinPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsCurrentMinPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMinPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsCurrentMinPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMinPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsCurrentMaxPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMaxPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsCurrentMaxPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMaxPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsCurrentMaxPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMaxPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeActivePowerPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeActivePowerPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeActivePowerPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeActivePowerMinPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMinPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeActivePowerMinPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMinPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeActivePowerMinPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMinPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeActivePowerMaxPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMaxPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeActivePowerMaxPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMaxPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeActivePowerMaxPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMaxPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeReactivePowerPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ReactivePowerPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeReactivePowerPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ReactivePowerPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeReactivePowerPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ReactivePowerPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeApparentPowerPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ApparentPowerPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeApparentPowerPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ApparentPowerPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeApparentPowerPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ApparentPowerPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributePowerFactorPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PowerFactorPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributePowerFactorPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PowerFactorPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributePowerFactorPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::PowerFactorPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriodPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriodPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriodPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAverageRmsOverVoltageCounterPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsOverVoltageCounterPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAverageRmsOverVoltageCounterPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                          reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsOverVoltageCounterPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAverageRmsOverVoltageCounterPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsOverVoltageCounterPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAverageRmsUnderVoltageCounterPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounterPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAverageRmsUnderVoltageCounterPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounterPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAverageRmsUnderVoltageCounterPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounterPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsExtremeOverVoltagePeriodPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriodPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsExtremeOverVoltagePeriodPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriodPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsExtremeOverVoltagePeriodPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriodPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsExtremeUnderVoltagePeriodPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriodPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsExtremeUnderVoltagePeriodPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                          reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriodPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsExtremeUnderVoltagePeriodPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriodPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsVoltageSagPeriodPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSagPeriodPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsVoltageSagPeriodPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSagPeriodPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsVoltageSagPeriodPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSagPeriodPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeRmsVoltageSwellPeriodPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSwellPeriodPhaseC::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeRmsVoltageSwellPeriodPhaseCWithParams:(MTRSubscribeParams * _Nonnull)params
                                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSwellPeriodPhaseC::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeRmsVoltageSwellPeriodPhaseCWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSwellPeriodPhaseC::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::GeneratedCommandList::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::GeneratedCommandList::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeGeneratedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::GeneratedCommandList::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcceptedCommandList::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcceptedCommandList::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAcceptedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AcceptedCommandList::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AttributeList::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams * _Nonnull)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AttributeList::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeAttributeListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::AttributeList::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::FeatureMap::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams * _Nonnull)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::FeatureMap::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeFeatureMapWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::FeatureMap::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
+    dispatch_async(self.callbackQueue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams * _Nonnull)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
+    dispatch_async(self.callbackQueue, ^{
+        reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 + (void)readAttributeClusterRevisionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 @end
@@ -13653,56 +10929,16 @@ public:
 }
 - (void)getProfileInfoCommandWithParams:(MTRElectricalMeasurementClusterGetProfileInfoCommandParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    if (params == nil) {
-        params = [[MTRElectricalMeasurementClusterGetProfileInfoCommandParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = ElectricalMeasurement::Commands::GetProfileInfoCommand::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (void)getMeasurementProfileCommandWithParams:(MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    if (params == nil) {
-        params = [[MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = ElectricalMeasurement::Commands::GetMeasurementProfileCommand::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasurementTypeWithParams:(MTRReadParams * _Nullable)params
@@ -14483,21 +11719,9 @@ public:
 }
 @end
 
-@interface MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType &)decodableStruct;
-
-@end
-
 @interface MTRElectricalMeasurementClusterGetProfileInfoCommandParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType &)decodableStruct;
 
 @end
 
@@ -14546,76 +11770,10 @@ public:
 - (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
                                          error:(NSError * __autoreleasing *)error
 {
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    if (error) {
+        *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED];
     }
     return nil;
-}
-
-@end
-
-@implementation MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType &)decodableStruct
-{
-    {
-        self.profileCount = [NSNumber numberWithUnsignedChar:decodableStruct.profileCount];
-    }
-    {
-        self.profileIntervalPeriod = [NSNumber numberWithUnsignedChar:decodableStruct.profileIntervalPeriod];
-    }
-    {
-        self.maxNumberOfIntervals = [NSNumber numberWithUnsignedChar:decodableStruct.maxNumberOfIntervals];
-    }
-    {
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = decodableStruct.listOfAttributes.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                return err;
-            }
-            self.listOfAttributes = array_0;
-        }
-    }
-    return CHIP_NO_ERROR;
 }
 
 @end
@@ -14652,24 +11810,7 @@ public:
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoCommand::Type encodableStruct;
-    ListFreer listFreer;
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
@@ -14738,82 +11879,10 @@ public:
 - (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
                                          error:(NSError * __autoreleasing *)error
 {
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    if (error) {
+        *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED];
     }
     return nil;
-}
-
-@end
-
-@implementation MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType &)decodableStruct
-{
-    {
-        self.startTime = [NSNumber numberWithUnsignedInt:decodableStruct.startTime];
-    }
-    {
-        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
-    }
-    {
-        self.profileIntervalPeriod = [NSNumber numberWithUnsignedChar:decodableStruct.profileIntervalPeriod];
-    }
-    {
-        self.numberOfIntervalsDelivered = [NSNumber numberWithUnsignedChar:decodableStruct.numberOfIntervalsDelivered];
-    }
-    {
-        self.attributeId = [NSNumber numberWithUnsignedShort:decodableStruct.attributeId];
-    }
-    {
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = decodableStruct.intervals.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                return err;
-            }
-            self.intervals = array_0;
-        }
-    }
-    return CHIP_NO_ERROR;
 }
 
 @end
@@ -14859,33 +11928,7 @@ public:
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileCommand::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.attributeId = self.attributeId.unsignedShortValue;
-    }
-    {
-        encodableStruct.startTime = self.startTime.unsignedIntValue;
-    }
-    {
-        encodableStruct.numberOfIntervals = self.numberOfIntervals.unsignedCharValue;
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error

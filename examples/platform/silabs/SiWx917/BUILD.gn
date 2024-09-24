@@ -40,9 +40,6 @@ declare_args() {
   #default Wifi Password
   chip_default_wifi_psk = ""
 
-  # Enable TestEventTrigger in GeneralDiagnostics cluster
-  sl_enable_test_event_trigger = false
-
   # The EnableKey in hex string format used by TestEventTrigger command in
   # GeneralDiagnostics cluster. The length of the string should be 16 bytes.
   sl_test_event_trigger_enable_key = "00112233445566778899AABBCCDDEEFF"
