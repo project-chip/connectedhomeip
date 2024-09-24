@@ -1594,7 +1594,15 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedLi
         bool duplicate = false;
         // skip all wildcard paths and invalid concrete attribute
         if (path1->mValue.IsWildcardPath() ||
-            !emberAfContainsAttribute(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId))
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+            !GetDataModelProvider()
+                 ->GetAttributeInfo(
+                     ConcreteAttributePath(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId))
+                 .has_value()
+#else
+            !emberAfContainsAttribute(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId)
+#endif
+        )
         {
             prev  = path1;
             path1 = path1->mpNext;
