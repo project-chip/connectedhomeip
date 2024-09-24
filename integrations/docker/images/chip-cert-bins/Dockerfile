@@ -195,7 +195,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-rvc-ipv6only \
     --target linux-x64-fabric-bridge-rpc-ipv6only \
     --target linux-x64-fabric-admin-rpc-ipv6only \
-    --target linux-x64-light-data-model-no-unique-id \
+    --target linux-x64-light-data-model-no-unique-id-ipv6only \
     --target linux-x64-network-manager-ipv6only \
     build \
     && mv out/linux-x64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
@@ -219,7 +219,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-rvc-ipv6only/chip-rvc-app out/chip-rvc-app \
     && mv out/linux-x64-fabric-bridge-rpc-ipv6only/fabric-bridge-app out/fabric-bridge-app \
     && mv out/linux-x64-fabric-admin-rpc-ipv6only/fabric-admin out/fabric-admin \
-    && mv out/linux-x64-light-data-model-no-unique-id/chip-lighting-app out/chip-lighting-data-model-no-unique-id-app \
+    && mv out/linux-x64-light-data-model-no-unique-id-ipv6only/chip-lighting-app out/chip-lighting-data-model-no-unique-id-app \
     && mv out/linux-x64-network-manager-ipv6only/matter-network-manager-app out/matter-network-manager-app \
     ;; \
     "linux/arm64")\
@@ -247,7 +247,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-rvc-ipv6only \
     --target linux-arm64-fabric-bridge-rpc-ipv6only \
     --target linux-arm64-fabric-admin-rpc-ipv6only \
-    --target linux-arm64-light-data-model-no-unique-id \
+    --target linux-arm64-light-data-model-no-unique-id-ipv6only \
     --target linux-arm64-network-manager-ipv6only \
     build \
     && mv out/linux-arm64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
@@ -271,7 +271,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-rvc-ipv6only/chip-rvc-app out/chip-rvc-app \
     && mv out/linux-arm64-fabric-bridge-rpc-ipv6only/fabric-bridge-app out/fabric-bridge-app \
     && mv out/linux-arm64-fabric-admin-rpc-ipv6only/fabric-admin out/fabric-admin \
-    && mv out/linux-arm64-light-data-model-no-unique-id/chip-lighting-app out/chip-lighting-data-model-no-unique-id-app \
+    && mv out/linux-arm64-light-data-model-no-unique-id-ipv6only/chip-lighting-app out/chip-lighting-data-model-no-unique-id-app \
     && mv out/linux-arm64-network-manager-ipv6only/matter-network-manager-app out/matter-network-manager-app \
     ;; \
     *) ;; \
