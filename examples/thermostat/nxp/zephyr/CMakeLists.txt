@@ -84,7 +84,6 @@ if(CONFIG_CHIP_OTA_REQUESTOR)
 endif()
 
 chip_configure_data_model(app
-    INCLUDE_SERVER
     ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/../../thermostat/nxp/zap/thermostat_matter_wifi.zap
 )
 

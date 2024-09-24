@@ -88,6 +88,13 @@ private:
     static void ResetActionEventHandler(const AppEvent & event);
 
     /**
+     * @brief This callback schedules a DSLS LIT action (Dynamic SIT LIT Support).
+     *
+     * It is used when the app requests SIT mode (check spec, "Runtime Operating Mode Switching")
+     */
+    static void DSLSActionEventHandler(const AppEvent & event);
+
+    /**
      * @brief This callback performs a factory reset.
      *
      * This is the callback registered with the timer scheduled in ResetActionEventHandler.

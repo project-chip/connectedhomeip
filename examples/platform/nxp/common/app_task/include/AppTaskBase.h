@@ -149,6 +149,8 @@ public:
      */
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
     virtual chip::DeviceLayer::NetworkCommissioning::WiFiDriver * GetWifiDriverInstance(void) = 0;
+#elif CONFIG_CHIP_ETHERNET
+    virtual chip::DeviceLayer::NetworkCommissioning::EthernetDriver * GetEthernetDriverInstance(void) = 0;
 #endif
 
     /**
@@ -176,6 +178,13 @@ public:
     virtual void StopCommissioningHandler(void);
     virtual void SwitchCommissioningStateHandler(void);
     virtual void FactoryResetHandler(void);
+
+    /**
+     * Cluster-handling functions
+     * Must be overridden by a child class per cluster configuration
+     */
+    virtual bool CheckStateClusterHandler(void) { return false; }
+    virtual CHIP_ERROR ProcessSetStateClusterHandler(void) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
 private:
     inline static chip::CommonCaseDeviceServerInitParams initParams;

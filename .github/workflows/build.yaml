@@ -42,7 +42,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:74
+            image: ghcr.io/project-chip/chip-build:77
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -138,7 +138,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:74
+            image: ghcr.io/project-chip/chip-build:77
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -283,7 +283,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:54
+            image: ghcr.io/project-chip/chip-build:77
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -316,9 +316,10 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh 'virtualenv pyenv'
                   source pyenv/bin/activate
-                  pip3 install ./out/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl
-                  pip3 install ./out/controller/python/chip_clusters-0.0-py3-none-any.whl
-                  pip3 install ./out/controller/python/chip_repl-0.0-py3-none-any.whl
+                  python -m ensurepip --upgrade
+                  python -m pip install ./out/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl
+                  python -m pip install ./out/controller/python/chip_clusters-0.0-py3-none-any.whl
+                  python -m pip install ./out/controller/python/chip_repl-0.0-py3-none-any.whl
 
             - name: Run Python tests
               shell: bash
@@ -334,7 +335,8 @@ jobs:
                   scripts/run_in_build_env.sh 'scripts/examples/gn_build_example.sh examples/chip-tool out/'
                   scripts/run_in_build_env.sh 'virtualenv pyenv'
                   source pyenv/bin/activate
-                  pip3 install -r scripts/setup/requirements.setuppayload.txt
+                  python -m ensurepip --upgrade
+                  python -m pip install -r scripts/setup/requirements.setuppayload.txt
                   python3 src/setup_payload/tests/run_python_setup_payload_test.py out/chip-tool
 
     build_linux_python_lighting_device:
@@ -344,7 +346,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:54
+            image: ghcr.io/project-chip/chip-build:77
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -455,7 +457,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:74
+            image: ghcr.io/project-chip/chip-build:77
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"

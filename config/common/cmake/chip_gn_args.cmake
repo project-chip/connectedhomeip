@@ -171,7 +171,7 @@ macro(matter_common_gn_args)
         LIB_PW_RPC
         DEVICE_INFO_EXAMPLE_PROVIDER
         PROJECT_CONFIG
-        
+        DATA_MODEL_INTERFACE
     )
     set(multiValueArgs
         PROJECT_CONFIG_INC_DIR
@@ -203,6 +203,11 @@ macro(matter_common_gn_args)
     if (ARG_DEVICE_INFO_EXAMPLE_PROVIDER)
         matter_add_gn_arg_bool      ("chip_build_example_providers" ${ARG_DEVICE_INFO_EXAMPLE_PROVIDER})
     endif() # ARG_DEVICE_INFO_EXAMPLE_PROVIDER
+
+    if (ARG_DATA_MODEL_INTERFACE)
+        matter_add_gn_arg_string("chip_use_data_model_interface"  "${ARG_DATA_MODEL_INTERFACE}")
+    endif()
+
     if (ARG_PROJECT_CONFIG)
         get_filename_component(PROJECT_CONFIG
             ${ARG_PROJECT_CONFIG}

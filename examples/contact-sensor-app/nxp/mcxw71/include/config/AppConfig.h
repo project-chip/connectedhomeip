@@ -18,8 +18,6 @@
 #pragma once
 
 /* ---- App Config ---- */
-#define APP_DEVICE_TYPE_ENDPOINT 1
-#define APP_CLUSTER_ATTRIBUTE chip::app::Clusters::BooleanState::Attributes::StateValue
 
 /* ---- Button Manager Config ---- */
 #define BUTTON_MANAGER_FACTORY_RESET_TIMEOUT_MS 6000
