@@ -22,19 +22,19 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
 -->
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
   <domain name="General"/>
-  <cluster>
+  <cluster apiMaturity="provisional">
     <domain name="General"/>
     <name>WebRTC Transport Requestor</name>
     <code>0x0554</code>
     <define>WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER</define>
-    <description>The process below SHALL be followed by the server when receiving this command:</description>
+    <description>The WebRTC transport requestor cluster provides a way for stream consumers (e.g. Matter Stream Viewer) to establish a WebRTC connection with a stream provider that implements the WebRTC Transport Provider Cluster</description>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1"/>
     <attribute code="0x0000" side="server" define="CURRENT_SESSIONS" type="array" entryType="WebRTCSessionStruct" default="0">CurrentSessions</attribute>
     <command code="0x01" source="client" name="WebRTCOffer" optional="false">
       <description>This command provides the stream requestor with WebRTC session details.</description>
-      <arg id="1" name="WebRTCSessionID" type="WebRTCSessionID"/>
+      <arg id="1" name="WebRTCSessionID" type="int16u"/>
       <arg id="2" name="SDP" type="char_string"/>
       <arg id="3" name="ICEServers" array="true" type="ICEServerStruct" optional="true"/>
       <arg id="4" name="ICETransportPolicy" type="char_string" optional="true"/>
@@ -42,19 +42,19 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
 
     <command code="0x02" source="client" name="WebRTCAnswer" optional="false">
       <description>This command provides the stream requestor with the WebRTC session details (i.e.</description>
-      <arg id="1" name="WebRTCSessionID" type="WebRTCSessionID"/>
+      <arg id="1" name="WebRTCSessionID" type="int16u"/>
       <arg id="2" name="SDP" type="char_string"/>
     </command>
 
     <command code="0x03" source="client" name="WebRTCICECandidate" optional="false">
       <description>This command provides an ICE candidate to the stream requestor in a WebRTC session.</description>
-      <arg id="1" name="WebRTCSessionID" type="WebRTCSessionID"/>
+      <arg id="1" name="WebRTCSessionID" type="int16u"/>
       <arg id="2" name="ICECandidate" type="char_string"/>
     </command>
 
     <command code="0x04" source="client" name="WebRTCEnd" optional="false">
       <description>This command notifies the stream requestor that the provider has ended the WebRTC session.</description>
-      <arg id="1" name="WebRTCSessionID" type="WebRTCSessionID"/>
+      <arg id="1" name="WebRTCSessionID" type="int16u"/>
       <arg id="2" name="Reason" type="WebRTCEndReasonEnum" min="0x00" max="0x0C"/>
     </command>
 

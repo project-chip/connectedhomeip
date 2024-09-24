@@ -76,7 +76,7 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
 
   <struct name="AudioStreamStruct" apiMaturity="provisional">
     <cluster code="0x0551"/>
-    <item fieldId="0" name="AudioStreamID" type="AudioStreamID"/>
+    <item fieldId="0" name="AudioStreamID" type="int16u"/>
     <item fieldId="1" name="StreamType" type="StreamTypeEnum" min="0x00" max="0x03"/>
     <item fieldId="2" name="AudioCodec" type="AudioCodecEnum" min="0x00" max="0x01"/>
     <item fieldId="3" name="ChannelCount" type="int8u"/>
@@ -84,13 +84,6 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
     <item fieldId="5" name="BitRate" type="int32u"/>
     <item fieldId="6" name="BitDepth" type="int8u"/>
     <item fieldId="7" name="ReferenceCount" type="int8u"/>
-  </struct>
-
-  <struct name="PerStreamStruct" apiMaturity="provisional">
-    <cluster code="0x0551"/>
-    <cluster code="0x0552"/>
-    <item fieldId="0" name="StreamID" type="unit8"/>
-    <item fieldId="1" name="OnOff" type="boolean"/>
   </struct>
 
   <struct name="RateDistortionTradeOffPointsStruct" apiMaturity="provisional">
@@ -109,7 +102,7 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
 
   <struct name="SnapshotStreamStruct" apiMaturity="provisional">
     <cluster code="0x0551"/>
-    <item fieldId="0" name="SnapshotStreamID" type="SnapshotStreamID"/>
+    <item fieldId="0" name="SnapshotStreamID" type="int16u"/>
     <item fieldId="1" name="ImageCodec" type="ImageCodecEnum" min="0x00" max="0x00"/>
     <item fieldId="2" name="FrameRate" type="int16u"/>
     <item fieldId="3" name="BitRate" type="int32u"/>
@@ -130,7 +123,7 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
 
   <struct name="VideoStreamStruct" apiMaturity="provisional">
     <cluster code="0x0551"/>
-    <item fieldId="0" name="VideoStreamID" type="VideoStreamID"/>
+    <item fieldId="0" name="VideoStreamID" type="int16u"/>
     <item fieldId="1" name="StreamType" type="StreamTypeEnum" min="0x00" max="0x03"/>
     <item fieldId="2" name="VideoCodec" type="VideoCodecEnum" min="0x00" max="0x03"/>
     <item fieldId="3" name="MinFrameRate" type="int16u"/>
@@ -153,12 +146,13 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
     <item fieldId="3" name="Y2" type="int16u" default="0"/>
   </struct>
 
-  <cluster>
+  <cluster apiMaturity="provisional">
     <domain name="General"/>
     <name>Camera AV Stream Management</name>
     <code>0x0551</code>
     <define>CAMERA_AV_STREAM_MANAGEMENT_CLUSTER</define>
-    <description/>
+    <description>This cluster is used to allow clients to manage, control, and configure various
+      audio, video, and snapshot streams on a camera.</description>
     <client init="false" tick="false">true</client>
     <features>
       <feature bit="0" code="PRIV" name="Privacy" summary="Privacy supported">
@@ -427,13 +421,13 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
 
     <command code="0x01" source="server" name="AudioStreamAllocateResponse" optional="true" disableDefaultResponse="true">
       <description>This command SHALL be sent by the camera in response to the AudioStreamAllocate command, carrying the newly allocated audio stream identifier.</description>
-      <arg id="0" name="AudioStreamID" type="AudioStreamID"/>
+      <arg id="0" name="AudioStreamID" type="int16u"/>
     </command>
 
     <command code="0x02" source="client" name="AudioStreamDeallocate" optional="true">
       <description>This command SHALL deallocate an audio stream on the camera, corresponding to the given audio stream identifier.</description>
       <access op="invoke" privilege="administer"/>
-      <arg id="0" name="AudioStreamID" type="AudioStreamID"/>
+      <arg id="0" name="AudioStreamID" type="int16u"/>
     </command>
 
     <command code="0x03" source="client" name="VideoStreamAllocate" optional="true" response="VideoStreamAllocateResponse">
@@ -453,20 +447,20 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
 
     <command code="0x04" source="server" name="VideoStreamAllocateResponse" optional="true" disableDefaultResponse="true">
       <description>This command SHALL be sent by the camera in response to the VideoStreamAllocate command, carrying the newly allocated video stream identifier.</description>
-      <arg id="0" name="VideoStreamID" type="VideoStreamID"/>
+      <arg id="0" name="VideoStreamID" type="int16u"/>
     </command>
 
     <command code="0x05" source="client" name="VideoStreamModify" optional="true">
       <description>This command SHALL be used to modify the resolution of a stream specified by the VideoStreamID.</description>
       <access op="invoke" privilege="administer"/>
-      <arg id="0" name="VideoStreamID" type="VideoStreamID"/>
+      <arg id="0" name="VideoStreamID" type="int16u"/>
       <arg id="1" name="Resolution" type="DimensionStruct"/>
     </command>
 
     <command code="0x06" source="client" name="VideoStreamDeallocate" optional="true">
       <description>This command SHALL deallocate a video stream on the camera, corresponding to the given video stream identifier.</description>
       <access op="invoke" privilege="administer"/>
-      <arg id="0" name="VideoStreamID" type="VideoStreamID"/>
+      <arg id="0" name="VideoStreamID" type="int16u"/>
     </command>
 
     <command code="0x07" source="client" name="SnapshotStreamAllocate" optional="true" response="SnapshotStreamAllocateResponse">
@@ -482,13 +476,13 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
 
     <command code="0x08" source="server" name="SnapshotStreamAllocateResponse" optional="true" disableDefaultResponse="true">
       <description>This command SHALL be sent by the device in response to the SnapshotStreamAllocate command, carrying the newly allocated snapshot stream identifier.</description>
-      <arg id="0" name="SnapshotStreamID" type="SnapshotStreamID"/>
+      <arg id="0" name="SnapshotStreamID" type="int16u"/>
     </command>
 
     <command code="0x09" source="client" name="SnapshotStreamDeallocate" optional="true">
       <description>This command SHALL deallocate an snapshot stream on the camera, corresponding to the given snapshot stream identifier.</description>
       <access op="invoke" privilege="administer"/>
-      <arg id="0" name="SnapshotStreamID" type="SnapshotStreamID"/>
+      <arg id="0" name="SnapshotStreamID" type="int16u"/>
     </command>
 
     <command code="0x0A" source="client" name="SetStreamPriority" optional="false">
@@ -499,7 +493,7 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
     <command code="0x0B" source="client" name="CaptureSnapshot" optional="true">
       <description>This command SHALL return a Snapshot from the camera.</description>
       <access op="invoke" privilege="administer"/>
-      <arg id="0" name="SnapshotStreamID" type="SnapshotStreamID"/>
+      <arg id="0" name="SnapshotStreamID" type="int16u"/>
       <arg id="1" name="RequestedResolution" type="DimensionStruct"/>
     </command>
 
@@ -531,7 +525,7 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
     </command>
 
     <event code="0x0000" name="VideoStreamChanged" priority="info" side="server" optional="true">
-      <field id="0" name="VideoStreamID" type="VideoStreamID"/>
+      <field id="0" name="VideoStreamID" type="int16u"/>
       <field id="1" name="StreamType" type="StreamTypeEnum" optional="true" min="0x00" max="0x03"/>
       <field id="2" name="VideoCodec" type="VideoCodecEnum" optional="true" min="0x00" max="0x03"/>
       <field id="3" name="MinFrameRate" type="int16u" optional="true"/>
@@ -546,7 +540,7 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
     </event>
 
     <event code="0x0001" name="AudioStreamChanged" priority="info" side="server" optional="true">
-      <field id="0" name="AudioStreamID" type="AudioStreamID"/>
+      <field id="0" name="AudioStreamID" type="int16u"/>
       <field id="1" name="StreamType" type="StreamTypeEnum" optional="true" min="0x00" max="0x03"/>
       <field id="2" name="AudioCodec" type="AudioCodecEnum" optional="true" min="0x00" max="0x01"/>
       <field id="3" name="ChannelCount" type="int8u" optional="true"/>
@@ -557,7 +551,7 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
     </event>
 
     <event code="0x0002" name="SnapshotStreamChanged" priority="info" side="server" optional="true">
-      <field id="0" name="SnapshotStreamID" type="SnapshotStreamID"/>
+      <field id="0" name="SnapshotStreamID" type="int16u"/>
       <field id="1" name="ImageCodec" type="ImageCodecEnum" optional="true" min="0x00" max="0x00"/>
       <field id="2" name="FrameRate" type="int16u" optional="true"/>
       <field id="3" name="BitRate" type="int32u" optional="true"/>

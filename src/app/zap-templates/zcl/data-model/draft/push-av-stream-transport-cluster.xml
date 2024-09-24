@@ -82,7 +82,7 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
 
   <struct name="PushAVStreamConfigurationStruct" apiMaturity="provisional">
     <cluster code="0x0555"/>
-    <item fieldId="0" name="ConnectionID" type="PushTransportConnectionID"/>
+    <item fieldId="0" name="ConnectionID" type="int16u"/>
     <item fieldId="1" name="StreamTransportStatus" type="PushAVStreamTransportStatusEnum" min="0x00" max="0x01"/>
     <item fieldId="2" name="StreamTransportOptions" type="PushAVStreamTransportOptionsStruct"/>
   </struct>
@@ -117,9 +117,9 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
   <struct name="PushAVStreamTransportOptionsStruct" apiMaturity="provisional">
     <cluster code="0x0555"/>
     <item fieldId="0" name="StreamType" type="StreamTypeEnum" min="0x00" max="0x03"/>
-    <item fieldId="1" name="VideoStreamID" type="VideoStreamID" isNullable="true" optional="true"/>
-    <item fieldId="2" name="AudioStreamID" type="AudioStreamID" isNullable="true" optional="true"/>
-    <item fieldId="3" name="TLSEndpointID" type="TLSEndpointID"/>
+    <item fieldId="1" name="VideoStreamID" type="int16u" isNullable="true" optional="true"/>
+    <item fieldId="2" name="AudioStreamID" type="int16u" isNullable="true" optional="true"/>
+    <item fieldId="3" name="TLSEndpointID" type="int16u"/>
     <item fieldId="4" name="URL" type="long_char_string" length="256"/>
     <item fieldId="5" name="TriggerOptions" type="PushAVStreamTransportTriggerOptionsStruct"/>
     <item fieldId="6" name="ContainerFormat" type="PushAVStreamTransportContainerFormatEnum" min="0x00" max="0x00"/>
@@ -132,7 +132,7 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
   <struct name="PushAVStreamTransportTriggerOptionsStruct" apiMaturity="provisional">
     <cluster code="0x0555"/>
     <item fieldId="0" name="TriggerType" type="PushAVStreamTransportTriggerTypeEnum" min="0x00" max="0x02"/>
-    <item fieldId="1" name="MotionZones" array="true" type="ZoneID" isNullable="true" optional="true"/>
+    <item fieldId="1" name="MotionZones" array="true" type="int16u" isNullable="true" optional="true"/>
     <item fieldId="2" name="MotionSensitivity" type="int8u" isNullable="true" optional="true" default="5" min="1" max="10"/>
     <item fieldId="3" name="MotionTimeControl" type="PushAVStreamTransportMotionTriggerTimeControlStruct" isNullable="true" optional="true"/>
     <item fieldId="4" name="ActivationReason" type="PushAVStreamTransportTriggerActivationReasonEnum" isNullable="true" optional="true" min="0x00" max="0x02"/>
@@ -143,13 +143,13 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
     <name>Push AV Stream Transport</name>
     <code>0x0555</code>
     <define>PUSH_AV_STREAM_TRANSPORT_CLUSTER</define>
-    <description/>
+    <description>This cluster implements the upload of Audio and Video streams from the Camera AV Stream Management Cluster using suitable push-based transports.</description>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1"/>
     <attribute code="0x0000" side="server" define="SUPPORTED_CONTAINER_FORMATS" type="PushAVStreamTransportSupportedContainerFormatsBitmap" min="0x00" max="0x01">SupportedContainerFormats</attribute>
     <attribute code="0x0001" side="server" define="SUPPORTED_INGEST_METHODS" type="PushAVStreamTransportSupportedIngestMethodsBitmap" min="0x00" max="0x01">SupportedIngestMethods</attribute>
-    <attribute code="0x0002" side="server" define="CURRENT_CONNECTIONS" type="array" entryType="PushTransportConnectionID" default="0">CurrentConnections</attribute>
+    <attribute code="0x0002" side="server" define="CURRENT_CONNECTIONS" type="array" entryType="int16u" default="0">CurrentConnections</attribute>
     <command code="0x00" source="client" name="AllocatePushTransport" optional="false" response="AllocatePushTransportResponse">
       <description>This command SHALL allocate a transport and return a PushTransportConnectionID.</description>
       <access op="invoke" privilege="administer"/>
@@ -158,7 +158,7 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
 
     <command code="0x01" source="server" name="AllocatePushTransportResponse" optional="false" disableDefaultResponse="true">
       <description>This command SHALL be generated in response to an AllocatePushTransport command.</description>
-      <arg id="0" name="ConnectionID" type="PushTransportConnectionID"/>
+      <arg id="0" name="ConnectionID" type="int16u"/>
       <arg id="1" name="StreamTransportOptions" type="PushAVStreamTransportOptionsStruct"/>
       <arg id="2" name="TransportStatus" type="PushAVStreamTransportStatusEnum" min="0x00" max="0x01"/>
     </command>
@@ -166,27 +166,27 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
     <command code="0x02" source="client" name="DeallocatePushTransport" optional="false">
       <description>This command SHALL be generated to request the Node deallocates the specified transport.</description>
       <access op="invoke" privilege="administer"/>
-      <arg id="0" name="ConnectionID" type="PushTransportConnectionID"/>
+      <arg id="0" name="ConnectionID" type="int16u"/>
     </command>
 
     <command code="0x03" source="client" name="ModifyPushTransport" optional="false">
       <description>This command is used to request the Node modifies the configuration of the specified push transport.</description>
       <access op="invoke" privilege="administer"/>
-      <arg id="0" name="ConnectionID" type="PushTransportConnectionID"/>
+      <arg id="0" name="ConnectionID" type="int16u"/>
       <arg id="1" name="StreamTransportOptions" type="PushAVStreamTransportOptionsStruct"/>
     </command>
 
     <command code="0x04" source="client" name="SetTransportStatus" optional="false">
       <description>This command SHALL be generated to request the Node modifies the Transport Status of the transport.</description>
       <access op="invoke" privilege="administer"/>
-      <arg id="0" name="ConnectionID" type="PushTransportConnectionID" isNullable="true"/>
+      <arg id="0" name="ConnectionID" type="int16u" isNullable="true"/>
       <arg id="1" name="StreamTransportStatus" type="PushAVStreamTransportStatusEnum" min="0x00" max="0x01"/>
     </command>
 
     <command code="0x05" source="client" name="ManuallyTriggerTransport" optional="false">
       <description>This command SHALL be generated to request the Node to manually start the specified push transport.</description>
       <access op="invoke" privilege="administer"/>
-      <arg id="0" name="ConnectionID" type="PushTransportConnectionID"/>
+      <arg id="0" name="ConnectionID" type="int16u"/>
       <arg id="1" name="ActivationReason" type="PushAVStreamTransportTriggerActivationReasonEnum" isNullable="true" min="0x00" max="0x02"/>
       <arg id="2" name="TimeControl" type="PushAVStreamTransportMotionTriggerTimeControlStruct" optional="true" isNullable="true"/>
     </command>
@@ -194,7 +194,7 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
     <command code="0x06" source="client" name="FindStreamConfiguration" optional="false" response="FindStreamConfigurationResponse">
       <description>This command SHALL return the Stream Options Configuration for the specified push transport.</description>
       <access op="invoke" privilege="administer"/>
-      <arg id="0" name="ConnectionID" type="PushTransportConnectionID" optional="true" isNullable="true"/>
+      <arg id="0" name="ConnectionID" type="int16u" optional="true" isNullable="true"/>
     </command>
 
     <command code="0x07" source="server" name="FindStreamConfigurationResponse" optional="false" disableDefaultResponse="true">
@@ -207,7 +207,7 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
     </event>
 
     <event code="0x0001" name="PushTransportEnd" priority="info" side="server">
-      <field id="0" name="ConnectionID" type="PushTransportConnectionID"/>
+      <field id="0" name="ConnectionID" type="int16u"/>
       <field id="1" name="TriggerDetails" type="PushAVStreamTransportTriggerOptionsStruct"/>
       <description>This event SHALL indicate a push transport transmission has ended.</description>
     </event>

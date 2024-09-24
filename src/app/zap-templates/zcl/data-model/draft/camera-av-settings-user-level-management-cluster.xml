@@ -35,7 +35,7 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
     <name>Camera AV Settings User Level Management</name>
     <code>0x0552</code>
     <define>CAMERA_AV_SETTINGS_USER_LEVEL_MANAGEMENT_CLUSTER</define>
-    <description/>
+    <description>This cluster provides an interface into controls associated with the operation of a device that provides pan, tilt, and zoom functions, either mechanically, or against a digital image.</description>
     <client init="false" tick="false">true</client>
     <features>
       <feature bit="0" code="MPTZ" name="MechanicalPTZ" summary="Mechanical PTZ supported">
@@ -71,13 +71,13 @@ Git: 0.7-fall2024-ncr-1155-g78ec59e8a-dirty
 
     <command code="0x03" source="client" name="DptzSetViewport" optional="true">
       <description>This command SHALL set the viewport in the digital PTZ for a specific Video Stream.</description>
-      <arg id="0" name="VideoStreamID" type="VideoStreamID"/>
+      <arg id="0" name="VideoStreamID" type="int16u"/>
       <arg id="1" name="Viewport" type="ViewportStruct"/>
     </command>
 
     <command code="0x04" source="client" name="DptzRelativeMove" optional="true">
       <description>This command SHALL change the viewports location by the amount specified in a relative fashion.</description>
-      <arg id="0" name="VideoStreamID" type="VideoStreamID"/>
+      <arg id="0" name="VideoStreamID" type="int16u"/>
       <arg id="1" name="Pan" type="int16s" default="0"/>
       <arg id="2" name="Tilt" type="int16s" default="0"/>
       <arg id="3" name="Zoom" type="int8s" default="0" min="-100" max="100"/>

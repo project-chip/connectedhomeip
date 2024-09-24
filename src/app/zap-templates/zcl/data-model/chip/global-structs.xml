@@ -17,7 +17,6 @@ limitations under the License.
 
 <configurator>
   <domain name="CHIP"/>
-
   <struct name="AtomicAttributeStatusStruct">
     <item fieldId="0" name="AttributeID" type="attrib_id" />
     <item fieldId="1" name="StatusCode" type="status"/>
@@ -30,20 +29,37 @@ limitations under the License.
   </struct>
 
   <struct name="WebRTCSessionStruct" apiMaturity="provisional">
-    <item fieldId="1" name="ID" type="WebRTCSessionID"/>
+    <cluster code="0x0553"/>
+    <cluster code="0x0554"/>
+    <item fieldId="1" name="ID" type="int16u"/>
     <item fieldId="2" name="PeerNodeId" type="node_id"/>
     <item fieldId="3" name="PeerFabricIndex" type="fabric_idx"/>
     <item fieldId="4" name="StreamType" type="StreamTypeEnum" min="0x00" max="0x03"/>
-    <item fieldId="5" name="VideoStreamID" type="VideoStreamID" isNullable="true"/>
-    <item fieldId="6" name="AudioStreamID" type="AudioStreamID" isNullable="true"/>
+    <item fieldId="5" name="VideoStreamID" type="int16u" isNullable="true"/>
+    <item fieldId="6" name="AudioStreamID" type="int16u" isNullable="true"/>
     <item fieldId="7" name="MetadataOptions" type="WebRTCMetadataOptions" default="0x00" min="0x00" max="0x01"/>
   </struct>
 
+  <struct name="ICEServerStruct" apiMaturity="provisional">
+    <cluster code="0x0553"/>
+    <cluster code="0x0554"/>
+    <item fieldId="1" name="urls" array="true" type="char_string"/>
+    <item fieldId="2" name="username" type="char_string" optional="true"/>
+    <item fieldId="3" name="credential" type="char_string" optional="true"/>
+    <item fieldId="4" name="CAID" type="int16u" optional="true"/>
+  </struct>
+
+  <struct name="PerStreamStruct" apiMaturity="provisional">
+    <cluster code="0x0551"/>
+    <cluster code="0x0552"/>
+    <item fieldId="0" name="StreamID" type="int16u"/>
+    <item fieldId="1" name="OnOff" type="boolean"/>
+  </struct>
   <!--
     These are test global items (no cluster attached) for testing only.
     Their usage is defined for UnitTestCluster only.
   -->
-  
+
   <struct name="TestGlobalStruct">
     <item fieldId="0" name="Name" type="char_string" length="128" isNullable="false" optional="false"/>
     <item fieldId="1" name="MyBitmap" type="TestGlobalBitmap" isNullable="true" optional="false"/>
