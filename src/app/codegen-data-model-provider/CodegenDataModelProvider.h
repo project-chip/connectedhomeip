@@ -20,6 +20,7 @@
 #include <app/data-model-provider/Provider.h>
 
 #include <app/util/af-types.h>
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -63,11 +64,23 @@ private:
 
         /// Checks if the given command id exists in the given list
         bool Exists(const CommandId * list, CommandId toCheck);
+
+        void Reset()
+        {
+            mCurrentList = nullptr;
+            mCurrentHint = nullptr;
+        }
     };
 
 public:
     /// Generic model implementations
-    CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR Shutdown() override
+    {
+        mAcceptedCommandsIterator.Reset();
+        mGeneratedCommandsIterator.Reset();
+        mPreviouslyFoundCluster = std::nullopt;
+        return CHIP_NO_ERROR;
+    }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
