@@ -26,6 +26,8 @@ extern "C" {
 #include "board_comp.h"
 }
 
+#include <app/icd/server/ICDServerConfig.h>
+
 /**
  * @brief Timeout (ms) for factory data reset action.
  *
@@ -110,7 +112,25 @@ void chip::NXP::App::ButtonBle::HandleLongPress()
 
 void chip::NXP::App::ButtonBle::HandleDoubleClick()
 {
-    /* Currently not mapped to any action */
+#if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
+    static bool sitModeRequested = false;
+
+    if (chip::DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
+    {
+        if (!sitModeRequested)
+        {
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(
+                [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification(); }, 0);
+            sitModeRequested = true;
+        }
+        else
+        {
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(
+                [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal(); }, 0);
+            sitModeRequested = false;
+        }
+    }
+#endif
 }
 
 void chip::NXP::App::ButtonBle::HandleTimerExpire()

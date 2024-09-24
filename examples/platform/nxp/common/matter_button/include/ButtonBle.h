@@ -32,7 +32,7 @@ namespace chip::NXP::App {
  * |              | reset is not scheduled, switch to ICD active mode. |
  * |              | Otherwise, switch commissioning state.             |
  * | Long press   | Schedule a factory reset                           |
- * | Double click | Do nothing                                         |
+ * | Double click | Toggle SIT mode request through DSLS mechanism     |
  *
  */
 class ButtonBle : public ButtonWithTimer
