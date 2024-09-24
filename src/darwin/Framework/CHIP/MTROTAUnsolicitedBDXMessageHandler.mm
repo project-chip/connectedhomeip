@@ -56,7 +56,7 @@ void MTROTAUnsolicitedBDXMessageHandler::ControllerShuttingDown(MTRDeviceControl
 }
 
 CHIP_ERROR MTROTAUnsolicitedBDXMessageHandler::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, const SessionHandle & session,
-    ExchangeDelegate *  _Nonnull & newDelegate)
+    ExchangeDelegate * _Nonnull & newDelegate)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -65,14 +65,12 @@ CHIP_ERROR MTROTAUnsolicitedBDXMessageHandler::OnUnsolicitedMessageReceived(cons
 
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    if (GetNumberOfDelegates() >= 1)
-    {
+    if (GetNumberOfDelegates() >= 1) {
         return CHIP_ERROR_BUSY;
     }
 
     // Only proceed if there is a valid fabric index for the SessionHandle.
-    if (session->IsSecureSession() && session->AsSecureSession() != nullptr && session->AsSecureSession()->GetFabricIndex() != kUndefinedFabricIndex)
-    {
+    if (session->IsSecureSession() && session->AsSecureSession() != nullptr && session->AsSecureSession()->GetFabricIndex() != kUndefinedFabricIndex) {
         // If we receive a ReceiveInit BDX message, create a new MTROTAImageTransferHandler and register it
         // as the handler for all BDX messages that will come over this exchange and increment the number of delegates.
         if (payloadHeader.HasMessageType(MessageType::ReceiveInit)) {

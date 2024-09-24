@@ -33,10 +33,12 @@ NS_ASSUME_NONNULL_BEGIN
  * returns CHIP_ERROR_INCORRECT_STATE.
  *
  */
-class MTROTAUnsolicitedBDXMessageHandler : public chip::Messaging::UnsolicitedMessageHandler
-{
+class MTROTAUnsolicitedBDXMessageHandler : public chip::Messaging::UnsolicitedMessageHandler {
 public:
-    MTROTAUnsolicitedBDXMessageHandler() : mExchangeMgr(nullptr) {}
+    MTROTAUnsolicitedBDXMessageHandler()
+        : mExchangeMgr(nullptr)
+    {
+    }
     ~MTROTAUnsolicitedBDXMessageHandler() { mExchangeMgr = nullptr; }
 
     CHIP_ERROR Init(chip::Messaging::ExchangeManager * exchangeManager);
@@ -50,14 +52,13 @@ public:
     // Decrease the number of delegates handling BDX transfers by 1.
     static void DecrementNumberOfDelegates();
 
-   void Shutdown();
+    void Shutdown();
 
-   void ControllerShuttingDown(MTRDeviceController * controller);
+    void ControllerShuttingDown(MTRDeviceController * controller);
 
 private:
-
     CHIP_ERROR OnUnsolicitedMessageReceived(const chip::PayloadHeader & payloadHeader, const chip::SessionHandle & session,
-                                            chip::Messaging::ExchangeDelegate * _Nonnull & newDelegate) override;
+        chip::Messaging::ExchangeDelegate * _Nonnull & newDelegate) override;
 
     void OnExchangeCreationFailed(chip::Messaging::ExchangeDelegate * _Nonnull delegate) override;
 

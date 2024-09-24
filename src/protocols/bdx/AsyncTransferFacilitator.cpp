@@ -39,9 +39,7 @@ void AsyncTransferFacilitator::CleanUp()
         this);
 }
 
-AsyncTransferFacilitator::~AsyncTransferFacilitator()
-{
-}
+AsyncTransferFacilitator::~AsyncTransferFacilitator() {}
 
 bdx::StatusCode AsyncTransferFacilitator::GetBdxStatusCodeFromChipError(CHIP_ERROR err)
 {
@@ -57,9 +55,10 @@ bdx::StatusCode AsyncTransferFacilitator::GetBdxStatusCodeFromChipError(CHIP_ERR
 }
 
 /**
- * Calls the GetNextAction on the TransferSession to get the next output events until it receives TransferSession::OutputEventType::kNone
- * If the output event is of type TransferSession::OutputEventType::kMsgToSend, it sends the message over the exchange context, otherwise it
- * calls the HandleTransferSessionOutput method implemented by the subclass to handle the BDX message.
+ * Calls the GetNextAction on the TransferSession to get the next output events until it receives
+ * TransferSession::OutputEventType::kNone If the output event is of type TransferSession::OutputEventType::kMsgToSend, it sends the
+ * message over the exchange context, otherwise it calls the HandleTransferSessionOutput method implemented by the subclass to
+ * handle the BDX message.
  */
 void AsyncTransferFacilitator::HandleNextOutputEvents()
 {
@@ -92,7 +91,8 @@ void AsyncTransferFacilitator::HandleNextOutputEvents()
     mHandlingOutputEvents = false;
 }
 
-CHIP_ERROR AsyncTransferFacilitator::SendMessage(const TransferSession::MessageTypeData msgTypeData, System::PacketBufferHandle & msgBuf)
+CHIP_ERROR AsyncTransferFacilitator::SendMessage(const TransferSession::MessageTypeData msgTypeData,
+                                                 System::PacketBufferHandle & msgBuf)
 {
     VerifyOrReturnError(mExchange, CHIP_ERROR_INCORRECT_STATE);
 
@@ -138,7 +138,6 @@ CHIP_ERROR AsyncTransferFacilitator::OnMessageReceived(Messaging::ExchangeContex
         // This should notify the tranfer object to abort transfer so it can send a status report across the exchange
         // when we call HandleNextOutputEvents below.
         mTransfer.AbortTransfer(AsyncResponder::GetBdxStatusCodeFromChipError(err));
-
     }
     else if (!payloadHeader.HasMessageType(MessageType::BlockAckEOF))
     {
@@ -171,7 +170,7 @@ CHIP_ERROR AsyncResponder::PrepareForTransfer(System::Layer * layer, Messaging::
     VerifyOrReturnError(!mExchange, CHIP_ERROR_INCORRECT_STATE);
 
     mSystemLayer = layer;
-    mTimeout = timeout;
+    mTimeout     = timeout;
 
     ReturnErrorOnFailure(mTransfer.WaitForTransfer(role, xferControlOpts, maxBlockSize, mTimeout));
 
@@ -195,7 +194,8 @@ void AsyncResponder::NotifyEventHandled(TransferSession::OutputEvent & event, CH
         return;
     }
 
-    // If there was an error handling the output event, this should notify the tranfer object to abort transfer so it can send a status report
+    // If there was an error handling the output event, this should notify the tranfer object to abort transfer so it can send a
+    // status report
     //  across the exchange when we call HandleNextOutputEvents below.
     if (error != CHIP_NO_ERROR)
     {

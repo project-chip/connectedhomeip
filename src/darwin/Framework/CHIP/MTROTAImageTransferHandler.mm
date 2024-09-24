@@ -65,7 +65,6 @@ MTROTAImageTransferHandler::~MTROTAImageTransferHandler()
     MTROTAUnsolicitedBDXMessageHandler::DecrementNumberOfDelegates();
 }
 
-
 CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(TransferSession::OutputEvent & event)
 {
     assertChipStackLockedByCurrentThread();
@@ -291,8 +290,8 @@ void MTROTAImageTransferHandler::HandleTransferSessionOutput(TransferSession::Ou
     case TransferSession::OutputEventType::kQueryReceived:
         err = OnBlockQuery(event);
         if (err != CHIP_NO_ERROR) {
-                LogErrorOnFailure(err);
-                AsyncResponder::NotifyEventHandled(event, err);
+            LogErrorOnFailure(err);
+            AsyncResponder::NotifyEventHandled(event, err);
         }
         break;
     case TransferSession::OutputEventType::kNone:

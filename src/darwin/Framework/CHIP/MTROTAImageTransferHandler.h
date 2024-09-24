@@ -46,8 +46,8 @@ protected:
                                  chip::System::PacketBufferHandle && payload) override;
 
 private:
-    CHIP_ERROR PrepareForTransfer(chip::System::Layer * layer, chip::Messaging::ExchangeContext * exchangeCtx, chip::FabricIndex fabricIndex,
-                                  chip::NodeId nodeId);
+    CHIP_ERROR PrepareForTransfer(chip::System::Layer * layer, chip::Messaging::ExchangeContext * exchangeCtx,
+                                  chip::FabricIndex fabricIndex, chip::NodeId nodeId);
 
     CHIP_ERROR ConfigureState(chip::FabricIndex fabricIndex, chip::NodeId nodeId);
 
@@ -67,7 +67,7 @@ private:
 
     // The OTA provider delegate used by the controller.
     id<MTROTAProviderDelegate> mDelegate = nil;
-    chip::System::Layer * mSystemLayer = nil;
+    chip::System::Layer * mSystemLayer   = nil;
 
     // The OTA provider delegate queue used by the controller.
     dispatch_queue_t mDelegateNotificationQueue = nil;

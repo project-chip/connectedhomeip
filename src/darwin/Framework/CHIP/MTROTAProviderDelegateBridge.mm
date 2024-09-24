@@ -33,8 +33,8 @@
 #include <MTRError_Internal.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/LockTracker.h>
-#include <protocols/bdx/BdxUri.h>
 #include <protocols/bdx/AsyncTransferFacilitator.h>
+#include <protocols/bdx/BdxUri.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -92,7 +92,6 @@ void MTROTAProviderDelegateBridge::ControllerShuttingDown(MTRDeviceController_Co
 
     mOtaUnsolicitedBDXMsgHandler.ControllerShuttingDown(controller);
 }
-
 
 namespace {
 // Return false if we could not get peer node info (a running controller for
