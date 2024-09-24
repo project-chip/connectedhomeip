@@ -1072,8 +1072,11 @@ template("efr32_sdk") {
       ":efr32_mbedtls_config",
       "${segger_rtt_root}:segger_rtt",
       "${segger_rtt_root}:segger_rtt_printf",
-      "${segger_rtt_root}:segger_rtt_syscalls",
     ]
+
+    if (!sl_uart_log_output) {
+      public_deps += [ "${segger_rtt_root}:segger_rtt_syscalls" ]
+    }
 
     if (defined(invoker.sources)) {
       sources += invoker.sources
