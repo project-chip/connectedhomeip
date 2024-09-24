@@ -82,7 +82,10 @@ public:
     /**
      * Get the action at the Nth index from list of actions.
      * @param index The index of the action to be returned. It is assumed that actions are indexable from 0 and with no gaps.
-     * @param action A reference to the action struct which copies existing and initialised buffer at index.
+     * @param action A reference to the action struct which copies existing initialised buffer at index.
+     *               Name field (CharSpan) of ActionStruct contails the name of an action.
+     *               The underlying data must remain allocated throughout the lifetime of the device,
+     *               as the API does not make a copy.
      * @return Returns a CHIP_NO_ERROR if there was no error and the action was returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index in beyond the list of available actions.
      */
@@ -91,7 +94,10 @@ public:
     /**
      * Get the EndpointList at the Nth index from list of endpointList.
      * @param index The index of the endpointList to be returned. It is assumed that actions are indexable from 0 and with no gaps.
-     * @param epList A reference to the endpointList struct which copies existing and initialised buffer at index.
+     * @param epList A reference to the endpointList struct which copies existing initialised buffer at index.
+     *               Name field (CharSpan) of EndpointList contails the name of an endpointList.
+     *               The underlying data must remain allocated throughout the lifetime of the device,
+     *               as the API does not make a copy.
      * @return Returns a CHIP_NO_ERROR if there was no error and the epList was returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index in beyond the list of available endpointList.
      */
