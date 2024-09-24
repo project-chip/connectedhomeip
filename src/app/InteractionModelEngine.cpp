@@ -24,6 +24,7 @@
  */
 
 #include "InteractionModelEngine.h"
+#include "lib/support/logging/TextOnlyLogging.h"
 
 #include <cinttypes>
 
@@ -516,6 +517,13 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
         {
             ConcreteAttributePath concretePath(paramsList.mValue.mEndpointId, paramsList.mValue.mClusterId,
                                                paramsList.mValue.mAttributeId);
+
+// "check" method to ensure DM interface and ember interface are identical
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE && CHIP_CONFIG_USE_EMBER_DATA_MODEL
+            VerifyOrDie(GetDataModelProvider()->GetAttributeInfo(concretePath).has_value() ==
+                        ConcreteAttributePathExists(concretePath));
+#endif
+
             if (
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
                 GetDataModelProvider()->GetAttributeInfo(concretePath).has_value()
@@ -1753,9 +1761,18 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    // DO NOT SUBMIT!!!
+    ChipLogProgress(InteractionModel, "!! TEST: 0x%08x / 0x%08x / 0x%08X", aCommandPath.mEndpointId, aCommandPath.mClusterId,
+                    aCommandPath.mCommandId);
+    auto em = ServerClusterCommandExists(aCommandPath);
+    ChipLogProgress(InteractionModel, "!!   EMBER:   %s",  Protocols::InteractionModel::StatusName(em));
+
     auto provider = GetDataModelProvider();
     if (provider->GetAcceptedCommandInfo(aCommandPath).has_value())
     {
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+        VerifyOrDie(ServerClusterCommandExists(aCommandPath) == Protocols::InteractionModel::Status::Success);
+#endif
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -1763,7 +1780,10 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const 
     //
     if (provider->GetClusterInfo(aCommandPath).has_value())
     {
-        return Protocols::InteractionModel::Status::InvalidCommand; // cluster exists, so command is invalid
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+        VerifyOrDie(ServerClusterCommandExists(aCommandPath) == Protocols::InteractionModel::Status::UnsupportedCommand);
+#endif
+        return Protocols::InteractionModel::Status::UnsupportedCommand; // cluster exists, so command is invalid
     }
 
     // at ths point either cluster or endpoint does not exist. If we find the endpoint, then the cluster
@@ -1773,12 +1793,18 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const 
     {
         if (endpoint == aCommandPath.mEndpointId)
         {
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+            VerifyOrDie(ServerClusterCommandExists(aCommandPath) == Protocols::InteractionModel::Status::UnsupportedCluster);
+#endif
             // endpoint exists, so cluster is invalid
             return Protocols::InteractionModel::Status::UnsupportedCluster;
         }
     }
 
     // endpoint not found
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+    VerifyOrDie(ServerClusterCommandExists(aCommandPath) == Protocols::InteractionModel::Status::UnsupportedEndpoint);
+#endif
     return Protocols::InteractionModel::Status::UnsupportedEndpoint;
 #else
     return ServerClusterCommandExists(aCommandPath);

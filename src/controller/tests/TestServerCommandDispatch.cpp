@@ -15,13 +15,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file implements unit tests for CHIP Interaction Model Command Interaction
- *
- */
-
+#include "app/codegen-data-model-provider/CodegenDataModelProvider.h"
+#include "app/codegen-data-model-provider/Instance.h"
+#include "app/tests/test-interaction-model-api.h"
+#include "lib/core/CHIPError.h"
+#include "lib/core/DataModelTypes.h"
+#include <optional>
 #include <pw_unit_test/framework.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -129,9 +128,33 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
 
 namespace {
 
+class DispatchTestDataModel : public CodegenDataModelProvider
+{
+public:
+    static DispatchTestDataModel & Instance()
+    {
+        static DispatchTestDataModel instance;
+        return instance;
+    }
+};
+
 class TestServerCommandDispatch : public chip::Test::AppContext
 {
+public:
+    void SetUp()
+    {
+        AppContext::SetUp();
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&DispatchTestDataModel::Instance());
+    }
+    void TearDown()
+    {
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+        AppContext::TearDown();
+    }
+
 protected:
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
+
     void TestDataResponseHelper(const EmberAfEndpointType * aEndpoint, bool aExpectSuccess);
 };
 

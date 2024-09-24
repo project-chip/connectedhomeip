@@ -17,14 +17,17 @@
  */
 
 #include "DataModelFixtures.h"
-#include "app/data-model-provider/ActionReturnStatus.h"
 
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/logging/TextOnlyLogging.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/InteractionModelEngine.h>
 #include <app/codegen-data-model-provider/Instance.h>
+#include <optional>
 
 using namespace chip;
 using namespace chip::app;
@@ -485,7 +488,7 @@ Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCom
     // Mock cluster catalog, only support commands on one cluster on one endpoint.
     using Protocols::InteractionModel::Status;
 
-    if (aCommandPath.mEndpointId != kTestEndpointId)
+    if (aCommandPath.mEndpointId != DataModelTests::kTestEndpointId)
     {
         return Status::UnsupportedEndpoint;
     }
@@ -665,7 +668,8 @@ ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest &
 std::optional<ActionReturnStatus> CustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                                                           CommandHandler * handler)
 {
-    return std::make_optional<ActionReturnStatus>(CHIP_ERROR_NOT_IMPLEMENTED);
+    DispatchSingleClusterCommand(request.path, input_arguments, handler);
+    return std::nullopt; // handler status is set by the dispatch
 }
 
 EndpointId CustomDataModel::FirstEndpoint()
@@ -705,6 +709,13 @@ AttributeEntry CustomDataModel::NextAttribute(const ConcreteAttributePath & befo
 
 std::optional<AttributeInfo> CustomDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
 {
+    // Hardcoded "supported" paths to pass TestRead
+    if (((path.mEndpointId == kTestEndpointId) && (path.mClusterId == app::Clusters::UnitTesting::Id)) ||
+        ((path.mEndpointId == kRootEndpointId) && (path.mClusterId == app::Clusters::IcdManagement::Id)))
+    {
+        return AttributeInfo();
+    }
+
     return CodegenDataModelProviderInstance()->GetAttributeInfo(path);
 }
 
@@ -720,6 +731,12 @@ CommandEntry CustomDataModel::NextAcceptedCommand(const ConcreteCommandPath & be
 
 std::optional<CommandInfo> CustomDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
+    // Mock cluster catalog, only support commands on one cluster on one endpoint.
+    if ((path.mEndpointId == DataModelTests::kTestEndpointId) && (path.mClusterId == Clusters::UnitTesting::Id))
+    {
+        return CommandInfo();
+    }
+
     return CodegenDataModelProviderInstance()->GetAcceptedCommandInfo(path);
 }
 

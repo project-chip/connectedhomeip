@@ -31,6 +31,7 @@
 #include <app/AppConfig.h>
 #include <app/CommandHandlerImpl.h>
 #include <app/InteractionModelEngine.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Encode.h>
 #include <app/tests/AppTestContext.h>
 #include <app/tests/test-interaction-model-api.h>
@@ -354,9 +355,39 @@ public:
     int onFinalCalledTimes = 0;
 } mockCommandHandlerDelegate;
 
+class TestCommandInteractionModel : public TestImCustomDataModel
+{
+public:
+    static TestCommandInteractionModel * Instance()
+    {
+        static TestCommandInteractionModel instance;
+        return &instance;
+    }
+
+    TestCommandInteractionModel() {}
+
+    std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request,
+                                                        chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
+    {
+        DispatchSingleClusterCommand(request.path, input_arguments, handler);
+        return std::nullopt; // handler status is set by the dispatch
+    }
+};
+
 class TestCommandInteraction : public chip::Test::AppContext
 {
 public:
+    void SetUp()
+    {
+        AppContext::SetUp();
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(TestCommandInteractionModel::Instance());
+    }
+    void TearDown()
+    {
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+        AppContext::TearDown();
+    }
+
     static size_t GetNumActiveCommandResponderObjects()
     {
         return chip::app::InteractionModelEngine::GetInstance()->mCommandResponderObjs.Allocated();
@@ -423,6 +454,9 @@ public:
     static void FillCurrentInvokeResponseBuffer(CommandHandlerImpl * apCommandHandler,
                                                 const ConcreteCommandPath & aRequestCommandPath, uint32_t aSizeToLeaveInBuffer);
     static void ValidateCommandHandlerEncodeInvokeResponseMessage(bool aNeedStatusCode);
+
+protected:
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
