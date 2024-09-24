@@ -119,7 +119,7 @@ void BLEManagerImpl::ProcessEvent(SilabsBleWrapper::BleEvent_t inEvent)
 {
     switch (inEvent.eventType)
     {
-    case SilabsBleWrapper::BleEventType_e::RSI_BLE_CONN_EVENT: {
+    case SilabsBleWrapper::BleEventType::RSI_BLE_CONN_EVENT: {
         BLEMgrImpl().HandleConnectEvent((inEvent.eventData));
         // Requests the connection parameters change with the remote device
         rsi_ble_conn_params_update(inEvent.eventData->resp_enh_conn.dev_addr, BLE_MIN_CONNECTION_INTERVAL_MS,
@@ -131,17 +131,17 @@ void BLEManagerImpl::ProcessEvent(SilabsBleWrapper::BleEvent_t inEvent)
         ble_measurement_hndl = inEvent.eventData->rsi_ble_measurement_hndl;
     }
     break;
-    case SilabsBleWrapper::BleEventType_e::RSI_BLE_DISCONN_EVENT: {
+    case SilabsBleWrapper::BleEventType::RSI_BLE_DISCONN_EVENT: {
         // event invokes when disconnection was completed
         BLEMgrImpl().HandleConnectionCloseEvent(inEvent.eventData);
     }
     break;
-    case SilabsBleWrapper::BleEventType_e::RSI_BLE_MTU_EVENT: {
+    case SilabsBleWrapper::BleEventType::RSI_BLE_MTU_EVENT: {
         // event invokes when write/notification events received
         BLEMgrImpl().UpdateMtu(inEvent.eventData);
     }
     break;
-    case SilabsBleWrapper::BleEventType_e::RSI_BLE_EVENT_GATT_RD: {
+    case SilabsBleWrapper::BleEventType::RSI_BLE_EVENT_GATT_RD: {
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
         if (inEvent.eventData->rsi_ble_read_req->type == 0)
         {
@@ -150,12 +150,12 @@ void BLEManagerImpl::ProcessEvent(SilabsBleWrapper::BleEvent_t inEvent)
 #endif // CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     }
     break;
-    case SilabsBleWrapper::BleEventType_e::RSI_BLE_GATT_WRITE_EVENT: {
+    case SilabsBleWrapper::BleEventType::RSI_BLE_GATT_WRITE_EVENT: {
         // event invokes when write/notification events received
         BLEMgrImpl().HandleWriteEvent(inEvent.eventData);
     }
     break;
-    case SilabsBleWrapper::BleEventType_e::RSI_BLE_GATT_INDICATION_CONFIRMATION: {
+    case SilabsBleWrapper::BleEventType::RSI_BLE_GATT_INDICATION_CONFIRMATION: {
         BLEMgrImpl().HandleTxConfirmationEvent(1);
     }
     break;

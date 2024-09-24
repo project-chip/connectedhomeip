@@ -80,7 +80,7 @@ namespace Internal {
 class SilabsBleWrapper
 {
 public:
-    typedef enum BleEventType
+    enum class BleEventType : uint8_t
     {
         RSI_BLE_CONN_EVENT,
         RSI_BLE_DISCONN_EVENT,
@@ -89,9 +89,9 @@ public:
         RSI_BLE_GATT_INDICATION_CONFIRMATION,
         RSI_BLE_RESP_ATT_VALUE,
         RSI_BLE_EVENT_GATT_RD
-    } BleEventType_e;
+    };
 
-    typedef struct sl_wfx_msg_s
+    struct sl_wfx_msg_t
     {
         uint8_t connectionHandle;
         uint8_t bondingHandle;
@@ -107,13 +107,13 @@ public:
         uint16_t rsi_ble_measurement_hndl;
         uint16_t rsi_ble_gatt_server_client_config_hndl;
         uint16_t subscribed;
-    } sl_wfx_msg_t;
+    };
 
-    typedef struct BleEvent_s
+    struct BleEvent_t
     {
-        BleEventType_e eventType;
+        BleEventType eventType;
         sl_wfx_msg_t * eventData;
-    } BleEvent_t;
+    };
 
     // ALL Ble functions
     static void rsi_ble_on_connect_event(rsi_ble_event_conn_status_t * resp_conn);

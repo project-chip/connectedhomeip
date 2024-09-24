@@ -40,7 +40,7 @@ SilabsBleWrapper::BleEvent_t bleEvent;
  */
 void SilabsBleWrapper::rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu)
 {
-    bleEvent.eventType = BleEventType_e::RSI_BLE_MTU_EVENT;
+    bleEvent.eventType = BleEventType::RSI_BLE_MTU_EVENT;
     memcpy(&bleEvent.eventData->rsi_ble_mtu, rsi_ble_mtu, sizeof(rsi_ble_event_mtu_t));
     BLEMgrImpl().BlePostEvent(&bleEvent);
 }
@@ -57,7 +57,7 @@ void SilabsBleWrapper::rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu)
  */
 void SilabsBleWrapper::rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t * rsi_ble_write)
 {
-    bleEvent.eventType           = BleEventType_e::RSI_BLE_GATT_WRITE_EVENT;
+    bleEvent.eventType           = BleEventType::RSI_BLE_GATT_WRITE_EVENT;
     bleEvent.eventData->event_id = event_id;
     memcpy(&bleEvent.eventData->rsi_ble_write, rsi_ble_write, sizeof(rsi_ble_event_write_t));
     BLEMgrImpl().BlePostEvent(&bleEvent);
@@ -74,7 +74,7 @@ void SilabsBleWrapper::rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_ev
  */
 void SilabsBleWrapper::rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * resp_enh_conn)
 {
-    bleEvent.eventType                   = BleEventType_e::RSI_BLE_CONN_EVENT;
+    bleEvent.eventType                   = BleEventType::RSI_BLE_CONN_EVENT;
     bleEvent.eventData->connectionHandle = 1;
     bleEvent.eventData->bondingHandle    = 255;
     memcpy(bleEvent.eventData->resp_enh_conn.dev_addr, resp_enh_conn->dev_addr, RSI_DEV_ADDR_LEN);
@@ -93,7 +93,7 @@ void SilabsBleWrapper::rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhanc
  */
 void SilabsBleWrapper::rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, uint16_t reason)
 {
-    bleEvent.eventType         = BleEventType_e::RSI_BLE_DISCONN_EVENT;
+    bleEvent.eventType         = BleEventType::RSI_BLE_DISCONN_EVENT;
     bleEvent.eventData->reason = reason;
     BLEMgrImpl().BlePostEvent(&bleEvent);
 }
@@ -110,7 +110,7 @@ void SilabsBleWrapper::rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * 
 void SilabsBleWrapper::rsi_ble_on_event_indication_confirmation(uint16_t resp_status,
                                                                 rsi_ble_set_att_resp_t * rsi_ble_event_set_att_rsp)
 {
-    bleEvent.eventType              = BleEventType_e::RSI_BLE_GATT_INDICATION_CONFIRMATION;
+    bleEvent.eventType              = BleEventType::RSI_BLE_GATT_INDICATION_CONFIRMATION;
     bleEvent.eventData->resp_status = resp_status;
     memcpy(&bleEvent.eventData->rsi_ble_event_set_att_rsp, rsi_ble_event_set_att_rsp, sizeof(rsi_ble_set_att_resp_t));
     BLEMgrImpl().BlePostEvent(&bleEvent);
@@ -128,7 +128,7 @@ void SilabsBleWrapper::rsi_ble_on_event_indication_confirmation(uint16_t resp_st
  */
 void SilabsBleWrapper::rsi_ble_on_read_req_event(uint16_t event_id, rsi_ble_read_req_t * rsi_ble_read_req)
 {
-    bleEvent.eventType           = BleEventType_e::RSI_BLE_EVENT_GATT_RD;
+    bleEvent.eventType           = BleEventType::RSI_BLE_EVENT_GATT_RD;
     bleEvent.eventData->event_id = event_id;
     memcpy(&bleEvent.eventData->rsi_ble_read_req, rsi_ble_read_req, sizeof(rsi_ble_read_req_t));
     BLEMgrImpl().BlePostEvent(&bleEvent);
