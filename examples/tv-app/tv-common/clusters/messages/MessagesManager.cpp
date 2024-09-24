@@ -33,7 +33,7 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
     const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint64_t> & duration, const CharSpan & messageText,
     const Optional<DataModel::DecodableList<MessageResponseOption>> & responses)
 {
-    ChipLogProgress(Zcl, "HandlePresentMessagesRequest message:%s", std::string(messageText.data(), messageText.size()).std::c_str());
+    ChipLogProgress(Zcl, "HandlePresentMessagesRequest message:%s", std::string(messageText.data(), messageText.size()).c_str());
 
     auto cachedMessage = CachedMessage(messageId, priority, messageControl, startTime, duration,
                                        std::string(messageText.data(), messageText.size()));

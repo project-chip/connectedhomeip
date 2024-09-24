@@ -54,7 +54,7 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
             {
                 std::string attrId = std::to_string(chip::app::Clusters::TargetNavigator::Attributes::TargetList::Id);
                 ChipLogProgress(Zcl, "TargetNavigatorManager::HandleNavigateTarget response parsing done. reading attr %s",
-                                attrId.std::c_str());
+                                attrId.c_str());
                 if (value[attrId].isArray())
                 {
                     return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
@@ -109,7 +109,7 @@ uint8_t TargetNavigatorManager::HandleGetCurrentTarget()
         chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::TargetNavigator::Id,
                                                    chip::app::Clusters::TargetNavigator::Attributes::TargetList::Id);
         std::string resStr = mAttributeDelegate->Read(aPath);
-        ChipLogProgress(Zcl, "TargetNavigatorManager::HandleGetCurrentTarget response %s", resStr.std::c_str());
+        ChipLogProgress(Zcl, "TargetNavigatorManager::HandleGetCurrentTarget response %s", resStr.c_str());
 
         if (resStr.length() != 0)
         {
@@ -119,7 +119,7 @@ uint8_t TargetNavigatorManager::HandleGetCurrentTarget()
             {
                 std::string attrId = std::to_string(chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::Id);
                 ChipLogProgress(Zcl, "TargetNavigatorManager::HandleGetCurrentTarget response parsing done. reading attr %s",
-                                attrId.std::c_str());
+                                attrId.c_str());
                 if (value[attrId].isUInt() && value[attrId].asUInt() < 256)
                 {
                     return static_cast<uint8_t>(value[attrId].asUInt());

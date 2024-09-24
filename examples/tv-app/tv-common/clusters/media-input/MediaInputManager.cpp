@@ -79,7 +79,7 @@ bool MediaInputManager::HandleShowInputStatus()
         std::string desc(inputInfo.description.data(), inputInfo.description.size());
         ChipLogProgress(Zcl, " [%d] type=%d selected=%d name=%s desc=%s", inputInfo.index,
                         static_cast<uint16_t>(inputInfo.inputType), (mCurrentInput == inputInfo.index ? 1 : 0), name.c_str(),
-                        desc.std::c_str());
+                        desc.c_str());
     }
     return true;
 }

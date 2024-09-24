@@ -194,7 +194,7 @@ uint64_t AppMediaPlaybackManager::HandleMediaRequestGetAttribute(chip::Attribute
     ChipLogProgress(Zcl, "Received AppMediaPlaybackManager::HandleMediaRequestGetAttribute:%d", attributeId);
     chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::MediaPlayback::Id, attributeId);
     std::string resStr = mAttributeDelegate->Read(aPath);
-    ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleMediaRequestGetAttribute response %s", resStr.std::c_str());
+    ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleMediaRequestGetAttribute response %s", resStr.c_str());
 
     uint64_t ret = std::numeric_limits<uint64_t>::max();
     if (resStr.length() != 0)
@@ -205,7 +205,7 @@ uint64_t AppMediaPlaybackManager::HandleMediaRequestGetAttribute(chip::Attribute
         {
             std::string attrId = std::to_string(attributeId);
             ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleMediaRequestGetAttribute response parsing done. reading attr %s",
-                            attrId.std::c_str());
+                            attrId.c_str());
             if (!value[attrId].empty() && value[attrId].isUInt())
             {
                 ret = static_cast<uint64_t>(value[attrId].asUInt());
@@ -241,7 +241,7 @@ CHIP_ERROR AppMediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncod
     chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::MediaPlayback::Id,
                                                chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::Id);
     std::string resStr = mAttributeDelegate->Read(aPath);
-    ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleGetSampledPosition response %s", resStr.std::c_str());
+    ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleGetSampledPosition response %s", resStr.c_str());
 
     if (resStr.length() != 0)
     {
@@ -251,7 +251,7 @@ CHIP_ERROR AppMediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncod
         {
             std::string attrId = std::to_string(chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::Id);
             ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSampledPosition response parsing done. reading attr %s",
-                            attrId.std::c_str());
+                            attrId.c_str());
             if (!value[attrId].empty() && value[attrId].isObject())
             {
                 std::string updatedAt = std::to_string(

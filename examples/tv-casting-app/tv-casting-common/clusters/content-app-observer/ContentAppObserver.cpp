@@ -38,7 +38,7 @@ void ContentAppObserverManager::HandleContentAppMessage(chip::app::CommandRespon
     std::string encodingHintString(encodingHint.data(), encodingHint.size());
 
     ChipLogProgress(Zcl, "ContentAppObserverManager::HandleContentAppMessage TEST CASE hint=%s data=%s ",
-                    encodingHintString.std::c_str(), dataString.std::c_str());
+                    encodingHintString.c_str(), dataString.c_str());
 
     ContentAppMessageResponse response;
     // TODO: Insert code here

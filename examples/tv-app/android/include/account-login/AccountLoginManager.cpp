@@ -130,7 +130,7 @@ void AccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupPINRes
     std::string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
 
     GetSetupPINResponse response;
-    ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.std::c_str(), mSetupPin);
+    ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.c_str(), mSetupPin);
 
     response.setupPIN = CharSpan::fromCharString(mSetupPin);
     helper.Success(response);
