@@ -22,7 +22,6 @@
 #include "dmd.h"
 #include "glib.h"
 #include "lcd.h"
-#include <CommonIcons.h>
 
 class AirQualitySensorUI
 {

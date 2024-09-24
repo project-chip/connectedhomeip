@@ -33,7 +33,7 @@
 #define VERY_POOR_THRESHOLD 250
 
 // <o EXTREMELY_POOR_THRESHOLD> Extremely Poor Threshold Value
-// <i> Default: 2147483647
+// <i> Default: 300
 #define EXTREMELY_POOR_THRESHOLD 300
 
 // <<< end of configuration section >>>

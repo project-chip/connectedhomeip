@@ -102,9 +102,9 @@ CHIP_ERROR SensorManager::Init()
 
     PlatformMgr().LockChipStack();
     ChipLogDetail(AppServer, "Int instnace");
-    AirQualitySensorManager::InitInstance(1);
-    ChipLogDetail(AppServer, "Int instnace success");
+    AirQualitySensorManager::InitInstance();
     PlatformMgr().UnlockChipStack();
+    ChipLogDetail(AppServer, "Int instnace success");
     // Create cmsisos sw timer for air quality sensor timer.
     mSensorTimer = osTimerNew(SensorTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
     if (mSensorTimer == NULL)
@@ -167,9 +167,9 @@ void SensorManager::SensorTimerEventHandler(void * arg)
 
     PlatformMgr().LockChipStack();
     AirQualitySensorManager::GetInstance()->OnAirQualityChangeHandler(classifyAirQuality(air_quality));
-
-    AppTask::GetAppTask().UpdateAirQualitySensorUI();
     PlatformMgr().UnlockChipStack();
+    
+    AppTask::GetAppTask().UpdateAirQualitySensorUI();
 
     ChipLogDetail(AppServer, "RAW AirQuality value: %ld and corresponding Enum value : %d", air_quality,
                   chip::to_underlying(AirQualitySensorManager::GetInstance()->GetAirQuality()));
