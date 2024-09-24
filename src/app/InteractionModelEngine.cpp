@@ -1764,7 +1764,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const 
     ChipLogProgress(InteractionModel, "!! TEST: 0x%08x / 0x%08x / 0x%08X", aCommandPath.mEndpointId, aCommandPath.mClusterId,
                     aCommandPath.mCommandId);
     auto em = ServerClusterCommandExists(aCommandPath);
-    ChipLogProgress(InteractionModel, "!!   EMBER:   %s",  Protocols::InteractionModel::StatusName(em));
+    ChipLogProgress(InteractionModel, "!!   EMBER:   %s", Protocols::InteractionModel::StatusName(em));
 
     auto provider = GetDataModelProvider();
     if (provider->GetAcceptedCommandInfo(aCommandPath).has_value())
