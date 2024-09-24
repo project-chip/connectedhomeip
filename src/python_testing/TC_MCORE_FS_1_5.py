@@ -22,11 +22,9 @@ import logging
 import os
 import queue
 import secrets
-import signal
 import struct
-import subprocess
+import tempfile
 import time
-import uuid
 from dataclasses import dataclass
 
 import chip.clusters as Clusters
@@ -34,6 +32,7 @@ from chip import ChipDeviceCtrl
 from ecdsa.curves import NIST256p
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+from TC_MCORE_FS_1_1 import AppServer
 from TC_SC_3_6 import AttributeChangeAccumulator
 
 # Length of `w0s` and `w1s` elements
@@ -50,7 +49,7 @@ def _generate_verifier(passcode: int, salt: bytes, iterations: int) -> bytes:
 
 
 @dataclass
-class _SetupParamters:
+class _SetupParameters:
     setup_qr_code: str
     manual_code: int
     discriminator: int
@@ -61,50 +60,54 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
+
         self._partslist_subscription = None
         self._cadmin_subscription = None
-        self._app_th_server_process = None
-        self._th_server_kvs = None
+        self.th_server = None
+        self.storage = None
+
+        th_server_port = self.user_params.get("th_server_port", 5543)
+        th_server_app = self.user_params.get("th_server_app_path", None)
+        if not th_server_app:
+            asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
+        if not os.path.exists(th_server_app):
+            asserts.fail(f'The path {th_server_app} does not exist')
+
+        # Create a temporary storage directory for keeping KVS files.
+        self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
+        logging.info("Temporary storage directory: %s", self.storage.name)
+
+        self.th_server_port = th_server_port
+        # These are default testing values
+        self.th_server_setup_params = _SetupParameters(
+            setup_qr_code="MT:-24J0AFN00KA0648G00",
+            manual_code=34970112332,
+            discriminator=3840,
+            passcode=20202021)
+
+        # Start the TH_SERVER_NO_UID app.
+        self.th_server = AppServer(
+            th_server_app,
+            storage_dir=self.storage.name,
+            port=self.th_server_port,
+            discriminator=self.th_server_setup_params.discriminator,
+            passcode=self.th_server_setup_params.passcode)
+        self.th_server.start()
 
     def teardown_class(self):
         if self._partslist_subscription is not None:
             self._partslist_subscription.Shutdown()
             self._partslist_subscription = None
-
         if self._cadmin_subscription is not None:
             self._cadmin_subscription.Shutdown()
             self._cadmin_subscription = None
-
-        if self._app_th_server_process is not None:
-            logging.warning("Stopping app with SIGTERM")
-            self._app_th_server_process.send_signal(signal.SIGTERM.value)
-            self._app_th_server_process.wait()
-
-        if self._th_server_kvs is not None:
-            os.remove(self._th_server_kvs)
+        if self.th_server is not None:
+            self.th_server.terminate()
+        if self.storage is not None:
+            self.storage.cleanup()
         super().teardown_class()
 
-    async def _create_th_server(self, port):
-        # These are default testing values
-        setup_params = _SetupParamters(setup_qr_code="MT:-24J0AFN00KA0648G00",
-                                       manual_code=34970112332, discriminator=3840, passcode=20202021)
-        kvs = f'kvs_{str(uuid.uuid4())}'
-
-        cmd = [self._th_server_app_path]
-        cmd.extend(['--secured-device-port', str(port)])
-        cmd.extend(['--discriminator', str(setup_params.discriminator)])
-        cmd.extend(['--passcode', str(setup_params.passcode)])
-        cmd.extend(['--KVS', kvs])
-
-        # TODO: Determine if we want these logs cooked or pushed to somewhere else
-        logging.info("Starting TH_SERVER")
-        self._app_th_server_process = subprocess.Popen(cmd)
-        self._th_server_kvs = kvs
-        logging.info("Started TH_SERVER")
-        time.sleep(3)
-        return setup_params
-
-    def _ask_for_vendor_commissioning_ux_operation(self, setup_params: _SetupParamters):
+    def _ask_for_vendor_commissioning_ux_operation(self, setup_params: _SetupParameters):
         self.wait_for_user_input(
             prompt_msg=f"Using the DUT vendor's provided interface, commission the ICD device using the following parameters:\n"
             f"- discriminator: {setup_params.discriminator}\n"
@@ -139,12 +142,6 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
 
         min_report_interval_sec = 0
         max_report_interval_sec = 30
-        th_server_port = self.user_params.get("th_server_port", 5543)
-        self._th_server_app_path = self.user_params.get("th_server_app_path", None)
-        if not self._th_server_app_path:
-            asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
-        if not os.path.exists(self._th_server_app_path):
-            asserts.fail(f'The path {self._th_server_app_path} does not exist')
 
         self.step(1)
         # Subscribe to the PartsList
@@ -169,8 +166,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         asserts.assert_true(type_matches(step_1_dut_parts_list, list), "PartsList is expected to be a list")
 
         self.step(2)
-        setup_params = await self._create_th_server(th_server_port)
-        self._ask_for_vendor_commissioning_ux_operation(setup_params)
+        self._ask_for_vendor_commissioning_ux_operation(self.th_server_setup_params)
 
         self.step(3)
         report_waiting_timeout_delay_sec = 30
