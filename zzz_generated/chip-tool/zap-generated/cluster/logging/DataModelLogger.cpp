@@ -8560,6 +8560,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     ReturnErrorOnFailure(DataModelLogger::LogValue("creatorFabricIndex", indent + 1, value.creatorFabricIndex));
     ReturnErrorOnFailure(DataModelLogger::LogValue("lastModifiedFabricIndex", indent + 1, value.lastModifiedFabricIndex));
     ReturnErrorOnFailure(DataModelLogger::LogValue("nextCredentialIndex", indent + 1, value.nextCredentialIndex));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("credentialData", indent + 1, value.credentialData));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }

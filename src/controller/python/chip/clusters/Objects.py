@@ -28861,6 +28861,7 @@ class DoorLock(Cluster):
                         ClusterObjectFieldDescriptor(Label="creatorFabricIndex", Tag=2, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="lastModifiedFabricIndex", Tag=3, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="nextCredentialIndex", Tag=4, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="credentialData", Tag=5, Type=typing.Union[None, Nullable, bytes]),
                     ])
 
             credentialExists: 'bool' = False
@@ -28868,6 +28869,7 @@ class DoorLock(Cluster):
             creatorFabricIndex: 'typing.Union[Nullable, uint]' = NullValue
             lastModifiedFabricIndex: 'typing.Union[Nullable, uint]' = NullValue
             nextCredentialIndex: 'typing.Union[Nullable, uint]' = NullValue
+            credentialData: 'typing.Union[None, Nullable, bytes]' = None
 
         @dataclass
         class ClearCredential(ClusterCommand):

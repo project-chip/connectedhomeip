@@ -26208,6 +26208,7 @@ enum class Fields : uint8_t
     kCreatorFabricIndex      = 2,
     kLastModifiedFabricIndex = 3,
     kNextCredentialIndex     = 4,
+    kCredentialData          = 5,
 };
 
 struct Type
@@ -26222,6 +26223,7 @@ public:
     DataModel::Nullable<chip::FabricIndex> creatorFabricIndex;
     DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
     DataModel::Nullable<uint16_t> nextCredentialIndex;
+    Optional<DataModel::Nullable<chip::ByteSpan>> credentialData;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -26241,6 +26243,7 @@ public:
     DataModel::Nullable<chip::FabricIndex> creatorFabricIndex;
     DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
     DataModel::Nullable<uint16_t> nextCredentialIndex;
+    Optional<DataModel::Nullable<chip::ByteSpan>> credentialData;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetCredentialStatusResponse

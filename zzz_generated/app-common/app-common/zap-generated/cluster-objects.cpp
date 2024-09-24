@@ -19400,6 +19400,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kCreatorFabricIndex), creatorFabricIndex);
     encoder.Encode(to_underlying(Fields::kLastModifiedFabricIndex), lastModifiedFabricIndex);
     encoder.Encode(to_underlying(Fields::kNextCredentialIndex), nextCredentialIndex);
+    encoder.Encode(to_underlying(Fields::kCredentialData), credentialData);
     return encoder.Finalize();
 }
 
@@ -19436,6 +19437,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kNextCredentialIndex))
         {
             err = DataModel::Decode(reader, nextCredentialIndex);
+        }
+        else if (__context_tag == to_underlying(Fields::kCredentialData))
+        {
+            err = DataModel::Decode(reader, credentialData);
         }
         else
         {
