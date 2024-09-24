@@ -53,8 +53,11 @@ public:
     };
 
     EnumeratorCommandFinder(Operation operation, CommandId target) : mOperation(operation), mTarget(target) {}
+
+    /// Callback to pass in to `Enumerate*` calls in COmmandHandlerInterface
     CommandHandlerInterface::CommandIdCallback Callback() { return HandlerCallbackFn; }
 
+    /// Get the element found (if any) after the `Callback` is used
     std::optional<CommandId> GetFound() const { return mFound; }
 
 private:
