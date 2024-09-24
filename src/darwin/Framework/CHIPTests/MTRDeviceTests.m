@@ -3747,10 +3747,15 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (NSArray<NSDictionary<NSString *, id> *> *)_testAttributeReportWithValue:(unsigned int)testValue
 {
+    return [self _testAttributeReportWithValue:testValue dataVersion:testValue];
+}
+
+- (NSArray<NSDictionary<NSString *, id> *> *)_testAttributeReportWithValue:(unsigned int)testValue dataVersion:(unsigned int)dataVersion
+{
     return @[ @{
         MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeCurrentLevelID)],
         MTRDataKey : @ {
-            MTRDataVersionKey : @(testValue),
+            MTRDataVersionKey : @(dataVersion),
             MTRTypeKey : MTRUnsignedIntegerValueType,
             MTRValueKey : @(testValue),
         }
@@ -3809,7 +3814,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [device setDelegate:delegate queue:queue];
 
     // Use a counter that will be incremented for each report as the value.
-    unsigned int currentTestValue = 1;
+    __block unsigned int currentTestValue = 1;
 
     // Initial setup: Inject report and see that the attribute persisted.  No delay is
     // expected for the first (priming) report.
@@ -3928,54 +3933,84 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertLessThan(reportToPersistenceDelay, baseTestDelayTime * 2 * 5 * 1.3);
 
     // Test 4: test reporting excessively, and see that persistence does not happen until
-    // reporting frequency goes back above the threshold
-    reportEndTime = nil;
-    dataPersistedTime = nil;
-    XCTestExpectation * dataPersisted4 = [self expectationWithDescription:@"data persisted 4"];
-    delegate.onClusterDataPersisted = ^{
-        os_unfair_lock_lock(&lock);
-        if (!dataPersistedTime) {
-            dataPersistedTime = [NSDate now];
+    // reporting frequency goes back below the threshold
+    __auto_type excessiveReportTest = ^(unsigned int testId, NSArray<NSDictionary<NSString *, id> *> * (^reportGenerator)(void), bool expectPersistence) {
+        reportEndTime = nil;
+        dataPersistedTime = nil;
+        XCTestExpectation * dataPersisted = [self expectationWithDescription:[NSString stringWithFormat:@"data persisted %u", testId]];
+        dataPersisted.inverted = !expectPersistence;
+        delegate.onClusterDataPersisted = ^{
+            os_unfair_lock_lock(&lock);
+            if (!dataPersistedTime) {
+                dataPersistedTime = [NSDate now];
+            }
+            os_unfair_lock_unlock(&lock);
+            [dataPersisted fulfill];
+        };
+
+        // Set report times with short delay and check that the multiplier is engaged
+        [device unitTestSetMostRecentReportTimes:[NSMutableArray arrayWithArray:@[
+            [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 4)],
+            [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 3)],
+            [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 2)],
+            [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1)],
+        ]]];
+
+        // Inject report that makes MTRDevice detect the device is reporting excessively
+        [device unitTestInjectAttributeReport:reportGenerator() fromSubscription:YES];
+
+        // Now keep reporting excessively for base delay time max times max multiplier, plus a bit more
+        NSDate * excessiveStartTime = [NSDate now];
+        for (;;) {
+            usleep((useconds_t) (baseTestDelayTime * 0.1 * USEC_PER_SEC));
+            [device unitTestInjectAttributeReport:reportGenerator() fromSubscription:YES];
+            NSTimeInterval elapsed = -[excessiveStartTime timeIntervalSinceNow];
+            if (elapsed > (baseTestDelayTime * 2 * 5 * 1.2)) {
+                break;
+            }
         }
-        os_unfair_lock_unlock(&lock);
-        [dataPersisted4 fulfill];
+
+        // Check that persistence has not happened because it's now turned off
+        XCTAssertNil(dataPersistedTime);
+
+        // Now force report times to large number, to simulate time passage
+        [device unitTestSetMostRecentReportTimes:[NSMutableArray arrayWithArray:@[
+            [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 10)],
+        ]]];
+
+        // And inject a report to trigger MTRDevice to recalculate that this device is no longer
+        // reporting excessively
+        [device unitTestInjectAttributeReport:reportGenerator() fromSubscription:YES];
+
+        [self waitForExpectations:@[ dataPersisted ] timeout:60];
     };
 
-    // Set report times with short delay and check that the multiplier is engaged
-    [device unitTestSetMostRecentReportTimes:[NSMutableArray arrayWithArray:@[
-        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 4)],
-        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 3)],
-        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 2)],
-        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1)],
-    ]]];
+    excessiveReportTest(
+        4, ^{
+            return [self _testAttributeReportWithValue:currentTestValue++];
+        }, true);
 
-    // Inject report that makes MTRDevice detect the device is reporting excessively
-    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+    // Test 5: test reporting excessively with the same value and different data
+    // versions, and see that persistence does not happen until reporting
+    // frequency goes back below the threshold.
+    __block __auto_type dataVersion = currentTestValue;
+    // We incremented currentTestValue after injecting the last report.  Make sure all the new
+    // reports use that last-reported value.
+    __auto_type lastReportedValue = currentTestValue - 1;
+    excessiveReportTest(
+        5, ^{
+            return [self _testAttributeReportWithValue:lastReportedValue dataVersion:dataVersion++];
+        }, true);
 
-    // Now keep reporting excessively for base delay time max times max multiplier, plus a bit more
-    NSDate * excessiveStartTime = [NSDate now];
-    for (;;) {
-        usleep((useconds_t) (baseTestDelayTime * 0.1 * USEC_PER_SEC));
-        [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
-        NSTimeInterval elapsed = -[excessiveStartTime timeIntervalSinceNow];
-        if (elapsed > (baseTestDelayTime * 2 * 5 * 1.2)) {
-            break;
-        }
-    }
-
-    // Check that persistence has not happened because it's now turned off
-    XCTAssertNil(dataPersistedTime);
-
-    // Now force report times to large number, to simulate time passage
-    [device unitTestSetMostRecentReportTimes:[NSMutableArray arrayWithArray:@[
-        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 10)],
-    ]]];
-
-    // And inject a report to trigger MTRDevice to recalculate that this device is no longer
-    // reporting excessively
-    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
-
-    [self waitForExpectations:@[ dataPersisted4 ] timeout:60];
+    // Test 6: test reporting excessively with the same value and same data
+    // version, and see that persistence does not happen at all.
+    // We incremented dataVersion after injecting the last report.  Make sure all the new
+    // reports use that last-reported value.
+    __block __auto_type lastReportedDataVersion = dataVersion - 1;
+    excessiveReportTest(
+        6, ^{
+            return [self _testAttributeReportWithValue:lastReportedValue dataVersion:lastReportedDataVersion];
+        }, false);
 
     delegate.onReportEnd = nil;
     delegate.onClusterDataPersisted = nil;
