@@ -9778,6 +9778,8 @@
               - GlobalStruct
               - NullableGlobalEnum
               - NullableGlobalStruct
+              - ReadFailureCode
+              - FailureInt32U
       commands:
           AccessControl:
               # Targeting 1.4
@@ -9862,6 +9864,44 @@
                   - RequiredTCNotAccepted
                   - TCAcknowledgementsNotReceived
                   - TCMinVersionNotMet
+          RVCCleanMode:
+              # Not clear whether these will stay in the XML
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - Vacation
+          RVCOperationalState:
+              # Not clear whether these will stay in the XML
+              ErrorStateEnum:
+                  - NoError
+                  - UnableToStartOrResume
+                  - UnableToCompleteOperation
+                  - CommandInvalidInState
+              OperationalStateEnum:
+                  - Stopped
+                  - Running
+                  - Paused
+                  - Error
+          RVCRunMode:
+              # Not clear whether these will stay in the XML
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - Vacation
       bitmaps:
           AccessControl:
               # Targeting 1.4

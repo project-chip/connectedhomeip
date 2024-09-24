@@ -414,12 +414,8 @@ class MTRSwiftDeviceTests : XCTestCase {
         
         wait(for: [ resubscriptionReachableExpectation, resubscriptionGotReportsExpectation ], timeout:60)
         
-        // Now make sure we ignore later tests.  Ideally we would just unsubscribe
-        // or remove the delegate, but there's no good way to do that.
-        delegate.onReachable = { () -> Void in }
-        delegate.onNotReachable = nil
-        delegate.onAttributeDataReceived = nil
-        delegate.onEventDataReceived = nil
+        // Now make sure we ignore later tests.
+        device.remove(_: delegate)
         
         // Make sure we got no updated reports (because we had a cluster state cache
         // with data versions) during the resubscribe.
