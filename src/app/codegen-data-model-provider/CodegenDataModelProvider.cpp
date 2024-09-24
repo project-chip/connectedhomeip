@@ -14,17 +14,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/CommandHandlerInterface.h"
-#include "app/data-model-provider/MetadataTypes.h"
-#include "lib/core/CHIPError.h"
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <app-common/zap-generated/attribute-type.h>
+#include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/RequiredPrivilege.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
 #include <optional>
@@ -35,8 +35,13 @@ namespace app {
 namespace {
 
 /// Handles going through callback-based enumeration of generated/accepted commands
-/// for CommandHandler interface based items
+/// for CommandHandler interface based items.
 ///
+/// Offers the ability to focus on some operation for finding a given
+/// command id:
+///   - FindFirst will return the first found element
+///   - FindExact finds the element with the given id
+///   - FindNext finds the element following the given id
 class EnumeratorCommandFinder
 {
 public:
@@ -48,8 +53,11 @@ public:
     };
 
     EnumeratorCommandFinder(Operation operation, CommandId target) : mOperation(operation), mTarget(target) {}
+
+    /// Callback to pass in to `Enumerate*` calls in COmmandHandlerInterface
     CommandHandlerInterface::CommandIdCallback Callback() { return HandlerCallbackFn; }
 
+    /// Get the element found (if any) after the `Callback` is used
     std::optional<CommandId> GetFound() const { return mFound; }
 
 private:
