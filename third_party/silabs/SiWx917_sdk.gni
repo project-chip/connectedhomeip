@@ -775,7 +775,7 @@ template("siwx917_sdk") {
       "${segger_rtt_root}:segger_rtt_printf",
     ]
 
-    if (!sl_uart_log_output ) {
+    if (!sl_uart_log_output) {
       public_deps += [ "${segger_rtt_root}:segger_rtt_syscalls" ]
     }
 
