@@ -38,7 +38,7 @@ public:
     };
 
 private:
-    static void UpdateClusterState(intptr_t context);
+    static void UpdateTemperatureAttribute(intptr_t context);
     friend SensorManager & SensorMgr();
 
     osTimerId_t mSensorTimer;

@@ -122,11 +122,11 @@ void SensorManager::SensorTimerEventHandler(void * arg)
         // The SensorMagager shouldn't be aware of the Endpoint ID TODO Fix this.
         // TODO Per Spec we should also apply the Offset stored in the same cluster before saving the temp
 
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(data));
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateTemperatureAttribute, reinterpret_cast<intptr_t>(data));
     }
 }
 
-void SensorManager::UpdateClusterState(intptr_t context)
+void SensorManager::UpdateTemperatureAttribute(intptr_t context)
 {
     SensorManager::AttributeUpdateInfo * data = reinterpret_cast<SensorManager::AttributeUpdateInfo *>(context);
     app::Clusters::Thermostat::Attributes::LocalTemperature::Set(data->endPoint, data->temperature);
