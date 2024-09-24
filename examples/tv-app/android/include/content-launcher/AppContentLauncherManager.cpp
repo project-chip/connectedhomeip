@@ -31,7 +31,7 @@ using namespace chip::app::Clusters::ContentLauncher;
 using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 
 AppContentLauncherManager::AppContentLauncherManager(ContentAppAttributeDelegate * attributeDelegate,
-                                                     list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols) :
+                                                     std::list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols) :
     mAttributeDelegate(attributeDelegate)
 {
     mAcceptHeaderList            = acceptHeaderList;
@@ -45,7 +45,7 @@ void AppContentLauncherManager::HandleLaunchContent(CommandResponseHelper<Launch
                                                     bool useCurrentContext)
 {
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleLaunchContent for endpoint %d", mEndpointId);
-    string dataString(data.data(), data.size());
+    std::string dataString(data.data(), data.size());
 
     ChipLogProgress(Zcl, " AutoPlay=%s", (autoplay ? "true" : "false"));
 
@@ -75,8 +75,8 @@ void AppContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResp
 {
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleLaunchUrl");
 
-    string contentUrlString(contentUrl.data(), contentUrl.size());
-    string displayStringString(displayString.data(), displayString.size());
+    std::string contentUrlString(contentUrl.data(), contentUrl.size());
+    std::string displayStringString(displayString.data(), displayString.size());
 
     // TODO: Insert code here
     LaunchResponseType response;
@@ -91,7 +91,7 @@ CHIP_ERROR AppContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEn
     chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::ContentLauncher::Id,
                                                chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::Id);
     std::string resStr = mAttributeDelegate->Read(aPath);
-    ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetAcceptHeaderList response %s", resStr.c_str());
+    ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetAcceptHeaderList response %s", resStr.std::c_str());
 
     if (resStr.length() != 0)
     {
@@ -101,7 +101,7 @@ CHIP_ERROR AppContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEn
         {
             std::string attrId = std::to_string(chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::Id);
             ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetAcceptHeaderList response parsing done. reading attr %s",
-                            attrId.c_str());
+                            attrId.std::c_str());
             if (value[attrId].isArray())
             {
                 mAcceptHeaderList.clear();
@@ -132,7 +132,7 @@ uint32_t AppContentLauncherManager::HandleGetSupportedStreamingProtocols()
     chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::ContentLauncher::Id,
                                                chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id);
     std::string resStr = mAttributeDelegate->Read(aPath);
-    ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response %s", resStr.c_str());
+    ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response %s", resStr.std::c_str());
 
     if (resStr.length() == 0)
     {
@@ -147,7 +147,7 @@ uint32_t AppContentLauncherManager::HandleGetSupportedStreamingProtocols()
     }
     std::string attrId = std::to_string(chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id);
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response parsing done. reading attr %s",
-                    attrId.c_str());
+                    attrId.std::c_str());
     if (!value[attrId].empty() && value[attrId].isInt())
     {
         uint32_t supportedStreamingProtocols = static_cast<uint32_t>(value[attrId].asInt());

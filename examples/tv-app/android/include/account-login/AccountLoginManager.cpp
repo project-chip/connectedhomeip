@@ -35,7 +35,7 @@ const auto loginSetupPINFieldId = std::to_string(chip::to_underlying(AccountLogi
 const auto loginNodeFieldId     = std::to_string(chip::to_underlying(AccountLogin::Commands::Login::Fields::kNode));
 const auto logoutNodeFieldId    = std::to_string(chip::to_underlying(AccountLogin::Commands::Logout::Fields::kNode));
 
-string charSpanToString(const CharSpan & charSpan)
+std::string charSpanToString(const CharSpan & charSpan)
 {
     return { charSpan.data(), charSpan.size() };
 }
@@ -127,10 +127,10 @@ bool AccountLoginManager::HandleLogout(const chip::Optional<chip::NodeId> & node
 void AccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupPINResponse> & helper,
                                             const CharSpan & tempAccountIdentifier)
 {
-    string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
+    std::string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
 
     GetSetupPINResponse response;
-    ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.c_str(), mSetupPin);
+    ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.std::c_str(), mSetupPin);
 
     response.setupPIN = CharSpan::fromCharString(mSetupPin);
     helper.Success(response);
@@ -143,7 +143,7 @@ void AccountLoginManager::GetSetupPin(char * setupPin, size_t setupPinSize, cons
     // Other methods in this class do not need to be changed beecause those will get routed to java layer
     // upstream.
     ChipLogProgress(DeviceLayer, "AccountLoginManager::GetSetupPin called for endpoint %d", mEndpointId);
-    string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
+    std::string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
     if (mCommandDelegate == nullptr)
     {
         // For the dummy content apps to work.
