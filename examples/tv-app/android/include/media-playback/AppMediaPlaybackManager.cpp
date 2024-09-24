@@ -28,7 +28,6 @@
 
 #include <string>
 
-using namespace std;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;

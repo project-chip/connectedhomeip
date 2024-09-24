@@ -24,7 +24,6 @@
 #include <lib/support/ScopedBuffer.h>
 
 using namespace chip;
-using namespace std;
 
 namespace {
 

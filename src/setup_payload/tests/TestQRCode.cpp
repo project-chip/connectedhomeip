@@ -32,7 +32,6 @@
 #include <lib/support/Span.h>
 
 using namespace chip;
-using namespace std;
 
 namespace {
 

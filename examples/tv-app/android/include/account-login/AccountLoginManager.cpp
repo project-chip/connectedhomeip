@@ -23,7 +23,6 @@
 #include <json/json.h>
 #include <lib/core/DataModelTypes.h>
 
-using namespace std;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AccountLogin;
 using Status = chip::Protocols::InteractionModel::Status;
