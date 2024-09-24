@@ -508,6 +508,7 @@ private:
 
     void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
+
     Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
 
     bool HasActiveRead();

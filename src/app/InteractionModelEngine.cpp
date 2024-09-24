@@ -24,6 +24,7 @@
  */
 
 #include "InteractionModelEngine.h"
+#include "lib/core/DataModelTypes.h"
 
 #include <cinttypes>
 
@@ -515,7 +516,14 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
         {
             ConcreteAttributePath concretePath(paramsList.mValue.mEndpointId, paramsList.mValue.mClusterId,
                                                paramsList.mValue.mAttributeId);
-            if (ConcreteAttributePathExists(concretePath))
+            if (
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+                GetDataModelProvider()->GetAttributeInfo(concretePath).has_value()
+
+#else
+                ConcreteAttributePathExists(concretePath)
+#endif
+            )
             {
                 Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
                                                  .endpoint    = concretePath.mEndpointId,
@@ -1744,7 +1752,37 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 
 Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
 {
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    auto provider = GetDataModelProvider();
+    if (provider->GetAcceptedCommandInfo(aCommandPath).has_value())
+    {
+        return Protocols::InteractionModel::Status::Success;
+    }
+
+    // We failed, figure out why ...
+    //
+    if (provider->GetClusterInfo(aCommandPath).has_value())
+    {
+        return Protocols::InteractionModel::Status::InvalidCommand; // cluster exists, so command is invalid
+    }
+
+    // at ths point either cluster or endpoint does not exist. If we find the endpoint, then the cluster
+    // is invalid
+    for (EndpointId endpoint = provider->FirstEndpoint(); endpoint != kInvalidEndpointId;
+         endpoint            = provider->NextEndpoint(endpoint))
+    {
+        if (endpoint == aCommandPath.mEndpointId)
+        {
+            // endpoint exists, so cluster is invalid
+            return Protocols::InteractionModel::Status::UnsupportedCluster;
+        }
+    }
+
+    // endpoint not found
+    return Protocols::InteractionModel::Status::UnsupportedEndpoint;
+#else
     return ServerClusterCommandExists(aCommandPath);
+#endif
 }
 
 DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Provider * model)
