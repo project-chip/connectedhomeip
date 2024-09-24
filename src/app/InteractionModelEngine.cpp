@@ -24,7 +24,6 @@
  */
 
 #include "InteractionModelEngine.h"
-#include "lib/support/logging/TextOnlyLogging.h"
 
 #include <cinttypes>
 
