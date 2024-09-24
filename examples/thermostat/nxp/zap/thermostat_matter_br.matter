@@ -284,6 +284,56 @@ cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
+/** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
+cluster Identify = 3 {
+  revision 4;
+
+  enum EffectIdentifierEnum : enum8 {
+    kBlink = 0;
+    kBreathe = 1;
+    kOkay = 2;
+    kChannelChange = 11;
+    kFinishEffect = 254;
+    kStopEffect = 255;
+  }
+
+  enum EffectVariantEnum : enum8 {
+    kDefault = 0;
+  }
+
+  enum IdentifyTypeEnum : enum8 {
+    kNone = 0;
+    kLightOutput = 1;
+    kVisibleIndicator = 2;
+    kAudibleBeep = 3;
+    kDisplay = 4;
+    kActuator = 5;
+  }
+
+  attribute int16u identifyTime = 0;
+  readonly attribute IdentifyTypeEnum identifyType = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct IdentifyRequest {
+    int16u identifyTime = 0;
+  }
+
+  request struct TriggerEffectRequest {
+    EffectIdentifierEnum effectIdentifier = 0;
+    EffectVariantEnum effectVariant = 1;
+  }
+
+  /** Command description for Identify */
+  command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
+  /** Command description for TriggerEffect */
+  command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
+}
+
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
   revision 4;
@@ -386,6 +436,27 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
+cluster Binding = 30 {
+  revision 1; // NOTE: Default/not specifically set
+
+  fabric_scoped struct TargetStruct {
+    optional node_id node = 1;
+    optional group_id group = 2;
+    optional endpoint_no endpoint = 3;
+    optional cluster_id cluster = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  attribute access(write: manage) TargetStruct binding[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -768,6 +839,93 @@ cluster OtaSoftwareUpdateRequestor = 42 {
 
   /** Announce the presence of an OTA Provider */
   command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
+}
+
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing common languages, units of measurements, and numerical formatting
+      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
+      they can be configured to use a user’s preferred language, units, etc */
+cluster LocalizationConfiguration = 43 {
+  revision 1; // NOTE: Default/not specifically set
+
+  attribute access(write: manage) char_string<35> activeLocale = 0;
+  readonly attribute char_string supportedLocales[] = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
+      or audibly convey time information need a mechanism by which they can be configured to use a
+      user’s preferred format. */
+cluster TimeFormatLocalization = 44 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum CalendarTypeEnum : enum8 {
+    kBuddhist = 0;
+    kChinese = 1;
+    kCoptic = 2;
+    kEthiopian = 3;
+    kGregorian = 4;
+    kHebrew = 5;
+    kIndian = 6;
+    kIslamic = 7;
+    kJapanese = 8;
+    kKorean = 9;
+    kPersian = 10;
+    kTaiwanese = 11;
+    kUseActiveLocale = 255;
+  }
+
+  enum HourFormatEnum : enum8 {
+    k12hr = 0;
+    k24hr = 1;
+    kUseActiveLocale = 255;
+  }
+
+  bitmap Feature : bitmap32 {
+    kCalendarFormat = 0x1;
+  }
+
+  attribute access(write: manage) HourFormatEnum hourFormat = 0;
+  attribute access(write: manage) optional CalendarTypeEnum activeCalendarType = 1;
+  readonly attribute optional CalendarTypeEnum supportedCalendarTypes[] = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing preferences for the units in which values are conveyed in communication to a
+      user. As such, Nodes that visually or audibly convey measurable values to the user need a
+      mechanism by which they can be configured to use a user’s preferred unit. */
+cluster UnitLocalization = 45 {
+  revision 1;
+
+  enum TempUnitEnum : enum8 {
+    kFahrenheit = 0;
+    kCelsius = 1;
+    kKelvin = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kTemperatureUnit = 0x1;
+  }
+
+  attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
@@ -1219,43 +1377,6 @@ cluster GeneralDiagnostics = 51 {
   command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
-/** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
-cluster SoftwareDiagnostics = 52 {
-  revision 1; // NOTE: Default/not specifically set
-
-  bitmap Feature : bitmap32 {
-    kWatermarks = 0x1;
-  }
-
-  struct ThreadMetricsStruct {
-    int64u id = 0;
-    optional char_string<8> name = 1;
-    optional int32u stackFreeCurrent = 2;
-    optional int32u stackFreeMinimum = 3;
-    optional int32u stackSize = 4;
-  }
-
-  info event SoftwareFault = 0 {
-    int64u id = 0;
-    optional char_string name = 1;
-    optional octet_string faultRecording = 2;
-  }
-
-  readonly attribute optional ThreadMetricsStruct threadMetrics[] = 0;
-  readonly attribute optional int64u currentHeapFree = 1;
-  readonly attribute optional int64u currentHeapUsed = 2;
-  readonly attribute optional int64u currentHeapHighWatermark = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  /** Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute. */
-  command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
-}
-
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
   revision 2;
@@ -1420,6 +1541,83 @@ cluster ThreadNetworkDiagnostics = 53 {
 
   /** Reception of this command SHALL reset the OverrunCount attributes to 0 */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
+}
+
+/** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
+cluster WiFiNetworkDiagnostics = 54 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum AssociationFailureCauseEnum : enum8 {
+    kUnknown = 0;
+    kAssociationFailed = 1;
+    kAuthenticationFailed = 2;
+    kSsidNotFound = 3;
+  }
+
+  enum ConnectionStatusEnum : enum8 {
+    kConnected = 0;
+    kNotConnected = 1;
+  }
+
+  enum SecurityTypeEnum : enum8 {
+    kUnspecified = 0;
+    kNone = 1;
+    kWEP = 2;
+    kWPA = 3;
+    kWPA2 = 4;
+    kWPA3 = 5;
+  }
+
+  enum WiFiVersionEnum : enum8 {
+    kA = 0;
+    kB = 1;
+    kG = 2;
+    kN = 3;
+    kAc = 4;
+    kAx = 5;
+    kAh = 6;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPacketCounts = 0x1;
+    kErrorCounts = 0x2;
+  }
+
+  info event Disconnection = 0 {
+    int16u reasonCode = 0;
+  }
+
+  info event AssociationFailure = 1 {
+    AssociationFailureCauseEnum associationFailureCause = 0;
+    int16u status = 1;
+  }
+
+  info event ConnectionStatus = 2 {
+    ConnectionStatusEnum connectionStatus = 0;
+  }
+
+  readonly attribute nullable octet_string<6> bssid = 0;
+  readonly attribute nullable SecurityTypeEnum securityType = 1;
+  readonly attribute nullable WiFiVersionEnum wiFiVersion = 2;
+  readonly attribute nullable int16u channelNumber = 3;
+  readonly attribute nullable int8s rssi = 4;
+  readonly attribute optional nullable int32u beaconLostCount = 5;
+  readonly attribute optional nullable int32u beaconRxCount = 6;
+  readonly attribute optional nullable int32u packetMulticastRxCount = 7;
+  readonly attribute optional nullable int32u packetMulticastTxCount = 8;
+  readonly attribute optional nullable int32u packetUnicastRxCount = 9;
+  readonly attribute optional nullable int32u packetUnicastTxCount = 10;
+  readonly attribute optional nullable int64u currentMaxRate = 11;
+  readonly attribute optional nullable int64u overrunCount = 12;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  /** Reception of this command SHALL reset the Breacon and Packet related count attributes to 0 */
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
@@ -1713,539 +1911,294 @@ cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** Allows servers to ensure that listed clients are notified when a server is available for communication. */
-cluster IcdManagement = 70 {
-  revision 3;
-
-  enum ClientTypeEnum : enum8 {
-    kPermanent = 0;
-    kEphemeral = 1;
-  }
-
-  enum OperatingModeEnum : enum8 {
-    kSIT = 0;
-    kLIT = 1;
-  }
-
-  bitmap Feature : bitmap32 {
-    kCheckInProtocolSupport = 0x1;
-    kUserActiveModeTrigger = 0x2;
-    kLongIdleTimeSupport = 0x4;
-    kDynamicSitLitSupport = 0x8;
-  }
-
-  bitmap UserActiveModeTriggerBitmap : bitmap32 {
-    kPowerCycle = 0x1;
-    kSettingsMenu = 0x2;
-    kCustomInstruction = 0x4;
-    kDeviceManual = 0x8;
-    kActuateSensor = 0x10;
-    kActuateSensorSeconds = 0x20;
-    kActuateSensorTimes = 0x40;
-    kActuateSensorLightsBlink = 0x80;
-    kResetButton = 0x100;
-    kResetButtonLightsBlink = 0x200;
-    kResetButtonSeconds = 0x400;
-    kResetButtonTimes = 0x800;
-    kSetupButton = 0x1000;
-    kSetupButtonSeconds = 0x2000;
-    kSetupButtonLightsBlink = 0x4000;
-    kSetupButtonTimes = 0x8000;
-    kAppDefinedButton = 0x10000;
-  }
-
-  fabric_scoped struct MonitoringRegistrationStruct {
-    fabric_sensitive node_id checkInNodeID = 1;
-    fabric_sensitive int64u monitoredSubject = 2;
-    fabric_sensitive ClientTypeEnum clientType = 4;
-    fabric_idx fabricIndex = 254;
-  }
-
-  readonly attribute int32u idleModeDuration = 0;
-  readonly attribute int32u activeModeDuration = 1;
-  readonly attribute int16u activeModeThreshold = 2;
-  readonly attribute access(read: administer) optional MonitoringRegistrationStruct registeredClients[] = 3;
-  readonly attribute access(read: administer) optional int32u ICDCounter = 4;
-  readonly attribute optional int16u clientsSupportedPerFabric = 5;
-  provisional readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
-  provisional readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
-  provisional readonly attribute optional OperatingModeEnum operatingMode = 8;
-  provisional readonly attribute optional int32u maximumCheckInBackOff = 9;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct RegisterClientRequest {
-    node_id checkInNodeID = 0;
-    int64u monitoredSubject = 1;
-    octet_string<16> key = 2;
-    optional octet_string<16> verificationKey = 3;
-    ClientTypeEnum clientType = 4;
-  }
-
-  response struct RegisterClientResponse = 1 {
-    int32u ICDCounter = 0;
-  }
-
-  request struct UnregisterClientRequest {
-    node_id checkInNodeID = 0;
-    optional octet_string<16> verificationKey = 1;
-  }
-
-  request struct StayActiveRequestRequest {
-    int32u stayActiveDuration = 0;
-  }
-
-  response struct StayActiveResponse = 4 {
-    int32u promisedActiveDuration = 0;
-  }
-
-  /** Register a client to the end device */
-  fabric command access(invoke: manage) RegisterClient(RegisterClientRequest): RegisterClientResponse = 0;
-  /** Unregister a client from an end device */
-  fabric command access(invoke: manage) UnregisterClient(UnregisterClientRequest): DefaultSuccess = 2;
-  /** Request the end device to stay in Active Mode for an additional ActiveModeThreshold */
-  command access(invoke: manage) StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
-}
-
-/** An interface to a generic way to secure a door */
-cluster DoorLock = 257 {
+/** An interface for configuring and controlling the functionality of a thermostat. */
+cluster Thermostat = 513 {
   revision 7;
 
-  enum AlarmCodeEnum : enum8 {
-    kLockJammed = 0;
-    kLockFactoryReset = 1;
-    kLockRadioPowerCycled = 3;
-    kWrongCodeEntryLimit = 4;
-    kFrontEsceutcheonRemoved = 5;
-    kDoorForcedOpen = 6;
-    kDoorAjar = 7;
-    kForcedUser = 8;
+  enum ACCapacityFormatEnum : enum8 {
+    kBTUh = 0;
   }
 
-  enum CredentialRuleEnum : enum8 {
-    kSingle = 0;
-    kDual = 1;
-    kTri = 2;
+  enum ACCompressorTypeEnum : enum8 {
+    kUnknown = 0;
+    kT1 = 1;
+    kT2 = 2;
+    kT3 = 3;
   }
 
-  enum CredentialTypeEnum : enum8 {
-    kProgrammingPIN = 0;
-    kPIN = 1;
-    kRFID = 2;
-    kFingerprint = 3;
-    kFingerVein = 4;
-    kFace = 5;
-    kAliroCredentialIssuerKey = 6;
-    kAliroEvictableEndpointKey = 7;
-    kAliroNonEvictableEndpointKey = 8;
+  enum ACLouverPositionEnum : enum8 {
+    kClosed = 1;
+    kOpen = 2;
+    kQuarter = 3;
+    kHalf = 4;
+    kThreeQuarters = 5;
   }
 
-  enum DataOperationTypeEnum : enum8 {
-    kAdd = 0;
-    kClear = 1;
-    kModify = 2;
+  enum ACRefrigerantTypeEnum : enum8 {
+    kUnknown = 0;
+    kR22 = 1;
+    kR410a = 2;
+    kR407c = 3;
   }
 
-  enum DlLockState : enum8 {
-    kNotFullyLocked = 0;
-    kLocked = 1;
-    kUnlocked = 2;
-    kUnlatched = 3;
+  enum ACTypeEnum : enum8 {
+    kUnknown = 0;
+    kCoolingFixed = 1;
+    kHeatPumpFixed = 2;
+    kCoolingInverter = 3;
+    kHeatPumpInverter = 4;
   }
 
-  enum DlLockType : enum8 {
-    kDeadBolt = 0;
-    kMagnetic = 1;
-    kOther = 2;
-    kMortise = 3;
-    kRim = 4;
-    kLatchBolt = 5;
-    kCylindricalLock = 6;
-    kTubularLock = 7;
-    kInterconnectedLock = 8;
-    kDeadLatch = 9;
-    kDoorFurniture = 10;
-    kEurocylinder = 11;
+  enum ControlSequenceOfOperationEnum : enum8 {
+    kCoolingOnly = 0;
+    kCoolingWithReheat = 1;
+    kHeatingOnly = 2;
+    kHeatingWithReheat = 3;
+    kCoolingAndHeating = 4;
+    kCoolingAndHeatingWithReheat = 5;
   }
 
-  enum DlStatus : enum8 {
-    kSuccess = 0;
-    kFailure = 1;
-    kDuplicate = 2;
-    kOccupied = 3;
-    kInvalidField = 133;
-    kResourceExhausted = 137;
-    kNotFound = 139;
+  enum PresetScenarioEnum : enum8 {
+    kOccupied = 1;
+    kUnoccupied = 2;
+    kSleep = 3;
+    kWake = 4;
+    kVacation = 5;
+    kGoingToSleep = 6;
+    kUserDefined = 254;
   }
 
-  enum DoorLockOperationEventCode : enum8 {
-    kUnknownOrMfgSpecific = 0;
-    kLock = 1;
-    kUnlock = 2;
-    kLockInvalidPinOrId = 3;
-    kLockInvalidSchedule = 4;
-    kUnlockInvalidPinOrId = 5;
-    kUnlockInvalidSchedule = 6;
-    kOneTouchLock = 7;
-    kKeyLock = 8;
-    kKeyUnlock = 9;
-    kAutoLock = 10;
-    kScheduleLock = 11;
-    kScheduleUnlock = 12;
-    kManualLock = 13;
-    kManualUnlock = 14;
+  enum SetpointChangeSourceEnum : enum8 {
+    kManual = 0;
+    kSchedule = 1;
+    kExternal = 2;
   }
 
-  enum DoorLockProgrammingEventCode : enum8 {
-    kUnknownOrMfgSpecific = 0;
-    kMasterCodeChanged = 1;
-    kPinAdded = 2;
-    kPinDeleted = 3;
-    kPinChanged = 4;
-    kIdAdded = 5;
-    kIdDeleted = 6;
+  enum SetpointRaiseLowerModeEnum : enum8 {
+    kHeat = 0;
+    kCool = 1;
+    kBoth = 2;
   }
 
-  enum DoorLockSetPinOrIdStatus : enum8 {
-    kSuccess = 0;
-    kGeneralFailure = 1;
-    kMemoryFull = 2;
-    kDuplicateCodeError = 3;
+  enum StartOfWeekEnum : enum8 {
+    kSunday = 0;
+    kMonday = 1;
+    kTuesday = 2;
+    kWednesday = 3;
+    kThursday = 4;
+    kFriday = 5;
+    kSaturday = 6;
   }
 
-  enum DoorLockUserStatus : enum8 {
-    kAvailable = 0;
-    kOccupiedEnabled = 1;
-    kOccupiedDisabled = 3;
-    kNotSupported = 255;
+  enum SystemModeEnum : enum8 {
+    kOff = 0;
+    kAuto = 1;
+    kCool = 3;
+    kHeat = 4;
+    kEmergencyHeat = 5;
+    kPrecooling = 6;
+    kFanOnly = 7;
+    kDry = 8;
+    kSleep = 9;
   }
 
-  enum DoorLockUserType : enum8 {
-    kUnrestricted = 0;
-    kYearDayScheduleUser = 1;
-    kWeekDayScheduleUser = 2;
-    kMasterUser = 3;
-    kNonAccessUser = 4;
-    kNotSupported = 255;
+  enum TemperatureSetpointHoldEnum : enum8 {
+    kSetpointHoldOff = 0;
+    kSetpointHoldOn = 1;
   }
 
-  enum DoorStateEnum : enum8 {
-    kDoorOpen = 0;
-    kDoorClosed = 1;
-    kDoorJammed = 2;
-    kDoorForcedOpen = 3;
-    kDoorUnspecifiedError = 4;
-    kDoorAjar = 5;
+  enum ThermostatRunningModeEnum : enum8 {
+    kOff = 0;
+    kCool = 3;
+    kHeat = 4;
   }
 
-  enum LockDataTypeEnum : enum8 {
-    kUnspecified = 0;
-    kProgrammingCode = 1;
-    kUserIndex = 2;
-    kWeekDaySchedule = 3;
-    kYearDaySchedule = 4;
-    kHolidaySchedule = 5;
-    kPIN = 6;
-    kRFID = 7;
-    kFingerprint = 8;
-    kFingerVein = 9;
-    kFace = 10;
-    kAliroCredentialIssuerKey = 11;
-    kAliroEvictableEndpointKey = 12;
-    kAliroNonEvictableEndpointKey = 13;
-  }
-
-  enum LockOperationTypeEnum : enum8 {
-    kLock = 0;
-    kUnlock = 1;
-    kNonAccessUserEvent = 2;
-    kForcedUserEvent = 3;
-    kUnlatch = 4;
-  }
-
-  enum OperatingModeEnum : enum8 {
-    kNormal = 0;
-    kVacation = 1;
-    kPrivacy = 2;
-    kNoRemoteLockUnlock = 3;
-    kPassage = 4;
-  }
-
-  enum OperationErrorEnum : enum8 {
-    kUnspecified = 0;
-    kInvalidCredential = 1;
-    kDisabledUserDenied = 2;
-    kRestricted = 3;
-    kInsufficientBattery = 4;
-  }
-
-  enum OperationSourceEnum : enum8 {
-    kUnspecified = 0;
-    kManual = 1;
-    kProprietaryRemote = 2;
-    kKeypad = 3;
-    kAuto = 4;
-    kButton = 5;
-    kSchedule = 6;
-    kRemote = 7;
-    kRFID = 8;
-    kBiometric = 9;
-    kAliro = 10;
-  }
-
-  enum UserStatusEnum : enum8 {
-    kAvailable = 0;
-    kOccupiedEnabled = 1;
-    kOccupiedDisabled = 3;
-  }
-
-  enum UserTypeEnum : enum8 {
-    kUnrestrictedUser = 0;
-    kYearDayScheduleUser = 1;
-    kWeekDayScheduleUser = 2;
-    kProgrammingUser = 3;
-    kNonAccessUser = 4;
-    kForcedUser = 5;
-    kDisposableUser = 6;
-    kExpiringUser = 7;
-    kScheduleRestrictedUser = 8;
-    kRemoteOnlyUser = 9;
-  }
-
-  bitmap DaysMaskMap : bitmap8 {
-    kSunday = 0x1;
-    kMonday = 0x2;
-    kTuesday = 0x4;
-    kWednesday = 0x8;
-    kThursday = 0x10;
-    kFriday = 0x20;
-    kSaturday = 0x40;
-  }
-
-  bitmap DlCredentialRuleMask : bitmap8 {
-    kSingle = 0x1;
-    kDual = 0x2;
-    kTri = 0x4;
-  }
-
-  bitmap DlCredentialRulesSupport : bitmap8 {
-    kSingle = 0x1;
-    kDual = 0x2;
-    kTri = 0x4;
-  }
-
-  bitmap DlDefaultConfigurationRegister : bitmap16 {
-    kEnableLocalProgrammingEnabled = 0x1;
-    kKeypadInterfaceDefaultAccessEnabled = 0x2;
-    kRemoteInterfaceDefaultAccessIsEnabled = 0x4;
-    kSoundEnabled = 0x20;
-    kAutoRelockTimeSet = 0x40;
-    kLEDSettingsSet = 0x80;
-  }
-
-  bitmap DlKeypadOperationEventMask : bitmap16 {
-    kUnknown = 0x1;
-    kLock = 0x2;
-    kUnlock = 0x4;
-    kLockInvalidPIN = 0x8;
-    kLockInvalidSchedule = 0x10;
-    kUnlockInvalidCode = 0x20;
-    kUnlockInvalidSchedule = 0x40;
-    kNonAccessUserOpEvent = 0x80;
-  }
-
-  bitmap DlKeypadProgrammingEventMask : bitmap16 {
-    kUnknown = 0x1;
-    kProgrammingPINChanged = 0x2;
-    kPINAdded = 0x4;
-    kPINCleared = 0x8;
-    kPINChanged = 0x10;
-  }
-
-  bitmap DlLocalProgrammingFeatures : bitmap8 {
-    kAddUsersCredentialsSchedulesLocally = 0x1;
-    kModifyUsersCredentialsSchedulesLocally = 0x2;
-    kClearUsersCredentialsSchedulesLocally = 0x4;
-    kAdjustLockSettingsLocally = 0x8;
-  }
-
-  bitmap DlManualOperationEventMask : bitmap16 {
-    kUnknown = 0x1;
-    kThumbturnLock = 0x2;
-    kThumbturnUnlock = 0x4;
-    kOneTouchLock = 0x8;
-    kKeyLock = 0x10;
-    kKeyUnlock = 0x20;
-    kAutoLock = 0x40;
-    kScheduleLock = 0x80;
-    kScheduleUnlock = 0x100;
-    kManualLock = 0x200;
-    kManualUnlock = 0x400;
-  }
-
-  bitmap DlRFIDOperationEventMask : bitmap16 {
-    kUnknown = 0x1;
-    kLock = 0x2;
-    kUnlock = 0x4;
-    kLockInvalidRFID = 0x8;
-    kLockInvalidSchedule = 0x10;
-    kUnlockInvalidRFID = 0x20;
-    kUnlockInvalidSchedule = 0x40;
-  }
-
-  bitmap DlRFIDProgrammingEventMask : bitmap16 {
-    kUnknown = 0x1;
-    kRFIDCodeAdded = 0x20;
-    kRFIDCodeCleared = 0x40;
-  }
-
-  bitmap DlRemoteOperationEventMask : bitmap16 {
-    kUnknown = 0x1;
-    kLock = 0x2;
-    kUnlock = 0x4;
-    kLockInvalidCode = 0x8;
-    kLockInvalidSchedule = 0x10;
-    kUnlockInvalidCode = 0x20;
-    kUnlockInvalidSchedule = 0x40;
-  }
-
-  bitmap DlRemoteProgrammingEventMask : bitmap16 {
-    kUnknown = 0x1;
-    kProgrammingPINChanged = 0x2;
-    kPINAdded = 0x4;
-    kPINCleared = 0x8;
-    kPINChanged = 0x10;
-    kRFIDCodeAdded = 0x20;
-    kRFIDCodeCleared = 0x40;
-  }
-
-  bitmap DlSupportedOperatingModes : bitmap16 {
-    kNormal = 0x1;
-    kVacation = 0x2;
-    kPrivacy = 0x4;
-    kNoRemoteLockUnlock = 0x8;
-    kPassage = 0x10;
-  }
-
-  bitmap DoorLockDayOfWeek : bitmap8 {
-    kSunday = 0x1;
-    kMonday = 0x2;
-    kTuesday = 0x4;
-    kWednesday = 0x8;
-    kThursday = 0x10;
-    kFriday = 0x20;
-    kSaturday = 0x40;
+  bitmap ACErrorCodeBitmap : bitmap32 {
+    kCompressorFail = 0x1;
+    kRoomSensorFail = 0x2;
+    kOutdoorSensorFail = 0x4;
+    kCoilSensorFail = 0x8;
+    kFanFail = 0x10;
   }
 
   bitmap Feature : bitmap32 {
-    kPINCredential = 0x1;
-    kRFIDCredential = 0x2;
-    kFingerCredentials = 0x4;
-    kLogging = 0x8;
-    kWeekDayAccessSchedules = 0x10;
-    kDoorPositionSensor = 0x20;
-    kFaceCredentials = 0x40;
-    kCredentialsOverTheAirAccess = 0x80;
-    kUser = 0x100;
-    kNotification = 0x200;
-    kYearDayAccessSchedules = 0x400;
-    kHolidaySchedules = 0x800;
-    kUnbolt = 0x1000;
-    kAliroProvisioning = 0x2000;
-    kAliroBLEUWB = 0x4000;
+    kHeating = 0x1;
+    kCooling = 0x2;
+    kOccupancy = 0x4;
+    kScheduleConfiguration = 0x8;
+    kSetback = 0x10;
+    kAutoMode = 0x20;
+    kLocalTemperatureNotExposed = 0x40;
+    kMatterScheduleConfiguration = 0x80;
+    kPresets = 0x100;
   }
 
-  struct CredentialStruct {
-    CredentialTypeEnum credentialType = 0;
-    int16u credentialIndex = 1;
+  bitmap HVACSystemTypeBitmap : bitmap8 {
+    kCoolingStage = 0x3;
+    kHeatingStage = 0xC;
+    kHeatingIsHeatPump = 0x10;
+    kHeatingUsesFuel = 0x20;
   }
 
-  critical event DoorLockAlarm = 0 {
-    AlarmCodeEnum alarmCode = 0;
+  bitmap OccupancyBitmap : bitmap8 {
+    kOccupied = 0x1;
   }
 
-  critical event DoorStateChange = 1 {
-    DoorStateEnum doorState = 0;
+  bitmap PresetTypeFeaturesBitmap : bitmap16 {
+    kAutomatic = 0x1;
+    kSupportsNames = 0x2;
   }
 
-  critical event LockOperation = 2 {
-    LockOperationTypeEnum lockOperationType = 0;
-    OperationSourceEnum operationSource = 1;
-    nullable int16u userIndex = 2;
-    nullable fabric_idx fabricIndex = 3;
-    nullable node_id sourceNode = 4;
-    optional nullable CredentialStruct credentials[] = 5;
+  bitmap ProgrammingOperationModeBitmap : bitmap8 {
+    kScheduleActive = 0x1;
+    kAutoRecovery = 0x2;
+    kEconomy = 0x4;
   }
 
-  critical event LockOperationError = 3 {
-    LockOperationTypeEnum lockOperationType = 0;
-    OperationSourceEnum operationSource = 1;
-    OperationErrorEnum operationError = 2;
-    nullable int16u userIndex = 3;
-    nullable fabric_idx fabricIndex = 4;
-    nullable node_id sourceNode = 5;
-    optional nullable CredentialStruct credentials[] = 6;
+  bitmap RelayStateBitmap : bitmap16 {
+    kHeat = 0x1;
+    kCool = 0x2;
+    kFan = 0x4;
+    kHeatStage2 = 0x8;
+    kCoolStage2 = 0x10;
+    kFanStage2 = 0x20;
+    kFanStage3 = 0x40;
   }
 
-  info event LockUserChange = 4 {
-    LockDataTypeEnum lockDataType = 0;
-    DataOperationTypeEnum dataOperationType = 1;
-    OperationSourceEnum operationSource = 2;
-    nullable int16u userIndex = 3;
-    nullable fabric_idx fabricIndex = 4;
-    nullable node_id sourceNode = 5;
-    nullable int16u dataIndex = 6;
+  bitmap RemoteSensingBitmap : bitmap8 {
+    kLocalTemperature = 0x1;
+    kOutdoorTemperature = 0x2;
+    kOccupancy = 0x4;
   }
 
-  readonly attribute nullable DlLockState lockState = 0;
-  readonly attribute DlLockType lockType = 1;
-  readonly attribute boolean actuatorEnabled = 2;
-  readonly attribute optional nullable DoorStateEnum doorState = 3;
-  attribute access(write: manage) optional int32u doorOpenEvents = 4;
-  attribute access(write: manage) optional int32u doorClosedEvents = 5;
-  attribute access(write: manage) optional int16u openPeriod = 6;
-  readonly attribute optional int16u numberOfTotalUsersSupported = 17;
-  readonly attribute optional int16u numberOfPINUsersSupported = 18;
-  readonly attribute optional int16u numberOfRFIDUsersSupported = 19;
-  readonly attribute optional int8u numberOfWeekDaySchedulesSupportedPerUser = 20;
-  readonly attribute optional int8u numberOfYearDaySchedulesSupportedPerUser = 21;
-  readonly attribute optional int8u numberOfHolidaySchedulesSupported = 22;
-  readonly attribute optional int8u maxPINCodeLength = 23;
-  readonly attribute optional int8u minPINCodeLength = 24;
-  readonly attribute optional int8u maxRFIDCodeLength = 25;
-  readonly attribute optional int8u minRFIDCodeLength = 26;
-  readonly attribute optional DlCredentialRuleMask credentialRulesSupport = 27;
-  readonly attribute optional int8u numberOfCredentialsSupportedPerUser = 28;
-  attribute access(write: manage) optional char_string<3> language = 33;
-  attribute access(write: manage) optional int8u LEDSettings = 34;
-  attribute access(write: manage) optional int32u autoRelockTime = 35;
-  attribute access(write: manage) optional int8u soundVolume = 36;
-  attribute access(write: manage) OperatingModeEnum operatingMode = 37;
-  readonly attribute DlSupportedOperatingModes supportedOperatingModes = 38;
-  readonly attribute optional DlDefaultConfigurationRegister defaultConfigurationRegister = 39;
-  attribute access(write: administer) optional boolean enableLocalProgramming = 40;
-  attribute access(write: manage) optional boolean enableOneTouchLocking = 41;
-  attribute access(write: manage) optional boolean enableInsideStatusLED = 42;
-  attribute access(write: manage) optional boolean enablePrivacyModeButton = 43;
-  attribute access(write: administer) optional DlLocalProgrammingFeatures localProgrammingFeatures = 44;
-  attribute access(write: administer) optional int8u wrongCodeEntryLimit = 48;
-  attribute access(write: administer) optional int8u userCodeTemporaryDisableTime = 49;
-  attribute access(write: administer) optional boolean sendPINOverTheAir = 50;
-  attribute access(write: administer) optional boolean requirePINforRemoteOperation = 51;
-  attribute access(write: administer) optional int16u expiringUserTimeout = 53;
-  provisional readonly attribute access(read: administer) optional nullable octet_string<65> aliroReaderVerificationKey = 128;
-  provisional readonly attribute access(read: administer) optional nullable octet_string<16> aliroReaderGroupIdentifier = 129;
-  provisional readonly attribute access(read: administer) optional octet_string<16> aliroReaderGroupSubIdentifier = 130;
-  provisional readonly attribute access(read: administer) optional octet_string aliroExpeditedTransactionSupportedProtocolVersions[] = 131;
-  provisional readonly attribute access(read: administer) optional nullable octet_string<16> aliroGroupResolvingKey = 132;
-  provisional readonly attribute access(read: administer) optional octet_string aliroSupportedBLEUWBProtocolVersions[] = 133;
-  provisional readonly attribute access(read: administer) optional int8u aliroBLEAdvertisingVersion = 134;
-  provisional readonly attribute optional int16u numberOfAliroCredentialIssuerKeysSupported = 135;
-  provisional readonly attribute optional int16u numberOfAliroEndpointKeysSupported = 136;
+  bitmap ScheduleDayOfWeekBitmap : bitmap8 {
+    kSunday = 0x1;
+    kMonday = 0x2;
+    kTuesday = 0x4;
+    kWednesday = 0x8;
+    kThursday = 0x10;
+    kFriday = 0x20;
+    kSaturday = 0x40;
+    kAway = 0x80;
+  }
+
+  bitmap ScheduleModeBitmap : bitmap8 {
+    kHeatSetpointPresent = 0x1;
+    kCoolSetpointPresent = 0x2;
+  }
+
+  bitmap ScheduleTypeFeaturesBitmap : bitmap16 {
+    kSupportsPresets = 0x1;
+    kSupportsSetpoints = 0x2;
+    kSupportsNames = 0x4;
+    kSupportsOff = 0x8;
+  }
+
+  struct ScheduleTransitionStruct {
+    ScheduleDayOfWeekBitmap dayOfWeek = 0;
+    int16u transitionTime = 1;
+    optional octet_string<16> presetHandle = 2;
+    optional SystemModeEnum systemMode = 3;
+    optional temperature coolingSetpoint = 4;
+    optional temperature heatingSetpoint = 5;
+  }
+
+  struct ScheduleStruct {
+    nullable octet_string<16> scheduleHandle = 0;
+    SystemModeEnum systemMode = 1;
+    optional char_string<64> name = 2;
+    optional octet_string<16> presetHandle = 3;
+    ScheduleTransitionStruct transitions[] = 4;
+    nullable boolean builtIn = 5;
+  }
+
+  struct PresetStruct {
+    nullable octet_string<16> presetHandle = 0;
+    PresetScenarioEnum presetScenario = 1;
+    optional nullable char_string<64> name = 2;
+    optional temperature coolingSetpoint = 3;
+    optional temperature heatingSetpoint = 4;
+    nullable boolean builtIn = 5;
+  }
+
+  struct PresetTypeStruct {
+    PresetScenarioEnum presetScenario = 0;
+    int8u numberOfPresets = 1;
+    PresetTypeFeaturesBitmap presetTypeFeatures = 2;
+  }
+
+  struct ScheduleTypeStruct {
+    SystemModeEnum systemMode = 0;
+    int8u numberOfSchedules = 1;
+    ScheduleTypeFeaturesBitmap scheduleTypeFeatures = 2;
+  }
+
+  struct WeeklyScheduleTransitionStruct {
+    int16u transitionTime = 0;
+    nullable temperature heatSetpoint = 1;
+    nullable temperature coolSetpoint = 2;
+  }
+
+  readonly attribute nullable temperature localTemperature = 0;
+  readonly attribute optional nullable temperature outdoorTemperature = 1;
+  readonly attribute optional OccupancyBitmap occupancy = 2;
+  readonly attribute optional temperature absMinHeatSetpointLimit = 3;
+  readonly attribute optional temperature absMaxHeatSetpointLimit = 4;
+  readonly attribute optional temperature absMinCoolSetpointLimit = 5;
+  readonly attribute optional temperature absMaxCoolSetpointLimit = 6;
+  readonly attribute optional int8u PICoolingDemand = 7;
+  readonly attribute optional int8u PIHeatingDemand = 8;
+  attribute access(write: manage) optional HVACSystemTypeBitmap HVACSystemTypeConfiguration = 9;
+  attribute access(write: manage) optional int8s localTemperatureCalibration = 16;
+  attribute optional temperature occupiedCoolingSetpoint = 17;
+  attribute optional temperature occupiedHeatingSetpoint = 18;
+  attribute optional temperature unoccupiedCoolingSetpoint = 19;
+  attribute optional temperature unoccupiedHeatingSetpoint = 20;
+  attribute access(write: manage) optional temperature minHeatSetpointLimit = 21;
+  attribute access(write: manage) optional temperature maxHeatSetpointLimit = 22;
+  attribute access(write: manage) optional temperature minCoolSetpointLimit = 23;
+  attribute access(write: manage) optional temperature maxCoolSetpointLimit = 24;
+  attribute access(write: manage) optional int8s minSetpointDeadBand = 25;
+  attribute access(write: manage) optional RemoteSensingBitmap remoteSensing = 26;
+  attribute access(write: manage) ControlSequenceOfOperationEnum controlSequenceOfOperation = 27;
+  attribute access(write: manage) SystemModeEnum systemMode = 28;
+  readonly attribute optional ThermostatRunningModeEnum thermostatRunningMode = 30;
+  readonly attribute optional StartOfWeekEnum startOfWeek = 32;
+  readonly attribute optional int8u numberOfWeeklyTransitions = 33;
+  readonly attribute optional int8u numberOfDailyTransitions = 34;
+  attribute access(write: manage) optional TemperatureSetpointHoldEnum temperatureSetpointHold = 35;
+  attribute access(write: manage) optional nullable int16u temperatureSetpointHoldDuration = 36;
+  attribute access(write: manage) optional ProgrammingOperationModeBitmap thermostatProgrammingOperationMode = 37;
+  readonly attribute optional RelayStateBitmap thermostatRunningState = 41;
+  readonly attribute optional SetpointChangeSourceEnum setpointChangeSource = 48;
+  readonly attribute optional nullable int16s setpointChangeAmount = 49;
+  readonly attribute optional epoch_s setpointChangeSourceTimestamp = 50;
+  attribute access(write: manage) optional nullable int8u occupiedSetback = 52;
+  readonly attribute optional nullable int8u occupiedSetbackMin = 53;
+  readonly attribute optional nullable int8u occupiedSetbackMax = 54;
+  attribute access(write: manage) optional nullable int8u unoccupiedSetback = 55;
+  readonly attribute optional nullable int8u unoccupiedSetbackMin = 56;
+  readonly attribute optional nullable int8u unoccupiedSetbackMax = 57;
+  attribute access(write: manage) optional int8u emergencyHeatDelta = 58;
+  attribute access(write: manage) optional ACTypeEnum ACType = 64;
+  attribute access(write: manage) optional int16u ACCapacity = 65;
+  attribute access(write: manage) optional ACRefrigerantTypeEnum ACRefrigerantType = 66;
+  attribute access(write: manage) optional ACCompressorTypeEnum ACCompressorType = 67;
+  attribute access(write: manage) optional ACErrorCodeBitmap ACErrorCode = 68;
+  attribute access(write: manage) optional ACLouverPositionEnum ACLouverPosition = 69;
+  readonly attribute optional nullable temperature ACCoilTemperature = 70;
+  attribute access(write: manage) optional ACCapacityFormatEnum ACCapacityformat = 71;
+  readonly attribute optional PresetTypeStruct presetTypes[] = 72;
+  readonly attribute optional ScheduleTypeStruct scheduleTypes[] = 73;
+  readonly attribute optional int8u numberOfPresets = 74;
+  readonly attribute optional int8u numberOfSchedules = 75;
+  readonly attribute optional int8u numberOfScheduleTransitions = 76;
+  readonly attribute optional nullable int8u numberOfScheduleTransitionPerDay = 77;
+  readonly attribute optional nullable octet_string<16> activePresetHandle = 78;
+  readonly attribute optional nullable octet_string<16> activeScheduleHandle = 79;
+  attribute access(write: manage) optional PresetStruct presets[] = 80;
+  attribute access(write: manage) optional ScheduleStruct schedules[] = 81;
+  readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 82;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2253,214 +2206,108 @@ cluster DoorLock = 257 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  request struct LockDoorRequest {
-    optional octet_string PINCode = 0;
+  request struct SetpointRaiseLowerRequest {
+    SetpointRaiseLowerModeEnum mode = 0;
+    int8s amount = 1;
   }
 
-  request struct UnlockDoorRequest {
-    optional octet_string PINCode = 0;
+  response struct GetWeeklyScheduleResponse = 0 {
+    int8u numberOfTransitionsForSequence = 0;
+    ScheduleDayOfWeekBitmap dayOfWeekForSequence = 1;
+    ScheduleModeBitmap modeForSequence = 2;
+    WeeklyScheduleTransitionStruct transitions[] = 3;
   }
 
-  request struct UnlockWithTimeoutRequest {
-    int16u timeout = 0;
-    optional octet_string PINCode = 1;
+  request struct SetWeeklyScheduleRequest {
+    int8u numberOfTransitionsForSequence = 0;
+    ScheduleDayOfWeekBitmap dayOfWeekForSequence = 1;
+    ScheduleModeBitmap modeForSequence = 2;
+    WeeklyScheduleTransitionStruct transitions[] = 3;
   }
 
-  request struct SetWeekDayScheduleRequest {
-    int8u weekDayIndex = 0;
-    int16u userIndex = 1;
-    DaysMaskMap daysMask = 2;
-    int8u startHour = 3;
-    int8u startMinute = 4;
-    int8u endHour = 5;
-    int8u endMinute = 6;
+  request struct GetWeeklyScheduleRequest {
+    ScheduleDayOfWeekBitmap daysToReturn = 0;
+    ScheduleModeBitmap modeToReturn = 1;
   }
 
-  request struct GetWeekDayScheduleRequest {
-    int8u weekDayIndex = 0;
-    int16u userIndex = 1;
+  request struct SetActiveScheduleRequestRequest {
+    octet_string<16> scheduleHandle = 0;
   }
 
-  response struct GetWeekDayScheduleResponse = 12 {
-    int8u weekDayIndex = 0;
-    int16u userIndex = 1;
-    DlStatus status = 2;
-    optional DaysMaskMap daysMask = 3;
-    optional int8u startHour = 4;
-    optional int8u startMinute = 5;
-    optional int8u endHour = 6;
-    optional int8u endMinute = 7;
+  request struct SetActivePresetRequestRequest {
+    nullable octet_string<16> presetHandle = 0;
   }
 
-  request struct ClearWeekDayScheduleRequest {
-    int8u weekDayIndex = 0;
-    int16u userIndex = 1;
+  response struct AtomicResponse = 253 {
+    status statusCode = 0;
+    AtomicAttributeStatusStruct attributeStatus[] = 1;
+    optional int16u timeout = 2;
   }
 
-  request struct SetYearDayScheduleRequest {
-    int8u yearDayIndex = 0;
-    int16u userIndex = 1;
-    epoch_s localStartTime = 2;
-    epoch_s localEndTime = 3;
+  request struct AtomicRequestRequest {
+    AtomicRequestTypeEnum requestType = 0;
+    attrib_id attributeRequests[] = 1;
+    optional int16u timeout = 2;
   }
 
-  request struct GetYearDayScheduleRequest {
-    int8u yearDayIndex = 0;
-    int16u userIndex = 1;
+  /** Upon receipt, the attributes for the indicated setpoint(s) SHALL have the amount specified in the Amount field added to them. */
+  command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
+  /** This command is used to update the thermostat weekly setpoint schedule from a management system. */
+  command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
+  /** The Current Weekly Schedule Command is sent from the server in response to the Get Weekly Schedule Command. */
+  command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
+  /** This command is used to clear the weekly schedule. */
+  command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
+  /** Upon receipt, if the Schedules attribute contains a ScheduleStruct whose ScheduleHandle field matches the value of the ScheduleHandle field, the server SHALL set the thermostat's ActiveScheduleHandle attribute to the value of the ScheduleHandle field. */
+  command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
+  /** ID */
+  command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
+  /** Begins, Commits or Cancels an atomic write */
+  command access(invoke: manage) AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
+}
+
+/** Manage the Thread network of Thread Border Router */
+provisional cluster ThreadBorderRouterManagement = 1106 {
+  revision 1;
+
+  bitmap Feature : bitmap32 {
+    kPANChange = 0x1;
   }
 
-  response struct GetYearDayScheduleResponse = 15 {
-    int8u yearDayIndex = 0;
-    int16u userIndex = 1;
-    DlStatus status = 2;
-    optional epoch_s localStartTime = 3;
-    optional epoch_s localEndTime = 4;
+  provisional readonly attribute char_string<63> borderRouterName = 0;
+  provisional readonly attribute octet_string<254> borderAgentID = 1;
+  provisional readonly attribute int16u threadVersion = 2;
+  provisional readonly attribute boolean interfaceEnabled = 3;
+  provisional readonly attribute nullable int64u activeDatasetTimestamp = 4;
+  provisional readonly attribute nullable int64u pendingDatasetTimestamp = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct DatasetResponse = 2 {
+    octet_string<254> dataset = 0;
   }
 
-  request struct ClearYearDayScheduleRequest {
-    int8u yearDayIndex = 0;
-    int16u userIndex = 1;
+  request struct SetActiveDatasetRequestRequest {
+    octet_string<254> activeDataset = 0;
+    optional int64u breadcrumb = 1;
   }
 
-  request struct SetHolidayScheduleRequest {
-    int8u holidayIndex = 0;
-    epoch_s localStartTime = 1;
-    epoch_s localEndTime = 2;
-    OperatingModeEnum operatingMode = 3;
+  request struct SetPendingDatasetRequestRequest {
+    octet_string<254> pendingDataset = 0;
   }
 
-  request struct GetHolidayScheduleRequest {
-    int8u holidayIndex = 0;
-  }
-
-  response struct GetHolidayScheduleResponse = 18 {
-    int8u holidayIndex = 0;
-    DlStatus status = 1;
-    optional epoch_s localStartTime = 2;
-    optional epoch_s localEndTime = 3;
-    optional OperatingModeEnum operatingMode = 4;
-  }
-
-  request struct ClearHolidayScheduleRequest {
-    int8u holidayIndex = 0;
-  }
-
-  request struct SetUserRequest {
-    DataOperationTypeEnum operationType = 0;
-    int16u userIndex = 1;
-    nullable char_string userName = 2;
-    nullable int32u userUniqueID = 3;
-    nullable UserStatusEnum userStatus = 4;
-    nullable UserTypeEnum userType = 5;
-    nullable CredentialRuleEnum credentialRule = 6;
-  }
-
-  request struct GetUserRequest {
-    int16u userIndex = 0;
-  }
-
-  response struct GetUserResponse = 28 {
-    int16u userIndex = 0;
-    nullable char_string userName = 1;
-    nullable int32u userUniqueID = 2;
-    nullable UserStatusEnum userStatus = 3;
-    nullable UserTypeEnum userType = 4;
-    nullable CredentialRuleEnum credentialRule = 5;
-    nullable CredentialStruct credentials[] = 6;
-    nullable fabric_idx creatorFabricIndex = 7;
-    nullable fabric_idx lastModifiedFabricIndex = 8;
-    nullable int16u nextUserIndex = 9;
-  }
-
-  request struct ClearUserRequest {
-    int16u userIndex = 0;
-  }
-
-  request struct SetCredentialRequest {
-    DataOperationTypeEnum operationType = 0;
-    CredentialStruct credential = 1;
-    long_octet_string credentialData = 2;
-    nullable int16u userIndex = 3;
-    nullable UserStatusEnum userStatus = 4;
-    nullable UserTypeEnum userType = 5;
-  }
-
-  response struct SetCredentialResponse = 35 {
-    DlStatus status = 0;
-    nullable int16u userIndex = 1;
-    nullable int16u nextCredentialIndex = 2;
-  }
-
-  request struct GetCredentialStatusRequest {
-    CredentialStruct credential = 0;
-  }
-
-  response struct GetCredentialStatusResponse = 37 {
-    boolean credentialExists = 0;
-    nullable int16u userIndex = 1;
-    nullable fabric_idx creatorFabricIndex = 2;
-    nullable fabric_idx lastModifiedFabricIndex = 3;
-    nullable int16u nextCredentialIndex = 4;
-    optional nullable octet_string credentialData = 5;
-  }
-
-  request struct ClearCredentialRequest {
-    nullable CredentialStruct credential = 0;
-  }
-
-  request struct UnboltDoorRequest {
-    optional octet_string PINCode = 0;
-  }
-
-  request struct SetAliroReaderConfigRequest {
-    octet_string<32> signingKey = 0;
-    octet_string<65> verificationKey = 1;
-    octet_string<16> groupIdentifier = 2;
-    optional octet_string<16> groupResolvingKey = 3;
-  }
-
-  /** This command causes the lock device to lock the door. */
-  timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
-  /** This command causes the lock device to unlock the door. */
-  timed command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
-  /** This command causes the lock device to unlock the door with a timeout parameter. */
-  timed command UnlockWithTimeout(UnlockWithTimeoutRequest): DefaultSuccess = 3;
-  /** Set a weekly repeating schedule for a specified user. */
-  command access(invoke: administer) SetWeekDaySchedule(SetWeekDayScheduleRequest): DefaultSuccess = 11;
-  /** Retrieve the specific weekly schedule for the specific user. */
-  command access(invoke: administer) GetWeekDaySchedule(GetWeekDayScheduleRequest): GetWeekDayScheduleResponse = 12;
-  /** Clear the specific weekly schedule or all weekly schedules for the specific user. */
-  command access(invoke: administer) ClearWeekDaySchedule(ClearWeekDayScheduleRequest): DefaultSuccess = 13;
-  /** Set a time-specific schedule ID for a specified user. */
-  command access(invoke: administer) SetYearDaySchedule(SetYearDayScheduleRequest): DefaultSuccess = 14;
-  /** Returns the year day schedule data for the specified schedule and user indexes. */
-  command access(invoke: administer) GetYearDaySchedule(GetYearDayScheduleRequest): GetYearDayScheduleResponse = 15;
-  /** Clears the specific year day schedule or all year day schedules for the specific user. */
-  command access(invoke: administer) ClearYearDaySchedule(ClearYearDayScheduleRequest): DefaultSuccess = 16;
-  /** Set the holiday Schedule by specifying local start time and local end time with respect to any Lock Operating Mode. */
-  command access(invoke: administer) SetHolidaySchedule(SetHolidayScheduleRequest): DefaultSuccess = 17;
-  /** Get the holiday schedule for the specified index. */
-  command access(invoke: administer) GetHolidaySchedule(GetHolidayScheduleRequest): GetHolidayScheduleResponse = 18;
-  /** Clears the holiday schedule or all holiday schedules. */
-  command access(invoke: administer) ClearHolidaySchedule(ClearHolidayScheduleRequest): DefaultSuccess = 19;
-  /** Set User into the lock. */
-  timed command access(invoke: administer) SetUser(SetUserRequest): DefaultSuccess = 26;
-  /** Retrieve User. */
-  command access(invoke: administer) GetUser(GetUserRequest): GetUserResponse = 27;
-  /** Clears a User or all Users. */
-  timed command access(invoke: administer) ClearUser(ClearUserRequest): DefaultSuccess = 29;
-  /** Set a credential (e.g. PIN, RFID, Fingerprint, etc.) into the lock for a new user, existing user, or ProgrammingUser. */
-  timed command access(invoke: administer) SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
-  /** Retrieve the status of a particular credential (e.g. PIN, RFID, Fingerprint, etc.) by index. */
-  command access(invoke: administer) GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
-  /** Clear one, one type, or all credentials except ProgrammingPIN credential. */
-  timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
-  /** This command causes the lock device to unlock the door without pulling the latch. */
-  timed command UnboltDoor(UnboltDoorRequest): DefaultSuccess = 39;
-  /** This command communicates an Aliro Reader configuration to the lock. */
-  timed command access(invoke: administer) SetAliroReaderConfig(SetAliroReaderConfigRequest): DefaultSuccess = 40;
-  /** This command clears an existing Aliro Reader configuration for the lock. */
-  timed command access(invoke: administer) ClearAliroReaderConfig(): DefaultSuccess = 41;
+  /** Command to request the active operational dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session */
+  command access(invoke: manage) GetActiveDatasetRequest(): DatasetResponse = 0;
+  /** Command to request the pending dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session */
+  command access(invoke: manage) GetPendingDatasetRequest(): DatasetResponse = 1;
+  /** Command to set or update the active Dataset of the Thread network to which the Border Router is connected. */
+  command access(invoke: manage) SetActiveDatasetRequest(SetActiveDatasetRequestRequest): DefaultSuccess = 3;
+  /** Command set or update the pending Dataset of the Thread network to which the Border Router is connected. */
+  command access(invoke: manage) SetPendingDatasetRequest(SetPendingDatasetRequestRequest): DefaultSuccess = 4;
 }
 
 endpoint 0 {
@@ -2473,9 +2320,6 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -2488,8 +2332,6 @@ endpoint 0 {
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
@@ -2522,6 +2364,7 @@ endpoint 0 {
     callback attribute maxPathsPerInvoke;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
@@ -2535,13 +2378,41 @@ endpoint 0 {
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
     ram      attribute updateStateProgress default = 0;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
     handle command AnnounceOTAProvider;
+  }
+
+  server cluster LocalizationConfiguration {
+    persist  attribute activeLocale default = "en-US";
+    callback attribute supportedLocales;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TimeFormatLocalization {
+    persist  attribute hourFormat default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster UnitLocalization {
+    ram      attribute temperatureUnit;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x1;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster GeneralCommissioning {
@@ -2550,9 +2421,6 @@ endpoint 0 {
     callback attribute regulatoryConfig;
     callback attribute locationCapability;
     callback attribute supportsConcurrentConnection;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
@@ -2573,16 +2441,17 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
-    callback attribute supportedThreadFeatures;
-    callback attribute threadVersion;
+    callback attribute supportedWiFiBands;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 2;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
 
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
+    handle command AddOrUpdateWiFiNetwork;
     handle command AddOrUpdateThreadNetwork;
     handle command RemoveNetwork;
     handle command NetworkConfigResponse;
@@ -2594,6 +2463,7 @@ endpoint 0 {
   server cluster DiagnosticLogs {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2603,21 +2473,16 @@ endpoint 0 {
   }
 
   server cluster GeneralDiagnostics {
-    emits event HardwareFaultChange;
-    emits event RadioFaultChange;
-    emits event NetworkFaultChange;
     emits event BootReason;
     callback attribute networkInterfaces;
     callback attribute rebootCount;
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute activeHardwareFaults;
-    callback attribute activeRadioFaults;
-    callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -2627,102 +2492,29 @@ endpoint 0 {
     handle command TimeSnapshotResponse;
   }
 
-  server cluster SoftwareDiagnostics {
-    callback attribute threadMetrics;
-    callback attribute currentHeapFree;
-    callback attribute currentHeapUsed;
-    callback attribute currentHeapHighWatermark;
+  server cluster WiFiNetworkDiagnostics {
+    callback attribute bssid;
+    callback attribute securityType;
+    callback attribute wiFiVersion;
+    callback attribute channelNumber;
+    callback attribute rssi;
+    callback attribute currentMaxRate;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
-
-    handle command ResetWatermarks;
-  }
-
-  server cluster ThreadNetworkDiagnostics {
-    callback attribute channel;
-    callback attribute routingRole;
-    callback attribute networkName;
-    callback attribute panId;
-    callback attribute extendedPanId;
-    callback attribute meshLocalPrefix;
-    callback attribute overrunCount;
-    callback attribute neighborTable;
-    callback attribute routeTable;
-    callback attribute partitionId;
-    callback attribute weighting;
-    callback attribute dataVersion;
-    callback attribute stableDataVersion;
-    callback attribute leaderRouterId;
-    callback attribute detachedRoleCount;
-    callback attribute childRoleCount;
-    callback attribute routerRoleCount;
-    callback attribute leaderRoleCount;
-    callback attribute attachAttemptCount;
-    callback attribute partitionIdChangeCount;
-    callback attribute betterPartitionAttachAttemptCount;
-    callback attribute parentChangeCount;
-    callback attribute txTotalCount;
-    callback attribute txUnicastCount;
-    callback attribute txBroadcastCount;
-    callback attribute txAckRequestedCount;
-    callback attribute txAckedCount;
-    callback attribute txNoAckRequestedCount;
-    callback attribute txDataCount;
-    callback attribute txDataPollCount;
-    callback attribute txBeaconCount;
-    callback attribute txBeaconRequestCount;
-    callback attribute txOtherCount;
-    callback attribute txRetryCount;
-    callback attribute txDirectMaxRetryExpiryCount;
-    callback attribute txIndirectMaxRetryExpiryCount;
-    callback attribute txErrCcaCount;
-    callback attribute txErrAbortCount;
-    callback attribute txErrBusyChannelCount;
-    callback attribute rxTotalCount;
-    callback attribute rxUnicastCount;
-    callback attribute rxBroadcastCount;
-    callback attribute rxDataCount;
-    callback attribute rxDataPollCount;
-    callback attribute rxBeaconCount;
-    callback attribute rxBeaconRequestCount;
-    callback attribute rxOtherCount;
-    callback attribute rxAddressFilteredCount;
-    callback attribute rxDestAddrFilteredCount;
-    callback attribute rxDuplicatedCount;
-    callback attribute rxErrNoFrameCount;
-    callback attribute rxErrUnknownNeighborCount;
-    callback attribute rxErrInvalidSrcAddrCount;
-    callback attribute rxErrSecCount;
-    callback attribute rxErrFcsCount;
-    callback attribute rxErrOtherCount;
-    callback attribute securityPolicy;
-    callback attribute channelPage0Mask;
-    callback attribute operationalDatasetComponents;
-    callback attribute activeNetworkFaultsList;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 2;
-
-    handle command ResetCounts;
   }
 
   server cluster AdministratorCommissioning {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
     handle command OpenCommissioningWindow;
-    handle command OpenBasicCommissioningWindow;
     handle command RevokeCommissioning;
   }
 
@@ -2733,9 +2525,6 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
@@ -2758,9 +2547,6 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2771,46 +2557,18 @@ endpoint 0 {
     handle command KeySetReadAllIndices;
     handle command KeySetReadAllIndicesResponse;
   }
-
-  server cluster FixedLabel {
-    callback attribute labelList;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster UserLabel {
-    callback attribute labelList;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster IcdManagement {
-    callback attribute idleModeDuration;
-    callback attribute activeModeDuration;
-    callback attribute activeModeThreshold;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0x0000;
-    ram      attribute clusterRevision default = 3;
-  }
 }
 endpoint 1 {
-  device type ma_doorlock = 10, version 1;
+  device type ma_thermostat = 769, version 1;
 
+  binding cluster Identify;
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;
     ram      attribute identifyType default = 0x0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
@@ -2821,9 +2579,6 @@ endpoint 1 {
 
   server cluster Groups {
     ram      attribute nameSupport;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
 
@@ -2844,52 +2599,167 @@ endpoint 1 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster Binding {
+    callback attribute binding;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster FixedLabel {
+    callback attribute labelList;
+    callback attribute eventList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster UserLabel {
+    callback attribute labelList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster Thermostat {
+    ram      attribute localTemperature;
+    ram      attribute absMinHeatSetpointLimit default = 700;
+    ram      attribute absMaxHeatSetpointLimit default = 3000;
+    ram      attribute absMinCoolSetpointLimit default = 1600;
+    ram      attribute absMaxCoolSetpointLimit default = 3200;
+    persist  attribute occupiedCoolingSetpoint default = 0x0A28;
+    persist  attribute occupiedHeatingSetpoint default = 0x07D0;
+    ram      attribute minHeatSetpointLimit default = 700;
+    ram      attribute maxHeatSetpointLimit default = 3000;
+    ram      attribute minCoolSetpointLimit default = 1600;
+    ram      attribute maxCoolSetpointLimit default = 3200;
+    ram      attribute controlSequenceOfOperation default = 0x04;
+    persist  attribute systemMode default = 0x01;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x3;
+    ram      attribute clusterRevision default = 7;
+
+    handle command SetpointRaiseLower;
+  }
+}
+endpoint 2 {
+  device type ma_thread_border_router = 145, version 1;
+
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
-  server cluster DoorLock {
-    emits event DoorLockAlarm;
-    emits event DoorStateChange;
-    emits event LockOperation;
-    emits event LockOperationError;
-    emits event LockUserChange;
-    persist  attribute lockState default = 1;
-    ram      attribute lockType;
-    ram      attribute actuatorEnabled;
-    ram      attribute numberOfTotalUsersSupported default = 10;
-    ram      attribute numberOfPINUsersSupported default = 10;
-    ram      attribute maxPINCodeLength default = 8;
-    ram      attribute minPINCodeLength default = 6;
-    ram      attribute credentialRulesSupport default = 1;
-    ram      attribute numberOfCredentialsSupportedPerUser default = 5;
-    ram      attribute autoRelockTime default = 60;
-    ram      attribute operatingMode default = 0x00;
-    ram      attribute supportedOperatingModes default = 0xFFF6;
-    ram      attribute wrongCodeEntryLimit default = 3;
-    ram      attribute userCodeTemporaryDisableTime default = 10;
-    ram      attribute requirePINforRemoteOperation default = 0;
+  server cluster ThreadNetworkDiagnostics {
+    callback attribute channel;
+    callback attribute routingRole;
+    callback attribute networkName;
+    callback attribute panId;
+    callback attribute extendedPanId;
+    callback attribute meshLocalPrefix;
+    callback attribute neighborTable;
+    callback attribute routeTable;
+    callback attribute partitionId;
+    callback attribute weighting;
+    callback attribute dataVersion;
+    callback attribute stableDataVersion;
+    callback attribute leaderRouterId;
+    callback attribute securityPolicy;
+    callback attribute channelPage0Mask;
+    callback attribute operationalDatasetComponents;
+    callback attribute activeNetworkFaultsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x181;
-    ram      attribute clusterRevision default = 7;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 2;
+  }
 
-    handle command LockDoor;
-    handle command UnlockDoor;
-    handle command UnlockWithTimeout;
-    handle command SetUser;
-    handle command GetUser;
-    handle command GetUserResponse;
-    handle command ClearUser;
-    handle command SetCredential;
-    handle command SetCredentialResponse;
-    handle command GetCredentialStatus;
-    handle command GetCredentialStatusResponse;
-    handle command ClearCredential;
+  server cluster ThreadBorderRouterManagement {
+    callback attribute borderRouterName;
+    callback attribute borderAgentID;
+    callback attribute threadVersion;
+    callback attribute interfaceEnabled;
+    callback attribute activeDatasetTimestamp;
+    callback attribute pendingDatasetTimestamp;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+
+    handle command GetActiveDatasetRequest;
+    handle command GetPendingDatasetRequest;
+    handle command DatasetResponse;
+    handle command SetActiveDatasetRequest;
+    handle command SetPendingDatasetRequest;
+  }
+}
+endpoint 3 {
+  device type ma_secondary_network_interface = 25, version 1;
+
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster NetworkCommissioning {
+    ram      attribute maxNetworks;
+    callback attribute networks;
+    ram      attribute scanMaxTimeSeconds;
+    ram      attribute connectMaxTimeSeconds;
+    ram      attribute interfaceEnabled;
+    ram      attribute lastNetworkingStatus;
+    ram      attribute lastNetworkID;
+    ram      attribute lastConnectErrorValue;
+    ram      attribute supportedThreadFeatures;
+    ram      attribute threadVersion;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command ScanNetworks;
+    handle command ScanNetworksResponse;
+    handle command AddOrUpdateThreadNetwork;
+    handle command RemoveNetwork;
+    handle command NetworkConfigResponse;
+    handle command ConnectNetwork;
+    handle command ConnectNetworkResponse;
+    handle command ReorderNetwork;
   }
 }
 
