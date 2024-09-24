@@ -1817,6 +1817,210 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace ContentAppObserver
 
+namespace CameraAvStreamManagement {
+namespace Commands {
+
+namespace AudioStreamAllocate {
+static constexpr CommandId Id = 0x00000000;
+} // namespace AudioStreamAllocate
+
+namespace AudioStreamAllocateResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace AudioStreamAllocateResponse
+
+namespace AudioStreamDeallocate {
+static constexpr CommandId Id = 0x00000002;
+} // namespace AudioStreamDeallocate
+
+namespace VideoStreamAllocate {
+static constexpr CommandId Id = 0x00000003;
+} // namespace VideoStreamAllocate
+
+namespace VideoStreamAllocateResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace VideoStreamAllocateResponse
+
+namespace VideoStreamModify {
+static constexpr CommandId Id = 0x00000005;
+} // namespace VideoStreamModify
+
+namespace VideoStreamDeallocate {
+static constexpr CommandId Id = 0x00000006;
+} // namespace VideoStreamDeallocate
+
+namespace SnapshotStreamAllocate {
+static constexpr CommandId Id = 0x00000007;
+} // namespace SnapshotStreamAllocate
+
+namespace SnapshotStreamAllocateResponse {
+static constexpr CommandId Id = 0x00000008;
+} // namespace SnapshotStreamAllocateResponse
+
+namespace SnapshotStreamDeallocate {
+static constexpr CommandId Id = 0x00000009;
+} // namespace SnapshotStreamDeallocate
+
+namespace SetStreamPriority {
+static constexpr CommandId Id = 0x0000000A;
+} // namespace SetStreamPriority
+
+namespace CaptureSnapshot {
+static constexpr CommandId Id = 0x0000000B;
+} // namespace CaptureSnapshot
+
+namespace CaptureSnapshotResponse {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace CaptureSnapshotResponse
+
+namespace SetViewport {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace SetViewport
+
+namespace SetImageRotation {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace SetImageRotation
+
+namespace SetImageFlipHorizontal {
+static constexpr CommandId Id = 0x0000000F;
+} // namespace SetImageFlipHorizontal
+
+namespace SetImageFlipVertical {
+static constexpr CommandId Id = 0x00000010;
+} // namespace SetImageFlipVertical
+
+} // namespace Commands
+} // namespace CameraAvStreamManagement
+
+namespace CameraAvSettingsUserLevelManagement {
+namespace Commands {
+
+namespace MptzSet {
+static constexpr CommandId Id = 0x00000000;
+} // namespace MptzSet
+
+namespace MptzRelativeMove {
+static constexpr CommandId Id = 0x00000001;
+} // namespace MptzRelativeMove
+
+namespace SetAsPreset {
+static constexpr CommandId Id = 0x00000002;
+} // namespace SetAsPreset
+
+namespace DptzSetViewport {
+static constexpr CommandId Id = 0x00000003;
+} // namespace DptzSetViewport
+
+namespace DptzRelativeMove {
+static constexpr CommandId Id = 0x00000004;
+} // namespace DptzRelativeMove
+
+} // namespace Commands
+} // namespace CameraAvSettingsUserLevelManagement
+
+namespace WebRTCTransportProvider {
+namespace Commands {
+
+namespace WebRTCSolicitOffer {
+static constexpr CommandId Id = 0x00000001;
+} // namespace WebRTCSolicitOffer
+
+namespace WebRTCSolicitOfferResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace WebRTCSolicitOfferResponse
+
+namespace WebRTCProvideOffer {
+static constexpr CommandId Id = 0x00000003;
+} // namespace WebRTCProvideOffer
+
+namespace WebRTCProvideOfferResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace WebRTCProvideOfferResponse
+
+namespace WebRTCProvideAnswer {
+static constexpr CommandId Id = 0x00000005;
+} // namespace WebRTCProvideAnswer
+
+namespace WebRTCProvideICECandidate {
+static constexpr CommandId Id = 0x00000006;
+} // namespace WebRTCProvideICECandidate
+
+namespace WebRTCEndSession {
+static constexpr CommandId Id = 0x00000007;
+} // namespace WebRTCEndSession
+
+} // namespace Commands
+} // namespace WebRTCTransportProvider
+
+namespace WebRTCTransportRequestor {
+namespace Commands {
+
+namespace WebRTCOffer {
+static constexpr CommandId Id = 0x00000001;
+} // namespace WebRTCOffer
+
+namespace WebRTCAnswer {
+static constexpr CommandId Id = 0x00000002;
+} // namespace WebRTCAnswer
+
+namespace WebRTCICECandidate {
+static constexpr CommandId Id = 0x00000003;
+} // namespace WebRTCICECandidate
+
+namespace WebRTCEnd {
+static constexpr CommandId Id = 0x00000004;
+} // namespace WebRTCEnd
+
+} // namespace Commands
+} // namespace WebRTCTransportRequestor
+
+namespace PushAvStreamTransport {
+namespace Commands {
+
+namespace AllocatePushTransport {
+static constexpr CommandId Id = 0x00000000;
+} // namespace AllocatePushTransport
+
+namespace AllocatePushTransportResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace AllocatePushTransportResponse
+
+namespace DeallocatePushTransport {
+static constexpr CommandId Id = 0x00000002;
+} // namespace DeallocatePushTransport
+
+namespace ModifyPushTransport {
+static constexpr CommandId Id = 0x00000003;
+} // namespace ModifyPushTransport
+
+namespace SetTransportStatus {
+static constexpr CommandId Id = 0x00000004;
+} // namespace SetTransportStatus
+
+namespace ManuallyTriggerTransport {
+static constexpr CommandId Id = 0x00000005;
+} // namespace ManuallyTriggerTransport
+
+namespace FindStreamConfiguration {
+static constexpr CommandId Id = 0x00000006;
+} // namespace FindStreamConfiguration
+
+namespace FindStreamConfigurationResponse {
+static constexpr CommandId Id = 0x00000007;
+} // namespace FindStreamConfigurationResponse
+
+} // namespace Commands
+} // namespace PushAvStreamTransport
+
+namespace Chime {
+namespace Commands {
+
+namespace PlayChimeSound {
+static constexpr CommandId Id = 0x00000000;
+} // namespace PlayChimeSound
+
+} // namespace Commands
+} // namespace Chime
+
 namespace CommissionerControl {
 namespace Commands {
 

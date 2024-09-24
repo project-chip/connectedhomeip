@@ -8768,6 +8768,1118 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRCameraAVStreamManagementClusterAudioCapabilitiesStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _maxNumberOfChannels = @(0);
+
+        _supportedCodecs = [NSArray array];
+
+        _supportedSampleRates = [NSArray array];
+
+        _supportedBitDepths = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCameraAVStreamManagementClusterAudioCapabilitiesStruct alloc] init];
+
+    other.maxNumberOfChannels = self.maxNumberOfChannels;
+    other.supportedCodecs = self.supportedCodecs;
+    other.supportedSampleRates = self.supportedSampleRates;
+    other.supportedBitDepths = self.supportedBitDepths;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: maxNumberOfChannels:%@; supportedCodecs:%@; supportedSampleRates:%@; supportedBitDepths:%@; >", NSStringFromClass([self class]), _maxNumberOfChannels, _supportedCodecs, _supportedSampleRates, _supportedBitDepths];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCameraAVStreamManagementClusterAudioStreamStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _audioStreamID = @(0);
+
+        _streamType = @(0);
+
+        _audioCodec = @(0);
+
+        _channelCount = @(0);
+
+        _sampleRate = @(0);
+
+        _bitRate = @(0);
+
+        _bitDepth = @(0);
+
+        _referenceCount = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCameraAVStreamManagementClusterAudioStreamStruct alloc] init];
+
+    other.audioStreamID = self.audioStreamID;
+    other.streamType = self.streamType;
+    other.audioCodec = self.audioCodec;
+    other.channelCount = self.channelCount;
+    other.sampleRate = self.sampleRate;
+    other.bitRate = self.bitRate;
+    other.bitDepth = self.bitDepth;
+    other.referenceCount = self.referenceCount;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: audioStreamID:%@; streamType:%@; audioCodec:%@; channelCount:%@; sampleRate:%@; bitRate:%@; bitDepth:%@; referenceCount:%@; >", NSStringFromClass([self class]), _audioStreamID, _streamType, _audioCodec, _channelCount, _sampleRate, _bitRate, _bitDepth, _referenceCount];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCameraAVStreamManagementClusterPerStreamStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _streamID = @(0);
+
+        _onOff = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCameraAVStreamManagementClusterPerStreamStruct alloc] init];
+
+    other.streamID = self.streamID;
+    other.onOff = self.onOff;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamID:%@; onOff:%@; >", NSStringFromClass([self class]), _streamID, _onOff];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCameraAVStreamManagementClusterRateDistortionTradeOffPointsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _codec = @(0);
+
+        _resolution = [MTRCameraAVStreamManagementClusterDimensionStruct new];
+
+        _minBitRate = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCameraAVStreamManagementClusterRateDistortionTradeOffPointsStruct alloc] init];
+
+    other.codec = self.codec;
+    other.resolution = self.resolution;
+    other.minBitRate = self.minBitRate;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: codec:%@; resolution:%@; minBitRate:%@; >", NSStringFromClass([self class]), _codec, _resolution, _minBitRate];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCameraAVStreamManagementClusterSnapshotParamsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _resolution = [MTRCameraAVStreamManagementClusterDimensionStruct new];
+
+        _maxFrameRate = @(0);
+
+        _imageCodec = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCameraAVStreamManagementClusterSnapshotParamsStruct alloc] init];
+
+    other.resolution = self.resolution;
+    other.maxFrameRate = self.maxFrameRate;
+    other.imageCodec = self.imageCodec;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: resolution:%@; maxFrameRate:%@; imageCodec:%@; >", NSStringFromClass([self class]), _resolution, _maxFrameRate, _imageCodec];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCameraAVStreamManagementClusterSnapshotStreamStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _snapshotStreamID = @(0);
+
+        _imageCodec = @(0);
+
+        _frameRate = @(0);
+
+        _bitRate = @(0);
+
+        _minResolution = [MTRCameraAVStreamManagementClusterDimensionStruct new];
+
+        _maxResolution = [MTRCameraAVStreamManagementClusterDimensionStruct new];
+
+        _quality = @(0);
+
+        _referenceCount = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCameraAVStreamManagementClusterSnapshotStreamStruct alloc] init];
+
+    other.snapshotStreamID = self.snapshotStreamID;
+    other.imageCodec = self.imageCodec;
+    other.frameRate = self.frameRate;
+    other.bitRate = self.bitRate;
+    other.minResolution = self.minResolution;
+    other.maxResolution = self.maxResolution;
+    other.quality = self.quality;
+    other.referenceCount = self.referenceCount;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: snapshotStreamID:%@; imageCodec:%@; frameRate:%@; bitRate:%@; minResolution:%@; maxResolution:%@; quality:%@; referenceCount:%@; >", NSStringFromClass([self class]), _snapshotStreamID, _imageCodec, _frameRate, _bitRate, _minResolution, _maxResolution, _quality, _referenceCount];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCameraAVStreamManagementClusterVideoSensorParamsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _sensorWidth = @(0);
+
+        _sensorHeight = @(0);
+
+        _hdrCapable = @(0);
+
+        _maxFPS = @(0);
+
+        _maxHDRFPS = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCameraAVStreamManagementClusterVideoSensorParamsStruct alloc] init];
+
+    other.sensorWidth = self.sensorWidth;
+    other.sensorHeight = self.sensorHeight;
+    other.hdrCapable = self.hdrCapable;
+    other.maxFPS = self.maxFPS;
+    other.maxHDRFPS = self.maxHDRFPS;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sensorWidth:%@; sensorHeight:%@; hdrCapable:%@; maxFPS:%@; maxHDRFPS:%@; >", NSStringFromClass([self class]), _sensorWidth, _sensorHeight, _hdrCapable, _maxFPS, _maxHDRFPS];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCameraAVStreamManagementClusterVideoStreamStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _videoStreamID = @(0);
+
+        _streamType = @(0);
+
+        _videoCodec = @(0);
+
+        _minFrameRate = @(0);
+
+        _maxFrameRate = @(0);
+
+        _minResolution = [MTRCameraAVStreamManagementClusterDimensionStruct new];
+
+        _maxResolution = [MTRCameraAVStreamManagementClusterDimensionStruct new];
+
+        _minBitRate = @(0);
+
+        _maxBitRate = @(0);
+
+        _minFragmentLen = @(0);
+
+        _maxFragmentLen = @(0);
+
+        _referenceCount = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCameraAVStreamManagementClusterVideoStreamStruct alloc] init];
+
+    other.videoStreamID = self.videoStreamID;
+    other.streamType = self.streamType;
+    other.videoCodec = self.videoCodec;
+    other.minFrameRate = self.minFrameRate;
+    other.maxFrameRate = self.maxFrameRate;
+    other.minResolution = self.minResolution;
+    other.maxResolution = self.maxResolution;
+    other.minBitRate = self.minBitRate;
+    other.maxBitRate = self.maxBitRate;
+    other.minFragmentLen = self.minFragmentLen;
+    other.maxFragmentLen = self.maxFragmentLen;
+    other.referenceCount = self.referenceCount;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: videoStreamID:%@; streamType:%@; videoCodec:%@; minFrameRate:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; minBitRate:%@; maxBitRate:%@; minFragmentLen:%@; maxFragmentLen:%@; referenceCount:%@; >", NSStringFromClass([self class]), _videoStreamID, _streamType, _videoCodec, _minFrameRate, _maxFrameRate, _minResolution, _maxResolution, _minBitRate, _maxBitRate, _minFragmentLen, _maxFragmentLen, _referenceCount];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCameraAVStreamManagementClusterViewportStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _x1 = @(0);
+
+        _y1 = @(0);
+
+        _x2 = @(0);
+
+        _y2 = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCameraAVStreamManagementClusterViewportStruct alloc] init];
+
+    other.x1 = self.x1;
+    other.y1 = self.y1;
+    other.x2 = self.x2;
+    other.y2 = self.y2;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: x1:%@; y1:%@; x2:%@; y2:%@; >", NSStringFromClass([self class]), _x1, _y1, _x2, _y2];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCameraAVStreamManagementClusterVideoStreamChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _videoStreamID = @(0);
+
+        _streamType = nil;
+
+        _videoCodec = nil;
+
+        _minFrameRate = nil;
+
+        _maxFrameRate = nil;
+
+        _minResolution = nil;
+
+        _maxResolution = nil;
+
+        _minBitRate = nil;
+
+        _maxBitRate = nil;
+
+        _minFragmentLen = nil;
+
+        _maxFragmentLen = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCameraAVStreamManagementClusterVideoStreamChangedEvent alloc] init];
+
+    other.videoStreamID = self.videoStreamID;
+    other.streamType = self.streamType;
+    other.videoCodec = self.videoCodec;
+    other.minFrameRate = self.minFrameRate;
+    other.maxFrameRate = self.maxFrameRate;
+    other.minResolution = self.minResolution;
+    other.maxResolution = self.maxResolution;
+    other.minBitRate = self.minBitRate;
+    other.maxBitRate = self.maxBitRate;
+    other.minFragmentLen = self.minFragmentLen;
+    other.maxFragmentLen = self.maxFragmentLen;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: videoStreamID:%@; streamType:%@; videoCodec:%@; minFrameRate:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; minBitRate:%@; maxBitRate:%@; minFragmentLen:%@; maxFragmentLen:%@; >", NSStringFromClass([self class]), _videoStreamID, _streamType, _videoCodec, _minFrameRate, _maxFrameRate, _minResolution, _maxResolution, _minBitRate, _maxBitRate, _minFragmentLen, _maxFragmentLen];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCameraAVStreamManagementClusterAudioStreamChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _audioStreamID = @(0);
+
+        _streamType = nil;
+
+        _audioCodec = nil;
+
+        _channelCount = nil;
+
+        _sampleRate = nil;
+
+        _bitRate = nil;
+
+        _bitDepth = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCameraAVStreamManagementClusterAudioStreamChangedEvent alloc] init];
+
+    other.audioStreamID = self.audioStreamID;
+    other.streamType = self.streamType;
+    other.audioCodec = self.audioCodec;
+    other.channelCount = self.channelCount;
+    other.sampleRate = self.sampleRate;
+    other.bitRate = self.bitRate;
+    other.bitDepth = self.bitDepth;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: audioStreamID:%@; streamType:%@; audioCodec:%@; channelCount:%@; sampleRate:%@; bitRate:%@; bitDepth:%@; >", NSStringFromClass([self class]), _audioStreamID, _streamType, _audioCodec, _channelCount, _sampleRate, _bitRate, _bitDepth];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCameraAVStreamManagementClusterSnapshotStreamChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _snapshotStreamID = @(0);
+
+        _imageCodec = nil;
+
+        _frameRate = nil;
+
+        _bitRate = nil;
+
+        _minResolution = nil;
+
+        _maxResolution = nil;
+
+        _quality = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCameraAVStreamManagementClusterSnapshotStreamChangedEvent alloc] init];
+
+    other.snapshotStreamID = self.snapshotStreamID;
+    other.imageCodec = self.imageCodec;
+    other.frameRate = self.frameRate;
+    other.bitRate = self.bitRate;
+    other.minResolution = self.minResolution;
+    other.maxResolution = self.maxResolution;
+    other.quality = self.quality;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: snapshotStreamID:%@; imageCodec:%@; frameRate:%@; bitRate:%@; minResolution:%@; maxResolution:%@; quality:%@; >", NSStringFromClass([self class]), _snapshotStreamID, _imageCodec, _frameRate, _bitRate, _minResolution, _maxResolution, _quality];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCameraAVSettingsUserLevelManagementClusterMPTZStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mPan = nil;
+
+        _mTilt = nil;
+
+        _mZoom = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterMPTZStruct alloc] init];
+
+    other.mPan = self.mPan;
+    other.mTilt = self.mTilt;
+    other.mZoom = self.mZoom;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mPan:%@; mTilt:%@; mZoom:%@; >", NSStringFromClass([self class]), _mPan, _mTilt, _mZoom];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCameraAVSettingsUserLevelManagementClusterPerStreamStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _streamID = @(0);
+
+        _onOff = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterPerStreamStruct alloc] init];
+
+    other.streamID = self.streamID;
+    other.onOff = self.onOff;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamID:%@; onOff:%@; >", NSStringFromClass([self class]), _streamID, _onOff];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCameraAVSettingsUserLevelManagementClusterViewportStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _x1 = @(0);
+
+        _y1 = @(0);
+
+        _x2 = @(0);
+
+        _y2 = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterViewportStruct alloc] init];
+
+    other.x1 = self.x1;
+    other.y1 = self.y1;
+    other.x2 = self.x2;
+    other.y2 = self.y2;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: x1:%@; y1:%@; x2:%@; y2:%@; >", NSStringFromClass([self class]), _x1, _y1, _x2, _y2];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWebRTCTransportProviderClusterICEServerStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _urls = [NSArray array];
+
+        _username = nil;
+
+        _credential = nil;
+
+        _caid = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWebRTCTransportProviderClusterICEServerStruct alloc] init];
+
+    other.urls = self.urls;
+    other.username = self.username;
+    other.credential = self.credential;
+    other.caid = self.caid;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: urls:%@; username:%@; credential:%@; caid:%@; >", NSStringFromClass([self class]), _urls, _username, _credential, _caid];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWebRTCTransportProviderClusterWebRTCSessionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _id = @(0);
+
+        _peerNodeId = @(0);
+
+        _peerFabricIndex = @(0);
+
+        _streamType = @(0);
+
+        _videoStreamID = nil;
+
+        _audioStreamID = nil;
+
+        _metadataOptions = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWebRTCTransportProviderClusterWebRTCSessionStruct alloc] init];
+
+    other.id = self.id;
+    other.peerNodeId = self.peerNodeId;
+    other.peerFabricIndex = self.peerFabricIndex;
+    other.streamType = self.streamType;
+    other.videoStreamID = self.videoStreamID;
+    other.audioStreamID = self.audioStreamID;
+    other.metadataOptions = self.metadataOptions;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeId:%@; peerFabricIndex:%@; streamType:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _id, _peerNodeId, _peerFabricIndex, _streamType, _videoStreamID, _audioStreamID, _metadataOptions];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWebRTCTransportRequestorClusterICEServerStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _urls = [NSArray array];
+
+        _username = nil;
+
+        _credential = nil;
+
+        _caid = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWebRTCTransportRequestorClusterICEServerStruct alloc] init];
+
+    other.urls = self.urls;
+    other.username = self.username;
+    other.credential = self.credential;
+    other.caid = self.caid;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: urls:%@; username:%@; credential:%@; caid:%@; >", NSStringFromClass([self class]), _urls, _username, _credential, _caid];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWebRTCTransportRequestorClusterWebRTCSessionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _id = @(0);
+
+        _peerNodeId = @(0);
+
+        _peerFabricIndex = @(0);
+
+        _streamType = @(0);
+
+        _videoStreamID = nil;
+
+        _audioStreamID = nil;
+
+        _metadataOptions = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWebRTCTransportRequestorClusterWebRTCSessionStruct alloc] init];
+
+    other.id = self.id;
+    other.peerNodeId = self.peerNodeId;
+    other.peerFabricIndex = self.peerFabricIndex;
+    other.streamType = self.streamType;
+    other.videoStreamID = self.videoStreamID;
+    other.audioStreamID = self.audioStreamID;
+    other.metadataOptions = self.metadataOptions;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeId:%@; peerFabricIndex:%@; streamType:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _id, _peerNodeId, _peerFabricIndex, _streamType, _videoStreamID, _audioStreamID, _metadataOptions];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterPushAVStreamTransportMotionTriggerTimeControlStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _initialDuration = @(0);
+
+        _augmentationDuration = @(0);
+
+        _maxDuration = @(0);
+
+        _blindDuration = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterPushAVStreamTransportMotionTriggerTimeControlStruct alloc] init];
+
+    other.initialDuration = self.initialDuration;
+    other.augmentationDuration = self.augmentationDuration;
+    other.maxDuration = self.maxDuration;
+    other.blindDuration = self.blindDuration;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: initialDuration:%@; augmentationDuration:%@; maxDuration:%@; blindDuration:%@; >", NSStringFromClass([self class]), _initialDuration, _augmentationDuration, _maxDuration, _blindDuration];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterPushAVStreamTransportMetadataOptionsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _multiplexing = @(0);
+
+        _includeMotionZones = @(0);
+
+        _enableMetadataPrivacySensitive = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterPushAVStreamTransportMetadataOptionsStruct alloc] init];
+
+    other.multiplexing = self.multiplexing;
+    other.includeMotionZones = self.includeMotionZones;
+    other.enableMetadataPrivacySensitive = self.enableMetadataPrivacySensitive;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: multiplexing:%@; includeMotionZones:%@; enableMetadataPrivacySensitive:%@; >", NSStringFromClass([self class]), _multiplexing, _includeMotionZones, _enableMetadataPrivacySensitive];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterPushAVStreamTransportTriggerOptionsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _triggerType = @(0);
+
+        _motionZones = nil;
+
+        _motionSensitivity = nil;
+
+        _motionTimeControl = nil;
+
+        _activationReason = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterPushAVStreamTransportTriggerOptionsStruct alloc] init];
+
+    other.triggerType = self.triggerType;
+    other.motionZones = self.motionZones;
+    other.motionSensitivity = self.motionSensitivity;
+    other.motionTimeControl = self.motionTimeControl;
+    other.activationReason = self.activationReason;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: triggerType:%@; motionZones:%@; motionSensitivity:%@; motionTimeControl:%@; activationReason:%@; >", NSStringFromClass([self class]), _triggerType, _motionZones, _motionSensitivity, _motionTimeControl, _activationReason];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterPushAVStreamTransportCMAFContainerOptionsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _chunkDuration = @(0);
+
+        _cencKey = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterPushAVStreamTransportCMAFContainerOptionsStruct alloc] init];
+
+    other.chunkDuration = self.chunkDuration;
+    other.cencKey = self.cencKey;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chunkDuration:%@; cencKey:%@; >", NSStringFromClass([self class]), _chunkDuration, [_cencKey base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterPushAVStreamTransportContainerOptionsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _containerType = @(0);
+
+        _cmafContainerOptions = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterPushAVStreamTransportContainerOptionsStruct alloc] init];
+
+    other.containerType = self.containerType;
+    other.cmafContainerOptions = self.cmafContainerOptions;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: containerType:%@; cmafContainerOptions:%@; >", NSStringFromClass([self class]), _containerType, _cmafContainerOptions];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterPushAVStreamTransportOptionsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _streamType = @(0);
+
+        _videoStreamID = nil;
+
+        _audioStreamID = nil;
+
+        _tlsEndpointID = @(0);
+
+        _url = @"";
+
+        _triggerOptions = [MTRPushAVStreamTransportClusterPushAVStreamTransportTriggerOptionsStruct new];
+
+        _containerFormat = @(0);
+
+        _ingestMethod = @(0);
+
+        _containerOptions = [MTRPushAVStreamTransportClusterPushAVStreamTransportContainerOptionsStruct new];
+
+        _metadataOptions = nil;
+
+        _expiryTime = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterPushAVStreamTransportOptionsStruct alloc] init];
+
+    other.streamType = self.streamType;
+    other.videoStreamID = self.videoStreamID;
+    other.audioStreamID = self.audioStreamID;
+    other.tlsEndpointID = self.tlsEndpointID;
+    other.url = self.url;
+    other.triggerOptions = self.triggerOptions;
+    other.containerFormat = self.containerFormat;
+    other.ingestMethod = self.ingestMethod;
+    other.containerOptions = self.containerOptions;
+    other.metadataOptions = self.metadataOptions;
+    other.expiryTime = self.expiryTime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamType:%@; videoStreamID:%@; audioStreamID:%@; tlsEndpointID:%@; url:%@; triggerOptions:%@; containerFormat:%@; ingestMethod:%@; containerOptions:%@; metadataOptions:%@; expiryTime:%@; >", NSStringFromClass([self class]), _streamType, _videoStreamID, _audioStreamID, _tlsEndpointID, _url, _triggerOptions, _containerFormat, _ingestMethod, _containerOptions, _metadataOptions, _expiryTime];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterPushAVStreamConfigurationStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _connectionID = @(0);
+
+        _streamTransportStatus = @(0);
+
+        _streamTransportOptions = [MTRPushAVStreamTransportClusterPushAVStreamTransportOptionsStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterPushAVStreamConfigurationStruct alloc] init];
+
+    other.connectionID = self.connectionID;
+    other.streamTransportStatus = self.streamTransportStatus;
+    other.streamTransportOptions = self.streamTransportOptions;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; streamTransportStatus:%@; streamTransportOptions:%@; >", NSStringFromClass([self class]), _connectionID, _streamTransportStatus, _streamTransportOptions];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterPushTransportBeginEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterPushTransportBeginEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterPushTransportEndEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _connectionID = @(0);
+
+        _triggerDetails = [MTRPushAVStreamTransportClusterPushAVStreamTransportTriggerOptionsStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterPushTransportEndEvent alloc] init];
+
+    other.connectionID = self.connectionID;
+    other.triggerDetails = self.triggerDetails;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; triggerDetails:%@; >", NSStringFromClass([self class]), _connectionID, _triggerDetails];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRChimeClusterChimeSoundStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _chimeId = @(0);
+
+        _name = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRChimeClusterChimeSoundStruct alloc] init];
+
+    other.chimeId = self.chimeId;
+    other.name = self.name;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chimeId:%@; name:%@; >", NSStringFromClass([self class]), _chimeId, _name];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTREcosystemInformationClusterDeviceTypeStruct
 - (instancetype)init
 {

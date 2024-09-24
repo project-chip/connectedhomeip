@@ -212,6 +212,13 @@ enum TestGlobalEnum : enum8 {
   kFinalValue = 2;
 }
 
+enum ThreeLevelAutoEnum : enum8 {
+  kLow = 0;
+  kMedium = 1;
+  kHigh = 2;
+  kAutomatic = 3;
+}
+
 bitmap TestGlobalBitmap : bitmap32 {
   kFirstBit = 0x1;
   kSecondBit = 0x2;
@@ -9374,6 +9381,831 @@ provisional cluster ContentAppObserver = 1296 {
 
   /** Upon receipt, the data field MAY be parsed and interpreted. Message encoding is specific to the Content App. A Content App MAY when possible read attributes from the Basic Information Cluster on the Observer and use this to determine the Message encoding. */
   command ContentAppMessage(ContentAppMessageRequest): ContentAppMessageResponse = 0;
+}
+
+/** This cluster is used to allow clients to manage, control, and configure various
+      audio, video, and snapshot streams on a camera. */
+provisional cluster CameraAvStreamManagement = 1361 {
+  revision 1;
+
+  enum AudioCodecEnum : enum8 {
+    kOPUS = 0;
+    kAACLC = 1;
+  }
+
+  enum ImageCodecEnum : enum8 {
+    kJPEG = 0;
+  }
+
+  enum StreamTypeEnum : enum8 {
+    kInternal = 0;
+    kRecording = 1;
+    kAnalysis = 2;
+    kLiveView = 3;
+  }
+
+  enum TriStateAuto : enum8 {
+    kOff = 0;
+    kOn = 1;
+    kAuto = 2;
+  }
+
+  enum TwowayTalkSupportTypeEnum : enum8 {
+    kNotSupported = 0;
+    kHalfDuplex = 1;
+    kFullDuplex = 2;
+  }
+
+  enum VideoCodecEnum : enum8 {
+    kH264 = 0;
+    kHEVC = 1;
+    kVVC = 2;
+    kAV1 = 3;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPrivacy = 0x1;
+    kSensorControl = 0x2;
+    kAudio = 0x4;
+    kImageControl = 0x8;
+    kVideo = 0x10;
+    kSnapshot = 0x20;
+    kLocalStorage = 0x40;
+  }
+
+  struct AudioCapabilitiesStruct {
+    int8u maxNumberOfChannels = 0;
+    AudioCodecEnum supportedCodecs[] = 1;
+    int32u supportedSampleRates[] = 2;
+    int32u supportedBitDepths[] = 3;
+  }
+
+  struct AudioStreamStruct {
+    int16u audioStreamID = 0;
+    StreamTypeEnum streamType = 1;
+    AudioCodecEnum audioCodec = 2;
+    int8u channelCount = 3;
+    int32u sampleRate = 4;
+    int32u bitRate = 5;
+    int8u bitDepth = 6;
+    int8u referenceCount = 7;
+  }
+
+  struct PerStreamStruct {
+    int16u streamID = 0;
+    boolean onOff = 1;
+  }
+
+  struct RateDistortionTradeOffPointsStruct {
+    VideoCodecEnum codec = 0;
+    DimensionStruct resolution = 1;
+    int32u minBitRate = 2;
+  }
+
+  struct SnapshotParamsStruct {
+    DimensionStruct resolution = 0;
+    int16u maxFrameRate = 1;
+    ImageCodecEnum imageCodec = 2;
+  }
+
+  struct SnapshotStreamStruct {
+    int16u snapshotStreamID = 0;
+    ImageCodecEnum imageCodec = 1;
+    int16u frameRate = 2;
+    int32u bitRate = 3;
+    DimensionStruct minResolution = 4;
+    DimensionStruct maxResolution = 5;
+    int8u quality = 6;
+    int8u referenceCount = 7;
+  }
+
+  struct VideoSensorParamsStruct {
+    int16u sensorWidth = 0;
+    int16u sensorHeight = 1;
+    boolean HDRCapable = 2;
+    int16u maxFPS = 3;
+    int16u maxHDRFPS = 4;
+  }
+
+  struct VideoStreamStruct {
+    int16u videoStreamID = 0;
+    StreamTypeEnum streamType = 1;
+    VideoCodecEnum videoCodec = 2;
+    int16u minFrameRate = 3;
+    int16u maxFrameRate = 4;
+    DimensionStruct minResolution = 5;
+    DimensionStruct maxResolution = 6;
+    int16u minBitRate = 7;
+    int16u maxBitRate = 8;
+    int16u minFragmentLen = 9;
+    int16u maxFragmentLen = 10;
+    int8u referenceCount = 11;
+  }
+
+  struct ViewportStruct {
+    int16u x1 = 0;
+    int16u y1 = 1;
+    int16u x2 = 2;
+    int16u y2 = 3;
+  }
+
+  info event VideoStreamChanged = 0 {
+    int16u videoStreamID = 0;
+    optional StreamTypeEnum streamType = 1;
+    optional VideoCodecEnum videoCodec = 2;
+    optional int16u minFrameRate = 3;
+    optional int16u maxFrameRate = 4;
+    optional DimensionStruct minResolution = 5;
+    optional DimensionStruct maxResolution = 6;
+    optional int16u minBitRate = 7;
+    optional int16u maxBitRate = 8;
+    optional int16u minFragmentLen = 9;
+    optional int16u maxFragmentLen = 10;
+  }
+
+  info event AudioStreamChanged = 1 {
+    int16u audioStreamID = 0;
+    optional StreamTypeEnum streamType = 1;
+    optional AudioCodecEnum audioCodec = 2;
+    optional int8u channelCount = 3;
+    optional int32u sampleRate = 4;
+    optional int32u bitRate = 5;
+    optional int8u bitDepth = 6;
+  }
+
+  info event SnapshotStreamChanged = 2 {
+    int16u snapshotStreamID = 0;
+    optional ImageCodecEnum imageCodec = 1;
+    optional int16u frameRate = 2;
+    optional int32u bitRate = 3;
+    optional DimensionStruct minResolution = 4;
+    optional DimensionStruct maxResolution = 5;
+    optional int8u quality = 6;
+  }
+
+  readonly attribute access(read: administer) optional int8u maxConcurrentVideoEncoders = 0;
+  readonly attribute access(read: administer) optional int32u maxEncodedPixelRate = 1;
+  readonly attribute access(read: administer) optional VideoSensorParamsStruct videoSensorParams = 2;
+  readonly attribute access(read: administer) optional boolean nightVisionCapable = 3;
+  readonly attribute access(read: administer) optional DimensionStruct minViewPortWidth = 4;
+  readonly attribute access(read: administer) optional DimensionStruct minViewPortHeight = 5;
+  readonly attribute access(read: administer) optional RateDistortionTradeOffPointsStruct rateDistortionTradeOffPoints[] = 6;
+  readonly attribute access(read: administer) optional int32u maxPreRollBufferSize = 7;
+  readonly attribute access(read: administer) optional AudioCapabilitiesStruct microphoneCapabilities = 8;
+  readonly attribute access(read: administer) optional AudioCapabilitiesStruct speakerCapabilities = 9;
+  readonly attribute access(read: administer) optional TwowayTalkSupportTypeEnum twoWayTalkSupport = 10;
+  readonly attribute access(read: administer) optional SnapshotParamsStruct supportedSnapshotParams[] = 11;
+  readonly attribute access(read: administer) optional boolean HDRCapable = 12;
+  readonly attribute access(read: administer) int32u maxNetworkBandwidth = 13;
+  readonly attribute access(read: administer) optional int16u currentFrameRate = 14;
+  attribute access(read: administer, write: administer) optional boolean HDRMode = 15;
+  readonly attribute access(read: administer) optional VideoCodecEnum currentVideoCodecs[] = 16;
+  readonly attribute access(read: administer) optional SnapshotParamsStruct currentSnapshotConfig = 17;
+  readonly attribute access(read: administer) fabric_idx fabricsUsingCamera[] = 18;
+  readonly attribute access(read: administer) optional VideoStreamStruct allocatedVideoStreams[] = 19;
+  readonly attribute access(read: administer) optional AudioStreamStruct allocatedAudioStreams[] = 20;
+  readonly attribute access(read: administer) optional SnapshotStreamStruct allocatedSnapshotStreams[] = 21;
+  attribute access(read: administer, write: administer) optional StreamTypeEnum rankedVideoStreamPrioritiesList[] = 22;
+  attribute access(read: administer, write: administer) optional boolean softRecordingPrivacyModeSetting = 23;
+  attribute access(read: administer, write: administer) optional boolean softLivestreamPrivacyModeSetting = 24;
+  readonly attribute access(read: administer) optional boolean hardPrivacyMode = 25;
+  attribute access(read: administer, write: administer) optional TriStateAuto nightVision = 26;
+  attribute access(read: administer, write: administer) optional TriStateAuto nightVisionIllum = 27;
+  attribute access(read: administer, write: administer) optional boolean awb = 28;
+  attribute access(read: administer, write: administer) optional boolean shutterSpeed = 29;
+  attribute access(read: administer, write: administer) optional boolean iso = 30;
+  readonly attribute access(read: administer) optional ViewportStruct viewport = 31;
+  attribute access(read: administer, write: administer) optional boolean spkrOnOff = 32;
+  attribute access(read: administer, write: administer) optional int8u spkrVolumeLevel = 33;
+  attribute access(read: administer, write: administer) optional int8u spkrMaxLevel = 34;
+  attribute access(read: administer, write: administer) optional int8u spkrMinLevel = 35;
+  attribute access(read: administer, write: administer) optional boolean micOnOff = 36;
+  attribute access(read: administer, write: administer) optional int8u micCurrentLevel = 37;
+  attribute access(read: administer, write: administer) optional int8u micMaxLevel = 38;
+  attribute access(read: administer, write: administer) optional int8u micMinLevel = 39;
+  attribute access(read: administer, write: administer) optional boolean micAGC = 40;
+  readonly attribute access(read: administer) optional int16u imageRotation = 41;
+  readonly attribute access(read: administer) optional boolean imageFlipHorizontal = 42;
+  readonly attribute access(read: administer) optional boolean imageFlipVertical = 43;
+  attribute access(read: administer, write: administer) optional boolean localVideoRecordingEnabled = 44;
+  attribute access(read: administer, write: administer) optional boolean localSnapshotRecordingEnabled = 45;
+  attribute access(read: administer, write: administer) optional boolean statusLight = 46;
+  attribute access(read: administer, write: administer) optional ThreeLevelAutoEnum statusLightBrightness = 47;
+  attribute access(read: administer, write: administer) optional TriStateAuto depthSensorStatus = 48;
+  attribute access(read: administer, write: administer) optional PerStreamStruct watermarkEnabled[] = 49;
+  attribute access(read: administer, write: administer) optional PerStreamStruct OSDEnabled[] = 50;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AudioStreamAllocateRequest {
+    StreamTypeEnum streamType = 0;
+    AudioCodecEnum audioCodec = 1;
+    int8u channelCount = 2;
+    int32u sampleRate = 3;
+    int32u bitRate = 4;
+    int8u bitDepth = 5;
+  }
+
+  response struct AudioStreamAllocateResponse = 1 {
+    int16u audioStreamID = 0;
+  }
+
+  request struct AudioStreamDeallocateRequest {
+    int16u audioStreamID = 0;
+  }
+
+  request struct VideoStreamAllocateRequest {
+    StreamTypeEnum streamType = 0;
+    VideoCodecEnum videoCodec = 1;
+    int16u minFrameRate = 2;
+    int16u maxFrameRate = 3;
+    DimensionStruct minResolution = 4;
+    DimensionStruct maxResolution = 5;
+    int32u minBitRate = 6;
+    int32u maxBitRate = 7;
+    int16u minFragmentLen = 8;
+    int16u maxFragmentLen = 9;
+  }
+
+  response struct VideoStreamAllocateResponse = 4 {
+    int16u videoStreamID = 0;
+  }
+
+  request struct VideoStreamModifyRequest {
+    int16u videoStreamID = 0;
+    DimensionStruct resolution = 1;
+  }
+
+  request struct VideoStreamDeallocateRequest {
+    int16u videoStreamID = 0;
+  }
+
+  request struct SnapshotStreamAllocateRequest {
+    ImageCodecEnum imageCodec = 0;
+    int16u frameRate = 1;
+    int32u bitRate = 2;
+    DimensionStruct minResolution = 3;
+    DimensionStruct maxResolution = 4;
+    int8u quality = 5;
+  }
+
+  response struct SnapshotStreamAllocateResponse = 8 {
+    int16u snapshotStreamID = 0;
+  }
+
+  request struct SnapshotStreamDeallocateRequest {
+    int16u snapshotStreamID = 0;
+  }
+
+  request struct CaptureSnapshotRequest {
+    int16u snapshotStreamID = 0;
+    DimensionStruct requestedResolution = 1;
+  }
+
+  response struct CaptureSnapshotResponse = 12 {
+    octet_string data = 0;
+    ImageCodecEnum imageCodec = 1;
+    DimensionStruct resolution = 2;
+  }
+
+  request struct SetViewportRequest {
+    ViewportStruct viewport = 0;
+  }
+
+  request struct SetImageRotationRequest {
+    int16u angle = 0;
+  }
+
+  request struct SetImageFlipHorizontalRequest {
+    boolean onOff = 0;
+  }
+
+  request struct SetImageFlipVerticalRequest {
+    boolean onOff = 0;
+  }
+
+  /** This command SHALL allocate an audio stream on the camera and return an allocated audio stream identifier. */
+  command access(invoke: administer) AudioStreamAllocate(AudioStreamAllocateRequest): AudioStreamAllocateResponse = 0;
+  /** This command SHALL deallocate an audio stream on the camera, corresponding to the given audio stream identifier. */
+  command access(invoke: administer) AudioStreamDeallocate(AudioStreamDeallocateRequest): DefaultSuccess = 2;
+  /** This command SHALL allocate a video stream on the camera and return an allocated video stream identifier. */
+  command access(invoke: administer) VideoStreamAllocate(VideoStreamAllocateRequest): VideoStreamAllocateResponse = 3;
+  /** This command SHALL be used to modify the resolution of a stream specified by the VideoStreamID. */
+  command access(invoke: administer) VideoStreamModify(VideoStreamModifyRequest): DefaultSuccess = 5;
+  /** This command SHALL deallocate a video stream on the camera, corresponding to the given video stream identifier. */
+  command access(invoke: administer) VideoStreamDeallocate(VideoStreamDeallocateRequest): DefaultSuccess = 6;
+  /** This command SHALL allocate a snapshot stream on the device and return an allocated snapshot stream identifier. */
+  command access(invoke: administer) SnapshotStreamAllocate(SnapshotStreamAllocateRequest): SnapshotStreamAllocateResponse = 7;
+  /** This command SHALL deallocate an snapshot stream on the camera, corresponding to the given snapshot stream identifier. */
+  command access(invoke: administer) SnapshotStreamDeallocate(SnapshotStreamDeallocateRequest): DefaultSuccess = 9;
+  command access(invoke: administer) SetStreamPriority(): DefaultSuccess = 10;
+  /** This command SHALL return a Snapshot from the camera. */
+  command access(invoke: administer) CaptureSnapshot(CaptureSnapshotRequest): DefaultSuccess = 11;
+  /** This command SHALL set the viewport in all video streams. */
+  command SetViewport(SetViewportRequest): DefaultSuccess = 13;
+  /** The data fields for this command SHALL be as follows: */
+  command SetImageRotation(SetImageRotationRequest): DefaultSuccess = 14;
+  /** The data fields for this command SHALL be as follows: */
+  command SetImageFlipHorizontal(SetImageFlipHorizontalRequest): DefaultSuccess = 15;
+  /** The data fields for this command SHALL be as follows: */
+  command SetImageFlipVertical(SetImageFlipVerticalRequest): DefaultSuccess = 16;
+}
+
+/** This cluster provides an interface into controls associated with the operation of a device that provides pan, tilt, and zoom functions, either mechanically, or against a digital image. */
+provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
+  revision 1;
+
+  bitmap Feature : bitmap32 {
+    kMechanicalPTZ = 0x1;
+    kDigitalPTZ = 0x2;
+  }
+
+  struct MPTZStruct {
+    optional nullable int16s MPan = 0;
+    optional nullable int8s MTilt = 1;
+    optional nullable int16u MZoom = 2;
+  }
+
+  struct PerStreamStruct {
+    int16u streamID = 0;
+    boolean onOff = 1;
+  }
+
+  struct ViewportStruct {
+    int16u x1 = 0;
+    int16u y1 = 1;
+    int16u x2 = 2;
+    int16u y2 = 3;
+  }
+
+  readonly attribute optional MPTZStruct mptz = 0;
+  readonly attribute optional int8u maxPresets = 1;
+  readonly attribute optional MPTZStruct presetMptzTable[] = 2;
+  readonly attribute optional boolean mptzRelativeMove = 3;
+  readonly attribute optional PerStreamStruct dptzRelativeMove[] = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct MptzSetRequest {
+    optional MPTZStruct newPTZ = 0;
+    optional int8u presetID = 1;
+  }
+
+  request struct MptzRelativeMoveRequest {
+    int16s pan = 0;
+    int16s tilt = 1;
+    int16s zoom = 2;
+  }
+
+  request struct DptzSetViewportRequest {
+    int16u videoStreamID = 0;
+    ViewportStruct viewport = 1;
+  }
+
+  request struct DptzRelativeMoveRequest {
+    int16u videoStreamID = 0;
+    int16s pan = 1;
+    int16s tilt = 2;
+    int8s zoom = 3;
+  }
+
+  /** This command SHALL set the values for the pan, tilt, and zoom in the mechanical PTZ. */
+  command MptzSet(MptzSetRequest): DefaultSuccess = 0;
+  /** This command SHALL move the device by the values for pan, tilt, and zoom relative to the currently defined position. */
+  command MptzRelativeMove(MptzRelativeMoveRequest): DefaultSuccess = 1;
+  /** This command SHALL set the next available index in the PresetMptzTable to the current, known, values of pan, tilt, and zoom on the camera. */
+  command SetAsPreset(): DefaultSuccess = 2;
+  /** This command SHALL set the viewport in the digital PTZ for a specific Video Stream. */
+  command DptzSetViewport(DptzSetViewportRequest): DefaultSuccess = 3;
+  /** This command SHALL change the viewports location by the amount specified in a relative fashion. */
+  command DptzRelativeMove(DptzRelativeMoveRequest): DefaultSuccess = 4;
+}
+
+/** The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC. */
+provisional cluster WebRTCTransportProvider = 1363 {
+  revision 1;
+
+  enum StreamTypeEnum : enum8 {
+    kInternal = 0;
+    kRecording = 1;
+    kAnalysis = 2;
+    kLiveView = 3;
+  }
+
+  enum StreamTypeEnum : enum8 {
+    kInternal = 0;
+    kRecording = 1;
+    kAnalysis = 2;
+    kLiveView = 3;
+  }
+
+  enum WebRTCEndReasonEnum : enum8 {
+    kICEFAILED = 1;
+    kICETIMEOUT = 2;
+    kUSERHANGUP = 3;
+    kUSERBUSY = 4;
+    kREPLACED = 5;
+    kNOUSERMEDIA = 6;
+    kINVITETIMEOUT = 7;
+    kANSWEREDELSEWHERE = 8;
+    kOUTOFRESOURCES = 9;
+    kMEDIATIMEOUT = 10;
+    kLOWPOWER = 11;
+    kUNKNOWNERROR = 12;
+  }
+
+  bitmap WebRTCMetadataOptions : bitmap8 {
+    kDataTLV = 0x1;
+  }
+
+  struct ICEServerStruct {
+    char_string urls[] = 1;
+    optional char_string username = 2;
+    optional char_string credential = 3;
+    optional int16u caid = 4;
+  }
+
+  struct WebRTCSessionStruct {
+    int16u id = 1;
+    node_id peerNodeId = 2;
+    fabric_idx peerFabricIndex = 3;
+    StreamTypeEnum streamType = 4;
+    nullable int16u videoStreamID = 5;
+    nullable int16u audioStreamID = 6;
+    WebRTCMetadataOptions metadataOptions = 7;
+  }
+
+  readonly attribute WebRTCSessionStruct currentSessions[] = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct WebRTCSolicitOfferRequest {
+    StreamTypeEnum streamType = 0;
+    optional nullable int16u videoStreamID = 1;
+    optional nullable int16u audioStreamID = 2;
+    optional ICEServerStruct ICEServers[] = 3;
+    optional char_string ICETransportPolicy = 4;
+    optional WebRTCMetadataOptions metadataOptions = 5;
+  }
+
+  response struct WebRTCSolicitOfferResponse = 2 {
+    int16u webRTCSessionID = 0;
+    boolean deferredOffer = 1;
+    optional nullable int16u videoStreamID = 2;
+    optional nullable int16u audioStreamID = 3;
+  }
+
+  request struct WebRTCProvideOfferRequest {
+    nullable int16u webRTCSessionID = 0;
+    char_string sdp = 1;
+    StreamTypeEnum streamType = 2;
+    optional nullable int16u videoStreamID = 3;
+    optional nullable int16u audioStreamID = 4;
+    optional ICEServerStruct ICEServers[] = 5;
+    optional char_string ICETransportPolicy = 6;
+    optional WebRTCMetadataOptions metadataOptions = 7;
+  }
+
+  response struct WebRTCProvideOfferResponse = 4 {
+    int16u webRTCSessionID = 0;
+    int16u videoStreamID = 1;
+    int16u audioStreamID = 2;
+  }
+
+  request struct WebRTCProvideAnswerRequest {
+    int16u webRTCSessionID = 0;
+    char_string sdp = 1;
+  }
+
+  request struct WebRTCProvideICECandidateRequest {
+    int16u webRTCSessionID = 0;
+    char_string ICECandidate = 1;
+  }
+
+  request struct WebRTCEndSessionRequest {
+    int16u webRTCSessionID = 0;
+    WebRTCEndReasonEnum reason = 1;
+  }
+
+  /** Requests that the Provider initiates a new session with the Offer / Answer flow in a way that allows for options to be passed and work with devices needing the standby flow. */
+  command WebRTCSolicitOffer(WebRTCSolicitOfferRequest): WebRTCSolicitOfferResponse = 1;
+  /** This command allows an SDP Offer to be set and start a new session. */
+  command WebRTCProvideOffer(WebRTCProvideOfferRequest): WebRTCProvideOfferResponse = 3;
+  /** This command will be initiated from a local Node as a response to an offer that was previously provided by the remote peer. */
+  command WebRTCProvideAnswer(WebRTCProvideAnswerRequest): DefaultSuccess = 5;
+  /** This command allows for https://www.rfc-editor.org/rfc/rfc8839#section-4.2.1.2 nominated after the initial Offer / Answer exchange to be added to a session during the gathering phase. */
+  command WebRTCProvideICECandidate(WebRTCProvideICECandidateRequest): DefaultSuccess = 6;
+  /** This command instructs the stream provider to end the WebRTC session. */
+  command WebRTCEndSession(WebRTCEndSessionRequest): DefaultSuccess = 7;
+}
+
+/** The WebRTC transport requestor cluster provides a way for stream consumers (e.g. Matter Stream Viewer) to establish a WebRTC connection with a stream provider that implements the WebRTC Transport Provider Cluster */
+provisional cluster WebRTCTransportRequestor = 1364 {
+  revision 1;
+
+  enum StreamTypeEnum : enum8 {
+    kInternal = 0;
+    kRecording = 1;
+    kAnalysis = 2;
+    kLiveView = 3;
+  }
+
+  enum StreamTypeEnum : enum8 {
+    kInternal = 0;
+    kRecording = 1;
+    kAnalysis = 2;
+    kLiveView = 3;
+  }
+
+  enum WebRTCEndReasonEnum : enum8 {
+    kICEFAILED = 1;
+    kICETIMEOUT = 2;
+    kUSERHANGUP = 3;
+    kUSERBUSY = 4;
+    kREPLACED = 5;
+    kNOUSERMEDIA = 6;
+    kINVITETIMEOUT = 7;
+    kANSWEREDELSEWHERE = 8;
+    kOUTOFRESOURCES = 9;
+    kMEDIATIMEOUT = 10;
+    kLOWPOWER = 11;
+    kUNKNOWNERROR = 12;
+  }
+
+  bitmap WebRTCMetadataOptions : bitmap8 {
+    kDataTLV = 0x1;
+  }
+
+  struct ICEServerStruct {
+    char_string urls[] = 1;
+    optional char_string username = 2;
+    optional char_string credential = 3;
+    optional int16u caid = 4;
+  }
+
+  struct WebRTCSessionStruct {
+    int16u id = 1;
+    node_id peerNodeId = 2;
+    fabric_idx peerFabricIndex = 3;
+    StreamTypeEnum streamType = 4;
+    nullable int16u videoStreamID = 5;
+    nullable int16u audioStreamID = 6;
+    WebRTCMetadataOptions metadataOptions = 7;
+  }
+
+  readonly attribute WebRTCSessionStruct currentSessions[] = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct WebRTCOfferRequest {
+    int16u webRTCSessionID = 0;
+    char_string sdp = 1;
+    optional ICEServerStruct ICEServers[] = 2;
+    optional char_string ICETransportPolicy = 3;
+  }
+
+  request struct WebRTCAnswerRequest {
+    int16u webRTCSessionID = 0;
+    char_string sdp = 1;
+  }
+
+  request struct WebRTCICECandidateRequest {
+    int16u webRTCSessionID = 0;
+    char_string ICECandidate = 1;
+  }
+
+  request struct WebRTCEndRequest {
+    int16u webRTCSessionID = 0;
+    WebRTCEndReasonEnum reason = 1;
+  }
+
+  /** This command provides the stream requestor with WebRTC session details. */
+  command WebRTCOffer(WebRTCOfferRequest): DefaultSuccess = 1;
+  /** This command provides the stream requestor with the WebRTC session details (i.e. */
+  command WebRTCAnswer(WebRTCAnswerRequest): DefaultSuccess = 2;
+  /** This command provides an ICE candidate to the stream requestor in a WebRTC session. */
+  command WebRTCICECandidate(WebRTCICECandidateRequest): DefaultSuccess = 3;
+  /** This command notifies the stream requestor that the provider has ended the WebRTC session. */
+  command WebRTCEnd(WebRTCEndRequest): DefaultSuccess = 4;
+}
+
+/** This cluster implements the upload of Audio and Video streams from the Camera AV Stream Management Cluster using suitable push-based transports. */
+cluster PushAvStreamTransport = 1365 {
+  revision 1;
+
+  enum PushAVStreamTransportContainerFormatEnum : enum8 {
+    kCMAF = 0;
+  }
+
+  enum PushAVStreamTransportIngestMethodEnum : enum8 {
+    kCMAFIngest = 0;
+  }
+
+  enum PushAVStreamTransportStatusEnum : enum8 {
+    kActive = 0;
+    kInactive = 1;
+  }
+
+  enum PushAVStreamTransportStreamMultiplexingEnum : enum8 {
+    kInterleaved = 0;
+  }
+
+  enum PushAVStreamTransportTriggerActivationReasonEnum : enum8 {
+    kUserInitiated = 0;
+    kAutomation = 1;
+    kEmergency = 2;
+  }
+
+  enum PushAVStreamTransportTriggerTypeEnum : enum8 {
+    kCommand = 0;
+    kMotion = 1;
+    kContinuous = 2;
+  }
+
+  enum StatusCodeEnum : enum8 {
+    kALLOCATIONNOTPERMITTED = 2;
+    kINVALIDPARAMETERS = 3;
+    kINVALIDURL = 4;
+    kINVALIDTRIGGEROPTIONS = 5;
+    kUNSUPPORTEDCONTAINERFORMAT = 6;
+    kUNSUPPORTEDINGESTMETHOD = 7;
+    kPAVSTNOTINUSE = 8;
+    kINVALIDTRIGGERFORMAT = 9;
+    kINVALIDTRANSPORTSTATUS = 16;
+  }
+
+  enum StreamTypeEnum : enum8 {
+    kInternal = 0;
+    kRecording = 1;
+    kAnalysis = 2;
+    kLiveView = 3;
+  }
+
+  bitmap PushAVStreamTransportSupportedContainerFormatsBitmap : bitmap8 {
+    kCMAF = 0x1;
+  }
+
+  bitmap PushAVStreamTransportSupportedIngestMethodsBitmap : bitmap8 {
+    kCMAFIngest = 0x1;
+  }
+
+  struct PushAVStreamTransportMotionTriggerTimeControlStruct {
+    int16u initialDuration = 0;
+    int16u augmentationDuration = 1;
+    int32u maxDuration = 2;
+    int16u blindDuration = 3;
+  }
+
+  struct PushAVStreamTransportMetadataOptionsStruct {
+    PushAVStreamTransportStreamMultiplexingEnum multiplexing = 0;
+    boolean includeMotionZones = 1;
+    boolean enableMetadataPrivacySensitive = 2;
+  }
+
+  struct PushAVStreamTransportTriggerOptionsStruct {
+    PushAVStreamTransportTriggerTypeEnum triggerType = 0;
+    optional nullable int16u motionZones[] = 1;
+    optional nullable int8u motionSensitivity = 2;
+    optional nullable PushAVStreamTransportMotionTriggerTimeControlStruct motionTimeControl = 3;
+    optional nullable PushAVStreamTransportTriggerActivationReasonEnum activationReason = 4;
+  }
+
+  struct PushAVStreamTransportCMAFContainerOptionsStruct {
+    int16u chunkDuration = 0;
+    optional nullable octet_string CENCKey = 1;
+  }
+
+  struct PushAVStreamTransportContainerOptionsStruct {
+    PushAVStreamTransportContainerFormatEnum containerType = 0;
+    optional nullable PushAVStreamTransportCMAFContainerOptionsStruct CMAFContainerOptions = 1;
+  }
+
+  struct PushAVStreamTransportOptionsStruct {
+    StreamTypeEnum streamType = 0;
+    optional nullable int16u videoStreamID = 1;
+    optional nullable int16u audioStreamID = 2;
+    int16u TLSEndpointID = 3;
+    long_char_string<256> url = 4;
+    PushAVStreamTransportTriggerOptionsStruct triggerOptions = 5;
+    PushAVStreamTransportContainerFormatEnum containerFormat = 6;
+    PushAVStreamTransportIngestMethodEnum ingestMethod = 7;
+    PushAVStreamTransportContainerOptionsStruct containerOptions = 8;
+    optional nullable PushAVStreamTransportMetadataOptionsStruct metadataOptions = 9;
+    optional nullable int32u expiryTime = 10;
+  }
+
+  struct PushAVStreamConfigurationStruct {
+    int16u connectionID = 0;
+    PushAVStreamTransportStatusEnum streamTransportStatus = 1;
+    PushAVStreamTransportOptionsStruct streamTransportOptions = 2;
+  }
+
+  info event PushTransportBegin = 0 {
+  }
+
+  info event PushTransportEnd = 1 {
+    int16u connectionID = 0;
+    PushAVStreamTransportTriggerOptionsStruct triggerDetails = 1;
+  }
+
+  readonly attribute PushAVStreamTransportSupportedContainerFormatsBitmap supportedContainerFormats = 0;
+  readonly attribute PushAVStreamTransportSupportedIngestMethodsBitmap supportedIngestMethods = 1;
+  readonly attribute int16u currentConnections[] = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AllocatePushTransportRequest {
+    PushAVStreamTransportOptionsStruct streamTransportOptions = 0;
+  }
+
+  response struct AllocatePushTransportResponse = 1 {
+    int16u connectionID = 0;
+    PushAVStreamTransportOptionsStruct streamTransportOptions = 1;
+    PushAVStreamTransportStatusEnum transportStatus = 2;
+  }
+
+  request struct DeallocatePushTransportRequest {
+    int16u connectionID = 0;
+  }
+
+  request struct ModifyPushTransportRequest {
+    int16u connectionID = 0;
+    PushAVStreamTransportOptionsStruct streamTransportOptions = 1;
+  }
+
+  request struct SetTransportStatusRequest {
+    nullable int16u connectionID = 0;
+    PushAVStreamTransportStatusEnum streamTransportStatus = 1;
+  }
+
+  request struct ManuallyTriggerTransportRequest {
+    int16u connectionID = 0;
+    nullable PushAVStreamTransportTriggerActivationReasonEnum activationReason = 1;
+    optional nullable PushAVStreamTransportMotionTriggerTimeControlStruct timeControl = 2;
+  }
+
+  request struct FindStreamConfigurationRequest {
+    optional nullable int16u connectionID = 0;
+  }
+
+  response struct FindStreamConfigurationResponse = 7 {
+    PushAVStreamConfigurationStruct streamConfigurations[] = 0;
+  }
+
+  /** This command SHALL allocate a transport and return a PushTransportConnectionID. */
+  command access(invoke: administer) AllocatePushTransport(AllocatePushTransportRequest): AllocatePushTransportResponse = 0;
+  /** This command SHALL be generated to request the Node deallocates the specified transport. */
+  command access(invoke: administer) DeallocatePushTransport(DeallocatePushTransportRequest): DefaultSuccess = 2;
+  /** This command is used to request the Node modifies the configuration of the specified push transport. */
+  command access(invoke: administer) ModifyPushTransport(ModifyPushTransportRequest): DefaultSuccess = 3;
+  /** This command SHALL be generated to request the Node modifies the Transport Status of the transport. */
+  command access(invoke: administer) SetTransportStatus(SetTransportStatusRequest): DefaultSuccess = 4;
+  /** This command SHALL be generated to request the Node to manually start the specified push transport. */
+  command access(invoke: administer) ManuallyTriggerTransport(ManuallyTriggerTransportRequest): DefaultSuccess = 5;
+  /** This command SHALL return the Stream Options Configuration for the specified push transport. */
+  command access(invoke: administer) FindStreamConfiguration(FindStreamConfigurationRequest): FindStreamConfigurationResponse = 6;
+}
+
+/** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
+provisional cluster Chime = 1366 {
+  revision 1;
+
+  struct ChimeSoundStruct {
+    int8u chimeId = 0;
+    char_string<48> name = 1;
+  }
+
+  readonly attribute ChimeSoundStruct installedChimeSounds[] = 0;
+  attribute int8u activeChimeSoundId = 1;
+  attribute boolean enabled = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  command PlayChimeSound(): DefaultSuccess = 0;
 }
 
 /** Provides extended device information for all the logical devices represented by a Bridged Node. */

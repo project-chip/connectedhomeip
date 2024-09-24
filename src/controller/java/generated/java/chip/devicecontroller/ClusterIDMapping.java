@@ -388,6 +388,24 @@ public class ClusterIDMapping {
         if (clusterId == ContentAppObserver.ID) {
             return new ContentAppObserver();
         }
+        if (clusterId == CameraAvStreamManagement.ID) {
+            return new CameraAvStreamManagement();
+        }
+        if (clusterId == CameraAvSettingsUserLevelManagement.ID) {
+            return new CameraAvSettingsUserLevelManagement();
+        }
+        if (clusterId == WebRTCTransportProvider.ID) {
+            return new WebRTCTransportProvider();
+        }
+        if (clusterId == WebRTCTransportRequestor.ID) {
+            return new WebRTCTransportRequestor();
+        }
+        if (clusterId == PushAvStreamTransport.ID) {
+            return new PushAvStreamTransport();
+        }
+        if (clusterId == Chime.ID) {
+            return new Chime();
+        }
         if (clusterId == EcosystemInformation.ID) {
             return new EcosystemInformation();
         }
@@ -17201,6 +17219,1236 @@ public class ClusterIDMapping {
                         throw new NoSuchFieldError();
                     }
                 }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class CameraAvStreamManagement implements BaseCluster {
+        public static final long ID = 1361L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            MaxConcurrentVideoEncoders(0L),
+            MaxEncodedPixelRate(1L),
+            VideoSensorParams(2L),
+            NightVisionCapable(3L),
+            MinViewPortWidth(4L),
+            MinViewPortHeight(5L),
+            RateDistortionTradeOffPoints(6L),
+            MaxPreRollBufferSize(7L),
+            MicrophoneCapabilities(8L),
+            SpeakerCapabilities(9L),
+            TwoWayTalkSupport(10L),
+            SupportedSnapshotParams(11L),
+            HDRCapable(12L),
+            MaxNetworkBandwidth(13L),
+            CurrentFrameRate(14L),
+            HDRMode(15L),
+            CurrentVideoCodecs(16L),
+            CurrentSnapshotConfig(17L),
+            FabricsUsingCamera(18L),
+            AllocatedVideoStreams(19L),
+            AllocatedAudioStreams(20L),
+            AllocatedSnapshotStreams(21L),
+            RankedVideoStreamPrioritiesList(22L),
+            SoftRecordingPrivacyModeSetting(23L),
+            SoftLivestreamPrivacyModeSetting(24L),
+            HardPrivacyMode(25L),
+            NightVision(26L),
+            NightVisionIllum(27L),
+            Awb(28L),
+            ShutterSpeed(29L),
+            Iso(30L),
+            Viewport(31L),
+            SpkrOnOff(32L),
+            SpkrVolumeLevel(33L),
+            SpkrMaxLevel(34L),
+            SpkrMinLevel(35L),
+            MicOnOff(36L),
+            MicCurrentLevel(37L),
+            MicMaxLevel(38L),
+            MicMinLevel(39L),
+            MicAGC(40L),
+            ImageRotation(41L),
+            ImageFlipHorizontal(42L),
+            ImageFlipVertical(43L),
+            LocalVideoRecordingEnabled(44L),
+            LocalSnapshotRecordingEnabled(45L),
+            StatusLight(46L),
+            StatusLightBrightness(47L),
+            DepthSensorStatus(48L),
+            WatermarkEnabled(49L),
+            OSDEnabled(50L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {
+            VideoStreamChanged(0L),
+            AudioStreamChanged(1L),
+            SnapshotStreamChanged(2L),;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            AudioStreamAllocate(0L),
+            AudioStreamDeallocate(2L),
+            VideoStreamAllocate(3L),
+            VideoStreamModify(5L),
+            VideoStreamDeallocate(6L),
+            SnapshotStreamAllocate(7L),
+            SnapshotStreamDeallocate(9L),
+            SetStreamPriority(10L),
+            CaptureSnapshot(11L),
+            SetViewport(13L),
+            SetImageRotation(14L),
+            SetImageFlipHorizontal(15L),
+            SetImageFlipVertical(16L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum AudioStreamAllocateCommandField {StreamType(0),AudioCodec(1),ChannelCount(2),SampleRate(3),BitRate(4),BitDepth(5),;
+                    private final int id;
+                    AudioStreamAllocateCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static AudioStreamAllocateCommandField value(int id) throws NoSuchFieldError {
+                        for (AudioStreamAllocateCommandField field : AudioStreamAllocateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum AudioStreamDeallocateCommandField {AudioStreamID(0),;
+                    private final int id;
+                    AudioStreamDeallocateCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static AudioStreamDeallocateCommandField value(int id) throws NoSuchFieldError {
+                        for (AudioStreamDeallocateCommandField field : AudioStreamDeallocateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum VideoStreamAllocateCommandField {StreamType(0),VideoCodec(1),MinFrameRate(2),MaxFrameRate(3),MinResolution(4),MaxResolution(5),MinBitRate(6),MaxBitRate(7),MinFragmentLen(8),MaxFragmentLen(9),;
+                    private final int id;
+                    VideoStreamAllocateCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static VideoStreamAllocateCommandField value(int id) throws NoSuchFieldError {
+                        for (VideoStreamAllocateCommandField field : VideoStreamAllocateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum VideoStreamModifyCommandField {VideoStreamID(0),Resolution(1),;
+                    private final int id;
+                    VideoStreamModifyCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static VideoStreamModifyCommandField value(int id) throws NoSuchFieldError {
+                        for (VideoStreamModifyCommandField field : VideoStreamModifyCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum VideoStreamDeallocateCommandField {VideoStreamID(0),;
+                    private final int id;
+                    VideoStreamDeallocateCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static VideoStreamDeallocateCommandField value(int id) throws NoSuchFieldError {
+                        for (VideoStreamDeallocateCommandField field : VideoStreamDeallocateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SnapshotStreamAllocateCommandField {ImageCodec(0),FrameRate(1),BitRate(2),MinResolution(3),MaxResolution(4),Quality(5),;
+                    private final int id;
+                    SnapshotStreamAllocateCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SnapshotStreamAllocateCommandField value(int id) throws NoSuchFieldError {
+                        for (SnapshotStreamAllocateCommandField field : SnapshotStreamAllocateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SnapshotStreamDeallocateCommandField {SnapshotStreamID(0),;
+                    private final int id;
+                    SnapshotStreamDeallocateCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SnapshotStreamDeallocateCommandField value(int id) throws NoSuchFieldError {
+                        for (SnapshotStreamDeallocateCommandField field : SnapshotStreamDeallocateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum CaptureSnapshotCommandField {SnapshotStreamID(0),RequestedResolution(1),;
+                    private final int id;
+                    CaptureSnapshotCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static CaptureSnapshotCommandField value(int id) throws NoSuchFieldError {
+                        for (CaptureSnapshotCommandField field : CaptureSnapshotCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetViewportCommandField {Viewport(0),;
+                    private final int id;
+                    SetViewportCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetViewportCommandField value(int id) throws NoSuchFieldError {
+                        for (SetViewportCommandField field : SetViewportCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetImageRotationCommandField {Angle(0),;
+                    private final int id;
+                    SetImageRotationCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetImageRotationCommandField value(int id) throws NoSuchFieldError {
+                        for (SetImageRotationCommandField field : SetImageRotationCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetImageFlipHorizontalCommandField {OnOff(0),;
+                    private final int id;
+                    SetImageFlipHorizontalCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetImageFlipHorizontalCommandField value(int id) throws NoSuchFieldError {
+                        for (SetImageFlipHorizontalCommandField field : SetImageFlipHorizontalCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetImageFlipVerticalCommandField {OnOff(0),;
+                    private final int id;
+                    SetImageFlipVerticalCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetImageFlipVerticalCommandField value(int id) throws NoSuchFieldError {
+                        for (SetImageFlipVerticalCommandField field : SetImageFlipVerticalCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class CameraAvSettingsUserLevelManagement implements BaseCluster {
+        public static final long ID = 1362L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            Mptz(0L),
+            MaxPresets(1L),
+            PresetMptzTable(2L),
+            MptzRelativeMove(3L),
+            DptzRelativeMove(4L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            MptzSet(0L),
+            MptzRelativeMove(1L),
+            SetAsPreset(2L),
+            DptzSetViewport(3L),
+            DptzRelativeMove(4L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum MptzSetCommandField {NewPTZ(0),PresetID(1),;
+                    private final int id;
+                    MptzSetCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static MptzSetCommandField value(int id) throws NoSuchFieldError {
+                        for (MptzSetCommandField field : MptzSetCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum MptzRelativeMoveCommandField {Pan(0),Tilt(1),Zoom(2),;
+                    private final int id;
+                    MptzRelativeMoveCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static MptzRelativeMoveCommandField value(int id) throws NoSuchFieldError {
+                        for (MptzRelativeMoveCommandField field : MptzRelativeMoveCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum DptzSetViewportCommandField {VideoStreamID(0),Viewport(1),;
+                    private final int id;
+                    DptzSetViewportCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static DptzSetViewportCommandField value(int id) throws NoSuchFieldError {
+                        for (DptzSetViewportCommandField field : DptzSetViewportCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum DptzRelativeMoveCommandField {VideoStreamID(0),Pan(1),Tilt(2),Zoom(3),;
+                    private final int id;
+                    DptzRelativeMoveCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static DptzRelativeMoveCommandField value(int id) throws NoSuchFieldError {
+                        for (DptzRelativeMoveCommandField field : DptzRelativeMoveCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class WebRTCTransportProvider implements BaseCluster {
+        public static final long ID = 1363L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            CurrentSessions(0L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            WebRTCSolicitOffer(1L),
+            WebRTCProvideOffer(3L),
+            WebRTCProvideAnswer(5L),
+            WebRTCProvideICECandidate(6L),
+            WebRTCEndSession(7L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum WebRTCSolicitOfferCommandField {StreamType(0),VideoStreamID(1),AudioStreamID(2),ICEServers(3),ICETransportPolicy(4),MetadataOptions(5),;
+                    private final int id;
+                    WebRTCSolicitOfferCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static WebRTCSolicitOfferCommandField value(int id) throws NoSuchFieldError {
+                        for (WebRTCSolicitOfferCommandField field : WebRTCSolicitOfferCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum WebRTCProvideOfferCommandField {WebRTCSessionID(0),Sdp(1),StreamType(2),VideoStreamID(3),AudioStreamID(4),ICEServers(5),ICETransportPolicy(6),MetadataOptions(7),;
+                    private final int id;
+                    WebRTCProvideOfferCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static WebRTCProvideOfferCommandField value(int id) throws NoSuchFieldError {
+                        for (WebRTCProvideOfferCommandField field : WebRTCProvideOfferCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum WebRTCProvideAnswerCommandField {WebRTCSessionID(0),Sdp(1),;
+                    private final int id;
+                    WebRTCProvideAnswerCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static WebRTCProvideAnswerCommandField value(int id) throws NoSuchFieldError {
+                        for (WebRTCProvideAnswerCommandField field : WebRTCProvideAnswerCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum WebRTCProvideICECandidateCommandField {WebRTCSessionID(0),ICECandidate(1),;
+                    private final int id;
+                    WebRTCProvideICECandidateCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static WebRTCProvideICECandidateCommandField value(int id) throws NoSuchFieldError {
+                        for (WebRTCProvideICECandidateCommandField field : WebRTCProvideICECandidateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum WebRTCEndSessionCommandField {WebRTCSessionID(0),Reason(1),;
+                    private final int id;
+                    WebRTCEndSessionCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static WebRTCEndSessionCommandField value(int id) throws NoSuchFieldError {
+                        for (WebRTCEndSessionCommandField field : WebRTCEndSessionCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class WebRTCTransportRequestor implements BaseCluster {
+        public static final long ID = 1364L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            CurrentSessions(0L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            WebRTCOffer(1L),
+            WebRTCAnswer(2L),
+            WebRTCICECandidate(3L),
+            WebRTCEnd(4L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum WebRTCOfferCommandField {WebRTCSessionID(0),Sdp(1),ICEServers(2),ICETransportPolicy(3),;
+                    private final int id;
+                    WebRTCOfferCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static WebRTCOfferCommandField value(int id) throws NoSuchFieldError {
+                        for (WebRTCOfferCommandField field : WebRTCOfferCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum WebRTCAnswerCommandField {WebRTCSessionID(0),Sdp(1),;
+                    private final int id;
+                    WebRTCAnswerCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static WebRTCAnswerCommandField value(int id) throws NoSuchFieldError {
+                        for (WebRTCAnswerCommandField field : WebRTCAnswerCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum WebRTCICECandidateCommandField {WebRTCSessionID(0),ICECandidate(1),;
+                    private final int id;
+                    WebRTCICECandidateCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static WebRTCICECandidateCommandField value(int id) throws NoSuchFieldError {
+                        for (WebRTCICECandidateCommandField field : WebRTCICECandidateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum WebRTCEndCommandField {WebRTCSessionID(0),Reason(1),;
+                    private final int id;
+                    WebRTCEndCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static WebRTCEndCommandField value(int id) throws NoSuchFieldError {
+                        for (WebRTCEndCommandField field : WebRTCEndCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class PushAvStreamTransport implements BaseCluster {
+        public static final long ID = 1365L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            SupportedContainerFormats(0L),
+            SupportedIngestMethods(1L),
+            CurrentConnections(2L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {
+            PushTransportBegin(0L),
+            PushTransportEnd(1L),;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            AllocatePushTransport(0L),
+            DeallocatePushTransport(2L),
+            ModifyPushTransport(3L),
+            SetTransportStatus(4L),
+            ManuallyTriggerTransport(5L),
+            FindStreamConfiguration(6L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum AllocatePushTransportCommandField {StreamTransportOptions(0),;
+                    private final int id;
+                    AllocatePushTransportCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static AllocatePushTransportCommandField value(int id) throws NoSuchFieldError {
+                        for (AllocatePushTransportCommandField field : AllocatePushTransportCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum DeallocatePushTransportCommandField {ConnectionID(0),;
+                    private final int id;
+                    DeallocatePushTransportCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static DeallocatePushTransportCommandField value(int id) throws NoSuchFieldError {
+                        for (DeallocatePushTransportCommandField field : DeallocatePushTransportCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ModifyPushTransportCommandField {ConnectionID(0),StreamTransportOptions(1),;
+                    private final int id;
+                    ModifyPushTransportCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ModifyPushTransportCommandField value(int id) throws NoSuchFieldError {
+                        for (ModifyPushTransportCommandField field : ModifyPushTransportCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetTransportStatusCommandField {ConnectionID(0),StreamTransportStatus(1),;
+                    private final int id;
+                    SetTransportStatusCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetTransportStatusCommandField value(int id) throws NoSuchFieldError {
+                        for (SetTransportStatusCommandField field : SetTransportStatusCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ManuallyTriggerTransportCommandField {ConnectionID(0),ActivationReason(1),TimeControl(2),;
+                    private final int id;
+                    ManuallyTriggerTransportCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ManuallyTriggerTransportCommandField value(int id) throws NoSuchFieldError {
+                        for (ManuallyTriggerTransportCommandField field : ManuallyTriggerTransportCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum FindStreamConfigurationCommandField {ConnectionID(0),;
+                    private final int id;
+                    FindStreamConfigurationCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static FindStreamConfigurationCommandField value(int id) throws NoSuchFieldError {
+                        for (FindStreamConfigurationCommandField field : FindStreamConfigurationCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class Chime implements BaseCluster {
+        public static final long ID = 1366L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            InstalledChimeSounds(0L),
+            ActiveChimeSoundId(1L),
+            Enabled(2L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            PlayChimeSound(0L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
         }

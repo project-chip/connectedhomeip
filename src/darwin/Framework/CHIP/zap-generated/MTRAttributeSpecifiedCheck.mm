@@ -6056,6 +6056,360 @@ static BOOL AttributeIsSpecifiedInContentAppObserverCluster(AttributeId aAttribu
     }
     }
 }
+static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CameraAvStreamManagement;
+    switch (aAttributeId) {
+    case Attributes::MaxConcurrentVideoEncoders::Id: {
+        return YES;
+    }
+    case Attributes::MaxEncodedPixelRate::Id: {
+        return YES;
+    }
+    case Attributes::VideoSensorParams::Id: {
+        return YES;
+    }
+    case Attributes::NightVisionCapable::Id: {
+        return YES;
+    }
+    case Attributes::MinViewPortWidth::Id: {
+        return YES;
+    }
+    case Attributes::MinViewPortHeight::Id: {
+        return YES;
+    }
+    case Attributes::RateDistortionTradeOffPoints::Id: {
+        return YES;
+    }
+    case Attributes::MaxPreRollBufferSize::Id: {
+        return YES;
+    }
+    case Attributes::MicrophoneCapabilities::Id: {
+        return YES;
+    }
+    case Attributes::SpeakerCapabilities::Id: {
+        return YES;
+    }
+    case Attributes::TwoWayTalkSupport::Id: {
+        return YES;
+    }
+    case Attributes::SupportedSnapshotParams::Id: {
+        return YES;
+    }
+    case Attributes::HDRCapable::Id: {
+        return YES;
+    }
+    case Attributes::MaxNetworkBandwidth::Id: {
+        return YES;
+    }
+    case Attributes::CurrentFrameRate::Id: {
+        return YES;
+    }
+    case Attributes::HDRMode::Id: {
+        return YES;
+    }
+    case Attributes::CurrentVideoCodecs::Id: {
+        return YES;
+    }
+    case Attributes::CurrentSnapshotConfig::Id: {
+        return YES;
+    }
+    case Attributes::FabricsUsingCamera::Id: {
+        return YES;
+    }
+    case Attributes::AllocatedVideoStreams::Id: {
+        return YES;
+    }
+    case Attributes::AllocatedAudioStreams::Id: {
+        return YES;
+    }
+    case Attributes::AllocatedSnapshotStreams::Id: {
+        return YES;
+    }
+    case Attributes::RankedVideoStreamPrioritiesList::Id: {
+        return YES;
+    }
+    case Attributes::SoftRecordingPrivacyModeSetting::Id: {
+        return YES;
+    }
+    case Attributes::SoftLivestreamPrivacyModeSetting::Id: {
+        return YES;
+    }
+    case Attributes::HardPrivacyMode::Id: {
+        return YES;
+    }
+    case Attributes::NightVision::Id: {
+        return YES;
+    }
+    case Attributes::NightVisionIllum::Id: {
+        return YES;
+    }
+    case Attributes::Awb::Id: {
+        return YES;
+    }
+    case Attributes::ShutterSpeed::Id: {
+        return YES;
+    }
+    case Attributes::Iso::Id: {
+        return YES;
+    }
+    case Attributes::Viewport::Id: {
+        return YES;
+    }
+    case Attributes::SpkrOnOff::Id: {
+        return YES;
+    }
+    case Attributes::SpkrVolumeLevel::Id: {
+        return YES;
+    }
+    case Attributes::SpkrMaxLevel::Id: {
+        return YES;
+    }
+    case Attributes::SpkrMinLevel::Id: {
+        return YES;
+    }
+    case Attributes::MicOnOff::Id: {
+        return YES;
+    }
+    case Attributes::MicCurrentLevel::Id: {
+        return YES;
+    }
+    case Attributes::MicMaxLevel::Id: {
+        return YES;
+    }
+    case Attributes::MicMinLevel::Id: {
+        return YES;
+    }
+    case Attributes::MicAGC::Id: {
+        return YES;
+    }
+    case Attributes::ImageRotation::Id: {
+        return YES;
+    }
+    case Attributes::ImageFlipHorizontal::Id: {
+        return YES;
+    }
+    case Attributes::ImageFlipVertical::Id: {
+        return YES;
+    }
+    case Attributes::LocalVideoRecordingEnabled::Id: {
+        return YES;
+    }
+    case Attributes::LocalSnapshotRecordingEnabled::Id: {
+        return YES;
+    }
+    case Attributes::StatusLight::Id: {
+        return YES;
+    }
+    case Attributes::StatusLightBrightness::Id: {
+        return YES;
+    }
+    case Attributes::DepthSensorStatus::Id: {
+        return YES;
+    }
+    case Attributes::WatermarkEnabled::Id: {
+        return YES;
+    }
+    case Attributes::OSDEnabled::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInCameraAVSettingsUserLevelManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CameraAvSettingsUserLevelManagement;
+    switch (aAttributeId) {
+    case Attributes::Mptz::Id: {
+        return YES;
+    }
+    case Attributes::MaxPresets::Id: {
+        return YES;
+    }
+    case Attributes::PresetMptzTable::Id: {
+        return YES;
+    }
+    case Attributes::MptzRelativeMove::Id: {
+        return YES;
+    }
+    case Attributes::DptzRelativeMove::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInWebRTCTransportProviderCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WebRTCTransportProvider;
+    switch (aAttributeId) {
+    case Attributes::CurrentSessions::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInWebRTCTransportRequestorCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WebRTCTransportRequestor;
+    switch (aAttributeId) {
+    case Attributes::CurrentSessions::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInPushAVStreamTransportCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::PushAvStreamTransport;
+    switch (aAttributeId) {
+    case Attributes::SupportedContainerFormats::Id: {
+        return YES;
+    }
+    case Attributes::SupportedIngestMethods::Id: {
+        return YES;
+    }
+    case Attributes::CurrentConnections::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInChimeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Chime;
+    switch (aAttributeId) {
+    case Attributes::InstalledChimeSounds::Id: {
+        return YES;
+    }
+    case Attributes::ActiveChimeSoundId::Id: {
+        return YES;
+    }
+    case Attributes::Enabled::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInEcosystemInformationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::EcosystemInformation;
@@ -7208,6 +7562,24 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ContentAppObserver::Id: {
         return AttributeIsSpecifiedInContentAppObserverCluster(aAttributeId);
+    }
+    case Clusters::CameraAvStreamManagement::Id: {
+        return AttributeIsSpecifiedInCameraAVStreamManagementCluster(aAttributeId);
+    }
+    case Clusters::CameraAvSettingsUserLevelManagement::Id: {
+        return AttributeIsSpecifiedInCameraAVSettingsUserLevelManagementCluster(aAttributeId);
+    }
+    case Clusters::WebRTCTransportProvider::Id: {
+        return AttributeIsSpecifiedInWebRTCTransportProviderCluster(aAttributeId);
+    }
+    case Clusters::WebRTCTransportRequestor::Id: {
+        return AttributeIsSpecifiedInWebRTCTransportRequestorCluster(aAttributeId);
+    }
+    case Clusters::PushAvStreamTransport::Id: {
+        return AttributeIsSpecifiedInPushAVStreamTransportCluster(aAttributeId);
+    }
+    case Clusters::Chime::Id: {
+        return AttributeIsSpecifiedInChimeCluster(aAttributeId);
     }
     case Clusters::EcosystemInformation::Id: {
         return AttributeIsSpecifiedInEcosystemInformationCluster(aAttributeId);

@@ -4579,6 +4579,416 @@ static id _Nullable DecodeEventPayloadForContentAppObserverCluster(EventId aEven
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForCameraAVStreamManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::CameraAvStreamManagement;
+    switch (aEventId) {
+    case Events::VideoStreamChanged::Id: {
+        Events::VideoStreamChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRCameraAVStreamManagementClusterVideoStreamChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.videoStreamID];
+            value.videoStreamID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.streamType.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.streamType.Value())];
+            } else {
+                memberValue = nil;
+            }
+            value.streamType = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.videoCodec.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.videoCodec.Value())];
+            } else {
+                memberValue = nil;
+            }
+            value.videoCodec = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.minFrameRate.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.minFrameRate.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.minFrameRate = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.maxFrameRate.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.maxFrameRate.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.maxFrameRate = memberValue;
+        } while (0);
+        do {
+            MTRCameraAVStreamManagementClusterDimensionStruct * _Nullable memberValue;
+            if (cppValue.minResolution.HasValue()) {
+                memberValue = [MTRCameraAVStreamManagementClusterDimensionStruct new];
+            } else {
+                memberValue = nil;
+            }
+            value.minResolution = memberValue;
+        } while (0);
+        do {
+            MTRCameraAVStreamManagementClusterDimensionStruct * _Nullable memberValue;
+            if (cppValue.maxResolution.HasValue()) {
+                memberValue = [MTRCameraAVStreamManagementClusterDimensionStruct new];
+            } else {
+                memberValue = nil;
+            }
+            value.maxResolution = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.minBitRate.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.minBitRate.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.minBitRate = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.maxBitRate.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.maxBitRate.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.maxBitRate = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.minFragmentLen.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.minFragmentLen.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.minFragmentLen = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.maxFragmentLen.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.maxFragmentLen.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.maxFragmentLen = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::AudioStreamChanged::Id: {
+        Events::AudioStreamChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRCameraAVStreamManagementClusterAudioStreamChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.audioStreamID];
+            value.audioStreamID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.streamType.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.streamType.Value())];
+            } else {
+                memberValue = nil;
+            }
+            value.streamType = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.audioCodec.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.audioCodec.Value())];
+            } else {
+                memberValue = nil;
+            }
+            value.audioCodec = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.channelCount.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.channelCount.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.channelCount = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.sampleRate.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedInt:cppValue.sampleRate.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.sampleRate = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.bitRate.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedInt:cppValue.bitRate.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.bitRate = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.bitDepth.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.bitDepth.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.bitDepth = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::SnapshotStreamChanged::Id: {
+        Events::SnapshotStreamChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRCameraAVStreamManagementClusterSnapshotStreamChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.snapshotStreamID];
+            value.snapshotStreamID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.imageCodec.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.imageCodec.Value())];
+            } else {
+                memberValue = nil;
+            }
+            value.imageCodec = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.frameRate.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.frameRate.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.frameRate = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.bitRate.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedInt:cppValue.bitRate.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.bitRate = memberValue;
+        } while (0);
+        do {
+            MTRCameraAVStreamManagementClusterDimensionStruct * _Nullable memberValue;
+            if (cppValue.minResolution.HasValue()) {
+                memberValue = [MTRCameraAVStreamManagementClusterDimensionStruct new];
+            } else {
+                memberValue = nil;
+            }
+            value.minResolution = memberValue;
+        } while (0);
+        do {
+            MTRCameraAVStreamManagementClusterDimensionStruct * _Nullable memberValue;
+            if (cppValue.maxResolution.HasValue()) {
+                memberValue = [MTRCameraAVStreamManagementClusterDimensionStruct new];
+            } else {
+                memberValue = nil;
+            }
+            value.maxResolution = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.quality.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.quality.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.quality = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForCameraAVSettingsUserLevelManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::CameraAvSettingsUserLevelManagement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForWebRTCTransportProviderCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::WebRTCTransportProvider;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForWebRTCTransportRequestorCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::WebRTCTransportRequestor;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForPushAVStreamTransportCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::PushAvStreamTransport;
+    switch (aEventId) {
+    case Events::PushTransportBegin::Id: {
+        Events::PushTransportBegin::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRPushAVStreamTransportClusterPushTransportBeginEvent new];
+
+        return value;
+    }
+    case Events::PushTransportEnd::Id: {
+        Events::PushTransportEnd::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRPushAVStreamTransportClusterPushTransportEndEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.connectionID];
+            value.connectionID = memberValue;
+        } while (0);
+        do {
+            MTRPushAVStreamTransportClusterPushAVStreamTransportTriggerOptionsStruct * _Nonnull memberValue;
+            memberValue = [MTRPushAVStreamTransportClusterPushAVStreamTransportTriggerOptionsStruct new];
+            memberValue.triggerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.triggerDetails.triggerType)];
+            if (cppValue.triggerDetails.motionZones.HasValue()) {
+                if (cppValue.triggerDetails.motionZones.Value().IsNull()) {
+                    memberValue.motionZones = nil;
+                } else {
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = cppValue.triggerDetails.motionZones.Value().Value().begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            NSNumber * newElement_3;
+                            newElement_3 = [NSNumber numberWithUnsignedShort:entry_3];
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        memberValue.motionZones = array_3;
+                    }
+                }
+            } else {
+                memberValue.motionZones = nil;
+            }
+            if (cppValue.triggerDetails.motionSensitivity.HasValue()) {
+                if (cppValue.triggerDetails.motionSensitivity.Value().IsNull()) {
+                    memberValue.motionSensitivity = nil;
+                } else {
+                    memberValue.motionSensitivity = [NSNumber numberWithUnsignedChar:cppValue.triggerDetails.motionSensitivity.Value().Value()];
+                }
+            } else {
+                memberValue.motionSensitivity = nil;
+            }
+            if (cppValue.triggerDetails.motionTimeControl.HasValue()) {
+                if (cppValue.triggerDetails.motionTimeControl.Value().IsNull()) {
+                    memberValue.motionTimeControl = nil;
+                } else {
+                    memberValue.motionTimeControl = [MTRPushAVStreamTransportClusterPushAVStreamTransportMotionTriggerTimeControlStruct new];
+                    memberValue.motionTimeControl.initialDuration = [NSNumber numberWithUnsignedShort:cppValue.triggerDetails.motionTimeControl.Value().Value().initialDuration];
+                    memberValue.motionTimeControl.augmentationDuration = [NSNumber numberWithUnsignedShort:cppValue.triggerDetails.motionTimeControl.Value().Value().augmentationDuration];
+                    memberValue.motionTimeControl.maxDuration = [NSNumber numberWithUnsignedInt:cppValue.triggerDetails.motionTimeControl.Value().Value().maxDuration];
+                    memberValue.motionTimeControl.blindDuration = [NSNumber numberWithUnsignedShort:cppValue.triggerDetails.motionTimeControl.Value().Value().blindDuration];
+                }
+            } else {
+                memberValue.motionTimeControl = nil;
+            }
+            if (cppValue.triggerDetails.activationReason.HasValue()) {
+                if (cppValue.triggerDetails.activationReason.Value().IsNull()) {
+                    memberValue.activationReason = nil;
+                } else {
+                    memberValue.activationReason = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.triggerDetails.activationReason.Value().Value())];
+                }
+            } else {
+                memberValue.activationReason = nil;
+            }
+            value.triggerDetails = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForChimeCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::Chime;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForEcosystemInformationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::EcosystemInformation;
@@ -5189,6 +5599,24 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ContentAppObserver::Id: {
         return DecodeEventPayloadForContentAppObserverCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::CameraAvStreamManagement::Id: {
+        return DecodeEventPayloadForCameraAVStreamManagementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::CameraAvSettingsUserLevelManagement::Id: {
+        return DecodeEventPayloadForCameraAVSettingsUserLevelManagementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::WebRTCTransportProvider::Id: {
+        return DecodeEventPayloadForWebRTCTransportProviderCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::WebRTCTransportRequestor::Id: {
+        return DecodeEventPayloadForWebRTCTransportRequestorCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::PushAvStreamTransport::Id: {
+        return DecodeEventPayloadForPushAVStreamTransportCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::Chime::Id: {
+        return DecodeEventPayloadForChimeCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::EcosystemInformation::Id: {
         return DecodeEventPayloadForEcosystemInformationCluster(aPath.mEventId, aReader, aError);

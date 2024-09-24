@@ -12724,6 +12724,2430 @@ public static class ContentControlClusterRatingNameStruct {
     return output.toString();
   }
 }
+public static class CameraAvStreamManagementClusterAudioCapabilitiesStruct {
+  public Integer maxNumberOfChannels;
+  public ArrayList<Integer> supportedCodecs;
+  public ArrayList<Long> supportedSampleRates;
+  public ArrayList<Long> supportedBitDepths;
+  private static final long MAX_NUMBER_OF_CHANNELS_ID = 0L;
+  private static final long SUPPORTED_CODECS_ID = 1L;
+  private static final long SUPPORTED_SAMPLE_RATES_ID = 2L;
+  private static final long SUPPORTED_BIT_DEPTHS_ID = 3L;
+
+  public CameraAvStreamManagementClusterAudioCapabilitiesStruct(
+    Integer maxNumberOfChannels,
+    ArrayList<Integer> supportedCodecs,
+    ArrayList<Long> supportedSampleRates,
+    ArrayList<Long> supportedBitDepths
+  ) {
+    this.maxNumberOfChannels = maxNumberOfChannels;
+    this.supportedCodecs = supportedCodecs;
+    this.supportedSampleRates = supportedSampleRates;
+    this.supportedBitDepths = supportedBitDepths;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MAX_NUMBER_OF_CHANNELS_ID, new UIntType(maxNumberOfChannels)));
+    values.add(new StructElement(SUPPORTED_CODECS_ID, ArrayType.generateArrayType(supportedCodecs, (elementsupportedCodecs) -> new UIntType(elementsupportedCodecs))));
+    values.add(new StructElement(SUPPORTED_SAMPLE_RATES_ID, ArrayType.generateArrayType(supportedSampleRates, (elementsupportedSampleRates) -> new UIntType(elementsupportedSampleRates))));
+    values.add(new StructElement(SUPPORTED_BIT_DEPTHS_ID, ArrayType.generateArrayType(supportedBitDepths, (elementsupportedBitDepths) -> new UIntType(elementsupportedBitDepths))));
+
+    return new StructType(values);
+  }
+
+  public static CameraAvStreamManagementClusterAudioCapabilitiesStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer maxNumberOfChannels = null;
+    ArrayList<Integer> supportedCodecs = null;
+    ArrayList<Long> supportedSampleRates = null;
+    ArrayList<Long> supportedBitDepths = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MAX_NUMBER_OF_CHANNELS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          maxNumberOfChannels = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SUPPORTED_CODECS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          supportedCodecs = castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == SUPPORTED_SAMPLE_RATES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          supportedSampleRates = castingValue.map((elementcastingValue) -> elementcastingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == SUPPORTED_BIT_DEPTHS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          supportedBitDepths = castingValue.map((elementcastingValue) -> elementcastingValue.value(Long.class));
+        }
+      }
+    }
+    return new CameraAvStreamManagementClusterAudioCapabilitiesStruct(
+      maxNumberOfChannels,
+      supportedCodecs,
+      supportedSampleRates,
+      supportedBitDepths
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvStreamManagementClusterAudioCapabilitiesStruct {\n");
+    output.append("\tmaxNumberOfChannels: ");
+    output.append(maxNumberOfChannels);
+    output.append("\n");
+    output.append("\tsupportedCodecs: ");
+    output.append(supportedCodecs);
+    output.append("\n");
+    output.append("\tsupportedSampleRates: ");
+    output.append(supportedSampleRates);
+    output.append("\n");
+    output.append("\tsupportedBitDepths: ");
+    output.append(supportedBitDepths);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CameraAvStreamManagementClusterAudioStreamStruct {
+  public Integer audioStreamID;
+  public Integer streamType;
+  public Integer audioCodec;
+  public Integer channelCount;
+  public Long sampleRate;
+  public Long bitRate;
+  public Integer bitDepth;
+  public Integer referenceCount;
+  private static final long AUDIO_STREAM_ID_ID = 0L;
+  private static final long STREAM_TYPE_ID = 1L;
+  private static final long AUDIO_CODEC_ID = 2L;
+  private static final long CHANNEL_COUNT_ID = 3L;
+  private static final long SAMPLE_RATE_ID = 4L;
+  private static final long BIT_RATE_ID = 5L;
+  private static final long BIT_DEPTH_ID = 6L;
+  private static final long REFERENCE_COUNT_ID = 7L;
+
+  public CameraAvStreamManagementClusterAudioStreamStruct(
+    Integer audioStreamID,
+    Integer streamType,
+    Integer audioCodec,
+    Integer channelCount,
+    Long sampleRate,
+    Long bitRate,
+    Integer bitDepth,
+    Integer referenceCount
+  ) {
+    this.audioStreamID = audioStreamID;
+    this.streamType = streamType;
+    this.audioCodec = audioCodec;
+    this.channelCount = channelCount;
+    this.sampleRate = sampleRate;
+    this.bitRate = bitRate;
+    this.bitDepth = bitDepth;
+    this.referenceCount = referenceCount;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(AUDIO_STREAM_ID_ID, new UIntType(audioStreamID)));
+    values.add(new StructElement(STREAM_TYPE_ID, new UIntType(streamType)));
+    values.add(new StructElement(AUDIO_CODEC_ID, new UIntType(audioCodec)));
+    values.add(new StructElement(CHANNEL_COUNT_ID, new UIntType(channelCount)));
+    values.add(new StructElement(SAMPLE_RATE_ID, new UIntType(sampleRate)));
+    values.add(new StructElement(BIT_RATE_ID, new UIntType(bitRate)));
+    values.add(new StructElement(BIT_DEPTH_ID, new UIntType(bitDepth)));
+    values.add(new StructElement(REFERENCE_COUNT_ID, new UIntType(referenceCount)));
+
+    return new StructType(values);
+  }
+
+  public static CameraAvStreamManagementClusterAudioStreamStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer audioStreamID = null;
+    Integer streamType = null;
+    Integer audioCodec = null;
+    Integer channelCount = null;
+    Long sampleRate = null;
+    Long bitRate = null;
+    Integer bitDepth = null;
+    Integer referenceCount = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == AUDIO_STREAM_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          audioStreamID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == STREAM_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          streamType = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == AUDIO_CODEC_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          audioCodec = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CHANNEL_COUNT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          channelCount = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SAMPLE_RATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sampleRate = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == BIT_RATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          bitRate = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == BIT_DEPTH_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          bitDepth = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == REFERENCE_COUNT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          referenceCount = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new CameraAvStreamManagementClusterAudioStreamStruct(
+      audioStreamID,
+      streamType,
+      audioCodec,
+      channelCount,
+      sampleRate,
+      bitRate,
+      bitDepth,
+      referenceCount
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvStreamManagementClusterAudioStreamStruct {\n");
+    output.append("\taudioStreamID: ");
+    output.append(audioStreamID);
+    output.append("\n");
+    output.append("\tstreamType: ");
+    output.append(streamType);
+    output.append("\n");
+    output.append("\taudioCodec: ");
+    output.append(audioCodec);
+    output.append("\n");
+    output.append("\tchannelCount: ");
+    output.append(channelCount);
+    output.append("\n");
+    output.append("\tsampleRate: ");
+    output.append(sampleRate);
+    output.append("\n");
+    output.append("\tbitRate: ");
+    output.append(bitRate);
+    output.append("\n");
+    output.append("\tbitDepth: ");
+    output.append(bitDepth);
+    output.append("\n");
+    output.append("\treferenceCount: ");
+    output.append(referenceCount);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CameraAvStreamManagementClusterPerStreamStruct {
+  public Integer streamID;
+  public Boolean onOff;
+  private static final long STREAM_ID_ID = 0L;
+  private static final long ON_OFF_ID = 1L;
+
+  public CameraAvStreamManagementClusterPerStreamStruct(
+    Integer streamID,
+    Boolean onOff
+  ) {
+    this.streamID = streamID;
+    this.onOff = onOff;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(STREAM_ID_ID, new UIntType(streamID)));
+    values.add(new StructElement(ON_OFF_ID, new BooleanType(onOff)));
+
+    return new StructType(values);
+  }
+
+  public static CameraAvStreamManagementClusterPerStreamStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer streamID = null;
+    Boolean onOff = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == STREAM_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          streamID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ON_OFF_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          onOff = castingValue.value(Boolean.class);
+        }
+      }
+    }
+    return new CameraAvStreamManagementClusterPerStreamStruct(
+      streamID,
+      onOff
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvStreamManagementClusterPerStreamStruct {\n");
+    output.append("\tstreamID: ");
+    output.append(streamID);
+    output.append("\n");
+    output.append("\tonOff: ");
+    output.append(onOff);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct {
+  public Integer codec;
+  public Object resolution;
+  public Long minBitRate;
+  private static final long CODEC_ID = 0L;
+  private static final long RESOLUTION_ID = 1L;
+  private static final long MIN_BIT_RATE_ID = 2L;
+
+  public CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct(
+    Integer codec,
+    Object resolution,
+    Long minBitRate
+  ) {
+    this.codec = codec;
+    this.resolution = resolution;
+    this.minBitRate = minBitRate;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CODEC_ID, new UIntType(codec)));
+    values.add(new StructElement(RESOLUTION_ID, new AnyType(resolution)));
+    values.add(new StructElement(MIN_BIT_RATE_ID, new UIntType(minBitRate)));
+
+    return new StructType(values);
+  }
+
+  public static CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer codec = null;
+    Object resolution = null;
+    Long minBitRate = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CODEC_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          codec = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == RESOLUTION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Any) {
+          AnyType castingValue = element.value(AnyType.class);
+          resolution = castingValue.value(Object.class);
+        }
+      } else if (element.contextTagNum() == MIN_BIT_RATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          minBitRate = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct(
+      codec,
+      resolution,
+      minBitRate
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct {\n");
+    output.append("\tcodec: ");
+    output.append(codec);
+    output.append("\n");
+    output.append("\tresolution: ");
+    output.append(resolution);
+    output.append("\n");
+    output.append("\tminBitRate: ");
+    output.append(minBitRate);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CameraAvStreamManagementClusterSnapshotParamsStruct {
+  public Object resolution;
+  public Integer maxFrameRate;
+  public Integer imageCodec;
+  private static final long RESOLUTION_ID = 0L;
+  private static final long MAX_FRAME_RATE_ID = 1L;
+  private static final long IMAGE_CODEC_ID = 2L;
+
+  public CameraAvStreamManagementClusterSnapshotParamsStruct(
+    Object resolution,
+    Integer maxFrameRate,
+    Integer imageCodec
+  ) {
+    this.resolution = resolution;
+    this.maxFrameRate = maxFrameRate;
+    this.imageCodec = imageCodec;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(RESOLUTION_ID, new AnyType(resolution)));
+    values.add(new StructElement(MAX_FRAME_RATE_ID, new UIntType(maxFrameRate)));
+    values.add(new StructElement(IMAGE_CODEC_ID, new UIntType(imageCodec)));
+
+    return new StructType(values);
+  }
+
+  public static CameraAvStreamManagementClusterSnapshotParamsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Object resolution = null;
+    Integer maxFrameRate = null;
+    Integer imageCodec = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == RESOLUTION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Any) {
+          AnyType castingValue = element.value(AnyType.class);
+          resolution = castingValue.value(Object.class);
+        }
+      } else if (element.contextTagNum() == MAX_FRAME_RATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          maxFrameRate = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == IMAGE_CODEC_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          imageCodec = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new CameraAvStreamManagementClusterSnapshotParamsStruct(
+      resolution,
+      maxFrameRate,
+      imageCodec
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvStreamManagementClusterSnapshotParamsStruct {\n");
+    output.append("\tresolution: ");
+    output.append(resolution);
+    output.append("\n");
+    output.append("\tmaxFrameRate: ");
+    output.append(maxFrameRate);
+    output.append("\n");
+    output.append("\timageCodec: ");
+    output.append(imageCodec);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CameraAvStreamManagementClusterSnapshotStreamStruct {
+  public Integer snapshotStreamID;
+  public Integer imageCodec;
+  public Integer frameRate;
+  public Long bitRate;
+  public Object minResolution;
+  public Object maxResolution;
+  public Integer quality;
+  public Integer referenceCount;
+  private static final long SNAPSHOT_STREAM_ID_ID = 0L;
+  private static final long IMAGE_CODEC_ID = 1L;
+  private static final long FRAME_RATE_ID = 2L;
+  private static final long BIT_RATE_ID = 3L;
+  private static final long MIN_RESOLUTION_ID = 4L;
+  private static final long MAX_RESOLUTION_ID = 5L;
+  private static final long QUALITY_ID = 6L;
+  private static final long REFERENCE_COUNT_ID = 7L;
+
+  public CameraAvStreamManagementClusterSnapshotStreamStruct(
+    Integer snapshotStreamID,
+    Integer imageCodec,
+    Integer frameRate,
+    Long bitRate,
+    Object minResolution,
+    Object maxResolution,
+    Integer quality,
+    Integer referenceCount
+  ) {
+    this.snapshotStreamID = snapshotStreamID;
+    this.imageCodec = imageCodec;
+    this.frameRate = frameRate;
+    this.bitRate = bitRate;
+    this.minResolution = minResolution;
+    this.maxResolution = maxResolution;
+    this.quality = quality;
+    this.referenceCount = referenceCount;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SNAPSHOT_STREAM_ID_ID, new UIntType(snapshotStreamID)));
+    values.add(new StructElement(IMAGE_CODEC_ID, new UIntType(imageCodec)));
+    values.add(new StructElement(FRAME_RATE_ID, new UIntType(frameRate)));
+    values.add(new StructElement(BIT_RATE_ID, new UIntType(bitRate)));
+    values.add(new StructElement(MIN_RESOLUTION_ID, new AnyType(minResolution)));
+    values.add(new StructElement(MAX_RESOLUTION_ID, new AnyType(maxResolution)));
+    values.add(new StructElement(QUALITY_ID, new UIntType(quality)));
+    values.add(new StructElement(REFERENCE_COUNT_ID, new UIntType(referenceCount)));
+
+    return new StructType(values);
+  }
+
+  public static CameraAvStreamManagementClusterSnapshotStreamStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer snapshotStreamID = null;
+    Integer imageCodec = null;
+    Integer frameRate = null;
+    Long bitRate = null;
+    Object minResolution = null;
+    Object maxResolution = null;
+    Integer quality = null;
+    Integer referenceCount = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SNAPSHOT_STREAM_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          snapshotStreamID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == IMAGE_CODEC_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          imageCodec = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == FRAME_RATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          frameRate = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == BIT_RATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          bitRate = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MIN_RESOLUTION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Any) {
+          AnyType castingValue = element.value(AnyType.class);
+          minResolution = castingValue.value(Object.class);
+        }
+      } else if (element.contextTagNum() == MAX_RESOLUTION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Any) {
+          AnyType castingValue = element.value(AnyType.class);
+          maxResolution = castingValue.value(Object.class);
+        }
+      } else if (element.contextTagNum() == QUALITY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          quality = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == REFERENCE_COUNT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          referenceCount = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new CameraAvStreamManagementClusterSnapshotStreamStruct(
+      snapshotStreamID,
+      imageCodec,
+      frameRate,
+      bitRate,
+      minResolution,
+      maxResolution,
+      quality,
+      referenceCount
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvStreamManagementClusterSnapshotStreamStruct {\n");
+    output.append("\tsnapshotStreamID: ");
+    output.append(snapshotStreamID);
+    output.append("\n");
+    output.append("\timageCodec: ");
+    output.append(imageCodec);
+    output.append("\n");
+    output.append("\tframeRate: ");
+    output.append(frameRate);
+    output.append("\n");
+    output.append("\tbitRate: ");
+    output.append(bitRate);
+    output.append("\n");
+    output.append("\tminResolution: ");
+    output.append(minResolution);
+    output.append("\n");
+    output.append("\tmaxResolution: ");
+    output.append(maxResolution);
+    output.append("\n");
+    output.append("\tquality: ");
+    output.append(quality);
+    output.append("\n");
+    output.append("\treferenceCount: ");
+    output.append(referenceCount);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CameraAvStreamManagementClusterVideoSensorParamsStruct {
+  public Integer sensorWidth;
+  public Integer sensorHeight;
+  public Boolean HDRCapable;
+  public Integer maxFPS;
+  public Integer maxHDRFPS;
+  private static final long SENSOR_WIDTH_ID = 0L;
+  private static final long SENSOR_HEIGHT_ID = 1L;
+  private static final long HDR_CAPABLE_ID = 2L;
+  private static final long MAX_FPS_ID = 3L;
+  private static final long MAX_HDRFPS_ID = 4L;
+
+  public CameraAvStreamManagementClusterVideoSensorParamsStruct(
+    Integer sensorWidth,
+    Integer sensorHeight,
+    Boolean HDRCapable,
+    Integer maxFPS,
+    Integer maxHDRFPS
+  ) {
+    this.sensorWidth = sensorWidth;
+    this.sensorHeight = sensorHeight;
+    this.HDRCapable = HDRCapable;
+    this.maxFPS = maxFPS;
+    this.maxHDRFPS = maxHDRFPS;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SENSOR_WIDTH_ID, new UIntType(sensorWidth)));
+    values.add(new StructElement(SENSOR_HEIGHT_ID, new UIntType(sensorHeight)));
+    values.add(new StructElement(HDR_CAPABLE_ID, new BooleanType(HDRCapable)));
+    values.add(new StructElement(MAX_FPS_ID, new UIntType(maxFPS)));
+    values.add(new StructElement(MAX_HDRFPS_ID, new UIntType(maxHDRFPS)));
+
+    return new StructType(values);
+  }
+
+  public static CameraAvStreamManagementClusterVideoSensorParamsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer sensorWidth = null;
+    Integer sensorHeight = null;
+    Boolean HDRCapable = null;
+    Integer maxFPS = null;
+    Integer maxHDRFPS = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SENSOR_WIDTH_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sensorWidth = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SENSOR_HEIGHT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sensorHeight = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == HDR_CAPABLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          HDRCapable = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == MAX_FPS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          maxFPS = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MAX_HDRFPS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          maxHDRFPS = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new CameraAvStreamManagementClusterVideoSensorParamsStruct(
+      sensorWidth,
+      sensorHeight,
+      HDRCapable,
+      maxFPS,
+      maxHDRFPS
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvStreamManagementClusterVideoSensorParamsStruct {\n");
+    output.append("\tsensorWidth: ");
+    output.append(sensorWidth);
+    output.append("\n");
+    output.append("\tsensorHeight: ");
+    output.append(sensorHeight);
+    output.append("\n");
+    output.append("\tHDRCapable: ");
+    output.append(HDRCapable);
+    output.append("\n");
+    output.append("\tmaxFPS: ");
+    output.append(maxFPS);
+    output.append("\n");
+    output.append("\tmaxHDRFPS: ");
+    output.append(maxHDRFPS);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CameraAvStreamManagementClusterVideoStreamStruct {
+  public Integer videoStreamID;
+  public Integer streamType;
+  public Integer videoCodec;
+  public Integer minFrameRate;
+  public Integer maxFrameRate;
+  public Object minResolution;
+  public Object maxResolution;
+  public Integer minBitRate;
+  public Integer maxBitRate;
+  public Integer minFragmentLen;
+  public Integer maxFragmentLen;
+  public Integer referenceCount;
+  private static final long VIDEO_STREAM_ID_ID = 0L;
+  private static final long STREAM_TYPE_ID = 1L;
+  private static final long VIDEO_CODEC_ID = 2L;
+  private static final long MIN_FRAME_RATE_ID = 3L;
+  private static final long MAX_FRAME_RATE_ID = 4L;
+  private static final long MIN_RESOLUTION_ID = 5L;
+  private static final long MAX_RESOLUTION_ID = 6L;
+  private static final long MIN_BIT_RATE_ID = 7L;
+  private static final long MAX_BIT_RATE_ID = 8L;
+  private static final long MIN_FRAGMENT_LEN_ID = 9L;
+  private static final long MAX_FRAGMENT_LEN_ID = 10L;
+  private static final long REFERENCE_COUNT_ID = 11L;
+
+  public CameraAvStreamManagementClusterVideoStreamStruct(
+    Integer videoStreamID,
+    Integer streamType,
+    Integer videoCodec,
+    Integer minFrameRate,
+    Integer maxFrameRate,
+    Object minResolution,
+    Object maxResolution,
+    Integer minBitRate,
+    Integer maxBitRate,
+    Integer minFragmentLen,
+    Integer maxFragmentLen,
+    Integer referenceCount
+  ) {
+    this.videoStreamID = videoStreamID;
+    this.streamType = streamType;
+    this.videoCodec = videoCodec;
+    this.minFrameRate = minFrameRate;
+    this.maxFrameRate = maxFrameRate;
+    this.minResolution = minResolution;
+    this.maxResolution = maxResolution;
+    this.minBitRate = minBitRate;
+    this.maxBitRate = maxBitRate;
+    this.minFragmentLen = minFragmentLen;
+    this.maxFragmentLen = maxFragmentLen;
+    this.referenceCount = referenceCount;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(VIDEO_STREAM_ID_ID, new UIntType(videoStreamID)));
+    values.add(new StructElement(STREAM_TYPE_ID, new UIntType(streamType)));
+    values.add(new StructElement(VIDEO_CODEC_ID, new UIntType(videoCodec)));
+    values.add(new StructElement(MIN_FRAME_RATE_ID, new UIntType(minFrameRate)));
+    values.add(new StructElement(MAX_FRAME_RATE_ID, new UIntType(maxFrameRate)));
+    values.add(new StructElement(MIN_RESOLUTION_ID, new AnyType(minResolution)));
+    values.add(new StructElement(MAX_RESOLUTION_ID, new AnyType(maxResolution)));
+    values.add(new StructElement(MIN_BIT_RATE_ID, new UIntType(minBitRate)));
+    values.add(new StructElement(MAX_BIT_RATE_ID, new UIntType(maxBitRate)));
+    values.add(new StructElement(MIN_FRAGMENT_LEN_ID, new UIntType(minFragmentLen)));
+    values.add(new StructElement(MAX_FRAGMENT_LEN_ID, new UIntType(maxFragmentLen)));
+    values.add(new StructElement(REFERENCE_COUNT_ID, new UIntType(referenceCount)));
+
+    return new StructType(values);
+  }
+
+  public static CameraAvStreamManagementClusterVideoStreamStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer videoStreamID = null;
+    Integer streamType = null;
+    Integer videoCodec = null;
+    Integer minFrameRate = null;
+    Integer maxFrameRate = null;
+    Object minResolution = null;
+    Object maxResolution = null;
+    Integer minBitRate = null;
+    Integer maxBitRate = null;
+    Integer minFragmentLen = null;
+    Integer maxFragmentLen = null;
+    Integer referenceCount = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == VIDEO_STREAM_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          videoStreamID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == STREAM_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          streamType = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == VIDEO_CODEC_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          videoCodec = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MIN_FRAME_RATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          minFrameRate = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MAX_FRAME_RATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          maxFrameRate = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MIN_RESOLUTION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Any) {
+          AnyType castingValue = element.value(AnyType.class);
+          minResolution = castingValue.value(Object.class);
+        }
+      } else if (element.contextTagNum() == MAX_RESOLUTION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Any) {
+          AnyType castingValue = element.value(AnyType.class);
+          maxResolution = castingValue.value(Object.class);
+        }
+      } else if (element.contextTagNum() == MIN_BIT_RATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          minBitRate = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MAX_BIT_RATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          maxBitRate = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MIN_FRAGMENT_LEN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          minFragmentLen = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MAX_FRAGMENT_LEN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          maxFragmentLen = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == REFERENCE_COUNT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          referenceCount = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new CameraAvStreamManagementClusterVideoStreamStruct(
+      videoStreamID,
+      streamType,
+      videoCodec,
+      minFrameRate,
+      maxFrameRate,
+      minResolution,
+      maxResolution,
+      minBitRate,
+      maxBitRate,
+      minFragmentLen,
+      maxFragmentLen,
+      referenceCount
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvStreamManagementClusterVideoStreamStruct {\n");
+    output.append("\tvideoStreamID: ");
+    output.append(videoStreamID);
+    output.append("\n");
+    output.append("\tstreamType: ");
+    output.append(streamType);
+    output.append("\n");
+    output.append("\tvideoCodec: ");
+    output.append(videoCodec);
+    output.append("\n");
+    output.append("\tminFrameRate: ");
+    output.append(minFrameRate);
+    output.append("\n");
+    output.append("\tmaxFrameRate: ");
+    output.append(maxFrameRate);
+    output.append("\n");
+    output.append("\tminResolution: ");
+    output.append(minResolution);
+    output.append("\n");
+    output.append("\tmaxResolution: ");
+    output.append(maxResolution);
+    output.append("\n");
+    output.append("\tminBitRate: ");
+    output.append(minBitRate);
+    output.append("\n");
+    output.append("\tmaxBitRate: ");
+    output.append(maxBitRate);
+    output.append("\n");
+    output.append("\tminFragmentLen: ");
+    output.append(minFragmentLen);
+    output.append("\n");
+    output.append("\tmaxFragmentLen: ");
+    output.append(maxFragmentLen);
+    output.append("\n");
+    output.append("\treferenceCount: ");
+    output.append(referenceCount);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CameraAvStreamManagementClusterViewportStruct {
+  public Integer x1;
+  public Integer y1;
+  public Integer x2;
+  public Integer y2;
+  private static final long X1_ID = 0L;
+  private static final long Y1_ID = 1L;
+  private static final long X2_ID = 2L;
+  private static final long Y2_ID = 3L;
+
+  public CameraAvStreamManagementClusterViewportStruct(
+    Integer x1,
+    Integer y1,
+    Integer x2,
+    Integer y2
+  ) {
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(X1_ID, new UIntType(x1)));
+    values.add(new StructElement(Y1_ID, new UIntType(y1)));
+    values.add(new StructElement(X2_ID, new UIntType(x2)));
+    values.add(new StructElement(Y2_ID, new UIntType(y2)));
+
+    return new StructType(values);
+  }
+
+  public static CameraAvStreamManagementClusterViewportStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer x1 = null;
+    Integer y1 = null;
+    Integer x2 = null;
+    Integer y2 = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == X1_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          x1 = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == Y1_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          y1 = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == X2_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          x2 = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == Y2_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          y2 = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new CameraAvStreamManagementClusterViewportStruct(
+      x1,
+      y1,
+      x2,
+      y2
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvStreamManagementClusterViewportStruct {\n");
+    output.append("\tx1: ");
+    output.append(x1);
+    output.append("\n");
+    output.append("\ty1: ");
+    output.append(y1);
+    output.append("\n");
+    output.append("\tx2: ");
+    output.append(x2);
+    output.append("\n");
+    output.append("\ty2: ");
+    output.append(y2);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CameraAvSettingsUserLevelManagementClusterMPTZStruct {
+  public @Nullable Optional<Integer> MPan;
+  public @Nullable Optional<Integer> MTilt;
+  public @Nullable Optional<Integer> MZoom;
+  private static final long M_PAN_ID = 0L;
+  private static final long M_TILT_ID = 1L;
+  private static final long M_ZOOM_ID = 2L;
+
+  public CameraAvSettingsUserLevelManagementClusterMPTZStruct(
+    @Nullable Optional<Integer> MPan,
+    @Nullable Optional<Integer> MTilt,
+    @Nullable Optional<Integer> MZoom
+  ) {
+    this.MPan = MPan;
+    this.MTilt = MTilt;
+    this.MZoom = MZoom;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(M_PAN_ID, MPan != null ? MPan.<BaseTLVType>map((nonOptionalMPan) -> new IntType(nonOptionalMPan)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(M_TILT_ID, MTilt != null ? MTilt.<BaseTLVType>map((nonOptionalMTilt) -> new IntType(nonOptionalMTilt)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(M_ZOOM_ID, MZoom != null ? MZoom.<BaseTLVType>map((nonOptionalMZoom) -> new UIntType(nonOptionalMZoom)).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static CameraAvSettingsUserLevelManagementClusterMPTZStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable Optional<Integer> MPan = null;
+    @Nullable Optional<Integer> MTilt = null;
+    @Nullable Optional<Integer> MZoom = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == M_PAN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          MPan = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == M_TILT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          MTilt = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == M_ZOOM_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          MZoom = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new CameraAvSettingsUserLevelManagementClusterMPTZStruct(
+      MPan,
+      MTilt,
+      MZoom
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvSettingsUserLevelManagementClusterMPTZStruct {\n");
+    output.append("\tMPan: ");
+    output.append(MPan);
+    output.append("\n");
+    output.append("\tMTilt: ");
+    output.append(MTilt);
+    output.append("\n");
+    output.append("\tMZoom: ");
+    output.append(MZoom);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CameraAvSettingsUserLevelManagementClusterPerStreamStruct {
+  public Integer streamID;
+  public Boolean onOff;
+  private static final long STREAM_ID_ID = 0L;
+  private static final long ON_OFF_ID = 1L;
+
+  public CameraAvSettingsUserLevelManagementClusterPerStreamStruct(
+    Integer streamID,
+    Boolean onOff
+  ) {
+    this.streamID = streamID;
+    this.onOff = onOff;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(STREAM_ID_ID, new UIntType(streamID)));
+    values.add(new StructElement(ON_OFF_ID, new BooleanType(onOff)));
+
+    return new StructType(values);
+  }
+
+  public static CameraAvSettingsUserLevelManagementClusterPerStreamStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer streamID = null;
+    Boolean onOff = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == STREAM_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          streamID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ON_OFF_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          onOff = castingValue.value(Boolean.class);
+        }
+      }
+    }
+    return new CameraAvSettingsUserLevelManagementClusterPerStreamStruct(
+      streamID,
+      onOff
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvSettingsUserLevelManagementClusterPerStreamStruct {\n");
+    output.append("\tstreamID: ");
+    output.append(streamID);
+    output.append("\n");
+    output.append("\tonOff: ");
+    output.append(onOff);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CameraAvSettingsUserLevelManagementClusterViewportStruct {
+  public Integer x1;
+  public Integer y1;
+  public Integer x2;
+  public Integer y2;
+  private static final long X1_ID = 0L;
+  private static final long Y1_ID = 1L;
+  private static final long X2_ID = 2L;
+  private static final long Y2_ID = 3L;
+
+  public CameraAvSettingsUserLevelManagementClusterViewportStruct(
+    Integer x1,
+    Integer y1,
+    Integer x2,
+    Integer y2
+  ) {
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(X1_ID, new UIntType(x1)));
+    values.add(new StructElement(Y1_ID, new UIntType(y1)));
+    values.add(new StructElement(X2_ID, new UIntType(x2)));
+    values.add(new StructElement(Y2_ID, new UIntType(y2)));
+
+    return new StructType(values);
+  }
+
+  public static CameraAvSettingsUserLevelManagementClusterViewportStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer x1 = null;
+    Integer y1 = null;
+    Integer x2 = null;
+    Integer y2 = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == X1_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          x1 = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == Y1_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          y1 = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == X2_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          x2 = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == Y2_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          y2 = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new CameraAvSettingsUserLevelManagementClusterViewportStruct(
+      x1,
+      y1,
+      x2,
+      y2
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvSettingsUserLevelManagementClusterViewportStruct {\n");
+    output.append("\tx1: ");
+    output.append(x1);
+    output.append("\n");
+    output.append("\ty1: ");
+    output.append(y1);
+    output.append("\n");
+    output.append("\tx2: ");
+    output.append(x2);
+    output.append("\n");
+    output.append("\ty2: ");
+    output.append(y2);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class WebRTCTransportProviderClusterICEServerStruct {
+  public ArrayList<String> urls;
+  public Optional<String> username;
+  public Optional<String> credential;
+  public Optional<Integer> caid;
+  private static final long URLS_ID = 1L;
+  private static final long USERNAME_ID = 2L;
+  private static final long CREDENTIAL_ID = 3L;
+  private static final long CAID_ID = 4L;
+
+  public WebRTCTransportProviderClusterICEServerStruct(
+    ArrayList<String> urls,
+    Optional<String> username,
+    Optional<String> credential,
+    Optional<Integer> caid
+  ) {
+    this.urls = urls;
+    this.username = username;
+    this.credential = credential;
+    this.caid = caid;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(URLS_ID, ArrayType.generateArrayType(urls, (elementurls) -> new StringType(elementurls))));
+    values.add(new StructElement(USERNAME_ID, username.<BaseTLVType>map((nonOptionalusername) -> new StringType(nonOptionalusername)).orElse(new EmptyType())));
+    values.add(new StructElement(CREDENTIAL_ID, credential.<BaseTLVType>map((nonOptionalcredential) -> new StringType(nonOptionalcredential)).orElse(new EmptyType())));
+    values.add(new StructElement(CAID_ID, caid.<BaseTLVType>map((nonOptionalcaid) -> new UIntType(nonOptionalcaid)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static WebRTCTransportProviderClusterICEServerStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ArrayList<String> urls = null;
+    Optional<String> username = Optional.empty();
+    Optional<String> credential = Optional.empty();
+    Optional<Integer> caid = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == URLS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          urls = castingValue.map((elementcastingValue) -> elementcastingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == USERNAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          username = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == CREDENTIAL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          credential = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == CAID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          caid = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new WebRTCTransportProviderClusterICEServerStruct(
+      urls,
+      username,
+      credential,
+      caid
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WebRTCTransportProviderClusterICEServerStruct {\n");
+    output.append("\turls: ");
+    output.append(urls);
+    output.append("\n");
+    output.append("\tusername: ");
+    output.append(username);
+    output.append("\n");
+    output.append("\tcredential: ");
+    output.append(credential);
+    output.append("\n");
+    output.append("\tcaid: ");
+    output.append(caid);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
+  public Integer id;
+  public Long peerNodeId;
+  public Integer peerFabricIndex;
+  public Integer streamType;
+  public @Nullable Integer videoStreamID;
+  public @Nullable Integer audioStreamID;
+  public Integer metadataOptions;
+  private static final long ID_ID = 1L;
+  private static final long PEER_NODE_ID_ID = 2L;
+  private static final long PEER_FABRIC_INDEX_ID = 3L;
+  private static final long STREAM_TYPE_ID = 4L;
+  private static final long VIDEO_STREAM_ID_ID = 5L;
+  private static final long AUDIO_STREAM_ID_ID = 6L;
+  private static final long METADATA_OPTIONS_ID = 7L;
+
+  public WebRTCTransportProviderClusterWebRTCSessionStruct(
+    Integer id,
+    Long peerNodeId,
+    Integer peerFabricIndex,
+    Integer streamType,
+    @Nullable Integer videoStreamID,
+    @Nullable Integer audioStreamID,
+    Integer metadataOptions
+  ) {
+    this.id = id;
+    this.peerNodeId = peerNodeId;
+    this.peerFabricIndex = peerFabricIndex;
+    this.streamType = streamType;
+    this.videoStreamID = videoStreamID;
+    this.audioStreamID = audioStreamID;
+    this.metadataOptions = metadataOptions;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ID_ID, new UIntType(id)));
+    values.add(new StructElement(PEER_NODE_ID_ID, new UIntType(peerNodeId)));
+    values.add(new StructElement(PEER_FABRIC_INDEX_ID, new UIntType(peerFabricIndex)));
+    values.add(new StructElement(STREAM_TYPE_ID, new UIntType(streamType)));
+    values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? new UIntType(videoStreamID) : new NullType()));
+    values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? new UIntType(audioStreamID) : new NullType()));
+    values.add(new StructElement(METADATA_OPTIONS_ID, new UIntType(metadataOptions)));
+
+    return new StructType(values);
+  }
+
+  public static WebRTCTransportProviderClusterWebRTCSessionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer id = null;
+    Long peerNodeId = null;
+    Integer peerFabricIndex = null;
+    Integer streamType = null;
+    @Nullable Integer videoStreamID = null;
+    @Nullable Integer audioStreamID = null;
+    Integer metadataOptions = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          id = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == PEER_NODE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          peerNodeId = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == PEER_FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          peerFabricIndex = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == STREAM_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          streamType = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == VIDEO_STREAM_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          videoStreamID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == AUDIO_STREAM_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          audioStreamID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == METADATA_OPTIONS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          metadataOptions = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new WebRTCTransportProviderClusterWebRTCSessionStruct(
+      id,
+      peerNodeId,
+      peerFabricIndex,
+      streamType,
+      videoStreamID,
+      audioStreamID,
+      metadataOptions
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WebRTCTransportProviderClusterWebRTCSessionStruct {\n");
+    output.append("\tid: ");
+    output.append(id);
+    output.append("\n");
+    output.append("\tpeerNodeId: ");
+    output.append(peerNodeId);
+    output.append("\n");
+    output.append("\tpeerFabricIndex: ");
+    output.append(peerFabricIndex);
+    output.append("\n");
+    output.append("\tstreamType: ");
+    output.append(streamType);
+    output.append("\n");
+    output.append("\tvideoStreamID: ");
+    output.append(videoStreamID);
+    output.append("\n");
+    output.append("\taudioStreamID: ");
+    output.append(audioStreamID);
+    output.append("\n");
+    output.append("\tmetadataOptions: ");
+    output.append(metadataOptions);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class WebRTCTransportRequestorClusterICEServerStruct {
+  public ArrayList<String> urls;
+  public Optional<String> username;
+  public Optional<String> credential;
+  public Optional<Integer> caid;
+  private static final long URLS_ID = 1L;
+  private static final long USERNAME_ID = 2L;
+  private static final long CREDENTIAL_ID = 3L;
+  private static final long CAID_ID = 4L;
+
+  public WebRTCTransportRequestorClusterICEServerStruct(
+    ArrayList<String> urls,
+    Optional<String> username,
+    Optional<String> credential,
+    Optional<Integer> caid
+  ) {
+    this.urls = urls;
+    this.username = username;
+    this.credential = credential;
+    this.caid = caid;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(URLS_ID, ArrayType.generateArrayType(urls, (elementurls) -> new StringType(elementurls))));
+    values.add(new StructElement(USERNAME_ID, username.<BaseTLVType>map((nonOptionalusername) -> new StringType(nonOptionalusername)).orElse(new EmptyType())));
+    values.add(new StructElement(CREDENTIAL_ID, credential.<BaseTLVType>map((nonOptionalcredential) -> new StringType(nonOptionalcredential)).orElse(new EmptyType())));
+    values.add(new StructElement(CAID_ID, caid.<BaseTLVType>map((nonOptionalcaid) -> new UIntType(nonOptionalcaid)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static WebRTCTransportRequestorClusterICEServerStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ArrayList<String> urls = null;
+    Optional<String> username = Optional.empty();
+    Optional<String> credential = Optional.empty();
+    Optional<Integer> caid = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == URLS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          urls = castingValue.map((elementcastingValue) -> elementcastingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == USERNAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          username = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == CREDENTIAL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          credential = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == CAID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          caid = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new WebRTCTransportRequestorClusterICEServerStruct(
+      urls,
+      username,
+      credential,
+      caid
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WebRTCTransportRequestorClusterICEServerStruct {\n");
+    output.append("\turls: ");
+    output.append(urls);
+    output.append("\n");
+    output.append("\tusername: ");
+    output.append(username);
+    output.append("\n");
+    output.append("\tcredential: ");
+    output.append(credential);
+    output.append("\n");
+    output.append("\tcaid: ");
+    output.append(caid);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
+  public Integer id;
+  public Long peerNodeId;
+  public Integer peerFabricIndex;
+  public Integer streamType;
+  public @Nullable Integer videoStreamID;
+  public @Nullable Integer audioStreamID;
+  public Integer metadataOptions;
+  private static final long ID_ID = 1L;
+  private static final long PEER_NODE_ID_ID = 2L;
+  private static final long PEER_FABRIC_INDEX_ID = 3L;
+  private static final long STREAM_TYPE_ID = 4L;
+  private static final long VIDEO_STREAM_ID_ID = 5L;
+  private static final long AUDIO_STREAM_ID_ID = 6L;
+  private static final long METADATA_OPTIONS_ID = 7L;
+
+  public WebRTCTransportRequestorClusterWebRTCSessionStruct(
+    Integer id,
+    Long peerNodeId,
+    Integer peerFabricIndex,
+    Integer streamType,
+    @Nullable Integer videoStreamID,
+    @Nullable Integer audioStreamID,
+    Integer metadataOptions
+  ) {
+    this.id = id;
+    this.peerNodeId = peerNodeId;
+    this.peerFabricIndex = peerFabricIndex;
+    this.streamType = streamType;
+    this.videoStreamID = videoStreamID;
+    this.audioStreamID = audioStreamID;
+    this.metadataOptions = metadataOptions;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ID_ID, new UIntType(id)));
+    values.add(new StructElement(PEER_NODE_ID_ID, new UIntType(peerNodeId)));
+    values.add(new StructElement(PEER_FABRIC_INDEX_ID, new UIntType(peerFabricIndex)));
+    values.add(new StructElement(STREAM_TYPE_ID, new UIntType(streamType)));
+    values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? new UIntType(videoStreamID) : new NullType()));
+    values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? new UIntType(audioStreamID) : new NullType()));
+    values.add(new StructElement(METADATA_OPTIONS_ID, new UIntType(metadataOptions)));
+
+    return new StructType(values);
+  }
+
+  public static WebRTCTransportRequestorClusterWebRTCSessionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer id = null;
+    Long peerNodeId = null;
+    Integer peerFabricIndex = null;
+    Integer streamType = null;
+    @Nullable Integer videoStreamID = null;
+    @Nullable Integer audioStreamID = null;
+    Integer metadataOptions = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          id = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == PEER_NODE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          peerNodeId = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == PEER_FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          peerFabricIndex = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == STREAM_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          streamType = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == VIDEO_STREAM_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          videoStreamID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == AUDIO_STREAM_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          audioStreamID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == METADATA_OPTIONS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          metadataOptions = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new WebRTCTransportRequestorClusterWebRTCSessionStruct(
+      id,
+      peerNodeId,
+      peerFabricIndex,
+      streamType,
+      videoStreamID,
+      audioStreamID,
+      metadataOptions
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WebRTCTransportRequestorClusterWebRTCSessionStruct {\n");
+    output.append("\tid: ");
+    output.append(id);
+    output.append("\n");
+    output.append("\tpeerNodeId: ");
+    output.append(peerNodeId);
+    output.append("\n");
+    output.append("\tpeerFabricIndex: ");
+    output.append(peerFabricIndex);
+    output.append("\n");
+    output.append("\tstreamType: ");
+    output.append(streamType);
+    output.append("\n");
+    output.append("\tvideoStreamID: ");
+    output.append(videoStreamID);
+    output.append("\n");
+    output.append("\taudioStreamID: ");
+    output.append(audioStreamID);
+    output.append("\n");
+    output.append("\tmetadataOptions: ");
+    output.append(metadataOptions);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PushAvStreamTransportClusterPushAVStreamTransportMotionTriggerTimeControlStruct {
+  public Integer initialDuration;
+  public Integer augmentationDuration;
+  public Long maxDuration;
+  public Integer blindDuration;
+  private static final long INITIAL_DURATION_ID = 0L;
+  private static final long AUGMENTATION_DURATION_ID = 1L;
+  private static final long MAX_DURATION_ID = 2L;
+  private static final long BLIND_DURATION_ID = 3L;
+
+  public PushAvStreamTransportClusterPushAVStreamTransportMotionTriggerTimeControlStruct(
+    Integer initialDuration,
+    Integer augmentationDuration,
+    Long maxDuration,
+    Integer blindDuration
+  ) {
+    this.initialDuration = initialDuration;
+    this.augmentationDuration = augmentationDuration;
+    this.maxDuration = maxDuration;
+    this.blindDuration = blindDuration;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(INITIAL_DURATION_ID, new UIntType(initialDuration)));
+    values.add(new StructElement(AUGMENTATION_DURATION_ID, new UIntType(augmentationDuration)));
+    values.add(new StructElement(MAX_DURATION_ID, new UIntType(maxDuration)));
+    values.add(new StructElement(BLIND_DURATION_ID, new UIntType(blindDuration)));
+
+    return new StructType(values);
+  }
+
+  public static PushAvStreamTransportClusterPushAVStreamTransportMotionTriggerTimeControlStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer initialDuration = null;
+    Integer augmentationDuration = null;
+    Long maxDuration = null;
+    Integer blindDuration = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == INITIAL_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          initialDuration = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == AUGMENTATION_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          augmentationDuration = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MAX_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          maxDuration = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == BLIND_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          blindDuration = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new PushAvStreamTransportClusterPushAVStreamTransportMotionTriggerTimeControlStruct(
+      initialDuration,
+      augmentationDuration,
+      maxDuration,
+      blindDuration
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PushAvStreamTransportClusterPushAVStreamTransportMotionTriggerTimeControlStruct {\n");
+    output.append("\tinitialDuration: ");
+    output.append(initialDuration);
+    output.append("\n");
+    output.append("\taugmentationDuration: ");
+    output.append(augmentationDuration);
+    output.append("\n");
+    output.append("\tmaxDuration: ");
+    output.append(maxDuration);
+    output.append("\n");
+    output.append("\tblindDuration: ");
+    output.append(blindDuration);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PushAvStreamTransportClusterPushAVStreamTransportMetadataOptionsStruct {
+  public Integer multiplexing;
+  public Boolean includeMotionZones;
+  public Boolean enableMetadataPrivacySensitive;
+  private static final long MULTIPLEXING_ID = 0L;
+  private static final long INCLUDE_MOTION_ZONES_ID = 1L;
+  private static final long ENABLE_METADATA_PRIVACY_SENSITIVE_ID = 2L;
+
+  public PushAvStreamTransportClusterPushAVStreamTransportMetadataOptionsStruct(
+    Integer multiplexing,
+    Boolean includeMotionZones,
+    Boolean enableMetadataPrivacySensitive
+  ) {
+    this.multiplexing = multiplexing;
+    this.includeMotionZones = includeMotionZones;
+    this.enableMetadataPrivacySensitive = enableMetadataPrivacySensitive;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MULTIPLEXING_ID, new UIntType(multiplexing)));
+    values.add(new StructElement(INCLUDE_MOTION_ZONES_ID, new BooleanType(includeMotionZones)));
+    values.add(new StructElement(ENABLE_METADATA_PRIVACY_SENSITIVE_ID, new BooleanType(enableMetadataPrivacySensitive)));
+
+    return new StructType(values);
+  }
+
+  public static PushAvStreamTransportClusterPushAVStreamTransportMetadataOptionsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer multiplexing = null;
+    Boolean includeMotionZones = null;
+    Boolean enableMetadataPrivacySensitive = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MULTIPLEXING_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          multiplexing = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == INCLUDE_MOTION_ZONES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          includeMotionZones = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == ENABLE_METADATA_PRIVACY_SENSITIVE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          enableMetadataPrivacySensitive = castingValue.value(Boolean.class);
+        }
+      }
+    }
+    return new PushAvStreamTransportClusterPushAVStreamTransportMetadataOptionsStruct(
+      multiplexing,
+      includeMotionZones,
+      enableMetadataPrivacySensitive
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PushAvStreamTransportClusterPushAVStreamTransportMetadataOptionsStruct {\n");
+    output.append("\tmultiplexing: ");
+    output.append(multiplexing);
+    output.append("\n");
+    output.append("\tincludeMotionZones: ");
+    output.append(includeMotionZones);
+    output.append("\n");
+    output.append("\tenableMetadataPrivacySensitive: ");
+    output.append(enableMetadataPrivacySensitive);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PushAvStreamTransportClusterPushAVStreamTransportTriggerOptionsStruct {
+  public Integer triggerType;
+  public @Nullable Optional<ArrayList<Integer>> motionZones;
+  public @Nullable Optional<Integer> motionSensitivity;
+  public @Nullable Optional<ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportMotionTriggerTimeControlStruct> motionTimeControl;
+  public @Nullable Optional<Integer> activationReason;
+  private static final long TRIGGER_TYPE_ID = 0L;
+  private static final long MOTION_ZONES_ID = 1L;
+  private static final long MOTION_SENSITIVITY_ID = 2L;
+  private static final long MOTION_TIME_CONTROL_ID = 3L;
+  private static final long ACTIVATION_REASON_ID = 4L;
+
+  public PushAvStreamTransportClusterPushAVStreamTransportTriggerOptionsStruct(
+    Integer triggerType,
+    @Nullable Optional<ArrayList<Integer>> motionZones,
+    @Nullable Optional<Integer> motionSensitivity,
+    @Nullable Optional<ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportMotionTriggerTimeControlStruct> motionTimeControl,
+    @Nullable Optional<Integer> activationReason
+  ) {
+    this.triggerType = triggerType;
+    this.motionZones = motionZones;
+    this.motionSensitivity = motionSensitivity;
+    this.motionTimeControl = motionTimeControl;
+    this.activationReason = activationReason;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(TRIGGER_TYPE_ID, new UIntType(triggerType)));
+    values.add(new StructElement(MOTION_ZONES_ID, motionZones != null ? motionZones.<BaseTLVType>map((nonOptionalmotionZones) -> ArrayType.generateArrayType(nonOptionalmotionZones, (elementnonOptionalmotionZones) -> new UIntType(elementnonOptionalmotionZones))).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(MOTION_SENSITIVITY_ID, motionSensitivity != null ? motionSensitivity.<BaseTLVType>map((nonOptionalmotionSensitivity) -> new UIntType(nonOptionalmotionSensitivity)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(MOTION_TIME_CONTROL_ID, motionTimeControl != null ? motionTimeControl.<BaseTLVType>map((nonOptionalmotionTimeControl) -> nonOptionalmotionTimeControl.encodeTlv()).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(ACTIVATION_REASON_ID, activationReason != null ? activationReason.<BaseTLVType>map((nonOptionalactivationReason) -> new UIntType(nonOptionalactivationReason)).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static PushAvStreamTransportClusterPushAVStreamTransportTriggerOptionsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer triggerType = null;
+    @Nullable Optional<ArrayList<Integer>> motionZones = null;
+    @Nullable Optional<Integer> motionSensitivity = null;
+    @Nullable Optional<ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportMotionTriggerTimeControlStruct> motionTimeControl = null;
+    @Nullable Optional<Integer> activationReason = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == TRIGGER_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          triggerType = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MOTION_ZONES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          motionZones = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class)));
+        }
+      } else if (element.contextTagNum() == MOTION_SENSITIVITY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          motionSensitivity = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == MOTION_TIME_CONTROL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          motionTimeControl = Optional.of(ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportMotionTriggerTimeControlStruct.decodeTlv(castingValue));
+        }
+      } else if (element.contextTagNum() == ACTIVATION_REASON_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          activationReason = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new PushAvStreamTransportClusterPushAVStreamTransportTriggerOptionsStruct(
+      triggerType,
+      motionZones,
+      motionSensitivity,
+      motionTimeControl,
+      activationReason
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PushAvStreamTransportClusterPushAVStreamTransportTriggerOptionsStruct {\n");
+    output.append("\ttriggerType: ");
+    output.append(triggerType);
+    output.append("\n");
+    output.append("\tmotionZones: ");
+    output.append(motionZones);
+    output.append("\n");
+    output.append("\tmotionSensitivity: ");
+    output.append(motionSensitivity);
+    output.append("\n");
+    output.append("\tmotionTimeControl: ");
+    output.append(motionTimeControl);
+    output.append("\n");
+    output.append("\tactivationReason: ");
+    output.append(activationReason);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PushAvStreamTransportClusterPushAVStreamTransportCMAFContainerOptionsStruct {
+  public Integer chunkDuration;
+  public @Nullable Optional<byte[]> CENCKey;
+  private static final long CHUNK_DURATION_ID = 0L;
+  private static final long CENC_KEY_ID = 1L;
+
+  public PushAvStreamTransportClusterPushAVStreamTransportCMAFContainerOptionsStruct(
+    Integer chunkDuration,
+    @Nullable Optional<byte[]> CENCKey
+  ) {
+    this.chunkDuration = chunkDuration;
+    this.CENCKey = CENCKey;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CHUNK_DURATION_ID, new UIntType(chunkDuration)));
+    values.add(new StructElement(CENC_KEY_ID, CENCKey != null ? CENCKey.<BaseTLVType>map((nonOptionalCENCKey) -> new ByteArrayType(nonOptionalCENCKey)).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static PushAvStreamTransportClusterPushAVStreamTransportCMAFContainerOptionsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer chunkDuration = null;
+    @Nullable Optional<byte[]> CENCKey = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CHUNK_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          chunkDuration = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CENC_KEY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          CENCKey = Optional.of(castingValue.value(byte[].class));
+        }
+      }
+    }
+    return new PushAvStreamTransportClusterPushAVStreamTransportCMAFContainerOptionsStruct(
+      chunkDuration,
+      CENCKey
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PushAvStreamTransportClusterPushAVStreamTransportCMAFContainerOptionsStruct {\n");
+    output.append("\tchunkDuration: ");
+    output.append(chunkDuration);
+    output.append("\n");
+    output.append("\tCENCKey: ");
+    output.append(CENCKey.isPresent() ? Arrays.toString(CENCKey.get()) : "");
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PushAvStreamTransportClusterPushAVStreamTransportContainerOptionsStruct {
+  public Integer containerType;
+  public @Nullable Optional<ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportCMAFContainerOptionsStruct> CMAFContainerOptions;
+  private static final long CONTAINER_TYPE_ID = 0L;
+  private static final long CMAF_CONTAINER_OPTIONS_ID = 1L;
+
+  public PushAvStreamTransportClusterPushAVStreamTransportContainerOptionsStruct(
+    Integer containerType,
+    @Nullable Optional<ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportCMAFContainerOptionsStruct> CMAFContainerOptions
+  ) {
+    this.containerType = containerType;
+    this.CMAFContainerOptions = CMAFContainerOptions;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CONTAINER_TYPE_ID, new UIntType(containerType)));
+    values.add(new StructElement(CMAF_CONTAINER_OPTIONS_ID, CMAFContainerOptions != null ? CMAFContainerOptions.<BaseTLVType>map((nonOptionalCMAFContainerOptions) -> nonOptionalCMAFContainerOptions.encodeTlv()).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static PushAvStreamTransportClusterPushAVStreamTransportContainerOptionsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer containerType = null;
+    @Nullable Optional<ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportCMAFContainerOptionsStruct> CMAFContainerOptions = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CONTAINER_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          containerType = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CMAF_CONTAINER_OPTIONS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          CMAFContainerOptions = Optional.of(ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportCMAFContainerOptionsStruct.decodeTlv(castingValue));
+        }
+      }
+    }
+    return new PushAvStreamTransportClusterPushAVStreamTransportContainerOptionsStruct(
+      containerType,
+      CMAFContainerOptions
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PushAvStreamTransportClusterPushAVStreamTransportContainerOptionsStruct {\n");
+    output.append("\tcontainerType: ");
+    output.append(containerType);
+    output.append("\n");
+    output.append("\tCMAFContainerOptions: ");
+    output.append(CMAFContainerOptions);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PushAvStreamTransportClusterPushAVStreamTransportOptionsStruct {
+  public Integer streamType;
+  public @Nullable Optional<Integer> videoStreamID;
+  public @Nullable Optional<Integer> audioStreamID;
+  public Integer TLSEndpointID;
+  public String url;
+  public ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportTriggerOptionsStruct triggerOptions;
+  public Integer containerFormat;
+  public Integer ingestMethod;
+  public ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportContainerOptionsStruct containerOptions;
+  public @Nullable Optional<ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportMetadataOptionsStruct> metadataOptions;
+  public @Nullable Optional<Long> expiryTime;
+  private static final long STREAM_TYPE_ID = 0L;
+  private static final long VIDEO_STREAM_ID_ID = 1L;
+  private static final long AUDIO_STREAM_ID_ID = 2L;
+  private static final long TLS_ENDPOINT_ID_ID = 3L;
+  private static final long URL_ID = 4L;
+  private static final long TRIGGER_OPTIONS_ID = 5L;
+  private static final long CONTAINER_FORMAT_ID = 6L;
+  private static final long INGEST_METHOD_ID = 7L;
+  private static final long CONTAINER_OPTIONS_ID = 8L;
+  private static final long METADATA_OPTIONS_ID = 9L;
+  private static final long EXPIRY_TIME_ID = 10L;
+
+  public PushAvStreamTransportClusterPushAVStreamTransportOptionsStruct(
+    Integer streamType,
+    @Nullable Optional<Integer> videoStreamID,
+    @Nullable Optional<Integer> audioStreamID,
+    Integer TLSEndpointID,
+    String url,
+    ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportTriggerOptionsStruct triggerOptions,
+    Integer containerFormat,
+    Integer ingestMethod,
+    ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportContainerOptionsStruct containerOptions,
+    @Nullable Optional<ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportMetadataOptionsStruct> metadataOptions,
+    @Nullable Optional<Long> expiryTime
+  ) {
+    this.streamType = streamType;
+    this.videoStreamID = videoStreamID;
+    this.audioStreamID = audioStreamID;
+    this.TLSEndpointID = TLSEndpointID;
+    this.url = url;
+    this.triggerOptions = triggerOptions;
+    this.containerFormat = containerFormat;
+    this.ingestMethod = ingestMethod;
+    this.containerOptions = containerOptions;
+    this.metadataOptions = metadataOptions;
+    this.expiryTime = expiryTime;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(STREAM_TYPE_ID, new UIntType(streamType)));
+    values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? videoStreamID.<BaseTLVType>map((nonOptionalvideoStreamID) -> new UIntType(nonOptionalvideoStreamID)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? audioStreamID.<BaseTLVType>map((nonOptionalaudioStreamID) -> new UIntType(nonOptionalaudioStreamID)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(TLS_ENDPOINT_ID_ID, new UIntType(TLSEndpointID)));
+    values.add(new StructElement(URL_ID, new StringType(url)));
+    values.add(new StructElement(TRIGGER_OPTIONS_ID, triggerOptions.encodeTlv()));
+    values.add(new StructElement(CONTAINER_FORMAT_ID, new UIntType(containerFormat)));
+    values.add(new StructElement(INGEST_METHOD_ID, new UIntType(ingestMethod)));
+    values.add(new StructElement(CONTAINER_OPTIONS_ID, containerOptions.encodeTlv()));
+    values.add(new StructElement(METADATA_OPTIONS_ID, metadataOptions != null ? metadataOptions.<BaseTLVType>map((nonOptionalmetadataOptions) -> nonOptionalmetadataOptions.encodeTlv()).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(EXPIRY_TIME_ID, expiryTime != null ? expiryTime.<BaseTLVType>map((nonOptionalexpiryTime) -> new UIntType(nonOptionalexpiryTime)).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static PushAvStreamTransportClusterPushAVStreamTransportOptionsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer streamType = null;
+    @Nullable Optional<Integer> videoStreamID = null;
+    @Nullable Optional<Integer> audioStreamID = null;
+    Integer TLSEndpointID = null;
+    String url = null;
+    ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportTriggerOptionsStruct triggerOptions = null;
+    Integer containerFormat = null;
+    Integer ingestMethod = null;
+    ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportContainerOptionsStruct containerOptions = null;
+    @Nullable Optional<ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportMetadataOptionsStruct> metadataOptions = null;
+    @Nullable Optional<Long> expiryTime = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == STREAM_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          streamType = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == VIDEO_STREAM_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          videoStreamID = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == AUDIO_STREAM_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          audioStreamID = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == TLS_ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          TLSEndpointID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == URL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          url = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == TRIGGER_OPTIONS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          triggerOptions = ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportTriggerOptionsStruct.decodeTlv(castingValue);
+        }
+      } else if (element.contextTagNum() == CONTAINER_FORMAT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          containerFormat = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == INGEST_METHOD_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          ingestMethod = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CONTAINER_OPTIONS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          containerOptions = ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportContainerOptionsStruct.decodeTlv(castingValue);
+        }
+      } else if (element.contextTagNum() == METADATA_OPTIONS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          metadataOptions = Optional.of(ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportMetadataOptionsStruct.decodeTlv(castingValue));
+        }
+      } else if (element.contextTagNum() == EXPIRY_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          expiryTime = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new PushAvStreamTransportClusterPushAVStreamTransportOptionsStruct(
+      streamType,
+      videoStreamID,
+      audioStreamID,
+      TLSEndpointID,
+      url,
+      triggerOptions,
+      containerFormat,
+      ingestMethod,
+      containerOptions,
+      metadataOptions,
+      expiryTime
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PushAvStreamTransportClusterPushAVStreamTransportOptionsStruct {\n");
+    output.append("\tstreamType: ");
+    output.append(streamType);
+    output.append("\n");
+    output.append("\tvideoStreamID: ");
+    output.append(videoStreamID);
+    output.append("\n");
+    output.append("\taudioStreamID: ");
+    output.append(audioStreamID);
+    output.append("\n");
+    output.append("\tTLSEndpointID: ");
+    output.append(TLSEndpointID);
+    output.append("\n");
+    output.append("\turl: ");
+    output.append(url);
+    output.append("\n");
+    output.append("\ttriggerOptions: ");
+    output.append(triggerOptions);
+    output.append("\n");
+    output.append("\tcontainerFormat: ");
+    output.append(containerFormat);
+    output.append("\n");
+    output.append("\tingestMethod: ");
+    output.append(ingestMethod);
+    output.append("\n");
+    output.append("\tcontainerOptions: ");
+    output.append(containerOptions);
+    output.append("\n");
+    output.append("\tmetadataOptions: ");
+    output.append(metadataOptions);
+    output.append("\n");
+    output.append("\texpiryTime: ");
+    output.append(expiryTime);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PushAvStreamTransportClusterPushAVStreamConfigurationStruct {
+  public Integer connectionID;
+  public Integer streamTransportStatus;
+  public ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportOptionsStruct streamTransportOptions;
+  private static final long CONNECTION_ID_ID = 0L;
+  private static final long STREAM_TRANSPORT_STATUS_ID = 1L;
+  private static final long STREAM_TRANSPORT_OPTIONS_ID = 2L;
+
+  public PushAvStreamTransportClusterPushAVStreamConfigurationStruct(
+    Integer connectionID,
+    Integer streamTransportStatus,
+    ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportOptionsStruct streamTransportOptions
+  ) {
+    this.connectionID = connectionID;
+    this.streamTransportStatus = streamTransportStatus;
+    this.streamTransportOptions = streamTransportOptions;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CONNECTION_ID_ID, new UIntType(connectionID)));
+    values.add(new StructElement(STREAM_TRANSPORT_STATUS_ID, new UIntType(streamTransportStatus)));
+    values.add(new StructElement(STREAM_TRANSPORT_OPTIONS_ID, streamTransportOptions.encodeTlv()));
+
+    return new StructType(values);
+  }
+
+  public static PushAvStreamTransportClusterPushAVStreamConfigurationStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer connectionID = null;
+    Integer streamTransportStatus = null;
+    ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportOptionsStruct streamTransportOptions = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CONNECTION_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          connectionID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == STREAM_TRANSPORT_STATUS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          streamTransportStatus = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == STREAM_TRANSPORT_OPTIONS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          streamTransportOptions = ChipStructs.PushAvStreamTransportClusterPushAVStreamTransportOptionsStruct.decodeTlv(castingValue);
+        }
+      }
+    }
+    return new PushAvStreamTransportClusterPushAVStreamConfigurationStruct(
+      connectionID,
+      streamTransportStatus,
+      streamTransportOptions
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PushAvStreamTransportClusterPushAVStreamConfigurationStruct {\n");
+    output.append("\tconnectionID: ");
+    output.append(connectionID);
+    output.append("\n");
+    output.append("\tstreamTransportStatus: ");
+    output.append(streamTransportStatus);
+    output.append("\n");
+    output.append("\tstreamTransportOptions: ");
+    output.append(streamTransportOptions);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ChimeClusterChimeSoundStruct {
+  public Integer chimeId;
+  public String name;
+  private static final long CHIME_ID_ID = 0L;
+  private static final long NAME_ID = 1L;
+
+  public ChimeClusterChimeSoundStruct(
+    Integer chimeId,
+    String name
+  ) {
+    this.chimeId = chimeId;
+    this.name = name;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CHIME_ID_ID, new UIntType(chimeId)));
+    values.add(new StructElement(NAME_ID, new StringType(name)));
+
+    return new StructType(values);
+  }
+
+  public static ChimeClusterChimeSoundStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer chimeId = null;
+    String name = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CHIME_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          chimeId = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          name = castingValue.value(String.class);
+        }
+      }
+    }
+    return new ChimeClusterChimeSoundStruct(
+      chimeId,
+      name
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ChimeClusterChimeSoundStruct {\n");
+    output.append("\tchimeId: ");
+    output.append(chimeId);
+    output.append("\n");
+    output.append("\tname: ");
+    output.append(name);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class EcosystemInformationClusterDeviceTypeStruct {
   public Long deviceType;
   public Integer revision;

@@ -422,6 +422,57 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace ErrorStateStruct
 
+namespace ICEServerStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kUrls), urls);
+    encoder.Encode(to_underlying(Fields::kUsername), username);
+    encoder.Encode(to_underlying(Fields::kCredential), credential);
+    encoder.Encode(to_underlying(Fields::kCaid), caid);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kUrls))
+        {
+            err = DataModel::Decode(reader, urls);
+        }
+        else if (__context_tag == to_underlying(Fields::kUsername))
+        {
+            err = DataModel::Decode(reader, username);
+        }
+        else if (__context_tag == to_underlying(Fields::kCredential))
+        {
+            err = DataModel::Decode(reader, credential);
+        }
+        else if (__context_tag == to_underlying(Fields::kCaid))
+        {
+            err = DataModel::Decode(reader, caid);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace ICEServerStruct
+
 namespace LabelStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -503,6 +554,164 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace OperationalStateStruct
+
+namespace PerStreamStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStreamID), streamID);
+    encoder.Encode(to_underlying(Fields::kOnOff), onOff);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kStreamID))
+        {
+            err = DataModel::Decode(reader, streamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kOnOff))
+        {
+            err = DataModel::Decode(reader, onOff);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace PerStreamStruct
+
+namespace ViewportStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kX1), x1);
+    encoder.Encode(to_underlying(Fields::kY1), y1);
+    encoder.Encode(to_underlying(Fields::kX2), x2);
+    encoder.Encode(to_underlying(Fields::kY2), y2);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kX1))
+        {
+            err = DataModel::Decode(reader, x1);
+        }
+        else if (__context_tag == to_underlying(Fields::kY1))
+        {
+            err = DataModel::Decode(reader, y1);
+        }
+        else if (__context_tag == to_underlying(Fields::kX2))
+        {
+            err = DataModel::Decode(reader, x2);
+        }
+        else if (__context_tag == to_underlying(Fields::kY2))
+        {
+            err = DataModel::Decode(reader, y2);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace ViewportStruct
+
+namespace WebRTCSessionStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kId), id);
+    encoder.Encode(to_underlying(Fields::kPeerNodeId), peerNodeId);
+    encoder.Encode(to_underlying(Fields::kPeerFabricIndex), peerFabricIndex);
+    encoder.Encode(to_underlying(Fields::kStreamType), streamType);
+    encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
+    encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
+    encoder.Encode(to_underlying(Fields::kMetadataOptions), metadataOptions);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kId))
+        {
+            err = DataModel::Decode(reader, id);
+        }
+        else if (__context_tag == to_underlying(Fields::kPeerNodeId))
+        {
+            err = DataModel::Decode(reader, peerNodeId);
+        }
+        else if (__context_tag == to_underlying(Fields::kPeerFabricIndex))
+        {
+            err = DataModel::Decode(reader, peerFabricIndex);
+        }
+        else if (__context_tag == to_underlying(Fields::kStreamType))
+        {
+            err = DataModel::Decode(reader, streamType);
+        }
+        else if (__context_tag == to_underlying(Fields::kVideoStreamID))
+        {
+            err = DataModel::Decode(reader, videoStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kAudioStreamID))
+        {
+            err = DataModel::Decode(reader, audioStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kMetadataOptions))
+        {
+            err = DataModel::Decode(reader, metadataOptions);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace WebRTCSessionStruct
 } // namespace Structs
 } // namespace detail
 
@@ -28658,6 +28867,3190 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace ContentAppObserver
+namespace CameraAvStreamManagement {
+namespace Structs {
+
+namespace AudioCapabilitiesStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kMaxNumberOfChannels), maxNumberOfChannels);
+    encoder.Encode(to_underlying(Fields::kSupportedCodecs), supportedCodecs);
+    encoder.Encode(to_underlying(Fields::kSupportedSampleRates), supportedSampleRates);
+    encoder.Encode(to_underlying(Fields::kSupportedBitDepths), supportedBitDepths);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kMaxNumberOfChannels))
+        {
+            err = DataModel::Decode(reader, maxNumberOfChannels);
+        }
+        else if (__context_tag == to_underlying(Fields::kSupportedCodecs))
+        {
+            err = DataModel::Decode(reader, supportedCodecs);
+        }
+        else if (__context_tag == to_underlying(Fields::kSupportedSampleRates))
+        {
+            err = DataModel::Decode(reader, supportedSampleRates);
+        }
+        else if (__context_tag == to_underlying(Fields::kSupportedBitDepths))
+        {
+            err = DataModel::Decode(reader, supportedBitDepths);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace AudioCapabilitiesStruct
+
+namespace AudioStreamStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
+    encoder.Encode(to_underlying(Fields::kStreamType), streamType);
+    encoder.Encode(to_underlying(Fields::kAudioCodec), audioCodec);
+    encoder.Encode(to_underlying(Fields::kChannelCount), channelCount);
+    encoder.Encode(to_underlying(Fields::kSampleRate), sampleRate);
+    encoder.Encode(to_underlying(Fields::kBitRate), bitRate);
+    encoder.Encode(to_underlying(Fields::kBitDepth), bitDepth);
+    encoder.Encode(to_underlying(Fields::kReferenceCount), referenceCount);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kAudioStreamID))
+        {
+            err = DataModel::Decode(reader, audioStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kStreamType))
+        {
+            err = DataModel::Decode(reader, streamType);
+        }
+        else if (__context_tag == to_underlying(Fields::kAudioCodec))
+        {
+            err = DataModel::Decode(reader, audioCodec);
+        }
+        else if (__context_tag == to_underlying(Fields::kChannelCount))
+        {
+            err = DataModel::Decode(reader, channelCount);
+        }
+        else if (__context_tag == to_underlying(Fields::kSampleRate))
+        {
+            err = DataModel::Decode(reader, sampleRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kBitRate))
+        {
+            err = DataModel::Decode(reader, bitRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kBitDepth))
+        {
+            err = DataModel::Decode(reader, bitDepth);
+        }
+        else if (__context_tag == to_underlying(Fields::kReferenceCount))
+        {
+            err = DataModel::Decode(reader, referenceCount);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace AudioStreamStruct
+
+namespace RateDistortionTradeOffPointsStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kCodec), codec);
+    encoder.Encode(to_underlying(Fields::kResolution), resolution);
+    encoder.Encode(to_underlying(Fields::kMinBitRate), minBitRate);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kCodec))
+        {
+            err = DataModel::Decode(reader, codec);
+        }
+        else if (__context_tag == to_underlying(Fields::kResolution))
+        {
+            err = DataModel::Decode(reader, resolution);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinBitRate))
+        {
+            err = DataModel::Decode(reader, minBitRate);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace RateDistortionTradeOffPointsStruct
+
+namespace SnapshotParamsStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kResolution), resolution);
+    encoder.Encode(to_underlying(Fields::kMaxFrameRate), maxFrameRate);
+    encoder.Encode(to_underlying(Fields::kImageCodec), imageCodec);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kResolution))
+        {
+            err = DataModel::Decode(reader, resolution);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxFrameRate))
+        {
+            err = DataModel::Decode(reader, maxFrameRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kImageCodec))
+        {
+            err = DataModel::Decode(reader, imageCodec);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace SnapshotParamsStruct
+
+namespace SnapshotStreamStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kSnapshotStreamID), snapshotStreamID);
+    encoder.Encode(to_underlying(Fields::kImageCodec), imageCodec);
+    encoder.Encode(to_underlying(Fields::kFrameRate), frameRate);
+    encoder.Encode(to_underlying(Fields::kBitRate), bitRate);
+    encoder.Encode(to_underlying(Fields::kMinResolution), minResolution);
+    encoder.Encode(to_underlying(Fields::kMaxResolution), maxResolution);
+    encoder.Encode(to_underlying(Fields::kQuality), quality);
+    encoder.Encode(to_underlying(Fields::kReferenceCount), referenceCount);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kSnapshotStreamID))
+        {
+            err = DataModel::Decode(reader, snapshotStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kImageCodec))
+        {
+            err = DataModel::Decode(reader, imageCodec);
+        }
+        else if (__context_tag == to_underlying(Fields::kFrameRate))
+        {
+            err = DataModel::Decode(reader, frameRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kBitRate))
+        {
+            err = DataModel::Decode(reader, bitRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinResolution))
+        {
+            err = DataModel::Decode(reader, minResolution);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxResolution))
+        {
+            err = DataModel::Decode(reader, maxResolution);
+        }
+        else if (__context_tag == to_underlying(Fields::kQuality))
+        {
+            err = DataModel::Decode(reader, quality);
+        }
+        else if (__context_tag == to_underlying(Fields::kReferenceCount))
+        {
+            err = DataModel::Decode(reader, referenceCount);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace SnapshotStreamStruct
+
+namespace VideoSensorParamsStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kSensorWidth), sensorWidth);
+    encoder.Encode(to_underlying(Fields::kSensorHeight), sensorHeight);
+    encoder.Encode(to_underlying(Fields::kHDRCapable), HDRCapable);
+    encoder.Encode(to_underlying(Fields::kMaxFPS), maxFPS);
+    encoder.Encode(to_underlying(Fields::kMaxHDRFPS), maxHDRFPS);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kSensorWidth))
+        {
+            err = DataModel::Decode(reader, sensorWidth);
+        }
+        else if (__context_tag == to_underlying(Fields::kSensorHeight))
+        {
+            err = DataModel::Decode(reader, sensorHeight);
+        }
+        else if (__context_tag == to_underlying(Fields::kHDRCapable))
+        {
+            err = DataModel::Decode(reader, HDRCapable);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxFPS))
+        {
+            err = DataModel::Decode(reader, maxFPS);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxHDRFPS))
+        {
+            err = DataModel::Decode(reader, maxHDRFPS);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace VideoSensorParamsStruct
+
+namespace VideoStreamStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
+    encoder.Encode(to_underlying(Fields::kStreamType), streamType);
+    encoder.Encode(to_underlying(Fields::kVideoCodec), videoCodec);
+    encoder.Encode(to_underlying(Fields::kMinFrameRate), minFrameRate);
+    encoder.Encode(to_underlying(Fields::kMaxFrameRate), maxFrameRate);
+    encoder.Encode(to_underlying(Fields::kMinResolution), minResolution);
+    encoder.Encode(to_underlying(Fields::kMaxResolution), maxResolution);
+    encoder.Encode(to_underlying(Fields::kMinBitRate), minBitRate);
+    encoder.Encode(to_underlying(Fields::kMaxBitRate), maxBitRate);
+    encoder.Encode(to_underlying(Fields::kMinFragmentLen), minFragmentLen);
+    encoder.Encode(to_underlying(Fields::kMaxFragmentLen), maxFragmentLen);
+    encoder.Encode(to_underlying(Fields::kReferenceCount), referenceCount);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kVideoStreamID))
+        {
+            err = DataModel::Decode(reader, videoStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kStreamType))
+        {
+            err = DataModel::Decode(reader, streamType);
+        }
+        else if (__context_tag == to_underlying(Fields::kVideoCodec))
+        {
+            err = DataModel::Decode(reader, videoCodec);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinFrameRate))
+        {
+            err = DataModel::Decode(reader, minFrameRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxFrameRate))
+        {
+            err = DataModel::Decode(reader, maxFrameRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinResolution))
+        {
+            err = DataModel::Decode(reader, minResolution);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxResolution))
+        {
+            err = DataModel::Decode(reader, maxResolution);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinBitRate))
+        {
+            err = DataModel::Decode(reader, minBitRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxBitRate))
+        {
+            err = DataModel::Decode(reader, maxBitRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinFragmentLen))
+        {
+            err = DataModel::Decode(reader, minFragmentLen);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxFragmentLen))
+        {
+            err = DataModel::Decode(reader, maxFragmentLen);
+        }
+        else if (__context_tag == to_underlying(Fields::kReferenceCount))
+        {
+            err = DataModel::Decode(reader, referenceCount);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace VideoStreamStruct
+} // namespace Structs
+
+namespace Commands {
+namespace AudioStreamAllocate {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStreamType), streamType);
+    encoder.Encode(to_underlying(Fields::kAudioCodec), audioCodec);
+    encoder.Encode(to_underlying(Fields::kChannelCount), channelCount);
+    encoder.Encode(to_underlying(Fields::kSampleRate), sampleRate);
+    encoder.Encode(to_underlying(Fields::kBitRate), bitRate);
+    encoder.Encode(to_underlying(Fields::kBitDepth), bitDepth);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kStreamType))
+        {
+            err = DataModel::Decode(reader, streamType);
+        }
+        else if (__context_tag == to_underlying(Fields::kAudioCodec))
+        {
+            err = DataModel::Decode(reader, audioCodec);
+        }
+        else if (__context_tag == to_underlying(Fields::kChannelCount))
+        {
+            err = DataModel::Decode(reader, channelCount);
+        }
+        else if (__context_tag == to_underlying(Fields::kSampleRate))
+        {
+            err = DataModel::Decode(reader, sampleRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kBitRate))
+        {
+            err = DataModel::Decode(reader, bitRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kBitDepth))
+        {
+            err = DataModel::Decode(reader, bitDepth);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace AudioStreamAllocate.
+namespace AudioStreamAllocateResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kAudioStreamID))
+        {
+            err = DataModel::Decode(reader, audioStreamID);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace AudioStreamAllocateResponse.
+namespace AudioStreamDeallocate {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kAudioStreamID))
+        {
+            err = DataModel::Decode(reader, audioStreamID);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace AudioStreamDeallocate.
+namespace VideoStreamAllocate {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStreamType), streamType);
+    encoder.Encode(to_underlying(Fields::kVideoCodec), videoCodec);
+    encoder.Encode(to_underlying(Fields::kMinFrameRate), minFrameRate);
+    encoder.Encode(to_underlying(Fields::kMaxFrameRate), maxFrameRate);
+    encoder.Encode(to_underlying(Fields::kMinResolution), minResolution);
+    encoder.Encode(to_underlying(Fields::kMaxResolution), maxResolution);
+    encoder.Encode(to_underlying(Fields::kMinBitRate), minBitRate);
+    encoder.Encode(to_underlying(Fields::kMaxBitRate), maxBitRate);
+    encoder.Encode(to_underlying(Fields::kMinFragmentLen), minFragmentLen);
+    encoder.Encode(to_underlying(Fields::kMaxFragmentLen), maxFragmentLen);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kStreamType))
+        {
+            err = DataModel::Decode(reader, streamType);
+        }
+        else if (__context_tag == to_underlying(Fields::kVideoCodec))
+        {
+            err = DataModel::Decode(reader, videoCodec);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinFrameRate))
+        {
+            err = DataModel::Decode(reader, minFrameRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxFrameRate))
+        {
+            err = DataModel::Decode(reader, maxFrameRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinResolution))
+        {
+            err = DataModel::Decode(reader, minResolution);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxResolution))
+        {
+            err = DataModel::Decode(reader, maxResolution);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinBitRate))
+        {
+            err = DataModel::Decode(reader, minBitRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxBitRate))
+        {
+            err = DataModel::Decode(reader, maxBitRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinFragmentLen))
+        {
+            err = DataModel::Decode(reader, minFragmentLen);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxFragmentLen))
+        {
+            err = DataModel::Decode(reader, maxFragmentLen);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace VideoStreamAllocate.
+namespace VideoStreamAllocateResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kVideoStreamID))
+        {
+            err = DataModel::Decode(reader, videoStreamID);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace VideoStreamAllocateResponse.
+namespace VideoStreamModify {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
+    encoder.Encode(to_underlying(Fields::kResolution), resolution);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kVideoStreamID))
+        {
+            err = DataModel::Decode(reader, videoStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kResolution))
+        {
+            err = DataModel::Decode(reader, resolution);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace VideoStreamModify.
+namespace VideoStreamDeallocate {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kVideoStreamID))
+        {
+            err = DataModel::Decode(reader, videoStreamID);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace VideoStreamDeallocate.
+namespace SnapshotStreamAllocate {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kImageCodec), imageCodec);
+    encoder.Encode(to_underlying(Fields::kFrameRate), frameRate);
+    encoder.Encode(to_underlying(Fields::kBitRate), bitRate);
+    encoder.Encode(to_underlying(Fields::kMinResolution), minResolution);
+    encoder.Encode(to_underlying(Fields::kMaxResolution), maxResolution);
+    encoder.Encode(to_underlying(Fields::kQuality), quality);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kImageCodec))
+        {
+            err = DataModel::Decode(reader, imageCodec);
+        }
+        else if (__context_tag == to_underlying(Fields::kFrameRate))
+        {
+            err = DataModel::Decode(reader, frameRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kBitRate))
+        {
+            err = DataModel::Decode(reader, bitRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinResolution))
+        {
+            err = DataModel::Decode(reader, minResolution);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxResolution))
+        {
+            err = DataModel::Decode(reader, maxResolution);
+        }
+        else if (__context_tag == to_underlying(Fields::kQuality))
+        {
+            err = DataModel::Decode(reader, quality);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SnapshotStreamAllocate.
+namespace SnapshotStreamAllocateResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kSnapshotStreamID), snapshotStreamID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kSnapshotStreamID))
+        {
+            err = DataModel::Decode(reader, snapshotStreamID);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SnapshotStreamAllocateResponse.
+namespace SnapshotStreamDeallocate {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kSnapshotStreamID), snapshotStreamID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kSnapshotStreamID))
+        {
+            err = DataModel::Decode(reader, snapshotStreamID);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SnapshotStreamDeallocate.
+namespace SetStreamPriority {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+    }
+}
+} // namespace SetStreamPriority.
+namespace CaptureSnapshot {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kSnapshotStreamID), snapshotStreamID);
+    encoder.Encode(to_underlying(Fields::kRequestedResolution), requestedResolution);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kSnapshotStreamID))
+        {
+            err = DataModel::Decode(reader, snapshotStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kRequestedResolution))
+        {
+            err = DataModel::Decode(reader, requestedResolution);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace CaptureSnapshot.
+namespace CaptureSnapshotResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kData), data);
+    encoder.Encode(to_underlying(Fields::kImageCodec), imageCodec);
+    encoder.Encode(to_underlying(Fields::kResolution), resolution);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kData))
+        {
+            err = DataModel::Decode(reader, data);
+        }
+        else if (__context_tag == to_underlying(Fields::kImageCodec))
+        {
+            err = DataModel::Decode(reader, imageCodec);
+        }
+        else if (__context_tag == to_underlying(Fields::kResolution))
+        {
+            err = DataModel::Decode(reader, resolution);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace CaptureSnapshotResponse.
+namespace SetViewport {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kViewport), viewport);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kViewport))
+        {
+            err = DataModel::Decode(reader, viewport);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SetViewport.
+namespace SetImageRotation {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kAngle), angle);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kAngle))
+        {
+            err = DataModel::Decode(reader, angle);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SetImageRotation.
+namespace SetImageFlipHorizontal {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kOnOff), onOff);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kOnOff))
+        {
+            err = DataModel::Decode(reader, onOff);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SetImageFlipHorizontal.
+namespace SetImageFlipVertical {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kOnOff), onOff);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kOnOff))
+        {
+            err = DataModel::Decode(reader, onOff);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SetImageFlipVertical.
+} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MaxConcurrentVideoEncoders::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, maxConcurrentVideoEncoders);
+    case Attributes::MaxEncodedPixelRate::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, maxEncodedPixelRate);
+    case Attributes::VideoSensorParams::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, videoSensorParams);
+    case Attributes::NightVisionCapable::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, nightVisionCapable);
+    case Attributes::MinViewPortWidth::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, minViewPortWidth);
+    case Attributes::MinViewPortHeight::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, minViewPortHeight);
+    case Attributes::RateDistortionTradeOffPoints::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, rateDistortionTradeOffPoints);
+    case Attributes::MaxPreRollBufferSize::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, maxPreRollBufferSize);
+    case Attributes::MicrophoneCapabilities::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, microphoneCapabilities);
+    case Attributes::SpeakerCapabilities::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, speakerCapabilities);
+    case Attributes::TwoWayTalkSupport::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, twoWayTalkSupport);
+    case Attributes::SupportedSnapshotParams::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedSnapshotParams);
+    case Attributes::HDRCapable::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, HDRCapable);
+    case Attributes::MaxNetworkBandwidth::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, maxNetworkBandwidth);
+    case Attributes::CurrentFrameRate::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentFrameRate);
+    case Attributes::HDRMode::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, HDRMode);
+    case Attributes::CurrentVideoCodecs::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentVideoCodecs);
+    case Attributes::CurrentSnapshotConfig::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentSnapshotConfig);
+    case Attributes::FabricsUsingCamera::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, fabricsUsingCamera);
+    case Attributes::AllocatedVideoStreams::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, allocatedVideoStreams);
+    case Attributes::AllocatedAudioStreams::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, allocatedAudioStreams);
+    case Attributes::AllocatedSnapshotStreams::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, allocatedSnapshotStreams);
+    case Attributes::RankedVideoStreamPrioritiesList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, rankedVideoStreamPrioritiesList);
+    case Attributes::SoftRecordingPrivacyModeSetting::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, softRecordingPrivacyModeSetting);
+    case Attributes::SoftLivestreamPrivacyModeSetting::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, softLivestreamPrivacyModeSetting);
+    case Attributes::HardPrivacyMode::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, hardPrivacyMode);
+    case Attributes::NightVision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, nightVision);
+    case Attributes::NightVisionIllum::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, nightVisionIllum);
+    case Attributes::Awb::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, awb);
+    case Attributes::ShutterSpeed::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, shutterSpeed);
+    case Attributes::Iso::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, iso);
+    case Attributes::Viewport::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, viewport);
+    case Attributes::SpkrOnOff::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, spkrOnOff);
+    case Attributes::SpkrVolumeLevel::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, spkrVolumeLevel);
+    case Attributes::SpkrMaxLevel::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, spkrMaxLevel);
+    case Attributes::SpkrMinLevel::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, spkrMinLevel);
+    case Attributes::MicOnOff::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, micOnOff);
+    case Attributes::MicCurrentLevel::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, micCurrentLevel);
+    case Attributes::MicMaxLevel::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, micMaxLevel);
+    case Attributes::MicMinLevel::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, micMinLevel);
+    case Attributes::MicAGC::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, micAGC);
+    case Attributes::ImageRotation::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, imageRotation);
+    case Attributes::ImageFlipHorizontal::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, imageFlipHorizontal);
+    case Attributes::ImageFlipVertical::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, imageFlipVertical);
+    case Attributes::LocalVideoRecordingEnabled::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, localVideoRecordingEnabled);
+    case Attributes::LocalSnapshotRecordingEnabled::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, localSnapshotRecordingEnabled);
+    case Attributes::StatusLight::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, statusLight);
+    case Attributes::StatusLightBrightness::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, statusLightBrightness);
+    case Attributes::DepthSensorStatus::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, depthSensorStatus);
+    case Attributes::WatermarkEnabled::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, watermarkEnabled);
+    case Attributes::OSDEnabled::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, OSDEnabled);
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, generatedCommandList);
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, acceptedCommandList);
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, eventList);
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, attributeList);
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, featureMap);
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, clusterRevision);
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {
+namespace VideoStreamChanged {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kVideoStreamID), videoStreamID));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kStreamType), streamType));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kVideoCodec), videoCodec));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kMinFrameRate), minFrameRate));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kMaxFrameRate), maxFrameRate));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kMinResolution), minResolution));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kMaxResolution), maxResolution));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kMinBitRate), minBitRate));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kMaxBitRate), maxBitRate));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kMinFragmentLen), minFragmentLen));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kMaxFragmentLen), maxFragmentLen));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kVideoStreamID))
+        {
+            err = DataModel::Decode(reader, videoStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kStreamType))
+        {
+            err = DataModel::Decode(reader, streamType);
+        }
+        else if (__context_tag == to_underlying(Fields::kVideoCodec))
+        {
+            err = DataModel::Decode(reader, videoCodec);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinFrameRate))
+        {
+            err = DataModel::Decode(reader, minFrameRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxFrameRate))
+        {
+            err = DataModel::Decode(reader, maxFrameRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinResolution))
+        {
+            err = DataModel::Decode(reader, minResolution);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxResolution))
+        {
+            err = DataModel::Decode(reader, maxResolution);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinBitRate))
+        {
+            err = DataModel::Decode(reader, minBitRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxBitRate))
+        {
+            err = DataModel::Decode(reader, maxBitRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinFragmentLen))
+        {
+            err = DataModel::Decode(reader, minFragmentLen);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxFragmentLen))
+        {
+            err = DataModel::Decode(reader, maxFragmentLen);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace VideoStreamChanged.
+namespace AudioStreamChanged {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kAudioStreamID), audioStreamID));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kStreamType), streamType));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kAudioCodec), audioCodec));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kChannelCount), channelCount));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kSampleRate), sampleRate));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kBitRate), bitRate));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kBitDepth), bitDepth));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kAudioStreamID))
+        {
+            err = DataModel::Decode(reader, audioStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kStreamType))
+        {
+            err = DataModel::Decode(reader, streamType);
+        }
+        else if (__context_tag == to_underlying(Fields::kAudioCodec))
+        {
+            err = DataModel::Decode(reader, audioCodec);
+        }
+        else if (__context_tag == to_underlying(Fields::kChannelCount))
+        {
+            err = DataModel::Decode(reader, channelCount);
+        }
+        else if (__context_tag == to_underlying(Fields::kSampleRate))
+        {
+            err = DataModel::Decode(reader, sampleRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kBitRate))
+        {
+            err = DataModel::Decode(reader, bitRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kBitDepth))
+        {
+            err = DataModel::Decode(reader, bitDepth);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace AudioStreamChanged.
+namespace SnapshotStreamChanged {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kSnapshotStreamID), snapshotStreamID));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kImageCodec), imageCodec));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kFrameRate), frameRate));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kBitRate), bitRate));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kMinResolution), minResolution));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kMaxResolution), maxResolution));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kQuality), quality));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kSnapshotStreamID))
+        {
+            err = DataModel::Decode(reader, snapshotStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kImageCodec))
+        {
+            err = DataModel::Decode(reader, imageCodec);
+        }
+        else if (__context_tag == to_underlying(Fields::kFrameRate))
+        {
+            err = DataModel::Decode(reader, frameRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kBitRate))
+        {
+            err = DataModel::Decode(reader, bitRate);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinResolution))
+        {
+            err = DataModel::Decode(reader, minResolution);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxResolution))
+        {
+            err = DataModel::Decode(reader, maxResolution);
+        }
+        else if (__context_tag == to_underlying(Fields::kQuality))
+        {
+            err = DataModel::Decode(reader, quality);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SnapshotStreamChanged.
+} // namespace Events
+
+} // namespace CameraAvStreamManagement
+namespace CameraAvSettingsUserLevelManagement {
+namespace Structs {
+
+namespace MPTZStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kMPan), MPan);
+    encoder.Encode(to_underlying(Fields::kMTilt), MTilt);
+    encoder.Encode(to_underlying(Fields::kMZoom), MZoom);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kMPan))
+        {
+            err = DataModel::Decode(reader, MPan);
+        }
+        else if (__context_tag == to_underlying(Fields::kMTilt))
+        {
+            err = DataModel::Decode(reader, MTilt);
+        }
+        else if (__context_tag == to_underlying(Fields::kMZoom))
+        {
+            err = DataModel::Decode(reader, MZoom);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace MPTZStruct
+} // namespace Structs
+
+namespace Commands {
+namespace MptzSet {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kNewPTZ), newPTZ);
+    encoder.Encode(to_underlying(Fields::kPresetID), presetID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kNewPTZ))
+        {
+            err = DataModel::Decode(reader, newPTZ);
+        }
+        else if (__context_tag == to_underlying(Fields::kPresetID))
+        {
+            err = DataModel::Decode(reader, presetID);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace MptzSet.
+namespace MptzRelativeMove {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kPan), pan);
+    encoder.Encode(to_underlying(Fields::kTilt), tilt);
+    encoder.Encode(to_underlying(Fields::kZoom), zoom);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kPan))
+        {
+            err = DataModel::Decode(reader, pan);
+        }
+        else if (__context_tag == to_underlying(Fields::kTilt))
+        {
+            err = DataModel::Decode(reader, tilt);
+        }
+        else if (__context_tag == to_underlying(Fields::kZoom))
+        {
+            err = DataModel::Decode(reader, zoom);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace MptzRelativeMove.
+namespace SetAsPreset {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+    }
+}
+} // namespace SetAsPreset.
+namespace DptzSetViewport {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
+    encoder.Encode(to_underlying(Fields::kViewport), viewport);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kVideoStreamID))
+        {
+            err = DataModel::Decode(reader, videoStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kViewport))
+        {
+            err = DataModel::Decode(reader, viewport);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace DptzSetViewport.
+namespace DptzRelativeMove {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
+    encoder.Encode(to_underlying(Fields::kPan), pan);
+    encoder.Encode(to_underlying(Fields::kTilt), tilt);
+    encoder.Encode(to_underlying(Fields::kZoom), zoom);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kVideoStreamID))
+        {
+            err = DataModel::Decode(reader, videoStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kPan))
+        {
+            err = DataModel::Decode(reader, pan);
+        }
+        else if (__context_tag == to_underlying(Fields::kTilt))
+        {
+            err = DataModel::Decode(reader, tilt);
+        }
+        else if (__context_tag == to_underlying(Fields::kZoom))
+        {
+            err = DataModel::Decode(reader, zoom);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace DptzRelativeMove.
+} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::Mptz::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, mptz);
+    case Attributes::MaxPresets::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, maxPresets);
+    case Attributes::PresetMptzTable::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, presetMptzTable);
+    case Attributes::MptzRelativeMove::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, mptzRelativeMove);
+    case Attributes::DptzRelativeMove::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, dptzRelativeMove);
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, generatedCommandList);
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, acceptedCommandList);
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, eventList);
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, attributeList);
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, featureMap);
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, clusterRevision);
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace CameraAvSettingsUserLevelManagement
+namespace WebRTCTransportProvider {
+namespace Structs {} // namespace Structs
+
+namespace Commands {
+namespace WebRTCSolicitOffer {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStreamType), streamType);
+    encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
+    encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
+    encoder.Encode(to_underlying(Fields::kICEServers), ICEServers);
+    encoder.Encode(to_underlying(Fields::kICETransportPolicy), ICETransportPolicy);
+    encoder.Encode(to_underlying(Fields::kMetadataOptions), metadataOptions);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kStreamType))
+        {
+            err = DataModel::Decode(reader, streamType);
+        }
+        else if (__context_tag == to_underlying(Fields::kVideoStreamID))
+        {
+            err = DataModel::Decode(reader, videoStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kAudioStreamID))
+        {
+            err = DataModel::Decode(reader, audioStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kICEServers))
+        {
+            err = DataModel::Decode(reader, ICEServers);
+        }
+        else if (__context_tag == to_underlying(Fields::kICETransportPolicy))
+        {
+            err = DataModel::Decode(reader, ICETransportPolicy);
+        }
+        else if (__context_tag == to_underlying(Fields::kMetadataOptions))
+        {
+            err = DataModel::Decode(reader, metadataOptions);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace WebRTCSolicitOffer.
+namespace WebRTCSolicitOfferResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kWebRTCSessionID), webRTCSessionID);
+    encoder.Encode(to_underlying(Fields::kDeferredOffer), deferredOffer);
+    encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
+    encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kWebRTCSessionID))
+        {
+            err = DataModel::Decode(reader, webRTCSessionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kDeferredOffer))
+        {
+            err = DataModel::Decode(reader, deferredOffer);
+        }
+        else if (__context_tag == to_underlying(Fields::kVideoStreamID))
+        {
+            err = DataModel::Decode(reader, videoStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kAudioStreamID))
+        {
+            err = DataModel::Decode(reader, audioStreamID);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace WebRTCSolicitOfferResponse.
+namespace WebRTCProvideOffer {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kWebRTCSessionID), webRTCSessionID);
+    encoder.Encode(to_underlying(Fields::kSdp), sdp);
+    encoder.Encode(to_underlying(Fields::kStreamType), streamType);
+    encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
+    encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
+    encoder.Encode(to_underlying(Fields::kICEServers), ICEServers);
+    encoder.Encode(to_underlying(Fields::kICETransportPolicy), ICETransportPolicy);
+    encoder.Encode(to_underlying(Fields::kMetadataOptions), metadataOptions);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kWebRTCSessionID))
+        {
+            err = DataModel::Decode(reader, webRTCSessionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kSdp))
+        {
+            err = DataModel::Decode(reader, sdp);
+        }
+        else if (__context_tag == to_underlying(Fields::kStreamType))
+        {
+            err = DataModel::Decode(reader, streamType);
+        }
+        else if (__context_tag == to_underlying(Fields::kVideoStreamID))
+        {
+            err = DataModel::Decode(reader, videoStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kAudioStreamID))
+        {
+            err = DataModel::Decode(reader, audioStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kICEServers))
+        {
+            err = DataModel::Decode(reader, ICEServers);
+        }
+        else if (__context_tag == to_underlying(Fields::kICETransportPolicy))
+        {
+            err = DataModel::Decode(reader, ICETransportPolicy);
+        }
+        else if (__context_tag == to_underlying(Fields::kMetadataOptions))
+        {
+            err = DataModel::Decode(reader, metadataOptions);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace WebRTCProvideOffer.
+namespace WebRTCProvideOfferResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kWebRTCSessionID), webRTCSessionID);
+    encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
+    encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kWebRTCSessionID))
+        {
+            err = DataModel::Decode(reader, webRTCSessionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kVideoStreamID))
+        {
+            err = DataModel::Decode(reader, videoStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kAudioStreamID))
+        {
+            err = DataModel::Decode(reader, audioStreamID);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace WebRTCProvideOfferResponse.
+namespace WebRTCProvideAnswer {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kWebRTCSessionID), webRTCSessionID);
+    encoder.Encode(to_underlying(Fields::kSdp), sdp);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kWebRTCSessionID))
+        {
+            err = DataModel::Decode(reader, webRTCSessionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kSdp))
+        {
+            err = DataModel::Decode(reader, sdp);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace WebRTCProvideAnswer.
+namespace WebRTCProvideICECandidate {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kWebRTCSessionID), webRTCSessionID);
+    encoder.Encode(to_underlying(Fields::kICECandidate), ICECandidate);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kWebRTCSessionID))
+        {
+            err = DataModel::Decode(reader, webRTCSessionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kICECandidate))
+        {
+            err = DataModel::Decode(reader, ICECandidate);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace WebRTCProvideICECandidate.
+namespace WebRTCEndSession {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kWebRTCSessionID), webRTCSessionID);
+    encoder.Encode(to_underlying(Fields::kReason), reason);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kWebRTCSessionID))
+        {
+            err = DataModel::Decode(reader, webRTCSessionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kReason))
+        {
+            err = DataModel::Decode(reader, reason);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace WebRTCEndSession.
+} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::CurrentSessions::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentSessions);
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, generatedCommandList);
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, acceptedCommandList);
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, eventList);
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, attributeList);
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, featureMap);
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, clusterRevision);
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace WebRTCTransportProvider
+namespace WebRTCTransportRequestor {
+namespace Structs {} // namespace Structs
+
+namespace Commands {
+namespace WebRTCOffer {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kWebRTCSessionID), webRTCSessionID);
+    encoder.Encode(to_underlying(Fields::kSdp), sdp);
+    encoder.Encode(to_underlying(Fields::kICEServers), ICEServers);
+    encoder.Encode(to_underlying(Fields::kICETransportPolicy), ICETransportPolicy);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kWebRTCSessionID))
+        {
+            err = DataModel::Decode(reader, webRTCSessionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kSdp))
+        {
+            err = DataModel::Decode(reader, sdp);
+        }
+        else if (__context_tag == to_underlying(Fields::kICEServers))
+        {
+            err = DataModel::Decode(reader, ICEServers);
+        }
+        else if (__context_tag == to_underlying(Fields::kICETransportPolicy))
+        {
+            err = DataModel::Decode(reader, ICETransportPolicy);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace WebRTCOffer.
+namespace WebRTCAnswer {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kWebRTCSessionID), webRTCSessionID);
+    encoder.Encode(to_underlying(Fields::kSdp), sdp);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kWebRTCSessionID))
+        {
+            err = DataModel::Decode(reader, webRTCSessionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kSdp))
+        {
+            err = DataModel::Decode(reader, sdp);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace WebRTCAnswer.
+namespace WebRTCICECandidate {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kWebRTCSessionID), webRTCSessionID);
+    encoder.Encode(to_underlying(Fields::kICECandidate), ICECandidate);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kWebRTCSessionID))
+        {
+            err = DataModel::Decode(reader, webRTCSessionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kICECandidate))
+        {
+            err = DataModel::Decode(reader, ICECandidate);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace WebRTCICECandidate.
+namespace WebRTCEnd {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kWebRTCSessionID), webRTCSessionID);
+    encoder.Encode(to_underlying(Fields::kReason), reason);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kWebRTCSessionID))
+        {
+            err = DataModel::Decode(reader, webRTCSessionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kReason))
+        {
+            err = DataModel::Decode(reader, reason);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace WebRTCEnd.
+} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::CurrentSessions::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentSessions);
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, generatedCommandList);
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, acceptedCommandList);
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, eventList);
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, attributeList);
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, featureMap);
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, clusterRevision);
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace WebRTCTransportRequestor
+namespace PushAvStreamTransport {
+namespace Structs {
+
+namespace PushAVStreamTransportMotionTriggerTimeControlStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kInitialDuration), initialDuration);
+    encoder.Encode(to_underlying(Fields::kAugmentationDuration), augmentationDuration);
+    encoder.Encode(to_underlying(Fields::kMaxDuration), maxDuration);
+    encoder.Encode(to_underlying(Fields::kBlindDuration), blindDuration);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kInitialDuration))
+        {
+            err = DataModel::Decode(reader, initialDuration);
+        }
+        else if (__context_tag == to_underlying(Fields::kAugmentationDuration))
+        {
+            err = DataModel::Decode(reader, augmentationDuration);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxDuration))
+        {
+            err = DataModel::Decode(reader, maxDuration);
+        }
+        else if (__context_tag == to_underlying(Fields::kBlindDuration))
+        {
+            err = DataModel::Decode(reader, blindDuration);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace PushAVStreamTransportMotionTriggerTimeControlStruct
+
+namespace PushAVStreamTransportMetadataOptionsStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kMultiplexing), multiplexing);
+    encoder.Encode(to_underlying(Fields::kIncludeMotionZones), includeMotionZones);
+    encoder.Encode(to_underlying(Fields::kEnableMetadataPrivacySensitive), enableMetadataPrivacySensitive);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kMultiplexing))
+        {
+            err = DataModel::Decode(reader, multiplexing);
+        }
+        else if (__context_tag == to_underlying(Fields::kIncludeMotionZones))
+        {
+            err = DataModel::Decode(reader, includeMotionZones);
+        }
+        else if (__context_tag == to_underlying(Fields::kEnableMetadataPrivacySensitive))
+        {
+            err = DataModel::Decode(reader, enableMetadataPrivacySensitive);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace PushAVStreamTransportMetadataOptionsStruct
+
+namespace PushAVStreamTransportTriggerOptionsStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kTriggerType), triggerType);
+    encoder.Encode(to_underlying(Fields::kMotionZones), motionZones);
+    encoder.Encode(to_underlying(Fields::kMotionSensitivity), motionSensitivity);
+    encoder.Encode(to_underlying(Fields::kMotionTimeControl), motionTimeControl);
+    encoder.Encode(to_underlying(Fields::kActivationReason), activationReason);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kTriggerType))
+        {
+            err = DataModel::Decode(reader, triggerType);
+        }
+        else if (__context_tag == to_underlying(Fields::kMotionZones))
+        {
+            err = DataModel::Decode(reader, motionZones);
+        }
+        else if (__context_tag == to_underlying(Fields::kMotionSensitivity))
+        {
+            err = DataModel::Decode(reader, motionSensitivity);
+        }
+        else if (__context_tag == to_underlying(Fields::kMotionTimeControl))
+        {
+            err = DataModel::Decode(reader, motionTimeControl);
+        }
+        else if (__context_tag == to_underlying(Fields::kActivationReason))
+        {
+            err = DataModel::Decode(reader, activationReason);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace PushAVStreamTransportTriggerOptionsStruct
+
+namespace PushAVStreamTransportCMAFContainerOptionsStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kChunkDuration), chunkDuration);
+    encoder.Encode(to_underlying(Fields::kCENCKey), CENCKey);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kChunkDuration))
+        {
+            err = DataModel::Decode(reader, chunkDuration);
+        }
+        else if (__context_tag == to_underlying(Fields::kCENCKey))
+        {
+            err = DataModel::Decode(reader, CENCKey);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace PushAVStreamTransportCMAFContainerOptionsStruct
+
+namespace PushAVStreamTransportContainerOptionsStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kContainerType), containerType);
+    encoder.Encode(to_underlying(Fields::kCMAFContainerOptions), CMAFContainerOptions);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kContainerType))
+        {
+            err = DataModel::Decode(reader, containerType);
+        }
+        else if (__context_tag == to_underlying(Fields::kCMAFContainerOptions))
+        {
+            err = DataModel::Decode(reader, CMAFContainerOptions);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace PushAVStreamTransportContainerOptionsStruct
+
+namespace PushAVStreamTransportOptionsStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStreamType), streamType);
+    encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
+    encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
+    encoder.Encode(to_underlying(Fields::kTLSEndpointID), TLSEndpointID);
+    encoder.Encode(to_underlying(Fields::kUrl), url);
+    encoder.Encode(to_underlying(Fields::kTriggerOptions), triggerOptions);
+    encoder.Encode(to_underlying(Fields::kContainerFormat), containerFormat);
+    encoder.Encode(to_underlying(Fields::kIngestMethod), ingestMethod);
+    encoder.Encode(to_underlying(Fields::kContainerOptions), containerOptions);
+    encoder.Encode(to_underlying(Fields::kMetadataOptions), metadataOptions);
+    encoder.Encode(to_underlying(Fields::kExpiryTime), expiryTime);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kStreamType))
+        {
+            err = DataModel::Decode(reader, streamType);
+        }
+        else if (__context_tag == to_underlying(Fields::kVideoStreamID))
+        {
+            err = DataModel::Decode(reader, videoStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kAudioStreamID))
+        {
+            err = DataModel::Decode(reader, audioStreamID);
+        }
+        else if (__context_tag == to_underlying(Fields::kTLSEndpointID))
+        {
+            err = DataModel::Decode(reader, TLSEndpointID);
+        }
+        else if (__context_tag == to_underlying(Fields::kUrl))
+        {
+            err = DataModel::Decode(reader, url);
+        }
+        else if (__context_tag == to_underlying(Fields::kTriggerOptions))
+        {
+            err = DataModel::Decode(reader, triggerOptions);
+        }
+        else if (__context_tag == to_underlying(Fields::kContainerFormat))
+        {
+            err = DataModel::Decode(reader, containerFormat);
+        }
+        else if (__context_tag == to_underlying(Fields::kIngestMethod))
+        {
+            err = DataModel::Decode(reader, ingestMethod);
+        }
+        else if (__context_tag == to_underlying(Fields::kContainerOptions))
+        {
+            err = DataModel::Decode(reader, containerOptions);
+        }
+        else if (__context_tag == to_underlying(Fields::kMetadataOptions))
+        {
+            err = DataModel::Decode(reader, metadataOptions);
+        }
+        else if (__context_tag == to_underlying(Fields::kExpiryTime))
+        {
+            err = DataModel::Decode(reader, expiryTime);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace PushAVStreamTransportOptionsStruct
+
+namespace PushAVStreamConfigurationStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kConnectionID), connectionID);
+    encoder.Encode(to_underlying(Fields::kStreamTransportStatus), streamTransportStatus);
+    encoder.Encode(to_underlying(Fields::kStreamTransportOptions), streamTransportOptions);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kConnectionID))
+        {
+            err = DataModel::Decode(reader, connectionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kStreamTransportStatus))
+        {
+            err = DataModel::Decode(reader, streamTransportStatus);
+        }
+        else if (__context_tag == to_underlying(Fields::kStreamTransportOptions))
+        {
+            err = DataModel::Decode(reader, streamTransportOptions);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace PushAVStreamConfigurationStruct
+} // namespace Structs
+
+namespace Commands {
+namespace AllocatePushTransport {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStreamTransportOptions), streamTransportOptions);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kStreamTransportOptions))
+        {
+            err = DataModel::Decode(reader, streamTransportOptions);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace AllocatePushTransport.
+namespace AllocatePushTransportResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kConnectionID), connectionID);
+    encoder.Encode(to_underlying(Fields::kStreamTransportOptions), streamTransportOptions);
+    encoder.Encode(to_underlying(Fields::kTransportStatus), transportStatus);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kConnectionID))
+        {
+            err = DataModel::Decode(reader, connectionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kStreamTransportOptions))
+        {
+            err = DataModel::Decode(reader, streamTransportOptions);
+        }
+        else if (__context_tag == to_underlying(Fields::kTransportStatus))
+        {
+            err = DataModel::Decode(reader, transportStatus);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace AllocatePushTransportResponse.
+namespace DeallocatePushTransport {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kConnectionID), connectionID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kConnectionID))
+        {
+            err = DataModel::Decode(reader, connectionID);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace DeallocatePushTransport.
+namespace ModifyPushTransport {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kConnectionID), connectionID);
+    encoder.Encode(to_underlying(Fields::kStreamTransportOptions), streamTransportOptions);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kConnectionID))
+        {
+            err = DataModel::Decode(reader, connectionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kStreamTransportOptions))
+        {
+            err = DataModel::Decode(reader, streamTransportOptions);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace ModifyPushTransport.
+namespace SetTransportStatus {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kConnectionID), connectionID);
+    encoder.Encode(to_underlying(Fields::kStreamTransportStatus), streamTransportStatus);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kConnectionID))
+        {
+            err = DataModel::Decode(reader, connectionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kStreamTransportStatus))
+        {
+            err = DataModel::Decode(reader, streamTransportStatus);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SetTransportStatus.
+namespace ManuallyTriggerTransport {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kConnectionID), connectionID);
+    encoder.Encode(to_underlying(Fields::kActivationReason), activationReason);
+    encoder.Encode(to_underlying(Fields::kTimeControl), timeControl);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kConnectionID))
+        {
+            err = DataModel::Decode(reader, connectionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kActivationReason))
+        {
+            err = DataModel::Decode(reader, activationReason);
+        }
+        else if (__context_tag == to_underlying(Fields::kTimeControl))
+        {
+            err = DataModel::Decode(reader, timeControl);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace ManuallyTriggerTransport.
+namespace FindStreamConfiguration {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kConnectionID), connectionID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kConnectionID))
+        {
+            err = DataModel::Decode(reader, connectionID);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace FindStreamConfiguration.
+namespace FindStreamConfigurationResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStreamConfigurations), streamConfigurations);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kStreamConfigurations))
+        {
+            err = DataModel::Decode(reader, streamConfigurations);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace FindStreamConfigurationResponse.
+} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::SupportedContainerFormats::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedContainerFormats);
+    case Attributes::SupportedIngestMethods::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedIngestMethods);
+    case Attributes::CurrentConnections::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentConnections);
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, generatedCommandList);
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, acceptedCommandList);
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, eventList);
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, attributeList);
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, featureMap);
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, clusterRevision);
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {
+namespace PushTransportBegin {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+    }
+}
+} // namespace PushTransportBegin.
+namespace PushTransportEnd {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kConnectionID), connectionID));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kTriggerDetails), triggerDetails));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kConnectionID))
+        {
+            err = DataModel::Decode(reader, connectionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kTriggerDetails))
+        {
+            err = DataModel::Decode(reader, triggerDetails);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace PushTransportEnd.
+} // namespace Events
+
+} // namespace PushAvStreamTransport
+namespace Chime {
+namespace Structs {
+
+namespace ChimeSoundStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kChimeId), chimeId);
+    encoder.Encode(to_underlying(Fields::kName), name);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kChimeId))
+        {
+            err = DataModel::Decode(reader, chimeId);
+        }
+        else if (__context_tag == to_underlying(Fields::kName))
+        {
+            err = DataModel::Decode(reader, name);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace ChimeSoundStruct
+} // namespace Structs
+
+namespace Commands {
+namespace PlayChimeSound {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+    }
+}
+} // namespace PlayChimeSound.
+} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::InstalledChimeSounds::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, installedChimeSounds);
+    case Attributes::ActiveChimeSoundId::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, activeChimeSoundId);
+    case Attributes::Enabled::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, enabled);
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, generatedCommandList);
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, acceptedCommandList);
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, eventList);
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, attributeList);
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, featureMap);
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, clusterRevision);
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace Chime
 namespace EcosystemInformation {
 namespace Structs {
 
@@ -33041,6 +36434,48 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::ContentAppObserver::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::CameraAvStreamManagement::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::CameraAvSettingsUserLevelManagement::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::WebRTCTransportProvider::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::WebRTCTransportRequestor::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::PushAvStreamTransport::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::Chime::Id: {
         switch (aCommand)
         {
         default:
