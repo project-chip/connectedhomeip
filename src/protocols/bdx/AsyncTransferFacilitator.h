@@ -118,7 +118,7 @@ public:
      * that it has handled the OutputEvent specified in event and returns an error code (if any) or success in the error paramter.
      * Once this is called the AsyncTransferFacilitator either aborts the transfer if an error has ocurred or drives the TransferSession
      * state machine to generate the next output events to establish and continue the BDX session further.
-     * 
+     *
      *
      * @param[in] event The OutputEvent that was handled by the subclass.
      * @param[in] error The error code that occured when handling the event if an error occurs. Otherwise has CHIP_NO_ERROR.

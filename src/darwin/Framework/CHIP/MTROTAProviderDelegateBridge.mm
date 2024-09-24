@@ -262,7 +262,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                     // session with another requestor when we get this query image request. We do not want to interrupt the
                     // ongoing transfer instead just respond to the second requestor with a busy status and a delayedActionTime
                     // in which the requestor can retry.
-                    return;        
+                    return;
                 }
 
                 char uriBuffer[kMaxBDXURILen];

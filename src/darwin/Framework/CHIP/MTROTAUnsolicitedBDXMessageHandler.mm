@@ -41,7 +41,7 @@ void MTROTAUnsolicitedBDXMessageHandler::Shutdown()
 
     MTROTAUnsolicitedBDXMessageHandler::mNumberOfDelegates = 0;
     VerifyOrReturn(mExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    
+
     mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id);
 }
 
