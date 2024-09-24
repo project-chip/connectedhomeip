@@ -137,14 +137,14 @@ Here is the interpretation of the **optional** parameters:
 
 ## 3. Write provisioning data
 
-| platform  | tool                             | command                                                                                    | details                                                                                                   |
-| --------- | -------------------------------- | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| `k32w0x1` | `DK6Programmer.exe` or `dk6prog` | `DK6Programmer.exe -Y -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x9D600="factory_data.bin"` | NA                                                                                                        |
-| `k32w1`   | `JLink`                          | `loadfile factory_data.bin 0xFE080`                                                        | NA                                                                                                        |
-| `mcxw71`  | `JLink`                          | `loadfile factory_data.bin 0xFE080`                                                        | NA                                                                                                        |
+| platform  | tool                             | command                                                                                    | details                                                                                            |
+| --------- | -------------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `k32w0x1` | `DK6Programmer.exe` or `dk6prog` | `DK6Programmer.exe -Y -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x9D600="factory_data.bin"` | NA                                                                                                 |
+| `k32w1`   | `JLink`                          | `loadfile factory_data.bin 0xFE080`                                                        | NA                                                                                                 |
+| `mcxw71`  | `JLink`                          | `loadfile factory_data.bin 0xFE080`                                                        | NA                                                                                                 |
 | `rw61x`   | `JLink`                          | `loadfile factory_data.bin 0xBFFF000`                                                      | Here, `0xBFFF000` is the value of symbol `__FACTORY_DATA_START` from the corresponding `.map` file |
-| `rt1060`  | `MCUXpresso Flash Tool GUI`      | NA                                                                                         | The address is given by the `__FACTORY_DATA_START` symbol in the `.map` file                              |
-| `rt1170`  | `MCUXpresso Flash Tool GUI`      | NA                                                                                         | The address is given by the `__FACTORY_DATA_START` symbol in the `.map` file                              |
+| `rt1060`  | `MCUXpresso Flash Tool GUI`      | NA                                                                                         | The address is given by the `__FACTORY_DATA_START` symbol in the `.map` file                       |
+| `rt1170`  | `MCUXpresso Flash Tool GUI`      | NA                                                                                         | The address is given by the `__FACTORY_DATA_START` symbol in the `.map` file                       |
 
 ## 4. Build app and usage
 
