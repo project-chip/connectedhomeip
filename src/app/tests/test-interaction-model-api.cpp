@@ -208,19 +208,12 @@ std::optional<ActionReturnStatus> TestImCustomDataModel::Invoke(const InvokeRequ
 
 EndpointId TestImCustomDataModel::FirstEndpoint()
 {
-    return kRootEndpointId;
+    return CodegenDataModelProviderInstance()->FirstEndpoint();
 }
 
 EndpointId TestImCustomDataModel::NextEndpoint(EndpointId before)
 {
-    switch (before)
-    {
-    case kRootEndpointId:
-        return 1;
-    case 1:
-    default:
-        return kInvalidEndpointId;
-    }
+    return CodegenDataModelProviderInstance()->NextEndpoint(before);
 }
 
 ClusterEntry TestImCustomDataModel::FirstCluster(EndpointId endpoint)
