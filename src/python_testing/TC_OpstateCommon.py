@@ -1112,10 +1112,11 @@ class TC_OPSTATE_BASE():
 
             # STEP 11: Restart DUT
             self.step(11)
-            # In CI environment, the STOP coommand (step 8) already resets the variables. Only ask for
+            # In CI environment, the STOP command (step 8) already resets the variables. Only ask for
             # reboot outside CI environment.
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg="Restart DUT. Press Enter when ready.\n")
+                self.default_controller.ExpireSessions(self.dut_node_id)
 
             # STEP 12: TH waits for {PIXIT.WAITTIME.REBOOT}
             self.step(12)
