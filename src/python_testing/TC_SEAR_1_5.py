@@ -115,7 +115,7 @@ class TC_SEAR_1_5(MatterBaseTest):
 
         if self.check_pics("SEAR.S.M.INVALID_STATE_FOR_SKIP") and self.check_pics("SEAR.S.M.HAS_MANUAL_SKIP_STATE_CONTROL"):
             test_step = "Manually intervene to put the device in a state that prevents it from executing the SkipArea command \
-                  (e.g. set CurrentArea to null or make it not operate, i.e. be in the idle state)"
+                  (e.g. set CurrentArea to null or make it not operate, i.e. be in the idle state). Ensure that SelectedArea is not empty."
             self.print_step("3", test_step)
             if self.is_ci:
                 await self.send_single_cmd(cmd=Clusters.Objects.ServiceArea.Commands.SelectAreas(newAreas=[7]),
