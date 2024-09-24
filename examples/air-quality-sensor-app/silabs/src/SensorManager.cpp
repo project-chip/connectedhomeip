@@ -168,7 +168,7 @@ void SensorManager::SensorTimerEventHandler(void * arg)
     PlatformMgr().LockChipStack();
     AirQualitySensorManager::GetInstance()->OnAirQualityChangeHandler(classifyAirQuality(air_quality));
     PlatformMgr().UnlockChipStack();
-    
+
     AppTask::GetAppTask().UpdateAirQualitySensorUI();
 
     ChipLogDetail(AppServer, "RAW AirQuality value: %ld and corresponding Enum value : %d", air_quality,
