@@ -28,14 +28,23 @@ else
     CHIP_ROOT="$MATTER_ROOT"
 fi
 
+ACTIVATE_MATTER_ENV=true
+if [[ -z "${PW_ENVIRONMENT_ROOT}" ]]; then
+    echo "Using the bootstrapped pigweed ENV in Matter root"
+    PW_PATH="$CHIP_ROOT/.environment/cipd/packages/pigweed"
+else
+    echo "Using provided $PW_ENVIRONMENT_ROOT as Pigweed ENV root"
+    PW_PATH="$PW_ENVIRONMENT_ROOT"
+    ACTIVATE_MATTER_ENV=false
+fi
+
 set -x
 env
 USE_WIFI=false
 USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
 USE_SLC=false
-GN_PATH=gn
-GN_PATH_PROVIDED=false
+GN_PATH="$PW_PATH/gn"
 USE_BOOTLOADER=false
 DOTFILE=".gn"
 
@@ -252,6 +261,7 @@ else
             --slc_generate)
                 optArgs+="slc_generate=true "
                 USE_SLC=true
+                ACTIVATE_MATTER_ENV=false
                 shift
                 ;;
             --use_pw_rpc)
@@ -260,7 +270,6 @@ else
                 ;;
             --slc_reuse_files)
                 optArgs+="slc_reuse_files=true "
-                USE_SLC=true
                 shift
                 ;;
             --gn_path)
@@ -270,7 +279,6 @@ else
                 else
                     GN_PATH="$2"
                 fi
-                GN_PATH_PROVIDED=true
                 shift
                 shift
                 ;;
@@ -310,11 +318,7 @@ else
         } &>/dev/null
     fi
 
-    if [ "$USE_SLC" == true ]; then
-        if [ "$GN_PATH_PROVIDED" == false ]; then
-            GN_PATH=./.environment/cipd/packages/pigweed/gn
-        fi
-    elif [ "$USE_SLC" == false ]; then
+    if [ "$ACTIVATE_MATTER_ENV" == true ]; then
         # Activation needs to be after SLC generation which is done in gn gen.
         # Zap generation requires activation and is done in the build phase
         source "$CHIP_ROOT/scripts/activate.sh"
