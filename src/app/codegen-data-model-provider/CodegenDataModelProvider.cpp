@@ -72,16 +72,10 @@ private:
             }
             break;
         case Operation::FindNext:
-            // next uses `mFound` as a marker of found
             if (mTarget == id)
             {
-                mFound = id; // found it
-            }
-            else if (mFound.has_value())
-            {
-                // we found the ID, this is the "next" one
-                mFound = id; // found it
-                return Loop::Break;
+                // Once we found the ID, get the first
+                mOperation = Operation::FindFirst;
             }
             break;
         }
