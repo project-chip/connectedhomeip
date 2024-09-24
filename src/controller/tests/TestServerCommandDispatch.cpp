@@ -26,7 +26,6 @@
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 #include <app/codegen-data-model-provider/Instance.h>
 #include <app/tests/AppTestContext.h>
-#include <app/tests/test-interaction-model-api.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
 #include <controller/ReadInteraction.h>
