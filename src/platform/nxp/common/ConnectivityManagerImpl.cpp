@@ -95,10 +95,6 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    StartWiFiManagement();
-#endif
-
     SuccessOrExit(err);
 
 exit:
@@ -613,6 +609,11 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, uint
     VerifyOrExit(pNetworkData != NULL, ret = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(ssidLen <= IEEEtypes_SSID_SIZE, ret = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mWiFiStationState != kWiFiStationState_Connecting, ret = CHIP_ERROR_BUSY);
+
+    // Need to enable the WIFI interface here when Thread is enabled as a secondary network interface. We don't want to enable
+    // WIFI from the init phase anymore and we will only do it in case the commissioner is provisioning the device with
+    // the WIFI credentials.
+    StartWiFiManagement();
 
     memset(pNetworkData, 0, sizeof(struct wlan_network));
 

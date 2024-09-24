@@ -242,7 +242,6 @@ jobs:
                       ./scripts/build/build_examples.py \
                       --target nxp-rw61x-freertos-all-clusters-wifi \
                       --target nxp-rw61x-freertos-all-clusters-thread \
-                      --target nxp-rw61x-freertos-all-clusters-thread-wifi \
                       --target nxp-rw61x-freertos-all-clusters-wifi-ota-cmake \
                       build \
                       --copy-artifacts-to out/artifacts \
@@ -265,7 +264,6 @@ jobs:
                       ./scripts/build/build_examples.py \
                       --target nxp-rw61x-freertos-laundry-washer-wifi \
                       --target nxp-rw61x-freertos-laundry-washer-thread \
-                      --target nxp-rw61x-freertos-laundry-washer-thread-wifi \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
