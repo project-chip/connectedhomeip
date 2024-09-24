@@ -42,6 +42,8 @@ CHIP_ERROR MTROTAImageTransferHandler::PrepareForTransfer(System::Layer * layer,
     Messaging::ExchangeContext * exchangeCtx, FabricIndex fabricIndex, NodeId nodeId)
 {
     assertChipStackLockedByCurrentThread();
+    VerifyOrReturnError(layer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     mSystemLayer = layer;
 
     ReturnErrorOnFailure(ConfigureState(fabricIndex, nodeId));
@@ -279,7 +281,6 @@ void MTROTAImageTransferHandler::HandleTransferSessionOutput(TransferSession::Ou
     case TransferSession::OutputEventType::kAckEOFReceived:
     case TransferSession::OutputEventType::kInternalError:
     case TransferSession::OutputEventType::kTransferTimeout:
-        ChipLogError(BDX, "Got kAckEOFReceived/kInternalError/kTransferTimeout");
         err = OnTransferSessionEnd(event);
         if (err != CHIP_NO_ERROR) {
             LogErrorOnFailure(err);
@@ -343,7 +344,8 @@ CHIP_ERROR MTROTAImageTransferHandler::OnMessageReceived(
     VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR err;
 
-    // If we receive a ReceiveInit message, then we prepare for transfer.
+    // If we receive a ReceiveInit message, then we prepare for transfer. Otherwise we send the message
+    // received to the AsyncTransferFacilitator for processing.
     if (payloadHeader.HasMessageType(MessageType::ReceiveInit)) {
         NodeId nodeId = ec->GetSessionHandle()->GetPeer().GetNodeId();
         FabricIndex fabricIndex = ec->GetSessionHandle()->GetFabricIndex();

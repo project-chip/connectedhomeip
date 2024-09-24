@@ -244,7 +244,6 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
 
                 // If update is not available, return the delegate response
                 if (!hasUpdate) {
-                    ChipLogError(BDX, "delegate bridge. update not available");
                     handler->AddResponse(cachedCommandPath, delegateResponse);
                     handle.Release();
                     return;
