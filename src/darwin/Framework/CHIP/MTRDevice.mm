@@ -282,12 +282,14 @@ using namespace chip::Tracing::DarwinFramework;
     NSNumber * _Nullable _allNetworkFeatures;
 }
 
+// deviceController getter is implemented by subclasses.
+@dynamic deviceController;
+
 - (instancetype)initForSubclassesWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     if (self = [super init]) {
         _lock = OS_UNFAIR_LOCK_INIT;
         _delegates = [NSMutableSet set];
-        _deviceController = controller;
         _nodeID = nodeID;
         _state = MTRDeviceStateUnknown;
     }
@@ -606,7 +608,7 @@ using namespace chip::Tracing::DarwinFramework;
     // storage implementation, which will try to read them later.  Make sure
     // we snapshot the state here instead of handing out live copies.
     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * clusterData = [self _clusterDataToPersistSnapshot];
-    [_deviceController.controllerDataStore storeClusterData:clusterData forNodeID:_nodeID];
+    [self.deviceController.controllerDataStore storeClusterData:clusterData forNodeID:_nodeID];
     for (MTRClusterPath * clusterPath in _clusterDataToPersist) {
         [_persistedClusterData setObject:_clusterDataToPersist[clusterPath] forKey:clusterPath];
         [_persistedClusters addObject:clusterPath];
@@ -849,7 +851,7 @@ using namespace chip::Tracing::DarwinFramework;
 
     NSMutableSet * clusterPathsToRemove = [NSMutableSet set];
     for (MTRClusterPath * clusterPath in _persistedClusters) {
-        MTRDeviceClusterData * data = [_deviceController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
+        MTRDeviceClusterData * data = [self.deviceController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
         if (!data) {
             [clusterPathsToRemove addObject:clusterPath];
         }
@@ -884,13 +886,13 @@ using namespace chip::Tracing::DarwinFramework;
         return nil;
     }
 
-    NSAssert(_deviceController.controllerDataStore != nil,
+    NSAssert(self.deviceController.controllerDataStore != nil,
         @"How can _persistedClusters have an entry if we have no persistence?");
     NSAssert(_persistedClusterData != nil,
         @"How can _persistedClusterData not exist if we have persisted clusters?");
 
     // Page in the stored value for the data.
-    MTRDeviceClusterData * data = [_deviceController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
+    MTRDeviceClusterData * data = [self.deviceController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
     MTR_LOG("%@ cluster path %@ cache miss - load from storage success %@", self, clusterPath, MTR_YES_NO(data));
     if (data != nil) {
         [_persistedClusterData setObject:data forKey:clusterPath];

@@ -272,6 +272,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #endif
 
 @implementation MTRDevice_Concrete {
+    MTRDeviceController_Concrete * _deviceController;
+
 #ifdef DEBUG
     NSUInteger _unitTestAttributesReportedSinceLastCheck;
 #endif
@@ -365,6 +367,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     // `super` was NSObject, is now MTRDevice.  MTRDevice hides its `init`
     if (self = [super initForSubclassesWithNodeID:nodeID controller:controller]) {
+        _deviceController = controller;
         _timeSyncLock = OS_UNFAIR_LOCK_INIT;
         _descriptionLock = OS_UNFAIR_LOCK_INIT;
         _fabricIndex = controller.fabricIndex;
@@ -463,6 +466,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     return [NSString
         stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, state: %@, last subscription attempt wait: %lus, queued work: %lu, last report: %@%@, last subscription failure: %@%@, controller: %@>", NSStringFromClass(self.class), self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, vid, pid, wifi, thread, InternalDeviceStateString(internalDeviceState), static_cast<unsigned long>(lastSubscriptionAttemptWait), static_cast<unsigned long>(_asyncWorkQueue.itemCount), mostRecentReportTime, reportAge, lastSubscriptionFailureTime, subscriptionFailureAge, _deviceController.uniqueIdentifier];
+}
+
+- (nullable MTRDeviceController *)deviceController
+{
+    return _deviceController;
 }
 
 - (NSDictionary *)_internalProperties

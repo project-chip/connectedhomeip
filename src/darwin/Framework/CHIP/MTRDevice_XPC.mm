@@ -80,14 +80,16 @@
                                   : [[self deviceController] uniqueIdentifier] nodeID                                                                           \
                                   : [self nodeID])
 
-@implementation MTRDevice_XPC
+@implementation MTRDevice_XPC {
+    MTRDeviceController_XPC * _deviceController;
+}
 
 @synthesize _internalState;
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController_XPC *)controller
 {
     if (self = [super initForSubclassesWithNodeID:nodeID controller:controller]) {
-        // Nothing else to do, all set.
+        _deviceController = controller;
     }
 
     return self;
@@ -129,6 +131,11 @@
         wifi,
         thread,
         _deviceController.uniqueIdentifier];
+}
+
+- (nullable MTRDeviceController *)deviceController
+{
+    return _deviceController;
 }
 
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
