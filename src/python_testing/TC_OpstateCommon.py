@@ -1335,8 +1335,6 @@ class TC_OPSTATE_BASE():
             if countdownTime is not NullValue:
                 count = sub_handler.attribute_report_counts[attributes.CountdownTime]
                 asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
-        else:
-            self.skip_step(8)
 
         self.step(9)
         await self.read_and_expect_value(endpoint=endpoint,
