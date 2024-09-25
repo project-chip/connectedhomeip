@@ -16,7 +16,8 @@
 string(REPLACE "_retention" "" BASE_BOARD ${BOARD})
 
 if(NOT FLASH_SIZE)
-  if(${BASE_BOARD} MATCHES "tlsr9118bdk40d")
+  if(${BASE_BOARD} MATCHES "tlsr9118bdk40d" OR ${BASE_BOARD} MATCHES "tlsr9118bdk40d_v1"
+    OR ${BASE_BOARD} MATCHES "tlsr9118bdk40d_v2")
     set(FLASH_SIZE "3m")
   else()
     set(FLASH_SIZE "2m")
@@ -86,17 +87,23 @@ endif()
 
 set(GLOBAL_BOOT_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}.overlay")
 if(NOT EXISTS "${GLOBAL_BOOT_DTC_OVERLAY_FILE}")
-  message(FATAL_ERROR "${GLOBAL_BOOT_DTC_OVERLAY_FILE} doesn't exist")
+  message(STATUS "${GLOBAL_BOOT_DTC_OVERLAY_FILE} doesn't exist")
+  unset(GLOBAL_BOOT_DTC_OVERLAY_FILE)
 endif()
 
 set(GLOBAL_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}.overlay")
 if(NOT EXISTS "${GLOBAL_DTC_OVERLAY_FILE}")
-  message(FATAL_ERROR "${GLOBAL_DTC_OVERLAY_FILE} doesn't exist")
+  message(STATUS "${GLOBAL_DTC_OVERLAY_FILE} doesn't exist")
+  unset(GLOBAL_DTC_OVERLAY_FILE)
 endif()
 
 set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_${FLASH_SIZE}_flash.overlay")
 if(NOT EXISTS "${FLASH_DTC_OVERLAY_FILE}")
-  message(FATAL_ERROR "${FLASH_DTC_OVERLAY_FILE} doesn't exist")
+  if(${BASE_BOARD} MATCHES "tlsr9118bdk40d_v1" OR ${BASE_BOARD} MATCHES "tlsr9118bdk40d_v2")
+    set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/tlsr9118bdk40d_${FLASH_SIZE}_flash.overlay")
+  else()
+    message(FATAL_ERROR "${FLASH_DTC_OVERLAY_FILE} doesn't exist")
+  endif()
 endif()
 
 if(DTC_OVERLAY_FILE)
