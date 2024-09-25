@@ -14,10 +14,10 @@
 #    limitations under the License.
 
 string(REPLACE "_retention" "" BASE_BOARD ${BOARD})
+string(REGEX REPLACE "_v[0-9]+" "" BASE_BOARD ${BASE_BOARD})
 
 if(NOT FLASH_SIZE)
-  if(${BASE_BOARD} MATCHES "tlsr9118bdk40d" OR ${BASE_BOARD} MATCHES "tlsr9118bdk40d_v1"
-    OR ${BASE_BOARD} MATCHES "tlsr9118bdk40d_v2")
+  if(${BASE_BOARD} MATCHES "tlsr9118bdk40d")
     set(FLASH_SIZE "3m")
   else()
     set(FLASH_SIZE "2m")
@@ -99,11 +99,8 @@ endif()
 
 set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_${FLASH_SIZE}_flash.overlay")
 if(NOT EXISTS "${FLASH_DTC_OVERLAY_FILE}")
-  if(${BASE_BOARD} MATCHES "tlsr9118bdk40d_v1" OR ${BASE_BOARD} MATCHES "tlsr9118bdk40d_v2")
-    set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/tlsr9118bdk40d_${FLASH_SIZE}_flash.overlay")
-  else()
-    message(FATAL_ERROR "${FLASH_DTC_OVERLAY_FILE} doesn't exist")
-  endif()
+  message(STATUS "${FLASH_DTC_OVERLAY_FILE} doesn't exist")
+  unset(FLASH_DTC_OVERLAY_FILE)
 endif()
 
 if(DTC_OVERLAY_FILE)
