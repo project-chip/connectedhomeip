@@ -65,15 +65,26 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 - (void)tearDown
 {
 #if defined(ENABLE_LEAK_DETECTION) && ENABLE_LEAK_DETECTION
+    /**
+     * Unfortunately, doing this in "+ (void)tearDown" (the global suite teardown)
+     * does not trigger a test failure even if the XCTAssertEqual below fails.
+     */
     if (_detectLeaks) {
         int pid = getpid();
         __auto_type * cmd = [NSString stringWithFormat:@"leaks %d", pid];
         int ret = system(cmd.UTF8String);
-        /**
-         * Unfortunately, doing this in "+ (void)tearDown" (the global suite teardown)
-         * does not trigger a test failure even if the XCTAssertEqual fails.
-         */
-        XCTAssertEqual(ret, 0, "LEAKS DETECTED");
+        if (WIFEXITED(ret)) {
+            // leaks ran to completion.
+            XCTAssertEqual(WEXITSTATUS(ret), 0, "LEAKS DETECTED");
+        } else {
+            // leaks failed to actually run to completion (e.g. crashed or ran
+            // into some other sort of failure trying to do its work).  Ideally
+            // we would fail our tests in that case, but this seems to be
+            // happening a fair amount, and randomly, on the ARM GitHub runners.
+            // Just log and ignore for now.
+            XCTAssertFalse(WIFSTOPPED(ret), "Not expecting a stopped leaks");
+            NSLog(@"Stopped by signal %d", WTERMSIG(ret));
+        }
     }
 #endif
 
@@ -86,6 +97,11 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 
 #if HAVE_NSTASK
 - (NSTask *)createTaskForPath:(NSString *)path
+{
+    return [self.class createTaskForPath:path];
+}
+
++ (NSTask *)createTaskForPath:(NSString *)path
 {
     NSTask * task = [[NSTask alloc] init];
     [task setLaunchPath:[self absolutePathFor:path]];
@@ -102,7 +118,7 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
     XCTAssertEqual([task terminationStatus], 0);
 }
 
-- (void)doLaunchTask:(NSTask *)task
++ (void)doLaunchTask:(NSTask *)task
 {
     NSError * launchError;
     [task launchAndReturnError:&launchError];
@@ -111,12 +127,12 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 
 - (void)launchTask:(NSTask *)task
 {
-    [self doLaunchTask:task];
+    [self.class doLaunchTask:task];
 
     [_runningTasks addObject:task];
 }
 
-- (void)launchCrossTestTask:(NSTask *)task
++ (void)launchTask:(NSTask *)task
 {
     [self doLaunchTask:task];
 
@@ -125,6 +141,11 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 #endif // HAVE_NSTASK
 
 - (NSString *)absolutePathFor:(NSString *)matterRootRelativePath
+{
+    return [self.class absolutePathFor:matterRootRelativePath];
+}
+
++ (NSString *)absolutePathFor:(NSString *)matterRootRelativePath
 {
     // Start with the absolute path to our file, then remove the suffix that
     // comes after the path to the Matter SDK root.

@@ -38,12 +38,30 @@ extern "C" {
 #include "uart.h"
 #endif
 
+int _open(char * path, int flags, ...);
 int _close(int file);
 int _fstat(int file, struct stat * st);
 int _isatty(int file);
 int _lseek(int file, int ptr, int dir);
 int _read(int file, char * ptr, int len);
 int _write(int file, const char * ptr, int len);
+
+/**************************************************************************
+ * @brief
+ *  Open a file.
+ *
+ * @param[in] file
+ *  File you want to open.
+ *
+ * @return
+ *  Returns -1 since there is not logic here to open file.
+ **************************************************************************/
+
+int __attribute__((weak)) _open(char * path, int flags, ...)
+{
+    /* Pretend like we always fail */
+    return -1;
+}
 
 /**************************************************************************
  * @brief
@@ -170,17 +188,22 @@ int __attribute__((weak)) _lseek(int file, int ptr, int dir)
  * @return
  *  Number of characters that have been read.
  *************************************************************************/
+#if SILABS_LOG_OUT_UART
+int _read(int file, char * ptr, int len)
+{
+    (void) file;
+    return uartConsoleRead(ptr, len);
+}
+#else
 int __attribute__((weak)) _read(int file, char * ptr, int len)
 {
     (void) file;
-#if SILABS_LOG_OUT_UART
-    return uartConsoleRead(ptr, len);
-#else
     (void) ptr;
     (void) len;
-#endif
+
     return 0;
 }
+#endif // SILABS_LOG_OUT_UART
 
 /**************************************************************************
  * @brief
@@ -198,17 +221,20 @@ int __attribute__((weak)) _read(int file, char * ptr, int len)
  * @return
  *  Number of characters that have been written.
  **************************************************************************/
+#if SILABS_LOG_OUT_UART
+int _write(int file, const char * ptr, int len)
+{
+    (void) file;
+    return uartConsoleWrite(ptr, len);
+}
+#else
 int __attribute__((weak)) _write(int file, const char * ptr, int len)
 {
     (void) file;
-#if SILABS_LOG_OUT_UART
-    uartConsoleWrite(ptr, len);
-#else
     (void) ptr;
-#endif
-
     return len;
 }
+#endif // SILABS_LOG_OUT_UART
 
 #ifdef __cplusplus
 }

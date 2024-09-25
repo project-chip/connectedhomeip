@@ -28,7 +28,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     infineon:
         name: Infineon examples building
@@ -37,7 +37,10 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-infineon:54
+            image: ghcr.io/project-chip/chip-build-infineon:77
+            env:
+               # TODO: this should probably be part of the dockerfile itself
+               CY_TOOLS_PATHS: /opt/Tools/ModusToolbox/tools_3.2
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:

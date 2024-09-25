@@ -33,8 +33,8 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 ## Introduction
 
 The EFR32 Energy Management example provides a baseline demonstration of a EVSE
-device, built using Matter and the Silicon Labs gecko SDK. It can be controlled
-by a Chip controller over an Openthread or Wifi network..
+or Water Heater device, built using Matter and the Silicon Labs gecko SDK. It
+can be controlled by a Chip controller over an Openthread or Wifi network.
 
 The EFR32 device can be commissioned over Bluetooth Low Energy where the device
 and the Chip controller will exchange security information with the Rendez-vous
@@ -45,9 +45,9 @@ If the LCD is enabled, the LCD on the Silabs WSTK shows a QR Code containing the
 needed commissioning information for the BLE connection and starting the
 Rendez-vous procedure.
 
-The EVSE example is intended to serve both as a means to explore the workings of
-Matter as well as a template for creating real products based on the Silicon
-Labs platform.
+The EVSE and Water Heater examples are intended to serve both as a means to
+explore the workings of Matter Energy Management as well as a template for
+creating real products based on the Silicon Labs platform.
 
 ## Building
 
@@ -99,7 +99,23 @@ Labs platform.
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export SILABS_BOARD=BRD4187C
+
+    To build the EVSE example
+
           $ gn gen out/debug
+          $ ninja -C out/debug
+
+    To build the Water Heater example you can change the args to gn gen (see
+    BUILD.gn for arg options)
+
+          $ gn gen out/debug --args='chip_enable_example_evse_device=false chip_enable_example_water_heater_device=true'
+          $ ninja -C out/debug
+
+    To change Device Energy Management feature support (e.g. Power forecast or
+    State forecast reporting), you can change the args to gn gen (see BUILD.gn
+    for arg options)
+
+          $ gn gen out/debug --args='chip_dem_support_state_forecast_reporting=true chip_dem_support_power_forecast_reporting=false'
           $ ninja -C out/debug
 
 -   To delete generated executable, libraries and object files use:
