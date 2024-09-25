@@ -135,7 +135,8 @@ CHIP_ERROR GenericContext::FinalizeInternal(const char * errorStr, CHIP_ERROR er
     }
     else
     {
-        chip::Platform::Delete(this);
+        // Ensure that we clean up our service ref, if any, correctly.
+        MdnsContexts::GetInstance().Delete(this);
     }
 
     return err;
@@ -161,33 +162,22 @@ MdnsContexts::~MdnsContexts()
     }
 }
 
-CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
+CHIP_ERROR MdnsContexts::Add(GenericContext * context)
 {
-    VerifyOrReturnError(context != nullptr || sdRef != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (context == nullptr)
+    VerifyOrReturnError(context != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    if (!context->serviceRef)
     {
-        DNSServiceRefDeallocate(sdRef);
+        Delete(context);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (sdRef == nullptr)
-    {
-        chip::Platform::Delete(context);
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    auto err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
+    auto err = DNSServiceSetDispatchQueue(context->serviceRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
     if (kDNSServiceErr_NoError != err)
     {
-        // We can't just use our Delete to deallocate the service ref here,
-        // because our context may not have its serviceRef set yet.
-        DNSServiceRefDeallocate(sdRef);
-        chip::Platform::Delete(context);
+        Delete(context);
         return Error::ToChipError(err);
     }
 
-    context->serviceRef = sdRef;
     mContexts.push_back(context);
 
     return CHIP_NO_ERROR;
@@ -242,6 +232,8 @@ CHIP_ERROR MdnsContexts::RemoveAllOfType(ContextType type)
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
+// TODO: Perhaps this cleanup code should just move into ~GenericContext, and
+// the places that call this method should just Platform::Delete() the context?
 void MdnsContexts::Delete(GenericContext * context)
 {
     if (context->serviceRef != nullptr)

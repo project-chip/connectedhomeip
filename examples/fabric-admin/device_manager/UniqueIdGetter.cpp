@@ -53,8 +53,8 @@ UniqueIdGetter::UniqueIdGetter() :
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this)
 {}
 
-CHIP_ERROR UniqueIdGetter::GetUniqueId(OnDoneCallback onDoneCallback, chip::Controller::DeviceController & controller,
-                                       chip::NodeId nodeId, chip::EndpointId endpointId)
+CHIP_ERROR UniqueIdGetter::GetUniqueId(OnDoneCallback onDoneCallback, Controller::DeviceController & controller, NodeId nodeId,
+                                       EndpointId endpointId)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrDie(!mCurrentlyGettingUid);

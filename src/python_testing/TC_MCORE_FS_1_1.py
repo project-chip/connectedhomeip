@@ -17,18 +17,50 @@
 
 # This test requires a TH_SERVER application. Please specify with --string-arg th_server_app_path:<path_to_app>
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: examples/fabric-admin/scripts/fabric-sync-app.py
+# test-runner-run/run1/app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+# test-runner-run/run1/factoryreset: true
+# test-runner-run/run1/script-args: --PICS src/app/tests/suites/certification/ci-pics-values --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_server_app_path:${ALL_CLUSTERS_APP} --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-run/run1/script-start-delay: 5
+# test-runner-run/run1/quiet: true
+# === END CI TEST ARGUMENTS ===
+
 import logging
 import os
 import random
-import signal
-import subprocess
+import tempfile
 import time
-import uuid
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
+from chip.testing.tasks import Subprocess
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+
+class AppServer(Subprocess):
+    """Wrapper class for starting an application server in a subprocess."""
+
+    # Prefix for log messages from the application server.
+    PREFIX = "[SERVER]"
+
+    def __init__(self, app: str, storage_dir: str, discriminator: int, passcode: int, port: int = 5540):
+        storage_kvs_dir = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")[1]
+        # Start the server application with dedicated KVS storage.
+        super().__init__(app, "--KVS", storage_kvs_dir,
+                         '--secured-device-port', str(port),
+                         "--discriminator", str(discriminator),
+                         "--passcode", str(passcode),
+                         prefix=self.PREFIX)
+
+    def start(self):
+        # Start process and block until it prints the expected output.
+        super().start(expected_output="Server initialization complete")
 
 
 class TC_MCORE_FS_1_1(MatterBaseTest):
@@ -36,25 +68,32 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
-        self.app_process = None
-        app = self.user_params.get("th_server_app_path", None)
-        if not app:
-            asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
 
-        self.kvs = f'kvs_{str(uuid.uuid4())}'
-        self.port = 5543
-        discriminator = random.randint(0, 4095)
-        passcode = 20202021
-        cmd = [app]
-        cmd.extend(['--secured-device-port', str(5543)])
-        cmd.extend(['--discriminator', str(discriminator)])
-        cmd.extend(['--passcode', str(passcode)])
-        cmd.extend(['--KVS', self.kvs])
-        # TODO: Determine if we want these logs cooked or pushed to somewhere else
-        logging.info("Starting application to acts mock a server portion of TH_FSA")
-        self.app_process = subprocess.Popen(cmd)
-        logging.info("Started application to acts mock a server portion of TH_FSA")
-        time.sleep(3)
+        self.th_server = None
+        self.storage = None
+
+        th_server_app = self.user_params.get("th_server_app_path", None)
+        if not th_server_app:
+            asserts.fail("This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>")
+        if not os.path.exists(th_server_app):
+            asserts.fail(f"The path {th_server_app} does not exist")
+
+        # Create a temporary storage directory for keeping KVS files.
+        self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
+        logging.info("Temporary storage directory: %s", self.storage.name)
+
+        self.th_server_port = 5543
+        self.th_server_discriminator = random.randint(0, 4095)
+        self.th_server_passcode = 20202021
+
+        # Start the TH_SERVER_NO_UID app.
+        self.th_server = AppServer(
+            th_server_app,
+            storage_dir=self.storage.name,
+            port=self.th_server_port,
+            discriminator=self.th_server_discriminator,
+            passcode=self.th_server_passcode)
+        self.th_server.start()
 
         logging.info("Commissioning from separate fabric")
         # Create a second controller on a new fabric to communicate to the server
@@ -63,25 +102,24 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         paa_path = str(self.matter_test_config.paa_trust_store_path)
         self.TH_server_controller = new_fabric_admin.NewController(nodeId=112233, paaTrustStorePath=paa_path)
         self.server_nodeid = 1111
-        await self.TH_server_controller.CommissionOnNetwork(nodeId=self.server_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
+        await self.TH_server_controller.CommissionOnNetwork(
+            nodeId=self.server_nodeid,
+            setupPinCode=self.th_server_passcode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=self.th_server_discriminator)
         logging.info("Commissioning TH_SERVER complete")
 
     def teardown_class(self):
-        # In case the th_server_app_path does not exist, then we failed the test
-        # and there is nothing to remove
-        if self.app_process is not None:
-            logging.warning("Stopping app with SIGTERM")
-            self.app_process.send_signal(signal.SIGTERM.value)
-            self.app_process.wait()
-
-            if os.path.exists(self.kvs):
-                os.remove(self.kvs)
+        if self.th_server is not None:
+            self.th_server.terminate()
+        if self.storage is not None:
+            self.storage.cleanup()
         super().teardown_class()
 
     def steps_TC_MCORE_FS_1_1(self) -> list[TestStep]:
         steps = [TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism.", is_commissioning=True),
                  TestStep(2, "Commission DUT_FSA onto TH_FSA fabric."),
-                 TestStep(3, "Reverse Commision Commission TH_FSAs onto DUT_FSA fabric."),
+                 TestStep(3, "Reverse Commission TH_FSAs onto DUT_FSA fabric."),
                  TestStep("3a", "TH_FSA sends RequestCommissioningApproval"),
                  TestStep("3b", "TH_FSA sends CommissionNode"),
                  TestStep("3c", "DUT_FSA commissions TH_FSA")]

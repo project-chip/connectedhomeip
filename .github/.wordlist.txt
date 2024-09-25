@@ -453,6 +453,7 @@ dpkg
 dropdown
 dryrun
 DS
+DSLS
 duplicative
 DUT
 DUTS
@@ -461,6 +462,7 @@ DV
 DVK
 dynload
 eabi
+EAF
 EB
 ECC
 ECD
@@ -551,6 +553,7 @@ feff
 ffaa
 ffeebaefa
 FFF
+FFFFFFFFFFFF0102
 fffe
 fffff
 Fi
@@ -1626,3 +1629,5 @@ zhengyaohan
 Zigbee
 zigbeealliance
 zigbeethread
+zsdk
+TBR

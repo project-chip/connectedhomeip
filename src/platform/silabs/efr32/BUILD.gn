@@ -159,7 +159,7 @@ static_library("efr32") {
       "${silabs_platform_dir}/ConnectivityManagerImpl_WIFI.cpp",
       "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.cpp",
       "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.h",
-      "wifi/wfx_host_events.h",
+      "${silabs_platform_dir}/wifi/wfx_host_events.h",
       "wifi/wfx_msgs.h",
       "wifi/wifi_config.h",
     ]

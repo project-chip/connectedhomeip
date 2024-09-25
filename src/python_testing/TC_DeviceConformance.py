@@ -166,7 +166,6 @@ class DeviceConformanceTests(BasicCompositionTests):
                     if attribute_id not in self.xml_clusters[cluster_id].attributes.keys():
                         # TODO: Consolidate the range checks with IDM-10.1 once that lands
                         if attribute_id <= 0x4FFF:
-                            # manufacturer attribute
                             record_error(location=location, problem='Standard attribute found on device, but not in spec')
                         continue
                     xml_attribute = self.xml_clusters[cluster_id].attributes[attribute_id]
@@ -193,9 +192,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                         if command_id not in xml_commands_dict:
                             # TODO: Consolidate range checks with IDM-10.1 once that lands
                             if command_id <= 0xFF:
-                                # manufacturer command
-                                continue
-                            record_error(location=location, problem='Standard command found on device, but not in spec')
+                                record_error(location=location, problem='Standard command found on device, but not in spec')
                             continue
                         xml_command = xml_commands_dict[command_id]
                         conformance_decision_with_choice = xml_command.conformance(feature_map, attribute_list, all_command_list)
