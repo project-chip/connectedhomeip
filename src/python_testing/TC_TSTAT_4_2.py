@@ -244,7 +244,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
     @ async_test_body
     async def test_TC_TSTAT_4_2(self):
-        endpoint = self.matter_test_config.endpoint
+        endpoint = self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else 1
 
         self.step("1")
         # Commission DUT - already done
