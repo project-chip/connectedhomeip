@@ -21,6 +21,7 @@
 #include "app-common/zap-generated/ids/Attributes.h"
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "app/ConcreteAttributePath.h"
+#include "app/codegen-data-model-provider/Instance.h"
 #include "protocols/interaction_model/Constants.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AppConfig.h>
@@ -293,6 +294,7 @@ TEST_F(TestEventChunking, TestEventChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
+    CodegenDataModelProviderInstance()->Shutdown();
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -359,6 +361,7 @@ TEST_F(TestEventChunking, TestMixedEventsAndAttributesChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
+    CodegenDataModelProviderInstance()->Shutdown();
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -435,6 +438,7 @@ TEST_F(TestEventChunking, TestMixedEventsAndLargeAttributesChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
+    CodegenDataModelProviderInstance()->Shutdown();
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
