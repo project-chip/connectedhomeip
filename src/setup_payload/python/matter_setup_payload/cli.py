@@ -17,7 +17,7 @@
 
 import click
 
-from .setup_payload import CommissioningFlow, SetupPayload
+from .setup_payload import SetupPayload
 
 
 @click.group()
