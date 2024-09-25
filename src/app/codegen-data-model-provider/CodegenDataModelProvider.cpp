@@ -629,40 +629,24 @@ DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const Conc
 std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
     // Command handler interface MAY override lists of commands
-    CommandHandlerInterface * handler_interface =
+    CommandHandlerInterface * interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
 
-    if (handler_interface != nullptr)
+    if (interface != nullptr)
     {
-        struct Context
-        {
-            bool commandExists;
-            CommandId targetCommand;
-        } context{ false, path.mCommandId };
-
-        // if a list is available, try to see if the command exists
-        CHIP_ERROR err = handler_interface->EnumerateAcceptedCommands(
-            path,
-            [](CommandId command, void * closure) -> Loop {
-                auto * ctx = static_cast<Context *>(closure);
-                if (ctx->targetCommand == command)
-                {
-                    ctx->commandExists = true;
-                    return Loop::Break;
-                }
-                return Loop::Continue;
-            },
-            &context);
+        EnumeratorCommandFinder finder(EnumeratorCommandFinder::Operation::FindExact, path.mCommandId);
+        CHIP_ERROR err = interface->EnumerateGeneratedCommands(path, finder.Callback(), &finder);
 
         if (err != CHIP_ERROR_NOT_IMPLEMENTED)
         {
-            // TODO: we know the command exists, but don't actually have info such as flags. Ideally CHI should
-            //       provide more info.
-            //
-            // This will default claim kOperate privilege and no flags (not fabric-scoped nor timed)
-            return ((err == CHIP_NO_ERROR) && context.commandExists) //
-                ? std::make_optional<DataModel::CommandInfo>()       //  definitive answer: command exists
-                : std::nullopt;                                      // model says command does not exist
+            auto commandId = finder.GetFound();
+
+            if ((err == CHIP_NO_ERROR) && firstId.has_value())
+            {
+                return std::make_optional<DataModel::CommandInfo>()       //  definitive answer: command exists
+            }
+
+            return std::nullopt;
         }
     }
 
