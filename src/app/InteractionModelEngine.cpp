@@ -1593,7 +1593,7 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedLi
     {
         bool duplicate = false;
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE && CHIP_CONFIG_USE_EMBER_DATA_MODEL
-        // Double-check that Provider interface and ember are IDENTICAL in attribute location
+        // Ensure that Provider interface and ember are IDENTICAL in attribute location (i.e. "check" mode)
         if (!path1->mValue.IsWildcardPath())
         {
             VerifyOrDie(GetDataModelProvider()
