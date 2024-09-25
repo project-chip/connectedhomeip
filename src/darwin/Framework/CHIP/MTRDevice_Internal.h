@@ -123,7 +123,6 @@ MTR_DIRECT_MEMBERS
 }
 
 - (instancetype)initForSubclassesWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
-- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
 // called by controller to clean up and shutdown
 - (void)invalidate;
