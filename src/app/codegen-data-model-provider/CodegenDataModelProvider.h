@@ -68,7 +68,7 @@ private:
     };
 
 public:
-    /// clears out internal caching. Expecially useful in unit tests,
+    /// clears out internal caching. Especially useful in unit tests,
     /// where path caching does not really apply (the same path may result in different outcomes)
     void Reset()
     {
