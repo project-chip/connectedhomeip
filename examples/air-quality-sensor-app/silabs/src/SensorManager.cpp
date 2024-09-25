@@ -99,12 +99,7 @@ AirQualityEnum classifyAirQuality(int32_t value)
 
 CHIP_ERROR SensorManager::Init()
 {
-
-    PlatformMgr().LockChipStack();
-    ChipLogDetail(AppServer, "Int instnace");
-    AirQualitySensorManager::InitInstance();
-    PlatformMgr().UnlockChipStack();
-    ChipLogDetail(AppServer, "Int instnace success");
+    DeviceLayer::PlatformMgr().ScheduleWork(AirQualitySensorManager::InitInstance);
     // Create cmsisos sw timer for air quality sensor timer.
     mSensorTimer = osTimerNew(SensorTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
     if (mSensorTimer == NULL)
@@ -165,12 +160,14 @@ void SensorManager::SensorTimerEventHandler(void * arg)
     }
 #endif // USE_AIR_QUALITY_SENSOR
 
+    DeviceLayer::PlatformMgr().ScheduleWork(AirQualitySensorManager::GetInstance()->OnAirQualityChangeHandler,
+                                            classifyAirQuality(air_quality));
+    
     PlatformMgr().LockChipStack();
-    AirQualitySensorManager::GetInstance()->OnAirQualityChangeHandler(classifyAirQuality(air_quality));
-    PlatformMgr().UnlockChipStack();
-
-    AppTask::GetAppTask().UpdateAirQualitySensorUI();
-
     ChipLogDetail(AppServer, "RAW AirQuality value: %ld and corresponding Enum value : %d", air_quality,
                   chip::to_underlying(AirQualitySensorManager::GetInstance()->GetAirQuality()));
+    PlatformMgr().UnlockChipStack();
+
+
+    AppTask::GetAppTask().UpdateAirQualitySensorUI();
 }
