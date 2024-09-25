@@ -617,7 +617,6 @@ void ResolveContext::DispatchSuccess()
         auto addresses       = Span<Inet::IPAddress>(ips.data(), ips.size());
 
         ChipLogProgress(Discovery, "Mdns: Resolve success on interface %" PRIu32, interfaceKey.interfaceId);
-        ChipLogError(Inet, "TryReportingResultsForInterfaceIndex: %p", callback);
 
         if (nullptr == callback)
         {
