@@ -1,1 +1,1 @@
-80 : [NXP] Updating NXP docker image to include k32w0 platform
+80 : [Tizen] Run tests from 9P-shared directory instead of ISO
