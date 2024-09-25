@@ -1275,7 +1275,7 @@ class TC_OPSTATE_BASE():
             self.send_manual_or_pipe_command(name="OperationalStateChange",
                                              device=self.device,
                                              operation="Start",
-                                             msg="Put the DUT into the running state")
+                                             msg="Put DUT in running state")
             time.sleep(1)
             await self.read_and_expect_value(endpoint=endpoint,
                                              attribute=attributes.OperationalState,
