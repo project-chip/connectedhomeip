@@ -409,7 +409,6 @@ void DnssdService::ToDiscoveredCommissionNodeData(const Span<Inet::IPAddress> & 
         ByteSpan key(reinterpret_cast<const uint8_t *>(mTextEntries[i].mKey), strlen(mTextEntries[i].mKey));
         ByteSpan val(mTextEntries[i].mData, mTextEntries[i].mDataSize);
         FillNodeDataFromTxt(key, val, discoveredData);
-        FillNodeDataFromTxt(key, val, discoveredData);
     }
 }
 

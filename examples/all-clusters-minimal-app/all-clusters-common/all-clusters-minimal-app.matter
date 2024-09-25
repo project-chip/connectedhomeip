@@ -3464,6 +3464,7 @@ cluster DoorLock = 257 {
     nullable fabric_idx creatorFabricIndex = 2;
     nullable fabric_idx lastModifiedFabricIndex = 3;
     nullable int16u nextCredentialIndex = 4;
+    optional nullable octet_string credentialData = 5;
   }
 
   request struct ClearCredentialRequest {
@@ -6241,15 +6242,6 @@ endpoint 0 {
   device type ma_powersource = 17, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
-
-  server cluster Identify {
-    ram      attribute identifyTime default = 0x0000;
-    ram      attribute identifyType default = 0x0;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command Identify;
-  }
 
   server cluster Groups {
     ram      attribute nameSupport;

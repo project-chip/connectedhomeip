@@ -152,3 +152,17 @@ typedef struct {} variable_hidden_by_mtr_hide;
 #endif
 
 #define MTR_YES_NO(x) ((x) ? @"YES" : @"NO")
+
+#ifdef DEBUG
+#define _MTR_ABSTRACT_METHOD_IMPL(message, ...)                                                                                                        \
+    do {                                                                                                                                               \
+        MTR_LOG_ERROR(message, __VA_ARGS__);                                                                                                           \
+        @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:[NSString stringWithFormat:@message, __VA_ARGS__] userInfo:nil]; \
+    } while (0)
+#else // DEBUG
+#define _MTR_ABSTRACT_METHOD_IMPL(message, ...) \
+    MTR_LOG_ERROR(message, __VA_ARGS__)
+#endif // DEBUG
+
+#define MTR_ABSTRACT_METHOD() \
+    _MTR_ABSTRACT_METHOD_IMPL("%@ or some ancestor must implement %@", self.class, NSStringFromSelector(_cmd))
