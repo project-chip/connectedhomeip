@@ -154,7 +154,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # AttributePath = [[Cluster = Specific ClusterID, Attribute = Specific Attribute]]
         # On receipt of this message, DUT should send a report data action with the attribute value from all the Endpoints to the DUT.
 
-        # The number of endpoints needs to be read from the device. They're also not always sequential. This should come from the descriptor cluster parts list on EP0
         self.print_step(3, "Send Request Message to read one attribute on a given cluster at all endpoints")
         all_attributes = await self.default_controller.ReadAttribute(self.dut_node_id, [Clusters.Objects.Descriptor])
         for endpoint in all_attributes:
@@ -171,17 +170,13 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         ClusterId = None,
         AttributeId = global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
 
-        try:
-            read_request = await self.default_controller.ReadAttribute(
-                self.dut_node_id,
-                [attribute_path_1]
-            )
-            asserts.assert_in(Clusters.Objects.Descriptor, read_request[0].keys(), "Descriptor cluster not in output")
-            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList, read_request[0][Clusters.Objects.Descriptor], "AttributeList not in output")
-        except Exception as e:
-            # Seems to fail even after updating Python wheels - need to investigate, will ignore except to allow tests after this to run
-            # print(e)
-            raise
+        read_request = await self.default_controller.ReadAttribute(
+            self.dut_node_id,
+            [attribute_path_1]
+        )
+        for endpoint in read_request:
+            asserts.assert_in(Clusters.Objects.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
+            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList, read_request[endpoint][Clusters.Objects.Descriptor], "AttributeList not in output")
 
         # Step 5
         # TH sends the Read Request Message to the DUT to read all attributes from all clusters on all Endpoints
@@ -189,10 +184,21 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
         self.print_step(5, "Send Request Message to read all attributes from all clusters on all endpoints")
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [()])
-
-        for i in range(3):
-            asserts.assert_in(Clusters.Objects.Descriptor, read_request[i].keys(), "Descriptor cluster not in output")
-            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList, read_request[i][Clusters.Objects.Descriptor], "AttributeList not in output")
+        # NOTE: This is checked in its entirety in IDM-10.1
+        asserts.assert_equal(sorted(read_request), [0, 1, 2, 3, 4], "Endpoint list is not the expected value")
+        all_returned_clusters = []
+        for endpoint in read_request:
+            all_returned_clusters.extend(read_request[endpoint])
+        asserts.assert_equal(set(self.device_clusters), set(all_returned_clusters), "Mismatch of expected returned clusters")
+        
+        attr_count = 0
+        for endpoint in read_request:
+            cluster_list = iter(read_request[endpoint])
+            chosen_cluster = next(cluster_list)
+            attr_count = len(read_request[endpoint][chosen_cluster].keys())
+            if attr_count > 1:
+                break
+        asserts.assert_true((attr_count > 1), "No cluster in output has more than one attribute")
 
         # Step 6
         # TH sends the Read Request Message to the DUT to read a global attribute from all clusters at all Endpoints
@@ -200,19 +206,30 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
         self.print_step(6, "Send Request Message to read one global attribute from all clusters on all endpoints")
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [Clusters.Objects.Descriptor.Attributes.AttributeList])
-        for i in range(3):
-            asserts.assert_in(Clusters.Objects.Descriptor, read_request[i].keys(), "Descriptor cluster not in output")
-            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList, read_request[i][Clusters.Objects.Descriptor], "AttributeList not in output")
+        attribute_path_2 = AttributePath(
+        EndpointId = None,
+        ClusterId = None,
+        AttributeId = global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
 
+        read_request = await self.default_controller.ReadAttribute(
+            self.dut_node_id,
+            [attribute_path_2]
+        )
+
+        for endpoint in read_request:
+            asserts.assert_in(Clusters.Objects.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
+            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList, read_request[endpoint][Clusters.Objects.Descriptor], "AttributeList not in output")
+        
         # Step 7
         # TH sends the Read Request Message to the DUT to read all attributes from a cluster at all Endpoints
         # AttributePath = [[Cluster = Specific ClusterID]]
         # On receipt of this message, DUT should send a report data action with the attribute value from all the Endpoints to the DUT.
         self.print_step(7, "Send Request Message to read all attributes from one cluster at all endpoints")
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [Clusters.Objects.Descriptor])
-        for i in range(3):
-            asserts.assert_in(Clusters.Objects.Descriptor, read_request[i].keys(), "Descriptor cluster not in output")
-            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList, read_request[i][Clusters.Objects.Descriptor], "AttributeList not in output")
+
+        for endpoint in read_request:
+            asserts.assert_in(Clusters.Objects.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
+            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList, read_request[endpoint][Clusters.Objects.Descriptor], "AttributeList not in output")
 
         # Step 8
         # TH sends the Read Request Message to the DUT to read all attributes from all clusters at one Endpoint
@@ -221,14 +238,16 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         self.print_step(8, "Send Request Message to read all attributes from all clusters at one endpoint")
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [0])
 
-        asserts.assert_in(Clusters.Objects.Descriptor, read_request[0].keys(), "Descriptor cluster not in output")
-        asserts.assert_in(Clusters.Objects.Descriptor.Attributes.ServerList, read_request[0][Clusters.Objects.Descriptor], "ServerList not in output")
-        asserts.assert_equal(
-            read_request[0][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.ServerList],
-            [3, 4, 29, 30, 31, 40, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 60, 62, 63, 64, 65, 1029, 4294048774],
-            "ServerList doesn't match the expected server list"
-            )
-
+        for endpoint in read_request:
+            asserts.assert_in(Clusters.Objects.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
+            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.ServerList, read_request[endpoint][Clusters.Objects.Descriptor], "ServerList not in output")
+            asserts.assert_equal(
+                read_request[endpoint][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.ServerList],
+                [3, 4, 29, 30, 31, 40, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 60, 62, 63, 64, 65, 1029, 4294048774],
+                "ServerList doesn't match the expected server list"
+                )
+        import pdb
+        pdb.set_trace()
         # Step 9
         # TH sends the Read Request Message to the DUT to read an attribute of data type bool.
         # If the device does not have an attribute of data type bool, skip this step.
