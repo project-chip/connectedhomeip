@@ -151,7 +151,7 @@ RUN set -x \
     | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_OPT_POST_MOUNT : \
     ln-sf $SYSTEMD_UNIT_OPT_POST_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS \
     # Mount using 9P at /mnt/chip
-    && SYSTEMD_9P_MOUNT=$SYSTEMD_SYSTEM/mnt-chip.mount \
+    && SYSTEMD_UNIT_9P_MOUNT=$SYSTEMD_SYSTEM/mnt-chip.mount \
     && echo -n \
     "[Unit]\n" \
     "After=network.target\n" \
@@ -160,8 +160,8 @@ RUN set -x \
     "Where=/mnt/chip\n" \
     "Type=9p\n" \
     "Options=nofail,trans=virtio\n" \
-    | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_9P_MOUNT : \
-    ln-sf $SYSTEMD_9P_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS : \
+    | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_9P_MOUNT : \
+    ln-sf $SYSTEMD_UNIT_9P_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS : \
     mkdir /mnt/chip \
     # Setup auto-login for root user
     && SYSTEMD_UNIT_SERIAL_GETTY=$SYSTEMD_SYSTEM/serial-getty@.service \
