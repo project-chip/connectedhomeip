@@ -1592,6 +1592,20 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedLi
     while (path1 != nullptr)
     {
         bool duplicate = false;
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE && CHIP_CONFIG_USE_EMBER_DATA_MODEL
+        // Double-check that Provider interface and ember are IDENTICAL in attribute location
+        if (!path1->mValue.IsWildcardPath())
+        {
+            VerifyOrDie(GetDataModelProvider()
+                            ->GetAttributeInfo(ConcreteAttributePath(path1->mValue.mEndpointId, path1->mValue.mClusterId,
+                                                                     path1->mValue.mAttributeId))
+                            .has_value() ==
+                        emberAfContainsAttribute(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId)
+
+            );
+        }
+#endif
+
         // skip all wildcard paths and invalid concrete attribute
         if (path1->mValue.IsWildcardPath() ||
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
