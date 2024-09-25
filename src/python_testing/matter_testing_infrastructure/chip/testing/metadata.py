@@ -20,9 +20,11 @@ from typing import Any, Dict, List
 import yaml
 
 
-def bool_from_str(value: str) -> bool:
+def cast_to_bool(value: Any) -> bool:
     """Convert True/true/False/false strings to bool."""
-    return value.strip().lower() == "true"
+    if isinstance(value, str):
+        return value.strip().lower() == "true"
+    return bool(value)
 
 
 @dataclass
@@ -67,16 +69,16 @@ class Metadata:
             self.py_script_path = attr_dict["py_script_path"]
 
         if "factoryreset" in attr_dict:
-            self.factoryreset = bool_from_str(attr_dict["factoryreset"])
+            self.factoryreset = cast_to_bool(attr_dict["factoryreset"])
 
         if "factoryreset_app_only" in attr_dict:
-            self.factoryreset_app_only = bool_from_str(attr_dict["factoryreset_app_only"])
+            self.factoryreset_app_only = cast_to_bool(attr_dict["factoryreset_app_only"])
 
         if "script_gdb" in attr_dict:
-            self.script_gdb = bool_from_str(attr_dict["script_gdb"])
+            self.script_gdb = cast_to_bool(attr_dict["script_gdb"])
 
         if "quiet" in attr_dict:
-            self.quiet = bool_from_str(attr_dict["quiet"])
+            self.quiet = cast_to_bool(attr_dict["quiet"])
 
 
 def extract_runs_arg_lines(py_script_path: str) -> Dict[str, Dict[str, str]]:
@@ -91,6 +93,7 @@ def extract_runs_arg_lines(py_script_path: str) -> Dict[str, Dict[str, str]]:
 
     runs_arg_lines: Dict[str, Dict[str, str]] = {}
 
+    ci_args_section_lines = []
     with open(py_script_path, 'r', encoding='utf8') as py_script:
         for line_idx, line in enumerate(py_script.readlines()):
             line = line.strip()
@@ -99,9 +102,14 @@ def extract_runs_arg_lines(py_script_path: str) -> Dict[str, Dict[str, str]]:
             # Detect the single CI args section, to skip the lines otherwise.
             if not done_ci_args_section and line.startswith("# === BEGIN CI TEST ARGUMENTS ==="):
                 found_ci_args_section = True
+                continue
             elif found_ci_args_section and line.startswith("# === END CI TEST ARGUMENTS ==="):
                 done_ci_args_section = True
                 found_ci_args_section = False
+                continue
+
+            if found_ci_args_section:
+                ci_args_section_lines.append(line.lstrip("#"))
 
             runs_match = runs_def_ptrn.match(line)
             args_match = arg_def_ptrn.match(line)
@@ -118,6 +126,17 @@ def extract_runs_arg_lines(py_script_path: str) -> Dict[str, Dict[str, str]]:
 
             elif args_match:
                 runs_arg_lines[args_match.group("run_id")][args_match.group("arg_name")] = args_match.group("arg_val")
+
+    if not runs_arg_lines:
+        try:
+            runs = yaml.safe_load("\n".join(ci_args_section_lines))
+            for run, args in runs.get("test-runner-runs", {}).items():
+                runs_arg_lines[run] = {}
+                runs_arg_lines[run]['run'] = run
+                runs_arg_lines[run]['py_script_path'] = py_script_path
+                runs_arg_lines[run].update(args)
+        except yaml.YAMLError as e:
+            print(f"ERROR: {py_script_path}: Failed to parse CI arguments YAML: {e}", file=sys.stderr)
 
     return runs_arg_lines
 
@@ -155,10 +174,12 @@ class MetadataReader:
          the value for that argument defined in the test script.
         """
         for arg, arg_val in metadata_dict.items():
+            if not isinstance(arg_val, str):
+                continue
             # We do not expect to recurse (like ${FOO_${BAR}}) so just expand once
             for name, value in self.env.items():
                 arg_val = arg_val.replace(f'${{{name}}}', value)
-            metadata_dict[arg] = arg_val
+            metadata_dict[arg] = arg_val.strip()
 
     def parse_script(self, py_script_path: str) -> List[Metadata]:
         """
