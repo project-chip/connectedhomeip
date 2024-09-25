@@ -64,19 +64,17 @@ private:
         /// Checks if the given command id exists in the given list
         bool Exists(const CommandId * list, CommandId toCheck);
 
-        void Reset() {
-          mCurrentList = mCurrentHint = nullptr;
-        }
-
+        void Reset() { mCurrentList = mCurrentHint = nullptr; }
     };
 
 public:
     /// clears out internal caching. Expecially useful in unit tests,
     /// where path caching does not really apply (the same path may result in different outcomes)
-    void Reset() {
-      mAcceptedCommandsIterator.Reset();
-      mGeneratedCommandsIterator.Reset();
-      mPreviouslyFoundCluster = std::nullopt;
+    void Reset()
+    {
+        mAcceptedCommandsIterator.Reset();
+        mGeneratedCommandsIterator.Reset();
+        mPreviouslyFoundCluster = std::nullopt;
     }
 
     /// Generic model implementations
