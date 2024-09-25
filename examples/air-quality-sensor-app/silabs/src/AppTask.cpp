@@ -137,11 +137,6 @@ void AppTask::UpdateAirQualitySensorUI()
         GetLCD().ShowQRCode(true);
     }
 #endif // QR_CODE_ENABLED
-#else
-    PlatformMgr().LockChipStack();
-    ChipLogDetail(AppServer, "Air Quality Sensor Status - AirQualityEnumValue:%d",
-                  chip::to_underlying(AirQualitySensorManager::GetInstance()->GetAirQuality()));
-    PlatformMgr().UnlockChipStack();
 #endif
 }
 

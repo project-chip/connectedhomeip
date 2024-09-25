@@ -31,6 +31,7 @@
 #endif
 
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::AirQuality;
 
 namespace {
 // Bitmap
@@ -49,8 +50,6 @@ constexpr bool UI_WIFI = true;
 constexpr bool UI_WIFI = false;
 #endif
 } // namespace
-
-using namespace chip::app::Clusters::AirQuality;
 
 void AirQualitySensorUI::DrawUI(GLIB_Context_t * glibContext)
 {
