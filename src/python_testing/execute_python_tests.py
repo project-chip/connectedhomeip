@@ -62,7 +62,6 @@ def main(search_directory, env_file):
         "TC_CCTRL_2_3.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
         "TC_DGGEN_3_2.py",  # src/python_testing/test_testing/test_TC_DGGEN_3_2.py is the Unit test of this test
         "TC_EEVSE_Utils.py",  # Shared code for TC_EEVSE, not a standalone test
-        "TC_ECOINFO_2_1.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
         "TC_ECOINFO_2_2.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
         "TC_EWATERHTRBase.py",  # Shared code for TC_EWATERHTR, not a standalone test
         "TC_EnergyReporting_Utils.py",  # Shared code for TC_EEM and TC_EPM, not a standalone test
