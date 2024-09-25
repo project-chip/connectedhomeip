@@ -92,7 +92,7 @@ private:
 
     static Loop HandlerCallbackFn(CommandId id, void * context)
     {
-        EnumeratorCommandFinder * self = static_cast<EnumeratorCommandFinder *>(context);
+        auto self = static_cast<EnumeratorCommandFinder *>(context);
         return self->HandlerCallback(id);
     }
 };
@@ -572,9 +572,7 @@ DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const Con
 
             if ((err == CHIP_NO_ERROR) && firstId.has_value())
             {
-                DataModel::CommandEntry result;
-                result.path = ConcreteCommandPath(path.mEndpointId, path.mClusterId, *firstId);
-                return result;
+                return CommandEntryFrom(path, *firstId);
             }
 
             return DataModel::CommandEntry::kInvalid;
@@ -603,13 +601,11 @@ DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const Conc
 
         if (err != CHIP_ERROR_NOT_IMPLEMENTED)
         {
-            auto beforeId = finder.GetFound();
+            auto nextId = finder.GetFound();
 
-            if ((err == CHIP_NO_ERROR) && beforeId.has_value())
+            if ((err == CHIP_NO_ERROR) && nextId.has_value())
             {
-                DataModel::CommandEntry result;
-                result.path = ConcreteCommandPath(before.mEndpointId, before.mClusterId, *beforeId);
-                return result;
+                return CommandEntryFrom(before, *nextId);
             }
 
             return DataModel::CommandEntry::kInvalid;
@@ -641,9 +637,10 @@ std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedComma
         {
             auto commandId = finder.GetFound();
 
-            if ((err == CHIP_NO_ERROR) && firstId.has_value())
+            if ((err == CHIP_NO_ERROR) && commandId.has_value())
             {
-                return std::make_optional<DataModel::CommandInfo>()       //  definitive answer: command exists
+                //  definitive answer: command exists
+                return CommandEntryFrom(path, *commandId).info;
             }
 
             return std::nullopt;
