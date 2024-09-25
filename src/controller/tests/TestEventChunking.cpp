@@ -18,20 +18,19 @@
 
 #include <pw_unit_test/framework.h>
 
-#include "app-common/zap-generated/ids/Attributes.h"
-#include "app-common/zap-generated/ids/Clusters.h"
-#include "app/ConcreteAttributePath.h"
-#include "app/codegen-data-model-provider/Instance.h"
-#include "protocols/interaction_model/Constants.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/BufferedReadCallback.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
+#include <app/codegen-data-model-provider/Instance.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/DataModelHandler.h>
@@ -43,6 +42,7 @@
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
 using namespace chip::app;
