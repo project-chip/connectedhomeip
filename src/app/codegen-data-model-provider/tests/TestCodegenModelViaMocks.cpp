@@ -15,9 +15,6 @@
  *    limitations under the License.
  */
 
-#include "app/CommandHandlerInterface.h"
-#include "app/data-model-provider/MetadataTypes.h"
-
 #include <pw_unit_test/framework.h>
 
 #include <app/codegen-data-model-provider/tests/AttributeReportIBEncodeDecode.h>
@@ -32,12 +29,14 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeEncodeState.h>
 #include <app/AttributeValueDecoder.h>
+#include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/GlobalAttributes.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/StringBuilderAdapters.h>
 #include <app/data-model/Decode.h>
