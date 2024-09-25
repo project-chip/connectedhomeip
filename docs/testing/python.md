@@ -675,41 +675,41 @@ for that run, e.g.:
 
 ### Description of Parameters
 
-- `app`: Indicates the application to be used in the test. Different app types
-  as needed could be referenced from section [name: Generate an argument
-  environment file ] of the file
-  [.github/workflows/tests.yaml](https://github.com/project-chip/connectedhomeip/blob/master/.github/workflows/tests.yaml)
+-   `app`: Indicates the application to be used in the test. Different app types
+    as needed could be referenced from section [name: Generate an argument
+    environment file ] of the file
+    [.github/workflows/tests.yaml](https://github.com/project-chip/connectedhomeip/blob/master/.github/workflows/tests.yaml)
 
-  - Example: `${TYPE_OF_APP}`
+    -   Example: `${TYPE_OF_APP}`
 
-- `factoryreset`: Determines whether a factory reset should be performed
-  before the test.
+-   `factoryreset`: Determines whether a factory reset should be performed
+    before the test.
 
-  - Example: `true`
+    -   Example: `true`
 
-- `quiet`: Sets the verbosity level of the test run. When set to True, the
-  test run will be quieter.
+-   `quiet`: Sets the verbosity level of the test run. When set to True, the
+    test run will be quieter.
 
-  - Example: `true`
+    -   Example: `true`
 
-- `app-args`: Specifies the arguments to be passed to the application during
-  the test.
+-   `app-args`: Specifies the arguments to be passed to the application during
+    the test.
 
-  - Example: `--discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json`
+    -   Example:
+        `--discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json`
 
-- `script-args`: Specifies the arguments to be passed to the test script.
+-   `script-args`: Specifies the arguments to be passed to the test script.
 
-  - Example:
-    `--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto`
+    -   Example:
+        `--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto`
 
-- `script-start-delay`: Specifies the number
-  of seconds to wait before starting the test script. This parameter can be
-  used to allow the application to initialize itself properly before the test
-  script will try to commission it (e.g. in case if the application needs to
-  be commissioned to some other controller first). By default, the delay is 0
-  seconds.
+-   `script-start-delay`: Specifies the number of seconds to wait before
+    starting the test script. This parameter can be used to allow the
+    application to initialize itself properly before the test script will try to
+    commission it (e.g. in case if the application needs to be commissioned to
+    some other controller first). By default, the delay is 0 seconds.
 
-  - Example: `10`
+    -   Example: `10`
 
 This structured format ensures that all necessary configurations are clearly
 defined and easily understood, allowing for consistent and reliable test
