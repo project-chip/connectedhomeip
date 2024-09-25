@@ -245,8 +245,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 @property (nonatomic) NSDate * estimatedStartTimeFromGeneralDiagnosticsUpTime;
 
-@property (nonatomic) NSMutableDictionary * temporaryMetaDataCache;
-
 /**
  * If currentReadClient is non-null, that means that we successfully
  * called SendAutoResubscribeRequest on the ReadClient and have not yet gotten
@@ -3533,6 +3531,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             NSNumber * dataVersion = attributeDataValue[MTRDataVersionKey];
             MTRClusterPath * clusterPath = [MTRClusterPath clusterPathWithEndpointID:attributePath.endpoint clusterID:attributePath.cluster];
             if (dataVersion) {
+                [self _noteDataVersion:dataVersion forClusterPath:clusterPath];
+
                 // Remove data version from what we cache in memory
                 attributeDataValue = [self _dataValueWithoutDataVersion:attributeDataValue];
             }
@@ -3545,10 +3545,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 #endif
             // Now that we have grabbed previousValue, update our cache with the attribute value.
             if (readCacheValueChanged) {
-                if (dataVersion) {
-                    [self _noteDataVersion:dataVersion forClusterPath:clusterPath];
-                }
-
                 [self _pruneStoredDataForPath:attributePath missingFrom:attributeDataValue];
 
                 if (!_deviceConfigurationChanged) {
