@@ -1,1 +1,1 @@
-77 : [NXP] Migrate docker image to NXP Zephyr 3.7 downstream release
+79 : [NXP] Updating NXP docker image to include k32w0 platform

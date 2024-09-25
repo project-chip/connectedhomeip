@@ -19,6 +19,7 @@
  */
 
 #include "AppTask.h"
+#include "BLEApplicationManager.h"
 #include "CHIPDeviceManager.h"
 #include "LockManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -115,6 +116,9 @@ exit:
 void LockApp::AppTask::PreInitMatterStack()
 {
     ChipLogProgress(DeviceLayer, "Welcome to NXP Lock Demo App");
+
+    /* BLEApplicationManager implemented per platform or left blank */
+    chip::NXP::App::BleAppMgr().Init();
 }
 
 void LockApp::AppTask::PostInitMatterStack()

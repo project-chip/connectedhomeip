@@ -13,6 +13,7 @@ out/
 /examples/virtual-device-app/android/App/buildSrc/build/
 /src/test_driver/nrfconnect/build/
 /src/darwin/Framework/build/
+/src/python_testing/matter_testing_infrastructure/build/
 
 # Pigweed Environment
 .environment*/

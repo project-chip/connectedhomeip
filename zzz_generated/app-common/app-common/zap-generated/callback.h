@@ -51,17 +51,7 @@ void emberAfOnOffClusterInitCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfOnOffSwitchConfigurationClusterInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
 void emberAfLevelControlClusterInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfBinaryInputBasicClusterInitCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -431,11 +421,6 @@ void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBarrierControlClusterInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
 void emberAfServiceAreaClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -646,11 +631,6 @@ void emberAfCommissionerControlClusterInitCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfElectricalMeasurementClusterInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
 void emberAfUnitTestingClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -783,44 +763,6 @@ MatterOnOffClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAtt
 void emberAfOnOffClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
-// On/off Switch Configuration Cluster
-//
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfOnOffSwitchConfigurationClusterServerInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterOnOffSwitchConfigurationClusterServerShutdownCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfOnOffSwitchConfigurationClusterClientInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param attributePath Concrete attribute path that changed
- */
-void MatterOnOffSwitchConfigurationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/**
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status MatterOnOffSwitchConfigurationClusterServerPreAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/**
- * @param endpoint  Endpoint that is being served
- */
-void emberAfOnOffSwitchConfigurationClusterServerTickCallback(chip::EndpointId endpoint);
-
-//
 // Level Control Cluster
 //
 
@@ -858,45 +800,6 @@ MatterLevelControlClusterServerPreAttributeChangedCallback(const chip::app::Conc
  * @param endpoint  Endpoint that is being served
  */
 void emberAfLevelControlClusterServerTickCallback(chip::EndpointId endpoint);
-
-//
-// Binary Input (Basic) Cluster
-//
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfBinaryInputBasicClusterServerInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterBinaryInputBasicClusterServerShutdownCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfBinaryInputBasicClusterClientInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param attributePath Concrete attribute path that changed
- */
-void MatterBinaryInputBasicClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/**
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status
-MatterBinaryInputBasicClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/**
- * @param endpoint  Endpoint that is being served
- */
-void emberAfBinaryInputBasicClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // Pulse Width Modulation Cluster
@@ -3715,45 +3618,6 @@ MatterWindowCoveringClusterServerPreAttributeChangedCallback(const chip::app::Co
 void emberAfWindowCoveringClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
-// Barrier Control Cluster
-//
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfBarrierControlClusterServerInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterBarrierControlClusterServerShutdownCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfBarrierControlClusterClientInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param attributePath Concrete attribute path that changed
- */
-void MatterBarrierControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/**
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status
-MatterBarrierControlClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/**
- * @param endpoint  Endpoint that is being served
- */
-void emberAfBarrierControlClusterServerTickCallback(chip::EndpointId endpoint);
-
-//
 // Service Area Cluster
 //
 
@@ -5380,44 +5244,6 @@ chip::Protocols::InteractionModel::Status MatterCommissionerControlClusterServer
 void emberAfCommissionerControlClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
-// Electrical Measurement Cluster
-//
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfElectricalMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterElectricalMeasurementClusterServerShutdownCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfElectricalMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param attributePath Concrete attribute path that changed
- */
-void MatterElectricalMeasurementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/**
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status MatterElectricalMeasurementClusterServerPreAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/**
- * @param endpoint  Endpoint that is being served
- */
-void emberAfElectricalMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
-
-//
 // Unit Testing Cluster
 //
 
@@ -6283,18 +6109,6 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::DecodableType & commandData);
 /**
- * @brief Barrier Control Cluster BarrierControlGoToPercent Command callback (from client)
- */
-bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::DecodableType & commandData);
-/**
- * @brief Barrier Control Cluster BarrierControlStop Command callback (from client)
- */
-bool emberAfBarrierControlClusterBarrierControlStopCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::DecodableType & commandData);
-/**
  * @brief Thermostat Cluster SetpointRaiseLower Command callback (from client)
  */
 bool emberAfThermostatClusterSetpointRaiseLowerCallback(
@@ -6755,18 +6569,6 @@ bool emberAfCommissionerControlClusterRequestCommissioningApprovalCallback(
 bool emberAfCommissionerControlClusterCommissionNodeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::CommissionerControl::Commands::CommissionNode::DecodableType & commandData);
-/**
- * @brief Electrical Measurement Cluster GetProfileInfoCommand Command callback (from client)
- */
-bool emberAfElectricalMeasurementClusterGetProfileInfoCommandCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoCommand::DecodableType & commandData);
-/**
- * @brief Electrical Measurement Cluster GetMeasurementProfileCommand Command callback (from client)
- */
-bool emberAfElectricalMeasurementClusterGetMeasurementProfileCommandCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileCommand::DecodableType & commandData);
 /**
  * @brief Unit Testing Cluster Test Command callback (from client)
  */
