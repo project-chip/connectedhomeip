@@ -18,9 +18,13 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRDevice.h>
 
+#import "MTRDeviceController_Concrete.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDevice_Concrete : MTRDevice
+
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController_Concrete *)controller;
 
 @end
 

@@ -280,8 +280,6 @@ using namespace chip::Tracing::DarwinFramework;
     // _allNetworkFeatures is a bitwise or of the feature maps of all network commissioning clusters
     // present on the device, or nil if there aren't any.
     NSNumber * _Nullable _allNetworkFeatures;
-    // Most recent entry in _mostRecentReportTimes, if any.
-    NSDate * _Nullable _mostRecentReportTimeForDescription;
 }
 
 - (instancetype)initForSubclassesWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -294,44 +292,6 @@ using namespace chip::Tracing::DarwinFramework;
         _state = MTRDeviceStateUnknown;
     }
 
-    return self;
-}
-
-- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
-{
-    if (self = [super init]) {
-        _lock = OS_UNFAIR_LOCK_INIT;
-        _descriptionLock = OS_UNFAIR_LOCK_INIT;
-        _nodeID = [nodeID copy];
-        _fabricIndex = controller.fabricIndex;
-        _deviceController = controller;
-        _queue
-            = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        _asyncWorkQueue = [[MTRAsyncWorkQueue alloc] initWithContext:self];
-        _state = MTRDeviceStateUnknown;
-        if (controller.controllerDataStore) {
-            _persistedClusterData = [[NSCache alloc] init];
-        } else {
-            _persistedClusterData = nil;
-        }
-        _clusterDataToPersist = nil;
-        _persistedClusters = [NSMutableSet set];
-
-        // If there is a data store, make sure we have an observer to monitor system clock changes, so
-        // NSDate-based write coalescing could be reset and not get into a bad state.
-        if (_persistedClusterData) {
-            mtr_weakify(self);
-            _systemTimeChangeObserverToken = [[NSNotificationCenter defaultCenter] addObserverForName:NSSystemClockDidChangeNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
-                mtr_strongify(self);
-                std::lock_guard lock(self->_lock);
-                [self _resetStorageBehaviorState];
-            }];
-        }
-
-        _delegates = [NSMutableSet set];
-
-        MTR_LOG_DEBUG("%@ init with hex nodeID 0x%016llX", self, _nodeID.unsignedLongLongValue);
-    }
     return self;
 }
 
@@ -727,16 +687,6 @@ using namespace chip::Tracing::DarwinFramework;
     _clusterDataPersistenceFirstScheduledTime = nil;
 }
 
-#ifdef DEBUG
-- (void)unitTestSetMostRecentReportTimes:(NSMutableArray<NSDate *> *)mostRecentReportTimes
-{
-    _mostRecentReportTimes = mostRecentReportTimes;
-
-    std::lock_guard lock(_descriptionLock);
-    _mostRecentReportTimeForDescription = [mostRecentReportTimes lastObject];
-}
-#endif
-
 - (void)_scheduleClusterDataPersistence
 {
     os_unfair_lock_assert_owner(&self->_lock);
@@ -787,11 +737,6 @@ using namespace chip::Tracing::DarwinFramework;
         [_mostRecentReportTimes removeObjectAtIndex:0];
     }
     [_mostRecentReportTimes addObject:[NSDate now]];
-
-    {
-        std::lock_guard lock(_descriptionLock);
-        _mostRecentReportTimeForDescription = [_mostRecentReportTimes lastObject];
-    }
 
     // Calculate running average and update multiplier - need at least 2 items to calculate intervals
     if (_mostRecentReportTimes.count > 2) {
@@ -858,10 +803,6 @@ using namespace chip::Tracing::DarwinFramework;
 
     _clusterDataPersistenceFirstScheduledTime = nil;
     _mostRecentReportTimes = nil;
-    {
-        std::lock_guard lock(_descriptionLock);
-        _mostRecentReportTimeForDescription = nil;
-    }
     _deviceReportingExcessivelyStartTime = nil;
     _reportToPersistenceDelayCurrentMultiplier = 1;
 

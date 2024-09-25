@@ -84,10 +84,8 @@
 
 @synthesize _internalState;
 
-- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController_XPC *)controller
 {
-    // TODO: Verify that this is a valid MTRDeviceController_XPC?
-
     if (self = [super initForSubclassesWithNodeID:nodeID controller:controller]) {
         // Nothing else to do, all set.
     }
