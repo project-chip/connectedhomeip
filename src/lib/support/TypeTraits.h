@@ -34,11 +34,7 @@ namespace chip {
 
 #if __cplusplus >= 202300L
 
-template <class T>
-constexpr auto to_underlying(T e)
-{
-    return std::to_underlying(e);
-}
+using to_underlying = std::to_underlying;
 
 #else
 /**

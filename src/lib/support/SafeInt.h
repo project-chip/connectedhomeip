@@ -37,10 +37,11 @@ namespace chip {
 template <typename T, typename U, std::enable_if_t<std::is_integral<T>::value, int> = 0>
 bool CanCastTo(U arg)
 {
+    using namespace std;
     // U might be a reference to an integer type, if we're assigning from
     // something passed by reference.
-    typedef typename std::remove_reference<U>::type V; // V for "value"
-    static_assert(std::is_integral<V>::value, "Must be assigning from an integral type");
+    typedef typename remove_reference<U>::type V; // V for "value"
+    static_assert(is_integral<V>::value, "Must be assigning from an integral type");
 
     // We want to check that "arg" can fit inside T but without doing any tests
     // that are always true or always false due to the types involved, which
@@ -63,44 +64,44 @@ bool CanCastTo(U arg)
     // of T and V is signed and the other is unsigned: there might not be a
     // single integer type that can represent _both_ the value of arg and the
     // minimal/maximal value.
-    if (std::numeric_limits<T>::is_signed && std::numeric_limits<V>::is_signed)
+    if (numeric_limits<T>::is_signed && numeric_limits<V>::is_signed)
     {
-        if (static_cast<intmax_t>(std::numeric_limits<V>::max()) <= static_cast<intmax_t>(std::numeric_limits<T>::max()) &&
-            static_cast<intmax_t>(std::numeric_limits<V>::min()) >= static_cast<intmax_t>(std::numeric_limits<T>::min()))
+        if (static_cast<intmax_t>(numeric_limits<V>::max()) <= static_cast<intmax_t>(numeric_limits<T>::max()) &&
+            static_cast<intmax_t>(numeric_limits<V>::min()) >= static_cast<intmax_t>(numeric_limits<T>::min()))
         {
             // Any checks on arg would be trivially true; don't even do them, to
             // avoid warnings.
             return true;
         }
 
-        return static_cast<intmax_t>(std::numeric_limits<T>::min()) <= static_cast<intmax_t>(arg) &&
-            static_cast<intmax_t>(arg) <= static_cast<intmax_t>(std::numeric_limits<T>::max());
+        return static_cast<intmax_t>(numeric_limits<T>::min()) <= static_cast<intmax_t>(arg) &&
+            static_cast<intmax_t>(arg) <= static_cast<intmax_t>(numeric_limits<T>::max());
     }
 
-    if (!std::numeric_limits<T>::is_signed && !std::numeric_limits<V>::is_signed)
+    if (!numeric_limits<T>::is_signed && !numeric_limits<V>::is_signed)
     {
-        if (static_cast<uintmax_t>(std::numeric_limits<V>::max()) <= static_cast<uintmax_t>(std::numeric_limits<T>::max()))
+        if (static_cast<uintmax_t>(numeric_limits<V>::max()) <= static_cast<uintmax_t>(numeric_limits<T>::max()))
         {
             // Any checks on arg would be trivially true; don't even do them, to
             // avoid warnings.
             return true;
         }
 
-        return static_cast<uintmax_t>(arg) <= static_cast<uintmax_t>(std::numeric_limits<T>::max());
+        return static_cast<uintmax_t>(arg) <= static_cast<uintmax_t>(numeric_limits<T>::max());
     }
 
-    if (std::numeric_limits<T>::is_signed)
+    if (numeric_limits<T>::is_signed)
     {
-        static_assert(std::numeric_limits<T>::max() >= 0, "What weird type is this?");
-        if (static_cast<uintmax_t>(std::numeric_limits<V>::max()) <= static_cast<uintmax_t>(std::numeric_limits<T>::max()))
+        static_assert(numeric_limits<T>::max() >= 0, "What weird type is this?");
+        if (static_cast<uintmax_t>(numeric_limits<V>::max()) <= static_cast<uintmax_t>(numeric_limits<T>::max()))
         {
             return true;
         }
 
-        return static_cast<uintmax_t>(arg) <= static_cast<uintmax_t>(std::numeric_limits<T>::max());
+        return static_cast<uintmax_t>(arg) <= static_cast<uintmax_t>(numeric_limits<T>::max());
     }
 
-    return 0 <= arg && static_cast<uintmax_t>(arg) <= static_cast<uintmax_t>(std::numeric_limits<T>::max());
+    return 0 <= arg && static_cast<uintmax_t>(arg) <= static_cast<uintmax_t>(numeric_limits<T>::max());
 }
 
 template <typename T, typename U, std::enable_if_t<std::is_enum<T>::value, int> = 0>
@@ -126,9 +127,10 @@ bool CanCastTo(U arg)
 template <typename T>
 typename std::enable_if<std::is_unsigned<T>::value, typename std::make_signed<T>::type>::type CastToSigned(T arg)
 {
-    typedef typename std::make_signed<T>::type signed_type;
+    using namespace std;
+    typedef typename make_signed<T>::type signed_type;
 
-    if (arg <= static_cast<T>(std::numeric_limits<signed_type>::max()))
+    if (arg <= static_cast<T>(numeric_limits<signed_type>::max()))
     {
         return static_cast<signed_type>(arg);
     }
@@ -140,7 +142,7 @@ typename std::enable_if<std::is_unsigned<T>::value, typename std::make_signed<T>
     //
     // then noting that both (numeric_limits<T>::max() - arg) and its negation
     // are guaranteed to fit in signed_type.
-    signed_type diff = static_cast<signed_type>(std::numeric_limits<T>::max() - arg);
+    signed_type diff = static_cast<signed_type>(numeric_limits<T>::max() - arg);
     return static_cast<signed_type>(-diff - 1);
 }
 
