@@ -186,7 +186,7 @@ using namespace chip::Credentials;
         MTR_LOG_ERROR("Can't extract public key from second certificate: %s", ErrorStr(err));
         return NO;
     }
-    P256PublicKeySpan keySpan2(pubKey1.ConstBytes());
+    P256PublicKeySpan keySpan2(pubKey2.ConstBytes());
 
     if (!keySpan1.data_equal(keySpan2)) {
         return NO;
