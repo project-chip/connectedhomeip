@@ -35,7 +35,7 @@ namespace app {
 namespace {
 
 /// Handles going through callback-based enumeration of generated/accepted commands
-/// for CommandHandler interface based items.
+/// for CommandHandlerInterface based items.
 ///
 /// Offers the ability to focus on some operation for finding a given
 /// command id:
