@@ -1779,7 +1779,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const 
         return Protocols::InteractionModel::Status::UnsupportedCommand; // cluster exists, so command is invalid
     }
 
-    // at ths point either cluster or endpoint does not exist. If we find the endpoint, then the cluster
+    // At this point either cluster or endpoint does not exist. If we find the endpoint, then the cluster
     // is invalid
     for (EndpointId endpoint = provider->FirstEndpoint(); endpoint != kInvalidEndpointId;
          endpoint            = provider->NextEndpoint(endpoint))
