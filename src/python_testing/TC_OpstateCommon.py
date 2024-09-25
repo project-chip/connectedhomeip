@@ -1123,7 +1123,7 @@ class TC_OPSTATE_BASE():
                 # Expire the session and re-establish the subscription
                 self.default_controller.ExpireSessions(self.dut_node_id)
                 if self.check_pics(f"{self.test_info.pics_code}.S.E01"):
-                    # Subscribe to Events and when they are sent push them to a queue for checking later
+                    # Subscribe to Events and when they are received push them to a queue for checking later
                     events_callback = EventSpecificChangeCallback(events.OperationCompletion)
                     await events_callback.start(self.default_controller,
                                                 self.dut_node_id,
