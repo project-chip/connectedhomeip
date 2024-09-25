@@ -33,13 +33,7 @@ JNI_METHOD(jlong, MessagingContext, newMessagingContext)
 {
     LoopbackMessagingContext * messagingContext = chip::Platform::New<LoopbackMessagingContext>();
     messagingContext->ConfigInitializeNodes(initializeNodes != JNI_FALSE);
-    CHIP_ERROR err = messagingContext->Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        jclass exceptionCls = env->FindClass("chip/platform/AndroidChipPlatformException");
-        JniReferences::GetInstance().ThrowError(env, exceptionCls, err);
-        return 0;
-    }
+    messagingContext->SetUp();
 
     MessagingContext * messagingContextResult = messagingContext;
     return reinterpret_cast<jlong>(messagingContextResult);
@@ -48,8 +42,8 @@ JNI_METHOD(jlong, MessagingContext, newMessagingContext)
 JNI_METHOD(void, MessagingContext, deleteMessagingContext)
 (JNIEnv * env, jobject self, jlong contextHandle)
 {
-    MessagingContext * messagingContext = reinterpret_cast<MessagingContext *>(contextHandle);
+    LoopbackMessagingContext * messagingContext = reinterpret_cast<LoopbackMessagingContext *>(contextHandle);
     VerifyOrReturn(messagingContext != nullptr, ChipLogError(Test, "MessagingContext handle is nullptr"));
-    messagingContext->Shutdown();
+    messagingContext->TearDown();
     delete messagingContext;
 }

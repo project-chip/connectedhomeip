@@ -93,7 +93,7 @@ void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Messaging::
 }
 
 void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context,
-                                                             const OperationalSessionSetup::ConnnectionFailureInfo & failureInfo)
+                                                             const OperationalSessionSetup::ConnectionFailureInfo & failureInfo)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));

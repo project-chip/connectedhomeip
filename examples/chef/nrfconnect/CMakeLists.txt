@@ -83,6 +83,8 @@ target_sources(app PRIVATE
     ${CHEF}/common/chef-fan-control-manager.cpp
     ${CHEF}/common/chef-laundry-washer-controls-delegate-impl.cpp
     ${CHEF}/common/chef-laundry-washer-mode.cpp
+    ${CHEF}/common/chef-dishwasher-alarm-delegate-impl.cpp
+    ${CHEF}/common/chef-dishwasher-mode-delegate-impl.cpp
     ${CHEF}/common/chef-operational-state-delegate-impl.cpp
     ${CHEF}/common/chef-rvc-mode-delegate.cpp
     ${CHEF}/common/chef-rvc-operational-state-delegate.cpp

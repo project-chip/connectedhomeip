@@ -1,1 +1,1 @@
-77 : [NXP] Migrate docker image to NXP Zephyr 3.7 downstream release
+80 : [Tizen] Run tests from 9P-shared directory instead of ISO
