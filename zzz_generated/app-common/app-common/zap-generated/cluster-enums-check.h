@@ -430,6 +430,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::TestGlobalEnum
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ThreeLevelAutoEnum val)
+{
+    using EnumType = Globals::ThreeLevelAutoEnum;
+    switch (val)
+    {
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kAutomatic:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(Identify::EffectIdentifierEnum val)
 {
     using EnumType = Identify::EffectIdentifierEnum;

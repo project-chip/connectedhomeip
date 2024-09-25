@@ -434,6 +434,20 @@ enum class TestGlobalEnum : uint8_t
     kUnknownEnumValue = 3,
 };
 
+// Enum for ThreeLevelAutoEnum
+enum class ThreeLevelAutoEnum : uint8_t
+{
+    kLow       = 0x00,
+    kMedium    = 0x01,
+    kHigh      = 0x02,
+    kAutomatic = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
 // Global bitmaps.
 
 // Bitmap for TestGlobalBitmap
