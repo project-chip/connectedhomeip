@@ -69,7 +69,11 @@ public:
     template <typename T>
     CHIP_ERROR GLibMatterContextInvokeSync(CHIP_ERROR (*func)(T *), T * userData)
     {
-        return _GLibMatterContextInvokeSync((CHIP_ERROR(*)(void *)) func, (void *) userData);
+        auto lambda = [func, userData]() -> CHIP_ERROR { return func(userData); };
+
+        LambdaBridge bridge;
+        bridge.Initialize(lambda);
+        return _GLibMatterContextInvokeSync(std::move(bridge));
     }
 
     unsigned int GLibMatterContextAttachSource(GSource * source)
@@ -102,8 +106,7 @@ private:
 
     struct GLibMatterContextInvokeData
     {
-        CHIP_ERROR (*mFunc)(void *);
-        void * mFuncUserData;
+        LambdaBridge bridge;
         CHIP_ERROR mFuncResult;
         // Sync primitives to wait for the function to be executed
         std::condition_variable mDoneCond;
@@ -116,7 +119,7 @@ private:
      * @note This function does not provide type safety for the user data. Please,
      *       use the GLibMatterContextInvokeSync() template function instead.
      */
-    CHIP_ERROR _GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData);
+    CHIP_ERROR _GLibMatterContextInvokeSync(LambdaBridge && bridge);
 
     // XXX: Mutex for guarding access to glib main event loop callback indirection
     //      synchronization primitives. This is a workaround to suppress TSAN warnings.
