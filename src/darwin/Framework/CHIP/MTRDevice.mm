@@ -212,23 +212,8 @@ using namespace chip::Tracing::DarwinFramework;
 @end
 
 @interface MTRDevice ()
-// protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
-// and protects device calls to setUTCTime and setDSTOffset.  This can't just be replaced with "lock", because the time
-// update code calls public APIs like readAttributeWithEndpointID:.. (which attempt to take "lock") while holding
-// whatever lock protects the time sync bits.
-@property (nonatomic, readonly) os_unfair_lock timeSyncLock;
 
 @property (nonatomic) chip::FabricIndex fabricIndex;
-
-// TODO: instead of all the BOOL properties that are some facet of the state, move to internal state machine that has (at least):
-//   Actively receiving report
-//   Actively receiving priming report
-
-@property (nonatomic) MTRInternalDeviceState internalDeviceState;
-
-@property (nonatomic) BOOL timeUpdateScheduled;
-
-@property (nonatomic) NSMutableDictionary * temporaryMetaDataCache;
 
 @end
 
@@ -316,7 +301,6 @@ using namespace chip::Tracing::DarwinFramework;
 {
     if (self = [super init]) {
         _lock = OS_UNFAIR_LOCK_INIT;
-        _timeSyncLock = OS_UNFAIR_LOCK_INIT;
         _descriptionLock = OS_UNFAIR_LOCK_INIT;
         _nodeID = [nodeID copy];
         _fabricIndex = controller.fabricIndex;
@@ -325,7 +309,6 @@ using namespace chip::Tracing::DarwinFramework;
             = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _asyncWorkQueue = [[MTRAsyncWorkQueue alloc] initWithContext:self];
         _state = MTRDeviceStateUnknown;
-        _internalDeviceState = MTRInternalDeviceStateUnsubscribed;
         if (controller.controllerDataStore) {
             _persistedClusterData = [[NSCache alloc] init];
         } else {
@@ -363,189 +346,6 @@ using namespace chip::Tracing::DarwinFramework;
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     return [controller deviceForNodeID:nodeID];
-}
-
-#pragma mark - Time Synchronization
-
-- (void)_setTimeOnDevice
-{
-    NSDate * now = [NSDate date];
-    // If no date available, error
-    if (!now) {
-        MTR_LOG_ERROR("%@ Could not retrieve current date. Unable to setUTCTime on endpoints.", self);
-        return;
-    }
-
-    uint64_t matterEpochTimeMicroseconds = 0;
-    if (!DateToMatterEpochMicroseconds(now, matterEpochTimeMicroseconds)) {
-        MTR_LOG_ERROR("%@ Could not convert NSDate (%@) to Matter Epoch Time. Unable to setUTCTime on endpoints.", self, now);
-        return;
-    }
-
-    // Set Time on each Endpoint with a Time Synchronization Cluster Server
-    NSArray<NSNumber *> * endpointsToSync = [self _endpointsWithTimeSyncClusterServer];
-    for (NSNumber * endpoint in endpointsToSync) {
-        MTR_LOG_DEBUG("%@ Setting Time on Endpoint %@", self, endpoint);
-        [self _setUTCTime:matterEpochTimeMicroseconds withGranularity:MTRTimeSynchronizationGranularityMicrosecondsGranularity forEndpoint:endpoint];
-
-        // Check how many DST offsets this endpoint supports.
-        auto dstOffsetsMaxSizePath = [MTRAttributePath attributePathWithEndpointID:endpoint clusterID:@(MTRClusterIDTypeTimeSynchronizationID) attributeID:@(MTRAttributeIDTypeClusterTimeSynchronizationAttributeDSTOffsetListMaxSizeID)];
-        auto dstOffsetsMaxSize = [self readAttributeWithEndpointID:dstOffsetsMaxSizePath.endpoint clusterID:dstOffsetsMaxSizePath.cluster attributeID:dstOffsetsMaxSizePath.attribute params:nil];
-        if (dstOffsetsMaxSize == nil) {
-            // This endpoint does not support TZ, so won't support SetDSTOffset.
-            MTR_LOG("%@ Unable to SetDSTOffset on endpoint %@, since it does not support the TZ feature", self, endpoint);
-            continue;
-        }
-        auto attrReport = [[MTRAttributeReport alloc] initWithResponseValue:@{
-            MTRAttributePathKey : dstOffsetsMaxSizePath,
-            MTRDataKey : dstOffsetsMaxSize,
-        }
-                                                                      error:nil];
-        uint8_t maxOffsetCount;
-        if (attrReport == nil) {
-            MTR_LOG_ERROR("%@ DSTOffsetListMaxSize value on endpoint %@ is invalid. Defaulting to 1.", self, endpoint);
-            maxOffsetCount = 1;
-        } else {
-            NSNumber * maxOffsetCountAsNumber = attrReport.value;
-            maxOffsetCount = maxOffsetCountAsNumber.unsignedCharValue;
-            if (maxOffsetCount == 0) {
-                MTR_LOG_ERROR("%@ DSTOffsetListMaxSize value on endpoint %@ is 0, which is not allowed. Defaulting to 1.", self, endpoint);
-                maxOffsetCount = 1;
-            }
-        }
-        auto * dstOffsets = MTRComputeDSTOffsets(maxOffsetCount);
-        if (dstOffsets == nil) {
-            MTR_LOG_ERROR("%@ Could not retrieve DST offset information. Unable to setDSTOffset on endpoint %@.", self, endpoint);
-            continue;
-        }
-
-        [self _setDSTOffsets:dstOffsets forEndpoint:endpoint];
-    }
-}
-
-- (void)_scheduleNextUpdate:(UInt64)nextUpdateInSeconds
-{
-    mtr_weakify(self);
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (nextUpdateInSeconds * NSEC_PER_SEC)), self.queue, ^{
-        MTR_LOG_DEBUG("%@ Timer expired, start Device Time Update", self);
-        mtr_strongify(self);
-        if (self) {
-            [self _performScheduledTimeUpdate];
-        } else {
-            MTR_LOG_DEBUG("%@ MTRDevice no longer valid. No Timer Scheduled will be scheduled for a Device Time Update.", self);
-            return;
-        }
-    });
-    self.timeUpdateScheduled = YES;
-    MTR_LOG_DEBUG("%@ Timer Scheduled for next Device Time Update, in %llu seconds", self, nextUpdateInSeconds);
-}
-
-// Time Updates are a day apart (this can be changed in the future)
-#define MTR_DEVICE_TIME_UPDATE_DEFAULT_WAIT_TIME_SEC (24 * 60 * 60)
-// assume lock is held
-- (void)_updateDeviceTimeAndScheduleNextUpdate
-{
-    os_unfair_lock_assert_owner(&self->_timeSyncLock);
-    if (self.timeUpdateScheduled) {
-        MTR_LOG_DEBUG("%@ Device Time Update already scheduled", self);
-        return;
-    }
-
-    [self _setTimeOnDevice];
-    [self _scheduleNextUpdate:MTR_DEVICE_TIME_UPDATE_DEFAULT_WAIT_TIME_SEC];
-}
-
-- (void)_performScheduledTimeUpdate
-{
-    std::lock_guard lock(_timeSyncLock);
-    // Device needs to still be reachable
-    if (self.state != MTRDeviceStateReachable) {
-        MTR_LOG_DEBUG("%@ Device is not reachable, canceling Device Time Updates.", self);
-        return;
-    }
-    // Device must not be invalidated
-    if (!self.timeUpdateScheduled) {
-        MTR_LOG_DEBUG("%@ Device Time Update is no longer scheduled, MTRDevice may have been invalidated.", self);
-        return;
-    }
-    self.timeUpdateScheduled = NO;
-    [self _updateDeviceTimeAndScheduleNextUpdate];
-}
-
-- (NSArray<NSNumber *> *)_endpointsWithTimeSyncClusterServer
-{
-    NSArray<NSNumber *> * endpointsOnDevice;
-    {
-        std::lock_guard lock(_lock);
-        endpointsOnDevice = [self _endpointList];
-    }
-
-    NSMutableArray<NSNumber *> * endpointsWithTimeSyncCluster = [[NSMutableArray<NSNumber *> alloc] init];
-    for (NSNumber * endpoint in endpointsOnDevice) {
-        // Get list of server clusters on endpoint
-        auto clusterList = [self readAttributeWithEndpointID:endpoint clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeServerListID) params:nil];
-        NSArray<NSNumber *> * clusterArray = [self arrayOfNumbersFromAttributeValue:clusterList];
-
-        if (clusterArray && [clusterArray containsObject:@(MTRClusterIDTypeTimeSynchronizationID)]) {
-            [endpointsWithTimeSyncCluster addObject:endpoint];
-        }
-    }
-    MTR_LOG_DEBUG("%@ Device has following endpoints with Time Sync Cluster Server: %@", self, endpointsWithTimeSyncCluster);
-    return endpointsWithTimeSyncCluster;
-}
-
-- (void)_setUTCTime:(UInt64)matterEpochTime withGranularity:(uint8_t)granularity forEndpoint:(NSNumber *)endpoint
-{
-    MTR_LOG_DEBUG(" %@ _setUTCTime with matterEpochTime: %llu, endpoint %@", self, matterEpochTime, endpoint);
-    MTRTimeSynchronizationClusterSetUTCTimeParams * params = [[MTRTimeSynchronizationClusterSetUTCTimeParams
-        alloc] init];
-    params.utcTime = @(matterEpochTime);
-    params.granularity = @(granularity);
-    auto setUTCTimeResponseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        if (error) {
-            MTR_LOG_ERROR("%@ _setUTCTime failed on endpoint %@, with parameters %@, error: %@", self, endpoint, params, error);
-        }
-    };
-
-    [self _invokeKnownCommandWithEndpointID:endpoint
-                                  clusterID:@(MTRClusterIDTypeTimeSynchronizationID)
-                                  commandID:@(MTRCommandIDTypeClusterTimeSynchronizationCommandSetUTCTimeID)
-                             commandPayload:params
-                             expectedValues:nil
-                      expectedValueInterval:nil
-                         timedInvokeTimeout:nil
-                serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                              responseClass:nil
-                                      queue:self.queue
-                                 completion:setUTCTimeResponseHandler];
-}
-
-- (void)_setDSTOffsets:(NSArray<MTRTimeSynchronizationClusterDSTOffsetStruct *> *)dstOffsets forEndpoint:(NSNumber *)endpoint
-{
-    MTR_LOG_DEBUG("%@ _setDSTOffsets with offsets: %@, endpoint %@",
-        self, dstOffsets, endpoint);
-
-    MTRTimeSynchronizationClusterSetDSTOffsetParams * params = [[MTRTimeSynchronizationClusterSetDSTOffsetParams
-        alloc] init];
-    params.dstOffset = dstOffsets;
-
-    auto setDSTOffsetResponseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        if (error) {
-            MTR_LOG_ERROR("%@ _setDSTOffsets failed on endpoint %@, with parameters %@, error: %@", self, endpoint, params, error);
-        }
-    };
-
-    [self _invokeKnownCommandWithEndpointID:endpoint
-                                  clusterID:@(MTRClusterIDTypeTimeSynchronizationID)
-                                  commandID:@(MTRCommandIDTypeClusterTimeSynchronizationCommandSetDSTOffsetID)
-                             commandPayload:params
-                             expectedValues:nil
-                      expectedValueInterval:nil
-                         timedInvokeTimeout:nil
-                serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                              responseClass:nil
-                                      queue:self.queue
-                                 completion:setDSTOffsetResponseHandler];
 }
 
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary
@@ -753,14 +553,6 @@ using namespace chip::Tracing::DarwinFramework;
             return;
         }
     }
-}
-#endif
-
-#ifdef DEBUG
-- (MTRInternalDeviceState)_getInternalState
-{
-    std::lock_guard lock(self->_lock);
-    return _internalDeviceState;
 }
 #endif
 
