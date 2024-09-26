@@ -15,6 +15,10 @@
 #    limitations under the License.
 #
 
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# === END CI TEST ARGUMENTS ===
+
 import xml.etree.ElementTree as ElementTree
 from typing import Callable
 

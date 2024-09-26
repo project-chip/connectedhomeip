@@ -15,6 +15,10 @@
 #    limitations under the License.
 #
 
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# === END CI TEST ARGUMENTS ===
+
 from typing import Any
 
 import chip.clusters as Clusters
