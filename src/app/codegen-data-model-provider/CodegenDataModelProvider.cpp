@@ -14,6 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/ConcreteAttributePath.h"
+#include "app/ConcreteCommandPath.h"
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <app-common/zap-generated/attribute-type.h>
@@ -51,13 +53,13 @@ public:
 
     enum class Operation
     {
-        FindFirst, // Find the first value in the list
-        FindExact, // Find the given value
-        FindNext   // Find the value AFTER this value
+        kFindFirst, // Find the first value in the list
+        kFindExact, // Find the given value
+        kFindNext   // Find the value AFTER this value
     };
 
-    EnumeratorCommandFinder(HandlerCallbackFunction callback, Operation operation, CommandId target = kInvalidCommandId) :
-        mCallback(callback), mOperation(operation), mTarget(target)
+    EnumeratorCommandFinder(HandlerCallbackFunction callback) :
+        mCallback(callback), mOperation(Operation::kFindFirst), mTarget(kInvalidCommandId)
     {}
 
     /// Find the given command id fo
@@ -66,10 +68,10 @@ public:
     ///    - std::nullopt if no command found using the command handler interface
     ///    - kInvalidCommandId if the find failed (but command handler interface does provide a list)
     ///    - valid id if command handler interface usage succeeds
-    std::optional<CommandId> FindCommandId(ConcreteClusterPath cluster);
+    std::optional<CommandId> FindCommandId(Operation operation, const ConcreteCommandPath & path);
 
     /// Uses FindCommandId to find the given command and loads the command entry data
-    std::optional<DataModel::CommandEntry> FindCommandEntry(ConcreteClusterPath cluster);
+    std::optional<DataModel::CommandEntry> FindCommandEntry(Operation operation, const ConcreteCommandPath & path);
 
 private:
     HandlerCallbackFunction mCallback;
@@ -81,21 +83,21 @@ private:
     {
         switch (mOperation)
         {
-        case Operation::FindFirst:
+        case Operation::kFindFirst:
             mFound = id;
             return Loop::Break;
-        case Operation::FindExact:
+        case Operation::kFindExact:
             if (mTarget == id)
             {
                 mFound = id; // found it
                 return Loop::Break;
             }
             break;
-        case Operation::FindNext:
+        case Operation::kFindNext:
             if (mTarget == id)
             {
                 // Once we found the ID, get the first
-                mOperation = Operation::FindFirst;
+                mOperation = Operation::kFindFirst;
             }
             break;
         }
@@ -109,17 +111,20 @@ private:
     }
 };
 
-std::optional<CommandId> EnumeratorCommandFinder::FindCommandId(ConcreteClusterPath cluster)
+std::optional<CommandId> EnumeratorCommandFinder::FindCommandId(Operation operation, const ConcreteCommandPath & path)
 {
+    mOperation = operation;
+    mTarget    = path.mCommandId;
+
     CommandHandlerInterface * interface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(cluster.mEndpointId, cluster.mClusterId);
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
 
     if (interface == nullptr)
     {
         return std::nullopt; // no data: no interface
     }
 
-    CHIP_ERROR err = (interface->*mCallback)(cluster, HandlerCallbackFn, this);
+    CHIP_ERROR err = (interface->*mCallback)(path, HandlerCallbackFn, this);
     if (err == CHIP_ERROR_NOT_IMPLEMENTED)
     {
         return std::nullopt; // no data provided by the interface
@@ -265,17 +270,18 @@ DataModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clusterPath
     return entry;
 }
 
-std::optional<DataModel::CommandEntry> EnumeratorCommandFinder::FindCommandEntry(ConcreteClusterPath cluster)
+std::optional<DataModel::CommandEntry> EnumeratorCommandFinder::FindCommandEntry(Operation operation,
+                                                                                 const ConcreteCommandPath & path)
 {
 
-    std::optional<CommandId> id = FindCommandId(cluster);
+    std::optional<CommandId> id = FindCommandId(operation, path);
 
     if (!id.has_value())
     {
         return std::nullopt;
     }
 
-    return (*id == kInvalidCommandId) ? DataModel::CommandEntry::kInvalid : CommandEntryFrom(cluster, *id);
+    return (*id == kInvalidCommandId) ? DataModel::CommandEntry::kInvalid : CommandEntryFrom(path, *id);
 }
 
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
@@ -610,9 +616,9 @@ std::optional<DataModel::AttributeInfo> CodegenDataModelProvider::GetAttributeIn
 
 DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const ConcreteClusterPath & path)
 {
-    auto handlerInterfaceValue =
-        EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands, EnumeratorCommandFinder::Operation::FindFirst)
-            .FindCommandEntry(path);
+    auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
+                                     .FindCommandEntry(EnumeratorCommandFinder::Operation::kFindFirst,
+                                                       ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId));
 
     if (handlerInterfaceValue.has_value())
     {
@@ -633,9 +639,9 @@ DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const Conc
 {
     // TODO: `Next` redirecting to a callback is slow O(n^2).
     //       see https://github.com/project-chip/connectedhomeip/issues/35790
-    auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands,
-                                                         EnumeratorCommandFinder::Operation::FindNext, before.mCommandId)
-                                     .FindCommandEntry(before);
+    auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
+                                     .FindCommandEntry(EnumeratorCommandFinder::Operation::kFindNext, before);
+
     if (handlerInterfaceValue.has_value())
     {
         return *handlerInterfaceValue;
@@ -653,9 +659,8 @@ DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const Conc
 
 std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
-    auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands,
-                                                         EnumeratorCommandFinder::Operation::FindExact, path.mCommandId)
-                                     .FindCommandEntry(path);
+    auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
+                                     .FindCommandEntry(EnumeratorCommandFinder::Operation::kFindExact, path);
 
     if (handlerInterfaceValue.has_value())
     {
@@ -673,8 +678,9 @@ std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedComma
 ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const ConcreteClusterPath & path)
 {
     std::optional<CommandId> commandId =
-        EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateGeneratedCommands, EnumeratorCommandFinder::Operation::FindFirst)
-            .FindCommandId(path);
+        EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateGeneratedCommands)
+            .FindCommandId(EnumeratorCommandFinder::Operation::kFindFirst,
+                           ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId));
     if (commandId.has_value())
     {
         return *commandId == kInvalidCommandId ? kInvalidCommandPath
@@ -693,9 +699,8 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
 {
     // TODO: `Next` redirecting to a callback is slow O(n^2).
     //       see https://github.com/project-chip/connectedhomeip/issues/35790
-    auto nextId = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateGeneratedCommands,
-                                          EnumeratorCommandFinder::Operation::FindNext, before.mCommandId)
-                      .FindCommandId(before);
+    auto nextId = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateGeneratedCommands)
+                      .FindCommandId(EnumeratorCommandFinder::Operation::kFindNext, before);
 
     if (nextId.has_value())
     {
