@@ -70,20 +70,18 @@ public:
     template <typename T>
     CHIP_ERROR GLibMatterContextInvokeSync(CHIP_ERROR (*func)(T *), T * userData)
     {
+
+        LambdaBridge bridge;
+
         struct
         {
             CHIP_ERROR returnValue            = CHIP_NO_ERROR;
             CHIP_ERROR (*functionToCall)(T *) = func;
             T * userData                      = userData;
         } context;
+        bridge.Initialize([&context]() { context.returnValue = context.functionToCall(context.userData); });
 
-        // wrapping the function pointer and userData into a Lambda, to be stored and passed as a LambdaBridge
-        auto lambda = [&context]() { context.returnValue = context.functionToCall(context.userData); };
-
-        LambdaBridge bridge;
-        bridge.Initialize(lambda);
         _GLibMatterContextInvokeSync(std::move(bridge));
-
         return context.returnValue;
     }
 
