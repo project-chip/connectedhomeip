@@ -51,7 +51,6 @@ def generate_new_cipd_package_json(input, output, extra):
 
     logging.info("Loading extra packages for %s", my_platform)
 
-    
     # Extra chain because extra is a list of lists like:
     # [['darwin:path1'], ['windows:path2']]
     for item in itertools.chain.from_iterable(extra):
