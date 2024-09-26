@@ -64,7 +64,16 @@ public:
     template <typename T>
     CHIP_ERROR GLibMatterContextInvokeSync(CHIP_ERROR (*func)(T *), T * userData)
     {
-        return _GLibMatterContextInvokeSync((CHIP_ERROR(*)(void *)) func, (void *) userData);
+        CHIP_ERROR LambdaErrorReturn;
+
+        // wrapping the function pointer and userData into a Lambda, to be stored and passed as a LambdaBridge
+        auto lambda = [func, userData](CHIP_ERROR * apErrorReturn) { *apErrorReturn = func(userData); };
+
+        LambdaBridge bridge;
+        bridge.Initialize(lambda, &LambdaErrorReturn);
+        _GLibMatterContextInvokeSync(std::move(bridge));
+
+        return LambdaErrorReturn;
     }
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
@@ -87,10 +96,13 @@ private:
     /**
      * @brief Invoke a function on the Matter GLib context.
      *
-     * @note This function does not provide type safety for the user data. Please,
-     *       use the GLibMatterContextInvokeSync() template function instead.
+     * @param[in] bridge a LambdaBridge object that holds the lambda to be invoked within the GLib context.
+     *
+     * @note This function moves the LambdaBridge into the GLib context for invocation.
+     *       The LambdaBridge is created and initialised in GLibMatterContextInvokeSync().
+     *       use the GLibMatterContextInvokeSync() template function instead of this one.
      */
-    CHIP_ERROR _GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData);
+    void _GLibMatterContextInvokeSync(LambdaBridge && bridge);
 
     GMainLoop * mGLibMainLoop;
     GThread * mGLibMainLoopThread;
