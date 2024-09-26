@@ -27,14 +27,14 @@ tizen_qemu_run("chip-tests") {
   share = "${root_out_dir}/tests"
 
   # Copy runner script to shared directory.
-  copy("tests:runner") {
+  copy("${target_name}:runner") {
     sources = [ "runner.sh" ]
     outputs = [ share + "/runner.sh" ]
   }
 
   # Build CHIP unit tests.
   deps = [
-    ":tests:runner",
+    ":${target_name}:runner",
     "${chip_root}/src:tests",
   ]
 }
