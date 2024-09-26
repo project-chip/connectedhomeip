@@ -34,7 +34,7 @@ from enum import IntFlag
 
 import chip.clusters as Clusters
 import global_attribute_ids
-from dataclasses import dataclass, field
+
 from basic_composition_support import BasicCompositionTests
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.ClusterObjects import ClusterObject
@@ -43,8 +43,8 @@ from chip.clusters.Attribute import AttributePath
 from chip.interaction_model import InteractionModelError, Status
 from chip.tlv import uint
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
-from mobly import asserts, signals
-from typing import Optional
+from mobly import asserts
+
 
 class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
@@ -246,8 +246,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 [3, 4, 29, 30, 31, 40, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 60, 62, 63, 64, 65, 1029, 4294048774],
                 "ServerList doesn't match the expected server list"
                 )
-        import pdb
-        pdb.set_trace()
+
         # Step 9
         # TH sends the Read Request Message to the DUT to read an attribute of data type bool.
         # If the device does not have an attribute of data type bool, skip this step.
