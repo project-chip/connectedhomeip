@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import re
-import sys
 from dataclasses import dataclass
+from io import StringIO
 from typing import Any, Dict, List
 
 import yaml
 
 
+# TODO #35787: Remove support for non-YAML format
 def cast_to_bool(value: Any) -> bool:
     """Convert True/true/False/false strings to bool."""
     if isinstance(value, str):
@@ -81,6 +83,12 @@ class Metadata:
             self.quiet = cast_to_bool(attr_dict["quiet"])
 
 
+class NamedStringIO(StringIO):
+    def __init__(self, content, name):
+        super().__init__(content)
+        self.name = name
+
+
 def extract_runs_arg_lines(py_script_path: str) -> Dict[str, Dict[str, str]]:
     """Extract the run arguments from the CI test arguments blocks."""
 
@@ -99,6 +107,10 @@ def extract_runs_arg_lines(py_script_path: str) -> Dict[str, Dict[str, str]]:
             line = line.strip()
             line_num = line_idx + 1
 
+            # Append empty line to the line capture, so during YAML parsing
+            # line numbers will match the original file.
+            ci_args_section_lines.append("")
+
             # Detect the single CI args section, to skip the lines otherwise.
             if not done_ci_args_section and line.startswith("# === BEGIN CI TEST ARGUMENTS ==="):
                 found_ci_args_section = True
@@ -109,13 +121,14 @@ def extract_runs_arg_lines(py_script_path: str) -> Dict[str, Dict[str, str]]:
                 continue
 
             if found_ci_args_section:
-                ci_args_section_lines.append(line.lstrip("#"))
+                # Update the last line in the line capture.
+                ci_args_section_lines[-1] = " " + line.lstrip("#")
 
             runs_match = runs_def_ptrn.match(line)
             args_match = arg_def_ptrn.match(line)
 
             if not found_ci_args_section and (runs_match or args_match):
-                print(f"WARNING: {py_script_path}:{line_num}: Found CI args outside of CI TEST ARGUMENTS block!", file=sys.stderr)
+                logging.warning(f"{py_script_path}:{line_num}: Found CI args outside of CI TEST ARGUMENTS block")
                 continue
 
             if runs_match:
@@ -129,14 +142,14 @@ def extract_runs_arg_lines(py_script_path: str) -> Dict[str, Dict[str, str]]:
 
     if not runs_arg_lines:
         try:
-            runs = yaml.safe_load("\n".join(ci_args_section_lines))
+            runs = yaml.safe_load(NamedStringIO("\n".join(ci_args_section_lines), py_script_path))
             for run, args in runs.get("test-runner-runs", {}).items():
                 runs_arg_lines[run] = {}
                 runs_arg_lines[run]['run'] = run
                 runs_arg_lines[run]['py_script_path'] = py_script_path
                 runs_arg_lines[run].update(args)
         except yaml.YAMLError as e:
-            print(f"ERROR: {py_script_path}: Failed to parse CI arguments YAML: {e}", file=sys.stderr)
+            logging.error(f"Failed to parse CI arguments YAML: {e}")
 
     return runs_arg_lines
 
