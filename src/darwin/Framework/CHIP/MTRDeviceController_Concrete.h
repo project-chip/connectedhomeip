@@ -117,6 +117,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
 
+/**
+ * Notify the controller that a new operational instance with the given node id
+ * and a compressed fabric id that matches this controller has been observed.
+ */
+- (void)operationalInstanceAdded:(NSNumber *)nodeID;
+
 @end
 
 NS_ASSUME_NONNULL_END
