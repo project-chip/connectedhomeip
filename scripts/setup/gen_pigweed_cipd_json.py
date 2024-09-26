@@ -63,7 +63,7 @@ def generate_new_cipd_package_json(input, output, extra):
     with open(output, 'w') as f:
         json.dump(new_packages, f, indent=2)
 
-     logging.info("PACKAGES:\n%s\n", json.dump(new_packages, f, indent=2))
+     logging.info("PACKAGES:\n%s\n", json.dumps(new_packages, indent=2))
 
 
 def main():
