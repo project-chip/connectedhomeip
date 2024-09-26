@@ -51,6 +51,7 @@ def generate_new_cipd_package_json(input, output, extra):
     logging.info("LOADING EXTRA PACKAGES FOR %s", my_platform)
     logging.info("Mappings: %r", extra)
 
+    # Odd "," because extra items are list entries
     for item, in extra:
         inject_platform, path = item.split(':', 1)
 
