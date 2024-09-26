@@ -281,7 +281,7 @@ void PlatformManagerImpl::_Shutdown()
 }
 
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
-CHIP_ERROR PlatformManagerImpl::_GLibMatterContextInvokeSync(LambdaBridge && bridge)
+void PlatformManagerImpl::_GLibMatterContextInvokeSync(LambdaBridge && bridge)
 {
     // Because of TSAN false positives, we need to use a mutex to synchronize access to all members of
     // the GLibMatterContextInvokeData object (including constructor and destructor). This is a temporary
@@ -301,11 +301,10 @@ CHIP_ERROR PlatformManagerImpl::_GLibMatterContextInvokeSync(LambdaBridge && bri
             std::unique_lock<std::mutex> lock_(PlatformMgrImpl().mGLibMainLoopCallbackIndirectionMutex);
 
             lock_.unlock();
-            auto result = data->bridge.CallLambdaWithErrorReturn();
+            data->bridge();
             lock_.lock();
 
-            data->mDone       = true;
-            data->mFuncResult = result;
+            data->mDone = true;
             data->mDoneCond.notify_one();
 
             return G_SOURCE_REMOVE;
@@ -313,10 +312,7 @@ CHIP_ERROR PlatformManagerImpl::_GLibMatterContextInvokeSync(LambdaBridge && bri
         &invokeData, nullptr);
 
     lock.lock();
-
     invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
-
-    return invokeData.mFuncResult;
 }
 #endif // CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 

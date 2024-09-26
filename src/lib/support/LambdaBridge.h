@@ -28,47 +28,41 @@ class LambdaBridge
 public:
     // Use initialize instead of constructor because this class has to be trivial
     template <typename Lambda>
-    void Initialize(const Lambda & lambda)
+    void Initialize(const Lambda & lambda, CHIP_ERROR * Error_Value = nullptr)
     {
+        // LambdaBridge accepts either Lambdas without arguments or those with `CHIP_ERROR *` as argument.
+        mpError = Error_Value;
+
         // memcpy is used to move the lambda into the event queue, so it must be trivially copyable
         static_assert(std::is_trivially_copyable<Lambda>::value, "lambda must be trivially copyable");
         static_assert(sizeof(Lambda) <= CHIP_CONFIG_LAMBDA_EVENT_SIZE, "lambda too large");
         static_assert(CHIP_CONFIG_LAMBDA_EVENT_ALIGN % alignof(Lambda) == 0, "lambda align too large");
 
         // Implicit cast a capture-less lambda into a raw function pointer.
-        if constexpr (std::is_same_v<decltype(lambda()), void>)
-        {
-            mLambdaVoidProxy = [](const LambdaStorage & body) { (*reinterpret_cast<const Lambda *>(&body))(); };
-        }
-        else if constexpr (std::is_same_v<decltype(lambda()), CHIP_ERROR>)
-        {
-            mLambdaProxy = [](const LambdaStorage & body) { return (*reinterpret_cast<const Lambda *>(&body))(); };
-        }
+        mLambdaProxy = [](const LambdaStorage & body, CHIP_ERROR * apError) {
+            // Check if lambda has CHIP_ERROR * as argument, if not, call it without arguments
+            if constexpr (std::is_invocable<Lambda, CHIP_ERROR *>::value)
+            {
+                // Call the lambda with CHIP_ERROR* argument
+                (*reinterpret_cast<const Lambda *>(&body))(apError);
+            }
+            else
+            {
+                // Call the lambda with no arguments
+                (*reinterpret_cast<const Lambda *>(&body))();
+            }
+        };
 
         ::memcpy(&mLambdaBody, &lambda, sizeof(Lambda));
     }
 
-    void operator()() const
-    {
-        if (mLambdaVoidProxy != nullptr)
-        {
-            mLambdaVoidProxy(mLambdaBody);
-        }
-    }
-    CHIP_ERROR CallLambdaWithErrorReturn() const
-    {
-        if (mLambdaProxy != nullptr)
-        {
-            return mLambdaProxy(mLambdaBody);
-        }
-        return CHIP_ERROR_INTERNAL; // Return an error if the proxy is not for CHIP_ERROR
-    }
+    void operator()() const { mLambdaProxy(mLambdaBody, mpError); }
 
 private:
     using LambdaStorage = std::aligned_storage_t<CHIP_CONFIG_LAMBDA_EVENT_SIZE, CHIP_CONFIG_LAMBDA_EVENT_ALIGN>;
-    void (*mLambdaVoidProxy)(const LambdaStorage & body);
-    CHIP_ERROR (*mLambdaProxy)(const LambdaStorage & body);
+    void (*mLambdaProxy)(const LambdaStorage & body, CHIP_ERROR * mpError);
     LambdaStorage mLambdaBody;
+    CHIP_ERROR * mpError;
 };
 
 static_assert(std::is_trivial<LambdaBridge>::value, "LambdaBridge is not trivial");

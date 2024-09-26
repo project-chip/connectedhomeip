@@ -69,11 +69,16 @@ public:
     template <typename T>
     CHIP_ERROR GLibMatterContextInvokeSync(CHIP_ERROR (*func)(T *), T * userData)
     {
-        auto lambda = [func, userData]() -> CHIP_ERROR { return func(userData); };
+        CHIP_ERROR LambdaErrorReturn;
+
+        // wrapping the function pointer and userData into a Lambda, to be stored and passed as a LambdaBridge
+        auto lambda = [func, userData](CHIP_ERROR * apErrorReturn) { *apErrorReturn = func(userData); };
 
         LambdaBridge bridge;
-        bridge.Initialize(lambda);
-        return _GLibMatterContextInvokeSync(std::move(bridge));
+        bridge.Initialize(lambda, &LambdaErrorReturn);
+        _GLibMatterContextInvokeSync(std::move(bridge));
+
+        return LambdaErrorReturn;
     }
 
     unsigned int GLibMatterContextAttachSource(GSource * source)
@@ -107,7 +112,6 @@ private:
     struct GLibMatterContextInvokeData
     {
         LambdaBridge bridge;
-        CHIP_ERROR mFuncResult;
         // Sync primitives to wait for the function to be executed
         std::condition_variable mDoneCond;
         bool mDone = false;
@@ -116,10 +120,13 @@ private:
     /**
      * @brief Invoke a function on the Matter GLib context.
      *
-     * @note This function does not provide type safety for the user data. Please,
-     *       use the GLibMatterContextInvokeSync() template function instead.
+     * @param[in] bridge a LambdaBridge object that holds the lambda to be invoked within the GLib context.
+     *
+     * @note This function moves the LambdaBridge into the GLib context for invocation.
+     *       The LambdaBridge is created and initialised in GLibMatterContextInvokeSync().
+     *       use the GLibMatterContextInvokeSync() template function instead of this one.
      */
-    CHIP_ERROR _GLibMatterContextInvokeSync(LambdaBridge && bridge);
+    void _GLibMatterContextInvokeSync(LambdaBridge && bridge);
 
     // XXX: Mutex for guarding access to glib main event loop callback indirection
     //      synchronization primitives. This is a workaround to suppress TSAN warnings.
