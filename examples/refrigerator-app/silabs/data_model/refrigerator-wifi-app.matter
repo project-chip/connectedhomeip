@@ -489,93 +489,6 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing common languages, units of measurements, and numerical formatting
-      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
-      they can be configured to use a user’s preferred language, units, etc */
-cluster LocalizationConfiguration = 43 {
-  revision 1; // NOTE: Default/not specifically set
-
-  attribute access(write: manage) char_string<35> activeLocale = 0;
-  readonly attribute char_string supportedLocales[] = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
-      or audibly convey time information need a mechanism by which they can be configured to use a
-      user’s preferred format. */
-cluster TimeFormatLocalization = 44 {
-  revision 1; // NOTE: Default/not specifically set
-
-  enum CalendarTypeEnum : enum8 {
-    kBuddhist = 0;
-    kChinese = 1;
-    kCoptic = 2;
-    kEthiopian = 3;
-    kGregorian = 4;
-    kHebrew = 5;
-    kIndian = 6;
-    kIslamic = 7;
-    kJapanese = 8;
-    kKorean = 9;
-    kPersian = 10;
-    kTaiwanese = 11;
-    kUseActiveLocale = 255;
-  }
-
-  enum HourFormatEnum : enum8 {
-    k12hr = 0;
-    k24hr = 1;
-    kUseActiveLocale = 255;
-  }
-
-  bitmap Feature : bitmap32 {
-    kCalendarFormat = 0x1;
-  }
-
-  attribute access(write: manage) HourFormatEnum hourFormat = 0;
-  attribute access(write: manage) optional CalendarTypeEnum activeCalendarType = 1;
-  readonly attribute optional CalendarTypeEnum supportedCalendarTypes[] = 2;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing preferences for the units in which values are conveyed in communication to a
-      user. As such, Nodes that visually or audibly convey measurable values to the user need a
-      mechanism by which they can be configured to use a user’s preferred unit. */
-cluster UnitLocalization = 45 {
-  revision 1;
-
-  enum TempUnitEnum : enum8 {
-    kFahrenheit = 0;
-    kCelsius = 1;
-    kKelvin = 2;
-  }
-
-  bitmap Feature : bitmap32 {
-    kTemperatureUnit = 0x1;
-  }
-
-  attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 cluster GeneralCommissioning = 48 {
   revision 1; // NOTE: Default/not specifically set
@@ -845,6 +758,53 @@ cluster NetworkCommissioning = 49 {
   command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
   /** Retrieve details about and optionally proof of possession of a network client identity. */
   command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
+}
+
+/** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
+cluster DiagnosticLogs = 50 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum IntentEnum : enum8 {
+    kEndUserSupport = 0;
+    kNetworkDiag = 1;
+    kCrashLogs = 2;
+  }
+
+  enum StatusEnum : enum8 {
+    kSuccess = 0;
+    kExhausted = 1;
+    kNoLogs = 2;
+    kBusy = 3;
+    kDenied = 4;
+  }
+
+  enum TransferProtocolEnum : enum8 {
+    kResponsePayload = 0;
+    kBDX = 1;
+  }
+
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct RetrieveLogsRequestRequest {
+    IntentEnum intent = 0;
+    TransferProtocolEnum requestedProtocol = 1;
+    optional char_string<32> transferFileDesignator = 2;
+  }
+
+  response struct RetrieveLogsResponse = 1 {
+    StatusEnum status = 0;
+    long_octet_string logContent = 1;
+    optional epoch_us UTCTimeStamp = 2;
+    optional systime_us timeSinceBoot = 3;
+  }
+
+  /** Retrieving diagnostic logs from a Node */
+  command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
 }
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -1490,34 +1450,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 3;
   }
 
-  server cluster LocalizationConfiguration {
-    persist  attribute activeLocale default = "en-US";
-    callback attribute supportedLocales;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster TimeFormatLocalization {
-    persist  attribute hourFormat default = 0;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster UnitLocalization {
-    persist  attribute temperatureUnit default = 0;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster GeneralCommissioning {
     ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
@@ -1556,12 +1488,23 @@ endpoint 0 {
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
     handle command AddOrUpdateWiFiNetwork;
-    handle command AddOrUpdateThreadNetwork;
     handle command RemoveNetwork;
     handle command NetworkConfigResponse;
     handle command ConnectNetwork;
     handle command ConnectNetworkResponse;
     handle command ReorderNetwork;
+  }
+
+  server cluster DiagnosticLogs {
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command RetrieveLogsRequest;
+    handle command RetrieveLogsResponse;
   }
 
   server cluster GeneralDiagnostics {

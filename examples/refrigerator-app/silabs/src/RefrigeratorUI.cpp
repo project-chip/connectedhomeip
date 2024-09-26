@@ -131,31 +131,7 @@ void RefrigeratorUI::DrawHeader(GLIB_Context_t * glibContext)
  */
 void RefrigeratorUI::DrawFooter(GLIB_Context_t * glibContext, bool autoMode)
 {
-    switch (static_cast<RefrigeratorUI::SUPPORTED_MODES>(mMode))
-    {
-    case SUPPORTED_MODES::RAPID_COOL:
-        GLIB_drawStringOnLine(glibContext, "Mode : Rapid Cool", 11, GLIB_ALIGN_LEFT, 0, 0, true);
-        GLIB_drawBitmap(glibContext, HEATING_COOLING_X, HEATING_COOLING_Y, COOLING_WIDTH, COOLING_HEIGHT, heating_bits);
-        DrawSetPoint(glibContext, mCurrentTempCelsius, false);
-        break;
-    case SUPPORTED_MODES::RAPID_FREEZE:
-        GLIB_drawStringOnLine(glibContext, "Mode : Rapid Freeze", 11, GLIB_ALIGN_LEFT, 0, 0, true);
-        GLIB_drawBitmap(glibContext, HEATING_COOLING_X, HEATING_COOLING_Y, COOLING_WIDTH, COOLING_HEIGHT, cooling_bits);
-        DrawSetPoint(glibContext, mCurrentTempCelsius, false);
-        break;
-    case SUPPORTED_MODES::NORMAL:
-        GLIB_drawStringOnLine(glibContext, "Mode : Normal", 11, GLIB_ALIGN_LEFT, 0, 0, true);
-        GLIB_drawBitmap(glibContext, HEATING_COOLING_X, HEATING_COOLING_Y, COOLING_WIDTH, COOLING_HEIGHT, heating_cooling_bits);
-        DrawSetPoint(glibContext, mCurrentTempCelsius, false);
-        break;
-    case SUPPORTED_MODES::ENERGY_SAVE:
-        DrawSetPoint(glibContext, 0, false);
-        GLIB_drawStringOnLine(glibContext, "Mode : Energy Save", 11, GLIB_ALIGN_LEFT, 0, 0, true);
-        DrawSetPoint(glibContext, mCurrentTempCelsius, false);
-        break;
-    default:
-        break;
-    }
+    //TODO:: Need to implement this function 
 
 #if SL_LCDCTRL_MUX
     sl_wfx_host_pre_lcd_spi_transfer();
@@ -279,13 +255,7 @@ void RefrigeratorUI::DrawSetPoint(GLIB_Context_t * glibContext, int8_t setPoint,
     }
 
     // Update SetPoint string
-    if (static_cast<RefrigeratorUI::SUPPORTED_MODES>(mMode) == RefrigeratorUI::SUPPORTED_MODES::ENERGY_SAVE)
-    {
-        setPointLine[0] = '-';
-        setPointLine[1] = '-';
-        setPointLine[2] = '\0';
-    }
-    else if (setPoint < 0)
+    if (setPoint < 0)
     {
         setPointLine[0] = (setPoint < 0) ? '-' : ' ';
         setPoint *= -1;
