@@ -151,8 +151,8 @@ void PlatformManagerImpl::_GLibMatterContextInvokeSync(LambdaBridge && bridge)
         [](void * userData_) {
             auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
             VerifyOrExit(g_main_context_get_thread_default() != nullptr,
-                         ChipLogError(DeviceLayer, "GLib thread default main context is not set"););
-            //              data->mFuncResult = CHIP_ERROR_INCORRECT_STATE);
+                         ChipLogError(DeviceLayer, "GLib thread default main context is not set"));
+            data->bridge();
         exit:
             data->mDoneMutex.lock();
             data->mDone = true;
