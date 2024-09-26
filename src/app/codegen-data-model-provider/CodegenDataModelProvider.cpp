@@ -594,6 +594,8 @@ DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const Conc
     CommandHandlerInterface * interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(before.mEndpointId, before.mClusterId);
 
+    // TODO: `Next` redirecting to a callback is slow O(n^2).
+    //       see https://github.com/project-chip/connectedhomeip/issues/35790
     if (interface != nullptr)
     {
         EnumeratorCommandFinder finder(EnumeratorCommandFinder::Operation::FindNext, before.mCommandId);
@@ -692,6 +694,8 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
     CommandHandlerInterface * interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(before.mEndpointId, before.mClusterId);
 
+    // TODO: `Next` redirecting to a callback is slow O(n^2).
+    //       see https://github.com/project-chip/connectedhomeip/issues/35790
     if (interface != nullptr)
     {
         EnumeratorCommandFinder finder(EnumeratorCommandFinder::Operation::FindNext, before.mCommandId);
