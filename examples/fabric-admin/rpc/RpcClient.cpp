@@ -144,12 +144,12 @@ CHIP_ERROR AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & data)
     return WaitForResponse(call);
 }
 
-CHIP_ERROR RemoveSynchronizedDevice(uint64_t handleId)
+CHIP_ERROR RemoveSynchronizedDevice(uint64_t handle)
 {
     ChipLogProgress(NotSpecified, "RemoveSynchronizedDevice");
 
     chip_rpc_SynchronizedDevice device = chip_rpc_SynchronizedDevice_init_default;
-    device.device_handle_id            = handleId;
+    device.handle            = handle;
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.
@@ -164,12 +164,12 @@ CHIP_ERROR RemoveSynchronizedDevice(uint64_t handleId)
     return WaitForResponse(call);
 }
 
-CHIP_ERROR ActiveChanged(uint64_t handleId, uint32_t promisedActiveDurationMs)
+CHIP_ERROR ActiveChanged(uint64_t handle, uint32_t promisedActiveDurationMs)
 {
     ChipLogProgress(NotSpecified, "ActiveChanged");
 
     chip_rpc_KeepActiveChanged parameters;
-    parameters.device_handle_id            = handleId;
+    parameters.handle            = handle;
     parameters.promised_active_duration_ms = promisedActiveDurationMs;
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler

@@ -47,7 +47,7 @@ CHIP_ERROR StartRpcClient();
  * - CHIP_ERROR_INTERNAL: An internal error occurred.
  */
 CHIP_ERROR
-OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams params, uint64_t handleId);
+OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams params, uint64_t handle);
 
 /**
  * Commission a node using the specified parameters.
@@ -68,4 +68,4 @@ OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams para
 CHIP_ERROR
 CommissionNode(chip::Controller::CommissioningWindowPasscodeParams params, chip::VendorId vendorId, uint16_t productId);
 
-CHIP_ERROR KeepActive(uint64_t handleId, uint32_t stayActiveDurationMs, uint32_t timeoutMs);
+CHIP_ERROR KeepActive(uint64_t handle, uint32_t stayActiveDurationMs, uint32_t timeoutMs);

@@ -569,11 +569,11 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
 #if defined(PW_RPC_ENABLED)
         app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(command->CurrentCommissioner().GetFabricIndex(), nodeId);
         ScopedNodeId scopedNodeId(nodeId, command->CurrentCommissioner().GetFabricIndex());
-        auto optionalHandleId = DeviceMgr().BridgeToAdminDeviceMapper().GetHandleId(scopedNodeId);
-        if (optionalHandleId.has_value())
+        auto optionalHandle = DeviceMgr().BridgeToAdminDeviceMapper().GetHandleForBridge(scopedNodeId);
+        if (optionalHandle.has_value())
         {
-            RemoveSynchronizedDevice(optionalHandleId.value());
-            DeviceMgr().BridgeToAdminDeviceMapper().RemoveScopedNodeIdByHandleId(optionalHandleId.value());
+            RemoveSynchronizedDevice(optionalHandle.value());
+            DeviceMgr().BridgeToAdminDeviceMapper().RemoveScopedNodeIdByBridgeHandle(optionalHandle.value());
         }
 #endif
     }

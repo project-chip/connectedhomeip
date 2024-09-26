@@ -38,7 +38,7 @@ DeviceSubscriptionManager & DeviceSubscriptionManager::Instance()
     return instance;
 }
 
-CHIP_ERROR DeviceSubscriptionManager::StartSubscription(Controller::DeviceController & controller, NodeId nodeId, uint64_t handleId)
+CHIP_ERROR DeviceSubscriptionManager::StartSubscription(Controller::DeviceController & controller, NodeId nodeId, uint64_t handle)
 {
     assertChipStackLockedByCurrentThread();
     auto it = mDeviceSubscriptionMap.find(nodeId);
@@ -47,7 +47,7 @@ CHIP_ERROR DeviceSubscriptionManager::StartSubscription(Controller::DeviceContro
     auto deviceSubscription = std::make_unique<DeviceSubscription>();
     VerifyOrReturnError(deviceSubscription, CHIP_ERROR_NO_MEMORY);
     ReturnErrorOnFailure(deviceSubscription->StartSubscription(
-        [this](NodeId aNodeId) { this->DeviceSubscriptionTerminated(aNodeId); }, controller, nodeId, handleId));
+        [this](NodeId aNodeId) { this->DeviceSubscriptionTerminated(aNodeId); }, controller, nodeId, handle));
 
     mDeviceSubscriptionMap[nodeId] = std::move(deviceSubscription);
     return CHIP_NO_ERROR;

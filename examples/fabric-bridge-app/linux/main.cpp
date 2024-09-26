@@ -192,7 +192,7 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
                                     .SetIteration(commandData.iterations)
                                     .SetSalt(commandData.salt)
                                     .SetVerifier(commandData.PAKEPasscodeVerifier),
-                                device->GetHandleId()) == CHIP_NO_ERROR)
+                                device->GetHandle()) == CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "Commissioning window is now open");
         status = Status::Success;
@@ -254,7 +254,7 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
     Status status = Status::Failure;
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
-    if (KeepActive(device->GetHandleId(), commandData.stayActiveDuration, commandData.timeoutMs) == CHIP_NO_ERROR)
+    if (KeepActive(device->GetHandle(), commandData.stayActiveDuration, commandData.timeoutMs) == CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "KeepActive successfully processed");
         status = Status::Success;

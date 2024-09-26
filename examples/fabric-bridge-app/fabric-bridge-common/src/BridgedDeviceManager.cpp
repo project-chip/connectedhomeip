@@ -220,8 +220,8 @@ std::optional<unsigned> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<
                 emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
             if (err == CHIP_NO_ERROR)
             {
-                ChipLogProgress(NotSpecified, "Added device with handleId=0x" ChipLogFormatX64 " to dynamic endpoint %d (index=%d)",
-                                ChipLogValueX64(dev->GetHandleId()), mCurrentEndpointId, index);
+                ChipLogProgress(NotSpecified, "Added device with handle=0x" ChipLogFormatX64 " to dynamic endpoint %d (index=%d)",
+                                ChipLogValueX64(dev->GetHandle()), mCurrentEndpointId, index);
                 mDevices[index] = std::move(dev);
                 return index;
             }
@@ -314,11 +314,11 @@ BridgedDevice * BridgedDeviceManager::GetDeviceByUniqueId(const std::string & id
     return nullptr;
 }
 
-BridgedDevice * BridgedDeviceManager::GetDeviceByHandleId(uint64_t handleId) const
+BridgedDevice * BridgedDeviceManager::GetDeviceByHandle(uint64_t handle) const
 {
     for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
-        if (mDevices[index] && mDevices[index]->GetHandleId() == handleId)
+        if (mDevices[index] && mDevices[index]->GetHandle() == handle)
         {
             return mDevices[index].get();
         }
@@ -326,17 +326,17 @@ BridgedDevice * BridgedDeviceManager::GetDeviceByHandleId(uint64_t handleId) con
     return nullptr;
 }
 
-std::optional<unsigned> BridgedDeviceManager::RemoveDeviceByHandleId(uint64_t handleId)
+std::optional<unsigned> BridgedDeviceManager::RemoveDeviceByHandle(uint64_t handle)
 {
     for (unsigned index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
-        if (mDevices[index] && mDevices[index]->GetHandleId() == handleId)
+        if (mDevices[index] && mDevices[index]->GetHandle() == handle)
         {
             DeviceLayer::StackLock lock;
             EndpointId ep   = emberAfClearDynamicEndpoint(index);
             mDevices[index] = nullptr;
-            ChipLogProgress(NotSpecified, "Removed device with HandleId=0x" ChipLogFormatX64 " from dynamic endpoint %d (index=%d)",
-                            ChipLogValueX64(handleId), ep, index);
+            ChipLogProgress(NotSpecified, "Removed device with Handle=0x" ChipLogFormatX64 " from dynamic endpoint %d (index=%d)",
+                            ChipLogValueX64(handle), ep, index);
             return index;
         }
     }

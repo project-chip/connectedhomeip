@@ -32,27 +32,27 @@ struct ScopedNodeIdHasher
     {
         std::size_t h1 = std::hash<uint64_t>{}(scopedNodeId.GetFabricIndex());
         std::size_t h2 = std::hash<uint64_t>{}(scopedNodeId.GetNodeId());
-        // Bitshifting h2 reduces collisions where fabricIndex == nodeId resulting
-        // in hash return of 0.
+        // Bitshifting h2 reduces collisions when fabricIndex == nodeId.
         return h1 ^ (h2 << 1);
     }
 };
 
 // Bi-directional translation between handle for aggregator and information about the
-// the device required for fabric admin to communicate with local device.
+// the device required for fabric admin to communicate with device.
 class BridgeAdminDeviceMapper
 {
 public:
-    std::optional<uint64_t> AddScopedNodeId(const chip::ScopedNodeId & scopedNodeId);
-    void RemoveScopedNodeIdByHandleId(uint64_t handleId);
+    std::optional<uint64_t> AddAdminScopedNodeId(const chip::ScopedNodeId & scopedNodeId);
+    void RemoveScopedNodeIdByBridgeHandle(uint64_t handle);
 
-    std::optional<uint64_t> GetHandleId(const chip::ScopedNodeId & scopedNodeId);
-    std::optional<chip::ScopedNodeId> GetScopedNodeId(uint64_t handleId);
+    std::optional<uint64_t> GetHandleForBridge(const chip::ScopedNodeId & scopedNodeId);
+    std::optional<chip::ScopedNodeId> GetScopedNodeIdForAdmin(uint64_t handle);
 
 private:
-    uint64_t mNextHandleId = 0;
-    // If we ever need more data other than ScopedNodeId we can change
-    // mHandleIdToScopedNodeId value from ScopedNodeId to AggregatorDeviceInfo.
-    std::unordered_map<uint64_t, chip::ScopedNodeId> mHandleIdToScopedNodeId;
-    std::unordered_map<chip::ScopedNodeId, uint64_t, ScopedNodeIdHasher> mScopedNodeIdToHandleId;
+    uint64_t mNextHandle = 0;
+    // If admin side ever needs more data other than ScopedNodeId we can change
+    // mHandleToScopedNodeId value type from ScopedNodeId to AdminDeviceInfo (or something
+    // of that nature).
+    std::unordered_map<uint64_t, chip::ScopedNodeId> mHandleToScopedNodeId;
+    std::unordered_map<chip::ScopedNodeId, uint64_t, ScopedNodeIdHasher> mScopedNodeIdToHandle;
 };

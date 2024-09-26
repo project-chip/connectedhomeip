@@ -119,8 +119,8 @@ CHIP_ERROR StartRpcClient()
 
 CHIP_ERROR OpenCommissioningWindow(chip_rpc_DeviceCommissioningWindowInfo device)
 {
-    ChipLogProgress(NotSpecified, "OpenCommissioningWindow with HandleId 0x" ChipLogFormatX64,
-                    ChipLogValueX64(device.device_handle_id));
+    ChipLogProgress(NotSpecified, "OpenCommissioningWindow with Handle 0x" ChipLogFormatX64,
+                    ChipLogValueX64(device.handle));
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.
@@ -136,10 +136,10 @@ CHIP_ERROR OpenCommissioningWindow(chip_rpc_DeviceCommissioningWindowInfo device
 }
 
 CHIP_ERROR
-OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams params, uint64_t handleId)
+OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams params, uint64_t handle)
 {
     chip_rpc_DeviceCommissioningWindowInfo device;
-    device.device_handle_id      = handleId;
+    device.handle      = handle;
     device.commissioning_timeout = params.GetTimeout().count();
     device.discriminator         = params.GetDiscriminator();
     device.iterations            = params.GetIteration();
@@ -182,10 +182,10 @@ CommissionNode(chip::Controller::CommissioningWindowPasscodeParams params, Vendo
     return WaitForResponse(call);
 }
 
-CHIP_ERROR KeepActive(uint64_t handleId, uint32_t stayActiveDurationMs, uint32_t timeoutMs)
+CHIP_ERROR KeepActive(uint64_t handle, uint32_t stayActiveDurationMs, uint32_t timeoutMs)
 {
     chip_rpc_KeepActiveParameters params;
-    params.device_handle_id        = handleId;
+    params.handle        = handle;
     params.stay_active_duration_ms = stayActiveDurationMs;
     params.timeout_ms              = timeoutMs;
 

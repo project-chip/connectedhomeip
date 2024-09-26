@@ -18,41 +18,39 @@
 
 #include "BridgeAdminDeviceMapper.h"
 
-#include <limits>
-
 #include <lib/support/CodeUtils.h>
 
-std::optional<uint64_t> BridgeAdminDeviceMapper::AddScopedNodeId(const chip::ScopedNodeId & scopedNodeId)
+std::optional<uint64_t> BridgeAdminDeviceMapper::AddAdminScopedNodeId(const chip::ScopedNodeId & scopedNodeId)
 {
-    // We are assuming that we will never run out of HandleIds
-    VerifyOrDie(mNextHandleId != std::numeric_limits<uint64_t>::max());
-    VerifyOrReturnValue(mScopedNodeIdToHandleId.find(scopedNodeId) == mScopedNodeIdToHandleId.end(), std::nullopt);
+    VerifyOrReturnValue(mScopedNodeIdToHandle.find(scopedNodeId) == mScopedNodeIdToHandle.end(), std::nullopt, ChipLogError(NotSpecified, "Duplicate ScopedNodeId alread exists in map"));
 
-    uint64_t handleId                     = mNextHandleId;
-    mHandleIdToScopedNodeId[handleId]     = scopedNodeId;
-    mScopedNodeIdToHandleId[scopedNodeId] = handleId;
-    mNextHandleId++;
-    return handleId;
+    uint64_t handle                     = mNextHandle;
+    mHandleToScopedNodeId[handle]     = scopedNodeId;
+    mScopedNodeIdToHandle[scopedNodeId] = handle;
+    // We are assuming that we will never run out of Handles because we are using uint64_t here.
+    static_assert(sizeof(mNextHandle) == sizeof(uint64_t));
+    mNextHandle++;
+    return handle;
 }
 
-void BridgeAdminDeviceMapper::RemoveScopedNodeIdByHandleId(uint64_t handleId)
+void BridgeAdminDeviceMapper::RemoveScopedNodeIdByBridgeHandle(uint64_t handle)
 {
-    auto it = mHandleIdToScopedNodeId.find(handleId);
-    VerifyOrReturn(it != mHandleIdToScopedNodeId.end());
-    mScopedNodeIdToHandleId.erase(it->second);
-    mHandleIdToScopedNodeId.erase(handleId);
+    auto it = mHandleToScopedNodeId.find(handle);
+    VerifyOrReturn(it != mHandleToScopedNodeId.end());
+    mScopedNodeIdToHandle.erase(it->second);
+    mHandleToScopedNodeId.erase(handle);
 }
 
-std::optional<uint64_t> BridgeAdminDeviceMapper::GetHandleId(const chip::ScopedNodeId & scopedNodeId)
+std::optional<uint64_t> BridgeAdminDeviceMapper::GetHandleForBridge(const chip::ScopedNodeId & scopedNodeId)
 {
-    auto scopedNodeIterator = mScopedNodeIdToHandleId.find(scopedNodeId);
-    VerifyOrReturnValue(scopedNodeIterator != mScopedNodeIdToHandleId.end(), std::nullopt);
+    auto scopedNodeIterator = mScopedNodeIdToHandle.find(scopedNodeId);
+    VerifyOrReturnValue(scopedNodeIterator != mScopedNodeIdToHandle.end(), std::nullopt);
     return scopedNodeIterator->second;
 }
 
-std::optional<chip::ScopedNodeId> BridgeAdminDeviceMapper::GetScopedNodeId(uint64_t handleId)
+std::optional<chip::ScopedNodeId> BridgeAdminDeviceMapper::GetScopedNodeIdForAdmin(uint64_t handle)
 {
-    auto it = mHandleIdToScopedNodeId.find(handleId);
-    VerifyOrReturnValue(it != mHandleIdToScopedNodeId.end(), std::nullopt);
+    auto it = mHandleToScopedNodeId.find(handle);
+    VerifyOrReturnValue(it != mHandleToScopedNodeId.end(), std::nullopt);
     return it->second;
 }

@@ -207,7 +207,7 @@ void DeviceSubscription::OnDeviceConnectionFailure(const ScopedNodeId & peerId, 
 }
 
 CHIP_ERROR DeviceSubscription::StartSubscription(OnDoneCallback onDoneCallback, Controller::DeviceController & controller,
-                                                 NodeId nodeId, uint64_t handleId)
+                                                 NodeId nodeId, uint64_t handle)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrDie(mState == State::Idle);
@@ -216,7 +216,7 @@ CHIP_ERROR DeviceSubscription::StartSubscription(OnDoneCallback onDoneCallback, 
 
 #if defined(PW_RPC_ENABLED)
     mCurrentAdministratorCommissioningAttributes                  = chip_rpc_AdministratorCommissioningChanged_init_default;
-    mCurrentAdministratorCommissioningAttributes.device_handle_id = handleId;
+    mCurrentAdministratorCommissioningAttributes.handle = handle;
     mCurrentAdministratorCommissioningAttributes.window_status =
         static_cast<uint32_t>(Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
 #endif

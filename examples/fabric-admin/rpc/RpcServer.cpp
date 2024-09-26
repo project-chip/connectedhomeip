@@ -68,14 +68,14 @@ public:
             return;
         }
 
-        auto optionalHandleId = DeviceMgr().BridgeToAdminDeviceMapper().GetHandleId(scopedNodeId);
-        if (!optionalHandleId.has_value())
+        auto optionalHandle = DeviceMgr().BridgeToAdminDeviceMapper().GetHandleForBridge(scopedNodeId);
+        if (!optionalHandle.has_value())
         {
             ChipLogError(NotSpecified, "ICD check-in for device for no longer on aggregator. Request dropped for Node ID: 0x%lx",
                          scopedNodeId.GetNodeId());
             return;
         }
-        uint64_t handleId = optionalHandleId.value();
+        uint64_t handle = optionalHandle.value();
 
         // TODO https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/10448. Spec does
         // not define what to do if we fail to send the StayActiveRequest. We are assuming that any
@@ -83,7 +83,7 @@ public:
         // there is no mechanism for us to communicate with the client that sent out the KeepActive
         // command that there was a failure, we simply fail silently. After spec issue is
         // addressed, we can implement what spec defines here.
-        auto onDone    = [=](uint32_t promisedActiveDuration) { ActiveChanged(handleId, promisedActiveDuration); };
+        auto onDone    = [=](uint32_t promisedActiveDuration) { ActiveChanged(handle, promisedActiveDuration); };
         CHIP_ERROR err = StayActiveSender::SendStayActiveCommand(checkInData.mStayActiveDurationMs, clientInfo.peer_node,
                                                                  app::InteractionModelEngine::GetInstance(), onDone);
         if (err != CHIP_NO_ERROR)
@@ -95,7 +95,7 @@ public:
     pw::Status OpenCommissioningWindow(const chip_rpc_DeviceCommissioningWindowInfo & request,
                                        chip_rpc_OperationStatus & response) override
     {
-        auto optionalScopedNode = DeviceMgr().BridgeToAdminDeviceMapper().GetScopedNodeId(request.device_handle_id);
+        auto optionalScopedNode = DeviceMgr().BridgeToAdminDeviceMapper().GetScopedNodeIdForAdmin(request.handle);
         VerifyOrReturnValue(optionalScopedNode.has_value(), pw::Status::InvalidArgument());
 
         NodeId nodeId                    = optionalScopedNode.value().GetNodeId();
@@ -161,7 +161,7 @@ public:
 
     pw::Status KeepActive(const chip_rpc_KeepActiveParameters & request, pw_protobuf_Empty & response) override
     {
-        auto optionalScopedNode = DeviceMgr().BridgeToAdminDeviceMapper().GetScopedNodeId(request.device_handle_id);
+        auto optionalScopedNode = DeviceMgr().BridgeToAdminDeviceMapper().GetScopedNodeIdForAdmin(request.handle);
         VerifyOrReturnValue(optionalScopedNode.has_value(), pw::Status::InvalidArgument());
 
         ChipLogProgress(NotSpecified, "Received KeepActive request: 0x%lx, %u", optionalScopedNode.value().GetNodeId(),

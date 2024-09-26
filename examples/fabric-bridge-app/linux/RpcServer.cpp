@@ -52,10 +52,10 @@ public:
 
 pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response)
 {
-    uint64_t handleId = request.device_handle_id;
-    ChipLogProgress(NotSpecified, "Received AddSynchronizedDevice: " ChipLogFormatX64, ChipLogValueX64(handleId));
+    uint64_t handle = request.handle;
+    ChipLogProgress(NotSpecified, "Received AddSynchronizedDevice: " ChipLogFormatX64, ChipLogValueX64(handle));
 
-    auto device = std::make_unique<BridgedDevice>(handleId);
+    auto device = std::make_unique<BridgedDevice>(handle);
     device->SetReachable(true);
 
     BridgedDevice::BridgedAttributes attributes;
@@ -116,11 +116,11 @@ pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice
     auto result = BridgeDeviceMgr().AddDeviceEndpoint(std::move(device), 1 /* parentEndpointId */);
     if (!result.has_value())
     {
-        ChipLogError(NotSpecified, "Failed to add device with handleId=0x" ChipLogFormatX64, ChipLogValueX64(handleId));
+        ChipLogError(NotSpecified, "Failed to add device with handle=0x" ChipLogFormatX64, ChipLogValueX64(handle));
         return pw::Status::Unknown();
     }
 
-    BridgedDevice * addedDevice = BridgeDeviceMgr().GetDeviceByHandleId(handleId);
+    BridgedDevice * addedDevice = BridgeDeviceMgr().GetDeviceByHandle(handle);
     VerifyOrDie(addedDevice);
 
     CHIP_ERROR err = EcosystemInformation::EcosystemInformationServer::Instance().AddEcosystemInformationClusterToEndpoint(
@@ -133,13 +133,13 @@ pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice
 // TODO this need to be updated to handleID
 pw::Status FabricBridge::RemoveSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response)
 {
-    uint64_t handleId = request.device_handle_id;
-    ChipLogProgress(NotSpecified, "Received RemoveSynchronizedDevice: " ChipLogFormatX64, ChipLogValueX64(handleId));
+    uint64_t handle = request.handle;
+    ChipLogProgress(NotSpecified, "Received RemoveSynchronizedDevice: " ChipLogFormatX64, ChipLogValueX64(handle));
 
-    auto removed_idx = BridgeDeviceMgr().RemoveDeviceByHandleId(handleId);
+    auto removed_idx = BridgeDeviceMgr().RemoveDeviceByHandle(handle);
     if (!removed_idx.has_value())
     {
-        ChipLogError(NotSpecified, "Failed to remove device with handleId=0x" ChipLogFormatX64, ChipLogValueX64(handleId));
+        ChipLogError(NotSpecified, "Failed to remove device with handle=0x" ChipLogFormatX64, ChipLogValueX64(handle));
         return pw::Status::NotFound();
     }
 
@@ -148,14 +148,14 @@ pw::Status FabricBridge::RemoveSynchronizedDevice(const chip_rpc_SynchronizedDev
 
 pw::Status FabricBridge::ActiveChanged(const chip_rpc_KeepActiveChanged & request, pw_protobuf_Empty & response)
 {
-    uint64_t handleId = request.device_handle_id;
-    ChipLogProgress(NotSpecified, "Received ActiveChanged for handleId:" ChipLogFormatX64, ChipLogValueX64(handleId));
+    uint64_t handle = request.handle;
+    ChipLogProgress(NotSpecified, "Received ActiveChanged for handle:" ChipLogFormatX64, ChipLogValueX64(handle));
 
-    auto * device = BridgeDeviceMgr().GetDeviceByHandleId(handleId);
+    auto * device = BridgeDeviceMgr().GetDeviceByHandle(handle);
     if (device == nullptr)
     {
-        ChipLogError(NotSpecified, "Could not find bridged device associated with handleId=0x" ChipLogFormatX64,
-                     ChipLogValueX64(handleId));
+        ChipLogError(NotSpecified, "Could not find bridged device associated with handle=0x" ChipLogFormatX64,
+                     ChipLogValueX64(handle));
         return pw::Status::NotFound();
     }
 
@@ -166,14 +166,14 @@ pw::Status FabricBridge::ActiveChanged(const chip_rpc_KeepActiveChanged & reques
 pw::Status FabricBridge::AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommissioningChanged & request,
                                                             pw_protobuf_Empty & response)
 {
-    uint64_t handleId = request.device_handle_id;
-    ChipLogProgress(NotSpecified, "Received CADMIN attribute change for handleId:" ChipLogFormatX64, ChipLogValueX64(handleId));
+    uint64_t handle = request.handle;
+    ChipLogProgress(NotSpecified, "Received CADMIN attribute change for handle:" ChipLogFormatX64, ChipLogValueX64(handle));
 
-    auto * device = BridgeDeviceMgr().GetDeviceByHandleId(handleId);
+    auto * device = BridgeDeviceMgr().GetDeviceByHandle(handle);
     if (device == nullptr)
     {
-        ChipLogError(NotSpecified, "Could not find bridged device associated with handleId=0x" ChipLogFormatX64,
-                     ChipLogValueX64(handleId));
+        ChipLogError(NotSpecified, "Could not find bridged device associated with handle=0x" ChipLogFormatX64,
+                     ChipLogValueX64(handle));
         return pw::Status::NotFound();
     }
 
