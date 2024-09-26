@@ -24,6 +24,7 @@
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <device_manager/DeviceSynchronization.h>
+#include <device_manager/DeviceManager.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
@@ -567,7 +568,13 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
 
 #if defined(PW_RPC_ENABLED)
         app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(command->CurrentCommissioner().GetFabricIndex(), nodeId);
-        RemoveSynchronizedDevice(nodeId);
+        ScopedNodeId scopedNodeId(nodeId, command->CurrentCommissioner().GetFabricIndex());
+        auto optionalHandleId = DeviceMgr().BridgeToAdminDeviceMapper().GetHandleId(scopedNodeId);
+        if (optionalHandleId.has_value())
+        {
+            RemoveSynchronizedDevice(optionalHandleId.value());
+            DeviceMgr().BridgeToAdminDeviceMapper().RemoveScopedNodeIdByHandleId(optionalHandleId.value());
+        }
 #endif
     }
     else
