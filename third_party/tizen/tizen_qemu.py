@@ -66,7 +66,7 @@ parser.add_argument(
           "default: $TIZEN_SDK_ROOT/iot-sysdata.img"))
 parser.add_argument(
     '--share', type=str,
-    help="directory to be shared")
+    help="directory to be shared, runner.sh inside will be run if present")
 parser.add_argument(
     '--output', metavar='FILE', default="/dev/null",
     help="store the QEMU output in a FILE")
