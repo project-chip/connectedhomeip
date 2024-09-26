@@ -82,6 +82,7 @@ def main():
         help="Inject extra packages for specific platforms. Format is <platform>:<path_to_json>"
     )
 
+    logging.basicConfig(format= '%(asctime)s %(message)s', level=logging.INFO)
     generate_new_cipd_package_json(**vars(parser.parse_args()))
 
 
