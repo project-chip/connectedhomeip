@@ -37,16 +37,16 @@ logger = logging.getLogger(__name__)
 cluster = Clusters.Thermostat
 
 
-class TC_TSTAT_2_2(MatterBaseTest):
-    def desc_TC_TSTAT_2_2(self) -> str:
+class TC_TSTAT_2_3(MatterBaseTest):
+    def desc_TC_TSTAT_2_3(self) -> str:
         """Returns a description of this test"""
-        return "42.2.2. [TC-TSTAT-2.2] Setpoint Test Cases with server as DUT"
+        return "[TC-TSTAT-2.3] Setpoint Deadband Test Cases with server as DUT""
 
-    def pics_TC_TSTAT_2_2(self):
+    def pics_TC_TSTAT_2_3(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
         return ["TSTAT.S"]
 
-    def steps_TC_TSTAT_2_2(self) -> list[TestStep]:
+    def steps_TC_TSTAT_2_3(self) -> list[TestStep]:
         steps = [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
@@ -64,7 +64,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
         return steps
 
     @async_test_body
-    async def test_TC_TSTAT_2_2(self):
+    async def test_TC_TSTAT_2_3(self):
         endpoint = self.user_params.get("endpoint", 1)
 
         self.step("1")
