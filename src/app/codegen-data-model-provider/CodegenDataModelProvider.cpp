@@ -699,11 +699,11 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
 
         if (err != CHIP_ERROR_NOT_IMPLEMENTED)
         {
-            auto beforeId = finder.GetFound();
+            auto nextId = finder.GetFound();
 
-            if ((err == CHIP_NO_ERROR) && beforeId.has_value())
+            if ((err == CHIP_NO_ERROR) && nextId.has_value())
             {
-                return ConcreteCommandPath(before.mEndpointId, before.mClusterId, *beforeId);
+                return ConcreteCommandPath(before.mEndpointId, before.mClusterId, *nextId);
             }
 
             return kInvalidCommandPath;
