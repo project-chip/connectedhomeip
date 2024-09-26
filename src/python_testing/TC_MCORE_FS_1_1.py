@@ -47,7 +47,7 @@ class AppServer(Subprocess):
     """Wrapper class for starting an application server in a subprocess."""
 
     # Prefix for log messages from the application server.
-    PREFIX = "[SERVER]"
+    PREFIX = b"[SERVER]"
 
     def __init__(self, app: str, storage_dir: str, discriminator: int, passcode: int, port: int = 5540):
         storage_kvs_dir = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")[1]
@@ -56,7 +56,7 @@ class AppServer(Subprocess):
                          '--secured-device-port', str(port),
                          "--discriminator", str(discriminator),
                          "--passcode", str(passcode),
-                         prefix=self.PREFIX)
+                         output_cb=lambda line, is_stderr: self.PREFIX + line)
 
     def start(self):
         # Start process and block until it prints the expected output.
