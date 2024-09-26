@@ -28,12 +28,12 @@ Git: 0.7-fall2024-ncr-1158-g413e195c2
     <item fieldId="1" name="Name" type="char_string" length="48"/>
   </struct>
 
-  <cluster>
+  <cluster apiMaturity="provisional">
     <domain name="General"/>
     <name>Chime</name>
     <code>0x0556</code>
     <define>CHIME_CLUSTER</define>
-    <description/>
+    <description>This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell.</description>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1"/>
