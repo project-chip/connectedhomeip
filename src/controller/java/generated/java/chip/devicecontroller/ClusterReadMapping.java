@@ -18236,6 +18236,109 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readChimeInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readChimeInstalledChimeSoundsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readChimeInstalledChimeSoundsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ChimeCluster) cluster).readInstalledChimeSoundsAttribute(
+              (ChipClusters.ChimeCluster.InstalledChimeSoundsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedChimeClusterInstalledChimeSoundsAttributeCallback(),
+          readChimeInstalledChimeSoundsCommandParams
+        );
+        result.put("readInstalledChimeSoundsAttribute", readChimeInstalledChimeSoundsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readChimeActiveChimeSoundIdCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readChimeActiveChimeSoundIdAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ChimeCluster) cluster).readActiveChimeSoundIdAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readChimeActiveChimeSoundIdCommandParams
+        );
+        result.put("readActiveChimeSoundIdAttribute", readChimeActiveChimeSoundIdAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readChimeEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readChimeEnabledAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ChimeCluster) cluster).readEnabledAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readChimeEnabledCommandParams
+        );
+        result.put("readEnabledAttribute", readChimeEnabledAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readChimeGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readChimeGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ChimeCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.ChimeCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedChimeClusterGeneratedCommandListAttributeCallback(),
+          readChimeGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readChimeGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readChimeAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readChimeAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ChimeCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.ChimeCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedChimeClusterAcceptedCommandListAttributeCallback(),
+          readChimeAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readChimeAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readChimeEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readChimeEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ChimeCluster) cluster).readEventListAttribute(
+              (ChipClusters.ChimeCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedChimeClusterEventListAttributeCallback(),
+          readChimeEventListCommandParams
+        );
+        result.put("readEventListAttribute", readChimeEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readChimeAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readChimeAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ChimeCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.ChimeCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedChimeClusterAttributeListAttributeCallback(),
+          readChimeAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readChimeAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readChimeFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readChimeFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ChimeCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readChimeFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readChimeFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readChimeClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readChimeClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ChimeCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readChimeClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readChimeClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readEcosystemInformationInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readEcosystemInformationDeviceDirectoryCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readEcosystemInformationDeviceDirectoryAttributeInteractionInfo = new InteractionInfo(
@@ -19686,6 +19789,7 @@ public class ClusterReadMapping {
             put("accountLogin", readAccountLoginInteractionInfo());
             put("contentControl", readContentControlInteractionInfo());
             put("contentAppObserver", readContentAppObserverInteractionInfo());
+            put("chime", readChimeInteractionInfo());
             put("ecosystemInformation", readEcosystemInformationInteractionInfo());
             put("commissionerControl", readCommissionerControlInteractionInfo());
             put("unitTesting", readUnitTestingInteractionInfo());
