@@ -20,8 +20,8 @@ import logging
 import platform
 
 _LIST_OF_PACKAGES_TO_EXCLUDE = {
-   'fuchsia/third_party/rust/',
-   'infra/3pp/tools/renode',
+    'fuchsia/third_party/rust/',
+    'infra/3pp/tools/renode',
 }
 
 
@@ -85,7 +85,7 @@ def main():
         help="Inject extra packages for specific platforms. Format is <platform>:<path_to_json>"
     )
 
-    logging.basicConfig(format= '%(asctime)s %(message)s', level=logging.INFO)
+    logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
     generate_new_cipd_package_json(**vars(parser.parse_args()))
 
 
