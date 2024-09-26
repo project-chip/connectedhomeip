@@ -48,12 +48,14 @@ def generate_new_cipd_package_json(input, output, extra):
     # Filter it for the given platform and append any resulting packages
     my_platform = platform.system().lower()
 
-    logging.info("LADING EXTRA PACKAGES FOR %s", my_platform)
+    logging.info("LOADING EXTRA PACKAGES FOR %s", my_platform)
+    logging.info("Mappings: %r", extra)
 
     for item in extra:
         inject_platform, path = item.split(':', 1)
 
         if inject_platform.lower() != my_platform:
+            logging.info("Skipping: %s (i.e. %s)", inject_platform.lower(), path)
             continue
 
         logging.info("Appending: %s", path)
