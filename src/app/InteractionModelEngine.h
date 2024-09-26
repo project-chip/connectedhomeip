@@ -612,6 +612,11 @@ private:
     void ShutdownMatchingSubscriptions(const Optional<FabricIndex> & aFabricIndex = NullOptional,
                                        const Optional<NodeId> & aPeerNodeId       = NullOptional);
 
+    /**
+     * Check if the given attribute path is a valid path in the data model provider.
+     */
+    bool IsExistingAttributePath(const ConcreteAttributePath &path);
+
     static void ResumeSubscriptionsTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 
     template <typename T, size_t N>

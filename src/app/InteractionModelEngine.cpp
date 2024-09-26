@@ -1584,6 +1584,26 @@ CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(SingleLinkedListNo
     return err;
 }
 
+bool InteractionModelEngine::IsExistingAttributePath(const ConcreteAttributePath & path)
+{
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+    // Ensure that Provider interface and ember are IDENTICAL in attribute location (i.e. "check" mode)
+    VerifyOrDie(GetDataModelProvider()
+                    ->GetAttributeInfo(ConcreteAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId))
+                    .has_value() == emberAfContainsAttribute(path.mEndpointId, path.mClusterId, path.mAttributeId)
+
+    );
+#endif
+
+    return GetDataModelProvider()
+        ->GetAttributeInfo(ConcreteAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId))
+        .has_value();
+#else
+    return emberAfContainsAttribute(path.mEndpointId, path.mClusterId, path.mAttributeId);
+#endif
+}
+
 void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedListNode<AttributePathParams> *& aAttributePaths)
 {
     SingleLinkedListNode<AttributePathParams> * prev = nullptr;
@@ -1592,31 +1612,11 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedLi
     while (path1 != nullptr)
     {
         bool duplicate = false;
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE && CHIP_CONFIG_USE_EMBER_DATA_MODEL
-        // Ensure that Provider interface and ember are IDENTICAL in attribute location (i.e. "check" mode)
-        if (!path1->mValue.IsWildcardPath())
-        {
-            VerifyOrDie(GetDataModelProvider()
-                            ->GetAttributeInfo(ConcreteAttributePath(path1->mValue.mEndpointId, path1->mValue.mClusterId,
-                                                                     path1->mValue.mAttributeId))
-                            .has_value() ==
-                        emberAfContainsAttribute(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId)
-
-            );
-        }
-#endif
 
         // skip all wildcard paths and invalid concrete attribute
         if (path1->mValue.IsWildcardPath() ||
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-            !GetDataModelProvider()
-                 ->GetAttributeInfo(
-                     ConcreteAttributePath(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId))
-                 .has_value()
-#else
-            !emberAfContainsAttribute(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId)
-#endif
-        )
+            !IsExistingAttributePath(
+                ConcreteAttributePath(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId)))
         {
             prev  = path1;
             path1 = path1->mpNext;
