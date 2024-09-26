@@ -19,8 +19,8 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
-#include <app/ConcreteCommandPath.h>
 #include <app/ConcreteClusterPath.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/util/IMClusterCommandHandler.h>
