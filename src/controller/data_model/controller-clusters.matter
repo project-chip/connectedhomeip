@@ -9408,8 +9408,8 @@ provisional cluster ContentAppObserver = 1296 {
   command ContentAppMessage(ContentAppMessageRequest): ContentAppMessageResponse = 0;
 }
 
-/**  */
-cluster Chime = 1366 {
+/** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
+provisional cluster Chime = 1366 {
   revision 1;
 
   struct ChimeSoundStruct {

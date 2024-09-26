@@ -14759,7 +14759,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Cluster Chime
  *
- *
+ * This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterChime : MTRGenericBaseCluster
