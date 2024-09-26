@@ -19,7 +19,10 @@ import json
 import logging
 import platform
 
-_LIST_OF_PACKAGES_TO_EXCLUDE = ['fuchsia/third_party/rust/']
+_LIST_OF_PACKAGES_TO_EXCLUDE = {
+   'fuchsia/third_party/rust/',
+   'infra/3pp/tools/renode',
+}
 
 
 def include_package(package: dict) -> bool:
