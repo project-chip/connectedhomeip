@@ -64,16 +64,21 @@ public:
     template <typename T>
     CHIP_ERROR GLibMatterContextInvokeSync(CHIP_ERROR (*func)(T *), T * userData)
     {
-        CHIP_ERROR LambdaErrorReturn;
+        struct
+        {
+            CHIP_ERROR returnValue = CHIP_NO_ERROR;
+            CHIP_ERROR (*functionToCall)(T *);
+            T * userData;
+        } context;
 
-        // wrapping the function pointer and userData into a Lambda, to be stored and passed as a LambdaBridge
-        auto lambda = [func, userData](CHIP_ERROR * apErrorReturn) { *apErrorReturn = func(userData); };
+        context.functionToCall = func;
+        context.userData       = userData;
 
         LambdaBridge bridge;
-        bridge.Initialize(lambda, &LambdaErrorReturn);
-        _GLibMatterContextInvokeSync(std::move(bridge));
+        bridge.Initialize([&context]() { context.returnValue = context.functionToCall(context.userData); });
 
-        return LambdaErrorReturn;
+        _GLibMatterContextInvokeSync(std::move(bridge));
+        return context.returnValue;
     }
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
