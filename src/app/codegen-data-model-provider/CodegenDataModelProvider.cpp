@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/support/logging/TextOnlyLogging.h"
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <app-common/zap-generated/attribute-type.h>
