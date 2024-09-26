@@ -142,7 +142,7 @@ void PlatformManagerImpl::_Shutdown()
     mGLibMainLoop = nullptr;
 }
 
-void PlatformManagerImpl::_GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData)
+void PlatformManagerImpl::_GLibMatterContextInvokeSync(LambdaBridge && bridge)
 {
     GLibMatterContextInvokeData invokeData{ std::move(bridge) };
 
