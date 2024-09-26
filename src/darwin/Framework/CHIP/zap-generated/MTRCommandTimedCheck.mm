@@ -1124,6 +1124,15 @@ static BOOL CommandNeedsTimedInvokeInContentAppObserverCluster(AttributeId aAttr
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInChimeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Chime;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInEcosystemInformationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::EcosystemInformation;
@@ -1511,6 +1520,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ContentAppObserver::Id: {
         return CommandNeedsTimedInvokeInContentAppObserverCluster(commandID);
+    }
+    case Clusters::Chime::Id: {
+        return CommandNeedsTimedInvokeInChimeCluster(commandID);
     }
     case Clusters::EcosystemInformation::Id: {
         return CommandNeedsTimedInvokeInEcosystemInformationCluster(commandID);

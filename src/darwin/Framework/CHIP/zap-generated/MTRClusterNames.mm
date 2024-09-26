@@ -369,6 +369,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeContentAppObserverID:
         result = @"ContentAppObserver";
         break;
+    case MTRClusterIDTypeChimeID:
+        result = @"Chime";
+        break;
     case MTRClusterIDTypeEcosystemInformationID:
         result = @"EcosystemInformation";
         break;
@@ -8136,6 +8139,53 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeChimeID:
+
+        switch (attributeID) {
+
+            // Cluster Chime attributes
+        case MTRAttributeIDTypeClusterChimeAttributeInstalledChimeSoundsID:
+            result = @"InstalledChimeSounds";
+            break;
+
+        case MTRAttributeIDTypeClusterChimeAttributeActiveChimeSoundIdID:
+            result = @"ActiveChimeSoundId";
+            break;
+
+        case MTRAttributeIDTypeClusterChimeAttributeEnabledID:
+            result = @"Enabled";
+            break;
+
+        case MTRAttributeIDTypeClusterChimeAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterChimeAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterChimeAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterChimeAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterChimeAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterChimeAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeEcosystemInformationID:
 
         switch (attributeID) {
@@ -10278,6 +10328,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeContentAppObserverID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %d>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeChimeID:
 
         switch (eventID) {
 

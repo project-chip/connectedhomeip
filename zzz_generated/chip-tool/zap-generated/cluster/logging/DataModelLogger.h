@@ -405,6 +405,9 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ContentControl::Structs::RatingNameStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Chime::Structs::ChimeSoundStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::DecodableType & value);
 
 static CHIP_ERROR

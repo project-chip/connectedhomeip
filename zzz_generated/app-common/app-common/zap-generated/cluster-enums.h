@@ -5392,6 +5392,8 @@ enum class StatusEnum : uint8_t
 };
 } // namespace ContentAppObserver
 
+namespace Chime {} // namespace Chime
+
 namespace EcosystemInformation {} // namespace EcosystemInformation
 
 namespace CommissionerControl {

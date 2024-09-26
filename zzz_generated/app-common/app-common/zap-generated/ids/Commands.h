@@ -1803,6 +1803,16 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace ContentAppObserver
 
+namespace Chime {
+namespace Commands {
+
+namespace PlayChimeSound {
+static constexpr CommandId Id = 0x00000000;
+} // namespace PlayChimeSound
+
+} // namespace Commands
+} // namespace Chime
+
 namespace CommissionerControl {
 namespace Commands {
 
