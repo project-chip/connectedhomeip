@@ -51,7 +51,7 @@ def generate_new_cipd_package_json(input, output, extra):
     logging.info("LOADING EXTRA PACKAGES FOR %s", my_platform)
     logging.info("Mappings: %r", extra)
 
-    for item in extra:
+    for item, in extra:
         inject_platform, path = item.split(':', 1)
 
         if inject_platform.lower() != my_platform:
@@ -83,7 +83,7 @@ def main():
         '--output', '-o', required=True
     )
     parser.add_argument(
-        '--extra', '-e', nargs='*', default=[],
+        '--extra', '-e', nargs='*', action="append",
         help="Inject extra packages for specific platforms. Format is <platform>:<path_to_json>"
     )
 
