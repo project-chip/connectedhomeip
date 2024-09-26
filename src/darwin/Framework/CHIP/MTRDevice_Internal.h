@@ -120,21 +120,9 @@ MTR_DIRECT_MEMBERS
     // Our controller.  Declared nullable because our property is, though in
     // practice it does not look like we ever set it to nil.
     MTRDeviceController * _Nullable _deviceController;
-
-    // Whether this device has been accessed via the public deviceWithNodeID API
-    // (as opposed to just via the internal _deviceWithNodeID).
-    BOOL _accessedViaPublicAPI;
 }
 
-/**
- * Internal way of creating an MTRDevice that does not flag the device as being
- * visible to external API consumers.
- */
-+ (MTRDevice *)_deviceWithNodeID:(NSNumber *)nodeID
-                      controller:(MTRDeviceController *)controller;
-
 - (instancetype)initForSubclassesWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
-- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
 // called by controller to clean up and shutdown
 - (void)invalidate;
@@ -196,12 +184,27 @@ MTR_DIRECT_MEMBERS
 
 - (BOOL)_delegateExists;
 
+// Must be called by subclasses or MTRDevice implementation only.
+- (void)_delegateAdded;
+
 #ifdef DEBUG
 // Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
 // Returns YES if a delegate is called
 - (void)_callFirstDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
 #endif
 
+// Used to generate attribute report that contains all known attributes, taking into consideration expected values
+- (NSArray<NSDictionary<NSString *, id> *> *)getAllAttributesReport;
+
+// Hooks for controller suspend/resume.
+- (void)controllerSuspended;
+- (void)controllerResumed;
+
+@end
+
+#pragma mark - MTRDevice internal state monitoring
+@protocol MTRDeviceInternalStateDelegate
+- (void)devicePrivateInternalStateChanged:(MTRDevice *)device internalState:(NSDictionary *)state;
 @end
 
 #pragma mark - Constants
@@ -216,5 +219,14 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 // Declared inside platform, but noting here for reference
 // static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
+
+// Concrete to XPC internal state property dictionary keys
+static NSString * const kMTRDeviceInternalPropertyKeyVendorID = @"MTRDeviceInternalStateKeyVendorID";
+static NSString * const kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalStateKeyProductID";
+static NSString * const kMTRDeviceInternalPropertyNetworkFeatures = @"MTRDeviceInternalPropertyNetworkFeatures";
+static NSString * const kMTRDeviceInternalPropertyDeviceState = @"MTRDeviceInternalPropertyDeviceState";
+static NSString * const kMTRDeviceInternalPropertyLastSubscriptionAttemptWait = @"kMTRDeviceInternalPropertyLastSubscriptionAttemptWait";
+static NSString * const kMTRDeviceInternalPropertyMostRecentReportTime = @"MTRDeviceInternalPropertyMostRecentReportTime";
+static NSString * const kMTRDeviceInternalPropertyLastSubscriptionFailureTime = @"MTRDeviceInternalPropertyLastSubscriptionFailureTime";
 
 NS_ASSUME_NONNULL_END

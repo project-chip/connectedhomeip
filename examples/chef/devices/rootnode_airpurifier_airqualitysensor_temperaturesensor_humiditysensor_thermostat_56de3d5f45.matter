@@ -2757,7 +2757,7 @@ endpoint 1 {
   }
 
   server cluster FanControl {
-    ram      attribute fanMode default = 0;
+    persist  attribute fanMode default = 0;
     ram      attribute fanModeSequence default = 2;
     ram      attribute percentSetting default = 0;
     ram      attribute percentCurrent default = 0;
@@ -3143,11 +3143,11 @@ endpoint 5 {
     ram      attribute absMinHeatSetpointLimit default = 700;
     ram      attribute absMaxHeatSetpointLimit default = 3000;
     persist  attribute PIHeatingDemand default = 0;
-    ram      attribute occupiedHeatingSetpoint default = 2000;
-    ram      attribute minHeatSetpointLimit default = 700;
-    ram      attribute maxHeatSetpointLimit default = 3000;
-    ram      attribute controlSequenceOfOperation default = 2;
-    ram      attribute systemMode default = 4;
+    persist  attribute occupiedHeatingSetpoint default = 2000;
+    persist  attribute minHeatSetpointLimit default = 700;
+    persist  attribute maxHeatSetpointLimit default = 3000;
+    persist  attribute controlSequenceOfOperation default = 2;
+    persist  attribute systemMode default = 4;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

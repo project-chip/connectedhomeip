@@ -15,18 +15,28 @@
 #    limitations under the License.
 #
 
-# TODO: add to CI. See https://github.com/project-chip/connectedhomeip/issues/34676
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: examples/fabric-admin/scripts/fabric-sync-app.py
+# test-runner-run/run1/app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+# test-runner-run/run1/factoryreset: true
+# test-runner-run/run1/script-args: --PICS src/app/tests/suites/certification/ci-pics-values --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_server_app_path:${ALL_CLUSTERS_APP} dut_fsa_stdin_pipe:dut-fsa-stdin --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-run/run1/script-start-delay: 5
+# test-runner-run/run1/quiet: false
+# === END CI TEST ARGUMENTS ===
 
+import asyncio
 import hashlib
 import logging
 import os
 import queue
 import secrets
-import signal
 import struct
-import subprocess
+import tempfile
 import time
-import uuid
 from dataclasses import dataclass
 
 import chip.clusters as Clusters
@@ -34,6 +44,7 @@ from chip import ChipDeviceCtrl
 from ecdsa.curves import NIST256p
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+from TC_MCORE_FS_1_1 import AppServer
 from TC_SC_3_6 import AttributeChangeAccumulator
 
 # Length of `w0s` and `w1s` elements
@@ -50,7 +61,7 @@ def _generate_verifier(passcode: int, salt: bytes, iterations: int) -> bytes:
 
 
 @dataclass
-class _SetupParamters:
+class _SetupParameters:
     setup_qr_code: str
     manual_code: int
     discriminator: int
@@ -61,40 +72,59 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
-        self._app_th_server_process = None
-        self._th_server_kvs = None
+
+        self._partslist_subscription = None
+        self._cadmin_subscription = None
+        self.th_server = None
+        self.storage = None
+
+        th_server_port = self.user_params.get("th_server_port", 5543)
+        th_server_app = self.user_params.get("th_server_app_path", None)
+        if not th_server_app:
+            asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
+        if not os.path.exists(th_server_app):
+            asserts.fail(f'The path {th_server_app} does not exist')
+
+        # Create a temporary storage directory for keeping KVS files.
+        self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
+        logging.info("Temporary storage directory: %s", self.storage.name)
+
+        # Get the named pipe path for the DUT_FSA app input from the user params.
+        dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe", None)
+        if dut_fsa_stdin_pipe is not None:
+            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
+
+        self.th_server_port = th_server_port
+        # These are default testing values.
+        self.th_server_setup_params = _SetupParameters(
+            setup_qr_code="MT:-24J0AFN00KA0648G00",
+            manual_code=34970112332,
+            discriminator=3840,
+            passcode=20202021)
+
+        # Start the TH_SERVER_NO_UID app.
+        self.th_server = AppServer(
+            th_server_app,
+            storage_dir=self.storage.name,
+            port=self.th_server_port,
+            discriminator=self.th_server_setup_params.discriminator,
+            passcode=self.th_server_setup_params.passcode)
+        self.th_server.start()
 
     def teardown_class(self):
-        if self._app_th_server_process is not None:
-            logging.warning("Stopping app with SIGTERM")
-            self._app_th_server_process.send_signal(signal.SIGTERM.value)
-            self._app_th_server_process.wait()
-
-        if self._th_server_kvs is not None:
-            os.remove(self._th_server_kvs)
+        if self._partslist_subscription is not None:
+            self._partslist_subscription.Shutdown()
+            self._partslist_subscription = None
+        if self._cadmin_subscription is not None:
+            self._cadmin_subscription.Shutdown()
+            self._cadmin_subscription = None
+        if self.th_server is not None:
+            self.th_server.terminate()
+        if self.storage is not None:
+            self.storage.cleanup()
         super().teardown_class()
 
-    async def _create_th_server(self, port):
-        # These are default testing values
-        setup_params = _SetupParamters(setup_qr_code="MT:-24J0AFN00KA0648G00",
-                                       manual_code=34970112332, discriminator=3840, passcode=20202021)
-        kvs = f'kvs_{str(uuid.uuid4())}'
-
-        cmd = [self._th_server_app_path]
-        cmd.extend(['--secured-device-port', str(port)])
-        cmd.extend(['--discriminator', str(setup_params.discriminator)])
-        cmd.extend(['--passcode', str(setup_params.passcode)])
-        cmd.extend(['--KVS', kvs])
-
-        # TODO: Determine if we want these logs cooked or pushed to somewhere else
-        logging.info("Starting TH_SERVER")
-        self._app_th_server_process = subprocess.Popen(cmd)
-        self._th_server_kvs = kvs
-        logging.info("Started TH_SERVER")
-        time.sleep(3)
-        return setup_params
-
-    def _ask_for_vendor_commissioning_ux_operation(self, setup_params: _SetupParamters):
+    def _ask_for_vendor_commissioning_ux_operation(self, setup_params: _SetupParameters):
         self.wait_for_user_input(
             prompt_msg=f"Using the DUT vendor's provided interface, commission the ICD device using the following parameters:\n"
             f"- discriminator: {setup_params.discriminator}\n"
@@ -129,12 +159,6 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
 
         min_report_interval_sec = 0
         max_report_interval_sec = 30
-        th_server_port = self.user_params.get("th_server_port", 5543)
-        self._th_server_app_path = self.user_params.get("th_server_app_path", None)
-        if not self._th_server_app_path:
-            asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
-        if not os.path.exists(self._th_server_app_path):
-            asserts.fail(f'The path {self._th_server_app_path} does not exist')
 
         self.step(1)
         # Subscribe to the PartsList
@@ -142,7 +166,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         parts_list_subscription_contents = [
             (root_endpoint, Clusters.Descriptor.Attributes.PartsList)
         ]
-        parts_list_sub = await self.default_controller.ReadAttribute(
+        self._partslist_subscription = await self.default_controller.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=parts_list_subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
@@ -152,15 +176,21 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         parts_list_queue = queue.Queue()
         parts_list_attribute_handler = AttributeChangeAccumulator(
             name=self.default_controller.name, expected_attribute=Clusters.Descriptor.Attributes.PartsList, output=parts_list_queue)
-        parts_list_sub.SetAttributeUpdateCallback(parts_list_attribute_handler)
-        parts_list_cached_attributes = parts_list_sub.GetAttributes()
+        self._partslist_subscription.SetAttributeUpdateCallback(parts_list_attribute_handler)
+        parts_list_cached_attributes = self._partslist_subscription.GetAttributes()
         step_1_dut_parts_list = parts_list_cached_attributes[root_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
         asserts.assert_true(type_matches(step_1_dut_parts_list, list), "PartsList is expected to be a list")
 
         self.step(2)
-        setup_params = await self._create_th_server(th_server_port)
-        self._ask_for_vendor_commissioning_ux_operation(setup_params)
+        if not self.is_ci:
+            self._ask_for_vendor_commissioning_ux_operation(self.th_server_setup_params)
+        else:
+            self.dut_fsa_stdin.write(
+                f"pairing onnetwork 2 {self.th_server_setup_params.passcode}\n")
+            self.dut_fsa_stdin.flush()
+            # Wait for the commissioning to complete.
+            await asyncio.sleep(5)
 
         self.step(3)
         report_waiting_timeout_delay_sec = 30
@@ -219,7 +249,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         cadmin_subscription_contents = [
             (newly_added_endpoint, Clusters.AdministratorCommissioning)
         ]
-        cadmin_sub = await self.default_controller.ReadAttribute(
+        self._cadmin_subscription = await self.default_controller.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=cadmin_subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
@@ -230,7 +260,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         # This AttributeChangeAccumulator is really just to let us know when new subscription came in
         cadmin_attribute_handler = AttributeChangeAccumulator(
             name=self.default_controller.name, expected_attribute=Clusters.AdministratorCommissioning.Attributes.WindowStatus, output=cadmin_queue)
-        cadmin_sub.SetAttributeUpdateCallback(cadmin_attribute_handler)
+        self._cadmin_subscription.SetAttributeUpdateCallback(cadmin_attribute_handler)
         time.sleep(1)
 
         self.step(7)

@@ -134,6 +134,11 @@ void TransferSession::PollOutput(OutputEvent & event, System::Clock::Timestamp c
     mPendingOutput = OutputEventType::kNone;
 }
 
+void TransferSession::GetNextAction(OutputEvent & event)
+{
+    PollOutput(event, System::SystemClock().GetMonotonicTimestamp());
+}
+
 CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitData & initData, System::Clock::Timeout timeout)
 {
     VerifyOrReturnError(mState == TransferState::kUnitialized, CHIP_ERROR_INCORRECT_STATE);

@@ -169,20 +169,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::DegradationDire
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ErrorStateEnum val)
-{
-    using EnumType = detail::ErrorStateEnum;
-    switch (val)
-    {
-    case EnumType::kNoError:
-    case EnumType::kUnableToStartOrResume:
-    case EnumType::kUnableToCompleteOperation:
-    case EnumType::kCommandInvalidInState:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::FloorSurfaceTag val)
 {
     using EnumType = Globals::FloorSurfaceTag;
@@ -346,20 +332,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnit
     case EnumType::kNgm3:
     case EnumType::kPm3:
     case EnumType::kBqm3:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::OperationalStateEnum val)
-{
-    using EnumType = detail::OperationalStateEnum;
-    switch (val)
-    {
-    case EnumType::kStopped:
-    case EnumType::kRunning:
-    case EnumType::kPaused:
-    case EnumType::kError:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -1666,11 +1638,50 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Timer::TimerStatusEnum 
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(OvenCavityOperationalState::ErrorStateEnum val)
+{
+    using EnumType = OvenCavityOperationalState::ErrorStateEnum;
+    switch (val)
+    {
+    case EnumType::kNoError:
+    case EnumType::kUnableToStartOrResume:
+    case EnumType::kUnableToCompleteOperation:
+    case EnumType::kCommandInvalidInState:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(OvenCavityOperationalState::OperationalStateEnum val)
+{
+    using EnumType = OvenCavityOperationalState::OperationalStateEnum;
+    switch (val)
+    {
+    case EnumType::kStopped:
+    case EnumType::kRunning:
+    case EnumType::kPaused:
+    case EnumType::kError:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(OvenMode::ModeTag val)
 {
     using EnumType = OvenMode::ModeTag;
     switch (val)
     {
+    case EnumType::kAuto:
+    case EnumType::kQuick:
+    case EnumType::kQuiet:
+    case EnumType::kLowNoise:
+    case EnumType::kLowEnergy:
+    case EnumType::kVacation:
+    case EnumType::kMin:
+    case EnumType::kMax:
+    case EnumType::kNight:
+    case EnumType::kDay:
     case EnumType::kBake:
     case EnumType::kConvection:
     case EnumType::kGrill:
@@ -1823,8 +1834,47 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(MicrowaveOvenMode::Mode
     using EnumType = MicrowaveOvenMode::ModeTag;
     switch (val)
     {
+    case EnumType::kAuto:
+    case EnumType::kQuick:
+    case EnumType::kQuiet:
+    case EnumType::kLowNoise:
+    case EnumType::kLowEnergy:
+    case EnumType::kVacation:
+    case EnumType::kMin:
+    case EnumType::kMax:
+    case EnumType::kNight:
+    case EnumType::kDay:
     case EnumType::kNormal:
     case EnumType::kDefrost:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalState::ErrorStateEnum val)
+{
+    using EnumType = OperationalState::ErrorStateEnum;
+    switch (val)
+    {
+    case EnumType::kNoError:
+    case EnumType::kUnableToStartOrResume:
+    case EnumType::kUnableToCompleteOperation:
+    case EnumType::kCommandInvalidInState:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalState::OperationalStateEnum val)
+{
+    using EnumType = OperationalState::OperationalStateEnum;
+    switch (val)
+    {
+    case EnumType::kStopped:
+    case EnumType::kRunning:
+    case EnumType::kPaused:
+    case EnumType::kError:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
