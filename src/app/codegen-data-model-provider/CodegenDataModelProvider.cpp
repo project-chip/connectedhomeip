@@ -62,7 +62,10 @@ public:
         mCallback(callback), mOperation(Operation::kFindFirst), mTarget(kInvalidCommandId)
     {}
 
-    /// Find the given command id fo
+    /// Find the given command ID that matches the given operation/path.
+    ///
+    /// If operation is kFindFirst, then path commandID is ignored. Otherwise it is used as a key to
+    /// kFindExact or kFindNext.
     ///
     /// Returns:
     ///    - std::nullopt if no command found using the command handler interface
