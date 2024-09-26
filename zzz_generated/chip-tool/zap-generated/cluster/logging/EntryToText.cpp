@@ -259,6 +259,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ContentControl";
     case chip::app::Clusters::ContentAppObserver::Id:
         return "ContentAppObserver";
+    case chip::app::Clusters::Chime::Id:
+        return "Chime";
     case chip::app::Clusters::EcosystemInformation::Id:
         return "EcosystemInformation";
     case chip::app::Clusters::CommissionerControl::Id:
@@ -4375,6 +4377,31 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::Chime::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Chime::Attributes::InstalledChimeSounds::Id:
+            return "InstalledChimeSounds";
+        case chip::app::Clusters::Chime::Attributes::ActiveChimeSoundId::Id:
+            return "ActiveChimeSoundId";
+        case chip::app::Clusters::Chime::Attributes::Enabled::Id:
+            return "Enabled";
+        case chip::app::Clusters::Chime::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::Chime::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::Chime::Attributes::EventList::Id:
+            return "EventList";
+        case chip::app::Clusters::Chime::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::Chime::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::Chime::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::EcosystemInformation::Id: {
         switch (id)
         {
@@ -5697,6 +5724,15 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessage::Id:
             return "ContentAppMessage";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::Chime::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Chime::Commands::PlayChimeSound::Id:
+            return "PlayChimeSound";
         default:
             return "Unknown";
         }

@@ -3472,6 +3472,52 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("contentControl", writeContentControlInteractionInfo);
     Map<String, InteractionInfo> writeContentAppObserverInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("contentAppObserver", writeContentAppObserverInteractionInfo);
+    Map<String, InteractionInfo> writeChimeInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeChimeActiveChimeSoundIdCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo chimeactiveChimeSoundIdCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeChimeActiveChimeSoundIdCommandParams.put(
+        "value",
+        chimeactiveChimeSoundIdCommandParameterInfo
+    );
+    InteractionInfo writeChimeActiveChimeSoundIdAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ChimeCluster) cluster).writeActiveChimeSoundIdAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeChimeActiveChimeSoundIdCommandParams
+    );
+    writeChimeInteractionInfo.put("writeActiveChimeSoundIdAttribute", writeChimeActiveChimeSoundIdAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeChimeEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo chimeenabledCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeChimeEnabledCommandParams.put(
+        "value",
+        chimeenabledCommandParameterInfo
+    );
+    InteractionInfo writeChimeEnabledAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ChimeCluster) cluster).writeEnabledAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeChimeEnabledCommandParams
+    );
+    writeChimeInteractionInfo.put("writeEnabledAttribute", writeChimeEnabledAttributeInteractionInfo);
+    writeAttributeMap.put("chime", writeChimeInteractionInfo);
     Map<String, InteractionInfo> writeEcosystemInformationInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("ecosystemInformation", writeEcosystemInformationInteractionInfo);
     Map<String, InteractionInfo> writeCommissionerControlInteractionInfo = new LinkedHashMap<>();
