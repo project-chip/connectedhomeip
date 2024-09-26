@@ -191,7 +191,8 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
                                     .SetDiscriminator(commandData.discriminator)
                                     .SetIteration(commandData.iterations)
                                     .SetSalt(commandData.salt)
-                                    .SetVerifier(commandData.PAKEPasscodeVerifier), device->GetHandleId()) == CHIP_NO_ERROR)
+                                    .SetVerifier(commandData.PAKEPasscodeVerifier),
+                                device->GetHandleId()) == CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "Commissioning window is now open");
         status = Status::Success;

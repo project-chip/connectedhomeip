@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <optional>
 #include <memory>
+#include <optional>
 #include <set>
 #include <unordered_map>
 
@@ -28,7 +28,7 @@
 
 struct ScopedNodeIdHasher
 {
-    std::size_t operator()(const chip::ScopedNodeId& scopedNodeId) const
+    std::size_t operator()(const chip::ScopedNodeId & scopedNodeId) const
     {
         std::size_t h1 = std::hash<uint64_t>{}(scopedNodeId.GetFabricIndex());
         std::size_t h2 = std::hash<uint64_t>{}(scopedNodeId.GetNodeId());

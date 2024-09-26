@@ -130,7 +130,7 @@ pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice
     return pw::OkStatus();
 }
 
-//TODO this need to be updated to handleID
+// TODO this need to be updated to handleID
 pw::Status FabricBridge::RemoveSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response)
 {
     uint64_t handleId = request.device_handle_id;

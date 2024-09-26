@@ -119,7 +119,8 @@ CHIP_ERROR StartRpcClient()
 
 CHIP_ERROR OpenCommissioningWindow(chip_rpc_DeviceCommissioningWindowInfo device)
 {
-    ChipLogProgress(NotSpecified, "OpenCommissioningWindow with HandleId 0x" ChipLogFormatX64, ChipLogValueX64(device.device_handle_id));
+    ChipLogProgress(NotSpecified, "OpenCommissioningWindow with HandleId 0x" ChipLogFormatX64,
+                    ChipLogValueX64(device.device_handle_id));
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.

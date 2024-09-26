@@ -28,8 +28,8 @@ std::optional<uint64_t> BridgeAdminDeviceMapper::AddScopedNodeId(const chip::Sco
     VerifyOrDie(mNextHandleId != std::numeric_limits<uint64_t>::max());
     VerifyOrReturnValue(mScopedNodeIdToHandleId.find(scopedNodeId) == mScopedNodeIdToHandleId.end(), std::nullopt);
 
-    uint64_t handleId = mNextHandleId;
-    mHandleIdToScopedNodeId[handleId] = scopedNodeId;
+    uint64_t handleId                     = mNextHandleId;
+    mHandleIdToScopedNodeId[handleId]     = scopedNodeId;
     mScopedNodeIdToHandleId[scopedNodeId] = handleId;
     mNextHandleId++;
     return handleId;

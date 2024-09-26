@@ -18,8 +18,8 @@
 
 #include "DeviceSynchronization.h"
 
-#include "DeviceSubscriptionManager.h"
 #include "BridgeAdminDeviceMapper.h"
+#include "DeviceSubscriptionManager.h"
 
 #if defined(PW_RPC_ENABLED)
 #include "rpc/RpcClient.h"

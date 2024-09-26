@@ -50,7 +50,7 @@ public:
         // Accessing mPendingCheckIn should only be done while holding ChipStackLock
         assertChipStackLockedByCurrentThread();
         ScopedNodeId scopedNodeId = clientInfo.peer_node;
-        auto it       = mPendingCheckIn.find(scopedNodeId);
+        auto it                   = mPendingCheckIn.find(scopedNodeId);
         VerifyOrReturn(it != mPendingCheckIn.end());
 
         KeepActiveDataForCheckIn checkInData = it->second;
@@ -71,10 +71,8 @@ public:
         auto optionalHandleId = DeviceMgr().BridgeToAdminDeviceMapper().GetHandleId(scopedNodeId);
         if (!optionalHandleId.has_value())
         {
-            ChipLogError(
-                NotSpecified,
-                "ICD check-in for device for no longer on aggregator. Request dropped for Node ID: 0x%lx",
-                scopedNodeId.GetNodeId());
+            ChipLogError(NotSpecified, "ICD check-in for device for no longer on aggregator. Request dropped for Node ID: 0x%lx",
+                         scopedNodeId.GetNodeId());
             return;
         }
         uint64_t handleId = optionalHandleId.value();
@@ -166,9 +164,10 @@ public:
         auto optionalScopedNode = DeviceMgr().BridgeToAdminDeviceMapper().GetScopedNodeId(request.device_handle_id);
         VerifyOrReturnValue(optionalScopedNode.has_value(), pw::Status::InvalidArgument());
 
-        ChipLogProgress(NotSpecified, "Received KeepActive request: 0x%lx, %u", optionalScopedNode.value().GetNodeId(), request.stay_active_duration_ms);
-        KeepActiveWorkData * data =
-            Platform::New<KeepActiveWorkData>(this, optionalScopedNode.value(), request.stay_active_duration_ms, request.timeout_ms);
+        ChipLogProgress(NotSpecified, "Received KeepActive request: 0x%lx, %u", optionalScopedNode.value().GetNodeId(),
+                        request.stay_active_duration_ms);
+        KeepActiveWorkData * data = Platform::New<KeepActiveWorkData>(this, optionalScopedNode.value(),
+                                                                      request.stay_active_duration_ms, request.timeout_ms);
         VerifyOrReturnValue(data, pw::Status::Internal());
         DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
         return pw::OkStatus();
@@ -203,8 +202,10 @@ private:
 
     struct KeepActiveWorkData
     {
-        KeepActiveWorkData(FabricAdmin * fabricAdmin, ScopedNodeId scopedNodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs) :
-            mFabricAdmin(fabricAdmin), mScopedNodeId(scopedNodeId), mStayActiveDurationMs(stayActiveDurationMs), mTimeoutMs(timeoutMs)
+        KeepActiveWorkData(FabricAdmin * fabricAdmin, ScopedNodeId scopedNodeId, uint32_t stayActiveDurationMs,
+                           uint32_t timeoutMs) :
+            mFabricAdmin(fabricAdmin),
+            mScopedNodeId(scopedNodeId), mStayActiveDurationMs(stayActiveDurationMs), mTimeoutMs(timeoutMs)
         {}
 
         FabricAdmin * mFabricAdmin;
