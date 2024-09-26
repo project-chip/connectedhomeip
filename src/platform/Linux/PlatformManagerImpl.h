@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "lib/core/CHIPError.h"
 #include <condition_variable>
 #include <mutex>
 
@@ -69,16 +70,21 @@ public:
     template <typename T>
     CHIP_ERROR GLibMatterContextInvokeSync(CHIP_ERROR (*func)(T *), T * userData)
     {
-        CHIP_ERROR LambdaErrorReturn;
+        struct
+        {
+            CHIP_ERROR returnValue            = CHIP_NO_ERROR;
+            CHIP_ERROR (*functionToCall)(T *) = func;
+            T * userData                      = userData;
+        } context;
 
         // wrapping the function pointer and userData into a Lambda, to be stored and passed as a LambdaBridge
-        auto lambda = [func, userData](CHIP_ERROR * apErrorReturn) { *apErrorReturn = func(userData); };
+        auto lambda = [&context]() { context.returnValue = context.functionToCall(context.userData); };
 
         LambdaBridge bridge;
-        bridge.Initialize(lambda, &LambdaErrorReturn);
+        bridge.Initialize(lambda);
         _GLibMatterContextInvokeSync(std::move(bridge));
 
-        return LambdaErrorReturn;
+        return context.returnValue;
     }
 
     unsigned int GLibMatterContextAttachSource(GSource * source)
