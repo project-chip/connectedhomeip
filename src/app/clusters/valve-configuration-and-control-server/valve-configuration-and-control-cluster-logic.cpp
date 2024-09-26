@@ -276,6 +276,18 @@ CHIP_ERROR ClusterLogic::GetLevelStep(uint8_t & levelStep)
     levelStep = mState.GetState().levelStep;
     return CHIP_NO_ERROR;
 }
+CHIP_ERROR ClusterLogic::GetFeatureMap(Attributes::FeatureMap::TypeInfo::Type & featureMap)
+{
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
+    featureMap = mConformance.featureMap;
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR ClusterLogic::GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision)
+{
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
+    clusterRevision = kClusterRevision;
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR ClusterLogic::SetDefaultOpenDuration(const DataModel::Nullable<ElapsedS> & defaultOpenDuration)
 {

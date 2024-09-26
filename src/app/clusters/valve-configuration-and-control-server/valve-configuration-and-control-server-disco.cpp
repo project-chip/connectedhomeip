@@ -115,6 +115,14 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
         typedef LevelStep::TypeInfo::Type T;
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetLevelStep(ret); });
     }
+    case FeatureMap::Id: {
+        typedef FeatureMap::TypeInfo::Type T;
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetFeatureMap(ret); });
+    }
+    case ClusterRevision::Id: {
+        typedef ClusterRevision::TypeInfo::Type T;
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetClusterRevision(ret); });
+    }
     default:
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }

@@ -105,6 +105,8 @@ namespace {
 // These are globals because SetUpTestSuite is static and I'm not shaving that yak today.
 System::TimerAndMockClock gSystemLayerAndClock = System::TimerAndMockClock();
 System::Clock::ClockBase * gSavedClock         = nullptr;
+
+constexpr uint16_t kExpectedClusterRevision = 1u;
 } // namespace
 
 class TestValveConfigurationAndControlClusterLogic : public ::testing::Test
@@ -406,6 +408,8 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesAllFeature
     Percent valPercent;
     uint8_t val8;
     BitMask<ValveFaultBitmap> valBitmap;
+    Attributes::FeatureMap::TypeInfo::Type featureMap;
+    Attributes::ClusterRevision::TypeInfo::Type clusterRevision;
 
     EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
     EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
@@ -439,6 +443,12 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesAllFeature
 
     EXPECT_EQ(logic.GetLevelStep(val8), CHIP_NO_ERROR);
     EXPECT_EQ(val8, 1);
+
+    EXPECT_EQ(logic.GetFeatureMap(featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, conformance.featureMap);
+
+    EXPECT_EQ(logic.GetClusterRevision(clusterRevision), CHIP_NO_ERROR);
+    EXPECT_EQ(clusterRevision, kExpectedClusterRevision);
 }
 
 // This test ensures that attributes that are not supported by the conformance properly return errors
@@ -463,6 +473,8 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesNoFeatures
     Percent valPercent;
     uint8_t val8;
     BitMask<ValveFaultBitmap> valBitmap;
+    Attributes::FeatureMap::TypeInfo::Type featureMap;
+    Attributes::ClusterRevision::TypeInfo::Type clusterRevision;
 
     EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
     EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
@@ -490,6 +502,12 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesNoFeatures
     EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     EXPECT_EQ(logic.GetLevelStep(val8), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    EXPECT_EQ(logic.GetFeatureMap(featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, conformance.featureMap);
+
+    EXPECT_EQ(logic.GetClusterRevision(clusterRevision), CHIP_NO_ERROR);
+    EXPECT_EQ(clusterRevision, kExpectedClusterRevision);
 }
 
 // This test ensures that all attribute getters return the given starting state values before changes.
@@ -526,6 +544,8 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesStartingSt
     Percent valPercent;
     uint8_t val8;
     BitMask<ValveFaultBitmap> valBitmap;
+    Attributes::FeatureMap::TypeInfo::Type featureMap;
+    Attributes::ClusterRevision::TypeInfo::Type clusterRevision;
 
     EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
     EXPECT_EQ(valElapsedSNullable, state.openDuration);
@@ -559,6 +579,12 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesStartingSt
 
     EXPECT_EQ(logic.GetLevelStep(val8), CHIP_NO_ERROR);
     EXPECT_EQ(val8, state.levelStep);
+
+    EXPECT_EQ(logic.GetFeatureMap(featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, conformance.featureMap);
+
+    EXPECT_EQ(logic.GetClusterRevision(clusterRevision), CHIP_NO_ERROR);
+    EXPECT_EQ(clusterRevision, kExpectedClusterRevision);
 }
 
 // This test ensures that all attribute getter functions properly error on an uninitialized cluster.
@@ -576,6 +602,8 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesUninitiali
     Percent valPercent;
     uint8_t val8;
     BitMask<ValveFaultBitmap> valBitmap;
+    Attributes::FeatureMap::TypeInfo::Type featureMap;
+    Attributes::ClusterRevision::TypeInfo::Type clusterRevision;
 
     EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_ERROR_INCORRECT_STATE);
     EXPECT_EQ(logic.GetDefaultOpenDuration(valElapsedSNullable), CHIP_ERROR_INCORRECT_STATE);
@@ -588,6 +616,8 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesUninitiali
     EXPECT_EQ(logic.GetDefaultOpenLevel(valPercent), CHIP_ERROR_INCORRECT_STATE);
     EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_ERROR_INCORRECT_STATE);
     EXPECT_EQ(logic.GetLevelStep(val8), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(logic.GetFeatureMap(featureMap), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(logic.GetClusterRevision(clusterRevision), CHIP_ERROR_INCORRECT_STATE);
 }
 
 //=========================================================================================

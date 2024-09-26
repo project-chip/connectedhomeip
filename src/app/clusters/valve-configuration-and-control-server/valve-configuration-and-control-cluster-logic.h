@@ -22,6 +22,7 @@
 
 #include "valve-configuration-and-control-delegate.h"
 #include "valve-configuration-and-control-matter-context.h"
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/cluster-building-blocks/QuieterReporting.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
@@ -84,7 +85,7 @@ struct ClusterState
 class ClusterStateAttributes
 {
 public:
-    explicit ClusterStateAttributes(MatterContext & matterContext) : mMatterContext(matterContext){};
+    explicit ClusterStateAttributes(MatterContext & matterContext) : mMatterContext(matterContext) {};
     void Init(ClusterInitParameters initialState);
     const ClusterState & GetState() { return mState; }
 
@@ -143,6 +144,8 @@ public:
     CHIP_ERROR GetDefaultOpenLevel(Percent & defaultOpenLevel);
     CHIP_ERROR GetValveFault(BitMask<ValveFaultBitmap> & valveFault);
     CHIP_ERROR GetLevelStep(uint8_t & levelStep);
+    CHIP_ERROR GetFeatureMap(Attributes::FeatureMap::TypeInfo::Type & featureMap);
+    CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);
 
     // All Set functions
     // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
@@ -181,6 +184,10 @@ public:
     CHIP_ERROR HandleCloseCommand();
 
 private:
+    // This cluster implements version 1 of the valve cluster. Do not change this revision without updating
+    // the cluster to implement the newest features.
+    // TODO: consider implementing the server such that multiple revisions can be supported
+    static constexpr Attributes::ClusterRevision::TypeInfo::Type kClusterRevision = 1u;
     // Determines if the level value is allowed per the level step.
     bool ValueCompliesWithLevelStep(const uint8_t value);
     // Returns the target level to send to the delegate based on the targetLevel command field, the device conformance and the
