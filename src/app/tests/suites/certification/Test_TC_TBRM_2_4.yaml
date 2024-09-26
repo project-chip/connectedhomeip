@@ -21,6 +21,8 @@ PICS:
 
 config:
     nodeId: 0x12344321
+    cluster: Thread Border Router Management
+    endpoint: 1
 
     payload: "MT:-24J0AFN00KA0648G00"
     discriminator: 3840
@@ -70,8 +72,6 @@ tests:
     - label:
           "TH2 send GetActiveDatasetRequest command to the DUT in PASE session"
       identity: beta
-      cluster: Thread Border Router Management
-      endpoint: 1
       command: GetActiveDatasetRequest
       response:
           error: UNSUPPORTED_ACCESS
@@ -79,8 +79,6 @@ tests:
     - label:
           "TH2 send GetPendingDatasetRequest command to the DUT in PASE session"
       identity: beta
-      cluster: Thread Border Router Management
-      endpoint: 1
       command: GetPendingDatasetRequest
       response:
           error: UNSUPPORTED_ACCESS
