@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#include <vector>
-
 #include <pw_unit_test/framework.h>
 
 #include <app/codegen-data-model-provider/tests/EmberInvokeOverride.h>
@@ -30,11 +28,14 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeEncodeState.h>
 #include <app/AttributeValueDecoder.h>
+#include <app/CommandHandlerInterface.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/GlobalAttributes.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/StringBuilderAdapters.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
@@ -61,6 +62,8 @@
 #include <lib/core/TLVWriter.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include <vector>
 
 using namespace chip;
 using namespace chip::Test;
@@ -181,6 +184,61 @@ public:
     }
 
     bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return true; }
+};
+
+/// Overrides Enumerate*Commands in the CommandHandlerInterface to allow
+/// testing of behaviors when command enumeration is done in the interace.
+class CustomListCommandHandler : public CommandHandlerInterface
+{
+public:
+    CustomListCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) : CommandHandlerInterface(endpointId, clusterId)
+    {
+        CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
+    }
+    ~CustomListCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
+
+    void InvokeCommand(HandlerContext & handlerContext) override { handlerContext.SetCommandNotHandled(); }
+
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
+    {
+        VerifyOrReturnError(mOverrideAccepted, CHIP_ERROR_NOT_IMPLEMENTED);
+
+        for (auto id : mAccepted)
+        {
+            if (callback(id, context) != Loop::Continue)
+            {
+                break;
+            }
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
+    {
+        VerifyOrReturnError(mOverrideGenerated, CHIP_ERROR_NOT_IMPLEMENTED);
+
+        for (auto id : mGenerated)
+        {
+            if (callback(id, context) != Loop::Continue)
+            {
+                break;
+            }
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    void SetOverrideAccepted(bool o) { mOverrideAccepted = o; }
+    void SetOverrideGenerated(bool o) { mOverrideGenerated = o; }
+
+    std::vector<CommandId> & AcceptedVec() { return mAccepted; }
+    std::vector<CommandId> & GeneratedVec() { return mGenerated; }
+
+private:
+    bool mOverrideAccepted  = false;
+    bool mOverrideGenerated = false;
+
+    std::vector<CommandId> mAccepted;
+    std::vector<CommandId> mGenerated;
 };
 
 class ScopedMockAccessControl
@@ -1191,6 +1249,60 @@ TEST(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
         path = model.NextGeneratedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(3), 6));
         EXPECT_FALSE(path.HasValidIds());
     }
+}
+
+TEST(TestCodegenModelViaMocks, CommandHandlerInterfaceAcceptedCommands)
+{
+
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    // Command handler interface is capable to override accepted and generated commands.
+    // Validate that these work
+    CustomListCommandHandler handler(MakeOptional(kMockEndpoint1), MockClusterId(1));
+
+    // At this point, without overrides, there should be no accepted/generated commands
+    EXPECT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).IsValid());
+    EXPECT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).HasValidIds());
+    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).has_value());
+
+    handler.SetOverrideAccepted(true);
+    handler.SetOverrideGenerated(true);
+
+    // with overrides, the list is still empty ...
+    EXPECT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).IsValid());
+    EXPECT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1))).HasValidIds());
+    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).has_value());
+
+    // set some overrides
+    handler.AcceptedVec().push_back(1234);
+    handler.AcceptedVec().push_back(999);
+
+    handler.GeneratedVec().push_back(33);
+
+    DataModel::CommandEntry entry;
+
+    entry = model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
+    EXPECT_TRUE(entry.IsValid());
+    EXPECT_EQ(entry.path, ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234));
+
+    entry = model.NextAcceptedCommand(entry.path);
+    EXPECT_TRUE(entry.IsValid());
+    EXPECT_EQ(entry.path, ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 999));
+
+    entry = model.NextAcceptedCommand(entry.path);
+    EXPECT_FALSE(entry.IsValid());
+
+    ConcreteCommandPath path = model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
+    EXPECT_TRUE(path.HasValidIds());
+    EXPECT_EQ(path, ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 33));
+    path = model.NextGeneratedCommand(path);
+    EXPECT_FALSE(path.HasValidIds());
+
+    // Command finding should work
+    EXPECT_TRUE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 1234)).has_value());
+    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 88)).has_value());
+    EXPECT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint1, MockClusterId(1), 33)).has_value());
 }
 
 TEST(TestCodegenModelViaMocks, EmberAttributeReadAclDeny)
