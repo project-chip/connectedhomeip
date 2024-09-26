@@ -320,20 +320,6 @@ using namespace chip::Tracing::DarwinFramework;
     // Subclass hook; nothing to do.
 }
 
-- (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate
-{
-    // TODO: Once the factory knows it's dealing with MTRDeviceController_Concrete, this can be removed, and its
-    // declaration moved to MTRDeviceController_Concrete.
-    return NO;
-}
-
-- (void)clearPendingShutdown
-{
-    // TODO: Once the factory knows it's dealing with MTRDeviceController_Concrete, this can be removed, and its
-    // declaration moved to MTRDeviceController_Concrete.
-    MTR_ABSTRACT_METHOD();
-}
-
 - (void)shutdown
 {
     MTR_ABSTRACT_METHOD();
@@ -1083,36 +1069,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     auto storedValue = _storedCompressedFabricID.load();
     return storedValue.has_value() ? @(storedValue.value()) : nil;
-}
-
-- (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
-                    fabricIndex:(chip::FabricIndex)fabricIndex
-                      isRunning:(BOOL *)isRunning
-{
-    assertChipStackLockedByCurrentThread();
-
-    if (![self isRunning]) {
-        *isRunning = NO;
-        return CHIP_NO_ERROR;
-    }
-
-    const chip::FabricInfo * otherFabric = fabricTable->FindFabricWithIndex(fabricIndex);
-    if (!otherFabric) {
-        // Should not happen...
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    if (_cppCommissioner->GetFabricId() != otherFabric->GetFabricId()) {
-        *isRunning = NO;
-        return CHIP_NO_ERROR;
-    }
-
-    chip::Crypto::P256PublicKey ourRootPublicKey, otherRootPublicKey;
-    ReturnErrorOnFailure(_cppCommissioner->GetRootPublicKey(ourRootPublicKey));
-    ReturnErrorOnFailure(fabricTable->FetchRootPubkey(otherFabric->GetFabricIndex(), otherRootPublicKey));
-
-    *isRunning = (ourRootPublicKey.Matches(otherRootPublicKey));
-    return CHIP_NO_ERROR;
 }
 
 - (void)invalidateCASESessionForNode:(chip::NodeId)nodeID;

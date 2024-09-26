@@ -6,7 +6,7 @@ FROM ghcr.io/project-chip/chip-build-android:${VERSION} AS android
 FROM ghcr.io/project-chip/chip-build-esp32-qemu:${VERSION} as esp32
 FROM ghcr.io/project-chip/chip-build-telink:${VERSION} AS telink
 FROM ghcr.io/project-chip/chip-build-infineon:${VERSION} AS psoc6
-FROM ghcr.io/project-chip/chip-build-tizen:${VERSION} AS tizen
+FROM ghcr.io/project-chip/chip-build-tizen-qemu:${VERSION} AS tizen
 FROM ghcr.io/project-chip/chip-build-crosscompile:${VERSION} AS crosscompile
 FROM ghcr.io/project-chip/chip-build-ameba:${VERSION} AS ameba
 FROM ghcr.io/project-chip/chip-build-nxp:${VERSION} AS nxp
@@ -139,10 +139,10 @@ ENV NXP_SDK_PATH=/opt/nxp
 # NOTE: This directory is NOT persistent.
 ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 
-ENV TIZEN_VERSION 7.0
+ENV TIZEN_VERSION 8.0
 ENV TIZEN_SDK_ROOT /opt/tizen-sdk
 ENV TIZEN_SDK_TOOLCHAIN $TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2
-ENV TIZEN_SDK_SYSROOT $TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/mobile/rootstraps/mobile-$TIZEN_VERSION-device.core
+ENV TIZEN_SDK_SYSROOT $TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core
 
 ENV FVP_CORSTONE_300_PATH=/opt/FVP_Corstone_SSE-300
 ENV BOUFFALOLAB_SDK_ROOT=/opt/bouffalolab_sdk

@@ -513,4 +513,59 @@
     XCTAssertEqualObjects(publicKey, originalPublicKey);
 }
 
+- (void)testEqualTo
+{
+    __auto_type * testKeys1 = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(testKeys1);
+
+    __auto_type * testKeys2 = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(testKeys2);
+
+    __auto_type * issuerID1 = @(1);
+    __auto_type * issuerID2 = @(2);
+
+    __auto_type * fabricID1 = @(3);
+    __auto_type * fabricID2 = @(4);
+
+    NSError * error;
+    __auto_type * cert111a = [MTRCertificates createRootCertificate:testKeys1 issuerID:issuerID1 fabricID:fabricID1 error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(cert111a);
+
+    __auto_type * cert111b = [MTRCertificates createRootCertificate:testKeys1 issuerID:issuerID1 fabricID:fabricID1 error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(cert111b);
+
+    __auto_type * interval = [[NSDateInterval alloc] initWithStartDate:[NSDate now] duration:500];
+    __auto_type * cert111c = [MTRCertificates createRootCertificate:testKeys1 issuerID:issuerID1 fabricID:fabricID1 validityPeriod:interval error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(cert111c);
+
+    __auto_type * cert112 = [MTRCertificates createRootCertificate:testKeys1 issuerID:issuerID1 fabricID:fabricID2 error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(cert112);
+
+    __auto_type * cert121 = [MTRCertificates createRootCertificate:testKeys1 issuerID:issuerID2 fabricID:fabricID1 error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(cert121);
+
+    __auto_type * cert211 = [MTRCertificates createRootCertificate:testKeys2 issuerID:issuerID1 fabricID:fabricID1 error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(cert121);
+
+    XCTAssertTrue([MTRCertificates isCertificate:cert111a equalTo:cert111b]);
+    XCTAssertTrue([MTRCertificates isCertificate:cert111a equalTo:cert111c]);
+    XCTAssertTrue([MTRCertificates isCertificate:cert111b equalTo:cert111c]);
+    XCTAssertTrue([MTRCertificates isCertificate:cert111c equalTo:cert111b]);
+
+    XCTAssertFalse([MTRCertificates isCertificate:cert111a equalTo:cert112]);
+    XCTAssertFalse([MTRCertificates isCertificate:cert111a equalTo:cert121]);
+    XCTAssertFalse([MTRCertificates isCertificate:cert111a equalTo:cert211]);
+
+    XCTAssertFalse([MTRCertificates isCertificate:cert112 equalTo:cert121]);
+    XCTAssertFalse([MTRCertificates isCertificate:cert112 equalTo:cert211]);
+
+    XCTAssertFalse([MTRCertificates isCertificate:cert121 equalTo:cert211]);
+}
+
 @end

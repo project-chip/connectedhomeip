@@ -1893,7 +1893,7 @@ endpoint 1 {
   }
 
   server cluster OnOff {
-    ram      attribute onOff default = 0;
+    persist  attribute onOff default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -1906,7 +1906,7 @@ endpoint 1 {
   }
 
   server cluster LevelControl {
-    ram      attribute currentLevel default = 0x00;
+    persist  attribute currentLevel default = 0x00;
     ram      attribute minLevel default = 0x00;
     ram      attribute maxLevel default = 0xFE;
     ram      attribute options default = 0x00;

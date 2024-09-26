@@ -975,9 +975,9 @@ MTR_DIRECT_MEMBERS
     return [_controllers copy];
 }
 
-- (nullable MTRDeviceController *)runningControllerForFabricIndex:(FabricIndex)fabricIndex
-                                      includeControllerStartingUp:(BOOL)includeControllerStartingUp
-                                    includeControllerShuttingDown:(BOOL)includeControllerShuttingDown
+- (nullable MTRDeviceController_Concrete *)runningControllerForFabricIndex:(FabricIndex)fabricIndex
+                                               includeControllerStartingUp:(BOOL)includeControllerStartingUp
+                                             includeControllerShuttingDown:(BOOL)includeControllerShuttingDown
 {
     assertChipStackLockedByCurrentThread();
 
@@ -1006,7 +1006,7 @@ MTR_DIRECT_MEMBERS
     return nil;
 }
 
-- (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
+- (nullable MTRDeviceController_Concrete *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
 {
     return [self runningControllerForFabricIndex:fabricIndex includeControllerStartingUp:YES includeControllerShuttingDown:YES];
 }
