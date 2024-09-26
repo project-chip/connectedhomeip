@@ -134,7 +134,7 @@ std::optional<CommandId> EnumeratorCommandFinder::FindCommandId(Operation operat
 
     if (err != CHIP_NO_ERROR)
     {
-        // Report the error here since we lose actual error. This generally should NOT be possible as CHI usually returns
+        // Report the error here since we lose actual error. This generally should NOT be possible as CommandHandlerInterface usually returns
         // unimplemented or should just work for our use case (our callback never fails)
         ChipLogError(DataManagement, "Enumerate error: %" CHIP_ERROR_FORMAT, err.Format());
         return kInvalidCommandId;
