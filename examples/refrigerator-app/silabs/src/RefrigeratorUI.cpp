@@ -131,7 +131,7 @@ void RefrigeratorUI::DrawHeader(GLIB_Context_t * glibContext)
  */
 void RefrigeratorUI::DrawFooter(GLIB_Context_t * glibContext, bool autoMode)
 {
-    //TODO:: Need to implement this function
+    // TODO:: Need to implement this function
 
 #if SL_LCDCTRL_MUX
     sl_wfx_host_pre_lcd_spi_transfer();

@@ -29,7 +29,7 @@ namespace Clusters {
 
 namespace RefrigeratorAndTemperatureControlledCabinetMode {
 
-const uint8_t ModeNormal   = 0;
+const uint8_t ModeNormal      = 0;
 const uint8_t ModeRapidCool   = 1;
 const uint8_t ModeRapidFreeze = 2;
 
@@ -38,7 +38,7 @@ class RefrigeratorAndTemperatureControlledCabinetModeDelegate : public ModeBase:
 {
 private:
     using ModeTagStructType                  = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType modeTagsNoarmal[1]   = { { .value = to_underlying(ModeTag::kAuto) } };
+    ModeTagStructType modeTagsNoarmal[1]     = { { .value = to_underlying(ModeTag::kAuto) } };
     ModeTagStructType modeTagsRapidCool[1]   = { { .value = to_underlying(ModeTag::kRapidCool) } };
     ModeTagStructType modeTagsRapidFreeze[3] = { { .value = to_underlying(ModeBase::ModeTag::kMax) },
                                                  { .value = to_underlying(ModeTag::kRapidFreeze) } };
