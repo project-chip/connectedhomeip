@@ -99,7 +99,7 @@ public:
      * This function attempts to remove a device from a dynamic endpoint by iterating through the
      * available endpoints and checking if the device matches the specified HandleId. If the device is
      * found, it clears the dynamic endpoint, logs the removal,
-     * 
+     *
      * @param handleId The HandleId of the device to be removed.
      * @return unsigned of the index of the removed dynamic endpoint if successful, nullopt otherwise.
      */
