@@ -1918,7 +1918,7 @@ endpoint 1 {
   server cluster PowerSource {
     emits event BatFaultChange;
     ram      attribute status default = 0;
-    ram      attribute order default = 2;
+    persist  attribute order default = 2;
     ram      attribute description default = "B2";
     ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded;
