@@ -1141,12 +1141,10 @@ using namespace chip::Tracing::DarwinFramework;
                                            queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
 {
-    auto * baseDevice = [self newBaseDevice];
-    [baseDevice openCommissioningWindowWithSetupPasscode:setupPasscode
-                                           discriminator:discriminator
-                                                duration:duration
-                                                   queue:queue
-                                              completion:completion];
+    MTR_ABSTRACT_METHOD();
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+    });
 }
 
 - (void)openCommissioningWindowWithDiscriminator:(NSNumber *)discriminator
@@ -1154,8 +1152,10 @@ using namespace chip::Tracing::DarwinFramework;
                                            queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
 {
-    auto * baseDevice = [self newBaseDevice];
-    [baseDevice openCommissioningWindowWithDiscriminator:discriminator duration:duration queue:queue completion:completion];
+    MTR_ABSTRACT_METHOD();
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+    });
 }
 
 - (void)downloadLogOfType:(MTRDiagnosticLogType)type
@@ -1163,11 +1163,10 @@ using namespace chip::Tracing::DarwinFramework;
                     queue:(dispatch_queue_t)queue
                completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
-    auto * baseDevice = [self newBaseDevice];
-    [baseDevice downloadLogOfType:type
-                          timeout:timeout
-                            queue:queue
-                       completion:completion];
+    MTR_ABSTRACT_METHOD();
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+    });
 }
 
 #pragma mark - Cache management
@@ -1284,11 +1283,6 @@ using namespace chip::Tracing::DarwinFramework;
 {
     std::lock_guard lock(_lock);
     return _deviceCachePrimed;
-}
-
-- (MTRBaseDevice *)newBaseDevice
-{
-    return [MTRBaseDevice deviceWithNodeID:self.nodeID controller:self.deviceController];
 }
 
 #pragma mark Log Help
