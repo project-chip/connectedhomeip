@@ -20631,6 +20631,8 @@ NS_ASSUME_NONNULL_BEGIN
         _lastModifiedFabricIndex = nil;
 
         _nextCredentialIndex = nil;
+
+        _credentialData = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -20645,6 +20647,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.creatorFabricIndex = self.creatorFabricIndex;
     other.lastModifiedFabricIndex = self.lastModifiedFabricIndex;
     other.nextCredentialIndex = self.nextCredentialIndex;
+    other.credentialData = self.credentialData;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -20652,7 +20655,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: credentialExists:%@; userIndex:%@; creatorFabricIndex:%@; lastModifiedFabricIndex:%@; nextCredentialIndex:%@; >", NSStringFromClass([self class]), _credentialExists, _userIndex, _creatorFabricIndex, _lastModifiedFabricIndex, _nextCredentialIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: credentialExists:%@; userIndex:%@; creatorFabricIndex:%@; lastModifiedFabricIndex:%@; nextCredentialIndex:%@; credentialData:%@; >", NSStringFromClass([self class]), _credentialExists, _userIndex, _creatorFabricIndex, _lastModifiedFabricIndex, _nextCredentialIndex, [_credentialData base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -20731,6 +20734,17 @@ NS_ASSUME_NONNULL_BEGIN
             self.nextCredentialIndex = nil;
         } else {
             self.nextCredentialIndex = [NSNumber numberWithUnsignedShort:decodableStruct.nextCredentialIndex.Value()];
+        }
+    }
+    {
+        if (decodableStruct.credentialData.HasValue()) {
+            if (decodableStruct.credentialData.Value().IsNull()) {
+                self.credentialData = nil;
+            } else {
+                self.credentialData = AsData(decodableStruct.credentialData.Value().Value());
+            }
+        } else {
+            self.credentialData = nil;
         }
     }
     return CHIP_NO_ERROR;

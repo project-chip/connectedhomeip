@@ -2164,4 +2164,17 @@ CHIP_ERROR FabricTable::SetFabricIndexForNextAddition(FabricIndex fabricIndex)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR FabricTable::SetShouldAdvertiseIdentity(FabricIndex fabricIndex, AdvertiseIdentity advertiseIdentity)
+{
+    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    FabricInfo * fabricInfo  = GetMutableFabricByIndex(fabricIndex);
+    bool fabricIsInitialized = (fabricInfo != nullptr) && fabricInfo->IsInitialized();
+    VerifyOrReturnError(fabricIsInitialized, CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    fabricInfo->SetShouldAdvertiseIdentity(advertiseIdentity == AdvertiseIdentity::Yes);
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace chip
