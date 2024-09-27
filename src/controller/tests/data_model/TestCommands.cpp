@@ -50,16 +50,43 @@ using namespace chip::Protocols;
 
 namespace {
 
+const chip::Test::MockNodeConfig & TestMockNodeConfig()
+{
+    using namespace chip::app;
+    using namespace chip::Test;
+    using namespace chip::app::Clusters::Globals::Attributes;
+
+    // clang-format off
+    static const MockNodeConfig config({
+        MockEndpointConfig(kTestEndpointId, {
+            MockClusterConfig(Clusters::UnitTesting::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+            },
+            {},      // events
+            {
+               Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id,
+            }, // accepted commands
+            {} // generated commands
+          ),
+        }),
+    });
+    // clang-format on
+    return config;
+}
+
 class TestCommands : public chip::Test::AppContext
 {
 public:
-    void SetUp()
+    void SetUp() override
     {
         AppContext::SetUp();
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&CustomDataModel::Instance());
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
     }
-    void TearDown()
+
+    void TearDown() override
     {
+        chip::Test::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         AppContext::TearDown();
     }

@@ -721,12 +721,6 @@ CommandEntry CustomDataModel::NextAcceptedCommand(const ConcreteCommandPath & be
 
 std::optional<CommandInfo> CustomDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
-    // Mock cluster catalog, only support commands on one cluster on one endpoint.
-    if ((path.mEndpointId == DataModelTests::kTestEndpointId) && (path.mClusterId == Clusters::UnitTesting::Id))
-    {
-        return CommandInfo();
-    }
-
     return CodegenDataModelProviderInstance()->GetAcceptedCommandInfo(path);
 }
 
