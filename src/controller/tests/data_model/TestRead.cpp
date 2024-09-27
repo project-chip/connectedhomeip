@@ -20,7 +20,6 @@
 #include <pw_unit_test/framework.h>
 
 #include "DataModelFixtures.h"
-#include "lib/core/DataModelTypes.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ClusterStateCache.h>
@@ -32,6 +31,7 @@
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <controller/ReadInteraction.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
@@ -4766,8 +4766,8 @@ TEST_F(TestRead, TestReadHandler_KeepSubscriptionTest)
 
     readParam.mAttributePathParamsListSize = 0;
     readClient                             = std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(),
-                                                   app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
-                                                   app::ReadClient::InteractionType::Subscribe);
+                                                                               app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+                                                                               app::ReadClient::InteractionType::Subscribe);
     EXPECT_EQ(readClient->SendRequest(readParam), CHIP_NO_ERROR);
 
     DrainAndServiceIO();
