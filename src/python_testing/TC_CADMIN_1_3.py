@@ -32,7 +32,6 @@
 
 import logging
 import random
-from pathlib import Path
 from time import sleep
 
 import chip.clusters as Clusters
@@ -42,13 +41,12 @@ from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from chip.native import PyChipError
 from chip.tlv import TLVReader
-from matter_testing_support import MatterBaseTest, MatterStackState, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery import mdns_discovery
 from mobly import asserts
 
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
-
 
 class TC_CADMIN_1_3(MatterBaseTest):
     async def CommissionAttempt(
@@ -98,7 +96,7 @@ class TC_CADMIN_1_3(MatterBaseTest):
         window_status = await self.read_single_attribute_check_success(dev_ctrl=self.th2, fabric_filtered=True, cluster=AC_cluster, attribute=AC_cluster.Attributes.WindowStatus)
         return window_status
 
-    async def OpenCommissioningWindow(self, th: ChipDeviceCtrl, duration: int):
+    async def OpenCommissioningWindow(self, th: ChipDeviceCtrl, duration: int) -> CommissioningParameters:
         self.discriminator = random.randint(0, 4095)
         try:
             params = await th.OpenCommissioningWindow(
@@ -118,7 +116,7 @@ class TC_CADMIN_1_3(MatterBaseTest):
 
     async def read_nl_attr(self, th: str, attr_val: object):
         try:
-            result = await th.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, attr_val)])
+            await th.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, attr_val)])
         except Exception as e:
             asserts.assert_equal(e.err, "Received error message from read attribute attempt")
 
@@ -197,9 +195,9 @@ class TC_CADMIN_1_3(MatterBaseTest):
         await self.send_single_cmd(dev_ctrl=self.th1, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(10))
         th1_rcac_decoded = await self.get_rcac_decoded(th=self.th1)
         if th1_fabric_info[0].rootPublicKey != th1_rcac_decoded[9]:
-            asserts.fail(f"public keys from fabric and certs for TH1 are not the same")
+            asserts.fail("public keys from fabric and certs for TH1 are not the same")
         if th1_fabric_info[0].nodeID != self.dut_node_id:
-            asserts.fail(f"DUT node ID from fabric does not equal DUT node ID for TH1 during commissioning")
+            asserts.fail("DUT node ID from fabric does not equal DUT node ID for TH1 during commissioning")
 
         # Expiring the failsafe timer in an attempt to clean up before TH2 attempt.
         await self.th1.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
@@ -212,9 +210,9 @@ class TC_CADMIN_1_3(MatterBaseTest):
         await self.send_single_cmd(dev_ctrl=self.th2, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(self.max_window_duration))
         th2_rcac_decoded = await self.get_rcac_decoded(th=self.th2)
         if th2_fabric_info[0].rootPublicKey != th2_rcac_decoded[9]:
-            asserts.fail(f"public keys from fabric and certs for TH2 are not the same")
+            asserts.fail("public keys from fabric and certs for TH2 are not the same")
         if th2_fabric_info[0].nodeID != self.dut_node_id:
-            asserts.fail(f"DUT node ID from fabric does not match DUT node ID for TH2 during commissioning")
+            asserts.fail("DUT node ID from fabric does not match DUT node ID for TH2 during commissioning")
 
         await self.th2.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
 
@@ -239,9 +237,9 @@ class TC_CADMIN_1_3(MatterBaseTest):
 
         self.step(11)
         # TH_CR2 reads the window status to verify the DUT_CE window is closed
-        await self.th2.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
         window_status = await self.get_window_status()
         # window_status = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AdministratorCommissioning.Attributes.WindowStatus)])
+        AC_cluster = Clusters.AdministratorCommissioning
         self.print_step(0, dir(AC_cluster.Enums))
         self.print_step(1, window_status)
 
