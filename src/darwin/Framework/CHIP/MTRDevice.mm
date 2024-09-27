@@ -311,6 +311,8 @@ using namespace chip::Tracing::DarwinFramework;
         // dispatch with bad values).  While we promise to not return nil from
         // this method, if the caller is ignoring the nullability API contract,
         // there's not much we can do here.
+        MTR_LOG_ERROR("Can't create device with nodeID: %@, controller: %@",
+            nodeID, controller);
         return nil;
     }
 
