@@ -669,10 +669,10 @@ for that run, e.g.:
 # test-runner-runs:
 #   run1:
 #     app: ${TYPE_OF_APP}
-#     factoryreset: <true|false>
-#     quiet: <true|false>
 #     app-args: <app_arguments>
 #     script-args: <script_arguments>
+#     factoryreset: <true|false>
+#     quiet: <true|false>
 # === END CI TEST ARGUMENTS ===
 ```
 
@@ -700,6 +700,14 @@ for that run, e.g.:
 
     -   Example:
         `--discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json`
+
+-   `app-ready-pattern`: Regular expression pattern to match against the output
+    of the application to determine when the application is ready. If this
+    parameter is specified, the test runner will not run the test script until
+    the pattern is found.
+
+    -   Example:
+        `"Manual pairing code: \\[\\d+\\]"`
 
 -   `script-args`: Specifies the arguments to be passed to the test script.
 

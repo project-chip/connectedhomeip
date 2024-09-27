@@ -76,6 +76,8 @@ def process_test_script_output(line, is_stderr):
               help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests, but not the controller config')
 @click.option("--app-args", type=str, default='',
               help='The extra arguments passed to the device. Can use placholders like {SCRIPT_BASE_NAME}')
+@click.option("--app-ready-pattern", type=str, default=None,
+              help='Delay test script start until given regular expression pattern is found in the application output.')
 @click.option("--script", type=click.Path(exists=True), default=os.path.join(DEFAULT_CHIP_ROOT,
                                                                              'src',
                                                                              'controller',
@@ -92,7 +94,7 @@ def process_test_script_output(line, is_stderr):
 @click.option("--quiet", is_flag=True, help="Do not print output from passing tests. Use this flag in CI to keep github log sizes manageable.")
 @click.option("--load-from-env", default=None, help="YAML file that contains values for environment variables.")
 def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: str,
-         script: str, script_args: str, script_start_delay: int, script_gdb: bool, quiet: bool, load_from_env):
+         app_ready_pattern: str, script: str, script_args: str, script_gdb: bool, quiet: bool, load_from_env):
     if load_from_env:
         reader = MetadataReader(load_from_env)
         runs = reader.parse_script(script)
@@ -103,10 +105,11 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
                 run="cmd-run",
                 app=app,
                 app_args=app_args,
+                app_ready_pattern=app_ready_pattern,
                 script_args=script_args,
                 script_start_delay=script_start_delay,
-                factoryreset=factoryreset,
-                factoryreset_app_only=factoryreset_app_only,
+                factory_reset=factoryreset,
+                factory_reset_app_only=factoryreset_app_only,
                 script_gdb=script_gdb,
                 quiet=quiet
             )
@@ -118,17 +121,17 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
 
     for run in runs:
         print(f"Executing {run.py_script_path.split('/')[-1]} {run.run}")
-        main_impl(run.app, run.factoryreset, run.factoryreset_app_only, run.app_args,
-                  run.py_script_path, run.script_args, run.script_start_delay, run.script_gdb, run.quiet)
+        main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "",
+                  run.app_ready_pattern, run.py_script_path, run.script_args or "", run.script_start_delay, run.script_gdb, run.quiet)
 
 
-def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: str,
-              script: str, script_args: str, script_start_delay: int, script_gdb: bool, quiet: bool):
+def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
+              app_ready_pattern: str, script: str, script_args: str, script_start_delay: int, script_gdb: bool, quiet: bool):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
 
-    if factoryreset or factoryreset_app_only:
+    if factory_reset or factory_reset_app_only:
         # Remove native app config
         retcode = subprocess.call("rm -rf /tmp/chip* /tmp/repl*", shell=True)
         if retcode != 0:
@@ -143,7 +146,7 @@ def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_arg
             if retcode != 0:
                 raise Exception("Failed to remove %s for factory reset." % kvs_path_to_remove)
 
-    if factoryreset:
+    if factory_reset:
         # Remove Python test admin storage if provided
         storage_match = re.search(r"--storage-path (?P<storage_path>[^ ]+)", script_args)
         if storage_match:
@@ -167,11 +170,13 @@ def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_arg
         if not os.path.exists(app):
             if app is None:
                 raise FileNotFoundError(f"{app} not found")
+        if app_ready_pattern:
+            app_ready_pattern = re.compile(app_ready_pattern.encode())
         app_process = Subprocess(app, *shlex.split(app_args),
                                  output_cb=process_chip_app_output,
                                  f_stdout=stream_output,
                                  f_stderr=stream_output)
-        app_process.start()
+        app_process.start(expected_output=app_ready_pattern, timeout=30)
         app_process.p.stdin.close()
         app_pid = app_process.p.pid
 
