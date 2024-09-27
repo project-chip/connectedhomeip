@@ -305,6 +305,15 @@ using namespace chip::Tracing::DarwinFramework;
 
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
+    if (nodeID == nil || controller == nil) {
+        // These are not nullable in our API, but clearly someone is not
+        // actually turning on the relevant compiler checks (or is doing dynamic
+        // dispatch with bad values).  While we promise to not return nil from
+        // this method, if the caller is ignoring the nullability API contract,
+        // there's not much we can do here.
+        return nil;
+    }
+
     return [controller deviceForNodeID:nodeID];
 }
 
