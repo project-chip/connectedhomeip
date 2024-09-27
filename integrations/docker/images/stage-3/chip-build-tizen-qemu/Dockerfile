@@ -16,7 +16,6 @@ RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
     bc \
-    genisoimage \
     libgmp-dev \
     libmpc-dev \
     patch \
@@ -57,8 +56,12 @@ RUN set -x \
     && ./scripts/config -e VIRTIO_NET -e VETH \
     && ./scripts/config -e IKCONFIG -e IKCONFIG_PROC \
     && ./scripts/config -e BT_HCIVHCI -e CRYPTO_USER_API_HASH -e CRYPTO_USER_API_SKCIPHER \
-    && ./scripts/config -e OVERLAY_FS -e ISO9660_FS \
+    && ./scripts/config -e OVERLAY_FS \
     && ./scripts/config -e SECURITY_SMACK_PERMISSIVE_MODE \
+    && ./scripts/config -e NET_9P -e NET_9P_VIRTIO \
+    && ./scripts/config -e INET \
+    && ./scripts/config -e 9P_FS -e 9P_FS_POSIX_ACL \
+    && ./scripts/config -e PCI_HOST_GENERIC \
     && make olddefconfig \
     && make -j$(nproc) zImage \
     && mv arch/arm/boot/zImage $TIZEN_IOT_QEMU_KERNEL \
@@ -147,17 +150,18 @@ RUN set -x \
     "RemainAfterExit=yes\n" \
     | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_OPT_POST_MOUNT : \
     ln-sf $SYSTEMD_UNIT_OPT_POST_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS \
-    # Mount Matter ISO image on startup
-    && SYSTEMD_UNIT_CHIP_MOUNT=$SYSTEMD_SYSTEM/mnt-chip.mount \
+    # Mount using 9P at /mnt/chip
+    && SYSTEMD_UNIT_9P_MOUNT=$SYSTEMD_SYSTEM/mnt-chip.mount \
     && echo -n \
     "[Unit]\n" \
-    "ConditionPathIsMountPoint=!/mnt/chip\n" \
+    "After=network.target\n" \
     "[Mount]\n" \
-    "What=/dev/disk/by-label/CHIP\n" \
+    "What=host0\n" \
     "Where=/mnt/chip\n" \
-    "Options=nofail\n" \
-    | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_CHIP_MOUNT : \
-    ln-sf $SYSTEMD_UNIT_CHIP_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS : \
+    "Type=9p\n" \
+    "Options=nofail,trans=virtio\n" \
+    | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_9P_MOUNT : \
+    ln-sf $SYSTEMD_UNIT_9P_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS : \
     mkdir /mnt/chip \
     # Setup auto-login for root user
     && SYSTEMD_UNIT_SERIAL_GETTY=$SYSTEMD_SYSTEM/serial-getty@.service \

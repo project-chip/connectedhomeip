@@ -23,7 +23,9 @@
  *
  **/
 #include "CommonDeviceCallbacks.h"
+#include "AppTaskBase.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/Dnssd.h>
@@ -73,7 +75,7 @@ void chip::NXP::App::CommonDeviceCallbacks::DeviceEventCallback(const ChipDevice
         OnInterfaceIpAddressChanged(event);
         break;
 
-#if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
+#if CHIP_ENABLE_OPENTHREAD
     case DeviceEventType::kCommissioningComplete:
         CommonDeviceCallbacks::OnComissioningComplete(event);
         break;
@@ -153,9 +155,25 @@ void chip::NXP::App::CommonDeviceCallbacks::OnSessionEstablished(chip::DeviceLay
     /* Empty */
 }
 
-#if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
+#if CHIP_ENABLE_OPENTHREAD
 void chip::NXP::App::CommonDeviceCallbacks::OnComissioningComplete(const chip::DeviceLayer::ChipDeviceEvent * event)
 {
+#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    if (ConnectivityMgr().IsWiFiStationConnected())
+    {
+        // Disable thr nwk commissioining cluster
+        app::Clusters::NetworkCommissioning::Attributes::InterfaceEnabled::Set(CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID, 0);
+    }
+    else if (ConnectivityMgr().IsThreadProvisioned())
+    {
+        // Set WIFI cluster interface attribute to disable.
+        app::Clusters::NetworkCommissioning::Attributes::InterfaceEnabled::Set(0, 0);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#endif // _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
+
+#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
     /*
      * If a transceiver supporting a multiprotocol scenario is used, a check of the provisioning state is required,
      * so that we can inform the transceiver to stop BLE to give the priority to another protocol.
@@ -171,5 +189,6 @@ void chip::NXP::App::CommonDeviceCallbacks::OnComissioningComplete(const chip::D
         PlatformMgrImpl().StopBLEConnectivity();
         ThreadStackMgrImpl().UnlockThreadStack();
     }
+#endif
 }
 #endif

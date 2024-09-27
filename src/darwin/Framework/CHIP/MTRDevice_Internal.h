@@ -118,23 +118,12 @@ MTR_DIRECT_MEMBERS
     NSNumber * _nodeID;
 
     // Our controller.  Declared nullable because our property is, though in
-    // practice it does not look like we ever set it to nil.
+    // practice it does not look like we ever set it to nil.  If this changes,
+    // fix _concreteController on MTRDevice_Concrete accordingly.
     MTRDeviceController * _Nullable _deviceController;
-
-    // Whether this device has been accessed via the public deviceWithNodeID API
-    // (as opposed to just via the internal _deviceWithNodeID).
-    BOOL _accessedViaPublicAPI;
 }
 
-/**
- * Internal way of creating an MTRDevice that does not flag the device as being
- * visible to external API consumers.
- */
-+ (MTRDevice *)_deviceWithNodeID:(NSNumber *)nodeID
-                      controller:(MTRDeviceController *)controller;
-
 - (instancetype)initForSubclassesWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
-- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
 // called by controller to clean up and shutdown
 - (void)invalidate;

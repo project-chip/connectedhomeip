@@ -42,6 +42,8 @@ declare_args() {
 
   # if rw610_mbedtls_port_els_pkc is set to false software mbedtls is used instead
   rw610_mbedtls_port_els_pkc = true
+
+  chip_enable_secondary_nwk_if = false
 }
 
 # TODO : Enable the OTA Requestor by default.

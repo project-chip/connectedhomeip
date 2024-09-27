@@ -16,7 +16,6 @@
 #
 
 import argparse
-import fcntl
 import json
 import os
 import shutil
@@ -338,15 +337,29 @@ class LockFileSerializer:
             return
 
         self.lock_file = open(self.lock_file_path, 'wb')
-        fcntl.lockf(self.lock_file, fcntl.LOCK_EX)
+        self._lock()
 
     def __exit__(self, *args):
         if not self.lock_file:
             return
 
-        fcntl.lockf(self.lock_file, fcntl.LOCK_UN)
+        self._unlock()
         self.lock_file.close()
         self.lock_file = None
+
+    def _lock(self):
+        if sys.platform == 'linux' or sys.platform == 'darwin':
+            import fcntl
+            fcntl.lockf(self.lock_file, fcntl.LOCK_EX)
+        else:
+            print(f"Warning: lock does nothing on {sys.platform} platform")
+
+    def _unlock(self):
+        if sys.platform == 'linux' or sys.platform == 'darwin':
+            import fcntl
+            fcntl.lockf(self.lock_file, fcntl.LOCK_UN)
+        else:
+            print(f"Warning: unlock does nothing on {sys.platform} platform")
 
 
 def main():

@@ -18,6 +18,8 @@ MTRCluster{{compatClusterNameRemapping label}}ID {{availability (compatClusterNa
 MTRClusterIDType{{>cluster}}ID {{availability (asUpperCamelCase label preserveAcronyms=true) minimalRelease="267F4B03-3256-4056-A62D-5237640FDCFE" isForIds=true deprecationMessage=(concat "The " (asUpperCamelCase label preserveAcronyms=true) " cluster will be removed")}} = {{asMEI manufacturerCode code}},
 {{/if}}
 {{/zcl_clusters}}
+
+{{> cluster_id_shims}}
 };
 
 #pragma mark - Attributes IDs
@@ -112,6 +114,8 @@ MTRAttributeIDTypeCluster{{compatClusterNameRemapping ../clusterName}}Attribute{
 
 {{> attributeIDs clusterName=label}}
 {{/zcl_clusters}}
+
+{{> attribute_id_shims}}
 };
 
 #pragma mark - Commands IDs
@@ -174,6 +178,8 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID {{availability cluster co
 
 {{> commandIDs clusterName=label}}
 {{/zcl_clusters}}
+
+{{> command_id_shims}}
 };
 
 #pragma mark - Events IDs
