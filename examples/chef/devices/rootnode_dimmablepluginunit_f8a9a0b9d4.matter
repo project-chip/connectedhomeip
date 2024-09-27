@@ -2214,11 +2214,11 @@ endpoint 1 {
   }
 
   server cluster OnOff {
-    ram      attribute onOff default = 0;
+    persist  attribute onOff default = 0;
     ram      attribute globalSceneControl default = 1;
     ram      attribute onTime default = 0;
     ram      attribute offWaitTime default = 0;
-    ram      attribute startUpOnOff default = 0;
+    persist  attribute startUpOnOff default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2235,13 +2235,13 @@ endpoint 1 {
   }
 
   server cluster LevelControl {
-    ram      attribute currentLevel default = 0x01;
+    persist  attribute currentLevel default = 0x01;
     ram      attribute remainingTime default = 0x0000;
     ram      attribute minLevel default = 0x01;
     ram      attribute maxLevel default = 0xFE;
     ram      attribute options default = 0x00;
     ram      attribute onLevel default = 0xFE;
-    ram      attribute startUpCurrentLevel default = 0x00;
+    persist  attribute startUpCurrentLevel default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
