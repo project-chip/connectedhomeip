@@ -141,6 +141,7 @@ void writeAirQualityToAttribute(intptr_t context)
     ChipLogDetail(AppServer, "RAW AirQuality value: %ld and corresponding Enum value : %d", *air_quality_ptr,
                   chip::to_underlying(AirQualitySensorManager::GetInstance()->GetAirQuality()));
     AppTask::GetAppTask().UpdateAirQualitySensorUI();
+    delete air_quality_ptr;
 }
 
 void SensorManager::SensorTimerEventHandler(void * arg)
@@ -176,5 +177,4 @@ void SensorManager::SensorTimerEventHandler(void * arg)
     // create pointer for the int32_t air_quality
     int32_t * air_quality_ptr = new int32_t(air_quality);
     DeviceLayer::PlatformMgr().ScheduleWork(writeAirQualityToAttribute, reinterpret_cast<intptr_t>(air_quality_ptr));
-    ChipLogDetail(AppServer, "writeAirQualityToAttribute success");
 }
