@@ -96,7 +96,7 @@ config CHIP_MALLOC_SYS_HEAP
 
 config CHIP_TASK_STACK_SIZE
 	int "The CHIP (Matter) thread stack size"
-	default 10240 if LTO
+	default 10240 if (LTO || PSA_CRYPTO_DRIVER_CC3XX)
 	default 6144
 	help
 	  Configures the stack size available for the CHIP (Matter) thread.

@@ -299,15 +299,13 @@ choice RNG_GENERATOR_CHOICE
     default XOSHIRO_RANDOM_GENERATOR if SOC_SERIES_NRF53X
 endchoice
 
-config OBERON_BACKEND
-    default y
-
 config MBEDTLS_ENABLE_HEAP
-    default y
+    default y if !BUILD_WITH_TFM
+    default n
 
 config MBEDTLS_HEAP_SIZE
     default 8192
-    
+
 # Enable PSA Crypto dependencies for Matter
 
 config CHIP_CRYPTO_PSA
@@ -316,8 +314,14 @@ config CHIP_CRYPTO_PSA
 
 if CHIP_CRYPTO_PSA
 
+config PSA_CRYPTO_DRIVER_OBERON
+    default y if (SOC_SERIES_NRF52X || SOC_SERIES_NRF53X)
+
 config PSA_CRYPTO_DRIVER_CC3XX
     default n
+
+config PSA_CRYPTO_DRIVER_CRACEN
+    default y if SOC_SERIES_NRF54LX
 
 config PSA_WANT_ALG_SHA_224
     default n
@@ -334,13 +338,12 @@ config PSA_USE_CC3XX_HASH_DRIVER
 
 endif # PSA_CRYPTO_DRIVER_CC3XX && PSA_CRYPTO_DRIVER_OBERON
 
-# Spake2+ support
-config MBEDTLS_MD_C
-    default y
-
 endif # CHIP_CRYPTO_PSA
 
 if !CHIP_CRYPTO_PSA
+
+config OBERON_BACKEND
+    default y
 
 config NRF_SECURITY_ADVANCED
     default y
@@ -352,6 +355,9 @@ config MBEDTLS_CTR_DRBG_C
     default y
 
 config MBEDTLS_CIPHER_MODE_CTR
+    default y
+
+config MBEDTLS_MD_C
     default y
 
 config MBEDTLS_SHA1_C
