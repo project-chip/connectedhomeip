@@ -65,15 +65,37 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 - (void)tearDown
 {
 #if defined(ENABLE_LEAK_DETECTION) && ENABLE_LEAK_DETECTION
+    /**
+     * Unfortunately, doing this in "+ (void)tearDown" (the global suite teardown)
+     * does not trigger a test failure even if the XCTAssertEqual below fails.
+     */
     if (_detectLeaks) {
         int pid = getpid();
         __auto_type * cmd = [NSString stringWithFormat:@"leaks %d", pid];
         int ret = system(cmd.UTF8String);
-        /**
-         * Unfortunately, doing this in "+ (void)tearDown" (the global suite teardown)
-         * does not trigger a test failure even if the XCTAssertEqual fails.
-         */
-        XCTAssertEqual(ret, 0, "LEAKS DETECTED");
+        if (WIFSIGNALED(ret)) {
+            XCTFail(@"leaks unexpectedly stopped by signal %d", WTERMSIG(ret));
+        }
+        XCTAssertTrue(WIFEXITED(ret), "leaks did not run to completion");
+        // The exit status is 0 if no leaks detected, 1 if leaks were detected,
+        // something else on error.
+        if (WEXITSTATUS(ret) == 1) {
+            XCTFail(@"LEAKS DETECTED");
+        } else if (WEXITSTATUS(ret) != 0) {
+            // leaks failed to actually run correctly.  Ideally we would fail
+            // our tests in that case, but this seems to be happening a fair
+            // amount, and randomly, on the ARM GitHub runners, with errors
+            // like:
+            //
+            // *** getStackLoggingSharedMemoryAddressFromTask: couldn't find ___mach_stack_logging_shared_memory_address in target task
+            // *** task_malloc_get_all_zones: error 1 reading num_zones at 0
+            // *** task_malloc_get_all_zones: error 1 reading num_zones at 0
+            // *** task_malloc_get_all_zones: error 1 reading num_zones at 0
+            // [fatal] unable to instantiate a memory scanner.
+            //
+            // Just log and ignore for now.
+            NSLog(@"leaks failed to run, exit status: %d", WEXITSTATUS(ret));
+        }
     }
 #endif
 

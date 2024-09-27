@@ -122,21 +122,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, retain, nullable) NSData * rootPublicKey;
 
 /**
- * Check whether this controller is running on the given fabric, as represented
- * by the provided FabricTable and fabric index.  The provided fabric table may
- * not be the same as the fabric table this controller is using. This method
- * MUST be called from the Matter work queue.
- *
- * Might return failure, in which case we don't know whether it's running on the
- * given fabric.  Otherwise it will set *isRunning to the right boolean value.
- *
- * Only MTRDeviceControllerFactory should be calling this.
- */
-- (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
-                    fabricIndex:(chip::FabricIndex)fabricIndex
-                      isRunning:(BOOL *)isRunning;
-
-/**
  * Ensure we have a CASE session to the given node ID and then call the provided
  * connection callback.  This may be called on any queue (including the Matter
  * event queue) and on success will always call the provided connection callback
@@ -257,23 +242,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData;
 - (void)removeDevice:(MTRDevice *)device;
-
-/**
- * Since getSessionForNode now enqueues by the subscription pool for Thread
- * devices, MTRDevice needs a direct non-queued access because it already
- * makes use of the subscription pool.
- */
-- (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
-
-/**
- * This method returns TRUE if this controller matches the fabric reference and node ID as listed in the parameters.
- */
-- (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate;
-
-/**
- * Clear any pending shutdown request.
- */
-- (void)clearPendingShutdown;
 
 @end
 

@@ -141,7 +141,8 @@ _bootstrap_or_activate() {
     $_CHIP_ROOT/scripts/setup/gen_pigweed_cipd_json.py \
         -i $_PIGWEED_CIPD_JSON                         \
         -o $_GENERATED_PIGWEED_CIPD_JSON               \
-        -e darwin:$_PYTHON_CIPD_JSON
+        -e darwin:$_PYTHON_CIPD_JSON                   \
+        -e windows:$_PYTHON_CIPD_JSON
 
     if test -n "$GITHUB_ACTION"; then
         tee <<EOF >"${_PW_ACTUAL_ENVIRONMENT_ROOT}/pip.conf"
