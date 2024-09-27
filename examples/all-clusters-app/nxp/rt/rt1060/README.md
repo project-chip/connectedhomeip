@@ -15,7 +15,7 @@ commissioning and different cluster control.
     - [Configurations supported](#configurations-supported)
     - [Hardware requirements RT1060 + transceiver](#hardware-requirements-rt1060--transceiver)
       - [Hardware requirements RT1060+IW416](#hardware-requirements-rt1060iw416)
-      - [Hardware requirements RT1060+8801](#hardware-requirements-rt10608801)
+      - [Hardware requirements RT1060+88W8801](#hardware-requirements-rt106088w8801)
       - [Hardware requirements RT1060 + K32W0](#hardware-requirements-rt1060--k32w0)
       - [Hardware requirements RT1060-EVKC+IW612](#hardware-requirements-rt1060-evkciw612)
       - [Hardware requirements RT1060 + 88W8801 + K32W0x1DK6](#hardware-requirements-rt1060--88w8801--k32w0x1dk6)
@@ -65,7 +65,7 @@ Here are listed configurations supported on RT1060.
 Matter over Wi-Fi :
 
 -   RT1060 + IW416 (Wi-Fi + BLE)
--   RT1060 + 8801 (Wi-Fi)
+-   RT1060 + 88W8801 (Wi-Fi)
 -   **Experimental:** _RT1060-EVKC + IW612 (Wi-fi +BLE)_
 
 Matter over Thread :
@@ -146,7 +146,7 @@ Only the SDK package downloaded from https://mcuxpresso.nxp.com contains the PDF
 document, it is not present in the SDK downloaded from GitHub using the west
 tool.
 
-#### Hardware requirements RT1060+8801
+#### Hardware requirements RT1060+88W8801
 
 Host part:
 
@@ -154,16 +154,16 @@ Host part:
 
 Transceiver part :
 
--   1 8801 2DS M.2 Module (rev A)
+-   1 88W8801 2DS M.2 Module (rev A)
 -   1 Murata uSD-M.2 Adapter (rev B1)
 
-The 8801 2DS M.2 Module should be inserted into the Murata uSD-M.2 Adapter and
+The 88W8801 2DS M.2 Module should be inserted into the Murata uSD-M.2 Adapter and
 inserted in the uSD slot J22 of MIMXRT1060-EVKB. The Murata uSD-M.2 Adapter can
 be powered up using uSD pins. For that, set the J1 jumper of Murata uSD-M.2 to
 position 2-3 (Position 2-3: VBAT supply, typical 3.1 ~ 3.3V, from microSD
 connector).
 
-Note: as the 8801 module supports only the 2.4 GHz Wi-Fi band, it is mandatory
+Note: as the 88W8801 module supports only the 2.4 GHz Wi-Fi band, it is mandatory
 to connect it to a Wi-Fi access point on the 2.4 GHz band.
 
 #### Hardware requirements RT1060 + K32W0
@@ -278,7 +278,7 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt106
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
 ```
 
--   Build the Wi-fi configuration for **EVKB-MIMXRT1060 board + 8801
+-   Build the Wi-fi configuration for **EVKB-MIMXRT1060 board + 88W8801
     transceiver** with Matter-over-Wifi configuration and only onnetwork
     commissioning (without BLE, the WiFi network credentials are provided at
     build-time which will enable the device to join the Wi-Fi AP at startup):
