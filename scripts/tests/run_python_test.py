@@ -15,13 +15,14 @@
 # limitations under the License.
 
 import datetime
+import glob
 import io
 import logging
 import os
 import os.path
 import re
 import shlex
-import subprocess
+import shutil
 import sys
 import time
 
@@ -75,7 +76,7 @@ def process_test_script_output(line, is_stderr):
 @click.option("--factoryreset-app-only", is_flag=True,
               help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests, but not the controller config')
 @click.option("--app-args", type=str, default='',
-              help='The extra arguments passed to the device. Can use placholders like {SCRIPT_BASE_NAME}')
+              help='The extra arguments passed to the device. Can use placeholders like {SCRIPT_BASE_NAME}')
 @click.option("--app-ready-pattern", type=str, default=None,
               help='Delay test script start until given regular expression pattern is found in the application output.')
 @click.option("--script", type=click.Path(exists=True), default=os.path.join(DEFAULT_CHIP_ROOT,
@@ -116,8 +117,10 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
         raise Exception(
             "No valid runs were found. Make sure you add runs to your file, see https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md document for reference/example.")
 
+    coloredlogs.install(level='INFO')
+
     for run in runs:
-        print(f"Executing {run.py_script_path.split('/')[-1]} {run.run}")
+        logging.info("Executing %s %s", run.py_script_path.split('/')[-1], run.run)
         main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "",
                   run.app_ready_pattern, run.py_script_path, run.script_args or "", run.script_gdb, run.quiet)
 
@@ -130,30 +133,19 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     if factory_reset or factory_reset_app_only:
         # Remove native app config
-        retcode = subprocess.call("rm -rf /tmp/chip* /tmp/repl*", shell=True)
-        if retcode != 0:
-            raise Exception("Failed to remove /tmp/chip* for factory reset.")
+        for path in glob.glob('/tmp/chip*') + glob.glob('/tmp/repl*'):
+            shutil.rmtree(path)
 
         # Remove native app KVS if that was used
-        kvs_match = re.search(r"--KVS (?P<kvs_path>[^ ]+)", app_args)
-        if kvs_match:
-            kvs_path_to_remove = kvs_match.group("kvs_path")
-            retcode = subprocess.call("rm -f %s" % kvs_path_to_remove, shell=True)
-            print("Trying to remove KVS path %s" % kvs_path_to_remove)
-            if retcode != 0:
-                raise Exception("Failed to remove %s for factory reset." % kvs_path_to_remove)
+        if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
+            logging.info("Removing KVS path: %s" % match.group("path"))
+            shutil.rmtree(match.group("path"))
 
     if factory_reset:
         # Remove Python test admin storage if provided
-        storage_match = re.search(r"--storage-path (?P<storage_path>[^ ]+)", script_args)
-        if storage_match:
-            storage_path_to_remove = storage_match.group("storage_path")
-            retcode = subprocess.call("rm -f %s" % storage_path_to_remove, shell=True)
-            print("Trying to remove storage path %s" % storage_path_to_remove)
-            if retcode != 0:
-                raise Exception("Failed to remove %s for factory reset." % storage_path_to_remove)
-
-    coloredlogs.install(level='INFO')
+        if match := re.search(r"--storage-path (?P<path>[^ ]+)", script_args):
+            logging.info("Removing storage path: %s" % match.group("path"))
+            shutil.rmtree(match.group("path"))
 
     app_process = None
     app_exit_code = 0
