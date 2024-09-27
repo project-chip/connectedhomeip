@@ -249,14 +249,6 @@ AttributeEntry TestImCustomDataModel::NextAttribute(const ConcreteAttributePath 
 
 std::optional<AttributeInfo> TestImCustomDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
 {
-    // Hardcoded "supported" paths to pass TestReadInteraction
-    if ((path == ConcreteAttributePath(1 /*kTestEndpointId*/, app::Clusters::OnOff::Id, 1)) ||
-        (path == ConcreteAttributePath(1 /*kTestEndpointId*/, app::Clusters::OnOff::Id, 2)) ||
-        (path == ConcreteAttributePath(1 /*kTestEndpointId*/, 7 /* kInvalidTestClusterId */, 1)))
-    {
-        return AttributeInfo();
-    }
-
     return CodegenDataModelProviderInstance()->GetAttributeInfo(path);
 }
 
