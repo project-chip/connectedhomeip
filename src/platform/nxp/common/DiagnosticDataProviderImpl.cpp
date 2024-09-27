@@ -465,8 +465,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts(void)
         mBeaconRxCount          = stats.bcn_rcv_cnt;
         mBeaconLostCount        = stats.bcn_miss_cnt;
 #if SDK_2_16_100
-        mPacketUnicastRxCount   = stats.rx_unicast_cnt;
-        mOverrunCount           = stats.tx_overrun_cnt + stats.rx_overrun_cnt;
+        mPacketUnicastRxCount = stats.rx_unicast_cnt;
+        mOverrunCount         = stats.tx_overrun_cnt + stats.rx_overrun_cnt;
 #endif
         return CHIP_NO_ERROR;
     }
