@@ -1,7 +1,6 @@
 {
     "cipd_package_files": [
         "third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/arm.json",
-        "scripts/setup/python.json",
         "scripts/setup/zap.json"
     ],
     "virtualenv": {

@@ -1,9 +1,0 @@
-{
-    "packages": [
-        {
-            "path": "infra/3pp/tools/cpython3/${platform}",
-            "platforms": ["mac-amd64", "windows-amd64"],
-            "tags": ["version:2@3.9.5.chromium.19"]
-        }
-    ]
-}

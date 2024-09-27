@@ -19,6 +19,8 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/ConcreteClusterPath.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/util/IMClusterCommandHandler.h>
@@ -35,7 +37,7 @@ namespace app {
 namespace {
 
 /// Handles going through callback-based enumeration of generated/accepted commands
-/// for CommandHandler interface based items.
+/// for CommandHandlerInterface based items.
 ///
 /// Offers the ability to focus on some operation for finding a given
 /// command id:
@@ -45,22 +47,36 @@ namespace {
 class EnumeratorCommandFinder
 {
 public:
+    using HandlerCallbackFunction = CHIP_ERROR (CommandHandlerInterface::*)(const ConcreteClusterPath &,
+                                                                            CommandHandlerInterface::CommandIdCallback, void *);
+
     enum class Operation
     {
-        FindFirst, // Find the first value in the list
-        FindExact, // Find the given value
-        FindNext   // Find the value AFTER this value
+        kFindFirst, // Find the first value in the list
+        kFindExact, // Find the given value
+        kFindNext   // Find the value AFTER this value
     };
 
-    EnumeratorCommandFinder(Operation operation, CommandId target) : mOperation(operation), mTarget(target) {}
+    EnumeratorCommandFinder(HandlerCallbackFunction callback) :
+        mCallback(callback), mOperation(Operation::kFindFirst), mTarget(kInvalidCommandId)
+    {}
 
-    /// Callback to pass in to `Enumerate*` calls in COmmandHandlerInterface
-    CommandHandlerInterface::CommandIdCallback Callback() { return HandlerCallbackFn; }
+    /// Find the given command ID that matches the given operation/path.
+    ///
+    /// If operation is kFindFirst, then path commandID is ignored. Otherwise it is used as a key to
+    /// kFindExact or kFindNext.
+    ///
+    /// Returns:
+    ///    - std::nullopt if no command found using the command handler interface
+    ///    - kInvalidCommandId if the find failed (but command handler interface does provide a list)
+    ///    - valid id if command handler interface usage succeeds
+    std::optional<CommandId> FindCommandId(Operation operation, const ConcreteCommandPath & path);
 
-    /// Get the element found (if any) after the `Callback` is used
-    std::optional<CommandId> GetFound() const { return mFound; }
+    /// Uses FindCommandId to find the given command and loads the command entry data
+    std::optional<DataModel::CommandEntry> FindCommandEntry(Operation operation, const ConcreteCommandPath & path);
 
 private:
+    HandlerCallbackFunction mCallback;
     Operation mOperation;
     CommandId mTarget;
     std::optional<CommandId> mFound = std::nullopt;
@@ -69,21 +85,21 @@ private:
     {
         switch (mOperation)
         {
-        case Operation::FindFirst:
+        case Operation::kFindFirst:
             mFound = id;
             return Loop::Break;
-        case Operation::FindExact:
+        case Operation::kFindExact:
             if (mTarget == id)
             {
                 mFound = id; // found it
                 return Loop::Break;
             }
             break;
-        case Operation::FindNext:
+        case Operation::kFindNext:
             if (mTarget == id)
             {
                 // Once we found the ID, get the first
-                mOperation = Operation::FindFirst;
+                mOperation = Operation::kFindFirst;
             }
             break;
         }
@@ -92,10 +108,40 @@ private:
 
     static Loop HandlerCallbackFn(CommandId id, void * context)
     {
-        EnumeratorCommandFinder * self = static_cast<EnumeratorCommandFinder *>(context);
+        auto self = static_cast<EnumeratorCommandFinder *>(context);
         return self->HandlerCallback(id);
     }
 };
+
+std::optional<CommandId> EnumeratorCommandFinder::FindCommandId(Operation operation, const ConcreteCommandPath & path)
+{
+    mOperation = operation;
+    mTarget    = path.mCommandId;
+
+    CommandHandlerInterface * interface =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
+
+    if (interface == nullptr)
+    {
+        return std::nullopt; // no data: no interface
+    }
+
+    CHIP_ERROR err = (interface->*mCallback)(path, HandlerCallbackFn, this);
+    if (err == CHIP_ERROR_NOT_IMPLEMENTED)
+    {
+        return std::nullopt; // no data provided by the interface
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        // Report the error here since we lose actual error. This generally should NOT be possible as CommandHandlerInterface
+        // usually returns unimplemented or should just work for our use case (our callback never fails)
+        ChipLogError(DataManagement, "Enumerate error: %" CHIP_ERROR_FORMAT, err.Format());
+        return kInvalidCommandId;
+    }
+
+    return mFound.value_or(kInvalidCommandId);
+}
 
 /// Load the cluster information into the specified destination
 std::variant<CHIP_ERROR, DataModel::ClusterInfo> LoadClusterInfo(const ConcreteClusterPath & path, const EmberAfCluster & cluster)
@@ -224,6 +270,20 @@ DataModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clusterPath
                          CommandIsFabricScoped(clusterPath.mClusterId, clusterCommandId));
 
     return entry;
+}
+
+std::optional<DataModel::CommandEntry> EnumeratorCommandFinder::FindCommandEntry(Operation operation,
+                                                                                 const ConcreteCommandPath & path)
+{
+
+    std::optional<CommandId> id = FindCommandId(operation, path);
+
+    if (!id.has_value())
+    {
+        return std::nullopt;
+    }
+
+    return (*id == kInvalidCommandId) ? DataModel::CommandEntry::kInvalid : CommandEntryFrom(path, *id);
 }
 
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
@@ -558,27 +618,13 @@ std::optional<DataModel::AttributeInfo> CodegenDataModelProvider::GetAttributeIn
 
 DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const ConcreteClusterPath & path)
 {
-    CommandHandlerInterface * interface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
+    auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
+                                     .FindCommandEntry(EnumeratorCommandFinder::Operation::kFindFirst,
+                                                       ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId));
 
-    if (interface != nullptr)
+    if (handlerInterfaceValue.has_value())
     {
-        EnumeratorCommandFinder finder(EnumeratorCommandFinder::Operation::FindFirst, kInvalidCommandId);
-        CHIP_ERROR err = interface->EnumerateAcceptedCommands(path, finder.Callback(), &finder);
-
-        if (err != CHIP_ERROR_NOT_IMPLEMENTED)
-        {
-            auto firstId = finder.GetFound();
-
-            if ((err == CHIP_NO_ERROR) && firstId.has_value())
-            {
-                DataModel::CommandEntry result;
-                result.path = ConcreteCommandPath(path.mEndpointId, path.mClusterId, *firstId);
-                return result;
-            }
-
-            return DataModel::CommandEntry::kInvalid;
-        }
+        return *handlerInterfaceValue;
     }
 
     const EmberAfCluster * cluster = FindServerCluster(path);
@@ -593,27 +639,14 @@ DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const Con
 
 DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const ConcreteCommandPath & before)
 {
-    CommandHandlerInterface * interface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(before.mEndpointId, before.mClusterId);
+    // TODO: `Next` redirecting to a callback is slow O(n^2).
+    //       see https://github.com/project-chip/connectedhomeip/issues/35790
+    auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
+                                     .FindCommandEntry(EnumeratorCommandFinder::Operation::kFindNext, before);
 
-    if (interface != nullptr)
+    if (handlerInterfaceValue.has_value())
     {
-        EnumeratorCommandFinder finder(EnumeratorCommandFinder::Operation::FindNext, before.mCommandId);
-        CHIP_ERROR err = interface->EnumerateAcceptedCommands(before, finder.Callback(), &finder);
-
-        if (err != CHIP_ERROR_NOT_IMPLEMENTED)
-        {
-            auto beforeId = finder.GetFound();
-
-            if ((err == CHIP_NO_ERROR) && beforeId.has_value())
-            {
-                DataModel::CommandEntry result;
-                result.path = ConcreteCommandPath(before.mEndpointId, before.mClusterId, *beforeId);
-                return result;
-            }
-
-            return DataModel::CommandEntry::kInvalid;
-        }
+        return *handlerInterfaceValue;
     }
 
     const EmberAfCluster * cluster = FindServerCluster(before);
@@ -628,42 +661,12 @@ DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const Conc
 
 std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
-    // Command handler interface MAY override lists of commands
-    CommandHandlerInterface * handler_interface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
+    auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
+                                     .FindCommandEntry(EnumeratorCommandFinder::Operation::kFindExact, path);
 
-    if (handler_interface != nullptr)
+    if (handlerInterfaceValue.has_value())
     {
-        struct Context
-        {
-            bool commandExists;
-            CommandId targetCommand;
-        } context{ false, path.mCommandId };
-
-        // if a list is available, try to see if the command exists
-        CHIP_ERROR err = handler_interface->EnumerateAcceptedCommands(
-            path,
-            [](CommandId command, void * closure) -> Loop {
-                auto * ctx = static_cast<Context *>(closure);
-                if (ctx->targetCommand == command)
-                {
-                    ctx->commandExists = true;
-                    return Loop::Break;
-                }
-                return Loop::Continue;
-            },
-            &context);
-
-        if (err != CHIP_ERROR_NOT_IMPLEMENTED)
-        {
-            // TODO: we know the command exists, but don't actually have info such as flags. Ideally CHI should
-            //       provide more info.
-            //
-            // This will default claim kOperate privilege and no flags (not fabric-scoped nor timed)
-            return ((err == CHIP_NO_ERROR) && context.commandExists) //
-                ? std::make_optional<DataModel::CommandInfo>()       //  definitive answer: command exists
-                : std::nullopt;                                      // model says command does not exist
-        }
+        return handlerInterfaceValue->IsValid() ? std::make_optional(handlerInterfaceValue->info) : std::nullopt;
     }
 
     const EmberAfCluster * cluster = FindServerCluster(path);
@@ -676,57 +679,35 @@ std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedComma
 
 ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const ConcreteClusterPath & path)
 {
-    CommandHandlerInterface * interface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
-
-    if (interface != nullptr)
+    std::optional<CommandId> commandId =
+        EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateGeneratedCommands)
+            .FindCommandId(EnumeratorCommandFinder::Operation::kFindFirst,
+                           ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId));
+    if (commandId.has_value())
     {
-        EnumeratorCommandFinder finder(EnumeratorCommandFinder::Operation::FindFirst, kInvalidCommandId);
-        CHIP_ERROR err = interface->EnumerateGeneratedCommands(path, finder.Callback(), &finder);
-
-        if (err != CHIP_ERROR_NOT_IMPLEMENTED)
-        {
-            auto firstId = finder.GetFound();
-
-            if ((err == CHIP_NO_ERROR) && firstId.has_value())
-            {
-                return ConcreteCommandPath(path.mEndpointId, path.mClusterId, *firstId);
-            }
-
-            return kInvalidCommandPath;
-        }
+        return *commandId == kInvalidCommandId ? kInvalidCommandPath
+                                               : ConcreteCommandPath(path.mEndpointId, path.mClusterId, *commandId);
     }
 
     const EmberAfCluster * cluster = FindServerCluster(path);
-
     VerifyOrReturnValue(cluster != nullptr, kInvalidCommandPath);
 
-    std::optional<CommandId> commandId = mGeneratedCommandsIterator.First(cluster->generatedCommandList);
+    commandId = mGeneratedCommandsIterator.First(cluster->generatedCommandList);
     VerifyOrReturnValue(commandId.has_value(), kInvalidCommandPath);
     return ConcreteCommandPath(path.mEndpointId, path.mClusterId, *commandId);
 }
 
 ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const ConcreteCommandPath & before)
 {
-    CommandHandlerInterface * interface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(before.mEndpointId, before.mClusterId);
+    // TODO: `Next` redirecting to a callback is slow O(n^2).
+    //       see https://github.com/project-chip/connectedhomeip/issues/35790
+    auto nextId = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateGeneratedCommands)
+                      .FindCommandId(EnumeratorCommandFinder::Operation::kFindNext, before);
 
-    if (interface != nullptr)
+    if (nextId.has_value())
     {
-        EnumeratorCommandFinder finder(EnumeratorCommandFinder::Operation::FindNext, before.mCommandId);
-        CHIP_ERROR err = interface->EnumerateGeneratedCommands(before, finder.Callback(), &finder);
-
-        if (err != CHIP_ERROR_NOT_IMPLEMENTED)
-        {
-            auto beforeId = finder.GetFound();
-
-            if ((err == CHIP_NO_ERROR) && beforeId.has_value())
-            {
-                return ConcreteCommandPath(before.mEndpointId, before.mClusterId, *beforeId);
-            }
-
-            return kInvalidCommandPath;
-        }
+        return (*nextId == kInvalidCommandId) ? kInvalidCommandPath
+                                              : ConcreteCommandPath(before.mEndpointId, before.mClusterId, *nextId);
     }
 
     const EmberAfCluster * cluster = FindServerCluster(before);
