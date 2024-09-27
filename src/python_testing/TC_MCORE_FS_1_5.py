@@ -34,7 +34,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factoryreset: true
-#     quiet: false
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
