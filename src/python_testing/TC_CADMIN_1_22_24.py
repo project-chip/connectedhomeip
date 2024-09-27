@@ -14,7 +14,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-#=== BEGIN CI TEST ARGUMENTS ===
+# === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
@@ -166,6 +166,7 @@ class TC_CADMIN_1_22(MatterBaseTest):
         window_status2 = await self.get_window_status()
         if window_status2 != Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen:
             asserts.fail("Commissioning window is expected to be closed, but was found to be open")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
