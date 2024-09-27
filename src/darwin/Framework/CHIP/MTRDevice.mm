@@ -295,6 +295,15 @@ using namespace chip::Tracing::DarwinFramework;
     return self;
 }
 
+// For now, implement an initWithNodeID in case some sub-class outside the
+// framework called it (by manually declaring it, even though it's not public
+// API).  Ideally we would not have this thing, since its signature does not
+// match the initWithNodeID signatures of our subclasses.
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
+{
+    return [self initForSubclassesWithNodeID:nodeID controller:controller];
+}
+
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:_systemTimeChangeObserverToken];
