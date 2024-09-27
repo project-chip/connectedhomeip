@@ -3256,7 +3256,7 @@ TEST_F(TestRead, TestSubscribeAttributeDeniedNotExistPath)
         app::AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
-        attributePathParams[0].mEndpointId             = kRootEndpointId;  // this cluster does NOT exist on the root endpoint
+        attributePathParams[0].mEndpointId             = kRootEndpointId; // this cluster does NOT exist on the root endpoint
         attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
         attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::ListStructOctetString::Id;
 
@@ -4766,8 +4766,8 @@ TEST_F(TestRead, TestReadHandler_KeepSubscriptionTest)
 
     readParam.mAttributePathParamsListSize = 0;
     readClient                             = std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(),
-                                                                               app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
-                                                                               app::ReadClient::InteractionType::Subscribe);
+                                                   app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+                                                   app::ReadClient::InteractionType::Subscribe);
     EXPECT_EQ(readClient->SendRequest(readParam), CHIP_NO_ERROR);
 
     DrainAndServiceIO();
