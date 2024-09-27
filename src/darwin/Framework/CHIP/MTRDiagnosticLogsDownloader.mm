@@ -86,7 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
                     completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
                           done:(void (^)(MTRDownload * finishedDownload))done;
 
-- (void)abortDownloadsForController:(MTRDeviceController *)controller;
+- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller;
 
 @end
 
@@ -354,7 +354,7 @@ private:
     return download;
 }
 
-- (void)abortDownloadsForController:(MTRDeviceController *)controller
+- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller
 {
     assertChipStackLockedByCurrentThread();
 
@@ -408,7 +408,7 @@ private:
 }
 
 - (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
-                       controller:(MTRDeviceController *)controller
+                       controller:(MTRDeviceController_Concrete *)controller
                              type:(MTRDiagnosticLogType)type
                           timeout:(NSTimeInterval)timeout
                             queue:(dispatch_queue_t)queue
@@ -462,7 +462,7 @@ private:
     }
 }
 
-- (void)abortDownloadsForController:(MTRDeviceController *)controller;
+- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller;
 {
     assertChipStackLockedByCurrentThread();
 

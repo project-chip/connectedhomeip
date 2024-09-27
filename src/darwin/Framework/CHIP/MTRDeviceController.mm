@@ -126,7 +126,6 @@ using namespace chip::Tracing::DarwinFramework;
     MTRDeviceControllerDelegateBridge * _deviceControllerDelegateBridge;
     MTROperationalCredentialsDelegate * _operationalCredentialsDelegate;
     MTRDeviceAttestationDelegateBridge * _deviceAttestationDelegateBridge;
-    MTRDeviceControllerFactory * _factory;
     os_unfair_lock _underlyingDeviceMapLock;
     MTRCommissionableBrowser * _commissionableBrowser;
     MTRAttestationTrustStoreBridge * _attestationTrustStoreBridge;
@@ -554,65 +553,14 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
-    // Get the corresponding MTRDevice object to determine if the case/subscription pool is to be used
-    MTRDevice * device = [self deviceForNodeID:@(nodeID)];
-
-    // In the case that this device is known to use thread, queue this with subscription attempts as well, to
-    // help with throttling Thread traffic.
-    if ([device deviceUsesThread]) {
-        MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
-        [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull workItemCompletion) {
-            MTRInternalDeviceConnectionCallback completionWrapper = ^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
-                const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
-                completion(exchangeManager, session, error, retryDelay);
-                workItemCompletion(MTRAsyncWorkComplete);
-            };
-            [self directlyGetSessionForNode:nodeID completion:completionWrapper];
-        }];
-
-        [_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX", nodeID];
-    } else {
-        [self directlyGetSessionForNode:nodeID completion:completion];
-    }
-}
-
-- (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
-{
-    [self
-        asyncGetCommissionerOnMatterQueue:^(chip::Controller::DeviceCommissioner * commissioner) {
-            auto connectionBridge = new MTRDeviceConnectionBridge(completion);
-
-            // MTRDeviceConnectionBridge always delivers errors async via
-            // completion.
-            connectionBridge->connect(commissioner, nodeID);
-        }
-        errorHandler:^(NSError * error) {
-            completion(nullptr, chip::NullOptional, error, nil);
-        }];
+    MTR_ABSTRACT_METHOD();
+    completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
 }
 
 - (void)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion
 {
-    [self
-        asyncGetCommissionerOnMatterQueue:^(chip::Controller::DeviceCommissioner * commissioner) {
-            chip::CommissioneeDeviceProxy * deviceProxy;
-            CHIP_ERROR err = commissioner->GetDeviceBeingCommissioned(deviceID, &deviceProxy);
-            if (err != CHIP_NO_ERROR) {
-                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:err], nil);
-                return;
-            }
-
-            chip::Optional<chip::SessionHandle> session = deviceProxy->GetSecureSession();
-            if (!session.HasValue() || !session.Value()->AsSecureSession()->IsPASESession()) {
-                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-                return;
-            }
-
-            completion(deviceProxy->GetExchangeManager(), session, nil, nil);
-        }
-        errorHandler:^(NSError * error) {
-            completion(nullptr, chip::NullOptional, error, nil);
-        }];
+    MTR_ABSTRACT_METHOD();
+    completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
 }
 
 - (MTRTransportType)sessionTransportTypeForDevice:(MTRBaseDevice *)device
@@ -665,10 +613,8 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler
 {
-    auto adapter = ^(chip::Controller::DeviceCommissioner *) {
-        block();
-    };
-    [self asyncGetCommissionerOnMatterQueue:adapter errorHandler:errorHandler];
+    MTR_ABSTRACT_METHOD();
+    errorHandler([MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
 }
 
 - (void)syncRunOnWorkQueue:(SyncWorkQueueBlock)block error:(NSError * __autoreleasing *)error
@@ -751,17 +697,10 @@ using namespace chip::Tracing::DarwinFramework;
                             queue:(dispatch_queue_t)queue
                        completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
-    [self asyncDispatchToMatterQueue:^() {
-        [self->_factory downloadLogFromNodeWithID:nodeID
-                                       controller:self
-                                             type:type
-                                          timeout:timeout
-                                            queue:queue
-                                       completion:completion];
-    }
-        errorHandler:^(NSError * error) {
-            completion(nil, error);
-        }];
+    MTR_ABSTRACT_METHOD();
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+    });
 }
 
 - (NSArray<MTRAccessGrant *> *)accessGrantsForClusterPath:(MTRClusterPath *)clusterPath
