@@ -1247,8 +1247,7 @@ TEST_F(TestReadInteraction, TestSetDirtyBetweenChunks)
         public:
             DirtyingMockDelegate(AttributePathParams (&aReadPaths)[2], int & aNumAttributeResponsesWhenSetDirty,
                                  int & aNumArrayItemsWhenSetDirty) :
-                mReadPaths(aReadPaths),
-                mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
+                mReadPaths(aReadPaths), mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
                 mNumArrayItemsWhenSetDirty(aNumArrayItemsWhenSetDirty)
             {}
 
@@ -2430,10 +2429,8 @@ TEST_F(TestReadInteraction, TestSubscribeWildcard)
         EXPECT_TRUE(delegate.mGotReport);
 
 #if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        // Mock attribute storage we define in TestMockNodeConfig has the following items
-        // - Endpoint 1
-        //    - cluster 6 (4 attributes)
-        //    - cluster 7 (3 attributes)
+        // Mock attribute storage that is reset and resides in src/app/util/mock/attribute-storage.cpp
+        // has the following items:
         // - Endpoint 0xFFFE
         //    - cluster 0xFFF1'FC01 (2 attributes)
         //    - cluster 0xFFF1'FC02 (3 attributes)
@@ -2447,8 +2444,8 @@ TEST_F(TestReadInteraction, TestSubscribeWildcard)
         //    - cluster 0xFFF1'FC03 (2 attributes)
         //    - cluster 0xFFF1'FC04 (2 attributes)
         //
-        // For at total of 36 attributes. There are two wildcard subscription
-        // paths, for a total of 72 attributes.
+        // For at total of 29 attributes. There are two wildcard subscription
+        // paths, for a total of 58 attributes.
         //
         // Attribute 0xFFFC::0xFFF1'FC02::0xFFF1'0004 (kMockEndpoint3::MockClusterId(2)::MockAttributeId(4))
         // is a list of kMockAttribute4ListLength elements of size 256 bytes each, which cannot fit in a single
@@ -2469,7 +2466,7 @@ TEST_F(TestReadInteraction, TestSubscribeWildcard)
         // report for the list attribute we receive four of its items in the initial list,
         // then additional items.  For the second report we receive 4 items in
         // the initial list followed by additional items.
-        constexpr size_t kExpectedAttributeResponse = 36 * 2 + (kMockAttribute4ListLength - 4) + (kMockAttribute4ListLength - 4);
+        constexpr size_t kExpectedAttributeResponse = 29 * 2 + (kMockAttribute4ListLength - 4) + (kMockAttribute4ListLength - 4);
 #endif
         EXPECT_EQ((unsigned) delegate.mNumAttributeResponse, kExpectedAttributeResponse);
         EXPECT_EQ(delegate.mNumArrayItems, 12);
