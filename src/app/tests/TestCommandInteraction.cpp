@@ -111,8 +111,8 @@ const chip::Test::MockNodeConfig & TestMockNodeConfig()
             },
             {},      // events
             {
-                kTestCommandIdWithData, 
-                kTestCommandIdNoData, 
+                kTestCommandIdWithData,
+                kTestCommandIdNoData,
                 kTestCommandIdCommandSpecificResponse,
                 kTestCommandIdFillResponseMessage,
             }, // accepted commands
