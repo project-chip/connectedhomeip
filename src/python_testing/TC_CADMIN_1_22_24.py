@@ -35,10 +35,8 @@ import random
 from time import sleep
 
 import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
-from chip.native import PyChipError
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
