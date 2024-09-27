@@ -37,7 +37,6 @@ class Metadata:
     app_args: Optional[str] = None
     app_ready_pattern: Optional[str] = None
     script_args: Optional[str] = None
-    script_start_delay: int = 0
     factory_reset: bool = False
     factory_reset_app_only: bool = False
     script_gdb: bool = False
@@ -183,7 +182,6 @@ class MetadataReader:
                 app_args=attr.get("app-args"),
                 app_ready_pattern=attr.get("app-ready-pattern"),
                 script_args=attr.get("script-args"),
-                script_start_delay=attr.get("script-start-delay", 0),
                 factory_reset=cast_to_bool(attr.get("factoryreset", False)),
                 quiet=cast_to_bool(attr.get("quiet", True))
             ))

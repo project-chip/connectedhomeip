@@ -87,8 +87,6 @@ def process_test_script_output(line, is_stderr):
                                                                              'mobile-device-test.py'), help='Test script to use.')
 @click.option("--script-args", type=str, default='',
               help='Script arguments, can use placeholders like {SCRIPT_BASE_NAME}.')
-@click.option("--script-start-delay", type=int, default=0,
-              help='Delay in seconds before starting the script.')
 @click.option("--script-gdb", is_flag=True,
               help='Run script through gdb')
 @click.option("--quiet", is_flag=True, help="Do not print output from passing tests. Use this flag in CI to keep github log sizes manageable.")
@@ -107,7 +105,6 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
                 app_args=app_args,
                 app_ready_pattern=app_ready_pattern,
                 script_args=script_args,
-                script_start_delay=script_start_delay,
                 factory_reset=factoryreset,
                 factory_reset_app_only=factoryreset_app_only,
                 script_gdb=script_gdb,
@@ -122,11 +119,11 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
     for run in runs:
         print(f"Executing {run.py_script_path.split('/')[-1]} {run.run}")
         main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "",
-                  run.app_ready_pattern, run.py_script_path, run.script_args or "", run.script_start_delay, run.script_gdb, run.quiet)
+                  run.app_ready_pattern, run.py_script_path, run.script_args or "", run.script_gdb, run.quiet)
 
 
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
-              app_ready_pattern: str, script: str, script_args: str, script_start_delay: int, script_gdb: bool, quiet: bool):
+              app_ready_pattern: str, script: str, script_args: str, script_gdb: bool, quiet: bool):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
@@ -179,8 +176,6 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         app_process.start(expected_output=app_ready_pattern, timeout=30)
         app_process.p.stdin.close()
         app_pid = app_process.p.pid
-
-    time.sleep(script_start_delay)
 
     script_command = [script, "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
                       '--log-format', '%(message)s', "--app-pid", str(app_pid)] + shlex.split(script_args)
