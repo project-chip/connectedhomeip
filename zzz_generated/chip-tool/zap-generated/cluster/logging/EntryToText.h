@@ -28,3 +28,5 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id);
 char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id);
 
 char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId id);
+
+char const * DeviceTypeIdToText(chip::DeviceTypeId id);

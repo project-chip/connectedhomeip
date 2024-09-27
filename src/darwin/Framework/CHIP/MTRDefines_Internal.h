@@ -91,7 +91,7 @@ typedef struct {} variable_hidden_by_mtr_hide;
     {                                                                                                 \
         NSXPCConnection * xpcConnection = XPC_CONNECTION;                                             \
                                                                                                       \
-        [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {    \
+        [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {               \
             MTR_LOG_ERROR("Error: %@", error);                                                        \
         }] PREFIX ADDITIONAL_ARGUMENTS];                                                              \
     }
@@ -132,20 +132,6 @@ typedef struct {} variable_hidden_by_mtr_hide;
 #endif
 #endif
 
-#ifndef MTR_OPTIONAL_COLLECTION_ATTRIBUTE
-#define MTR_OPTIONAL_COLLECTION_ATTRIBUTE(ATTRIBUTE, COLLECTION, DICTIONARY)                                           \
-    if ([COLLECTION count] > 0) {                                                                                      \
-        CFDictionarySetValue((CFMutableDictionaryRef) DICTIONARY, (CFStringRef) ATTRIBUTE, (const void *) COLLECTION); \
-    }
-#endif
-
-#ifndef MTR_OPTIONAL_NUMBER_ATTRIBUTE
-#define MTR_OPTIONAL_NUMBER_ATTRIBUTE(ATTRIBUTE, NUMBER, DICTIONARY)                                               \
-    if ([NUMBER intValue] != 0) {                                                                                  \
-        CFDictionarySetValue((CFMutableDictionaryRef) DICTIONARY, (CFStringRef) ATTRIBUTE, (const void *) NUMBER); \
-    }
-#endif
-
 #ifndef MTR_REMOVE_ATTRIBUTE
 #define MTR_REMOVE_ATTRIBUTE(ATTRIBUTE, DICTIONARY)                                            \
     if (ATTRIBUTE != nil && DICTIONARY) {                                                      \
@@ -164,3 +150,19 @@ typedef struct {} variable_hidden_by_mtr_hide;
         }                                                                                                                  \
     }
 #endif
+
+#define MTR_YES_NO(x) ((x) ? @"YES" : @"NO")
+
+#ifdef DEBUG
+#define _MTR_ABSTRACT_METHOD_IMPL(message, ...)                                                                                                        \
+    do {                                                                                                                                               \
+        MTR_LOG_ERROR(message, __VA_ARGS__);                                                                                                           \
+        @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:[NSString stringWithFormat:@message, __VA_ARGS__] userInfo:nil]; \
+    } while (0)
+#else // DEBUG
+#define _MTR_ABSTRACT_METHOD_IMPL(message, ...) \
+    MTR_LOG_ERROR(message, __VA_ARGS__)
+#endif // DEBUG
+
+#define MTR_ABSTRACT_METHOD() \
+    _MTR_ABSTRACT_METHOD_IMPL("%@ or some ancestor must implement %@", self.class, NSStringFromSelector(_cmd))

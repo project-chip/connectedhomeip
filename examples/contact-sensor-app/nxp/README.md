@@ -24,6 +24,7 @@ The example is based on:
 ## Supported devices
 
 -   [k32w1](k32w1/README.md)
+-   [mcxw71](mcxw71/README.md)
 
 ## Introduction
 
@@ -153,6 +154,7 @@ This is a list of ICD configuration gn args.
 | nxp_active_mode_threshold_ms                                                   | 1000 (ms)     | Active Mode Threshold value                                                                                |
 | nxp_icd_supported_clients_per_fabric                                           | 2             | Registration slots per fabric                                                                              |
 | chip_enable_icd_lit                                                            | false         | Enable LIT ICD support                                                                                     |
+| chip_enable_icd_dsls                                                           | false         | Enable LIT ICD DSLS support                                                                                |
 | chip_persist_subscriptions                                                     | true          | Try once to re-establish subscriptions from the server side after reboot. May be disabled for LIT use case |
 | chip_subscription_timeout_resumption                                           | true          | Same as above, but try to re-establish timeout out subscriptions                                           |
 | using `Fibonacci Backoff` for retries pacing. May be disabled for LIT use case |

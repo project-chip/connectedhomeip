@@ -26,6 +26,7 @@ from enum import Enum, auto
 from typing import Callable, Optional
 
 import chip.clusters as Clusters
+import conformance_support
 from chip.tlv import uint
 from conformance_support import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
                                  ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
@@ -528,7 +529,7 @@ def _get_data_model_directory(data_model_directory: typing.Union[PrebuiltDataMod
         return data_model_directory
 
 
-def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.kMaster) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
+def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.kInProgress) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
     dir = _get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
 
     clusters: dict[int, XmlCluster] = {}
@@ -610,6 +611,25 @@ def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirec
             0x04: XmlAttribute(name='SelectedTemperatureLevel', datatype='uint8', conformance=feature(0x02, 'TL'), read_access=view, write_access=none, write_optional=False),
             0x05: XmlAttribute(name='SupportedTemperatureLevels', datatype='list', conformance=feature(0x02, 'TL'), read_access=view, write_access=none, write_optional=False),
         }
+
+    # TODO: Need automated parsing for atomic attributes.
+    atomic_request_cmd_id = 0xFE
+    atomic_response_cmd_id = 0xFD
+    atomic_request_name = "Atomic Request"
+    atomic_response_name = "Atomic Response"
+    presets_name = "Presets"
+    schedules_name = "Schedules"
+    if clusters[Clusters.Thermostat.id].revision >= 8:
+        presents_id = clusters[Clusters.Thermostat.id].attribute_map[presets_name]
+        schedules_id = clusters[Clusters.Thermostat.id].attribute_map[schedules_name]
+        conformance = or_operation([conformance_support.attribute(presents_id, presets_name),
+                                   conformance_support.attribute(schedules_id, schedules_name)])
+        clusters[Clusters.Thermostat.id].accepted_commands[atomic_request_cmd_id] = XmlCommand(
+            id=atomic_request_cmd_id, name=atomic_request_name, conformance=conformance)
+        clusters[Clusters.Thermostat.id].generated_commands[atomic_response_cmd_id] = XmlCommand(
+            id=atomic_response_cmd_id, name=atomic_response_name, conformance=conformance)
+        clusters[Clusters.Thermostat.id].command_map[atomic_request_name] = atomic_request_cmd_id
+        clusters[Clusters.Thermostat.id].command_map[atomic_response_name] = atomic_response_cmd_id
 
     check_clusters_for_unknown_commands(clusters, problems)
 

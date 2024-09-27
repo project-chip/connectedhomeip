@@ -58,6 +58,7 @@ public:
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize);
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;
     CHIP_ERROR GetLocationCapability(uint8_t & location) override;
+    CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) override;
     static ConfigurationManagerImpl & GetDefaultInstance();
 
     // Set the country code to esp_phy layer and also store it to NVS

@@ -33,6 +33,7 @@
 #include <app/RequiredPrivilege.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/Read.h>
+#include <app/reporting/reporting.h>
 #include <app/util/MatterCallbacks.h>
 #include <app/util/ember-compatibility-functions.h>
 
@@ -855,7 +856,7 @@ CHIP_ERROR Engine::InsertPathIntoDirtySet(const AttributePathParams & aAttribute
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
+CHIP_ERROR Engine::SetDirty(const AttributePathParams & aAttributePath)
 {
     BumpDirtySetGeneration();
 
@@ -1010,7 +1011,16 @@ void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
     Run();
 }
 
-}; // namespace reporting
+void Engine::MarkDirty(const AttributePathParams & path)
+{
+    CHIP_ERROR err = SetDirty(path);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Failed to set path dirty: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+} // namespace reporting
 } // namespace app
 } // namespace chip
 

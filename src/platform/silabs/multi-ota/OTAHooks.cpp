@@ -30,7 +30,7 @@
 
 CHIP_ERROR chip::OTAMultiImageProcessorImpl::ProcessDescriptor(void * descriptor)
 {
-    auto desc = static_cast<chip::OTAFirmwareProcessor::Descriptor *>(descriptor);
+    [[maybe_unused]] auto desc = static_cast<chip::OTAFirmwareProcessor::Descriptor *>(descriptor);
     ChipLogDetail(SoftwareUpdate, "Descriptor: %ld, %s, %s", desc->version, desc->versionString, desc->buildDate);
 
     return CHIP_NO_ERROR;
