@@ -26,18 +26,18 @@
 import logging
 import random
 from pathlib import Path
+from time import sleep
 
 import chip.clusters as Clusters
-from chip.tlv import TLVReader
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from chip.native import PyChipError
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, MatterStackState
+from chip.tlv import TLVReader
+from matter_testing_support import MatterBaseTest, MatterStackState, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery import mdns_discovery
 from mobly import asserts
-from time import sleep
 
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
