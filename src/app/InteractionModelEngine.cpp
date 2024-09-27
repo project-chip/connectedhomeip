@@ -1597,6 +1597,7 @@ bool InteractionModelEngine::IsExistingAttributePath(const ConcreteAttributePath
 
     bool emberResult = emberAfContainsAttribute(path.mEndpointId, path.mClusterId, path.mAttributeId);
 
+    // BEGIN: TEST CODE, DO NOT SUBMIT !!!
     if (providerResult != emberResult)
     {
         ChipLogError(InteractionModel, "!!!!!!!!!!!!!!!!!!!!!! DIFF FOUND !!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -1609,6 +1610,7 @@ bool InteractionModelEngine::IsExistingAttributePath(const ConcreteAttributePath
     {
         ChipLogError(InteractionModel, "Path: %u / %u / %u", path.mEndpointId, path.mClusterId, path.mAttributeId);
     }
+    // END: TEST CODE, DO NOT SUBMIT !!!
 
     // Ensure that Provider interface and ember are IDENTICAL in attribute location (i.e. "check" mode)
     VerifyOrDie(providerResult == emberResult);
