@@ -205,6 +205,13 @@ static_library("ESP32") {
     ]
   }
 
+  if (chip_use_factory_data_provider && chip_use_secure_cert_dac_provider) {
+    sources += [
+      "ESP32SecureCertDataProvider.cpp",
+      "ESP32SecureCertDataProvider.h",
+    ]
+  }
+
   if (chip_use_esp32_ecdsa_peripheral) {
     sources += [
       "ESP32CHIPCryptoPAL.cpp",
