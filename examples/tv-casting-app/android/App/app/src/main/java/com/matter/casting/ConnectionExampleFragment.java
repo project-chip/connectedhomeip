@@ -234,8 +234,8 @@ public class ConnectionExampleFragment extends Fragment {
                                 }
                                 if (cd.getErrorCode() != CommissionerDeclaration.CdError.noError) {
                                   commissionerDeclarationErrorTextView.setText(
-                                      "CastingPlayer/Commissioner Error: "
-                                          + cd.getErrorCode().toString());
+                                      "CommissionerDeclaration error from CastingPlayer: "
+                                          + cd.getErrorCode().getDescription());
                                 }
                               });
                     }

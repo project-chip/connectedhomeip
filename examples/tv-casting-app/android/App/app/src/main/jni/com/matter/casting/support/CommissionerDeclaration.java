@@ -27,33 +27,53 @@ public class CommissionerDeclaration {
    * commissioning.
    */
   public enum CdError {
-    noError(0),
-    commissionableDiscoveryFailed(1),
-    paseConnectionFailed(2),
-    paseAuthFailed(3),
-    dacValidationFailed(4),
-    alreadyOnFabric(5),
-    operationalDiscoveryFailed(6),
-    caseConnectionFailed(7),
-    caseAuthFailed(8),
-    configurationFailed(9),
-    bindingConfigurationFailed(10),
-    commissionerPasscodeNotSupported(11),
-    invalidIdentificationDeclarationParams(12),
-    appInstallConsentPending(13),
-    appInstalling(14),
-    appInstallFailed(15),
-    appInstalledRetryNeeded(16),
-    commissionerPasscodeDisabled(17),
-    unexpectedCommissionerPasscodeReady(18);
+    noError(0, "No error"),
+    commissionableDiscoveryFailed(1, "Commissionable Node discovery failed"),
+    paseConnectionFailed(2, "PASE connection failed"),
+    paseAuthFailed(3, "PASE authentication failed (bad Passcode)"),
+    dacValidationFailed(4, "DAC validation failed"),
+    alreadyOnFabric(5, "Already on fabric"),
+    operationalDiscoveryFailed(6, "Operational Node discovery failed"),
+    caseConnectionFailed(7, "CASE connection failed"),
+    caseAuthFailed(8, "CASE authentication failed"),
+    configurationFailed(9, "Configuration failed"),
+    bindingConfigurationFailed(10, "Binding Configuration failed"),
+    commissionerPasscodeNotSupported(11, "Commissioner Passcode not supported"),
+    invalidIdentificationDeclarationParams(12, "Invalid UDC Identification Declaration parameters"),
+    appInstallConsentPending(13, "App Install Consent Pending"),
+    appInstalling(14, "App Installing"),
+    appInstallFailed(15, "App Install Failed"),
+    appInstalledRetryNeeded(16, "App Installed, Retry Needed"),
+    commissionerPasscodeDisabled(17, "Commissioner Passcode disabled"),
+    unexpectedCommissionerPasscodeReady(18, "Unexpected Commissioner Passcode ready");
+
     private final int value;
+    private final String description;
+
+    private CdError(int value, String description) {
+      this.value = value;
+      this.description = description;
+    }
+
+    private static String getDefaultDescription(int value) {
+      for (CdError error : CdError.values()) {
+        if (error.value == value) {
+          return error.name();
+        }
+      }
+      return "Unknown Error";
+    }
 
     CdError(int value) {
-      this.value = value;
+      this(value, getDefaultDescription(value));
     }
 
     public int getValue() {
       return value;
+    }
+
+    public String getDescription() {
+      return description;
     }
   }
   /** Feature: All - Indicates errors incurred during commissioning. */

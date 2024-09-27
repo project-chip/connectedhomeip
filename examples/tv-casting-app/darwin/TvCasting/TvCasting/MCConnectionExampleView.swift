@@ -68,7 +68,7 @@ struct MCConnectionExampleView: View {
             Spacer()  // Push the error code to the bottom
             if let errorCode = viewModel.errorCodeDescription {
 
-                Text("CastingPlayer/Commissioner Error: \(errorCode)")
+                Text("\(errorCode)")
                     .foregroundColor(.red)
                     .padding()
             }

@@ -29,7 +29,6 @@
             android:layout_height="wrap_content"
             android:text="@string/matter_connection_next_button_text" />
         
-        <!-- TextView for CommissionerDeclaration errors -->
         <TextView
             android:id="@+id/commissionerDeclarationErrorTextView"
             android:layout_width="wrap_content"

@@ -40,7 +40,7 @@ class MCConnectionExampleViewModel: ObservableObject {
 
     @Published var connectionStatus: String?;
 
-    @Published var errorCodeDescription: String?  // New published variable for error code
+    @Published var errorCodeDescription: String?
 
     func connect(selectedCastingPlayer: MCCastingPlayer?, useCommissionerGeneratedPasscode: Bool) {
         self.Log.info("MCConnectionExampleViewModel.connect() useCommissionerGeneratedPasscode: \(String(describing: useCommissionerGeneratedPasscode))")
@@ -70,7 +70,7 @@ class MCConnectionExampleViewModel: ObservableObject {
 
                 // Display CommissionerDeclaration error code if `errorCode` is not `kNoError`
                 if commissionerDeclarationMessage.errorCode != CdError.noError {
-                    self.errorCodeDescription = commissionerDeclarationMessage.getErrorCodeString()
+                    self.errorCodeDescription = "CommissionerDeclaration error from CastingPlayer: \(commissionerDeclarationMessage.getErrorCodeString())"
                     self.Log.error("MCConnectionExampleViewModel connect() Casting Player/Commissioner Error: \(self.errorCodeDescription ?? "Unknown Error")")
                 }
 
@@ -169,7 +169,6 @@ class MCConnectionExampleViewModel: ObservableObject {
         } else {
             identificationDeclarationOptions = MCIdentificationDeclarationOptions()
             targetAppInfo = MCTargetAppInfo(vendorId: kDesiredEndpointVendorId)
-            // 
             connectionCallbacks = MCConnectionCallbacks(
                 callbacks: connectionCompleteCallback,
                 commissionerDeclarationCallback: commissionerDeclarationCallback
