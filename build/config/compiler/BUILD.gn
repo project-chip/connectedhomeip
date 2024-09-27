@@ -455,6 +455,11 @@ config("sanitize_undefined_behavior") {
     ]
   }
 
+  #According to the LLVM UBSan documentation, sanitizing vptr is incompatible with the -fno-rtti flag.
+  if (!enable_rtti) {
+    cflags += [ "-fno-sanitize=vptr" ]
+  }
+
   ldflags = cflags
 }
 
