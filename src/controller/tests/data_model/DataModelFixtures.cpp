@@ -17,13 +17,13 @@
  */
 
 #include "DataModelFixtures.h"
-#include "app/ConcreteAttributePath.h"
-#include "app/ConcreteClusterPath.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/codegen-data-model-provider/Instance.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
