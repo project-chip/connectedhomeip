@@ -65,10 +65,10 @@ parser.add_argument(
     help=("path to the system data image; "
           "default: $TIZEN_SDK_ROOT/iot-sysdata.img"))
 parser.add_argument(
-    '--image-iso', metavar='IMAGE',
-    help=("path to the ISO image with the runner script; the ISO image "
-          "should have 'CHIP' label and a file named 'runner.sh' at the "
-          "root directory"))
+    '--share', type=str,
+    help=("host directory to share with the guest; if file named 'runner.sh' "
+          "is present at the root of that directory, it will be executed "
+          "automatically after boot"))
 parser.add_argument(
     '--output', metavar='FILE', default="/dev/null",
     help="store the QEMU output in a FILE")
@@ -107,18 +107,18 @@ qemu_args = [
     '-m', str(args.memory),
 ]
 
+if args.share:
+    # Add directory sharing.
+    qemu_args += [
+        '-virtfs',
+        'local,path=%s,mount_tag=host0,security_model=none' % args.share
+    ]
+
 if args.virtio_net:
     # Add network support.
     qemu_args += [
         '-device', 'virtio-net-device,netdev=virtio-net',
         '-netdev', 'user,id=virtio-net',
-    ]
-
-if args.image_iso:
-    # Add a block device for the runner ISO image.
-    qemu_args += [
-        '-device', 'virtio-blk-device,drive=virtio-blk3',
-        '-drive', 'file=%s,id=virtio-blk3,if=none,format=raw' % args.image_iso,
     ]
 
 # Add Tizen image block devices.

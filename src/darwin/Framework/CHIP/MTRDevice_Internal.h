@@ -118,12 +118,12 @@ MTR_DIRECT_MEMBERS
     NSNumber * _nodeID;
 
     // Our controller.  Declared nullable because our property is, though in
-    // practice it does not look like we ever set it to nil.
+    // practice it does not look like we ever set it to nil.  If this changes,
+    // fix _concreteController on MTRDevice_Concrete accordingly.
     MTRDeviceController * _Nullable _deviceController;
 }
 
 - (instancetype)initForSubclassesWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
-- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
 // called by controller to clean up and shutdown
 - (void)invalidate;

@@ -1129,7 +1129,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     [_factory preWarmCommissioningSession];
 }
 
-- (MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
+- (nullable MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
     auto block = ^MTRBaseDevice *
     {
@@ -1304,16 +1304,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                 static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue));
         }];
     return YES;
-}
-
-- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint queue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion
-{
-    [self removeServerEndpointInternal:endpoint queue:queue completion:completion];
-}
-
-- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint
-{
-    [self removeServerEndpointInternal:endpoint queue:nil completion:nil];
 }
 
 - (void)removeServerEndpointInternal:(MTRServerEndpoint *)endpoint queue:(dispatch_queue_t _Nullable)queue completion:(dispatch_block_t _Nullable)completion
@@ -1907,23 +1897,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return success;
 }
 
-- (BOOL)commissionDevice:(uint64_t)deviceID
-     commissioningParams:(MTRCommissioningParameters *)commissioningParams
-                   error:(NSError * __autoreleasing *)error
-{
-    return [self commissionNodeWithID:@(deviceID) commissioningParams:commissioningParams error:error];
-}
-
-- (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
-{
-    return [self cancelCommissioningForNodeID:@(deviceID) error:error];
-}
-
-- (MTRBaseDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error
-{
-    return [self deviceBeingCommissionedWithNodeID:@(deviceId) error:error];
-}
-
 - (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error
 {
     if (duration > UINT16_MAX) {
@@ -1946,11 +1919,11 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
 }
 
-- (NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
-                              duration:(NSUInteger)duration
-                         discriminator:(NSUInteger)discriminator
-                              setupPIN:(NSUInteger)setupPIN
-                                 error:(NSError * __autoreleasing *)error
+- (nullable NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
+                                       duration:(NSUInteger)duration
+                                  discriminator:(NSUInteger)discriminator
+                                       setupPIN:(NSUInteger)setupPIN
+                                          error:(NSError * __autoreleasing *)error
 {
     if (duration > UINT16_MAX) {
         MTR_LOG_ERROR("%@ Error: Duration %lu is too large. Max value %d", self, static_cast<unsigned long>(duration), UINT16_MAX);

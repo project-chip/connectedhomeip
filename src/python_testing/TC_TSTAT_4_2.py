@@ -244,7 +244,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
     @ async_test_body
     async def test_TC_TSTAT_4_2(self):
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else 1
 
         self.step("1")
         # Commission DUT - already done
@@ -261,6 +261,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
 
+        secondary_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=secondary_controller, endpoint=0, cluster=Clusters.Objects.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
+
         current_presets = []
         presetTypes = []
         presetScenarioCounts = {}
@@ -272,25 +274,53 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
         supportsHeat = self.check_pics("TSTAT.S.F00")
         supportsCool = self.check_pics("TSTAT.S.F01")
-        supportsOccupancy = self.check_pics("TSTAT.S.F02")
-
-        occupied = True
 
         if supportsHeat:
-            minHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinHeatSetpointLimit)
-            maxHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxHeatSetpointLimit)
+            # If the server supports MinHeatSetpointLimit & MaxHeatSetpointLimit, use those
+            if self.check_pics("TSTAT.S.A0015") and self.check_pics("TSTAT.S.A0016"):
+                minHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinHeatSetpointLimit)
+                maxHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxHeatSetpointLimit)
+            elif self.check_pics("TSTAT.S.A0003") and self.check_pics("TSTAT.S.A0004"):
+                # Otherwise, if the server supports AbsMinHeatSetpointLimit & AbsMaxHeatSetpointLimit, use those
+                minHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMinHeatSetpointLimit)
+                maxHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMaxHeatSetpointLimit)
+
             asserts.assert_true(minHeatSetpointLimit < maxHeatSetpointLimit, "Heat setpoint range invalid")
 
         if supportsCool:
-            minCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinCoolSetpointLimit)
-            maxCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxCoolSetpointLimit)
+            # If the server supports MinCoolSetpointLimit & MaxCoolSetpointLimit, use those
+            if self.check_pics("TSTAT.S.A0017") and self.check_pics("TSTAT.S.A0018"):
+                minCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinCoolSetpointLimit)
+                maxCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxCoolSetpointLimit)
+            elif self.check_pics("TSTAT.S.A0005") and self.check_pics("TSTAT.S.A0006"):
+                # Otherwise, if the server supports AbsMinCoolSetpointLimit & AbsMaxCoolSetpointLimit, use those
+                minCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMinCoolSetpointLimit)
+                maxCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMaxCoolSetpointLimit)
+
             asserts.assert_true(minCoolSetpointLimit < maxCoolSetpointLimit, "Cool setpoint range invalid")
 
+        # Servers that do not support occupancy are always "occupied"
+        occupied = True
+
+        supportsOccupancy = self.check_pics("TSTAT.S.F02")
         if supportsOccupancy:
             occupied = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Occupancy) & 1
 
+        # Target setpoints
         heatSetpoint = minHeatSetpointLimit + ((maxHeatSetpointLimit - minHeatSetpointLimit) / 2)
         coolSetpoint = minCoolSetpointLimit + ((maxCoolSetpointLimit - minCoolSetpointLimit) / 2)
+
+        # Set the heating and cooling setpoints to something other than the target setpoints
+        if occupied:
+            if supportsHeat:
+                await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(heatSetpoint-1), endpoint_id=endpoint)
+            if supportsCool:
+                await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedCoolingSetpoint(coolSetpoint-1), endpoint_id=endpoint)
+        else:
+            if supportsHeat:
+                await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedHeatingSetpoint(heatSetpoint-1), endpoint_id=endpoint)
+            if supportsCool:
+                await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(coolSetpoint-1), endpoint_id=endpoint)
 
         self.step("2")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050")):
@@ -643,7 +673,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_begin_command(dev_ctrl=secondary_controller)
 
             # Primary controller removes the second fabric
-            await self.send_single_cmd(Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=2),  endpoint=0)
+            await self.send_single_cmd(Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=secondary_fabric_index),  endpoint=0)
 
             # Send the AtomicRequest begin command from primary controller, which should succeed, as the secondary controller's atomic write state has been cleared
             status = await self.send_atomic_request_begin_command()

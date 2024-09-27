@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "lib/core/CHIPError.h"
 #include <condition_variable>
 #include <mutex>
 
@@ -69,7 +70,21 @@ public:
     template <typename T>
     CHIP_ERROR GLibMatterContextInvokeSync(CHIP_ERROR (*func)(T *), T * userData)
     {
-        return _GLibMatterContextInvokeSync((CHIP_ERROR(*)(void *)) func, (void *) userData);
+        struct
+        {
+            CHIP_ERROR returnValue = CHIP_NO_ERROR;
+            CHIP_ERROR (*functionToCall)(T *);
+            T * userData;
+        } context;
+
+        context.functionToCall = func;
+        context.userData       = userData;
+
+        LambdaBridge bridge;
+        bridge.Initialize([&context]() { context.returnValue = context.functionToCall(context.userData); });
+
+        _GLibMatterContextInvokeSync(std::move(bridge));
+        return context.returnValue;
     }
 
     unsigned int GLibMatterContextAttachSource(GSource * source)
@@ -102,9 +117,7 @@ private:
 
     struct GLibMatterContextInvokeData
     {
-        CHIP_ERROR (*mFunc)(void *);
-        void * mFuncUserData;
-        CHIP_ERROR mFuncResult;
+        LambdaBridge bridge;
         // Sync primitives to wait for the function to be executed
         std::condition_variable mDoneCond;
         bool mDone = false;
@@ -113,10 +126,13 @@ private:
     /**
      * @brief Invoke a function on the Matter GLib context.
      *
-     * @note This function does not provide type safety for the user data. Please,
-     *       use the GLibMatterContextInvokeSync() template function instead.
+     * @param[in] bridge a LambdaBridge object that holds the lambda to be invoked within the GLib context.
+     *
+     * @note This function moves the LambdaBridge into the GLib context for invocation.
+     *       The LambdaBridge is created and initialised in GLibMatterContextInvokeSync().
+     *       use the GLibMatterContextInvokeSync() template function instead of this one.
      */
-    CHIP_ERROR _GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData);
+    void _GLibMatterContextInvokeSync(LambdaBridge && bridge);
 
     // XXX: Mutex for guarding access to glib main event loop callback indirection
     //      synchronization primitives. This is a workaround to suppress TSAN warnings.

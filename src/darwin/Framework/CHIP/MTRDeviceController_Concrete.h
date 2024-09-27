@@ -19,6 +19,7 @@
 
 #import <Matter/Matter.h>
 
+#import "MTRDeviceConnectionBridge.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -108,6 +109,13 @@ NS_ASSUME_NONNULL_BEGIN
  * Clear any pending shutdown request.
  */
 - (void)clearPendingShutdown;
+
+/**
+ * Since getSessionForNode now enqueues by the subscription pool for Thread
+ * devices, MTRDevice_Concrete needs a direct non-queued access because it already
+ * makes use of the subscription pool.
+ */
+- (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
 
 @end
 

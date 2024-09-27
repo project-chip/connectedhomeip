@@ -243,13 +243,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData;
 - (void)removeDevice:(MTRDevice *)device;
 
-/**
- * Since getSessionForNode now enqueues by the subscription pool for Thread
- * devices, MTRDevice needs a direct non-queued access because it already
- * makes use of the subscription pool.
- */
-- (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
-
 @end
 
 /**
