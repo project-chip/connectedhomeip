@@ -122,11 +122,13 @@ static_library("nxp_platform") {
 
   if (chip_enable_openthread) {
     sources += [
+      # Temporary fix, to be revert once PR #34662 is merged, build issue when using GN check argument
+      "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
+      "../../../OpenThread/GenericThreadBorderRouterDelegate.cpp",
+      "../../../OpenThread/GenericThreadBorderRouterDelegate.h",
       "../../../OpenThread/OpenThreadUtils.cpp",
       "../../common/ThreadStackManagerImpl.cpp",
       "../../common/ThreadStackManagerImpl.h",
-      "../../../OpenThread/GenericThreadBorderRouterDelegate.cpp",
-      "../../../OpenThread/GenericThreadBorderRouterDelegate.h",
     ]
 
     deps += [ "${chip_root}/src/app/common:ids" ]
