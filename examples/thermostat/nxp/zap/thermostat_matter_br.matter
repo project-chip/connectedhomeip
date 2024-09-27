@@ -2552,8 +2552,10 @@ endpoint 0 {
     callback attribute beaconRxCount;
     callback attribute packetMulticastRxCount;
     callback attribute packetMulticastTxCount;
+    callback attribute packetUnicastRxCount;
     callback attribute packetUnicastTxCount;
     callback attribute currentMaxRate;
+    callback attribute overrunCount;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
