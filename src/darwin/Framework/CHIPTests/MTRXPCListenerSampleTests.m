@@ -419,6 +419,7 @@ static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12344321;
 static NSString * kOnboardingPayload = @"MT:Y.K90SO527JA0648G00";
+static NSString * _Nullable sLogContentFilePath;
 static NSString * kSimpleLogContent = @"This is a simple log\n";
 static const uint16_t kLocalPort = 5541;
 
@@ -516,14 +517,14 @@ static BOOL sStackInitRan = NO;
     [super setUp];
 
     __auto_type * uniqueName = [[NSUUID UUID] UUIDString];
-    __auto_type * uniquePath = [NSTemporaryDirectory() stringByAppendingPathComponent:uniqueName];
-    [[NSFileManager defaultManager] createFileAtPath:uniquePath
+    sLogContentFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:uniqueName];
+    [[NSFileManager defaultManager] createFileAtPath:sLogContentFilePath
                                             contents:[kSimpleLogContent dataUsingEncoding:NSUTF8StringEncoding]
                                           attributes:nil];
     BOOL started = [self startAppWithName:@"all-clusters"
                                 arguments:@[
                                     @"--end_user_support_log",
-                                    uniquePath,
+                                    sLogContentFilePath,
                                 ]
                                   payload:kOnboardingPayload];
     XCTAssertTrue(started);
@@ -532,6 +533,10 @@ static BOOL sStackInitRan = NO;
 + (void)tearDown
 {
     // Global teardown, runs once
+    if (sLogContentFilePath != nil) {
+        [[NSFileManager defaultManager] removeItemAtPath:sLogContentFilePath error:nil];
+    }
+
     [self shutdownStack];
     [super tearDown];
 }
