@@ -43,7 +43,7 @@ from matter_testing_support import MatterBaseTest, TestStep, async_test_body, de
 from mobly import asserts
 
 
-class TC_CADMIN_1_22(MatterBaseTest):
+class TC_CADMIN_1_22_24(MatterBaseTest):
     async def OpenCommissioningWindow(self) -> CommissioningParameters:
         try:
             params = await self.th1.OpenCommissioningWindow(
