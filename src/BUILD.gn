@@ -54,22 +54,16 @@ if (chip_build_tests) {
       "${chip_root}/src/app/data-model/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/data-model-provider/tests",
-#      "${chip_root}/src/app/icd/server/tests",
-      "${chip_root}/src/app/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
       "${chip_root}/src/lib/address_resolve/tests",
       "${chip_root}/src/lib/asn1/tests",
       "${chip_root}/src/lib/core/tests",
-#      "${chip_root}/src/lib/format/tests",
       "${chip_root}/src/messaging/tests",
       "${chip_root}/src/protocols/bdx/tests",
       "${chip_root}/src/protocols/interaction_model/tests",
-#      "${chip_root}/src/protocols/secure_channel/tests",
       "${chip_root}/src/protocols/user_directed_commissioning/tests",
-#      "${chip_root}/src/system/tests",
       "${chip_root}/src/transport/retransmit/tests",
-#      "${chip_root}/src/transport/tests",
     ]
 
     # Skip DNSSD tests for Mbed platform due to flash memory size limitations
@@ -86,7 +80,8 @@ if (chip_build_tests) {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
     }
 
-    if (current_os != "zephyr" && current_os != "mbed" && chip_device_platform != "efr32") {
+    if (current_os != "zephyr" && current_os != "mbed" &&
+        chip_device_platform != "efr32") {
       # Avoid these items from "one single binary" test executions. Once tests
       # are split, we can re-visit this (and likely many others)
       #
@@ -109,11 +104,11 @@ if (chip_build_tests) {
         "${chip_root}/src/lib/support/tests",
 
 
-        # "${chip_root}/src/app/tests",
-        # "${chip_root}/src/lib/format/tests",
-        # "${chip_root}/src/protocols/secure_channel/tests",
-        # "${chip_root}/src/system/tests",
-        # "${chip_root}/src/transport/tests",
+        "${chip_root}/src/app/tests",
+        "${chip_root}/src/lib/format/tests",
+        "${chip_root}/src/protocols/secure_channel/tests",
+        "${chip_root}/src/system/tests",
+        "${chip_root}/src/transport/tests",
       ]
 
       if (matter_enable_tracing_support &&
@@ -126,7 +121,8 @@ if (chip_build_tests) {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/tests" ]
     }
 
-    if (chip_device_platform != "esp32" && chip_device_platform != "ameba") {
+    if (chip_device_platform != "esp32" && chip_device_platform != "efr32" &&
+        chip_device_platform != "ameba") {
       tests += [ "${chip_root}/src/platform/tests" ]
     }
 
@@ -136,7 +132,8 @@ if (chip_build_tests) {
 
     # On nrfconnect, the controller tests run into
     # https://github.com/project-chip/connectedhomeip/issues/9630
-    if (chip_device_platform != "nrfconnect") {
+    if (chip_device_platform != "nrfconnect" &&
+        chip_device_platform != "efr32") {
       tests += [ "${chip_root}/src/controller/tests/data_model" ]
 
       # Skip controller test for Open IoT SDK

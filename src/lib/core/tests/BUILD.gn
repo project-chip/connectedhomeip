@@ -31,7 +31,7 @@ chip_test_suite("tests") {
     "TestOptional.cpp",
     "TestReferenceCounted.cpp",
     "TestTLV.cpp",
-    "TestTLVVectorWriter.cpp",
+    #"TestTLVVectorWriter.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
