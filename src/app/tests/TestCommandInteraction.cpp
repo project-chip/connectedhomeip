@@ -97,6 +97,33 @@ public:
     }
 };
 
+const chip::Test::MockNodeConfig & TestMockNodeConfig()
+{
+    using namespace chip::app;
+    using namespace chip::Test;
+    using namespace chip::app::Clusters::Globals::Attributes;
+
+    // clang-format off
+    static const MockNodeConfig config({
+        MockEndpointConfig(chip::kTestEndpointId, {
+            MockClusterConfig(Clusters::Identify::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+            },
+            {},      // events
+            {
+                kTestCommandIdWithData, 
+                kTestCommandIdNoData, 
+                kTestCommandIdCommandSpecificResponse,
+                kTestCommandIdFillResponseMessage,
+            }, // accepted commands
+            {} // generated commands
+          ),
+        }),
+    });
+    // clang-format on
+    return config;
+}
+
 } // namespace
 
 namespace app {
@@ -377,13 +404,16 @@ public:
 class TestCommandInteraction : public chip::Test::AppContext
 {
 public:
-    void SetUp()
+    void SetUp() override
     {
         AppContext::SetUp();
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(TestCommandInteractionModel::Instance());
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
     }
-    void TearDown()
+
+    void TearDown() override
     {
+        chip::Test::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         AppContext::TearDown();
     }

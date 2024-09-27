@@ -228,12 +228,6 @@ ClusterEntry TestImCustomDataModel::NextCluster(const ConcreteClusterPath & befo
 
 std::optional<ClusterInfo> TestImCustomDataModel::GetClusterInfo(const ConcreteClusterPath & path)
 {
-    // Hardcoded "supported" paths to pass TestCommandInteraction
-    if ((path == ConcreteClusterPath(1 /*kTestEndpointId*/, app::Clusters::Identify::Id)))
-    {
-        return ClusterInfo(1234 /* dataVersion */);
-    }
-
     return CodegenDataModelProviderInstance()->GetClusterInfo(path);
 }
 
@@ -264,12 +258,6 @@ CommandEntry TestImCustomDataModel::NextAcceptedCommand(const ConcreteCommandPat
 
 std::optional<CommandInfo> TestImCustomDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
-    // Hardcoded "supported" paths to pass TestReadInteraction
-    if ((path == ConcreteCommandPath(1 /*kTestEndpointId*/, app::Clusters::Identify::Id, 4)) ||
-        (path == ConcreteCommandPath(1 /*kTestEndpointId*/, app::Clusters::Identify::Id, 6)))
-    {
-        return CommandInfo();
-    }
     return CodegenDataModelProviderInstance()->GetAcceptedCommandInfo(path);
 }
 

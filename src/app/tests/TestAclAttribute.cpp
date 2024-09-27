@@ -41,8 +41,6 @@
 #include <messaging/Flags.h>
 #include <protocols/interaction_model/Constants.h>
 
-#include <type_traits>
-
 namespace {
 using namespace chip;
 using namespace chip::Access;
