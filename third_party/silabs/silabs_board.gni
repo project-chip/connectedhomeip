@@ -18,7 +18,7 @@ declare_args() {
 
   # Silabs mcu family used
   silabs_family = ""
-  
+
   # Silabs mcu model used
   silabs_mcu = ""
 
@@ -162,8 +162,8 @@ if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A") {
   print("Using custom board configuration")
   print("silabs_family:", silabs_family)
   print("silabs_mcu:", silabs_mcu)
-  assert(silabs_family != "", "Must specify silabs_family to configure custom board")
-  assert(silabs_mcu != "", "Must specify silabs_mcu to configure custom board")
+  assert(silabs_family != "", "Must specify silabs_family to config custom board")
+  assert(silabs_mcu != "", "Must specify silabs_mcu to config custom board")
 } else {
   assert(
       false,
