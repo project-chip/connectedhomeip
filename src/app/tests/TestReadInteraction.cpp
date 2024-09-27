@@ -2533,9 +2533,6 @@ TEST_F(TestReadInteraction, TestSubscribeWildcard)
     EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
     engine->Shutdown();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    // Set the configuration back for future use ...
-    chip::Test::SetMockNodeConfig(TestMockNodeConfig());
 }
 
 // Subscribe (wildcard, C3, A1), then setDirty (E2, C3, wildcard), receive one attribute after setDirty
