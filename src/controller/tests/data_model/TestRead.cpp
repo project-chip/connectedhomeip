@@ -20,6 +20,7 @@
 #include <pw_unit_test/framework.h>
 
 #include "DataModelFixtures.h"
+#include "lib/core/DataModelTypes.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ClusterStateCache.h>
@@ -47,6 +48,67 @@ using namespace chip::Test;
 
 namespace {
 
+const MockNodeConfig & TestMockNodeConfig()
+{
+    using namespace Clusters::Globals::Attributes;
+
+    // clang-format off
+    static const MockNodeConfig config({
+        MockEndpointConfig(kRootEndpointId, {
+            MockClusterConfig(Clusters::IcdManagement::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+                Clusters::IcdManagement::Attributes::OperatingMode::Id,
+            }),
+        }),
+        MockEndpointConfig(kTestEndpointId, {
+            MockClusterConfig(Clusters::UnitTesting::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+                Clusters::UnitTesting::Attributes::Boolean::Id,
+                Clusters::UnitTesting::Attributes::Int16u::Id,
+                Clusters::UnitTesting::Attributes::ListFabricScoped::Id,
+                Clusters::UnitTesting::Attributes::ListStructOctetString::Id,
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint1, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }, {
+                MockEventId(1), MockEventId(2),
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint2, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2),
+            }),
+            MockClusterConfig(MockClusterId(3), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint3, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3), MockAttributeId(4),
+            }),
+            MockClusterConfig(MockClusterId(3), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+            MockClusterConfig(MockClusterId(4), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+        }),
+    });
+    // clang-format on
+    return config;
+}
+
 class TestRead : public chip::Test::AppContext, public app::ReadHandler::ApplicationCallback
 {
 protected:
@@ -57,11 +119,13 @@ protected:
     {
         chip::Test::AppContext::SetUp();
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&CustomDataModel::Instance());
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
     }
 
     // Performs teardown for each individual test in the test suite
     void TearDown() override
     {
+        chip::Test::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::Test::AppContext::TearDown();
     }
@@ -3192,6 +3256,7 @@ TEST_F(TestRead, TestSubscribeAttributeDeniedNotExistPath)
         app::AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mEndpointId             = kRootEndpointId;  // this cluster does NOT exist on the root endpoint
         attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
         attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::ListStructOctetString::Id;
 
@@ -4701,8 +4766,8 @@ TEST_F(TestRead, TestReadHandler_KeepSubscriptionTest)
 
     readParam.mAttributePathParamsListSize = 0;
     readClient                             = std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(),
-                                                   app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
-                                                   app::ReadClient::InteractionType::Subscribe);
+                                                                               app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+                                                                               app::ReadClient::InteractionType::Subscribe);
     EXPECT_EQ(readClient->SendRequest(readParam), CHIP_NO_ERROR);
 
     DrainAndServiceIO();

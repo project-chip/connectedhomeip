@@ -517,20 +517,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             ConcreteAttributePath concretePath(paramsList.mValue.mEndpointId, paramsList.mValue.mClusterId,
                                                paramsList.mValue.mAttributeId);
 
-// "check" method to ensure DM interface and ember interface are identical
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE && CHIP_CONFIG_USE_EMBER_DATA_MODEL
-            VerifyOrDie(GetDataModelProvider()->GetAttributeInfo(concretePath).has_value() ==
-                        ConcreteAttributePathExists(concretePath));
-#endif
-
-            if (
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-                GetDataModelProvider()->GetAttributeInfo(concretePath).has_value()
-
-#else
-                ConcreteAttributePathExists(concretePath)
-#endif
-            )
+            if (IsExistingAttributePath(concretePath))
             {
                 Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
                                                  .endpoint    = concretePath.mEndpointId,
@@ -1603,12 +1590,28 @@ bool InteractionModelEngine::IsExistingAttributePath(const ConcreteAttributePath
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 #if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-    // Ensure that Provider interface and ember are IDENTICAL in attribute location (i.e. "check" mode)
-    VerifyOrDie(GetDataModelProvider()
-                    ->GetAttributeInfo(ConcreteAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId))
-                    .has_value() == emberAfContainsAttribute(path.mEndpointId, path.mClusterId, path.mAttributeId)
 
-    );
+    bool providerResult = GetDataModelProvider()
+                              ->GetAttributeInfo(ConcreteAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId))
+                              .has_value();
+
+    bool emberResult = emberAfContainsAttribute(path.mEndpointId, path.mClusterId, path.mAttributeId);
+
+    if (providerResult != emberResult)
+    {
+        ChipLogError(InteractionModel, "!!!!!!!!!!!!!!!!!!!!!! DIFF FOUND !!!!!!!!!!!!!!!!!!!!!!!!!");
+        ChipLogError(InteractionModel, "Path: %u / %u / %u", path.mEndpointId, path.mClusterId, path.mAttributeId);
+        ChipLogError(InteractionModel, "HEX:  0x%08X / 0x%08X / 0x%08X", path.mEndpointId, path.mClusterId, path.mAttributeId);
+        ChipLogError(InteractionModel, "Provider: %s", providerResult ? "true" : "false");
+        ChipLogError(InteractionModel, "Ember:    %s", emberResult ? "true" : "false");
+    }
+    else
+    {
+        ChipLogError(InteractionModel, "Path: %u / %u / %u", path.mEndpointId, path.mClusterId, path.mAttributeId);
+    }
+
+    // Ensure that Provider interface and ember are IDENTICAL in attribute location (i.e. "check" mode)
+    VerifyOrDie(providerResult == emberResult);
 #endif
 
     return GetDataModelProvider()

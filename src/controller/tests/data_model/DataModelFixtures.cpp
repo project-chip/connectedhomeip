@@ -17,6 +17,8 @@
  */
 
 #include "DataModelFixtures.h"
+#include "app/ConcreteAttributePath.h"
+#include "app/ConcreteClusterPath.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -238,11 +240,6 @@ bool IsClusterDataVersionEqual(const app::ConcreteClusterPath & aConcreteCluster
 bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 {
     return false;
-}
-
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
-{
-    return true;
 }
 
 Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
@@ -709,13 +706,6 @@ AttributeEntry CustomDataModel::NextAttribute(const ConcreteAttributePath & befo
 
 std::optional<AttributeInfo> CustomDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
 {
-    // Hardcoded "supported" paths to pass TestRead
-    if (((path.mEndpointId == kTestEndpointId) && (path.mClusterId == app::Clusters::UnitTesting::Id)) ||
-        ((path.mEndpointId == kRootEndpointId) && (path.mClusterId == app::Clusters::IcdManagement::Id)))
-    {
-        return AttributeInfo();
-    }
-
     return CodegenDataModelProviderInstance()->GetAttributeInfo(path);
 }
 
