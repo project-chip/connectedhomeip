@@ -27,7 +27,7 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep
+from matter_testing_support import ClusterAttributeChangeAccumulator, EventChangeCallback, TestStep
 from mobly import asserts
 
 
@@ -210,7 +210,6 @@ class TC_OPSTATE_BASE():
     async def TEST_TC_OPSTATE_BASE_1_1(self, endpoint=1, cluster_revision=1, feature_map=0):
         cluster = self.test_info.cluster
         attributes = cluster.Attributes
-        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attributes.AttributeList)
 
         commands = cluster.Commands
         accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attributes.AcceptedCommandList)
@@ -876,14 +875,14 @@ class TC_OPSTATE_BASE():
 
         # STEP 14: TH sends Pause command to the DUT
         self.step(14)
-        if ((commands.Pause.command_id in attribute_list) and (commands.OperationalCommandResponse.command_id in attribute_list)):
+        if ((commands.Pause.command_id in accepted_cmd_list) and (commands.OperationalCommandResponse.command_id in generated_cmd_list)):
             await self.send_cmd_expect_response(endpoint=endpoint,
                                                 cmd=commands.Pause(),
                                                 expected_response=cluster.Enums.ErrorStateEnum.kCommandInvalidInState)
 
         # STEP 15: TH sends Resume command to the DUT
         self.step(15)
-        if ((commands.Resume.command_id in accepted_cmd_list) and (commands.OperationalCommandResponse.command_id in attribute_list)):
+        if ((commands.Resume.command_id in accepted_cmd_list) and (commands.OperationalCommandResponse.command_id in generated_cmd_list)):
             await self.send_cmd_expect_response(endpoint=endpoint,
                                                 cmd=commands.Resume(),
                                                 expected_response=cluster.Enums.ErrorStateEnum.kCommandInvalidInState)
