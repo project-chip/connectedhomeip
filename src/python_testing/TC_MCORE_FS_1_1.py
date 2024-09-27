@@ -25,6 +25,7 @@
 #   run1:
 #     app: examples/fabric-admin/scripts/fabric-sync-app.py
 #     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-ready-pattern: "Successfully opened pairing window on the device"
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
@@ -34,7 +35,6 @@
 #       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     script-start-delay: 5
 #     factoryreset: true
 #     quiet: false
 # === END CI TEST ARGUMENTS ===
