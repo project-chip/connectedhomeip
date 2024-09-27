@@ -248,6 +248,8 @@ CHIP_ERROR Resolver::Init(System::Layer * systemLayer)
 
 void Resolver::Shutdown()
 {
+    VerifyOrReturn(mSystemLayer != nullptr);
+
     while (mActiveLookups.begin() != mActiveLookups.end())
     {
         auto current = mActiveLookups.begin();
