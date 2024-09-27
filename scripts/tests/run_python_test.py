@@ -19,19 +19,16 @@ import io
 import logging
 import os
 import os.path
-import queue
 import re
 import shlex
-import signal
 import subprocess
 import sys
-import threading
 import time
-import typing
 
 import click
 import coloredlogs
 from chip.testing.metadata import Metadata, MetadataReader
+from chip.testing.tasks import Subprocess
 from colorama import Fore, Style
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
@@ -39,34 +36,35 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
 
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 
+TAG_PROCESS_APP = f"[{Fore.GREEN}APP {Style.RESET_ALL}]".encode()
+TAG_PROCESS_TEST = f"[{Fore.GREEN}TEST{Style.RESET_ALL}]".encode()
+TAG_STDOUT = f"[{Fore.YELLOW}STDOUT{Style.RESET_ALL}]".encode()
+TAG_STDERR = f"[{Fore.RED}STDERR{Style.RESET_ALL}]".encode()
 
-def EnqueueLogOutput(fp, tag, output_stream, q):
-    for line in iter(fp.readline, b''):
-        timestamp = time.time()
-        if len(line) > len('[1646290606.901990]') and line[0:1] == b'[':
-            try:
-                timestamp = float(line[1:18].decode())
-                line = line[19:]
-            except Exception:
-                pass
-        output_stream.write(
-            (f"[{datetime.datetime.fromtimestamp(timestamp).isoformat(sep=' ')}]").encode() + tag + line)
-        sys.stdout.flush()
-    fp.close()
+# RegExp which matches the timestamp in the output of CHIP application
+OUTPUT_TIMESTAMP_MATCH = re.compile(r'(?P<prefix>.*)\[(?P<ts>\d+\.\d+)\](?P<suffix>\[\d+:\d+\].*)'.encode())
 
 
-def RedirectQueueThread(fp, tag, stream_output, queue) -> threading.Thread:
-    log_queue_thread = threading.Thread(target=EnqueueLogOutput, args=(
-        fp, tag, stream_output, queue))
-    log_queue_thread.start()
-    return log_queue_thread
+def chip_output_extract_timestamp(line: bytes) -> (float, bytes):
+    """Try to extract timestamp from a CHIP application output line."""
+    if match := OUTPUT_TIMESTAMP_MATCH.match(line):
+        return float(match.group(2)), match.group(1) + match.group(3) + b'\n'
+    return time.time(), line
 
 
-def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: str, process: subprocess.Popen, stream_output, queue: queue.Queue):
-    thread_list.append(RedirectQueueThread(process.stdout,
-                                           (f"[{tag}][{Fore.YELLOW}STDOUT{Style.RESET_ALL}]").encode(), stream_output, queue))
-    thread_list.append(RedirectQueueThread(process.stderr,
-                                           (f"[{tag}][{Fore.RED}STDERR{Style.RESET_ALL}]").encode(), stream_output, queue))
+def process_chip_output(line: bytes, is_stderr: bool, process_tag: bytes = b"") -> bytes:
+    """Rewrite the output line to add the timestamp and the process tag."""
+    timestamp, line = chip_output_extract_timestamp(line)
+    timestamp = datetime.datetime.fromtimestamp(timestamp).isoformat(sep=' ')
+    return f"[{timestamp}]".encode() + process_tag + (TAG_STDERR if is_stderr else TAG_STDOUT) + line
+
+
+def process_chip_app_output(line, is_stderr):
+    return process_chip_output(line, is_stderr, TAG_PROCESS_APP)
+
+
+def process_test_script_output(line, is_stderr):
+    return process_chip_output(line, is_stderr, TAG_PROCESS_TEST)
 
 
 @click.command()
@@ -157,10 +155,8 @@ def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_arg
 
     coloredlogs.install(level='INFO')
 
-    log_queue = queue.Queue()
-    log_cooking_threads = []
-
     app_process = None
+    app_exit_code = 0
     app_pid = 0
 
     stream_output = sys.stdout.buffer
@@ -171,14 +167,13 @@ def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_arg
         if not os.path.exists(app):
             if app is None:
                 raise FileNotFoundError(f"{app} not found")
-        app_args = [app] + shlex.split(app_args)
-        logging.info(f"Execute: {app_args}")
-        app_process = subprocess.Popen(
-            app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, bufsize=0)
-        app_process.stdin.close()
-        app_pid = app_process.pid
-        DumpProgramOutputToQueue(
-            log_cooking_threads, Fore.GREEN + "APP " + Style.RESET_ALL, app_process, stream_output, log_queue)
+        app_process = Subprocess(app, *shlex.split(app_args),
+                                 output_cb=process_chip_app_output,
+                                 f_stdout=stream_output,
+                                 f_stderr=stream_output)
+        app_process.start()
+        app_process.p.stdin.close()
+        app_pid = app_process.p.pid
 
     time.sleep(script_start_delay)
 
@@ -198,31 +193,24 @@ def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_arg
 
     final_script_command = [i.replace('|', ' ') for i in script_command]
 
-    logging.info(f"Execute: {final_script_command}")
-    test_script_process = subprocess.Popen(
-        final_script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-    test_script_process.stdin.close()
-    DumpProgramOutputToQueue(log_cooking_threads, Fore.GREEN + "TEST" + Style.RESET_ALL,
-                             test_script_process, stream_output, log_queue)
-
+    test_script_process = Subprocess(final_script_command[0], *final_script_command[1:],
+                                     output_cb=process_test_script_output,
+                                     f_stdout=stream_output,
+                                     f_stderr=stream_output)
+    test_script_process.start()
+    test_script_process.p.stdin.close()
     test_script_exit_code = test_script_process.wait()
 
     if test_script_exit_code != 0:
-        logging.error("Test script exited with error %r" % test_script_exit_code)
+        logging.error("Test script exited with returncode %d" % test_script_exit_code)
 
-    test_app_exit_code = 0
     if app_process:
-        logging.warning("Stopping app with SIGINT")
-        app_process.send_signal(signal.SIGINT.value)
-        test_app_exit_code = app_process.wait()
-
-    # There are some logs not cooked, so we wait until we have processed all logs.
-    # This procedure should be very fast since the related processes are finished.
-    for thread in log_cooking_threads:
-        thread.join()
+        logging.info("Stopping app with SIGTERM")
+        app_process.terminate()
+        app_exit_code = app_process.returncode
 
     # We expect both app and test script should exit with 0
-    exit_code = test_script_exit_code if test_script_exit_code != 0 else test_app_exit_code
+    exit_code = test_script_exit_code or app_exit_code
 
     if quiet:
         if exit_code:
