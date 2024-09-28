@@ -418,7 +418,11 @@ using namespace chip::Tracing::DarwinFramework;
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData
 {
     MTR_ABSTRACT_METHOD();
-    return nil;
+    // We promise to not return nil from this API... return an MTRDevice
+    // instance, which will largely not be able to do anything useful.  This
+    // only matters when someone subclasses MTRDeviceController in a weird way,
+    // then tries to create an MTRDevice from their subclass.
+    return [[MTRDevice alloc] initForSubclassesWithNodeID:nodeID controller:self];
 }
 
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
