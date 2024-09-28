@@ -54,11 +54,15 @@ private:
     EndpointId mEndpoint;
 };
 
+// TODO: Does this conflict with the kvs delegate that's statically allocated in the AppMain?
+// I think as long as the manager is the same, we're ok, but need to confirm.
+KvsPersistentStorageDelegate sStorage;
+
 class NonLevelValveEndpoint
 {
 public:
     NonLevelValveEndpoint(EndpointId endpoint) :
-        mEndpoint(endpoint), mContext(mEndpoint, storage), mDelegate(mEndpoint), mLogic(mDelegate, mContext),
+        mEndpoint(endpoint), mContext(mEndpoint, sStorage), mDelegate(mEndpoint), mLogic(mDelegate, mContext),
         mInterface(mEndpoint, mLogic)
     {}
     CHIP_ERROR Init()
@@ -77,7 +81,6 @@ private:
                                                 .valveFault   = 0,
                                                 .levelStep    = 1 };
     EndpointId mEndpoint;
-    KvsPersistentStorageDelegate storage;
     MatterContext mContext;
     PrintOnlyDelegate mDelegate;
     ClusterLogic mLogic;
@@ -130,6 +133,9 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp6TagList[] = {
 void ApplicationInit()
 {
     ChipLogError(NotSpecified, "App init!!!");
+    chip::DeviceLayer::PersistedStorage::KeyValueStoreManager & kvsManager = DeviceLayer::PersistedStorage::KeyValueStoreMgr();
+    sStorage.Init(&kvsManager);
+
     ep1.Init();
     ep2.Init();
     ep3.Init();

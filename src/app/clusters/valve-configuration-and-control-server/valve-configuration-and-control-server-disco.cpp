@@ -41,6 +41,29 @@ using namespace Commands;
 using namespace Protocols::InteractionModel;
 namespace {
 
+CHIP_ERROR TranslateErrorToIMStatus(CHIP_ERROR err)
+{
+    if (err == CHIP_NO_ERROR)
+    {
+        return err;
+    }
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+    }
+    if (err == CHIP_ERROR_INCORRECT_STATE)
+    {
+        // what actually gets returned here? This is really an internal error, so failure seems perhaps correct.
+        return CHIP_IM_GLOBAL_STATUS(Failure);
+    }
+    if (err == CHIP_ERROR_INVALID_ARGUMENT)
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+    // Catch-all error
+    return CHIP_IM_GLOBAL_STATUS(Failure);
+}
+
 template <typename T, typename F>
 CHIP_ERROR EncodeRead(AttributeValueEncoder & aEncoder, const F & getter)
 {
@@ -52,16 +75,7 @@ CHIP_ERROR EncodeRead(AttributeValueEncoder & aEncoder, const F & getter)
     }
 
     // TODO: Should the logic return these directly? I didn't want to mix the IM layer into there, but this is annoying.
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-    {
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-    if (err == CHIP_ERROR_INCORRECT_STATE)
-    {
-        // what actually gets returned here? This is really an internal error, so failure seems perhaps correct.
-        return CHIP_IM_GLOBAL_STATUS(Failure);
-    }
-    return err;
+    return TranslateErrorToIMStatus(err);
 }
 
 } // namespace
@@ -135,12 +149,13 @@ CHIP_ERROR Interface::Write(const ConcreteDataAttributePath & aPath, AttributeVa
     case DefaultOpenDuration::Id: {
         DefaultOpenDuration::TypeInfo::Type val;
         ReturnErrorOnFailure(aDecoder.Decode(val));
-        return mClusterLogic.SetDefaultOpenDuration(val);
+        return TranslateErrorToIMStatus(mClusterLogic.SetDefaultOpenDuration(val));
     }
+    break;
     case DefaultOpenLevel::Id: {
         DefaultOpenLevel::TypeInfo::Type val;
         ReturnErrorOnFailure(aDecoder.Decode(val));
-        return mClusterLogic.SetDefaultOpenLevel(val);
+        return TranslateErrorToIMStatus(mClusterLogic.SetDefaultOpenLevel(val));
     }
     default:
         return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
