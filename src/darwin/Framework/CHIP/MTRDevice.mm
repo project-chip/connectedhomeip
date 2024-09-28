@@ -1063,7 +1063,7 @@ using namespace chip::Tracing::DarwinFramework;
     }
 
     MTRDeviceDataValueDictionary fieldsDataValue = commandFields;
-    if (fieldsDataValue[MTRTypeKey] != MTRStructureValueType) {
+    if (![MTRStructureValueType isEqual:fieldsDataValue[MTRTypeKey]]) {
         MTR_LOG_ERROR("%@ invokeCommandWithEndpointID passed a commandFields (%@) that is not a structure-typed data-value object",
             self, commandFields);
         completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
