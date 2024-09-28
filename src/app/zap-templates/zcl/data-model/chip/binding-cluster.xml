@@ -34,6 +34,7 @@ limitations under the License.
     <attribute side="server" code="0x0000" define="BINDING_LIST" type="array" entryType="TargetStruct" writable="true" optional="false">
         <description>Binding</description>
         <access op="write" role="manage"/>
+        <mandatoryConform/>
     </attribute>
   </cluster>
 

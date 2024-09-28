@@ -26,11 +26,42 @@ limitations under the License.
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
 
-    <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPT_HEADER"                 type="array" entryType="char_string" length="254" writable="false" optional="true">AcceptHeader</attribute>
-    <attribute side="server" code="0x0001" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS" type="SupportedProtocolsBitmap" default="0"                       writable="false"  optional="true">SupportedStreamingProtocols</attribute>
+    <features>
+      <feature bit="0" code="CS" name="ContentSearch" summary="Device supports content search (non-app specific)">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="UP" name="URLPlayback" summary="Device supports basic URL-based file playback">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="AS" name="AdvancedSeek" summary="Enables clients to implement more advanced media seeking behavior in their user interface, such as for example a &quot;seek bar&quot;.">
+        <optionalConform/>
+      </feature>
+      <feature bit="3" code="TT" name="TextTracks" summary="Device or app supports Text Tracks.">
+        <optionalConform/>
+      </feature>
+      <feature bit="4" code="AT" name="AudioTracks" summary="Device or app supports Audio Tracks.">
+        <optionalConform/>
+      </feature>
+    </features>
+
+    <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPT_HEADER"                 type="array" entryType="char_string" length="254" writable="false" optional="true">
+      <description>AcceptHeader</description>
+      <mandatoryConform>
+        <feature name="UP"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0001" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS" type="SupportedProtocolsBitmap" default="0"                       writable="false"  optional="true">
+      <description>SupportedStreamingProtocols</description>
+      <mandatoryConform>
+        <feature name="UP"/>
+      </mandatoryConform>
+    </attribute>
 
     <command source="client" code="0x00" name="LaunchContent" response="LauncherResponse" optional="true">
       <description>Upon receipt, this SHALL launch the specified content with optional search criteria.</description>
+      <mandatoryConform>
+        <feature name="CS"/>
+      </mandatoryConform>
       <arg name="Search" type="ContentSearchStruct"/>
       <arg name="AutoPlay" type="boolean"/>
       <arg name="Data" type="char_string" optional="true"/>
@@ -40,6 +71,9 @@ limitations under the License.
 
     <command source="client" code="0x01" name="LaunchURL" response="LauncherResponse" optional="true">
       <description>Upon receipt, this SHALL launch content from the specified URL.</description>
+      <mandatoryConform>
+        <feature name="UP"/>
+      </mandatoryConform>
       <arg name="ContentURL" type="char_string"/>
       <arg name="DisplayString" type="char_string" optional="true"/>
       <arg name="BrandingInformation" type="BrandingInformationStruct" optional="true"/>
@@ -47,6 +81,12 @@ limitations under the License.
 
     <command source="server" code="0x02" name="LauncherResponse" optional="true" disableDefaultResponse="true">
       <description>This command SHALL be generated in response to LaunchContent command.</description>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="CS"/>
+          <feature name="UP"/>
+        </orTerm>
+      </mandatoryConform>
       <arg name="Status" type="StatusEnum"/>
       <arg name="Data" type="char_string" optional="true"/>
     </command>
@@ -175,14 +215,5 @@ limitations under the License.
     <field name="DASH" mask="0x1"/>
     <field name="HLS" mask="0x2"/>
   </bitmap>
-
-  <bitmap name="Feature" type="bitmap32">
-     <cluster code="0x050a"/>
-     <field name="ContentSearch" mask="0x1"/>
-     <field name="URLPlayback" mask="0x2"/>
-     <field name="AdvancedSeek" mask="0x3"/>
-     <field name="TextTracks" mask="0x4"/>
-     <field name="AudioTracks" mask="0x5"/>
-   </bitmap>
 
 </configurator>
