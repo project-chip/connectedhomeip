@@ -55,6 +55,7 @@ class TC_VALCC_4_2(MatterBaseTest):
             TestStep(8, "Send Close command"),
             TestStep(9, "Read OpenDuration attribute"),
             TestStep(10, "Read RemainingDuration attribute"),
+            TestStep(11, "Write DefaultOpenDuration back to original value")
         ]
         return steps
 
@@ -73,16 +74,11 @@ class TC_VALCC_4_2(MatterBaseTest):
         attributes = Clusters.ValveConfigurationAndControl.Attributes
 
         self.step("2a")
-        defaultOpenDuration = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultOpenDuration)
+        originalDefaultOpenDuration = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultOpenDuration)
 
         self.step("2b")
-        if defaultOpenDuration is NullValue:
-            defaultOpenDuration = 60
-
-            result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.DefaultOpenDuration(defaultOpenDuration))])
-            asserts.assert_equal(result[0].Status, Status.Success, "DefaultOpenDuration write failed")
-        else:
-            logging.info("Test step skipped")
+        defaultOpenDuration = 60
+        await self.write_single_attribute(attributes.DefaultOpenDuration(defaultOpenDuration))
 
         self.step(3)
         try:
@@ -128,6 +124,9 @@ class TC_VALCC_4_2(MatterBaseTest):
         self.step(10)
         remaining_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
         asserts.assert_true(remaining_duration_dut is NullValue, "RemainingDuration is not null")
+
+        self.step(11)
+        await self.write_single_attribute(attributes.DefaultOpenDuration(originalDefaultOpenDuration))
 
 
 if __name__ == "__main__":
