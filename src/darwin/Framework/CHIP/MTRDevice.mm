@@ -452,13 +452,6 @@ using namespace chip::Tracing::DarwinFramework;
     [_delegates removeAllObjects];
 }
 
-- (void)nodeMayBeAdvertisingOperational
-{
-    assertChipStackLockedByCurrentThread();
-
-    MTR_LOG("%@ saw new operational advertisement", self);
-}
-
 - (BOOL)_delegateExists
 {
     os_unfair_lock_assert_owner(&self->_lock);

@@ -202,12 +202,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (MTRBaseDevice *)baseDeviceForNodeID:(NSNumber *)nodeID;
 
 /**
- * Notify the controller that a new operational instance with the given node id
- * and a compressed fabric id that matches this controller has been observed.
- */
-- (void)operationalInstanceAdded:(chip::NodeId)nodeID;
-
-/**
  * Download log of the desired type from the device.
  */
 - (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
