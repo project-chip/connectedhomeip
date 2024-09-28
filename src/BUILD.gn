@@ -110,11 +110,11 @@ if (chip_build_tests) {
 
         "${chip_root}/src/app/tests",
       ]
+    }
 
-      if (matter_enable_tracing_support &&
-          matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
-        tests += [ "${chip_root}/src/tracing/tests" ]
-      }
+    if (matter_enable_tracing_support &&
+        matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
+      tests += [ "${chip_root}/src/tracing/tests" ]
     }
 
     if (chip_device_platform != "none") {
