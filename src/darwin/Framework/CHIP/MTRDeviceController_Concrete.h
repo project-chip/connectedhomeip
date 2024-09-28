@@ -17,10 +17,18 @@
 
 #import <Foundation/Foundation.h>
 
-#import <Matter/Matter.h>
+#import <Matter/MTRDefines.h>
+#import <Matter/MTRDeviceController.h>
+#import <Matter/MTRDeviceControllerFactory.h>
+#import <Matter/MTRDeviceControllerStorageDelegate.h>
+#import <Matter/MTRDeviceStorageBehaviorConfiguration.h>
+#import <Matter/MTROTAProviderDelegate.h>
 
 #import "MTRDeviceConnectionBridge.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+
+#include <credentials/FabricTable.h>
+#include <lib/core/DataModelTypes.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
