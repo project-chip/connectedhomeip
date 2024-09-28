@@ -28,7 +28,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, TestStep, default_matter_test_main, has_attribute, run_if_endpoint_matches
 from mobly import asserts
 
 
@@ -51,36 +51,17 @@ class TC_VALCC_3_4(MatterBaseTest):
         ]
         return steps
 
-    def pics_TC_VALCC_3_4(self) -> list[str]:
-        pics = [
-            "VALCC.S",
-        ]
-        return pics
-
-    @async_test_body
+    @run_if_endpoint_matches(has_attribute(Clusters.ValveConfigurationAndControl.Attributes.LevelStep))
     async def test_TC_VALCC_3_4(self):
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.matter_test_config.endpoint
 
         self.step(1)
         attributes = Clusters.ValveConfigurationAndControl.Attributes
 
         self.step(2)
-        attribute_list = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
-
         self.step(3)
-        if attributes.LevelStep.attribute_id not in attribute_list:
-            logging.info("LevelStep not supported skipping test case")
-
-            # Skipping all remainig steps
-            for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
-                self.step(step.test_plan_number)
-                logging.info("Test step skipped")
-
-            return
-
-        else:
-            logging.info("Test step skipped")
+        # Steps 2 and three are handled by the decorator
 
         self.step(4)
         levelStep = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.LevelStep)
