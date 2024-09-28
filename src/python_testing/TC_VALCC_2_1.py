@@ -28,7 +28,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
 
@@ -58,16 +58,10 @@ class TC_VALCC_2_1(MatterBaseTest):
         ]
         return steps
 
-    def pics_TC_VALCC_2_1(self) -> list[str]:
-        pics = [
-            "VALCC.S",
-        ]
-        return pics
-
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.ValveConfigurationAndControl))
     async def test_TC_VALCC_2_1(self):
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.matter_test_config.endpoint
 
         self.step(1)
         attributes = Clusters.ValveConfigurationAndControl.Attributes
