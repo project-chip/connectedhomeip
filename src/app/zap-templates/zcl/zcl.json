@@ -124,6 +124,8 @@
         "washer-controls-cluster.xml",
         "water-heater-management-cluster.xml",
         "water-heater-mode-cluster.xml",
+        "webrtc-requestor-cluster.xml",
+        "webrtc-provider-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "wifi-network-management-cluster.xml",
         "window-covering.xml",
