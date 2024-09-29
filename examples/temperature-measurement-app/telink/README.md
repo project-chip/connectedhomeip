@@ -128,9 +128,9 @@ feature for another Telink example:
 After build application with enabled OTA feature, use next binary files:
 
 -   merged.bin - main binary to flash PCB (Use at least 2MB PCB).
--   metter.ota - binary for OTA Provider
+-   matter.ota - binary for OTA Provider
 
-All binaries has the same SW version. To test OTA “metter.ota” should have
+All binaries has the same SW version. To test OTA “matter.ota” should have
 higher SW version than base SW. Set CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 in
 corresponding “prj.conf” conﬁguration file.
 
@@ -145,7 +145,7 @@ Usage of OTA:
 -   Run the Linux OTA Provider with OTA image.
 
     ```
-    ./chip-ota-provider-app -f metter.ota
+    ./chip-ota-provider-app -f matter.ota
     ```
 
 -   Provision the Linux OTA Provider using chip-tool
