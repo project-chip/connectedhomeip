@@ -18,7 +18,7 @@ string(REGEX REPLACE "_v[0-9]+" "" BASE_BOARD ${BASE_BOARD})
 
 if(NOT FLASH_SIZE)
   if(${BASE_BOARD} MATCHES "tlsr9118bdk40d")
-    set(FLASH_SIZE "3m")
+    set(FLASH_SIZE "4m")
   else()
     set(FLASH_SIZE "2m")
   endif()

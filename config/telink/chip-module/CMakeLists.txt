@@ -168,9 +168,9 @@ include(${TELINK_COMMON}/common.cmake)
 set(BLOCK_SIZE "1024")
 
 if (CONFIG_BOOTLOADER_MCUBOOT)
-    dt_nodelabel(dts_partition_path NODELABEL "boot_partition")
-    dt_reg_size(mcuboot_size PATH ${dts_partition_path})
-    math(EXPR boot_blocks "${mcuboot_size} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
+    dt_nodelabel(dts_partition_path NODELABEL "slot0_partition")
+    dt_reg_addr(dts_partition_addr PATH ${dts_partition_path})
+    math(EXPR blocks_offset "${dts_partition_addr} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
 
     add_custom_target(build_mcuboot ALL
         COMMAND
@@ -184,7 +184,7 @@ if (CONFIG_BOOTLOADER_MCUBOOT)
         COMMAND
         dd if=${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin of=${PROJECT_BINARY_DIR}/zephyr.bin
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=${BLOCK_SIZE} seek=${boot_blocks}
+        dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=${BLOCK_SIZE} seek=${blocks_offset}
     )
 
     add_dependencies(merge_mcuboot ${ZEPHYR_FINAL_EXECUTABLE})
@@ -201,12 +201,12 @@ endif()
 
 if (CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)
     dt_nodelabel(dts_partition_path NODELABEL "factory_partition")
-    dt_reg_addr(factory_size PATH ${dts_partition_path})
-    math(EXPR factory_blocks "${factory_size} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
+    dt_reg_addr(dts_partition_addr PATH ${dts_partition_path})
+    math(EXPR blocks_offset "${dts_partition_addr} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
 
     add_custom_target(merge_factory_data ALL
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/factory/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=${BLOCK_SIZE} seek=${factory_blocks}
+        dd if=${PROJECT_BINARY_DIR}/factory/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=${BLOCK_SIZE} seek=${blocks_offset}
     )
     if (CONFIG_CHIP_OTA_IMAGE_BUILD)
         add_dependencies(merge_factory_data merge_mcuboot)
@@ -224,16 +224,15 @@ if (CONFIG_CHIP_FACTORY_DATA_BUILD)
 endif()
 
 if (CONFIG_SOC_SERIES_RISCV_TELINK_W91 AND CONFIG_TELINK_W91_FETCH_N22_BIN)
-    dt_nodelabel(flash_path NODELABEL "flash")
-    dt_reg_size(flash_size PATH ${flash_path})
-    math(EXPR flash_blocks "${flash_size} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
+    dt_nodelabel(dts_partition_path NODELABEL "n22_partition")
+    dt_reg_addr(dts_partition_addr PATH ${dts_partition_path})
+    math(EXPR blocks_offset "${dts_partition_addr} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
 
     add_custom_target(merge_n22 ALL
         COMMAND
         [ -f ${PROJECT_BINARY_DIR}/n22.bin ] && (
-            dd if=/dev/zero bs=${BLOCK_SIZE} count=${flash_blocks} | tr '\\000' '\\377' > ${PROJECT_BINARY_DIR}/merged.bin &&
-            dd if=${PROJECT_BINARY_DIR}/zephyr.bin of=${PROJECT_BINARY_DIR}/merged.bin conv=notrunc &&
-            dd if=${PROJECT_BINARY_DIR}/n22.bin of=${PROJECT_BINARY_DIR}/merged.bin bs=${BLOCK_SIZE} seek=${flash_blocks} conv=notrunc
+            dd if=${PROJECT_BINARY_DIR}/zephyr.bin of=${PROJECT_BINARY_DIR}/merged.bin &&
+            dd if=${PROJECT_BINARY_DIR}/n22.bin of=${PROJECT_BINARY_DIR}/merged.bin bs=${BLOCK_SIZE} seek=${blocks_offset} conv=notrunc
         ) || true
     )
 
