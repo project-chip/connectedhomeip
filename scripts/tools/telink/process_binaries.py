@@ -50,6 +50,9 @@ def merge_binaries(input_file1, input_file2, output_file, offset):
 # Obtain build configuration
 build_conf = BuildConfiguration(os.path.join(os.getcwd(), os.pardir))
 
+# Clean up merged.bin from previuse build
+os.remove('merged.bin')
+
 # Telink W91 dual-core SoC binary operations
 if build_conf.getboolean('CONFIG_SOC_SERIES_RISCV_TELINK_W91'):
     n22_partition_offset = build_conf['CONFIG_TELINK_W91_N22_PARTITION_ADDR']
