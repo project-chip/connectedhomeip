@@ -30,6 +30,7 @@ except ImportError:
     sys.path.append(os.path.abspath(os.path.join(ZEPHYR_BASE, 'scripts/west_commands/runners')))
     from core import BuildConfiguration
 
+
 def merge_binaries(input_file1, input_file2, output_file, offset):
     with open(output_file, 'r+b' if os.path.exists(output_file) else 'wb') as outfile:
         # Merge input_file1 at offset 0
@@ -46,6 +47,7 @@ def merge_binaries(input_file1, input_file2, output_file, offset):
         with open(input_file2, 'rb') as infile2:
             outfile.seek(offset)
             outfile.write(infile2.read())
+
 
 # Obtain build configuration
 build_conf = BuildConfiguration(os.path.join(os.getcwd(), os.pardir))
