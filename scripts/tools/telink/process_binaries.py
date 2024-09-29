@@ -20,15 +20,15 @@ import os
 import subprocess
 import sys
 
+ZEPHYR_BASE = os.environ.get('ZEPHYR_BASE')
+if ZEPHYR_BASE is None:
+    raise EnvironmentError("ZEPHYR_BASE environment variable is not set")
+
 try:
     from core import BuildConfiguration
 except ImportError:
     sys.path.append(os.path.abspath(os.path.join(ZEPHYR_BASE, 'scripts/west_commands/runners')))
     from core import BuildConfiguration
-
-ZEPHYR_BASE = os.environ.get('ZEPHYR_BASE')
-if ZEPHYR_BASE is None:
-    raise EnvironmentError("ZEPHYR_BASE environment variable is not set")
 
 def merge_binaries(input_file1, input_file2, output_file, offset):
     with open(output_file, 'r+b' if os.path.exists(output_file) else 'wb') as outfile:
