@@ -263,7 +263,7 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink (W91) Window Covering App\
+            - name: Build example Telink (W91) Window Covering App
               continue-on-error: true
               run: |
                   ./scripts/run_in_build_env.sh \
