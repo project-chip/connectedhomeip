@@ -165,51 +165,84 @@ set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
 
 include(${TELINK_COMMON}/common.cmake)
 
-set(BLOCK_SIZE "1024")
+set(BLOCK_SIZE 1024)
+
+if (CONFIG_SOC_SERIES_RISCV_TELINK_W91)
+    dt_nodelabel(dts_partition_path NODELABEL "n22_partition")
+    dt_reg_addr(dts_partition_addr PATH ${dts_partition_path})
+    math(EXPR n22_partition_offset "${dts_partition_addr} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
+    if (CONFIG_BOOTLOADER_MCUBOOT)
+        dt_nodelabel(dts_partition_path NODELABEL "boot_partition")
+        dt_reg_size(dts_partition_size PATH ${dts_partition_path})
+        math(EXPR boot_partition_size "${dts_partition_size} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
+        math(EXPR n22_partition_offset "${n22_partition_offset} - ${boot_partition_size}" OUTPUT_FORMAT DECIMAL)
+    endif()
+
+    add_custom_target(merge_n22 ALL
+        COMMAND
+        [ -f ${PROJECT_BINARY_DIR}/n22.bin ] && (
+            dd if=${PROJECT_BINARY_DIR}/n22.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=${BLOCK_SIZE} seek=${n22_partition_offset}
+        ) || true
+    )
+    add_dependencies(merge_n22 ${ZEPHYR_FINAL_EXECUTABLE})
+endif()
 
 if (CONFIG_BOOTLOADER_MCUBOOT)
     dt_nodelabel(dts_partition_path NODELABEL "slot0_partition")
     dt_reg_addr(dts_partition_addr PATH ${dts_partition_path})
-    math(EXPR blocks_offset "${dts_partition_addr} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
-
-    add_custom_target(build_mcuboot ALL
-        COMMAND
-        west build -b ${BASE_BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
-            -- -DOVERLAY_CONFIG=${GLOBAL_BOOT_CONF_OVERLAY_FILE} -DDTC_OVERLAY_FILE="${GLOBAL_BOOT_DTC_OVERLAY_FILE};${FLASH_DTC_OVERLAY_FILE};${USB_BOOT_DTC_OVERLAY_FILE};${MARS_BOOT_DTC_OVERLAY_FILE}"
-        COMMAND
-        cp ${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin ${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin
-    )
+    math(EXPR slot0_partition_addr "${dts_partition_addr} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
 
     add_custom_target(merge_mcuboot ALL
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin of=${PROJECT_BINARY_DIR}/zephyr.bin
+        dd if=${PROJECT_BINARY_DIR}/mcuboot.bin of=${PROJECT_BINARY_DIR}/zephyr.bin
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=${BLOCK_SIZE} seek=${blocks_offset}
+        dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=${BLOCK_SIZE} seek=${slot0_partition_addr}
     )
 
-    add_dependencies(merge_mcuboot ${ZEPHYR_FINAL_EXECUTABLE})
+    if (CONFIG_SOC_SERIES_RISCV_TELINK_W91)
+        add_custom_target(sign_image ALL
+            COMMAND
+            west sign -t imgtool -d ${PROJECT_BINARY_DIR}/.. -- --key ${PROJECT_BINARY_DIR}/mcuboot_key.pem # root-rsa-2048.pem
+        )
+        add_dependencies(sign_image merge_n22)
+        add_dependencies(merge_mcuboot sign_image)
+    else()
+        add_custom_target(build_mcuboot ALL
+            COMMAND
+            west build -b ${BASE_BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
+                -- -DOVERLAY_CONFIG=${GLOBAL_BOOT_CONF_OVERLAY_FILE} -DDTC_OVERLAY_FILE="${GLOBAL_BOOT_DTC_OVERLAY_FILE};${FLASH_DTC_OVERLAY_FILE};${USB_BOOT_DTC_OVERLAY_FILE};${MARS_BOOT_DTC_OVERLAY_FILE}"
+            COMMAND
+            cp ${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin ${PROJECT_BINARY_DIR}/mcuboot.bin
+        )
+        add_dependencies(merge_mcuboot ${ZEPHYR_FINAL_EXECUTABLE})
+    endif()
 
     if (CONFIG_CHIP_OTA_IMAGE_BUILD)
         chip_ota_image(chip-ota-image
             INPUT_FILES ${PROJECT_BINARY_DIR}/zephyr.signed.bin
             OUTPUT_FILE ${PROJECT_BINARY_DIR}/zephyr-ota.bin
         )
-
-        add_dependencies(chip-ota-image ${ZEPHYR_FINAL_EXECUTABLE})
+        if (CONFIG_SOC_SERIES_RISCV_TELINK_W91)
+            add_dependencies(chip-ota-image sign_image)
+        else()
+            add_dependencies(chip-ota-image ${ZEPHYR_FINAL_EXECUTABLE})
+        endif()
     endif()
 endif()
 
 if (CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)
     dt_nodelabel(dts_partition_path NODELABEL "factory_partition")
     dt_reg_addr(dts_partition_addr PATH ${dts_partition_path})
-    math(EXPR blocks_offset "${dts_partition_addr} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
+    math(EXPR factory_partition_offset "${dts_partition_addr} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
 
     add_custom_target(merge_factory_data ALL
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/factory/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=${BLOCK_SIZE} seek=${blocks_offset}
+        dd if=${PROJECT_BINARY_DIR}/factory/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=${BLOCK_SIZE} seek=${factory_partition_offset}
     )
     if (CONFIG_CHIP_OTA_IMAGE_BUILD)
         add_dependencies(merge_factory_data merge_mcuboot)
+    elseif (CONFIG_SOC_SERIES_RISCV_TELINK_W91)
+        add_dependencies(merge_factory_data merge_n22)
     else()
         add_dependencies(merge_factory_data ${ZEPHYR_FINAL_EXECUTABLE})
     endif()
@@ -221,28 +254,6 @@ endif()
 
 if (CONFIG_CHIP_FACTORY_DATA_BUILD)
     telink_generate_factory_data()
-endif()
-
-if (CONFIG_SOC_SERIES_RISCV_TELINK_W91 AND CONFIG_TELINK_W91_FETCH_N22_BIN)
-    dt_nodelabel(dts_partition_path NODELABEL "n22_partition")
-    dt_reg_addr(dts_partition_addr PATH ${dts_partition_path})
-    math(EXPR blocks_offset "${dts_partition_addr} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
-
-    add_custom_target(merge_n22 ALL
-        COMMAND
-        [ -f ${PROJECT_BINARY_DIR}/n22.bin ] && (
-            dd if=${PROJECT_BINARY_DIR}/zephyr.bin of=${PROJECT_BINARY_DIR}/merged.bin &&
-            dd if=${PROJECT_BINARY_DIR}/n22.bin of=${PROJECT_BINARY_DIR}/merged.bin bs=${BLOCK_SIZE} seek=${blocks_offset} conv=notrunc
-        ) || true
-    )
-
-    if (CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)
-        add_dependencies(merge_n22 merge_factory_data)
-    elseif (CONFIG_CHIP_OTA_IMAGE_BUILD)
-        add_dependencies(merge_n22 merge_mcuboot)
-    else()
-        add_dependencies(merge_n22 ${ZEPHYR_FINAL_EXECUTABLE})
-    endif()
 endif()
 
 endif() # CONFIG_CHIP
