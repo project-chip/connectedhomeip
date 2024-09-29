@@ -193,6 +193,10 @@ config DYNAMIC_INTERRUPTS
 config CHIP_OTA_REQUESTOR
     default y
 
+config MCUBOOT_SIGNATURE_KEY_FILE
+	default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D
+	depends on BOOTLOADER_MCUBOOT
+
 # In current config/zephyr/Kconfig
 # next deprecated values are selected
 # warning: Deprecated symbol CPLUSPLUS is enabled.

@@ -202,7 +202,7 @@ if (CONFIG_BOOTLOADER_MCUBOOT)
     if (CONFIG_SOC_SERIES_RISCV_TELINK_W91)
         add_custom_target(sign_image ALL
             COMMAND
-            west sign -t imgtool -d ${PROJECT_BINARY_DIR}/.. -- --key ${PROJECT_BINARY_DIR}/mcuboot_key.pem # root-rsa-2048.pem
+            west sign -t imgtool -d ${PROJECT_BINARY_DIR}/.. -- --key ${ZEPHYR_BASE}/../${CONFIG_MCUBOOT_SIGNATURE_KEY_FILE}
         )
         add_dependencies(sign_image merge_n22)
         add_dependencies(merge_mcuboot sign_image)
