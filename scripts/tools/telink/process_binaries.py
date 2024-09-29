@@ -19,50 +19,67 @@
 import os
 import subprocess
 import sys
-import shutil
 
-sys.path.append(os.path.abspath(os.path.join(os.environ.get('ZEPHYR_BASE'), 'scripts/west_commands/runners')))
+ZEPHYR_BASE = os.environ.get('ZEPHYR_BASE')
+if ZEPHYR_BASE is None:
+    raise EnvironmentError("ZEPHYR_BASE environment variable is not set")
+
+sys.path.append(os.path.abspath(os.path.join(ZEPHYR_BASE, 'scripts/west_commands/runners')))
 from core import BuildConfiguration
 
-def merge_binaries(input_file, output_file, offset):
-    with open(input_file, 'rb') as infile, open(output_file, 'r+b') as outfile:
-        outfile.seek(offset)
-        outfile.write(infile.read())
+def merge_binaries(input_file1, input_file2, output_file, offset):
+    with open(output_file, 'r+b' if os.path.exists(output_file) else 'wb') as outfile:
+        # Merge input_file1 at offset 0
+        with open(input_file1, 'rb') as infile1:
+            outfile.seek(0)
+            outfile.write(infile1.read())
 
-# obtain build configuration
+        # Fill gaps with 0xFF if necessary
+        current_size = outfile.tell()
+        if current_size < offset:
+            outfile.write(bytearray([0xFF] * (offset - current_size)))
+
+        # Merge input_file2 at the specified offset
+        with open(input_file2, 'rb') as infile2:
+            outfile.seek(offset)
+            outfile.write(infile2.read())
+
+# Obtain build configuration
 build_conf = BuildConfiguration(os.path.join(os.getcwd(), os.pardir))
 
-# merge N22 core binary
+# Telink W91 dual-core SoC binary operations
 if build_conf.getboolean('CONFIG_SOC_SERIES_RISCV_TELINK_W91'):
     n22_partition_offset = build_conf['CONFIG_TELINK_W91_N22_PARTITION_ADDR']
     if build_conf.getboolean('CONFIG_BOOTLOADER_MCUBOOT'):
         n22_partition_offset -= build_conf['CONFIG_FLASH_LOAD_OFFSET']
 
-    with open('merged.bin', 'wb') as f:
-       pass
-    merge_binaries('zephyr.bin', 'merged.bin', 0)
-    merge_binaries('n22.bin', 'merged.bin', n22_partition_offset)
+    # Merge N22 core binary
+    merge_binaries('zephyr.bin', 'n22.bin', 'merged.bin', n22_partition_offset)
 
+    # Sign the image if MCUBoot is used
     if build_conf.getboolean('CONFIG_BOOTLOADER_MCUBOOT'):
-        command = [
+        sign_command = [
             'python3',
-            os.path.join(os.environ.get('ZEPHYR_BASE'), '../bootloader/mcuboot/scripts/imgtool.py'),
+            os.path.join(ZEPHYR_BASE, '../bootloader/mcuboot/scripts/imgtool.py'),
             'sign',
             '--version', '0.0.0+0',
             '--align', '1',
             '--header-size', str(build_conf['CONFIG_ROM_START_OFFSET']),
             '--slot-size', str(build_conf['CONFIG_FLASH_LOAD_SIZE']),
-            '--key', os.path.join(os.environ.get('ZEPHYR_BASE'), '../', build_conf['CONFIG_MCUBOOT_SIGNATURE_KEY_FILE']),
+            '--key', os.path.join(ZEPHYR_BASE, '../', build_conf['CONFIG_MCUBOOT_SIGNATURE_KEY_FILE']),
             'merged.bin',
             'zephyr.signed.bin'
         ]
-        subprocess.run(command, check=True)
+        try:
+            subprocess.run(sign_command, check=True)
+            os.remove('merged.bin')  # Clean up merged.bin after signing
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(f"Error signing the image: {e}")
 
-# merge MCUboot binary
+# Merge MCUBoot binary if configured
 if build_conf.getboolean('CONFIG_BOOTLOADER_MCUBOOT'):
-    merge_binaries('mcuboot.bin', 'merged.bin', 0)
-    merge_binaries('zephyr.signed.bin', 'merged.bin', build_conf['CONFIG_FLASH_LOAD_OFFSET'])
+    merge_binaries('mcuboot.bin', 'zephyr.signed.bin', 'merged.bin', build_conf['CONFIG_FLASH_LOAD_OFFSET'])
 
-# merge Factory Data binary
+# Merge Factory Data binary if configured
 if build_conf.getboolean('CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE'):
-    merge_binaries('factory/factory_data.bin', 'merged.bin', build_conf['CONFIG_TELINK_FACTORY_DATA_PARTITION_ADDR'])
+    merge_binaries('merged.bin', 'factory/factory_data.bin', 'merged.bin', build_conf['CONFIG_TELINK_FACTORY_DATA_PARTITION_ADDR'])
