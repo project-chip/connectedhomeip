@@ -82,7 +82,7 @@ Scripts can be used to build both the lighting app and chip tool
 The first thing you need to do is to commission the device. First start up the
 lighting app in one terminal. By default it will start up with the default
 discriminator (3840) and passcode (20202021) and save its non-volatile information
-in a KVS in /temp/chip_kvs. You can change these, and multiple other options on
+in a key-value-store file ("KVS") in /tmp/chip_kvs. You can change this, and multiple other options on
 the command line. For a full description, use the `--help` command.
 
 Start the lighting app in one terminal using
