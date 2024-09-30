@@ -25,6 +25,9 @@
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
+#include <inet/UDPEndPointImpl.h>
+#include <inet/UDPEndPointImplLwIP.h>
+#include <platform/ESP32/MdnsBasicPacketFilters.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
@@ -70,6 +73,10 @@ static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLe
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
                                                                                           0xcc, 0xdd, 0xee, 0xff };
 #endif
+
+constexpr size_t kMaxPendingMdnsPackets = 10u;
+mdns::Minimal::DropIfTooManyQueuedMdnsPacketFilter sMdnsPacketFilter(kMaxPendingMdnsPackets);
+
 } // namespace
 
 #if CONFIG_TEST_EVENT_TRIGGER_ENABLED
@@ -168,6 +175,9 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
         initParams.appDelegate = sAppDelegate;
     }
     chip::Server::GetInstance().Init(initParams);
+
+    // Example of setting a packet filter to avoid queueing too much mDNS during storms
+    chip::Inet::UDPEndPointImplLwIP::SetQueueFilter(&sMdnsPacketFilter);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #ifdef CONFIG_ENABLE_CHIP_SHELL
