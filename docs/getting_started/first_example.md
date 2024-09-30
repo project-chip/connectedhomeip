@@ -10,6 +10,8 @@ The example devices (occasionally referred to as "apps") are located in the
 directory. The examples often implement one particular device type. Some have
 implementations for various platforms.
 
+<!--- Relative path link to "examples" above doesn't work. See #35855 --->
+
 The linux platform examples are provided as examples, and are used in the CI.
 These can be used for preliminary testing.
 
