@@ -13,17 +13,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/data-model-provider/ActionReturnStatus.h"
-#include "lib/core/DataModelTypes.h"
 #include <app/tests/test-interaction-model-api.h>
 
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/codegen-data-model-provider/Instance.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/util/basic-types.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/DataModelTypes.h>
 #include <messaging/ReliableMessageContext.h>
 
 using namespace chip::app::DataModel;
@@ -228,12 +228,6 @@ ClusterEntry TestImCustomDataModel::NextCluster(const ConcreteClusterPath & befo
 
 std::optional<ClusterInfo> TestImCustomDataModel::GetClusterInfo(const ConcreteClusterPath & path)
 {
-    // Hardcoded "supported" paths to pass TestCommandInteraction
-    if ((path == ConcreteClusterPath(1 /*kTestEndpointId*/, app::Clusters::Identify::Id)))
-    {
-        return ClusterInfo(1234 /* dataVersion */);
-    }
-
     return CodegenDataModelProviderInstance()->GetClusterInfo(path);
 }
 
@@ -249,14 +243,6 @@ AttributeEntry TestImCustomDataModel::NextAttribute(const ConcreteAttributePath 
 
 std::optional<AttributeInfo> TestImCustomDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
 {
-    // Hardcoded "supported" paths to pass TestReadInteraction
-    if ((path == ConcreteAttributePath(1 /*kTestEndpointId*/, app::Clusters::OnOff::Id, 1)) ||
-        (path == ConcreteAttributePath(1 /*kTestEndpointId*/, app::Clusters::OnOff::Id, 2)) ||
-        (path == ConcreteAttributePath(1 /*kTestEndpointId*/, 7 /* kInvalidTestClusterId */, 1)))
-    {
-        return AttributeInfo();
-    }
-
     return CodegenDataModelProviderInstance()->GetAttributeInfo(path);
 }
 
@@ -272,12 +258,6 @@ CommandEntry TestImCustomDataModel::NextAcceptedCommand(const ConcreteCommandPat
 
 std::optional<CommandInfo> TestImCustomDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
-    // Hardcoded "supported" paths to pass TestReadInteraction
-    if ((path == ConcreteCommandPath(1 /*kTestEndpointId*/, app::Clusters::Identify::Id, 4)) ||
-        (path == ConcreteCommandPath(1 /*kTestEndpointId*/, app::Clusters::Identify::Id, 6)))
-    {
-        return CommandInfo();
-    }
     return CodegenDataModelProviderInstance()->GetAcceptedCommandInfo(path);
 }
 

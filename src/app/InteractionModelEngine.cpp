@@ -517,20 +517,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             ConcreteAttributePath concretePath(paramsList.mValue.mEndpointId, paramsList.mValue.mClusterId,
                                                paramsList.mValue.mAttributeId);
 
-// "check" method to ensure DM interface and ember interface are identical
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE && CHIP_CONFIG_USE_EMBER_DATA_MODEL
-            VerifyOrDie(GetDataModelProvider()->GetAttributeInfo(concretePath).has_value() ==
-                        ConcreteAttributePathExists(concretePath));
-#endif
-
-            if (
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-                GetDataModelProvider()->GetAttributeInfo(concretePath).has_value()
-
-#else
-                ConcreteAttributePathExists(concretePath)
-#endif
-            )
+            if (IsExistentAttributePath(concretePath))
             {
                 Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
                                                  .endpoint    = concretePath.mEndpointId,
@@ -1599,6 +1586,29 @@ CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(SingleLinkedListNo
     return err;
 }
 
+bool InteractionModelEngine::IsExistentAttributePath(const ConcreteAttributePath & path)
+{
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+
+    bool providerResult = GetDataModelProvider()
+                              ->GetAttributeInfo(ConcreteAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId))
+                              .has_value();
+
+    bool emberResult = emberAfContainsAttribute(path.mEndpointId, path.mClusterId, path.mAttributeId);
+
+    // Ensure that Provider interface and ember are IDENTICAL in attribute location (i.e. "check" mode)
+    VerifyOrDie(providerResult == emberResult);
+#endif
+
+    return GetDataModelProvider()
+        ->GetAttributeInfo(ConcreteAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId))
+        .has_value();
+#else
+    return emberAfContainsAttribute(path.mEndpointId, path.mClusterId, path.mAttributeId);
+#endif
+}
+
 void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedListNode<AttributePathParams> *& aAttributePaths)
 {
     SingleLinkedListNode<AttributePathParams> * prev = nullptr;
@@ -1607,9 +1617,11 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedLi
     while (path1 != nullptr)
     {
         bool duplicate = false;
+
         // skip all wildcard paths and invalid concrete attribute
         if (path1->mValue.IsWildcardPath() ||
-            !emberAfContainsAttribute(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId))
+            !IsExistentAttributePath(
+                ConcreteAttributePath(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId)))
         {
             prev  = path1;
             path1 = path1->mpNext;
@@ -1779,7 +1791,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const 
         return Protocols::InteractionModel::Status::UnsupportedCommand; // cluster exists, so command is invalid
     }
 
-    // at ths point either cluster or endpoint does not exist. If we find the endpoint, then the cluster
+    // At this point either cluster or endpoint does not exist. If we find the endpoint, then the cluster
     // is invalid
     for (EndpointId endpoint = provider->FirstEndpoint(); endpoint != kInvalidEndpointId;
          endpoint            = provider->NextEndpoint(endpoint))

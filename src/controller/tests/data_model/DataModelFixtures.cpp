@@ -22,6 +22,8 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/codegen-data-model-provider/Instance.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
@@ -238,11 +240,6 @@ bool IsClusterDataVersionEqual(const app::ConcreteClusterPath & aConcreteCluster
 bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 {
     return false;
-}
-
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
-{
-    return true;
 }
 
 Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
@@ -709,13 +706,6 @@ AttributeEntry CustomDataModel::NextAttribute(const ConcreteAttributePath & befo
 
 std::optional<AttributeInfo> CustomDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
 {
-    // Hardcoded "supported" paths to pass TestRead
-    if (((path.mEndpointId == kTestEndpointId) && (path.mClusterId == app::Clusters::UnitTesting::Id)) ||
-        ((path.mEndpointId == kRootEndpointId) && (path.mClusterId == app::Clusters::IcdManagement::Id)))
-    {
-        return AttributeInfo();
-    }
-
     return CodegenDataModelProviderInstance()->GetAttributeInfo(path);
 }
 
@@ -731,12 +721,6 @@ CommandEntry CustomDataModel::NextAcceptedCommand(const ConcreteCommandPath & be
 
 std::optional<CommandInfo> CustomDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
-    // Mock cluster catalog, only support commands on one cluster on one endpoint.
-    if ((path.mEndpointId == DataModelTests::kTestEndpointId) && (path.mClusterId == Clusters::UnitTesting::Id))
-    {
-        return CommandInfo();
-    }
-
     return CodegenDataModelProviderInstance()->GetAcceptedCommandInfo(path);
 }
 
