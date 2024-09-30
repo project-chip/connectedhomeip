@@ -13,16 +13,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/data-model-provider/ActionReturnStatus.h"
 #include <app/tests/test-interaction-model-api.h>
 
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/codegen-data-model-provider/Instance.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/util/basic-types.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/DataModelTypes.h>
 #include <messaging/ReliableMessageContext.h>
 
 using namespace chip::app::DataModel;

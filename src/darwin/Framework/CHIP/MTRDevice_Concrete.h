@@ -26,6 +26,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController_Concrete *)controller;
 
+// Called by controller when a new operational advertisement for what we think
+// is this device's identity has been observed.  This could have
+// false-positives, for example due to compressed fabric id collisions.
+- (void)nodeMayBeAdvertisingOperational;
+
 @end
 
 NS_ASSUME_NONNULL_END
