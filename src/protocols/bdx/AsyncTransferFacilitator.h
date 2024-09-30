@@ -27,11 +27,11 @@ namespace chip {
 namespace bdx {
 
 /**
- * An abstract class with methods for handling BDX messages received from an ExchangeContext. Once a message is receievd, this
- * class passes the message to the TransferSession to process the received message and gets the next output events from the
+ * An abstract class with methods for handling BDX messages received from an ExchangeContext. Once a message is received, this
+ * class passes the message to the TransferSession to process the received message and gets the resulting output events from the
  * TransferSession state machine and either sends a message accross the exchange or calls the HandleTransferSessionOutput virtual
- * method to notify the subclass of the event generated. It keeps getting the next output event until it receieves an output event
- * of type TransferSession::OutputEventType::kNone. For messages that are sent to the HandleTransferSessionOutput method, the
+ * method to notify the subclass of the event generated. It keeps getting the next output event until it recieves an output event
+ * of type TransferSession::OutputEventType::kNone. For events that are handled via the HandleTransferSessionOutput method, the
  * subclass must call the NotifyEventHandled to notify the AsyncTransferFacilitator that the event has been handled and returns an
  * error code for error cases or success.
  *
@@ -115,13 +115,13 @@ public:
 
     /**
      * This is called by the subclass implementing HandleTransferSessionOutput to notify the AsyncTransferFacilitator
-     * that it has handled the OutputEvent specified in event and returns an error code (if any) or success in the error paramter.
+     * that it has handled the OutputEvent specified in "event" and "status" is the result of handling the event.
      * Once this is called the AsyncTransferFacilitator either aborts the transfer if an error has ocurred or drives the
      * TransferSession state machine to generate the next output events to establish and continue the BDX session further.
      *
      *
      * @param[in] event The OutputEvent that was handled by the subclass.
-     * @param[in] error The error code that occured when handling the event if an error occurs. Otherwise has CHIP_NO_ERROR.
+     * @param[in] status The error code that occured when handling the event if an error occurs. Otherwise CHIP_NO_ERROR.
      */
     void NotifyEventHandled(TransferSession::OutputEvent & event, CHIP_ERROR error);
 };
