@@ -389,17 +389,7 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     err = commandPath.GetConcreteCommandPath(concretePath);
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
-    {
-        Status commandExists = mpCallback->CommandExists(concretePath);
-        if (commandExists != Status::Success)
-        {
-            ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%x",
-                          ChipLogValueMEI(concretePath.mCommandId), ChipLogValueMEI(concretePath.mClusterId),
-                          concretePath.mEndpointId);
-            return FallibleAddStatus(concretePath, commandExists) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
-        }
-    }
-
+    // Always check access first, before we even reply something about a supported path.
     {
         Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
         Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
@@ -417,6 +407,17 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
             // TODO: when wildcard invokes are supported, handle them to discard rather than fail with status
             Status status = err == CHIP_ERROR_ACCESS_DENIED ? Status::UnsupportedAccess : Status::AccessRestricted;
             return FallibleAddStatus(concretePath, status) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
+        }
+    }
+
+    {
+        Status commandExists = mpCallback->CommandExists(concretePath);
+        if (commandExists != Status::Success)
+        {
+            ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%x",
+                          ChipLogValueMEI(concretePath.mCommandId), ChipLogValueMEI(concretePath.mClusterId),
+                          concretePath.mEndpointId);
+            return FallibleAddStatus(concretePath, commandExists) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
         }
     }
 
@@ -542,14 +543,6 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
 
         const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
 
-        if (mpCallback->CommandExists(concretePath) != Status::Success)
-        {
-            ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%x",
-                          ChipLogValueMEI(commandId), ChipLogValueMEI(clusterId), mapping.endpoint_id);
-
-            continue;
-        }
-
         {
             Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
             Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
@@ -566,6 +559,15 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
                 continue;
             }
         }
+
+        if (mpCallback->CommandExists(concretePath) != Status::Success)
+        {
+            ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%x",
+                          ChipLogValueMEI(commandId), ChipLogValueMEI(clusterId), mapping.endpoint_id);
+
+            continue;
+        }
+
         if ((err = DataModelCallbacks::GetInstance()->PreCommandReceived(concretePath, GetSubjectDescriptor())) == CHIP_NO_ERROR)
         {
             TLV::TLVReader dataReader(commandDataReader);
