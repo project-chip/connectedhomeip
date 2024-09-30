@@ -821,7 +821,7 @@ CHIP_ERROR UDPEndPointImplSockets::IPv6JoinLeaveMulticastGroupImpl(InterfaceId a
 #if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
     if (sMulticastGroupHandler != nullptr)
     {
-        return sMulticastGroupHandler(aInterfaceId, aAddress, MulticastOperation::kJoin);
+        return sMulticastGroupHandler(aInterfaceId, aAddress, join ? MulticastOperation::kJoin : MulticastOperation::kLeave);
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 

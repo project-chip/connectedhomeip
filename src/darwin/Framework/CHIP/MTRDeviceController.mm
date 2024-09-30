@@ -418,7 +418,11 @@ using namespace chip::Tracing::DarwinFramework;
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData
 {
     MTR_ABSTRACT_METHOD();
-    return nil;
+    // We promise to not return nil from this API... return an MTRDevice
+    // instance, which will largely not be able to do anything useful.  This
+    // only matters when someone subclasses MTRDeviceController in a weird way,
+    // then tries to create an MTRDevice from their subclass.
+    return [[MTRDevice alloc] initForSubclassesWithNodeID:nodeID controller:self];
 }
 
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
@@ -673,22 +677,6 @@ using namespace chip::Tracing::DarwinFramework;
     };
 
     [self syncRunOnWorkQueue:block error:nil];
-}
-
-- (void)operationalInstanceAdded:(chip::NodeId)nodeID
-{
-    // Don't use deviceForNodeID here, because we don't want to create the
-    // device if it does not already exist.
-    os_unfair_lock_lock(self.deviceMapLock);
-    MTRDevice * device = [_nodeIDToDeviceMap objectForKey:@(nodeID)];
-    os_unfair_lock_unlock(self.deviceMapLock);
-
-    if (device == nil) {
-        return;
-    }
-
-    ChipLogProgress(Controller, "Notifying device about node 0x" ChipLogFormatX64 " advertising", ChipLogValueX64(nodeID));
-    [device nodeMayBeAdvertisingOperational];
 }
 
 - (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
