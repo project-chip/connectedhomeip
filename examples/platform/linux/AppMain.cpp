@@ -679,15 +679,15 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     ApplicationShutdown();
 
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    ShutdownCommissioner();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-
 #if defined(ENABLE_CHIP_SHELL)
     shellThread.join();
 #endif
 
     Server::GetInstance().Shutdown();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    ShutdownCommissioner();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #if ENABLE_TRACING
     tracing_setup.StopTracing();

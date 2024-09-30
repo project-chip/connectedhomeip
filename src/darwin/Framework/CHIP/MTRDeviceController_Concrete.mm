@@ -1633,20 +1633,28 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     [self syncRunOnWorkQueue:block error:nil];
 }
 
-- (void)operationalInstanceAdded:(chip::NodeId)nodeID
+- (void)operationalInstanceAdded:(NSNumber *)nodeID
 {
     // Don't use deviceForNodeID here, because we don't want to create the
     // device if it does not already exist.
     os_unfair_lock_lock(self.deviceMapLock);
-    MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:@(nodeID)];
+    MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:nodeID];
     os_unfair_lock_unlock(self.deviceMapLock);
 
     if (device == nil) {
         return;
     }
 
-    ChipLogProgress(Controller, "Notifying device about node 0x" ChipLogFormatX64 " advertising", ChipLogValueX64(nodeID));
-    [device nodeMayBeAdvertisingOperational];
+    // TODO: Can we not just assume this isKindOfClass test is true?  Would be
+    // really nice if we had compile-time checking for this somehow...
+    if (![device isKindOfClass:MTRDevice_Concrete.class]) {
+        MTR_LOG_ERROR("%@ somehow has %@ instead of MTRDevice_Concrete for node ID 0x%016llX (%llu)", self, device, nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue);
+        return;
+    }
+
+    MTR_LOG("%@ Notifying %@ about its node advertising", self, device);
+    auto * concreteDevice = static_cast<MTRDevice_Concrete *>(device);
+    [concreteDevice nodeMayBeAdvertisingOperational];
 }
 
 - (void)downloadLogFromNodeWithID:(NSNumber *)nodeID

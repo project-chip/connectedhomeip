@@ -52,10 +52,6 @@ ButtonManager ButtonManager::sInstance;
 
 TimerHandle_t resetTimer;
 
-#if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
-static bool sitModeRequested;
-#endif // CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS
-
 CHIP_ERROR ButtonManager::Init()
 {
     resetTimer = xTimerCreate("FnTmr", 1, false, (void *) this, [](TimerHandle_t xTimer) {
@@ -64,10 +60,6 @@ CHIP_ERROR ButtonManager::Init()
         chip::NXP::App::GetAppTask().PostEvent(event);
     });
     VerifyOrReturnError(resetTimer != NULL, APP_ERROR_CREATE_TIMER_FAILED);
-
-#if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
-    static bool sitModeRequested;
-#endif // CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS
 
     return CHIP_NO_ERROR;
 }
@@ -208,6 +200,9 @@ void ButtonManager::BleHandler(const AppEvent & event)
 #if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
 void ButtonManager::DSLSActionEventHandler(const AppEvent & event)
 {
+
+    static bool sitModeRequested = false;
+
     if (chip::DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
     {
         if (!sitModeRequested)
