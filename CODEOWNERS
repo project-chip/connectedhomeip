@@ -2,6 +2,7 @@
 /src/platform/Ameba/        @pankore
 /src/platform/Beken/        @zhengyaohan
 
+*.mm                        @project-chip/reviewers-apple
 /src/darwin/                @project-chip/reviewers-apple
 /src/platform/Darwin/       @project-chip/reviewers-apple
 
@@ -9,7 +10,11 @@
 /src/platform/Infineon/     @ifyall
 /src/platform/NuttX/        @zhhyu7
 /src/platform/Tizen/        @arkq
+
+*.java                      @project-chip/reviewers-google
+*.kt                        @project-chip/reviewers-google
 /src/platform/android/      @project-chip/reviewers-google
+
 /src/platform/bouffalolab/  @wy-hh
 /src/platform/cc13xx_26xx/  @s-jain2022
 /src/platform/cc32xx/       @s-jain2022
