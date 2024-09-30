@@ -85,6 +85,7 @@ Davis, CA 95616, USA
                 <feature name="RID"/>
                 <feature name="FPG"/>
                 <feature name="FACE"/>
+                <feature name="ALIRO"/>
               </orTerm>
             </andTerm>
           </mandatoryConform>
