@@ -517,7 +517,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             ConcreteAttributePath concretePath(paramsList.mValue.mEndpointId, paramsList.mValue.mClusterId,
                                                paramsList.mValue.mAttributeId);
 
-            if (IsExistingAttributePath(concretePath))
+            if (IsExistentAttributePath(concretePath))
             {
                 Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
                                                  .endpoint    = concretePath.mEndpointId,
@@ -1586,7 +1586,7 @@ CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(SingleLinkedListNo
     return err;
 }
 
-bool InteractionModelEngine::IsExistingAttributePath(const ConcreteAttributePath & path)
+bool InteractionModelEngine::IsExistentAttributePath(const ConcreteAttributePath & path)
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 #if CHIP_CONFIG_USE_EMBER_DATA_MODEL
@@ -1620,7 +1620,7 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedLi
 
         // skip all wildcard paths and invalid concrete attribute
         if (path1->mValue.IsWildcardPath() ||
-            !IsExistingAttributePath(
+            !IsExistentAttributePath(
                 ConcreteAttributePath(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId)))
         {
             prev  = path1;
