@@ -58,7 +58,7 @@ def merge_binaries(input_file1, input_file2, output_file, offset):
 # Obtain build configuration
 build_conf = BuildConfiguration(os.path.join(os.getcwd(), os.pardir))
 
-# Clean up merged.bin from previuse build
+# Clean up merged.bin from previous build
 if os.path.exists('merged.bin'):
     os.remove('merged.bin')
 
@@ -97,7 +97,11 @@ if build_conf.getboolean('CONFIG_BOOTLOADER_MCUBOOT'):
 
 # Merge Factory Data binary if configured
 if build_conf.getboolean('CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE'):
-    merge_binaries('merged.bin', 'factory/factory_data.bin', 'merged.bin', build_conf['CONFIG_TELINK_FACTORY_DATA_PARTITION_ADDR'])
+    if os.path.exists('merged.bin'):
+        merge_binaries('merged.bin', 'factory/factory_data.bin', 'merged.bin', build_conf['CONFIG_TELINK_FACTORY_DATA_PARTITION_ADDR'])
+    else:
+        # Initialize merged.bin with zephyr.bin since no base binary was created
+        merge_binaries('zephyr.bin', 'factory/factory_data.bin', 'merged.bin', build_conf['CONFIG_TELINK_FACTORY_DATA_PARTITION_ADDR'])
 
 # Check if merged.bin was created by any enabled feature, otherwise symlink zephyr.bin
 if not os.path.exists('merged.bin'):
