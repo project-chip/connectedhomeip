@@ -45,7 +45,7 @@ This quick start guide will walk you through
 ### Building the lighting app
 
 -   Install prerequisites from
-[docs/guides/BUILDING\.md](../guides/BUILDING.md#prerequisites)
+    [docs/guides/BUILDING\.md](../guides/BUILDING.md#prerequisites)
 -   Run bootstrap or activate to install all the required tools etc.
     -   `. scripts/bootstrap.sh` \- run this first\, or if builds fail
     -   `. scripts/activate.sh` \- faster\, use if you’ve already bootstrapped
@@ -81,9 +81,10 @@ Scripts can be used to build both the lighting app and chip tool
 
 The first thing you need to do is to commission the device. First start up the
 lighting app in one terminal. By default it will start up with the default
-discriminator (3840) and passcode (20202021) and save its non-volatile information
-in a key-value-store file ("KVS") in /tmp/chip_kvs. You can change this, and multiple other options on
-the command line. For a full description, use the `--help` command.
+discriminator (3840) and passcode (20202021) and save its non-volatile
+information in a key-value-store file ("KVS") in /tmp/chip_kvs. You can change
+this, and multiple other options on the command line. For a full description,
+use the `--help` command.
 
 Start the lighting app in one terminal using
 
@@ -98,8 +99,9 @@ Open a new terminal to use chip tool. Commission the device using:
 
 NOTE: pairing is the old name for commissioning. 0x12344321 is the node ID you
 want to assign to the node. 0x12344321 is the default for testing.
-MT:-24J0AFN00KA0648G00 is the QR code for a device with the default discriminator
-and passcode. If you have changed these, the code will be different.
+MT:-24J0AFN00KA0648G00 is the QR code for a device with the default
+discriminator and passcode. If you have changed these, the code will be
+different.
 
 #### Basic device interactions - Sending a command
 
