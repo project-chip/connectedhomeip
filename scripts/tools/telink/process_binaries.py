@@ -98,10 +98,12 @@ if build_conf.getboolean('CONFIG_BOOTLOADER_MCUBOOT'):
 # Merge Factory Data binary if configured
 if build_conf.getboolean('CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE'):
     if os.path.exists('merged.bin'):
-        merge_binaries('merged.bin', 'factory/factory_data.bin', 'merged.bin', build_conf['CONFIG_TELINK_FACTORY_DATA_PARTITION_ADDR'])
+        merge_binaries('merged.bin', 'factory/factory_data.bin', 'merged.bin',
+                       build_conf['CONFIG_TELINK_FACTORY_DATA_PARTITION_ADDR'])
     else:
         # Initialize merged.bin with zephyr.bin since no base binary was created
-        merge_binaries('zephyr.bin', 'factory/factory_data.bin', 'merged.bin', build_conf['CONFIG_TELINK_FACTORY_DATA_PARTITION_ADDR'])
+        merge_binaries('zephyr.bin', 'factory/factory_data.bin', 'merged.bin',
+                       build_conf['CONFIG_TELINK_FACTORY_DATA_PARTITION_ADDR'])
 
 # Check if merged.bin was created by any enabled feature, otherwise symlink zephyr.bin
 if not os.path.exists('merged.bin'):
