@@ -266,21 +266,35 @@ void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
 {
     // UULP_GPIO_2 is used to detect the button 0 press
     VerifyOrReturn(pin_intr == RTE_UULP_GPIO_2_PIN, ChipLogError(DeviceLayer, "invalid pin interrupt: %ld", pin_intr));
-    sl_status_t status = SL_STATUS_OK;
-    while (sl_si91x_gpio_get_uulp_npss_pin(pin_intr) == LOW && sl_btn0_pressed)
-        ; // button was pressed
-
-    if (sl_si91x_gpio_get_uulp_npss_pin(pin_intr) == LOW && !(sl_btn0_pressed))
+    sl_status_t status      = SL_STATUS_OK;
+    uint8_t pin_intr_status = sl_si91x_gpio_get_uulp_npss_pin(pin_intr);
+    if (pin_intr_status == LOW)
     {
-        status          = sl_si91x_gpio_driver_mask_uulp_npss_interrupt(BIT(pin_intr));
-        sl_btn0_pressed = true;
+        // BTN_0 is pressed
+        // NOTE: the GPIO is masked since the interrupt is invoked before scheduler is started, thus this is required to hand over
+        // control to scheduler
+        status = sl_si91x_gpio_driver_mask_uulp_npss_interrupt(BIT(pin_intr));
         VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(DeviceLayer, "failed to mask interrupt: %ld", status));
-        sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_PRESSED);
     }
-    else if (sl_si91x_gpio_get_uulp_npss_pin(pin_intr) == HIGH)
+}
+// NOTE: flow is GPIO wakeup due to BTN0 press -> check button state in idle task
+void sl_si91x_btn_power_requirement_handler(void)
+{
+    if (sl_si91x_gpio_get_uulp_npss_pin(SL_BUTTON_BTN0_PIN) == LOW)
     {
-        sl_btn0_pressed = false;
-        sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_RELEASED);
+        if (!sl_btn0_pressed)
+        {
+            sl_btn0_pressed = true;
+            sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_PRESSED);
+        }
+    }
+    else
+    {
+        if (sl_btn0_pressed)
+        {
+            sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_RELEASED);
+            sl_btn0_pressed = false;
+        }
     }
 }
 

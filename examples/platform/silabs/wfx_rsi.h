@@ -106,6 +106,7 @@ int32_t wfx_rsi_disconnect();
 int32_t wfx_wifi_rsi_init(void);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #if SLI_SI91X_MCU_INTERFACE
+void sl_si91x_btn_power_requirement_handler();
 void sl_si91x_uart_power_requirement_handler();
 // this is callback from the Wiseconnect SDK
 void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr);
