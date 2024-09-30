@@ -245,6 +245,7 @@ jobs:
                       --target nxp-rt1060-freertos-all-clusters-wifi-w8801 \
                       --target nxp-rt1060-freertos-all-clusters-wifi-evkc-iwx12 \
                       --target nxp-rt1060-freertos-all-clusters-thread-evkc-iwx12 \
+                      --target nxp-rt1060-freertos-all-clusters-wifi-ota-evkc-iwx12 \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -253,11 +254,11 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1060-freertos-all-clusters-wifi-iw416 \
-                      --target nxp-rt1060-freertos-all-clusters-wifi-w8801 \
-                      --target nxp-rt1060-freertos-all-clusters-wifi-evkc-iwx12 \
-                      --target nxp-rt1060-freertos-all-clusters-thread-evkc-iwx12 \
-                      --target nxp-rt1060-freertos-all-clusters-thread-wifi-evkc-iwx12 \
+                      --target nxp-rt1060-freertos-thermostat-wifi-iw416 \
+                      --target nxp-rt1060-freertos-thermostat-wifi-w8801 \
+                      --target nxp-rt1060-freertos-thermostat-wifi-evkc-iwx12 \
+                      --target nxp-rt1060-freertos-thermostat-thread-evkc-iwx12 \
+                      --target nxp-rt1060-freertos-thermostat-thread-wifi-evkc-iwx12 \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -266,10 +267,10 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1060-freertos-all-clusters-wifi-iw416 \
-                      --target nxp-rt1060-freertos-all-clusters-wifi-w8801 \
-                      --target nxp-rt1060-freertos-all-clusters-wifi-evkc-iwx12 \
-                      --target nxp-rt1060-freertos-all-clusters-thread-evkc-iwx12 \
+                      --target nxp-rt1060-freertos-laundry-washer-wifi-iw416 \
+                      --target nxp-rt1060-freertos-laundry-washer-wifi-w8801 \
+                      --target nxp-rt1060-freertos-laundry-washer-wifi-evkc-iwx12 \
+                      --target nxp-rt1060-freertos-laundry-washer-thread-evkc-iwx12 \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -312,6 +313,7 @@ jobs:
                       ./scripts/build/build_examples.py \
                       --target nxp-rt1170-freertos-all-clusters-wifi-iwx12 \
                       --target nxp-rt1170-freertos-all-clusters-thread-iwx12 \
+                      --target nxp-rt1170-freertos-all-clusters-wifi-ota-iwx12 \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
