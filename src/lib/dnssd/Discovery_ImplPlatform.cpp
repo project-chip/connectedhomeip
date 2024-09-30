@@ -43,7 +43,7 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
 {
     DiscoveryContext * discoveryContext = static_cast<DiscoveryContext *>(context);
 
-    if (error != CHIP_NO_ERROR)
+    if (error != CHIP_NO_ERROR && error != CHIP_ERROR_IN_PROGRESS)
     {
         discoveryContext->Release();
         return;
@@ -55,7 +55,13 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
 
     nodeData.Get<CommissionNodeData>().LogDetail();
     discoveryContext->OnNodeDiscovered(nodeData);
-    discoveryContext->Release();
+
+    // CHIP_ERROR_IN_PROGRESS indicates that more results are coming, so don't release
+    // the context yet.
+    if (error == CHIP_NO_ERROR)
+    {
+        discoveryContext->Release();
+    }
 }
 
 static void HandleNodeOperationalBrowse(void * context, DnssdService * result, CHIP_ERROR error)

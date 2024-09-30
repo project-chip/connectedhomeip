@@ -37,7 +37,6 @@
 #include <app/clusters/on-off-server/on-off-server.h>
 #endif // MATTER_DM_PLUGIN_ON_OFF
 
-using namespace std;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;

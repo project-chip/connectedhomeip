@@ -280,8 +280,6 @@ using namespace chip::Tracing::DarwinFramework;
     // _allNetworkFeatures is a bitwise or of the feature maps of all network commissioning clusters
     // present on the device, or nil if there aren't any.
     NSNumber * _Nullable _allNetworkFeatures;
-    // Most recent entry in _mostRecentReportTimes, if any.
-    NSDate * _Nullable _mostRecentReportTimeForDescription;
 }
 
 - (instancetype)initForSubclassesWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -297,42 +295,13 @@ using namespace chip::Tracing::DarwinFramework;
     return self;
 }
 
+// For now, implement an initWithNodeID in case some sub-class outside the
+// framework called it (by manually declaring it, even though it's not public
+// API).  Ideally we would not have this thing, since its signature does not
+// match the initWithNodeID signatures of our subclasses.
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
-    if (self = [super init]) {
-        _lock = OS_UNFAIR_LOCK_INIT;
-        _descriptionLock = OS_UNFAIR_LOCK_INIT;
-        _nodeID = [nodeID copy];
-        _fabricIndex = controller.fabricIndex;
-        _deviceController = controller;
-        _queue
-            = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        _asyncWorkQueue = [[MTRAsyncWorkQueue alloc] initWithContext:self];
-        _state = MTRDeviceStateUnknown;
-        if (controller.controllerDataStore) {
-            _persistedClusterData = [[NSCache alloc] init];
-        } else {
-            _persistedClusterData = nil;
-        }
-        _clusterDataToPersist = nil;
-        _persistedClusters = [NSMutableSet set];
-
-        // If there is a data store, make sure we have an observer to monitor system clock changes, so
-        // NSDate-based write coalescing could be reset and not get into a bad state.
-        if (_persistedClusterData) {
-            mtr_weakify(self);
-            _systemTimeChangeObserverToken = [[NSNotificationCenter defaultCenter] addObserverForName:NSSystemClockDidChangeNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
-                mtr_strongify(self);
-                std::lock_guard lock(self->_lock);
-                [self _resetStorageBehaviorState];
-            }];
-        }
-
-        _delegates = [NSMutableSet set];
-
-        MTR_LOG_DEBUG("%@ init with hex nodeID 0x%016llX", self, _nodeID.unsignedLongLongValue);
-    }
-    return self;
+    return [self initForSubclassesWithNodeID:nodeID controller:controller];
 }
 
 - (void)dealloc
@@ -345,6 +314,17 @@ using namespace chip::Tracing::DarwinFramework;
 
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
+    if (nodeID == nil || controller == nil) {
+        // These are not nullable in our API, but clearly someone is not
+        // actually turning on the relevant compiler checks (or is doing dynamic
+        // dispatch with bad values).  While we promise to not return nil from
+        // this method, if the caller is ignoring the nullability API contract,
+        // there's not much we can do here.
+        MTR_LOG_ERROR("Can't create device with nodeID: %@, controller: %@",
+            nodeID, controller);
+        return nil;
+    }
+
     return [controller deviceForNodeID:nodeID];
 }
 
@@ -470,13 +450,6 @@ using namespace chip::Tracing::DarwinFramework;
     std::lock_guard lock(_lock);
 
     [_delegates removeAllObjects];
-}
-
-- (void)nodeMayBeAdvertisingOperational
-{
-    assertChipStackLockedByCurrentThread();
-
-    MTR_LOG("%@ saw new operational advertisement", self);
 }
 
 - (BOOL)_delegateExists
@@ -727,16 +700,6 @@ using namespace chip::Tracing::DarwinFramework;
     _clusterDataPersistenceFirstScheduledTime = nil;
 }
 
-#ifdef DEBUG
-- (void)unitTestSetMostRecentReportTimes:(NSMutableArray<NSDate *> *)mostRecentReportTimes
-{
-    _mostRecentReportTimes = mostRecentReportTimes;
-
-    std::lock_guard lock(_descriptionLock);
-    _mostRecentReportTimeForDescription = [mostRecentReportTimes lastObject];
-}
-#endif
-
 - (void)_scheduleClusterDataPersistence
 {
     os_unfair_lock_assert_owner(&self->_lock);
@@ -787,11 +750,6 @@ using namespace chip::Tracing::DarwinFramework;
         [_mostRecentReportTimes removeObjectAtIndex:0];
     }
     [_mostRecentReportTimes addObject:[NSDate now]];
-
-    {
-        std::lock_guard lock(_descriptionLock);
-        _mostRecentReportTimeForDescription = [_mostRecentReportTimes lastObject];
-    }
 
     // Calculate running average and update multiplier - need at least 2 items to calculate intervals
     if (_mostRecentReportTimes.count > 2) {
@@ -858,10 +816,6 @@ using namespace chip::Tracing::DarwinFramework;
 
     _clusterDataPersistenceFirstScheduledTime = nil;
     _mostRecentReportTimes = nil;
-    {
-        std::lock_guard lock(_descriptionLock);
-        _mostRecentReportTimeForDescription = nil;
-    }
     _deviceReportingExcessivelyStartTime = nil;
     _reportToPersistenceDelayCurrentMultiplier = 1;
 
@@ -1109,7 +1063,7 @@ using namespace chip::Tracing::DarwinFramework;
     }
 
     MTRDeviceDataValueDictionary fieldsDataValue = commandFields;
-    if (fieldsDataValue[MTRTypeKey] != MTRStructureValueType) {
+    if (![MTRStructureValueType isEqual:fieldsDataValue[MTRTypeKey]]) {
         MTR_LOG_ERROR("%@ invokeCommandWithEndpointID passed a commandFields (%@) that is not a structure-typed data-value object",
             self, commandFields);
         completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
@@ -1200,12 +1154,10 @@ using namespace chip::Tracing::DarwinFramework;
                                            queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
 {
-    auto * baseDevice = [self newBaseDevice];
-    [baseDevice openCommissioningWindowWithSetupPasscode:setupPasscode
-                                           discriminator:discriminator
-                                                duration:duration
-                                                   queue:queue
-                                              completion:completion];
+    MTR_ABSTRACT_METHOD();
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+    });
 }
 
 - (void)openCommissioningWindowWithDiscriminator:(NSNumber *)discriminator
@@ -1213,8 +1165,10 @@ using namespace chip::Tracing::DarwinFramework;
                                            queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
 {
-    auto * baseDevice = [self newBaseDevice];
-    [baseDevice openCommissioningWindowWithDiscriminator:discriminator duration:duration queue:queue completion:completion];
+    MTR_ABSTRACT_METHOD();
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+    });
 }
 
 - (void)downloadLogOfType:(MTRDiagnosticLogType)type
@@ -1222,11 +1176,10 @@ using namespace chip::Tracing::DarwinFramework;
                     queue:(dispatch_queue_t)queue
                completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
-    auto * baseDevice = [self newBaseDevice];
-    [baseDevice downloadLogOfType:type
-                          timeout:timeout
-                            queue:queue
-                       completion:completion];
+    MTR_ABSTRACT_METHOD();
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+    });
 }
 
 #pragma mark - Cache management
@@ -1343,11 +1296,6 @@ using namespace chip::Tracing::DarwinFramework;
 {
     std::lock_guard lock(_lock);
     return _deviceCachePrimed;
-}
-
-- (MTRBaseDevice *)newBaseDevice
-{
-    return [MTRBaseDevice deviceWithNodeID:self.nodeID controller:self.deviceController];
 }
 
 #pragma mark Log Help
