@@ -297,6 +297,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     if (imageProcessor->mOTAUpdatePartition == NULL)
     {
         ChipLogError(SoftwareUpdate, "OTA partition not found");
+        imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_INTERNAL);
         return;
     }
 #ifdef CONFIG_ENABLE_DELTA_OTA
