@@ -36,6 +36,7 @@
 #include <app/util/af-types.h>
 #include <app/util/ember-compatibility-functions.h>
 #include <app/util/endpoint-config-api.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Global.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPFaultInjection.h>
@@ -519,7 +520,8 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
         {
             ConcreteAttributePath concretePath(paramsList.mValue.mEndpointId, paramsList.mValue.mClusterId,
                                                paramsList.mValue.mAttributeId);
-            if (ConcreteAttributePathExists(concretePath))
+
+            if (IsExistentAttributePath(concretePath))
             {
                 Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
                                                  .endpoint    = concretePath.mEndpointId,
@@ -1493,16 +1495,19 @@ CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(SingleLinkedListNo
     return err;
 }
 
-bool InteractionModelEngine::IsExistingAttributePath(const ConcreteAttributePath & path)
+bool InteractionModelEngine::IsExistentAttributePath(const ConcreteAttributePath & path)
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 #if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-    // Ensure that Provider interface and ember are IDENTICAL in attribute location (i.e. "check" mode)
-    VerifyOrDie(GetDataModelProvider()
-                    ->GetAttributeInfo(ConcreteAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId))
-                    .has_value() == emberAfContainsAttribute(path.mEndpointId, path.mClusterId, path.mAttributeId)
 
-    );
+    bool providerResult = GetDataModelProvider()
+                              ->GetAttributeInfo(ConcreteAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId))
+                              .has_value();
+
+    bool emberResult = emberAfContainsAttribute(path.mEndpointId, path.mClusterId, path.mAttributeId);
+
+    // Ensure that Provider interface and ember are IDENTICAL in attribute location (i.e. "check" mode)
+    VerifyOrDie(providerResult == emberResult);
 #endif
 
     return GetDataModelProvider()
@@ -1524,7 +1529,7 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedLi
 
         // skip all wildcard paths and invalid concrete attribute
         if (path1->mValue.IsWildcardPath() ||
-            !IsExistingAttributePath(
+            !IsExistentAttributePath(
                 ConcreteAttributePath(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId)))
         {
             prev  = path1;
@@ -1675,7 +1680,49 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 
 Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
 {
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    auto provider = GetDataModelProvider();
+    if (provider->GetAcceptedCommandInfo(aCommandPath).has_value())
+    {
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+        VerifyOrDie(ServerClusterCommandExists(aCommandPath) == Protocols::InteractionModel::Status::Success);
+#endif
+        return Protocols::InteractionModel::Status::Success;
+    }
+
+    // We failed, figure out why ...
+    //
+    if (provider->GetClusterInfo(aCommandPath).has_value())
+    {
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+        VerifyOrDie(ServerClusterCommandExists(aCommandPath) == Protocols::InteractionModel::Status::UnsupportedCommand);
+#endif
+        return Protocols::InteractionModel::Status::UnsupportedCommand; // cluster exists, so command is invalid
+    }
+
+    // At this point either cluster or endpoint does not exist. If we find the endpoint, then the cluster
+    // is invalid
+    for (EndpointId endpoint = provider->FirstEndpoint(); endpoint != kInvalidEndpointId;
+         endpoint            = provider->NextEndpoint(endpoint))
+    {
+        if (endpoint == aCommandPath.mEndpointId)
+        {
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+            VerifyOrDie(ServerClusterCommandExists(aCommandPath) == Protocols::InteractionModel::Status::UnsupportedCluster);
+#endif
+            // endpoint exists, so cluster is invalid
+            return Protocols::InteractionModel::Status::UnsupportedCluster;
+        }
+    }
+
+    // endpoint not found
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+    VerifyOrDie(ServerClusterCommandExists(aCommandPath) == Protocols::InteractionModel::Status::UnsupportedEndpoint);
+#endif
+    return Protocols::InteractionModel::Status::UnsupportedEndpoint;
+#else
     return ServerClusterCommandExists(aCommandPath);
+#endif
 }
 
 DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Provider * model)

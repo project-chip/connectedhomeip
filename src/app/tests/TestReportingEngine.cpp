@@ -50,6 +50,27 @@ constexpr EndpointId kTestEndpointId      = 1;
 constexpr chip::AttributeId kTestFieldId1 = 1;
 constexpr chip::AttributeId kTestFieldId2 = 2;
 
+using namespace chip;
+using namespace chip::Access;
+
+const Test::MockNodeConfig & TestMockNodeConfig()
+{
+    using namespace chip::app;
+    using namespace chip::app::Clusters::Globals::Attributes;
+
+    // clang-format off
+    static const Test::MockNodeConfig config({
+        Test::MockEndpointConfig(kTestEndpointId, {
+            Test::MockClusterConfig(kTestClusterId, {
+                ClusterRevision::Id, FeatureMap::Id,
+                kTestFieldId1, kTestFieldId2,
+            }),
+        }),
+    });
+    // clang-format on
+    return config;
+}
+
 namespace app {
 namespace reporting {
 
@@ -60,10 +81,12 @@ public:
     {
         chip::Test::AppContext::SetUp();
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
     }
 
     void TearDown() override
     {
+        chip::Test::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::Test::AppContext::TearDown();
     }

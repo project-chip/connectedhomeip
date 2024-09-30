@@ -507,6 +507,7 @@ private:
 
     void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
+
     Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
 
     bool HasActiveRead();
@@ -614,7 +615,7 @@ private:
     /**
      * Check if the given attribute path is a valid path in the data model provider.
      */
-    bool IsExistingAttributePath(const ConcreteAttributePath & path);
+    bool IsExistentAttributePath(const ConcreteAttributePath & path);
 
     static void ResumeSubscriptionsTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 
