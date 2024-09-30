@@ -36,17 +36,23 @@ def merge_binaries(input_file1, input_file2, output_file, offset):
         # Merge input_file1 at offset 0
         with open(input_file1, 'rb') as infile1:
             outfile.seek(0)
-            outfile.write(infile1.read())
+            data1 = infile1.read()
+            outfile.write(data1)
+            print(f"Merged {len(data1)} bytes from {input_file1} into {output_file} at offset 0")
 
         # Fill gaps with 0xFF if necessary
         current_size = outfile.tell()
         if current_size < offset:
-            outfile.write(bytearray([0xFF] * (offset - current_size)))
+            gap_size = offset - current_size
+            outfile.write(bytearray([0xFF] * gap_size))
+            print(f"Filled gap of {gap_size} bytes with 0xFF in {output_file} to reach offset {offset}")
 
         # Merge input_file2 at the specified offset
         with open(input_file2, 'rb') as infile2:
             outfile.seek(offset)
-            outfile.write(infile2.read())
+            data2 = infile2.read()
+            outfile.write(data2)
+            print(f"Merged {len(data2)} bytes from {input_file2} into {output_file} at offset {offset}")
 
 
 # Obtain build configuration
