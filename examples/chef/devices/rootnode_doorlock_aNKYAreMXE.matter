@@ -2301,6 +2301,7 @@ cluster DoorLock = 257 {
     nullable fabric_idx creatorFabricIndex = 2;
     nullable fabric_idx lastModifiedFabricIndex = 3;
     nullable int16u nextCredentialIndex = 4;
+    optional nullable octet_string credentialData = 5;
   }
 
   request struct ClearCredentialRequest {
@@ -2601,7 +2602,7 @@ endpoint 1 {
 
   server cluster PowerSource {
     ram      attribute status default = 1;
-    ram      attribute order default = 1;
+    persist  attribute order default = 1;
     ram      attribute description default = "Battery";
     ram      attribute batVoltage;
     ram      attribute batPercentRemaining;

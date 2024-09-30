@@ -63,11 +63,26 @@ private:
 
         /// Checks if the given command id exists in the given list
         bool Exists(const CommandId * list, CommandId toCheck);
+
+        void Reset() { mCurrentList = mCurrentHint = nullptr; }
     };
 
 public:
+    /// clears out internal caching. Especially useful in unit tests,
+    /// where path caching does not really apply (the same path may result in different outcomes)
+    void Reset()
+    {
+        mAcceptedCommandsIterator.Reset();
+        mGeneratedCommandsIterator.Reset();
+        mPreviouslyFoundCluster = std::nullopt;
+    }
+
     /// Generic model implementations
-    CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR Shutdown() override
+    {
+        Reset();
+        return CHIP_NO_ERROR;
+    }
 
     bool EventPathIncludesAccessibleConcretePath(const EventPathParams & path,
                                                  const Access::SubjectDescriptor & descriptor) override;

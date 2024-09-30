@@ -35125,6 +35125,8 @@ public class ChipClusters {
           @Nullable Integer lastModifiedFabricIndex = null;
           final long nextCredentialIndexFieldID = 4L;
           @Nullable Integer nextCredentialIndex = null;
+          final long credentialDataFieldID = 5L;
+          @Nullable Optional<byte[]> credentialData = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == credentialExistsFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
@@ -35151,9 +35153,14 @@ public class ChipClusters {
                 UIntType castingValue = element.value(UIntType.class);
                 nextCredentialIndex = castingValue.value(Integer.class);
               }
+            } else if (element.contextTagNum() == credentialDataFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                credentialData = Optional.of(castingValue.value(byte[].class));
+              }
             }
           }
-          callback.onSuccess(credentialExists, userIndex, creatorFabricIndex, lastModifiedFabricIndex, nextCredentialIndex);
+          callback.onSuccess(credentialExists, userIndex, creatorFabricIndex, lastModifiedFabricIndex, nextCredentialIndex, credentialData);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
@@ -35254,7 +35261,7 @@ public class ChipClusters {
     }
 
     public interface GetCredentialStatusResponseCallback extends BaseClusterCallback {
-      void onSuccess(Boolean credentialExists, @Nullable Integer userIndex, @Nullable Integer creatorFabricIndex, @Nullable Integer lastModifiedFabricIndex, @Nullable Integer nextCredentialIndex);
+      void onSuccess(Boolean credentialExists, @Nullable Integer userIndex, @Nullable Integer creatorFabricIndex, @Nullable Integer lastModifiedFabricIndex, @Nullable Integer nextCredentialIndex, @Nullable Optional<byte[]> credentialData);
     }
 
     public interface LockStateAttributeCallback extends BaseAttributeCallback {
