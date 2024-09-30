@@ -22,10 +22,11 @@
 
 std::optional<uint64_t> BridgeAdminDeviceMapper::AddAdminScopedNodeId(const chip::ScopedNodeId & scopedNodeId)
 {
-    VerifyOrReturnValue(mScopedNodeIdToHandle.find(scopedNodeId) == mScopedNodeIdToHandle.end(), std::nullopt, ChipLogError(NotSpecified, "Duplicate ScopedNodeId alread exists in map"));
+    VerifyOrReturnValue(mScopedNodeIdToHandle.find(scopedNodeId) == mScopedNodeIdToHandle.end(), std::nullopt,
+                        ChipLogError(NotSpecified, "Duplicate ScopedNodeId alread exists in map"));
 
     uint64_t handle                     = mNextHandle;
-    mHandleToScopedNodeId[handle]     = scopedNodeId;
+    mHandleToScopedNodeId[handle]       = scopedNodeId;
     mScopedNodeIdToHandle[scopedNodeId] = handle;
     // We are assuming that we will never run out of Handles because we are using uint64_t here.
     static_assert(sizeof(mNextHandle) == sizeof(uint64_t));

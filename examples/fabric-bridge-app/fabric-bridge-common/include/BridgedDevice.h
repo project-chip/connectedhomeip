@@ -80,7 +80,7 @@ protected:
     bool mReachable = false;
     bool mIsIcd     = false;
 
-    uint64_t mHandle                 = 0;
+    uint64_t mHandle                   = 0;
     chip::EndpointId mEndpointId       = 0;
     chip::EndpointId mParentEndpointId = 0;
 

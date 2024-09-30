@@ -149,7 +149,7 @@ CHIP_ERROR RemoveSynchronizedDevice(uint64_t handle)
     ChipLogProgress(NotSpecified, "RemoveSynchronizedDevice");
 
     chip_rpc_SynchronizedDevice device = chip_rpc_SynchronizedDevice_init_default;
-    device.handle            = handle;
+    device.handle                      = handle;
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.
@@ -169,7 +169,7 @@ CHIP_ERROR ActiveChanged(uint64_t handle, uint32_t promisedActiveDurationMs)
     ChipLogProgress(NotSpecified, "ActiveChanged");
 
     chip_rpc_KeepActiveChanged parameters;
-    parameters.handle            = handle;
+    parameters.handle                      = handle;
     parameters.promised_active_duration_ms = promisedActiveDurationMs;
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler

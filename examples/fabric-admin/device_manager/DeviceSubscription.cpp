@@ -215,7 +215,7 @@ CHIP_ERROR DeviceSubscription::StartSubscription(OnDoneCallback onDoneCallback, 
     mNodeId = nodeId;
 
 #if defined(PW_RPC_ENABLED)
-    mCurrentAdministratorCommissioningAttributes                  = chip_rpc_AdministratorCommissioningChanged_init_default;
+    mCurrentAdministratorCommissioningAttributes        = chip_rpc_AdministratorCommissioningChanged_init_default;
     mCurrentAdministratorCommissioningAttributes.handle = handle;
     mCurrentAdministratorCommissioningAttributes.window_status =
         static_cast<uint32_t>(Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);

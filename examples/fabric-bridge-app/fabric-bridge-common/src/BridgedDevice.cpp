@@ -85,7 +85,7 @@ using namespace chip::app::Clusters::Actions;
 BridgedDevice::BridgedDevice(uint64_t handle)
 {
     mReachable  = false;
-    mHandle   = handle;
+    mHandle     = handle;
     mEndpointId = chip::kInvalidEndpointId;
 }
 
