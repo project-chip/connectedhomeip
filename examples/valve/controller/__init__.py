@@ -11,14 +11,13 @@ class Bottle(StrEnum):
     kSourMix = "sour mix"
     kSimpleSyrup = "simple syrup",
 
-# One once == approx 12s.
-
 
 class Oz:
     def __init__(self, oz: float):
         self.oz = oz
 
     def time(self):
+        # One oz == approx 12s.
         return self.oz * 12
 
 
@@ -26,7 +25,7 @@ class DrinkMachine:
     def __init__(self, devCtrl: ChipDeviceCtrl, node_id: int):
         self.dev_ctrl = devCtrl
         self.node_id = node_id
-        # TODO: Should this actually be modelled as an aggregator with bridged nodes so I can have a nodelabel?
+        # TODO: Should this actually be modelled as an aggregator with bridged nodes so I can have a NodeLabel?
         # Right now I'm going to leave this as something on the app side because it's a demo, but it's weird that we don't have writeable labels unless you model it strangely. Spec issue?
         self.bottles: dict[Bottle, int] = {Bottle.kBourbon: 1, Bottle.kGin: 2,
                                            Bottle.kCampari: 3, Bottle.kVermouth: 4, Bottle.kSourMix: 5, Bottle.kSimpleSyrup: 6}
@@ -37,6 +36,8 @@ class DrinkMachine:
         self.add_recipe("martini", {Bottle.kGin: Oz(2), Bottle.kVermouth: Oz(0.25)})
         self.add_recipe("gimlet", {Bottle.kGin: Oz(2.5), Bottle.kSourMix: Oz(0.5), Bottle.kSimpleSyrup: Oz(0.5)})
         self.add_recipe("old fashioned", {Bottle.kBourbon: Oz(2), Bottle.kSimpleSyrup: Oz(0.125)})
+        self.add_recipe("shot of bourbon", {Bottle.kBourbon: Oz(1.5)})
+        self.add_recipe("shot of gin", {Bottle.kGin: Oz(1.5)})
 
     def set_bottle_names(self, bottles: dict[Bottle, int]) -> bool:
         ''' Bottle is a dict of bottle name to endpoint and should contain all 6 endpoints at once'''
@@ -45,7 +46,10 @@ class DrinkMachine:
         self.bottles = bottles
 
     def get_bottle_names(self):
-        return self.Bottle
+        return self.bottles
+
+    def get_recipes(self):
+        return self.recipes
 
     def add_recipe(self, name: str, ingredients: dict[Bottle, Oz]):
         # TODO: should store somewhere permanent - simplest is to write out to file. In the meanwhile, we have a few pre-populated
@@ -60,7 +64,7 @@ class DrinkMachine:
         if not required_bottles.issubset(set(self.bottles)):
             print('Recipe requires an ingredient that is not loaded into the drink machine')
             print(f'Recipe requires: {required_bottles}')
-            print(f'Availble: {self.bottles}')
+            print(f'Available: {self.bottles}')
             return
 
         ingredients = self.recipes[recipe]

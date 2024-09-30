@@ -35,7 +35,7 @@ public:
     PrintOnlyDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
     CHIP_ERROR HandleOpenValve(ValveStateEnum & currentState, BitMask<ValveFaultBitmap> & valveFault) override
     {
-        ChipLogProgress(NotSpecified, "VALVE IS OPENING on endpoint %u!!!!!", mEndpoint);
+        ChipLogError(NotSpecified, "\n\nVALVE IS OPENING on endpoint %u!!!!!\n\n", mEndpoint);
         state        = ValveStateEnum::kOpen;
         currentState = state;
         return CHIP_NO_ERROR;
@@ -43,7 +43,7 @@ public:
     ValveStateEnum GetCurrentValveState() override { return state; }
     CHIP_ERROR HandleCloseValve(ValveStateEnum & currentState, BitMask<ValveFaultBitmap> & valveFault) override
     {
-        ChipLogProgress(NotSpecified, "VALVE IS CLOSING on endpoint %u!!!!!", mEndpoint);
+        ChipLogError(NotSpecified, "\n\nVALVE IS CLOSING on endpoint %u!!!!!\n\n", mEndpoint);
         state        = ValveStateEnum::kClosed;
         currentState = state;
         return CHIP_NO_ERROR;
