@@ -43,6 +43,7 @@ CIRQUE_TESTS=(
     "FailsafeTest"
     "MobileDeviceTest"
     "CommissioningTest"
+    "InteractionModelTest"
     "IcdWaitForActiveTest"
     "SplitCommissioningTest"
     "CommissioningFailureTest"
