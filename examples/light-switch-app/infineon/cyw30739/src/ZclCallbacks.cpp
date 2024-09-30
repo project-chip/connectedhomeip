@@ -41,10 +41,6 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
             }
         }
         break;
-    case OnOffSwitchConfiguration::Id:
-        printf("OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u\n",
-               ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
-        return;
     default:
         printf("Unhandled cluster ID: 0x%04lx\n", attributePath.mClusterId);
         return;

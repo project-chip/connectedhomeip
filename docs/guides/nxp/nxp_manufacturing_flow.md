@@ -132,41 +132,19 @@ Here is the interpretation of the **optional** parameters:
 --unique_id             -> Unique id used for rotating device id generation
 --product_finish        -> Visible finish of the product
 --product_primary_color -> Representative color of the visible parts of the product
+--hw_params             -> Use application factory data from Hardware Parameters component
 ```
 
 ## 3. Write provisioning data
 
-For the **K32W0x1** variants, the binary needs to be written in the internal
-flash at location **0x9D600** using `DK6Programmer.exe`:
-
-```shell
-DK6Programmer.exe -Y -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x9D600="factory_data.bin"
-```
-
-For **K32W1** platform, the binary needs to be written in the internal flash at
-location given by `__MATTER_FACTORY_DATA_START`, using `JLink`:
-
-```
-loadfile factory_data.bin 0xf4000
-```
-
-where `0xf4000` is the value of `__MATTER_FACTORY_DATA_START` in the
-corresponding .map file (can be different if using a custom linker script).
-
-For **RW61X** platform, the binary needs to be written in the internal flash at
-location given by `__MATTER_FACTORY_DATA_START`, using `JLink`:
-
-```
-loadfile factory_data.bin 0xBFFF000
-```
-
-where `0xBFFF000` is the value of `__FACTORY_DATA_START` in the corresponding
-.map file (can be different if using a custom linker script).
-
-For the **RT1060** and **RT1170** platform, the binary needs to be written using
-`MCUXpresso Flash Tool GUI` at the address value corresponding to
-`__FACTORY_DATA_START` (the map file of the application should be checked to get
-the exact value).
+| platform  | tool                             | command                                                                                    | details                                                                                            |
+| --------- | -------------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `k32w0x1` | `DK6Programmer.exe` or `dk6prog` | `DK6Programmer.exe -Y -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x9D600="factory_data.bin"` | NA                                                                                                 |
+| `k32w1`   | `JLink`                          | `loadfile factory_data.bin 0xFE080`                                                        | NA                                                                                                 |
+| `mcxw71`  | `JLink`                          | `loadfile factory_data.bin 0xFE080`                                                        | NA                                                                                                 |
+| `rw61x`   | `JLink`                          | `loadfile factory_data.bin 0xBFFF000`                                                      | Here, `0xBFFF000` is the value of symbol `__FACTORY_DATA_START` from the corresponding `.map` file |
+| `rt1060`  | `MCUXpresso Flash Tool GUI`      | NA                                                                                         | The address is given by the `__FACTORY_DATA_START` symbol in the `.map` file                       |
+| `rt1170`  | `MCUXpresso Flash Tool GUI`      | NA                                                                                         | The address is given by the `__FACTORY_DATA_START` symbol in the `.map` file                       |
 
 ## 4. Build app and usage
 
@@ -204,11 +182,12 @@ Also, demo **DAC**, **PAI** and **PAA** certificates needed in case
 
 ## 6. Increased security for DAC private key
 
-### 6.1 K32W1
+### 6.1 SSS-based platforms
 
 Supported platforms:
 
--   K32W1 - `src/plaftorm/nxp/k32w/k32w1/FactoryDataProviderImpl.h`
+-   `k32w1`
+-   `mcxw71`
 
 For platforms that have a secure subsystem (`SSS`), the DAC private key can be
 converted to an encrypted blob. This blob will overwrite the DAC private key in
@@ -218,6 +197,12 @@ data provider instance.
 The application will check at initialization whether the DAC private key has
 been converted or not and convert it if needed. However, the conversion process
 should be done at manufacturing time for security reasons.
+
+Reference factory data generation command:
+
+```shell
+python3 ./scripts/tools/nxp/factory_data_generator/generate.py -i 10000 -s UXKLzwHdN3DZZLBaL2iVGhQi/OoQwIwJRQV4rpEalbA= -p 14014 -d 1000 --vid "0x1037" --pid "0xA221" --vendor_name "NXP Semiconductors" --product_name "Lighting app" --serial_num "12345678" --date "2023-01-01" --hw_version 1 --hw_version_str "1.0" --cert_declaration ./Chip-Test-CD-1037-A221.der --dac_cert ./Chip-DAC-NXP-1037-A221-Cert.der --dac_key ./Chip-DAC-NXP-1037-A221-Key.der --pai_cert ./Chip-PAI-NXP-1037-A221-Cert.der --spake2p_path ./out/spake2p --unique_id "00112233445566778899aabbccddeeff" --hw_params --out ./factory_data.bin
+```
 
 There is no need for an extra binary.
 

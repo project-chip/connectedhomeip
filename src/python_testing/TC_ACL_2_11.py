@@ -19,12 +19,23 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${NETWORK_MANAGEMENT_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --commissioning-arl-entries "[{\"endpoint\": 1,\"cluster\": 1105,\"restrictions\": [{\"type\": 0,\"id\": 0}]}]" --arl-entries "[{\"endpoint\": 1,\"cluster\": 1105,\"restrictions\": [{\"type\": 0,\"id\": 0}]}]"
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${NETWORK_MANAGEMENT_APP}
+#     factoryreset: true
+#     quiet: true
+#     app-args: >
+#       --discriminator 1234 --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
+#       --commissioning-arl-entries "[{\"endpoint\": 1,\"cluster\": 1105,\"restrictions\": [{\"type\": 0,\"id\": 0}]}]"
+#       --arl-entries "[{\"endpoint\": 1,\"cluster\": 1105,\"restrictions\": [{\"type\": 0,\"id\": 0}]}]"
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -105,11 +116,11 @@ class TC_ACL_2_11(MatterBaseTest):
         self.step(1)
 
         wildcard_read = (await dev_ctrl.Read(self.dut_node_id, [()]))
-        has_arl, has_carl = arls_populated(wildcard_read.tlvAttributes)
+        arl_data = arls_populated(wildcard_read.tlvAttributes)
         asserts.assert_true(
-            has_arl, "ARL attribute must contain at least one restriction to run this test. Please follow manufacturer-specific steps to add access restrictions and re-run this test")
+            arl_data.have_arl, "ARL attribute must contain at least one restriction to run this test. Please follow manufacturer-specific steps to add access restrictions and re-run this test")
         asserts.assert_true(
-            has_carl, "CommissioningARL attribute must contain at least one restriction to run this test. Please follow manufacturer-specific steps to add access restrictions and re-run this test")
+            arl_data.have_carl, "CommissioningARL attribute must contain at least one restriction to run this test. Please follow manufacturer-specific steps to add access restrictions and re-run this test")
 
         self.step(2)
         await self.read_single_attribute_check_success(

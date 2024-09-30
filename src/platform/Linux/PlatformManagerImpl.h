@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "lib/core/CHIPError.h"
 #include <condition_variable>
 #include <mutex>
 
@@ -69,42 +70,21 @@ public:
     template <typename T>
     CHIP_ERROR GLibMatterContextInvokeSync(CHIP_ERROR (*func)(T *), T * userData)
     {
-        // Because of TSAN false positives, we need to use a mutex to synchronize access to all members of
-        // the GLibMatterContextInvokeData object (including constructor and destructor). This is a temporary
-        // workaround until TSAN-enabled GLib will be used in our CI.
-        std::unique_lock<std::mutex> lock(mGLibMainLoopCallbackIndirectionMutex);
+        struct
+        {
+            CHIP_ERROR returnValue = CHIP_NO_ERROR;
+            CHIP_ERROR (*functionToCall)(T *);
+            T * userData;
+        } context;
 
-        // g_main_context_invoke_full needs (void *) arguments
-        GLibMatterContextInvokeData invokeData{ reinterpret_cast<CHIP_ERROR (*)(void *)>(func), static_cast<void *>(userData) };
+        context.functionToCall = func;
+        context.userData       = userData;
 
-        lock.unlock();
+        LambdaBridge bridge;
+        bridge.Initialize([&context]() { context.returnValue = context.functionToCall(context.userData); });
 
-        g_main_context_invoke_full(
-            g_main_loop_get_context(mGLibMainLoop), G_PRIORITY_HIGH_IDLE,
-            [](void * userData_) {
-                auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
-
-                std::unique_lock<std::mutex> lock_(PlatformMgrImpl().mGLibMainLoopCallbackIndirectionMutex);
-
-                // recasting func and userData back to T* to avoid undefined behaviour
-                auto mFunc     = reinterpret_cast<CHIP_ERROR (*)(T *)>(data->mFunc);
-                auto mUserData = static_cast<T *>(data->mFuncUserData);
-
-                lock_.unlock();
-                auto result = mFunc(mUserData);
-                lock_.lock();
-                data->mDone       = true;
-                data->mFuncResult = result;
-                data->mDoneCond.notify_one();
-
-                return G_SOURCE_REMOVE;
-            },
-            &invokeData, nullptr);
-
-        lock.lock();
-        invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
-
-        return invokeData.mFuncResult;
+        _GLibMatterContextInvokeSync(std::move(bridge));
+        return context.returnValue;
     }
 
     unsigned int GLibMatterContextAttachSource(GSource * source)
@@ -137,13 +117,22 @@ private:
 
     struct GLibMatterContextInvokeData
     {
-        CHIP_ERROR (*mFunc)(void *);
-        void * mFuncUserData;
-        CHIP_ERROR mFuncResult;
+        LambdaBridge bridge;
         // Sync primitives to wait for the function to be executed
         std::condition_variable mDoneCond;
         bool mDone = false;
     };
+
+    /**
+     * @brief Invoke a function on the Matter GLib context.
+     *
+     * @param[in] bridge a LambdaBridge object that holds the lambda to be invoked within the GLib context.
+     *
+     * @note This function moves the LambdaBridge into the GLib context for invocation.
+     *       The LambdaBridge is created and initialised in GLibMatterContextInvokeSync().
+     *       use the GLibMatterContextInvokeSync() template function instead of this one.
+     */
+    void _GLibMatterContextInvokeSync(LambdaBridge && bridge);
 
     // XXX: Mutex for guarding access to glib main event loop callback indirection
     //      synchronization primitives. This is a workaround to suppress TSAN warnings.

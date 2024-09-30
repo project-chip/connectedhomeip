@@ -403,6 +403,9 @@ void DeviceController::Shutdown()
         // assume that all sessions for our fabric belong to us here.
         mSystemState->CASESessionMgr()->ReleaseSessionsForFabric(mFabricIndex);
 
+        // Shut down any bdx transfers we're acting as the server for.
+        mSystemState->BDXTransferServer()->AbortTransfersForFabric(mFabricIndex);
+
         // TODO: The CASE session manager does not shut down existing CASE
         // sessions.  It just shuts down any ongoing CASE session establishment
         // we're in the middle of as initiator.  Maybe it should shut down

@@ -106,6 +106,8 @@ CHIP_ERROR IPv6Bind(int socket, const IPAddress & address, uint16_t port, Interf
     sa.sin6_scope_id = static_cast<decltype(sa.sin6_scope_id)>(interfaceId);
 
     CHIP_ERROR status = CHIP_NO_ERROR;
+
+    // NOLINTNEXTLINE(clang-analyzer-unix.StdCLibraryFunctions): Function called only with valid socket after GetSocket
     if (bind(socket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
     {
         status = CHIP_ERROR_POSIX(errno);
@@ -139,6 +141,8 @@ CHIP_ERROR IPv4Bind(int socket, const IPAddress & address, uint16_t port)
     sa.sin_addr   = address.ToIPv4();
 
     CHIP_ERROR status = CHIP_NO_ERROR;
+
+    // NOLINTNEXTLINE(clang-analyzer-unix.StdCLibraryFunctions): Function called only with valid socket after GetSocket
     if (bind(socket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
     {
         status = CHIP_ERROR_POSIX(errno);
@@ -410,6 +414,7 @@ CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, Sy
 #endif // INET_CONFIG_UDP_SOCKET_PKTINFO
 
     // Send IP packet.
+    // NOLINTNEXTLINE(clang-analyzer-unix.StdCLibraryFunctions): GetSocket calls ensure mSocket is valid
     const ssize_t lenSent = sendmsg(mSocket, &msgHeader, 0);
     if (lenSent == -1)
     {
@@ -816,7 +821,7 @@ CHIP_ERROR UDPEndPointImplSockets::IPv6JoinLeaveMulticastGroupImpl(InterfaceId a
 #if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
     if (sMulticastGroupHandler != nullptr)
     {
-        return sMulticastGroupHandler(aInterfaceId, aAddress, MulticastOperation::kJoin);
+        return sMulticastGroupHandler(aInterfaceId, aAddress, join ? MulticastOperation::kJoin : MulticastOperation::kLeave);
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 

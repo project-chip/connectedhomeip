@@ -38,7 +38,6 @@ class ManualTest:
 
 
 INVALID_TESTS = {
-    "tests.yaml",  # certification/tests.yaml is not a real test
     "PICS.yaml",  # certification/PICS.yaml is not a real test
 
     # The items below are examples and will never work (likely)

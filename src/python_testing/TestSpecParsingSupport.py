@@ -272,7 +272,8 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_equal(set(in_progress.keys())-set(tot_xml_clusters.keys()),
                              set(), "There are some in_progress clusters that are not included in the TOT spec")
 
-        str_path = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'master', 'clusters'))
+        str_path = str(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                       '..', '..', 'data_model', 'in_progress', 'clusters'))
         string_override_check, problems = build_xml_clusters(str_path)
         asserts.assert_equal(string_override_check.keys(), self.spec_xml_clusters.keys(), "Mismatched cluster generation")
 
@@ -461,6 +462,32 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_equal(len(problems), 0, "Unexpected problems parsing non-provisional cluster")
         asserts.assert_in(id, clusters.keys(), "Non-provisional cluster not parsed")
         asserts.assert_false(clusters[id].is_provisional, "Non-provisional cluster marked as provisional")
+
+    def test_atomic_thermostat(self):
+        tot_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.kMaster)
+        one_three_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
+        in_progress, problems = build_xml_clusters(PrebuiltDataModelDirectory.kInProgress)
+
+        asserts.assert_in("Atomic Request", tot_xml_clusters[Clusters.Thermostat.id].command_map,
+                          "Atomic request not found on thermostat command map")
+        request_id = tot_xml_clusters[Clusters.Thermostat.id].command_map["Atomic Request"]
+        asserts.assert_in(request_id, tot_xml_clusters[Clusters.Thermostat.id].accepted_commands.keys(),
+                          "Atomic request not found in thermostat accepted command list")
+
+        asserts.assert_in("Atomic Response", tot_xml_clusters[Clusters.Thermostat.id].command_map,
+                          "Atomic response not found in the thermostat command map")
+        response_id = tot_xml_clusters[Clusters.Thermostat.id].command_map["Atomic Response"]
+        asserts.assert_in(response_id, tot_xml_clusters[Clusters.Thermostat.id].generated_commands.keys(),
+                          "Atomic response not found in thermostat generated command list")
+
+        asserts.assert_not_in(
+            "Atomic Request", one_three_clusters[Clusters.Thermostat.id].command_map, "Atomic request found on thermostat command map for 1.3")
+        asserts.assert_not_in(request_id, one_three_clusters[Clusters.Thermostat.id].accepted_commands.keys(),
+                              "Atomic request found in thermostat accepted command list for 1.3")
+        asserts.assert_not_in(
+            "Atomic Response", one_three_clusters[Clusters.Thermostat.id].command_map, "Atomic response found on thermostat command map for 1.3")
+        asserts.assert_not_in(response_id, one_three_clusters[Clusters.Thermostat.id].generated_commands.keys(),
+                              "Atomic request found in thermostat generated command list for 1.3")
 
 
 if __name__ == "__main__":
