@@ -1,2 +1,23 @@
-# Current reviewers-XXX teams, who review everything for approval.
-* @reviewers-amazon @reviewers-apple @reviewers-comcast @reviewers-google @reviewers-lg @reviewers-nordic @reviewers-samsung @reviewers-silabs @reviewers-tcl
+src/platform/ASR @tx2rx
+src/platform/Ameba @pankore
+src/platform/Beken @zhengyaohan
+
+src/darwin          @project-chip/shared-reviewers-apple
+src/platform/Darwin @project-chip/shared-reviewers-apple
+
+src/platform/ESP32 @project-chip/shared-reviewers-espressif
+src/platform/Infineon @ifyall
+src/platform/NuttX @zhhyu7
+src/platform/Tizen @arkq
+src/platform/android @shared-reviewers-google
+src/platform/bouffalolab @wy-hh
+src/platform/cc13xx_26xx @s-jain2022
+src/platform/cc32xx @s-jain2022
+src/platform/mt793x @pakls
+src/platform/nrfconnect @project-chip/shared-reviewers-nordic
+src/platform/nxp @project-chip/shared-reviewers-nxp
+src/platform/qpg @dvdm-qorvo
+src/platform/silabs @project-chip/shared-reviewers-silabs
+src/platform/stm32 @STYoannZamaron
+src/platform/telink @s07641069
+src/platform/webos @joonhaengHeo
