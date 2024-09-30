@@ -31,6 +31,7 @@
 #include <app/AppConfig.h>
 #include <app/CommandHandlerImpl.h>
 #include <app/InteractionModelEngine.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Encode.h>
 #include <app/tests/AppTestContext.h>
 #include <app/tests/test-interaction-model-api.h>
@@ -95,6 +96,33 @@ public:
         return aWriter.EndContainer(outerType);
     }
 };
+
+const chip::Test::MockNodeConfig & TestMockNodeConfig()
+{
+    using namespace chip::app;
+    using namespace chip::Test;
+    using namespace chip::app::Clusters::Globals::Attributes;
+
+    // clang-format off
+    static const MockNodeConfig config({
+        MockEndpointConfig(chip::kTestEndpointId, {
+            MockClusterConfig(Clusters::Identify::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+            },
+            {},      // events
+            {
+                kTestCommandIdWithData,
+                kTestCommandIdNoData,
+                kTestCommandIdCommandSpecificResponse,
+                kTestCommandIdFillResponseMessage,
+            }, // accepted commands
+            {} // generated commands
+          ),
+        }),
+    });
+    // clang-format on
+    return config;
+}
 
 } // namespace
 
@@ -354,9 +382,42 @@ public:
     int onFinalCalledTimes = 0;
 } mockCommandHandlerDelegate;
 
+class TestCommandInteractionModel : public TestImCustomDataModel
+{
+public:
+    static TestCommandInteractionModel * Instance()
+    {
+        static TestCommandInteractionModel instance;
+        return &instance;
+    }
+
+    TestCommandInteractionModel() {}
+
+    std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request,
+                                                        chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
+    {
+        DispatchSingleClusterCommand(request.path, input_arguments, handler);
+        return std::nullopt; // handler status is set by the dispatch
+    }
+};
+
 class TestCommandInteraction : public chip::Test::AppContext
 {
 public:
+    void SetUp() override
+    {
+        AppContext::SetUp();
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(TestCommandInteractionModel::Instance());
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+    }
+
+    void TearDown() override
+    {
+        chip::Test::ResetMockNodeConfig();
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+        AppContext::TearDown();
+    }
+
     static size_t GetNumActiveCommandResponderObjects()
     {
         return chip::app::InteractionModelEngine::GetInstance()->mCommandResponderObjs.Allocated();
@@ -423,6 +484,9 @@ public:
     static void FillCurrentInvokeResponseBuffer(CommandHandlerImpl * apCommandHandler,
                                                 const ConcreteCommandPath & aRequestCommandPath, uint32_t aSizeToLeaveInBuffer);
     static void ValidateCommandHandlerEncodeInvokeResponseMessage(bool aNeedStatusCode);
+
+protected:
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate

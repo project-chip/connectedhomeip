@@ -2015,6 +2015,7 @@ endpoint 0 {
     ram      attribute userActiveModeTriggerHint default = 4096;
     ram      attribute userActiveModeTriggerInstruction default = "Push setup button for Active Mode";
     ram      attribute operatingMode default = 0;
+    callback attribute maximumCheckInBackOff;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
