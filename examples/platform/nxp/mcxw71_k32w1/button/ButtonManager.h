@@ -25,6 +25,7 @@
 
 #include "fsl_component_button.h"
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/CHIPError.h>
 
 // Application-defined error codes in the CHIP_ERROR space.
@@ -87,12 +88,14 @@ private:
      */
     static void ResetActionEventHandler(const AppEvent & event);
 
+#if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
     /**
      * @brief This callback schedules a DSLS LIT action (Dynamic SIT LIT Support).
      *
      * It is used when the app requests SIT mode (check spec, "Runtime Operating Mode Switching")
      */
     static void DSLSActionEventHandler(const AppEvent & event);
+#endif /* CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS */
 
     /**
      * @brief This callback performs a factory reset.
