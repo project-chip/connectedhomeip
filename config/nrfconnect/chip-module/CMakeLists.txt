@@ -62,7 +62,14 @@ endif()
 
 if (CONFIG_NRF_SECURITY)
     zephyr_include_directories($<TARGET_PROPERTY:mbedtls_external,INTERFACE_INCLUDE_DIRECTORIES>)
-    zephyr_include_directories($<TARGET_PROPERTY:psa_crypto_config,INTERFACE_INCLUDE_DIRECTORIES>)
+
+    if(CONFIG_BUILD_WITH_TFM)
+        zephyr_include_directories($<TARGET_PROPERTY:psa_crypto_config,INTERFACE_INCLUDE_DIRECTORIES>)
+    else()
+        zephyr_include_directories($<TARGET_PROPERTY:psa_crypto_library_config,INTERFACE_INCLUDE_DIRECTORIES>)
+        matter_add_flags(-DMBEDTLS_PSA_CRYPTO_USER_CONFIG_FILE=<nrf-psa-crypto-user-config.h>)
+    endif()
+
     zephyr_include_directories($<TARGET_PROPERTY:psa_interface,INTERFACE_INCLUDE_DIRECTORIES>)
     if(TARGET platform_cc3xx)
         zephyr_include_directories($<TARGET_PROPERTY:platform_cc3xx,INTERFACE_INCLUDE_DIRECTORIES>)
