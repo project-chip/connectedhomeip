@@ -281,6 +281,7 @@ const EmberAfCluster * emberAfGetNthCluster(chip::EndpointId endpoint, uint8_t n
 // Retrieve the device type list associated with a specific endpoint.
 //
 chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpoint, CHIP_ERROR & err);
+chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsigned endpointIndex, CHIP_ERROR & err);
 
 //
 // Override the device type list current associated with an endpoint with a user-provided list. The buffers backing

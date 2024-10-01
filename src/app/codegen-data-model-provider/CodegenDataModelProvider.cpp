@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/util/af-types.h"
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <app-common/zap-generated/attribute-type.h>
@@ -284,6 +285,21 @@ std::optional<DataModel::CommandEntry> EnumeratorCommandFinder::FindCommandEntry
     }
 
     return (*id == kInvalidCommandId) ? DataModel::CommandEntry::kInvalid : CommandEntryFrom(path, *id);
+}
+
+DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & other)
+{
+    DataModel::DeviceTypeEntry entry;
+
+    entry.deviceTypeId      = other.deviceId;
+    entry.deviceTypeVersion = other.deviceVersion;
+
+    return entry;
+}
+
+bool IsSameDeviceTypeEntry(const DataModel::DeviceTypeEntry & a, const EmberAfDeviceType & b)
+{
+    return (a.deviceTypeId == b.deviceId) && (a.deviceTypeVersion == b.deviceVersion);
 }
 
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
@@ -718,6 +734,65 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
     VerifyOrReturnValue(commandId.has_value(), kInvalidCommandPath);
 
     return ConcreteCommandPath(before.mEndpointId, before.mClusterId, *commandId);
+}
+
+std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceType(EndpointId endpoint)
+{
+    std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpoint);
+    if (!endpoint_index.has_value())
+    {
+        return std::nullopt;
+    }
+
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
+    Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
+
+    if (deviceTypes.empty())
+    {
+        return std::nullopt;
+    }
+
+    // we start at the beginning
+    mDeviceTypeIterationHint = 0;
+    return DeviceTypeEntryFromEmber(deviceTypes[0]);
+}
+
+std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceType(EndpointId endpoint,
+                                                                                   const DataModel::DeviceTypeEntry & previous)
+{
+    std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpoint);
+    if (!endpoint_index.has_value())
+    {
+        return std::nullopt;
+    }
+
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
+    Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
+
+    unsigned idx = 0;
+    if ((mDeviceTypeIterationHint < deviceTypes.size()) && IsSameDeviceTypeEntry(previous, deviceTypes[mDeviceTypeIterationHint]))
+    {
+        idx = mDeviceTypeIterationHint + 1; // target the NEXT device
+    }
+    else
+    {
+        while (idx < deviceTypes.size())
+        {
+            idx++;
+            if (IsSameDeviceTypeEntry(previous, deviceTypes[idx - 1]))
+            {
+                break;
+            }
+        }
+    }
+
+    if (idx >= deviceTypes.size())
+    {
+        return std::nullopt;
+    }
+
+    mDeviceTypeIterationHint = idx;
+    return DeviceTypeEntryFromEmber(deviceTypes[idx]);
 }
 
 } // namespace app

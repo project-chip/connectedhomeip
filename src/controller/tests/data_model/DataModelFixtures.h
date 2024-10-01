@@ -124,6 +124,9 @@ public:
 
     EndpointId FirstEndpoint() override;
     EndpointId NextEndpoint(EndpointId before) override;
+    std::optional<DataModel::DeviceTypeEntry> FirstDeviceType(EndpointId endpoint) override;
+    std::optional<DataModel::DeviceTypeEntry> NextDeviceType(EndpointId endpoint,
+                                                             const DataModel::DeviceTypeEntry & previous) override;
     DataModel::ClusterEntry FirstCluster(EndpointId endpoint) override;
     DataModel::ClusterEntry NextCluster(const ConcreteClusterPath & before) override;
     std::optional<DataModel::ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) override;

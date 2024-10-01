@@ -313,6 +313,18 @@ DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & a
     return &dataVersion;
 }
 
+chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpoint, CHIP_ERROR & err)
+{
+    // TODO: implement
+    return chip::Span<const EmberAfDeviceType>();
+}
+
+chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsigned index, CHIP_ERROR & err)
+{
+    // TODO: implement
+    return chip::Span<const EmberAfDeviceType>();
+}
+
 void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
                              AttributesChangedListener * listener)
 {
