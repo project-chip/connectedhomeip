@@ -37,7 +37,7 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-tsan-clang]
+                build_variant: [no-ble-no-shell-tsan-clang]
                 chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
@@ -331,7 +331,7 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-asan-clang, no-ble-tsan-clang]
+                build_variant: [no-ble-no-shell-asan-clang, no-ble-no-shell-tsan-clang]
                 chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
