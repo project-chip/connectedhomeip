@@ -18,21 +18,100 @@
 
 #include "PairingManager.h"
 
-#include <controller/CommissioningDelegate.h>
-#include <controller/CurrentFabricRemover.h>
-#include <lib/support/Span.h>
+#include <netdb.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+
+#include <commands/common/CHIPCommand.h>
+#include <device_manager/DeviceSynchronization.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <setup_payload/ManualSetupPayloadParser.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
+
+#if defined(PW_RPC_ENABLED)
+#include <rpc/RpcClient.h>
+#endif
 
 using namespace ::chip;
+using namespace ::chip::Controller;
+
+namespace {
+
+CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload)
+{
+    VerifyOrReturnValue(setUpCode, CHIP_ERROR_INVALID_ARGUMENT);
+    bool isQRCode = strncmp(setUpCode, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
+    if (isQRCode)
+    {
+        ReturnErrorOnFailure(QRCodeSetupPayloadParser(setUpCode).populatePayload(payload));
+        VerifyOrReturnError(payload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else
+    {
+        ReturnErrorOnFailure(ManualSetupPayloadParser(setUpCode).populatePayload(payload));
+        VerifyOrReturnError(payload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+bool ParseAddressWithInterface(const char * addressString, Inet::IPAddress & address, Inet::InterfaceId & interfaceId)
+{
+    struct addrinfo hints;
+    struct addrinfo * result;
+    int ret;
+
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family   = AF_UNSPEC;
+    hints.ai_socktype = SOCK_DGRAM;
+    ret               = getaddrinfo(addressString, nullptr, &hints, &result);
+    if (ret < 0)
+    {
+        ChipLogError(NotSpecified, "Invalid address: %s", addressString);
+        return false;
+    }
+
+    if (result->ai_family == AF_INET6)
+    {
+        struct sockaddr_in6 * addr = reinterpret_cast<struct sockaddr_in6 *>(result->ai_addr);
+        address                    = Inet::IPAddress::FromSockAddr(*addr);
+        interfaceId                = Inet::InterfaceId(addr->sin6_scope_id);
+    }
+#if INET_CONFIG_ENABLE_IPV4
+    else if (result->ai_family == AF_INET)
+    {
+        address     = Inet::IPAddress::FromSockAddr(*reinterpret_cast<struct sockaddr_in *>(result->ai_addr));
+        interfaceId = Inet::InterfaceId::Null();
+    }
+#endif // INET_CONFIG_ENABLE_IPV4
+    else
+    {
+        ChipLogError(NotSpecified, "Unsupported address: %s", addressString);
+        freeaddrinfo(result);
+        return false;
+    }
+
+    freeaddrinfo(result);
+    return true;
+}
+
+} // namespace
 
 PairingManager::PairingManager() :
     mOnOpenCommissioningWindowCallback(OnOpenCommissioningWindowResponse, this),
-    mOnOpenCommissioningWindowVerifierCallback(OnOpenCommissioningWindowVerifierResponse, this)
+    mOnOpenCommissioningWindowVerifierCallback(OnOpenCommissioningWindowVerifierResponse, this),
+    mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this)
 {}
 
-void PairingManager::Init(Controller::DeviceCommissioner * commissioner)
+CHIP_ERROR PairingManager::Init(Controller::DeviceCommissioner * commissioner, CredentialIssuerCommands * credIssuerCmds)
 {
-    VerifyOrDie(mCommissioner == nullptr);
+    VerifyOrReturnError(commissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mCommissioner = commissioner;
+
+    VerifyOrReturnError(credIssuerCmds != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mCredIssuerCmds = credIssuerCmds;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PairingManager::OpenCommissioningWindow(NodeId nodeId, EndpointId endpointId, uint16_t commissioningTimeoutSec,
@@ -167,4 +246,367 @@ void PairingManager::OnOpenCommissioningWindowVerifierResponse(void * context, N
 
     // Reset the window opener once the window operation is complete
     self->mWindowOpener.reset();
+}
+
+void PairingManager::OnStatusUpdate(DevicePairingDelegate::Status status)
+{
+    switch (status)
+    {
+    case DevicePairingDelegate::Status::SecurePairingSuccess:
+        ChipLogProgress(NotSpecified, "Secure Pairing Success");
+        ChipLogProgress(NotSpecified, "CASE establishment successful");
+        break;
+    case DevicePairingDelegate::Status::SecurePairingFailed:
+        ChipLogError(NotSpecified, "Secure Pairing Failed");
+        break;
+    }
+}
+
+void PairingManager::OnPairingComplete(CHIP_ERROR err)
+{
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(NotSpecified, "Pairing Success");
+        ChipLogProgress(NotSpecified, "PASE establishment successful");
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Pairing Failure: %s", ErrorStr(err));
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+    }
+}
+
+void PairingManager::OnPairingDeleted(CHIP_ERROR err)
+{
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(NotSpecified, "Pairing Deleted Success");
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Pairing Deleted Failure: %s", ErrorStr(err));
+    }
+}
+
+void PairingManager::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
+{
+    if (err == CHIP_NO_ERROR)
+    {
+        // print to console
+        fprintf(stderr, "New device with Node ID: 0x%lx has been successfully added.\n", nodeId);
+        // CurrentCommissioner() has a lifetime that is the entire life of the application itself
+        // so it is safe to provide to StartDeviceSynchronization.
+        DeviceSynchronizer::Instance().StartDeviceSynchronization(mCommissioner, nodeId, mDeviceIsICD);
+    }
+    else
+    {
+        // When ICD device commissioning fails, the ICDClientInfo stored in OnICDRegistrationComplete needs to be removed.
+        if (mDeviceIsICD)
+        {
+            CHIP_ERROR deleteEntryError =
+                CHIPCommand::sICDClientStorage.DeleteEntry(ScopedNodeId(nodeId, mCommissioner->GetFabricIndex()));
+            if (deleteEntryError != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "Failed to delete ICD entry: %s", ErrorStr(err));
+            }
+        }
+        ChipLogProgress(NotSpecified, "Device commissioning Failure: %s", ErrorStr(err));
+    }
+
+    if (mCommissioningDelegate)
+    {
+        mCommissioningDelegate->OnCommissioningComplete(nodeId, err);
+        this->SetCommissioningDelegate(nullptr);
+    }
+}
+
+void PairingManager::OnReadCommissioningInfo(const Controller::ReadCommissioningInfo & info)
+{
+    ChipLogProgress(AppServer, "OnReadCommissioningInfo - vendorId=0x%04X productId=0x%04X", info.basic.vendorId,
+                    info.basic.productId);
+
+    // The string in CharSpan received from the device is not null-terminated, we use std::string here for coping and
+    // appending a numm-terminator at the end of the string.
+    std::string userActiveModeTriggerInstruction;
+
+    // Note: the callback doesn't own the buffer, should make a copy if it will be used it later.
+    if (info.icd.userActiveModeTriggerInstruction.size() != 0)
+    {
+        userActiveModeTriggerInstruction =
+            std::string(info.icd.userActiveModeTriggerInstruction.data(), info.icd.userActiveModeTriggerInstruction.size());
+    }
+
+    if (info.icd.userActiveModeTriggerHint.HasAny())
+    {
+        ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerHint=0x%08x",
+                        info.icd.userActiveModeTriggerHint.Raw());
+        ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerInstruction=%s",
+                        userActiveModeTriggerInstruction.c_str());
+    }
+    ChipLogProgress(AppServer, "OnReadCommissioningInfo ICD - IdleModeDuration=%u activeModeDuration=%u activeModeThreshold=%u",
+                    info.icd.idleModeDuration, info.icd.activeModeDuration, info.icd.activeModeThreshold);
+}
+
+void PairingManager::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icdCounter)
+{
+    char icdSymmetricKeyHex[Crypto::kAES_CCM128_Key_Length * 2 + 1];
+
+    Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
+                         sizeof(icdSymmetricKeyHex), Encoding::HexFlags::kNullTerminate);
+
+    app::ICDClientInfo clientInfo;
+    clientInfo.peer_node         = nodeId;
+    clientInfo.monitored_subject = mICDMonitoredSubject.Value();
+    clientInfo.start_icd_counter = icdCounter;
+
+    CHIP_ERROR err = CHIPCommand::sICDClientStorage.SetKey(clientInfo, mICDSymmetricKey.Value());
+    if (err == CHIP_NO_ERROR)
+    {
+        err = CHIPCommand::sICDClientStorage.StoreEntry(clientInfo);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        CHIPCommand::sICDClientStorage.RemoveKey(clientInfo);
+        ChipLogError(NotSpecified, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s",
+                     ChipLogValueX64(nodeId.GetNodeId()), err.AsString());
+        return;
+    }
+
+    mDeviceIsICD = true;
+
+    ChipLogProgress(NotSpecified, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(nodeId.GetNodeId()));
+    ChipLogProgress(NotSpecified,
+                    "ICD Registration Complete for device " ChipLogFormatX64 " / Check-In NodeID: " ChipLogFormatX64
+                    " / Monitored Subject: " ChipLogFormatX64 " / Symmetric Key: %s / ICDCounter %u",
+                    ChipLogValueX64(nodeId.GetNodeId()), ChipLogValueX64(mICDCheckInNodeId.Value()),
+                    ChipLogValueX64(mICDMonitoredSubject.Value()), icdSymmetricKeyHex, icdCounter);
+}
+
+void PairingManager::OnICDStayActiveComplete(ScopedNodeId deviceId, uint32_t promisedActiveDuration)
+{
+    ChipLogProgress(NotSpecified, "ICD Stay Active Complete for device " ChipLogFormatX64 " / promisedActiveDuration: %u",
+                    ChipLogValueX64(deviceId.GetNodeId()), promisedActiveDuration);
+}
+
+void PairingManager::OnDiscoveredDevice(const Dnssd::CommissionNodeData & nodeData)
+{
+    // Ignore nodes with closed commissioning window
+    VerifyOrReturn(nodeData.commissioningMode != 0);
+
+    auto & resolutionData = nodeData;
+
+    const uint16_t port = resolutionData.port;
+    char buf[Inet::IPAddress::kMaxStringLength];
+    resolutionData.ipAddress[0].ToString(buf);
+    ChipLogProgress(NotSpecified, "Discovered Device: %s:%u", buf, port);
+
+    // Stop Mdns discovery.
+    auto err = mCommissioner->StopCommissionableDiscovery();
+
+    // Some platforms does not implement a mechanism to stop mdns browse, so
+    // we just ignore CHIP_ERROR_NOT_IMPLEMENTED instead of bailing out.
+    if (CHIP_NO_ERROR != err && CHIP_ERROR_NOT_IMPLEMENTED != err)
+    {
+        return;
+    }
+
+    mCommissioner->RegisterDeviceDiscoveryDelegate(nullptr);
+
+    auto interfaceId = resolutionData.ipAddress[0].IsIPv6LinkLocal() ? resolutionData.interfaceId : Inet::InterfaceId::Null();
+    auto peerAddress = Transport::PeerAddress::UDP(resolutionData.ipAddress[0], port, interfaceId);
+    err              = Pair(mNodeId, peerAddress);
+    if (CHIP_NO_ERROR != err)
+    {
+    }
+}
+
+Optional<uint16_t> PairingManager::FailSafeExpiryTimeoutSecs() const
+{
+    // No manual input, so do not need to extend.
+    return Optional<uint16_t>();
+}
+
+bool PairingManager::ShouldWaitAfterDeviceAttestation()
+{
+    // If there is a vendor ID and product ID, request OnDeviceAttestationCompleted().
+    // Currently this is added in the case that the example is performing reverse commissioning,
+    // but it would be an improvement to store that explicitly.
+    // TODO: Issue #35297 - [Fabric Sync] Improve where we get VID and PID when validating CCTRL CommissionNode command
+    SetupPayload payload;
+    CHIP_ERROR err = GetPayload(mOnboardingPayload, payload);
+    return err == CHIP_NO_ERROR && (payload.vendorID != 0 || payload.productID != 0);
+}
+
+void PairingManager::OnDeviceAttestationCompleted(Controller::DeviceCommissioner * deviceCommissioner, DeviceProxy * device,
+                                                  const Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
+                                                  Credentials::AttestationVerificationResult attestationResult)
+{
+    SetupPayload payload;
+    CHIP_ERROR parse_error = GetPayload(mOnboardingPayload, payload);
+    if (parse_error == CHIP_NO_ERROR && (payload.vendorID != 0 || payload.productID != 0))
+    {
+        if (payload.vendorID == 0 || payload.productID == 0)
+        {
+            ChipLogProgress(NotSpecified,
+                            "Failed validation: vendorID or productID must not be 0."
+                            "Requested VID: %u, Requested PID: %u.",
+                            payload.vendorID, payload.productID);
+            deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
+                device, Credentials::AttestationVerificationResult::kInvalidArgument);
+            return;
+        }
+
+        if (payload.vendorID != info.BasicInformationVendorId() || payload.productID != info.BasicInformationProductId())
+        {
+            ChipLogProgress(NotSpecified,
+                            "Failed validation of vendorID or productID."
+                            "Requested VID: %u, Requested PID: %u,"
+                            "Detected VID: %u, Detected PID %u.",
+                            payload.vendorID, payload.productID, info.BasicInformationVendorId(), info.BasicInformationProductId());
+            deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
+                device,
+                payload.vendorID == info.BasicInformationVendorId()
+                    ? Credentials::AttestationVerificationResult::kDacProductIdMismatch
+                    : Credentials::AttestationVerificationResult::kDacVendorIdMismatch);
+            return;
+        }
+
+        // NOTE: This will log errors even if the attestion was successful.
+        auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(device, attestationResult);
+        if (CHIP_NO_ERROR != err)
+        {
+        }
+        return;
+    }
+
+    // Don't bypass attestation, continue with error.
+    auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(device, attestationResult);
+    if (CHIP_NO_ERROR != err)
+    {
+    }
+}
+
+CommissioningParameters PairingManager::GetCommissioningParameters()
+{
+    auto params = CommissioningParameters();
+    params.SetSkipCommissioningComplete(false);
+    params.SetDeviceAttestationDelegate(this);
+
+    if (mICDRegistration.ValueOr(false))
+    {
+        params.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+
+        if (!mICDSymmetricKey.HasValue())
+        {
+            Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey));
+            mICDSymmetricKey.SetValue(ByteSpan(mRandomGeneratedICDSymmetricKey));
+        }
+        if (!mICDCheckInNodeId.HasValue())
+        {
+            mICDCheckInNodeId.SetValue(mCommissioner->GetNodeId());
+        }
+        if (!mICDMonitoredSubject.HasValue())
+        {
+            mICDMonitoredSubject.SetValue(mICDCheckInNodeId.Value());
+        }
+        if (!mICDClientType.HasValue())
+        {
+            mICDClientType.SetValue(app::Clusters::IcdManagement::ClientTypeEnum::kPermanent);
+        }
+        // These Optionals must have values now.
+        // The commissioner will verify these values.
+        params.SetICDSymmetricKey(mICDSymmetricKey.Value());
+        if (mICDStayActiveDurationMsec.HasValue())
+        {
+            params.SetICDStayActiveDurationMsec(mICDStayActiveDurationMsec.Value());
+        }
+        params.SetICDCheckInNodeId(mICDCheckInNodeId.Value());
+        params.SetICDMonitoredSubject(mICDMonitoredSubject.Value());
+        params.SetICDClientType(mICDClientType.Value());
+    }
+
+    return params;
+}
+
+CHIP_ERROR PairingManager::Pair(NodeId remoteId, Transport::PeerAddress address)
+{
+    auto params = RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
+
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    auto commissioningParams = GetCommissioningParameters();
+    err                      = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
+
+    return err;
+}
+
+void PairingManager::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_ERROR err)
+{
+    PairingManager * self = reinterpret_cast<PairingManager *>(context);
+    VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnCurrentFabricRemove: context is null"));
+
+    if (err == CHIP_NO_ERROR)
+    {
+        // print to console
+        fprintf(stderr, "Device with Node ID: 0x%lx has been successfully removed.\n", nodeId);
+
+#if defined(PW_RPC_ENABLED)
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(self->CurrentCommissioner().GetFabricIndex(), nodeId);
+        RemoveSynchronizedDevice(nodeId);
+#endif
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Device unpair Failure: " ChipLogFormatX64 " %s", ChipLogValueX64(nodeId), ErrorStr(err));
+    }
+}
+
+void PairingManager::InitCommand()
+{
+    mCommissioner->RegisterPairingDelegate(this);
+    // Clear the CATs in OperationalCredentialsIssuer
+    mCredIssuerCmds->SetCredentialIssuerCATValues(kUndefinedCATs);
+    mDeviceIsICD = false;
+}
+
+CHIP_ERROR PairingManager::PairDeviceWithCode(NodeId nodeId, const char * payload)
+{
+    InitCommand();
+
+    CommissioningParameters commissioningParams = GetCommissioningParameters();
+
+    auto discoveryType = DiscoveryType::kDiscoveryNetworkOnly;
+
+    mNodeId            = nodeId;
+    mOnboardingPayload = payload;
+    return mCommissioner->PairDevice(mNodeId, mOnboardingPayload, commissioningParams, discoveryType);
+}
+
+CHIP_ERROR PairingManager::PairDevice(chip::NodeId nodeId, uint32_t setupPINCode, const char * deviceRemoteIp,
+                                      uint16_t deviceRemotePort)
+{
+    InitCommand();
+    mSetupPINCode = setupPINCode;
+
+    Inet::IPAddress address;
+    Inet::InterfaceId interfaceId;
+
+    if (!ParseAddressWithInterface(deviceRemoteIp, address, interfaceId))
+    {
+        ChipLogError(NotSpecified, "Invalid IP address: %s", deviceRemoteIp);
+        return CHIP_ERROR_INVALID_ADDRESS;
+    }
+
+    return Pair(nodeId, Transport::PeerAddress::UDP(address, deviceRemotePort, interfaceId));
+}
+
+CHIP_ERROR PairingManager::UnpairDevice(NodeId nodeId)
+{
+    InitCommand();
+
+    mCurrentFabricRemover = Platform::MakeUnique<Controller::CurrentFabricRemover>(mCommissioner);
+    return mCurrentFabricRemover->RemoveCurrentFabric(nodeId, &mCurrentFabricRemoveCallback);
 }

@@ -19,7 +19,6 @@
 #pragma once
 
 #include <commands/common/CHIPCommand.h>
-#include <commands/pairing/PairingCommand.h>
 #include <device_manager/PairingManager.h>
 
 // Constants

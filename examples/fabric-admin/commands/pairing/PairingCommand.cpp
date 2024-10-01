@@ -442,12 +442,6 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
         ChipLogProgress(NotSpecified, "Device commissioning Failure: %s", ErrorStr(err));
     }
 
-    if (mCommissioningDelegate)
-    {
-        mCommissioningDelegate->OnCommissioningComplete(nodeId, err);
-        this->UnregisterCommissioningDelegate();
-    }
-
     SetCommandExitStatus(err);
 }
 
@@ -573,13 +567,6 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
     else
     {
         ChipLogProgress(NotSpecified, "Device unpair Failure: " ChipLogFormatX64 " %s", ChipLogValueX64(nodeId), ErrorStr(err));
-    }
-
-    PairingDelegate * pairingDelegate = command->GetPairingDelegate();
-    if (pairingDelegate)
-    {
-        pairingDelegate->OnDeviceRemoved(nodeId, err);
-        command->UnregisterPairingDelegate();
     }
 
     command->SetCommandExitStatus(err);
