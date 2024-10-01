@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <optional>
 #include <pw_unit_test/framework.h>
 
 #include <app/codegen-data-model-provider/tests/EmberInvokeOverride.h>
@@ -85,6 +86,15 @@ constexpr CommandId kMockCommandId2 = 0x1122;
 constexpr EndpointId kEndpointIdThatIsMissing = kMockEndpointMin - 1;
 
 constexpr AttributeId kReadOnlyAttributeId = 0x5001;
+
+constexpr DeviceTypeId kDeviceTypeId1   = 123;
+constexpr uint8_t kDeviceTypeId1Version = 10;
+
+constexpr DeviceTypeId kDeviceTypeId2   = 1122;
+constexpr uint8_t kDeviceTypeId2Version = 11;
+
+constexpr DeviceTypeId kDeviceTypeId3   = 3;
+constexpr uint8_t kDeviceTypeId3Version = 33;
 
 static_assert(kEndpointIdThatIsMissing != kInvalidEndpointId);
 static_assert(kEndpointIdThatIsMissing != kMockEndpoint1);
@@ -270,6 +280,10 @@ const MockNodeConfig gTestNodeConfig({
         MockClusterConfig(MockClusterId(2), {
             ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
         }),
+    }, {
+        { kDeviceTypeId1, kDeviceTypeId1Version},
+        { kDeviceTypeId2, kDeviceTypeId2Version},
+        { kDeviceTypeId3, kDeviceTypeId3Version},
     }),
     MockEndpointConfig(kMockEndpoint2, {
         MockClusterConfig(MockClusterId(1), {
@@ -296,6 +310,8 @@ const MockNodeConfig gTestNodeConfig({
             {11}, /* acceptedCommands */
             {4, 6}   /* generatedCommands */
         ),
+    }, {
+        { kDeviceTypeId2, kDeviceTypeId2Version},
     }),
     MockEndpointConfig(kMockEndpoint3, {
         MockClusterConfig(MockClusterId(1), {
@@ -2579,4 +2595,45 @@ TEST(TestCodegenModelViaMocks, EmberWriteInvalidDataType)
     // Without AAI, we expect a data type error (translated to failure)
     ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::Failure);
     ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
+}
+
+TEST(TestCodegenModelViaMocks, DeviceTypeIteration)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    // Mock endpoint 1 has 3 device types
+    std::optional<DeviceTypeEntry> entry = model.FirstDeviceType(kMockEndpoint1);
+    ASSERT_EQ(entry,
+              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId1, .deviceTypeVersion = kDeviceTypeId1Version }));
+    entry = model.NextDeviceType(kMockEndpoint1, *entry);
+    ASSERT_EQ(entry,
+              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeVersion = kDeviceTypeId2Version }));
+    entry = model.NextDeviceType(kMockEndpoint1, *entry);
+    ASSERT_EQ(entry,
+              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId3, .deviceTypeVersion = kDeviceTypeId3Version }));
+    entry = model.NextDeviceType(kMockEndpoint1, *entry);
+    ASSERT_FALSE(entry.has_value());
+
+    // Mock endpoint 2 has 1 device types
+    entry = model.FirstDeviceType(kMockEndpoint2);
+    ASSERT_EQ(entry,
+              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeVersion = kDeviceTypeId2Version }));
+    entry = model.NextDeviceType(kMockEndpoint2, *entry);
+    ASSERT_FALSE(entry.has_value());
+
+    // out of order query works
+    entry = std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId2, .deviceTypeVersion = kDeviceTypeId2Version });
+    entry = model.NextDeviceType(kMockEndpoint1, *entry);
+    ASSERT_EQ(entry,
+              std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId3, .deviceTypeVersion = kDeviceTypeId3Version }));
+
+    // invalid query fails
+    entry = std::make_optional(DeviceTypeEntry{ .deviceTypeId = kDeviceTypeId1, .deviceTypeVersion = kDeviceTypeId1Version });
+    entry = model.NextDeviceType(kMockEndpoint2, *entry);
+    ASSERT_FALSE(entry.has_value());
+
+    // empty endpoint works
+    entry = model.FirstDeviceType(kMockEndpoint3);
+    ASSERT_FALSE(entry.has_value());
 }

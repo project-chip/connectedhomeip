@@ -110,6 +110,11 @@ struct DeviceTypeEntry
 {
     DeviceTypeId deviceTypeId;
     uint8_t deviceTypeVersion;
+
+    bool operator==(const DeviceTypeEntry & other) const
+    {
+        return (deviceTypeId == other.deviceTypeId) && (deviceTypeVersion == other.deviceTypeVersion);
+    }
 };
 
 /// Provides metadata information for a data model

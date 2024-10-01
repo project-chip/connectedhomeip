@@ -313,16 +313,26 @@ DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & a
     return &dataVersion;
 }
 
-chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpoint, CHIP_ERROR & err)
+chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpointId, CHIP_ERROR & err)
 {
-    // TODO: implement
-    return chip::Span<const EmberAfDeviceType>();
+    auto endpoint = GetMockNodeConfig().endpointById(endpointId);
+
+    if (endpoint == nullptr)
+    {
+        return chip::Span<const EmberAfDeviceType>();
+    }
+
+    return endpoint->deviceTypes();
 }
 
 chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsigned index, CHIP_ERROR & err)
 {
-    // TODO: implement
-    return chip::Span<const EmberAfDeviceType>();
+    if (index >= GetMockNodeConfig().endpoints.size())
+    {
+        return chip::Span<const EmberAfDeviceType>();
+    }
+
+    return GetMockNodeConfig().endpoints[index].deviceTypes();
 }
 
 void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
