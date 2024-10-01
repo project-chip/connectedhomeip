@@ -60,7 +60,9 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0753" name="Joint Fabric PKI"/>
+    <clusterId id="0x0753" name="Joint Fabric PKI">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="JFPKI" scope="Node"/>
   <dataTypes>
@@ -121,18 +123,17 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="400"/>
       </field>
     </command>
-    <command id="0x02" name="Transfer Anchor Request Command" direction="commandToClient" response="Transfer Anchor Response Command">
+    <command id="0x02" name="Transfer Anchor Request Command" direction="commandToServer" response="Transfer Anchor Response Command">
       <access invokePrivilege="admin"/>
       <mandatoryConform/>
     </command>
-    <command id="0x03" name="Transfer Anchor Response Command" direction="responseFromClient">
-      <access invokePrivilege="admin"/>
+    <command id="0x03" name="Transfer Anchor Response Command" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="ref_TransferAnchorResponseStatusCode" type="Transfer Anchor Response Status Enum">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x04" name="Transfer Anchor Complete Command" direction="commandToClient" response="Y">
+    <command id="0x04" name="Transfer Anchor Complete Command" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform/>
     </command>
