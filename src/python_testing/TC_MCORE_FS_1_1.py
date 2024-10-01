@@ -38,8 +38,8 @@ import time
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from matter_testing_support.tasks import Subprocess
 from matter_testing_support.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support.tasks import Subprocess
 from mobly import asserts
 
 
