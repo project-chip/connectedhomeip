@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include "app/data-model-provider/ActionReturnStatus.h"
+#include "lib/support/CodeUtils.h"
 #include "lib/support/StringBuilder.h"
 #include <app/reporting/Read-Checked.h>
 
@@ -158,6 +159,23 @@ ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const Ac
                                                           DataModelCallbacks::OperationOrder::Post, path);
 
     return statusDm;
+}
+
+bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion)
+{
+    bool emberResult = EmberImpl::IsClusterDataVersionEqualTo(dataModel, path, dataVersion);
+    bool dmResult    = DataModelImpl::IsClusterDataVersionEqualTo(dataModel, path, dataVersion);
+
+    if (emberResult != dmResult)
+    {
+        ChipLogError(Test, "Different data model check result between ember (%s) and data model provider(%s)",
+                     emberResult ? "TRUE" : "FALSE", dmResult ? "TRUE" : "FALSE");
+#if CHIP_CONFIG_DATA_MODEL_CHECK_DIE_ON_FAILURE
+        chipDie();
+#endif
+    }
+
+    return dmResult;
 }
 
 } // namespace CheckedImpl

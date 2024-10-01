@@ -24,6 +24,7 @@
  */
 
 #include "app/data-model-provider/ActionReturnStatus.h"
+#include "app/reporting/Read-Checked.h"
 #include <app/icd/server/ICDServerConfig.h>
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
@@ -72,8 +73,10 @@ bool Engine::IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFil
         if (aPath.mEndpointId == filter->mValue.mEndpointId && aPath.mClusterId == filter->mValue.mClusterId)
         {
             existPathMatch = true;
-            if (!IsClusterDataVersionEqual(ConcreteClusterPath(filter->mValue.mEndpointId, filter->mValue.mClusterId),
-                                           filter->mValue.mDataVersion.Value()))
+
+            if (!Impl::IsClusterDataVersionEqualTo(mpImEngine->GetDataModelProvider(),
+                                                   ConcreteClusterPath(filter->mValue.mEndpointId, filter->mValue.mClusterId),
+                                                   filter->mValue.mDataVersion.Value()))
             {
                 existVersionMismatch = true;
             }
@@ -1027,6 +1030,6 @@ void Engine::MarkDirty(const AttributePathParams & path)
 // TODO: MatterReportingAttributeChangeCallback should just live in libCHIP,
 // instead of being in ember-compatibility-functions.  It does not depend on any
 // app-specific generated bits.
-void __attribute__((weak))
-MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
+void __attribute__((weak)) MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                  chip::AttributeId attributeId)
 {}

@@ -16,6 +16,9 @@
  */
 #pragma once
 
+#include "app/ConcreteClusterPath.h"
+#include "app/util/ember-compatibility-functions.h"
+#include "lib/core/DataModelTypes.h"
 #include <access/SubjectDescriptor.h>
 #include <app/AttributeEncodeState.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -32,6 +35,8 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
                                                   const Access::SubjectDescriptor & subjectDescriptor, bool isFabricFiltered,
                                                   AttributeReportIBs::Builder & reportBuilder,
                                                   const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState);
+
+bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion);
 
 } // namespace EmberImpl
 } // namespace reporting
