@@ -23,9 +23,9 @@
  *
  */
 
-#include "app/data-model-provider/ActionReturnStatus.h"
-#include "app/reporting/Read-Checked.h"
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/icd/server/ICDServerConfig.h>
+#include <app/reporting/Read-Checked.h>
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
