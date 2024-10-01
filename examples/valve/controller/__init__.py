@@ -1,5 +1,6 @@
 from enum import StrEnum
 from chip import ChipDeviceCtrl
+from chip.clusters.Types import NullValue
 import chip.clusters as Clusters
 
 
@@ -73,3 +74,11 @@ class DrinkMachine:
             time = amount.time()
             await self.dev_ctrl.SendCommand(nodeid=self.node_id, endpoint=ep,
                                             payload=Clusters.ValveConfigurationAndControl.Commands.Open(openDuration=time))
+
+    async def prime(self, endpoint: int):
+        await self.dev_ctrl.SendCommand(nodeid=self.node_id, endpoint=endpoint,
+                                        payload=Clusters.ValveConfigurationAndControl.Commands.Open(openDuration=NullValue))
+
+    async def stop(self, endpoint: int):
+        await self.dev_ctrl.SendCommand(nodeid=self.node_id, endpoint=endpoint,
+                                        payload=Clusters.ValveConfigurationAndControl.Commands.Close())
