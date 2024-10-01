@@ -144,7 +144,7 @@ CHIP_ERROR AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & data)
     return WaitForResponse(call);
 }
 
-CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId)
+CHIP_ERROR RemoveSynchronizedDevice(NodeId nodeId)
 {
     ChipLogProgress(NotSpecified, "RemoveSynchronizedDevice");
 
@@ -164,7 +164,7 @@ CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId)
     return WaitForResponse(call);
 }
 
-CHIP_ERROR ActiveChanged(chip::NodeId nodeId, uint32_t promisedActiveDurationMs)
+CHIP_ERROR ActiveChanged(NodeId nodeId, uint32_t promisedActiveDurationMs)
 {
     ChipLogProgress(NotSpecified, "ActiveChanged");
 

@@ -34,7 +34,7 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
-                                    per_endpoint_test)
+                                    run_if_endpoint_matches)
 from mobly import asserts
 
 
@@ -109,9 +109,8 @@ class TC_CCTRL_2_3(MatterBaseTest):
     def default_timeout(self) -> int:
         return 3*60
 
-    @per_endpoint_test(has_cluster(Clusters.CommissionerControl))
+    @run_if_endpoint_matches(has_cluster(Clusters.CommissionerControl))
     async def test_TC_CCTRL_2_3(self):
-        self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
 
         self.step(1)
         th_server_fabrics = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
@@ -125,11 +124,11 @@ class TC_CCTRL_2_3(MatterBaseTest):
         self.step(4)
         good_request_id = 0x1234567812345678
         cmd = Clusters.CommissionerControl.Commands.RequestCommissioningApproval(
-            requestId=good_request_id, vendorId=th_server_vid, productId=th_server_pid, label="Test Ecosystem")
+            requestID=good_request_id, vendorID=th_server_vid, productID=th_server_pid, label="Test Ecosystem")
         await self.send_single_cmd(cmd=cmd)
 
         self.step(5)
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input("Approve Commissioning approval request using manufacturer specified mechanism")
 
         self.step(6)
@@ -137,13 +136,13 @@ class TC_CCTRL_2_3(MatterBaseTest):
         events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
         asserts.assert_equal(len(events), 1, "Unexpected event list len")
         asserts.assert_equal(events[0].Data.statusCode, 0, "Unexpected status code")
-        asserts.assert_equal(events[0].Data.clientNodeId,
+        asserts.assert_equal(events[0].Data.clientNodeID,
                              self.matter_test_config.controller_node_id, "Unexpected client node id")
-        asserts.assert_equal(events[0].Data.requestId, good_request_id, "Unexpected request ID")
+        asserts.assert_equal(events[0].Data.requestID, good_request_id, "Unexpected request ID")
 
         self.step(7)
         cmd = Clusters.CommissionerControl.Commands.RequestCommissioningApproval(
-            requestId=good_request_id, vendorId=th_server_vid, productId=th_server_pid)
+            requestID=good_request_id, vendorID=th_server_vid, productID=th_server_pid)
         try:
             await self.send_single_cmd(cmd=cmd)
             asserts.fail("Unexpected success on CommissionNode")
@@ -151,13 +150,13 @@ class TC_CCTRL_2_3(MatterBaseTest):
             asserts.assert_equal(e.status, Status.Failure, "Incorrect error returned")
 
         self.step(8)
-        cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=good_request_id, responseTimeoutSeconds=30)
+        cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestID=good_request_id, responseTimeoutSeconds=30)
         resp = await self.send_single_cmd(cmd)
         asserts.assert_equal(type(resp), Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow,
                              "Incorrect response type")
 
         self.step(9)
-        cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=good_request_id, responseTimeoutSeconds=30)
+        cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestID=good_request_id, responseTimeoutSeconds=30)
         try:
             await self.send_single_cmd(cmd=cmd)
             asserts.fail("Unexpected success on CommissionNode")

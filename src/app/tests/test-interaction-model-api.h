@@ -91,7 +91,6 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
                                   TLV::TLVReader & aReader, WriteHandler * aWriteHandler);
 const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath);
 
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath);
 Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath);
 
 Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aRequestCommandPath);
@@ -118,12 +117,17 @@ public:
 
     CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
 
+    bool EventPathIncludesAccessibleConcretePath(const EventPathParams & path,
+                                                 const Access::SubjectDescriptor & descriptor) override
+    {
+        return true;
+    }
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
-    DataModel::ActionReturnStatus Invoke(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                                         CommandHandler * handler) override;
+    std::optional<DataModel::ActionReturnStatus> Invoke(const DataModel::InvokeRequest & request,
+                                                        chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     EndpointId FirstEndpoint() override;
     EndpointId NextEndpoint(EndpointId before) override;

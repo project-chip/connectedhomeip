@@ -24,6 +24,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/BLEManager.h>
 
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
@@ -74,6 +75,10 @@ using namespace ::chip::System;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace ::chip::DeviceLayer::DeviceEventType;
 
+// Table 9-50 "Status codes" of IEEE 802.11-2020: Unspecified failure
+// Temporary default status code before SDK API to map wlan_event_reason to IEEE Status codes
+#define WLAN_REFUSED_REASON_UNSPECIFIED 1
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -93,10 +98,6 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     // Initialize the generic base classes that require it.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    StartWiFiManagement();
 #endif
 
     SuccessOrExit(err);
@@ -238,6 +239,10 @@ bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled()
 
 void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
 {
+    WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+    uint8_t associationFailureCause =
+        chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
+
 #if CHIP_DETAIL_LOGGING
     enum wlan_connection_state state;
     int result;
@@ -274,6 +279,12 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
     case WLAN_REASON_CONNECT_FAILED:
         ChipLogError(DeviceLayer, "WLAN (re)connect failed");
         sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAssociationFailed);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, WLAN_REFUSED_REASON_UNSPECIFIED);
+        }
         UpdateInternetConnectivityState();
         break;
 
@@ -281,6 +292,12 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
         ChipLogError(DeviceLayer, "WLAN network not found");
         NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(NetworkCommissioning::Status::kNetworkNotFound,
                                                                                 CharSpan(), wlanEvent);
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kSsidNotFound);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, WLAN_REFUSED_REASON_UNSPECIFIED);
+        }
         break;
 
     case WLAN_REASON_NETWORK_AUTH_FAILED:
@@ -288,6 +305,12 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
         NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(NetworkCommissioning::Status::kAuthFailure,
                                                                                 CharSpan(), wlanEvent);
         ChipLogError(DeviceLayer, "Authentication to WLAN network failed end");
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAuthenticationFailed);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, WLAN_REFUSED_REASON_UNSPECIFIED);
+        }
         break;
 
     case WLAN_REASON_LINK_LOST:
@@ -296,6 +319,10 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
         {
             sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
             sInstance.OnStationDisconnected();
+            if (delegate)
+            {
+                delegate->OnAssociationFailureDetected(associationFailureCause, WLAN_REFUSED_REASON_UNSPECIFIED);
+            }
         }
         break;
 
@@ -303,6 +330,10 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
         ChipLogProgress(DeviceLayer, "Disconnected from WLAN network");
         sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
         sInstance.OnStationDisconnected();
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, WLAN_REFUSED_REASON_UNSPECIFIED);
+        }
         break;
 
     case WLAN_REASON_INITIALIZED:
@@ -334,6 +365,13 @@ void ConnectivityManagerImpl::OnStationConnected()
 
     /* Update the connectivity state in case the connected event has been received after getting an IP addr */
     UpdateInternetConnectivityState();
+    WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+
+    if (delegate)
+    {
+        delegate->OnConnectionStatusChanged(
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kConnected));
+    }
 }
 
 void ConnectivityManagerImpl::OnStationDisconnected()
@@ -343,6 +381,14 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Lost;
     (void) PlatformMgr().PostEvent(&event);
+
+    WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+
+    if (delegate)
+    {
+        delegate->OnConnectionStatusChanged(
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kNotConnected));
+    }
 
     /* Update the connectivity state in case the connected event has been received after getting an IP addr */
     UpdateInternetConnectivityState();
@@ -613,6 +659,15 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, uint
     VerifyOrExit(pNetworkData != NULL, ret = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(ssidLen <= IEEEtypes_SSID_SIZE, ret = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mWiFiStationState != kWiFiStationState_Connecting, ret = CHIP_ERROR_BUSY);
+
+    // Need to enable the WIFI interface here when Thread is enabled as a secondary network interface. We don't want to enable
+    // WIFI from the init phase anymore and we will only do it in case the commissioner is provisioning the device with
+    // the WIFI credentials.
+    if (mWifiManagerInit == false)
+    {
+        StartWiFiManagement();
+        mWifiManagerInit = true;
+    }
 
     memset(pNetworkData, 0, sizeof(struct wlan_network));
 

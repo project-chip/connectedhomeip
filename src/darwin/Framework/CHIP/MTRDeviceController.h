@@ -198,6 +198,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Adds a Delegate to the device controller as well as the Queue on which the Delegate callbacks will be triggered
  *
+ * Multiple delegates can be added to monitor MTRDeviceController state changes. Note that there should only
+ * be one delegate that responds to pairing related callbacks.
+ *
+ * If a delegate is added a second time, the call would be ignored.
+ *
+ * All delegates are held by weak references, and so if a delegate object goes away, it will be automatically removed.
+ *
  * @param[in] delegate The delegate the commissioning process should use
  *
  * @param[in] queue The queue on which the callbacks will be delivered

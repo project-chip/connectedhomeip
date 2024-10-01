@@ -19,8 +19,8 @@
 #pragma once
 
 #include <commands/common/CHIPCommand.h>
-#include <commands/pairing/OpenCommissioningWindowCommand.h>
 #include <commands/pairing/PairingCommand.h>
+#include <device_manager/PairingManager.h>
 
 // Constants
 constexpr uint32_t kCommissionPrepareTimeMs = 500;

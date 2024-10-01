@@ -78,9 +78,9 @@ and global variables in the shared memory area from `NBU` domain.
 
 Note: These instances and global variables are placed in `SMU2` memory through
 name matching in the application linker script. They should not be changed or,
-if changed, the names must be updated in `k32w1_app.ld`. See
-[k32w1_app.ld](../../../platform/nxp/k32w1/app/ldscripts/k32w1_app.ld) for names
-and `SMU2` memory range size.
+if changed, the names must be updated in `app.ld`. See
+[app.ld](../../../platform/nxp/mcxw71_k32w1/app/ldscripts/app.ld) for names and
+`SMU2` memory range size.
 
 When compiling the application as an OT Full Thread Device
 (`chip_openthread_ftd=true`), using `use_smu2_static=true` gn arg will cause the
@@ -220,8 +220,8 @@ by running:
 The console should have already been installed in the virtual environment. From
 the `chip-console`, a user can send specific commands to the device.
 
-For button commands, please run `rpcs.chip.rpc.Button.Event(index)` based on the
-table below:
+For button commands, please run `rpcs.chip.rpc.Button.Event(idx=index)` based on
+the table below:
 
 | index | action                                        |
 | ----- | --------------------------------------------- |

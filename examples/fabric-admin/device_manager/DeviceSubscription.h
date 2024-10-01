@@ -23,8 +23,10 @@
 
 #include <memory>
 
+#if defined(PW_RPC_ENABLED)
 #include "fabric_bridge_service/fabric_bridge_service.pb.h"
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
+#endif
 
 class DeviceSubscriptionManager;
 
@@ -32,7 +34,7 @@ class DeviceSubscriptionManager;
 /// via RPC when change has been identified.
 ///
 /// An instance of DeviceSubscription is intended to be used only once. Once a DeviceSubscription is
-/// terminal, either from an error or from subscriptions getting shut down, we expect the instance
+/// terminated, either from an error or from subscriptions getting shut down, we expect the instance
 /// to be deleted. Any new subscription should instantiate another instance of DeviceSubscription.
 class DeviceSubscription : public chip::app::ReadClient::Callback
 {
@@ -78,13 +80,18 @@ private:
     void MoveToState(const State aTargetState);
     const char * GetStateStr() const;
 
+    chip::NodeId mNodeId = chip::kUndefinedNodeId;
+
     OnDoneCallback mOnDoneCallback;
     std::unique_ptr<chip::app::ReadClient> mClient;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
+#if defined(PW_RPC_ENABLED)
     chip_rpc_AdministratorCommissioningChanged mCurrentAdministratorCommissioningAttributes;
+#endif
+
     bool mChangeDetected = false;
     State mState         = State::Idle;
 };
