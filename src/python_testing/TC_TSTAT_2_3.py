@@ -40,7 +40,7 @@ cluster = Clusters.Thermostat
 class TC_TSTAT_2_3(MatterBaseTest):
     def desc_TC_TSTAT_2_3(self) -> str:
         """Returns a description of this test"""
-        return "[TC-TSTAT-2.3] Setpoint Deadband Test Cases with server as DUT""
+        return "[TC-TSTAT-2.3] Setpoint Deadband Test Cases with server as DUT"
 
     def pics_TC_TSTAT_2_3(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
