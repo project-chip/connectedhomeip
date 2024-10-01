@@ -1030,6 +1030,6 @@ void Engine::MarkDirty(const AttributePathParams & path)
 // TODO: MatterReportingAttributeChangeCallback should just live in libCHIP,
 // instead of being in ember-compatibility-functions.  It does not depend on any
 // app-specific generated bits.
-void __attribute__((weak)) MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                  chip::AttributeId attributeId)
+void __attribute__((weak))
+MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {}
