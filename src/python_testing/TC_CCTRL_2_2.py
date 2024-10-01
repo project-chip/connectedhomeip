@@ -127,8 +127,6 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
     @run_if_endpoint_matches(has_cluster(Clusters.CommissionerControl))
     async def test_TC_CCTRL_2_2(self):
-        self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
-
         self.step(1)
         th_server_fabrics = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
         self.step(2)
@@ -192,7 +190,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         await self.send_single_cmd(cmd)
 
         self.step(12)
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input("Approve Commissioning approval request using manufacturer specified mechanism")
 
         self.step(13)
@@ -248,7 +246,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(19)
         logging.info("Test now waits for 30 seconds")
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             time.sleep(30)
 
         self.step(20)
@@ -267,7 +265,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         await self.send_single_cmd(cmd)
 
         self.step(23)
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input("Approve Commissioning approval request using manufacturer specified mechanism")
 
         self.step(24)
@@ -295,13 +293,13 @@ class TC_CCTRL_2_2(MatterBaseTest):
         await self.send_single_cmd(cmd, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, timedRequestTimeoutMs=5000)
 
         self.step(27)
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             time.sleep(30)
 
         self.step(28)
         th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
         # TODO: this should be mocked too.
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             asserts.assert_equal(len(th_server_fabrics) + 1, len(th_server_fabrics_new),
                                  "Unexpected number of fabrics on TH_SERVER")
 

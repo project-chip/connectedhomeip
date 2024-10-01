@@ -133,7 +133,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             ),
         )
 
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input("Approve Commissioning Approval Request on DUT using manufacturer specified mechanism")
 
         resp = await self.send_single_cmd(
@@ -161,7 +161,6 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_3(self):
-        self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
 
         # Commissioning - done
         self.step(0)

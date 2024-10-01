@@ -142,7 +142,6 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_1(self):
-        self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         # TODO this value should either be determined or passed in from command line
         dut_commissioning_control_endpoint = 0
         self.step(1)
@@ -161,7 +160,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
             requestID=good_request_id, vendorID=th_fsa_server_vid, productID=th_fsa_server_pid, label="Test Ecosystem")
         await self.send_single_cmd(cmd, endpoint=dut_commissioning_control_endpoint)
 
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input("Approve Commissioning approval request on DUT using manufacturer specified mechanism")
 
         if not events:
@@ -190,12 +189,12 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         await self.send_single_cmd(cmd, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, timedRequestTimeoutMs=5000)
 
         self.step("3c")
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             time.sleep(30)
 
         th_fsa_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
         # TODO: this should be mocked too.
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             asserts.assert_equal(len(th_fsa_server_fabrics) + 1, len(th_fsa_server_fabrics_new),
                                  "Unexpected number of fabrics on TH_SERVER")
 

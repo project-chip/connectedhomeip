@@ -356,9 +356,8 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         # TODO: Turn this off after TE2
         # https://github.com/project-chip/connectedhomeip/issues/34615
         ignore_in_progress = self.user_params.get("ignore_in_progress", True)
-        is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         allow_provisional = self.user_params.get("allow_provisional", False)
-        success, problems = self.check_conformance(ignore_in_progress, is_ci, allow_provisional)
+        success, problems = self.check_conformance(ignore_in_progress, self.is_pics_sdk_ci_only, allow_provisional)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with conformance")

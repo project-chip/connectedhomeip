@@ -203,7 +203,6 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_4(self):
-        self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
 
         # Commissioning - done
         self.step(0)
@@ -306,7 +305,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         self.step(4)
 
         # Commissioning TH_FSA_BRIDGE to DUT_FSA fabric.
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input(
                 f"Commission TH_FSA's aggregator on DUT using manufacturer specified mechanism.\n"
                 f"Use the following parameters:\n"
@@ -334,7 +333,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         ))
 
         # Synchronize TH_SERVER_NO_UID from TH_FSA to DUT_FSA fabric.
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input(
                 f"Synchronize endpoint from TH_FSA's aggregator to DUT using manufacturer specified mechanism.\n"
                 f"Use the following parameters:\n"

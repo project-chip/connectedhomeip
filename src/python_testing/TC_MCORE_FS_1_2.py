@@ -157,7 +157,6 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_2(self):
-        self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
 
         min_report_interval_sec = self.user_params.get("min_report_interval_sec", 0)
         max_report_interval_sec = self.user_params.get("max_report_interval_sec", 30)
@@ -185,7 +184,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         asserts.assert_true(type_matches(step_1_dut_parts_list, list), "PartsList is expected to be a list")
 
         self.step(2)
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             self._ask_for_vendor_commissioning_ux_operation(self.th_server_setup_params)
         else:
             self.dut_fsa_stdin.write(

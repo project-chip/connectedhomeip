@@ -175,7 +175,6 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
 
     @async_test_body
     async def test_TC_DA_1_2(self):
-        is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         cd_cert_dir = self.user_params.get("cd_cert_dir", 'credentials/development/cd-certs')
         post_cert_test = self.user_params.get("post_cert_test", False)
 
@@ -311,7 +310,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(format_version, 1, "Format version is incorrect")
         self.step("6.2")
         asserts.assert_equal(vendor_id, basic_info_vendor_id, "Vendor ID is incorrect")
-        if not is_ci:
+        if not self.is_pics_sdk_ci_only:
             asserts.assert_in(vendor_id, range(1, 0xfff0), "Vendor ID is out of range")
         self.step("6.3")
         asserts.assert_true(basic_info_product_id in product_id_array, "Product ID not found in CD product array")
@@ -328,7 +327,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
         self.step("6.9")
         if post_cert_test:
             asserts.assert_equal(certification_type, 2, "Certification declaration is not marked as production.")
-        elif is_ci:
+        elif self.is_pics_sdk_ci_only:
             asserts.assert_in(certification_type, [0, 1, 2], "Certification type is out of range")
         else:
             asserts.assert_in(certification_type, [1, 2], "Certification type is out of range")
