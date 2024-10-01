@@ -37,7 +37,7 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-asan-clang]
+                build_variant: [no-ble-no-shell-asan-clang]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
 
