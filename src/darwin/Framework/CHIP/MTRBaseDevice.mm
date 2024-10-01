@@ -2315,9 +2315,9 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRAttributeRequestPath endpoint %u cluster %u attribute %u>",
-                     (uint16_t) _endpoint.unsignedShortValue, (uint32_t) _cluster.unsignedLongValue,
-                     (uint32_t) _attribute.unsignedLongValue];
+    return [NSString stringWithFormat:@"<MTRAttributeRequestPath endpoint %u cluster 0x%llx (%llu) attribute 0x%llx (%llu)>",
+                     _endpoint.unsignedShortValue, _cluster.unsignedLongLongValue, _cluster.unsignedLongLongValue,
+                     _attribute.unsignedLongLongValue, _attribute.unsignedLongLongValue];
 }
 
 + (MTRAttributeRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
@@ -2439,9 +2439,9 @@ static NSString * const sAttributeIDKey = @"attributeIDKey";
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTREventRequestPath endpoint %u cluster %u event %u>",
-                     (uint16_t) _endpoint.unsignedShortValue, (uint32_t) _cluster.unsignedLongValue,
-                     (uint32_t) _event.unsignedLongValue];
+    return [NSString stringWithFormat:@"<MTREventRequestPath endpoint %u cluster 0x%llx (%llu) event 0x%llx (%llu)>",
+                     _endpoint.unsignedShortValue, _cluster.unsignedLongLongValue, _cluster.unsignedLongLongValue,
+                     _event.unsignedLongLongValue, _event.unsignedLongLongValue];
 }
 
 + (MTREventRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
@@ -2561,8 +2561,8 @@ static NSString * const sEventAttributeIDKey = @"attributeIDKey";
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRClusterPath endpoint %u cluster %u>", (uint16_t) _endpoint.unsignedShortValue,
-                     (uint32_t) _cluster.unsignedLongValue];
+    return [NSString stringWithFormat:@"<MTRClusterPath endpoint %u cluster 0x%llx (%llu)>", _endpoint.unsignedShortValue,
+                     _cluster.unsignedLongLongValue, _cluster.unsignedLongLongValue];
 }
 
 + (MTRClusterPath *)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
@@ -2646,9 +2646,9 @@ static NSString * const sClusterKey = @"clusterKey";
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRAttributePath endpoint %u cluster %u attribute %u>",
-                     (uint16_t) self.endpoint.unsignedShortValue, (uint32_t) self.cluster.unsignedLongValue,
-                     (uint32_t) _attribute.unsignedLongValue];
+    return [NSString stringWithFormat:@"<MTRAttributePath endpoint %u cluster 0x%llx (%llu) attribute 0x%llx (%llu)>",
+                     self.endpoint.unsignedShortValue, self.cluster.unsignedLongLongValue, self.cluster.unsignedLongLongValue,
+                     _attribute.unsignedLongLongValue, _attribute.unsignedLongLongValue];
 }
 
 + (MTRAttributePath *)attributePathWithEndpointID:(NSNumber *)endpointID
@@ -2743,8 +2743,8 @@ static NSString * const sAttributeKey = @"attributeKey";
 - (NSString *)description
 {
     return
-        [NSString stringWithFormat:@"<MTREventPath endpoint %u cluster %u event %u>", (uint16_t) self.endpoint.unsignedShortValue,
-                  (uint32_t) self.cluster.unsignedLongValue, (uint32_t) _event.unsignedLongValue];
+        [NSString stringWithFormat:@"<MTREventPath endpoint %u cluster 0x%llx (%llu) event 0x%llx (%llu)>", self.endpoint.unsignedShortValue,
+                  self.cluster.unsignedLongLongValue, self.cluster.unsignedLongLongValue, _event.unsignedLongLongValue, _event.unsignedLongLongValue];
 }
 
 + (MTREventPath *)eventPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID
@@ -2833,8 +2833,9 @@ static NSString * const sEventKey = @"eventKey";
 - (NSString *)description
 {
     return
-        [NSString stringWithFormat:@"<MTRCommandPath endpoint %u cluster %lu command %lu>", self.endpoint.unsignedShortValue,
-                  self.cluster.unsignedLongValue, _command.unsignedLongValue];
+        [NSString stringWithFormat:@"<MTRCommandPath endpoint %u cluster 0x%llx (%llu) command 0x%llx (%llu)>", self.endpoint.unsignedShortValue,
+                  self.cluster.unsignedLongLongValue, self.cluster.unsignedLongLongValue, _command.unsignedLongLongValue,
+                  _command.unsignedLongLongValue];
 }
 
 + (MTRCommandPath *)commandPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID commandID:(NSNumber *)commandID
