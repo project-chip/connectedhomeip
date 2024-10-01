@@ -8773,7 +8773,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _chimeId = @(0);
+        _chimeID = @(0);
 
         _name = @"";
     }
@@ -8784,7 +8784,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRChimeClusterChimeSoundStruct alloc] init];
 
-    other.chimeId = self.chimeId;
+    other.chimeID = self.chimeID;
     other.name = self.name;
 
     return other;
@@ -8792,7 +8792,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chimeId:%@; name:%@; >", NSStringFromClass([self class]), _chimeId, _name];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chimeID:%@; name:%@; >", NSStringFromClass([self class]), _chimeID, _name];
     return descriptionString;
 }
 

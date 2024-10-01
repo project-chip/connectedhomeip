@@ -16918,7 +16918,7 @@ static id _Nullable DecodeAttributeValueForChimeCluster(AttributeId aAttributeId
                 auto & entry_0 = iter_0.GetValue();
                 MTRChimeClusterChimeSoundStruct * newElement_0;
                 newElement_0 = [MTRChimeClusterChimeSoundStruct new];
-                newElement_0.chimeId = [NSNumber numberWithUnsignedChar:entry_0.chimeId];
+                newElement_0.chimeID = [NSNumber numberWithUnsignedChar:entry_0.chimeID];
                 newElement_0.name = AsString(entry_0.name);
                 if (newElement_0.name == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
@@ -16936,8 +16936,8 @@ static id _Nullable DecodeAttributeValueForChimeCluster(AttributeId aAttributeId
         }
         return value;
     }
-    case Attributes::ActiveChimeSoundId::Id: {
-        using TypeInfo = Attributes::ActiveChimeSoundId::TypeInfo;
+    case Attributes::ActiveChimeID::Id: {
+        using TypeInfo = Attributes::ActiveChimeID::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

@@ -36670,7 +36670,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 namespace Chime {
 namespace Attributes {
 
-namespace ActiveChimeSoundId {
+namespace ActiveChimeID {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
 {
@@ -36714,7 +36714,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
     return emberAfWriteAttribute(endpoint, Clusters::Chime::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-} // namespace ActiveChimeSoundId
+} // namespace ActiveChimeID
 
 namespace Enabled {
 

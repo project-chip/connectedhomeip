@@ -13048,7 +13048,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "ActiveChimeSoundId",
+                "attributeName": "ActiveChimeID",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,

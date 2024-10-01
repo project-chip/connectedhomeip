@@ -46515,7 +46515,7 @@ class Chime(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="installedChimeSounds", Tag=0x00000000, Type=typing.List[Chime.Structs.ChimeSoundStruct]),
-                ClusterObjectFieldDescriptor(Label="activeChimeSoundId", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="activeChimeID", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="enabled", Tag=0x00000002, Type=bool),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -46526,7 +46526,7 @@ class Chime(Cluster):
             ])
 
     installedChimeSounds: 'typing.List[Chime.Structs.ChimeSoundStruct]' = None
-    activeChimeSoundId: 'uint' = None
+    activeChimeID: 'uint' = None
     enabled: 'bool' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
@@ -46542,11 +46542,11 @@ class Chime(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="chimeId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="chimeID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
                     ])
 
-            chimeId: 'uint' = 0
+            chimeID: 'uint' = 0
             name: 'str' = ""
 
     class Commands:
@@ -46581,7 +46581,7 @@ class Chime(Cluster):
             value: 'typing.List[Chime.Structs.ChimeSoundStruct]' = field(default_factory=lambda: [])
 
         @dataclass
-        class ActiveChimeSoundId(ClusterAttributeDescriptor):
+        class ActiveChimeID(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000556
