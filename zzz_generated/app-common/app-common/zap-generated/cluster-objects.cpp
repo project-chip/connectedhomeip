@@ -28483,7 +28483,7 @@ namespace ChimeSoundStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kChimeId), chimeId);
+    encoder.Encode(to_underlying(Fields::kChimeID), chimeID);
     encoder.Encode(to_underlying(Fields::kName), name);
     return encoder.Finalize();
 }
@@ -28502,9 +28502,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kChimeId))
+        if (__context_tag == to_underlying(Fields::kChimeID))
         {
-            err = DataModel::Decode(reader, chimeId);
+            err = DataModel::Decode(reader, chimeID);
         }
         else if (__context_tag == to_underlying(Fields::kName))
         {
@@ -28551,8 +28551,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::InstalledChimeSounds::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, installedChimeSounds);
-    case Attributes::ActiveChimeSoundId::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeChimeSoundId);
+    case Attributes::ActiveChimeID::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, activeChimeID);
     case Attributes::Enabled::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, enabled);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():

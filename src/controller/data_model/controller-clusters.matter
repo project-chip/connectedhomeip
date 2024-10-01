@@ -9413,12 +9413,12 @@ provisional cluster Chime = 1366 {
   revision 1;
 
   struct ChimeSoundStruct {
-    int8u chimeId = 0;
+    int8u chimeID = 0;
     char_string<48> name = 1;
   }
 
   readonly attribute ChimeSoundStruct installedChimeSounds[] = 0;
-  attribute int8u activeChimeSoundId = 1;
+  attribute int8u activeChimeID = 1;
   attribute boolean enabled = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;

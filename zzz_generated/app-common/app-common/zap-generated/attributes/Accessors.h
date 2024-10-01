@@ -5566,11 +5566,11 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 namespace Chime {
 namespace Attributes {
 
-namespace ActiveChimeSoundId {
+namespace ActiveChimeID {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
-} // namespace ActiveChimeSoundId
+} // namespace ActiveChimeID
 
 namespace Enabled {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean

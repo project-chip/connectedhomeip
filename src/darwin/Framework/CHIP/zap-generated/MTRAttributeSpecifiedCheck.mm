@@ -5919,7 +5919,7 @@ static BOOL AttributeIsSpecifiedInChimeCluster(AttributeId aAttributeId)
     case Attributes::InstalledChimeSounds::Id: {
         return YES;
     }
-    case Attributes::ActiveChimeSoundId::Id: {
+    case Attributes::ActiveChimeID::Id: {
         return YES;
     }
     case Attributes::Enabled::Id: {

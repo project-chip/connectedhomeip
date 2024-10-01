@@ -18248,17 +18248,17 @@ public class ClusterReadMapping {
           readChimeInstalledChimeSoundsCommandParams
         );
         result.put("readInstalledChimeSoundsAttribute", readChimeInstalledChimeSoundsAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readChimeActiveChimeSoundIdCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readChimeActiveChimeSoundIdAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readChimeActiveChimeIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readChimeActiveChimeIDAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ChimeCluster) cluster).readActiveChimeSoundIdAttribute(
+            ((ChipClusters.ChimeCluster) cluster).readActiveChimeIDAttribute(
               (ChipClusters.IntegerAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readChimeActiveChimeSoundIdCommandParams
+          readChimeActiveChimeIDCommandParams
         );
-        result.put("readActiveChimeSoundIdAttribute", readChimeActiveChimeSoundIdAttributeInteractionInfo);
+        result.put("readActiveChimeIDAttribute", readChimeActiveChimeIDAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readChimeEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readChimeEnabledAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

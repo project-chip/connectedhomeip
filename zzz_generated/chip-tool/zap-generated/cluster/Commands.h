@@ -13654,7 +13654,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * InstalledChimeSounds                                              | 0x0000 |
-| * ActiveChimeSoundId                                                | 0x0001 |
+| * ActiveChimeID                                                     | 0x0001 |
 | * Enabled                                                           | 0x0002 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
@@ -26240,7 +26240,7 @@ void registerClusterChime(Commands & commands, CredentialIssuerCommands * credsI
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "installed-chime-sounds", Attributes::InstalledChimeSounds::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "active-chime-sound-id", Attributes::ActiveChimeSoundId::Id, credsIssuerConfig),    //
+        make_unique<ReadAttribute>(Id, "active-chime-id", Attributes::ActiveChimeID::Id, credsIssuerConfig),               //
         make_unique<ReadAttribute>(Id, "enabled", Attributes::Enabled::Id, credsIssuerConfig),                             //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
@@ -26253,7 +26253,7 @@ void registerClusterChime(Commands & commands, CredentialIssuerCommands * credsI
             WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type>>>(
             Id, "installed-chime-sounds", Attributes::InstalledChimeSounds::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "active-chime-sound-id", 0, UINT8_MAX, Attributes::ActiveChimeSoundId::Id,
+        make_unique<WriteAttribute<uint8_t>>(Id, "active-chime-id", 0, UINT8_MAX, Attributes::ActiveChimeID::Id,
                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "enabled", 0, 1, Attributes::Enabled::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
@@ -26272,7 +26272,7 @@ void registerClusterChime(Commands & commands, CredentialIssuerCommands * credsI
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "installed-chime-sounds", Attributes::InstalledChimeSounds::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "active-chime-sound-id", Attributes::ActiveChimeSoundId::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "active-chime-id", Attributes::ActiveChimeID::Id, credsIssuerConfig),               //
         make_unique<SubscribeAttribute>(Id, "enabled", Attributes::Enabled::Id, credsIssuerConfig),                             //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //

@@ -2119,7 +2119,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRChimeClusterChimeSoundStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull chimeId MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull chimeID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nonnull name MTR_PROVISIONALLY_AVAILABLE;
 @end
 

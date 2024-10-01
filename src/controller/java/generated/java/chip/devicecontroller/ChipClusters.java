@@ -59495,7 +59495,7 @@ public class ChipClusters {
     public static final long CLUSTER_ID = 1366L;
 
     private static final long INSTALLED_CHIME_SOUNDS_ATTRIBUTE_ID = 0L;
-    private static final long ACTIVE_CHIME_SOUND_ID_ATTRIBUTE_ID = 1L;
+    private static final long ACTIVE_CHIME_ID_ATTRIBUTE_ID = 1L;
     private static final long ENABLED_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
@@ -59576,9 +59576,9 @@ public class ChipClusters {
         }, INSTALLED_CHIME_SOUNDS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readActiveChimeSoundIdAttribute(
+    public void readActiveChimeIDAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_CHIME_SOUND_ID_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_CHIME_ID_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59586,21 +59586,21 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ACTIVE_CHIME_SOUND_ID_ATTRIBUTE_ID, true);
+        }, ACTIVE_CHIME_ID_ATTRIBUTE_ID, true);
     }
 
-    public void writeActiveChimeSoundIdAttribute(DefaultClusterCallback callback, Integer value) {
-      writeActiveChimeSoundIdAttribute(callback, value, 0);
+    public void writeActiveChimeIDAttribute(DefaultClusterCallback callback, Integer value) {
+      writeActiveChimeIDAttribute(callback, value, 0);
     }
 
-    public void writeActiveChimeSoundIdAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+    public void writeActiveChimeIDAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), ACTIVE_CHIME_SOUND_ID_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), ACTIVE_CHIME_ID_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
-    public void subscribeActiveChimeSoundIdAttribute(
+    public void subscribeActiveChimeIDAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_CHIME_SOUND_ID_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_CHIME_ID_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59608,7 +59608,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ACTIVE_CHIME_SOUND_ID_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ACTIVE_CHIME_ID_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readEnabledAttribute(

@@ -4382,8 +4382,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         {
         case chip::app::Clusters::Chime::Attributes::InstalledChimeSounds::Id:
             return "InstalledChimeSounds";
-        case chip::app::Clusters::Chime::Attributes::ActiveChimeSoundId::Id:
-            return "ActiveChimeSoundId";
+        case chip::app::Clusters::Chime::Attributes::ActiveChimeID::Id:
+            return "ActiveChimeID";
         case chip::app::Clusters::Chime::Attributes::Enabled::Id:
             return "Enabled";
         case chip::app::Clusters::Chime::Attributes::GeneratedCommandList::Id:
