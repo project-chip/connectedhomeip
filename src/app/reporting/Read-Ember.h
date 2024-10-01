@@ -16,15 +16,14 @@
  */
 #pragma once
 
-#include "app/ConcreteClusterPath.h"
-#include "app/util/ember-compatibility-functions.h"
-#include "lib/core/DataModelTypes.h"
 #include <access/SubjectDescriptor.h>
 #include <app/AttributeEncodeState.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/Provider.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
