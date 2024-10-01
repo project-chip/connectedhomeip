@@ -567,7 +567,8 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
 
 #if defined(PW_RPC_ENABLED)
         app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(command->CurrentCommissioner().GetFabricIndex(), nodeId);
-        RemoveSynchronizedDevice(nodeId);
+        ScopedNodeId scopedNodeId(nodeId, command->CurrentCommissioner().GetFabricIndex());
+        RemoveSynchronizedDevice(scopedNodeId);
 #endif
     }
     else
