@@ -22,10 +22,10 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ChimeClusterChimeSoundStruct(val chimeId: UInt, val name: String) {
+class ChimeClusterChimeSoundStruct(val chimeID: UInt, val name: String) {
   override fun toString(): String = buildString {
     append("ChimeClusterChimeSoundStruct {\n")
-    append("\tchimeId : $chimeId\n")
+    append("\tchimeID : $chimeID\n")
     append("\tname : $name\n")
     append("}\n")
   }
@@ -33,7 +33,7 @@ class ChimeClusterChimeSoundStruct(val chimeId: UInt, val name: String) {
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_CHIME_ID), chimeId)
+      put(ContextSpecificTag(TAG_CHIME_ID), chimeID)
       put(ContextSpecificTag(TAG_NAME), name)
       endStructure()
     }
@@ -45,12 +45,12 @@ class ChimeClusterChimeSoundStruct(val chimeId: UInt, val name: String) {
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChimeClusterChimeSoundStruct {
       tlvReader.enterStructure(tlvTag)
-      val chimeId = tlvReader.getUInt(ContextSpecificTag(TAG_CHIME_ID))
+      val chimeID = tlvReader.getUInt(ContextSpecificTag(TAG_CHIME_ID))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
 
       tlvReader.exitContainer()
 
-      return ChimeClusterChimeSoundStruct(chimeId, name)
+      return ChimeClusterChimeSoundStruct(chimeID, name)
     }
   }
 }

@@ -42240,13 +42240,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                jobject newElement_0_chimeId;
-                std::string newElement_0_chimeIdClassName     = "java/lang/Integer";
-                std::string newElement_0_chimeIdCtorSignature = "(I)V";
-                jint jninewElement_0_chimeId                  = static_cast<jint>(entry_0.chimeId);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_chimeIdClassName.c_str(),
-                                                                           newElement_0_chimeIdCtorSignature.c_str(),
-                                                                           jninewElement_0_chimeId, newElement_0_chimeId);
+                jobject newElement_0_chimeID;
+                std::string newElement_0_chimeIDClassName     = "java/lang/Integer";
+                std::string newElement_0_chimeIDCtorSignature = "(I)V";
+                jint jninewElement_0_chimeID                  = static_cast<jint>(entry_0.chimeID);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_chimeIDClassName.c_str(),
+                                                                           newElement_0_chimeIDCtorSignature.c_str(),
+                                                                           jninewElement_0_chimeID, newElement_0_chimeID);
                 jobject newElement_0_name;
                 LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.name, newElement_0_name));
 
@@ -42269,14 +42269,14 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(chimeSoundStructStructClass_1, chimeSoundStructStructCtor_1, newElement_0_chimeId,
+                newElement_0 = env->NewObject(chimeSoundStructStructClass_1, chimeSoundStructStructCtor_1, newElement_0_chimeID,
                                               newElement_0_name);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
-        case Attributes::ActiveChimeSoundId::Id: {
-            using TypeInfo = Attributes::ActiveChimeSoundId::TypeInfo;
+        case Attributes::ActiveChimeID::Id: {
+            using TypeInfo = Attributes::ActiveChimeID::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

@@ -8148,8 +8148,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"InstalledChimeSounds";
             break;
 
-        case MTRAttributeIDTypeClusterChimeAttributeActiveChimeSoundIdID:
-            result = @"ActiveChimeSoundId";
+        case MTRAttributeIDTypeClusterChimeAttributeActiveChimeIDID:
+            result = @"ActiveChimeID";
             break;
 
         case MTRAttributeIDTypeClusterChimeAttributeEnabledID:

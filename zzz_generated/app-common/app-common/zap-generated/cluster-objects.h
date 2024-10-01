@@ -41201,14 +41201,14 @@ namespace Structs {
 namespace ChimeSoundStruct {
 enum class Fields : uint8_t
 {
-    kChimeId = 0,
+    kChimeID = 0,
     kName    = 1,
 };
 
 struct Type
 {
 public:
-    uint8_t chimeId = static_cast<uint8_t>(0);
+    uint8_t chimeID = static_cast<uint8_t>(0);
     chip::CharSpan name;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -41279,7 +41279,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace InstalledChimeSounds
-namespace ActiveChimeSoundId {
+namespace ActiveChimeID {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -41287,10 +41287,10 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Chime::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveChimeSoundId::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveChimeID::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace ActiveChimeSoundId
+} // namespace ActiveChimeID
 namespace Enabled {
 struct TypeInfo
 {
@@ -41349,8 +41349,8 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::InstalledChimeSounds::TypeInfo::DecodableType installedChimeSounds;
-        Attributes::ActiveChimeSoundId::TypeInfo::DecodableType activeChimeSoundId = static_cast<uint8_t>(0);
-        Attributes::Enabled::TypeInfo::DecodableType enabled                       = static_cast<bool>(0);
+        Attributes::ActiveChimeID::TypeInfo::DecodableType activeChimeID = static_cast<uint8_t>(0);
+        Attributes::Enabled::TypeInfo::DecodableType enabled             = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

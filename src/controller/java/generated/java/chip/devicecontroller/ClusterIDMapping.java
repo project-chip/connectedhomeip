@@ -16889,7 +16889,7 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             InstalledChimeSounds(0L),
-            ActiveChimeSoundId(1L),
+            ActiveChimeID(1L),
             Enabled(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),

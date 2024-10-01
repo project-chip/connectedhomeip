@@ -3473,28 +3473,28 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeContentAppObserverInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("contentAppObserver", writeContentAppObserverInteractionInfo);
     Map<String, InteractionInfo> writeChimeInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeChimeActiveChimeSoundIdCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo chimeactiveChimeSoundIdCommandParameterInfo =
+    Map<String, CommandParameterInfo> writeChimeActiveChimeIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo chimeactiveChimeIDCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             Integer.class, 
             Integer.class 
         );
-    writeChimeActiveChimeSoundIdCommandParams.put(
+    writeChimeActiveChimeIDCommandParams.put(
         "value",
-        chimeactiveChimeSoundIdCommandParameterInfo
+        chimeactiveChimeIDCommandParameterInfo
     );
-    InteractionInfo writeChimeActiveChimeSoundIdAttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo writeChimeActiveChimeIDAttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ChimeCluster) cluster).writeActiveChimeSoundIdAttribute(
+        ((ChipClusters.ChimeCluster) cluster).writeActiveChimeIDAttribute(
           (DefaultClusterCallback) callback,
           (Integer) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeChimeActiveChimeSoundIdCommandParams
+      writeChimeActiveChimeIDCommandParams
     );
-    writeChimeInteractionInfo.put("writeActiveChimeSoundIdAttribute", writeChimeActiveChimeSoundIdAttributeInteractionInfo);
+    writeChimeInteractionInfo.put("writeActiveChimeIDAttribute", writeChimeActiveChimeIDAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeChimeEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo chimeenabledCommandParameterInfo =
         new CommandParameterInfo(

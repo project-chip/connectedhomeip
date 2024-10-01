@@ -5002,10 +5002,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("ChimeId", indent + 1, value.chimeId);
+        CHIP_ERROR err = LogValue("ChimeID", indent + 1, value.chimeID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ChimeId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ChimeID'");
             return err;
         }
     }
@@ -17951,10 +17951,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InstalledChimeSounds", 1, value);
         }
-        case Chime::Attributes::ActiveChimeSoundId::Id: {
+        case Chime::Attributes::ActiveChimeID::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ActiveChimeSoundId", 1, value);
+            return DataModelLogger::LogValue("ActiveChimeID", 1, value);
         }
         case Chime::Attributes::Enabled::Id: {
             bool value;
