@@ -65,11 +65,11 @@ class Subprocess(threading.Thread):
         self.output_match = None
         self.returncode = None
 
-    def _set_output_match(self, patter: Union[str, re.Pattern]):
-        if isinstance(patter, str):
-            self.output_match = re.compile(re.escape(patter.encode()))
+    def _set_output_match(self, pattern: Union[str, re.Pattern]):
+        if isinstance(pattern, str):
+            self.output_match = re.compile(re.escape(pattern.encode()))
         else:
-            self.output_match = patter
+            self.output_match = pattern
 
     def _check_output(self, line: bytes, is_stderr: bool):
         if self.output_match is not None and self.output_match.search(line):
