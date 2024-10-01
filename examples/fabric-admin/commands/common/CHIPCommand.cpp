@@ -184,7 +184,6 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
 
     ReturnLogErrorOnFailure(PairingManager::Instance().Init(&CurrentCommissioner(), mCredIssuerCmds));
 
-
     return CHIP_NO_ERROR;
 }
 
