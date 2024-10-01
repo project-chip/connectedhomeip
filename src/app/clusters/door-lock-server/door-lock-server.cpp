@@ -900,6 +900,21 @@ void DoorLockServer::getCredentialStatusCommandHandler(chip::app::CommandHandler
                               credentialExists);
 }
 
+namespace {
+bool IsAliroCredentialType(CredentialTypeEnum credentialType)
+{
+    switch (credentialType)
+    {
+    case CredentialTypeEnum::kAliroCredentialIssuerKey:
+    case CredentialTypeEnum::kAliroEvictableEndpointKey:
+    case CredentialTypeEnum::kAliroNonEvictableEndpointKey:
+        return true;
+    default:
+        return false;
+    }
+}
+} // anonymous namespace
+
 void DoorLockServer::sendGetCredentialResponse(chip::app::CommandHandler * commandObj,
                                                const chip::app::ConcreteCommandPath & commandPath,
                                                CredentialTypeEnum credentialType, uint16_t credentialIndex,
@@ -921,10 +936,18 @@ void DoorLockServer::sendGetCredentialResponse(chip::app::CommandHandler * comma
         {
             response.lastModifiedFabricIndex.SetNonNull(credentialInfo->lastModifiedBy);
         }
+        if (IsAliroCredentialType(credentialType))
+        {
+            response.credentialData.Emplace(credentialInfo->credentialData);
+        }
     }
     else
     {
         response.userIndex.SetNull();
+        if (IsAliroCredentialType(credentialType))
+        {
+            response.credentialData.Emplace(NullNullable);
+        }
     }
     uint16_t nextCredentialIndex = 0;
     if (findOccupiedCredentialSlot(commandPath.mEndpointId, credentialType, static_cast<uint16_t>(credentialIndex + 1),
@@ -4407,16 +4430,19 @@ CHIP_ERROR DoorLockServer::Read(const ConcreteReadAttributePath & aPath, Attribu
         return ReadAliroSupportedBLEUWBProtocolVersions(aEncoder, delegate);
     }
     case AliroBLEAdvertisingVersion::Id: {
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
         uint8_t bleAdvertisingVersion = delegate->GetAliroBLEAdvertisingVersion();
         ReturnErrorOnFailure(aEncoder.Encode(bleAdvertisingVersion));
         return CHIP_NO_ERROR;
     }
     case NumberOfAliroCredentialIssuerKeysSupported::Id: {
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
         uint16_t numberOfCredentialIssuerKeysSupported = delegate->GetNumberOfAliroCredentialIssuerKeysSupported();
         ReturnErrorOnFailure(aEncoder.Encode(numberOfCredentialIssuerKeysSupported));
         return CHIP_NO_ERROR;
     }
     case NumberOfAliroEndpointKeysSupported::Id: {
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
         uint16_t numberOfEndpointKeysSupported = delegate->GetNumberOfAliroEndpointKeysSupported();
         ReturnErrorOnFailure(aEncoder.Encode(numberOfEndpointKeysSupported));
         return CHIP_NO_ERROR;

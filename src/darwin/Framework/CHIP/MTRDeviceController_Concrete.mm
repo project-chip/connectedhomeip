@@ -31,10 +31,7 @@
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
-#import "MTRDeviceControllerXPCParameters.h"
 #import "MTRDeviceController_Concrete.h"
-#import "MTRDeviceController_XPC.h"
-#import "MTRDeviceController_XPC_Internal.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -148,61 +145,34 @@ using namespace chip::Tracing::DarwinFramework;
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                       error:(NSError * __autoreleasing *)error
 {
-    /// IF YOU ARE ALARMED BY TYPES:  You are right to be alarmed, but do not panic.
-    /// _ORDER MATTERS HERE:_ XPC parameters are a subclass of `MTRDeviceControllerParameters`
-    /// because of the enormous overlap of params.
-    if ([parameters isKindOfClass:MTRDeviceControllerXPCParameters.class]) {
-        if ([parameters isKindOfClass:MTRDeviceControllerMachServiceXPCParameters.class]) {
-            MTRDeviceControllerMachServiceXPCParameters * xpcParameters = (MTRDeviceControllerMachServiceXPCParameters *) parameters;
-            MTR_LOG_DEBUG("%s: got XPC parameters, getting XPC device controller", __PRETTY_FUNCTION__);
-
-            NSString * machServiceName = xpcParameters.machServiceName;
-            MTR_LOG_DEBUG("%s: machServiceName %@", __PRETTY_FUNCTION__, machServiceName);
-
-            MTRDeviceController * xpcDeviceController = [[MTRDeviceController_XPC alloc] initWithMachServiceName:machServiceName options:xpcParameters.connectionOptions];
-
-            /// Being of sound mind, I willfully and voluntarily make this static cast.
-            return static_cast<MTRDeviceController_Concrete *>(xpcDeviceController);
-        } else {
-            MTR_LOG_ERROR("%s: unrecognized XPC parameters class %@", __PRETTY_FUNCTION__, NSStringFromClass(parameters.class));
-
-            // TODO:  there's probably a more appropriate error here.
-            if (error) {
-                *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED];
-            }
-
-            return nil;
-        }
-    } else if ([parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
-        MTR_LOG_DEBUG("%s: got standard parameters, getting standard device controller from factory", __PRETTY_FUNCTION__);
-        auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
-
-        // Start us up normally. MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary.
-        MTRDeviceControllerFactory * factory = MTRDeviceControllerFactory.sharedInstance;
-        id controller = [factory initializeController:self
-                                       withParameters:controllerParameters
-                                                error:error];
-        return controller;
-    } else {
-        // way out of our league
-        MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
+    if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
+        MTR_LOG_ERROR("Expected MTRDeviceControllerParameters but got: %@", parameters);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
         }
         return nil;
     }
+
+    auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
+
+    // Start us up normally. MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary.
+    MTRDeviceControllerFactory * factory = MTRDeviceControllerFactory.sharedInstance;
+    auto * controller = [factory initializeController:self
+                                       withParameters:controllerParameters
+                                                error:error];
+    return controller;
 }
 
-- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
-                             queue:(dispatch_queue_t)queue
-                   storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
-              storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
-               otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
-          otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
-                  uniqueIdentifier:(NSUUID *)uniqueIdentifier
-    concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
-      storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
-                    startSuspended:(BOOL)startSuspended
+- (nullable instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
+                                   queue:(dispatch_queue_t)queue
+                         storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
+                    storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
+                     otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
+                otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
+                        uniqueIdentifier:(NSUUID *)uniqueIdentifier
+          concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
+            storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
+                          startSuspended:(BOOL)startSuspended
 {
     if (self = [super initForSubclasses:startSuspended]) {
         // Make sure our storage is all set up to work as early as possible,
@@ -1159,7 +1129,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     [_factory preWarmCommissioningSession];
 }
 
-- (MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
+- (nullable MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
     auto block = ^MTRBaseDevice *
     {
@@ -1221,30 +1191,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     [deviceToReturn setStorageBehaviorConfiguration:_storageBehaviorConfiguration];
 
     return deviceToReturn;
-}
-
-- (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
-{
-    std::lock_guard lock(*self.deviceMapLock);
-    MTRDevice * deviceToReturn = [self.nodeIDToDeviceMap objectForKey:nodeID];
-    if (!deviceToReturn) {
-        deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
-    }
-
-    return deviceToReturn;
-}
-
-- (void)removeDevice:(MTRDevice *)device
-{
-    std::lock_guard lock(*self.deviceMapLock);
-    auto * nodeID = device.nodeID;
-    MTRDevice * deviceToRemove = [self.nodeIDToDeviceMap objectForKey:nodeID];
-    if (deviceToRemove == device) {
-        [deviceToRemove invalidate];
-        [self.nodeIDToDeviceMap removeObjectForKey:nodeID];
-    } else {
-        MTR_LOG_ERROR("%@ Error: Cannot remove device %p with nodeID %llu", self, device, nodeID.unsignedLongLongValue);
-    }
 }
 
 #ifdef DEBUG
@@ -1358,16 +1304,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                 static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue));
         }];
     return YES;
-}
-
-- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint queue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion
-{
-    [self removeServerEndpointInternal:endpoint queue:queue completion:completion];
-}
-
-- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint
-{
-    [self removeServerEndpointInternal:endpoint queue:nil completion:nil];
 }
 
 - (void)removeServerEndpointInternal:(MTRServerEndpoint *)endpoint queue:(dispatch_queue_t _Nullable)queue completion:(dispatch_block_t _Nullable)completion
@@ -1697,20 +1633,28 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     [self syncRunOnWorkQueue:block error:nil];
 }
 
-- (void)operationalInstanceAdded:(chip::NodeId)nodeID
+- (void)operationalInstanceAdded:(NSNumber *)nodeID
 {
     // Don't use deviceForNodeID here, because we don't want to create the
     // device if it does not already exist.
     os_unfair_lock_lock(self.deviceMapLock);
-    MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:@(nodeID)];
+    MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:nodeID];
     os_unfair_lock_unlock(self.deviceMapLock);
 
     if (device == nil) {
         return;
     }
 
-    ChipLogProgress(Controller, "Notifying device about node 0x" ChipLogFormatX64 " advertising", ChipLogValueX64(nodeID));
-    [device nodeMayBeAdvertisingOperational];
+    // TODO: Can we not just assume this isKindOfClass test is true?  Would be
+    // really nice if we had compile-time checking for this somehow...
+    if (![device isKindOfClass:MTRDevice_Concrete.class]) {
+        MTR_LOG_ERROR("%@ somehow has %@ instead of MTRDevice_Concrete for node ID 0x%016llX (%llu)", self, device, nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue);
+        return;
+    }
+
+    MTR_LOG("%@ Notifying %@ about its node advertising", self, device);
+    auto * concreteDevice = static_cast<MTRDevice_Concrete *>(device);
+    [concreteDevice nodeMayBeAdvertisingOperational];
 }
 
 - (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
@@ -1961,23 +1905,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return success;
 }
 
-- (BOOL)commissionDevice:(uint64_t)deviceID
-     commissioningParams:(MTRCommissioningParameters *)commissioningParams
-                   error:(NSError * __autoreleasing *)error
-{
-    return [self commissionNodeWithID:@(deviceID) commissioningParams:commissioningParams error:error];
-}
-
-- (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
-{
-    return [self cancelCommissioningForNodeID:@(deviceID) error:error];
-}
-
-- (MTRBaseDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error
-{
-    return [self deviceBeingCommissionedWithNodeID:@(deviceId) error:error];
-}
-
 - (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error
 {
     if (duration > UINT16_MAX) {
@@ -2000,11 +1927,11 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
 }
 
-- (NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
-                              duration:(NSUInteger)duration
-                         discriminator:(NSUInteger)discriminator
-                              setupPIN:(NSUInteger)setupPIN
-                                 error:(NSError * __autoreleasing *)error
+- (nullable NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
+                                       duration:(NSUInteger)duration
+                                  discriminator:(NSUInteger)discriminator
+                                       setupPIN:(NSUInteger)setupPIN
+                                          error:(NSError * __autoreleasing *)error
 {
     if (duration > UINT16_MAX) {
         MTR_LOG_ERROR("%@ Error: Duration %lu is too large. Max value %d", self, static_cast<unsigned long>(duration), UINT16_MAX);

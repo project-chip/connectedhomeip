@@ -59,13 +59,17 @@ void RunDecodeFuzz(const std::vector<std::uint8_t> & bytes, chip::Protocols::Id 
     }
 }
 
-// This function allows us to fuzz using one of four protocols; by using FuzzTests's `ElementOf` API, we define an
+// This function allows us to fuzz using all existing protocols; by using FuzzTests's `ElementOf` API, we define an
 // input domain by explicitly enumerating the set of values in it More Info:
 // https://github.com/google/fuzztest/blob/main/doc/domains-reference.md#elementof-domains-element-of
 auto AnyProtocolID()
 {
+    // Adding an Invalid Protocol
+    static constexpr chip::Protocols::Id InvalidProtocolID(chip::VendorId::Common, 2121);
+
     return ElementOf({ chip::Protocols::SecureChannel::Id, chip::Protocols::InteractionModel::Id, chip::Protocols::BDX::Id,
-                       chip::Protocols::UserDirectedCommissioning::Id });
+                       chip::Protocols::UserDirectedCommissioning::Id, chip::Protocols::Echo::Id, chip::Protocols::NotSpecified,
+                       InvalidProtocolID });
 }
 
 FUZZ_TEST(PayloadDecoder, RunDecodeFuzz).WithDomains(Arbitrary<std::vector<std::uint8_t>>(), AnyProtocolID(), Arbitrary<uint8_t>());

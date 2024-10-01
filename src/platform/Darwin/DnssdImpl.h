@@ -43,7 +43,13 @@ struct GenericContext
 {
     ContextType type;
     void * context;
-    DNSServiceRef serviceRef;
+    // When using a GenericContext, if a DNSServiceRef is created successfully
+    // API consumers must ensure that it gets set as serviceRef on the context
+    // immediately, before any other operations that might fail can happen.
+    //
+    // In all cases, once a context has been created, Finalize() must be called
+    // on it to clean it up properly.
+    DNSServiceRef serviceRef = nullptr;
 
     virtual ~GenericContext() {}
 
@@ -69,7 +75,8 @@ public:
     ~MdnsContexts();
     static MdnsContexts & GetInstance() { return sInstance.get(); }
 
-    CHIP_ERROR Add(GenericContext * context, DNSServiceRef sdRef);
+    // The context being added is expected to have a valid serviceRef.
+    CHIP_ERROR Add(GenericContext * context);
     CHIP_ERROR Remove(GenericContext * context);
     CHIP_ERROR RemoveAllOfType(ContextType type);
     CHIP_ERROR Has(GenericContext * context);
@@ -226,6 +233,7 @@ struct InterfaceInfo
     std::vector<Inet::IPAddress> addresses;
     std::string fullyQualifiedDomainName;
     bool isDNSLookUpRequested = false;
+    bool HasAddresses() const { return addresses.size() != 0; };
 };
 
 struct InterfaceKey
@@ -238,6 +246,11 @@ struct InterfaceKey
             ((this->interfaceId == other.interfaceId) && (this->hostname < other.hostname)) ||
             ((this->interfaceId == other.interfaceId) && (this->hostname == other.hostname) &&
              (this->isSRPResult < other.isSRPResult));
+    }
+
+    inline bool operator==(const InterfaceKey & other) const
+    {
+        return this->interfaceId == other.interfaceId && this->hostname == other.hostname && this->isSRPResult == other.isSRPResult;
     }
 
     uint32_t interfaceId;
@@ -303,16 +316,6 @@ struct ResolveContext : public GenericContext
      *
      */
     void CancelSRPTimerIfRunning();
-
-private:
-    /**
-     * Try reporting the results we got on the provided interface index.
-     * Returns true if information was reported, false if not (e.g. if there
-     * were no IP addresses, etc).
-     */
-    bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, const std::string & hostname, bool isSRPResult);
-
-    bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex);
 };
 
 } // namespace Dnssd

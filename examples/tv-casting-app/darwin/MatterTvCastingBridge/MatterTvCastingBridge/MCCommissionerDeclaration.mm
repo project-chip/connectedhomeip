@@ -36,6 +36,7 @@
         _passcodeDialogDisplayed = cppCommissionerDeclaration->GetPasscodeDialogDisplayed();
         _commissionerPasscode = cppCommissionerDeclaration->GetCommissionerPasscode();
         _qRCodeDisplayed = cppCommissionerDeclaration->GetQRCodeDisplayed();
+        _cancelPasscode = cppCommissionerDeclaration->GetCancelPasscode();
     }
     return self;
 }
@@ -46,6 +47,7 @@
         passcodeDialogDisplayed:(BOOL)passcodeDialogDisplayed
            commissionerPasscode:(BOOL)commissionerPasscode
                 qRCodeDisplayed:(BOOL)qRCodeDisplayed
+                 cancelPasscode:(BOOL)cancelPasscode
 {
     self = [super init];
     if (self) {
@@ -55,62 +57,69 @@
         _passcodeDialogDisplayed = passcodeDialogDisplayed;
         _commissionerPasscode = commissionerPasscode;
         _qRCodeDisplayed = qRCodeDisplayed;
+        _cancelPasscode = cancelPasscode;
     }
     return self;
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"MCCommissionerDeclaration::errorCode:               %@\nMCCommissionerDeclaration::needsPasscode:           %d\nMCCommissionerDeclaration::noAppsFound:             %d\nMCCommissionerDeclaration::passcodeDialogDisplayed: %d\nMCCommissionerDeclaration::commissionerPasscode:    %d\nMCCommissionerDeclaration::qRCodeDisplayed:         %d",
+    return [NSString stringWithFormat:@"MCCommissionerDeclaration::errorCode:               %@\nMCCommissionerDeclaration::needsPasscode:           %d\nMCCommissionerDeclaration::noAppsFound:             %d\nMCCommissionerDeclaration::passcodeDialogDisplayed: %d\nMCCommissionerDeclaration::commissionerPasscode:    %d\nMCCommissionerDeclaration::qRCodeDisplayed:         %d\nMCCommissionerDeclaration::cancelPasscode:          %d",
                      [self stringForErrorCode:self.errorCode],
                      self.needsPasscode,
                      self.noAppsFound,
                      self.passcodeDialogDisplayed,
                      self.commissionerPasscode,
-                     self.qRCodeDisplayed];
+                     self.qRCodeDisplayed,
+                     self.cancelPasscode];
+}
+
+- (NSString *)getErrorCodeString
+{
+    return [self stringForErrorCode:self.errorCode];
 }
 
 - (NSString *)stringForErrorCode:(CdError)errorCode
 {
     switch (errorCode) {
-    case kNoError:
-        return @"kNoError";
-    case kCommissionableDiscoveryFailed:
-        return @"kCommissionableDiscoveryFailed";
-    case kPaseConnectionFailed:
-        return @"kPaseConnectionFailed";
-    case kPaseAuthFailed:
-        return @"kPaseAuthFailed";
-    case kDacValidationFailed:
-        return @"kDacValidationFailed";
-    case kAlreadyOnFabric:
-        return @"kAlreadyOnFabric";
-    case kOperationalDiscoveryFailed:
-        return @"kOperationalDiscoveryFailed";
-    case kCaseConnectionFailed:
-        return @"kCaseConnectionFailed";
-    case kCaseAuthFailed:
-        return @"kCaseAuthFailed";
-    case kConfigurationFailed:
-        return @"kConfigurationFailed";
-    case kBindingConfigurationFailed:
-        return @"kBindingConfigurationFailed";
-    case kCommissionerPasscodeNotSupported:
-        return @"kCommissionerPasscodeNotSupported";
-    case kInvalidIdentificationDeclarationParams:
-        return @"kInvalidIdentificationDeclarationParams";
-    case kAppInstallConsentPending:
-        return @"kAppInstallConsentPending";
-    case kAppInstalling:
-        return @"kAppInstalling";
-    case kAppInstallFailed:
-        return @"kAppInstallFailed";
-    case kAppInstalledRetryNeeded:
-        return @"kAppInstalledRetryNeeded";
-    case kCommissionerPasscodeDisabled:
-        return @"kCommissionerPasscodeDisabled";
-    case kUnexpectedCommissionerPasscodeReady:
-        return @"kUnexpectedCommissionerPasscodeReady";
+    case noError:
+        return @"noError";
+    case commissionableDiscoveryFailed:
+        return @"commissionableDiscoveryFailed";
+    case paseConnectionFailed:
+        return @"paseConnectionFailed";
+    case paseAuthFailed:
+        return @"paseAuthFailed";
+    case dacValidationFailed:
+        return @"dacValidationFailed";
+    case alreadyOnFabric:
+        return @"alreadyOnFabric";
+    case operationalDiscoveryFailed:
+        return @"operationalDiscoveryFailed";
+    case caseConnectionFailed:
+        return @"caseConnectionFailed";
+    case caseAuthFailed:
+        return @"caseAuthFailed";
+    case configurationFailed:
+        return @"configurationFailed";
+    case bindingConfigurationFailed:
+        return @"bindingConfigurationFailed";
+    case commissionerPasscodeNotSupported:
+        return @"commissionerPasscodeNotSupported";
+    case invalidIdentificationDeclarationParams:
+        return @"invalidIdentificationDeclarationParams";
+    case appInstallConsentPending:
+        return @"appInstallConsentPending";
+    case appInstalling:
+        return @"appInstalling";
+    case appInstallFailed:
+        return @"appInstallFailed";
+    case appInstalledRetryNeeded:
+        return @"appInstalledRetryNeeded";
+    case commissionerPasscodeDisabled:
+        return @"commissionerPasscodeDisabled";
+    case unexpectedCommissionerPasscodeReady:
+        return @"unexpectedCommissionerPasscodeReady";
     default:
         return @"Unknown Error";
     }

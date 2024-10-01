@@ -12382,7 +12382,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Boolean credentialExists, @Nullable Integer userIndex, @Nullable Integer creatorFabricIndex, @Nullable Integer lastModifiedFabricIndex, @Nullable Integer nextCredentialIndex) {
+    public void onSuccess(Boolean credentialExists, @Nullable Integer userIndex, @Nullable Integer creatorFabricIndex, @Nullable Integer lastModifiedFabricIndex, @Nullable Integer nextCredentialIndex, @Nullable Optional<byte[]> credentialData) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo credentialExistsResponseValue = new CommandResponseInfo("credentialExists", "Boolean");
@@ -12395,6 +12395,8 @@ public class ClusterInfoMapping {
       responseValues.put(lastModifiedFabricIndexResponseValue, lastModifiedFabricIndex);
       CommandResponseInfo nextCredentialIndexResponseValue = new CommandResponseInfo("nextCredentialIndex", "Integer");
       responseValues.put(nextCredentialIndexResponseValue, nextCredentialIndex);
+      CommandResponseInfo credentialDataResponseValue = new CommandResponseInfo("credentialData", "Optional<byte[]>");
+      responseValues.put(credentialDataResponseValue, credentialData);
       callback.onSuccess(responseValues);
     }
 

@@ -129,9 +129,18 @@ void ReliableMessageMgr::ExecuteActions()
 
         VerifyOrDie(!entry->retainedBuf.IsNull());
 
+        // Don't check whether the session in the exchange is valid, because when the session is released, the retrans entry is
+        // cleared inside ExchangeContext::OnSessionReleased, so the session must be valid if the entry exists.
+        auto session      = entry->ec->GetSessionHandle();
         uint8_t sendCount = entry->sendCount;
-#if CHIP_ERROR_LOGGING || CHIP_DETAIL_LOGGING
+#if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING
         uint32_t messageCounter = entry->retainedBuf.GetMessageCounter();
+        auto fabricIndex        = session->GetFabricIndex();
+        auto destination        = kUndefinedNodeId;
+        if (session->IsSecureSession())
+        {
+            destination = session->AsSecureSession()->GetPeerNodeId();
+        }
 #endif // CHIP_ERROR_LOGGING || CHIP_DETAIL_LOGGING
 
         if (sendCount == CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS)
@@ -140,13 +149,11 @@ void ReliableMessageMgr::ExecuteActions()
             ExchangeHandle ec(entry->ec);
 
             ChipLogError(ExchangeManager,
-                         "Failed to Send CHIP MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
-                         " sendCount: %u max retries: %d",
-                         messageCounter, ChipLogValueExchange(&ec.Get()), sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
-
-            // Don't check whether the session in the exchange is valid, because when the session is released, the retrans entry is
-            // cleared inside ExchangeContext::OnSessionReleased, so the session must be valid if the entry exists.
-            SessionHandle session = ec->GetSessionHandle();
+                         "<<%d [E:" ChipLogFormatExchange " S:%u M:" ChipLogFormatMessageCounter
+                         "] (%s) Msg Retransmission to %u:" ChipLogFormatX64 " failure (max retries:%d)",
+                         sendCount + 1, ChipLogValueExchange(&entry->ec.Get()), session->SessionIdForLogging(), messageCounter,
+                         Transport::GetSessionTypeString(session), fabricIndex, ChipLogValueX64(destination),
+                         CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
 
             // If the exchange is expecting a response, it will handle sending
             // this notification once it detects that it has not gotten a
@@ -167,10 +174,12 @@ void ReliableMessageMgr::ExecuteActions()
         }
 
         entry->sendCount++;
+
         ChipLogProgress(ExchangeManager,
-                        "Retransmitting MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
-                        " Send Cnt %d",
-                        messageCounter, ChipLogValueExchange(&entry->ec.Get()), entry->sendCount);
+                        "<<%d [E:" ChipLogFormatExchange " S:%u M:" ChipLogFormatMessageCounter
+                        "] (%s) Msg Retransmission to %u:" ChipLogFormatX64,
+                        entry->sendCount, ChipLogValueExchange(&entry->ec.Get()), session->SessionIdForLogging(), messageCounter,
+                        Transport::GetSessionTypeString(session), fabricIndex, ChipLogValueX64(destination));
         MATTER_LOG_METRIC(Tracing::kMetricDeviceRMPRetryCount, entry->sendCount);
 
         CalculateNextRetransTime(*entry);
@@ -467,22 +476,50 @@ void ReliableMessageMgr::SetAdditionalMRPBackoffTime(const Optional<System::Cloc
 void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
 {
     System::Clock::Timeout baseTimeout = System::Clock::Timeout(0);
+    const auto sessionHandle           = entry.ec->GetSessionHandle();
 
     // Check if we have received at least one application-level message
     if (entry.ec->HasReceivedAtLeastOneMessage())
     {
         // If we have received at least one message, assume peer is active and use ActiveRetransTimeout
-        baseTimeout = entry.ec->GetSessionHandle()->GetRemoteMRPConfig().mActiveRetransTimeout;
+        baseTimeout = sessionHandle->GetRemoteMRPConfig().mActiveRetransTimeout;
     }
     else
     {
         // If we haven't received at least one message
         // Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
-        baseTimeout = entry.ec->GetSessionHandle()->GetMRPBaseTimeout();
+        baseTimeout = sessionHandle->GetMRPBaseTimeout();
     }
 
     System::Clock::Timeout backoff = ReliableMessageMgr::GetBackoff(baseTimeout, entry.sendCount);
     entry.nextRetransTime          = System::SystemClock().GetMonotonicTimestamp() + backoff;
+
+#if CHIP_PROGRESS_LOGGING
+    const auto config       = sessionHandle->GetRemoteMRPConfig();
+    uint32_t messageCounter = entry.retainedBuf.GetMessageCounter();
+    auto fabricIndex        = sessionHandle->GetFabricIndex();
+    auto destination        = kUndefinedNodeId;
+    bool peerIsActive       = false;
+
+    if (sessionHandle->IsSecureSession())
+    {
+        peerIsActive = sessionHandle->AsSecureSession()->IsPeerActive();
+        destination  = sessionHandle->AsSecureSession()->GetPeerNodeId();
+    }
+    else if (sessionHandle->IsUnauthenticatedSession())
+    {
+        peerIsActive = sessionHandle->AsUnauthenticatedSession()->IsPeerActive();
+    }
+
+    ChipLogProgress(ExchangeManager,
+                    "??%d [E:" ChipLogFormatExchange " S:%u M:" ChipLogFormatMessageCounter
+                    "] (%s) Msg Retransmission to %u:" ChipLogFormatX64 " in %" PRIu32 "ms [State:%s II:%" PRIu32 " AI:%" PRIu32
+                    " AT:%u]",
+                    entry.sendCount + 1, ChipLogValueExchange(&entry.ec.Get()), sessionHandle->SessionIdForLogging(),
+                    messageCounter, Transport::GetSessionTypeString(sessionHandle), fabricIndex, ChipLogValueX64(destination),
+                    backoff.count(), peerIsActive ? "Active" : "Idle", config.mIdleRetransTimeout.count(),
+                    config.mActiveRetransTimeout.count(), config.mActiveThresholdTime.count());
+#endif // CHIP_PROGRESS_LOGGING
 }
 
 #if CHIP_CONFIG_TEST
