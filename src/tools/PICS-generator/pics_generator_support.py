@@ -64,10 +64,7 @@ def pics_xml_file_list_loader(pics_xml_path: str, log_loaded_pics_files: bool) -
 def map_cluster_name_to_pics_xml(cluster_name, pics_xml_file_list) -> str:
     file_name = ""
 
-    try:
-        pics_file_name = cluster_to_pics_dict[cluster_name]
-    except KeyError:
-        pics_file_name = cluster_name
+    pics_file_name = cluster_to_pics_dict.get(cluster_name, cluster_name)
 
     for file in pics_xml_file_list:
         if file.lower().startswith(pics_file_name.lower()):
