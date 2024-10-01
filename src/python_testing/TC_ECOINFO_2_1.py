@@ -39,6 +39,7 @@
 
 import asyncio
 import logging
+import os
 import random
 import tempfile
 
@@ -60,35 +61,8 @@ class TC_ECOINFO_2_1(MatterBaseTest):
         self.th_server = None
         self.storage = None
 
-        # Get the path to the TH_SERVER app from the user params.
-        if th_server_app := self.user_params.get("th_server_app_path"):
-            # Create a temporary storage directory for keeping KVS files.
-            self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-            logging.info("Temporary storage directory: %s", self.storage.name)
-
-            # Get the named pipe path for the DUT_FSA app input from the user params.
-            if dut_fsa_stdin_pipe := self.user_params.get("dut_fsa_stdin_pipe"):
-                self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
-
-            self.th_server_port = 5544
-            self.th_server_discriminator = random.randint(0, 4095)
-            self.th_server_passcode = 20202021
-
-            # Start the server app.
-            self.th_server = AppServer(
-                th_server_app,
-                storage_dir=self.storage.name,
-                port=self.th_server_port,
-                discriminator=self.th_server_discriminator,
-                passcode=self.th_server_passcode)
-            self.th_server.start()
-
-            # Add some server to the DUT_FSA's Aggregator/Bridge.
-            self.dut_fsa_stdin.write(
-                f"pairing onnetwork 2 {self.th_server_passcode}\n")
-            self.dut_fsa_stdin.flush()
-            # Wait for the commissioning to complete.
-            await asyncio.sleep(5)
+        if self.is_pics_sdk_ci_only:
+            await self._setup_ci_prerequisites()
 
     def teardown_class(self):
         if self.th_server is not None:
@@ -96,6 +70,44 @@ class TC_ECOINFO_2_1(MatterBaseTest):
         if self.storage is not None:
             self.storage.cleanup()
         super().teardown_class()
+
+    async def _setup_ci_prerequisites(self):
+        asserts.assert_true(self.is_pics_sdk_ci_only, "This method is only for PICS SDK CI")
+
+        th_server_app = self.user_params.get("th_server_app_path", None)
+        if not th_server_app:
+            asserts.fail("CI setup requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>")
+        if not os.path.exists(th_server_app):
+            asserts.fail(f"The path {th_server_app} does not exist")
+
+        # Get the named pipe path for the DUT_FSA app input from the user params.
+        dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
+        if not dut_fsa_stdin_pipe:
+            asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
+        self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
+
+        # Create a temporary storage directory for keeping KVS files.
+        self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
+        logging.info("Temporary storage directory: %s", self.storage.name)
+
+        self.th_server_port = 5544
+        self.th_server_discriminator = random.randint(0, 4095)
+        self.th_server_passcode = 20202021
+
+        # Start the server app.
+        self.th_server = AppServer(
+            th_server_app,
+            storage_dir=self.storage.name,
+            port=self.th_server_port,
+            discriminator=self.th_server_discriminator,
+            passcode=self.th_server_passcode)
+        self.th_server.start()
+
+        # Add some server to the DUT_FSA's Aggregator/Bridge.
+        self.dut_fsa_stdin.write(f"pairing onnetwork 2 {self.th_server_passcode}\n")
+        self.dut_fsa_stdin.flush()
+        # Wait for the commissioning to complete.
+        await asyncio.sleep(5)
 
     def _validate_device_directory(self, current_fabric_index, device_directory):
         for device in device_directory:
@@ -204,14 +216,13 @@ class TC_ECOINFO_2_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_ECOINFO_2_1(self):
-        self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         dev_ctrl = self.default_controller
         dut_node_id = self.dut_node_id
 
         # Commissioning - done
         self.step(0)
 
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input(
                 "Paused test to allow for manufacturer to satisfy precondition where "
                 "one or more bridged devices of a supported type is connected to DUT")
