@@ -111,14 +111,16 @@ class TC_OPSTATE_BASE():
                     asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
             self.app_pipe = self.app_pipe + str(app_pid)
 
-    def send_raw_manual_or_pipe_command(self, command: dict):
+    def send_raw_manual_or_pipe_command(self, command: dict, msg: str):
         if self.is_ci:
             self.write_to_app_pipe(command)
             time.sleep(0.1)
         else:
-            self.wait_for_user_input(prompt_msg="Press Enter when ready.\n")
+            prompt = msg if msg is not None else "Press Enter when ready."
+            prompt += '\n'
+            self.wait_for_user_input(prompt_msg=prompt)
 
-    def send_manual_or_pipe_command(self, device: str, name: str, operation: str, param: Any = None):
+    def send_manual_or_pipe_command(self, device: str, name: str, operation: str, param: Any = None, msg=None):
         command = {
             "Name": name,
             "Device": device,
@@ -128,7 +130,7 @@ class TC_OPSTATE_BASE():
         if param is not None:
             command["Param"] = param
 
-        self.send_raw_manual_or_pipe_command(command)
+        self.send_raw_manual_or_pipe_command(command, msg)
 
     async def send_cmd(self, endpoint, cmd, timedRequestTimeoutMs=None):
         logging.info(f"##### Command {cmd}")
@@ -1046,11 +1048,13 @@ class TC_OPSTATE_BASE():
         self.send_manual_or_pipe_command(name="OperationalStateChange",
                                          device=self.device,
                                          operation="OnFault",
-                                         param=cluster.Enums.ErrorStateEnum.kNoError)
+                                         param=cluster.Enums.ErrorStateEnum.kNoError,
+                                         msg="Ensure the DUT is not in an error state.")
 
         self.send_manual_or_pipe_command(name="OperationalStateChange",
                                          device=self.device,
-                                         operation="Stop")
+                                         operation="Stop",
+                                         msg="Put the DUT in a state where it can receive a start command")
 
         # STEP 4: TH sends Start command to the DUT
         self.step(4)
@@ -1112,10 +1116,18 @@ class TC_OPSTATE_BASE():
 
             # STEP 11: Restart DUT
             self.step(11)
-            # In CI environment, the STOP coommand (step 8) already resets the variables. Only ask for
+            # In CI environment, the STOP command (step 8) already resets the variables. Only ask for
             # reboot outside CI environment.
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg="Restart DUT. Press Enter when ready.\n")
+                # Expire the session and re-establish the subscription
+                self.default_controller.ExpireSessions(self.dut_node_id)
+                if self.check_pics(f"{self.test_info.pics_code}.S.E01"):
+                    # Subscribe to Events and when they are received push them to a queue for checking later
+                    events_callback = EventSpecificChangeCallback(events.OperationCompletion)
+                    await events_callback.start(self.default_controller,
+                                                self.dut_node_id,
+                                                endpoint)
 
             # STEP 12: TH waits for {PIXIT.WAITTIME.REBOOT}
             self.step(12)
@@ -1258,11 +1270,12 @@ class TC_OPSTATE_BASE():
         sub_handler = ClusterAttributeChangeAccumulator(cluster)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint)
 
+        self.step(3)
         if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_RUNNING")):
-            self.step(3)
             self.send_manual_or_pipe_command(name="OperationalStateChange",
                                              device=self.device,
-                                             operation="Start")
+                                             operation="Start",
+                                             msg="Put DUT in running state")
             time.sleep(1)
             await self.read_and_expect_value(endpoint=endpoint,
                                              attribute=attributes.OperationalState,
@@ -1271,8 +1284,6 @@ class TC_OPSTATE_BASE():
             if countdownTime is not NullValue:
                 count = sub_handler.attribute_report_counts[attributes.CountdownTime]
                 asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
-        else:
-            self.skip_step(3)
 
         sub_handler.reset()
         self.step(4)
@@ -1310,11 +1321,12 @@ class TC_OPSTATE_BASE():
             self.skip_step(7)
 
         sub_handler.reset()
+        self.step(8)
         if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_RUNNING")):
-            self.step(8)
             self.send_manual_or_pipe_command(name="OperationalStateChange",
                                              device=self.device,
-                                             operation="Start")
+                                             operation="Start",
+                                             msg="Put DUT in running state")
             time.sleep(1)
             await self.read_and_expect_value(endpoint=endpoint,
                                              attribute=attributes.OperationalState,
@@ -1323,8 +1335,6 @@ class TC_OPSTATE_BASE():
             if countdownTime is not NullValue:
                 count = sub_handler.attribute_report_counts[attributes.CountdownTime]
                 asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
-        else:
-            self.skip_step(8)
 
         self.step(9)
         await self.read_and_expect_value(endpoint=endpoint,
@@ -1338,7 +1348,8 @@ class TC_OPSTATE_BASE():
             self.step(11)
             self.send_manual_or_pipe_command(name="OperationalStateChange",
                                              device=self.device,
-                                             operation="Pause")
+                                             operation="Pause",
+                                             msg="Put DUT in paused state")
             time.sleep(1)
             count = sub_handler.attribute_report_counts[attributes.CountdownTime]
             asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")

@@ -38,7 +38,11 @@ pw_python_package("matter_testing_support") {
     "matter_testing_support/pics.py",
     "matter_testing_support/spec_parsing.py",
     "matter_testing_support/taglist_and_topology_test.py",
+    "matter_testing_support/tasks.py",
   ]
 
-  tests = [ "matter_testing_support/test_metadata.py" ]
+  tests = [
+    "matter_testing_support/test_metadata.py",
+    "matter_testing_support/test_tasks.py",
+  ]
 }

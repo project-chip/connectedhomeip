@@ -248,6 +248,10 @@ CHIP_ERROR Resolver::Init(System::Layer * systemLayer)
 
 void Resolver::Shutdown()
 {
+    // mSystemLayer is set in ::Init, so if it's null that means the resolver
+    // has not been initialized or has already been shut down.
+    VerifyOrReturn(mSystemLayer != nullptr);
+
     while (mActiveLookups.begin() != mActiveLookups.end())
     {
         auto current = mActiveLookups.begin();

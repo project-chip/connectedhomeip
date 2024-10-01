@@ -20,6 +20,7 @@
 #include "AppConfig.h"
 #include "AppMatterButton.h"
 #include "AppTask.h"
+#include "BLEApplicationManager.h"
 #include "UserInterfaceFeedback.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -76,6 +77,13 @@ button_status_t ButtonManager::BleCallback(void * handle, button_callback_messag
     case kBUTTON_EventLongPress:
         event.Handler = ButtonManager::ResetActionEventHandler;
         break;
+
+#if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
+    case kBUTTON_EventDoubleClick:
+        event.Handler = ButtonManager::DSLSActionEventHandler;
+        break;
+#endif
+
     default:
         /* No action required */
         break;
@@ -144,10 +152,8 @@ void ButtonManager::AppActionEventHandler(const AppEvent & event)
 {
     chip::DeviceLayer::PlatformMgr().ScheduleWork(
         [](intptr_t arg) {
-            bool val = false;
-            APP_CLUSTER_ATTRIBUTE::Get(APP_DEVICE_TYPE_ENDPOINT, &val);
-            auto status = APP_CLUSTER_ATTRIBUTE::Set(APP_DEVICE_TYPE_ENDPOINT, (bool) !val);
-            if (status != chip::Protocols::InteractionModel::Status::Success)
+            auto status = chip::NXP::App::GetAppTask().ProcessSetStateClusterHandler();
+            if (status != CHIP_NO_ERROR)
             {
                 ChipLogProgress(DeviceLayer, "Error when updating cluster attribute");
             }
@@ -187,7 +193,33 @@ void ButtonManager::BleHandler(const AppEvent & event)
 #endif
 
     chip::NXP::App::GetAppTask().SwitchCommissioningStateHandler();
+
+    chip::NXP::App::BleAppMgr().EnableMultipleConnectionsHandler();
 }
+
+#if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
+void ButtonManager::DSLSActionEventHandler(const AppEvent & event)
+{
+
+    static bool sitModeRequested = false;
+
+    if (chip::DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
+    {
+        if (!sitModeRequested)
+        {
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(
+                [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification(); }, 0);
+            sitModeRequested = true;
+        }
+        else
+        {
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(
+                [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal(); }, 0);
+            sitModeRequested = false;
+        }
+    }
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS
 
 void ButtonManager::CancelTimer()
 {

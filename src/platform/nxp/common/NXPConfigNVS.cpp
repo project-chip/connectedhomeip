@@ -20,10 +20,14 @@
 #include <lib/core/CHIPEncoding.h>
 #include <platform/CHIPDeviceError.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
+#include <platform/nxp/common/CHIPDeviceNXPPlatformDefaultConfig.h>
 #include <settings.h>
 
 /* Only for flash init, to be move to sdk framework */
 #include "port/nvs_port.h"
+#if (CHIP_DEVICE_CONFIG_KVS_WEAR_STATS == 1)
+#include "fwk_nvs_stats.h"
+#endif /* CHIP_DEVICE_CONFIG_KVS_WEAR_STATS */
 
 // These can be overridden by the application as needed.
 #ifndef CHIP_DEVICE_INTEGER_SETTINGS_KEY
@@ -137,6 +141,17 @@ int DeleteSubtreeCallback(const char * name, size_t /* entrySize */, settings_re
 
     return 0;
 }
+
+#if (CHIP_DEVICE_CONFIG_KVS_WEAR_STATS == 1)
+void OnFlashSectorWearCountUpdate(uint16_t sector_idx, const nvs_storage_wear_profile_t * flash_wear_profile)
+{
+    char keyUser[]                       = CHIP_DEVICE_CONFIG_KVS_WEAR_STATS_KEY;
+    const size_t flash_wear_profile_size = NVS_STORAGE_WEAR_PROFILE_SIZE(flash_wear_profile->sector_count);
+
+    /* Update the NVS stats key in storage */
+    NXPConfig::WriteConfigValueBin((const char *) keyUser, (uint8_t *) flash_wear_profile, flash_wear_profile_size);
+}
+#endif /* CHIP_DEVICE_CONFIG_KVS_WEAR_STATS */
 } // namespace
 
 CHIP_ERROR NXPConfig::Init()
@@ -151,8 +166,50 @@ CHIP_ERROR NXPConfig::Init()
 
     ReturnErrorCodeIf(settings_subsys_init(), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
+#if (CHIP_DEVICE_CONFIG_KVS_WEAR_STATS == 1)
+    ReturnErrorOnFailure(InitStorageWearStats());
+#endif /* CHIP_DEVICE_CONFIG_KVS_WEAR_STATS */
+
     return CHIP_NO_ERROR;
 }
+
+#if (CHIP_DEVICE_CONFIG_KVS_WEAR_STATS == 1)
+CHIP_ERROR NXPConfig::InitStorageWearStats(void)
+{
+    nvs_storage_wear_profile_t * flash_wear_profile = NULL;
+    const size_t flash_wear_profile_size            = NVS_STORAGE_WEAR_PROFILE_SIZE((uint32_t) NV_STORAGE_MAX_SECTORS);
+    size_t size;
+    char keyUser[] = CHIP_DEVICE_CONFIG_KVS_WEAR_STATS_KEY;
+
+    /* Create an empty flash wear profile */
+    flash_wear_profile = (nvs_storage_wear_profile_t *) calloc(1, flash_wear_profile_size);
+    ReturnErrorCodeIf(flash_wear_profile == NULL, CHIP_ERROR_NO_MEMORY);
+
+    /* Try to read the flash wear profile from the User Support diagnostic log key */
+    CHIP_ERROR err = ReadConfigValueBin((const char *) keyUser, (uint8_t *) flash_wear_profile, flash_wear_profile_size, size);
+    if ((err != CHIP_NO_ERROR) || (size != flash_wear_profile_size) ||
+        (flash_wear_profile->sector_count != (uint32_t) NV_STORAGE_MAX_SECTORS))
+    {
+        /* Either the flash wear stats are not available in the persistent
+         * storage or the flash wear statistics that we have read are not
+         * compatible with the current persistent storage configuration. In
+         * this case - just reset and save the flash wear statistics. */
+        flash_wear_profile->sector_count = (uint32_t) NV_STORAGE_MAX_SECTORS;
+        memset(flash_wear_profile->erase_count, 0, (uint32_t) NV_STORAGE_MAX_SECTORS * sizeof(uint16_t));
+        WriteConfigValueBin((const char *) keyUser, (uint8_t *) flash_wear_profile, flash_wear_profile_size);
+    }
+    else
+    {
+        /* Load the flash wear profile into the NVS statistics */
+        nvs_stats_load_profile(flash_wear_profile);
+    }
+    free(flash_wear_profile);
+
+    nvs_stats_config_event_handler(OnFlashSectorWearCountUpdate);
+
+    return CHIP_NO_ERROR;
+}
+#endif /* CHIP_DEVICE_CONFIG_KVS_WEAR_STATS */
 
 CHIP_ERROR NXPConfig::ReadConfigValue(Key key, bool & val)
 {

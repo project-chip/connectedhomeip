@@ -21,7 +21,7 @@
 #include <lib/core/Optional.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
-#include <platform/nxp/common/legacy/OTATlvProcessor.h>
+#include <platform/nxp/common/ota/OTATlvProcessor.h>
 #include <platform/nxp/k32w0/FactoryDataProvider.h>
 #include <platform/nxp/k32w0/FactoryDataProviderImpl.h>
 

@@ -52,7 +52,8 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
 
     def steps_TC_EEVSE_2_6(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
+                     is_commissioning=True),
             TestStep("2", "TH reads from the DUT the FeatureMap",
                      "Verify that the DUT response contains the FeatureMap attribute. Store the value as FeatureMap."),
             TestStep("3", "Set up a subscription to all EnergyEVSE cluster events"),

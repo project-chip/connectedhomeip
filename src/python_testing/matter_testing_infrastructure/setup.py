@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 """The matter_testing_support package."""
 
 import setuptools  # type: ignore

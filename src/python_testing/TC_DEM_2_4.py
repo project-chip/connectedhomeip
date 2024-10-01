@@ -56,7 +56,8 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
 
     def steps_TC_DEM_2_4(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
+                     is_commissioning=True),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
                      "Verify that the DUT response contains the _FeatureMap_ attribute. Verify Pausable feature is supported on the cluster. Verify PowerForecastReporting or StateForecastReporting feature is supported on the cluster."),
             TestStep("3", "Set up a subscription to all DeviceEnergyManagement cluster events"),

@@ -103,6 +103,32 @@ void PlatformManagerImpl::CleanReset()
     HAL_ResetMCU();
 }
 
+void PlatformManagerImpl::ScheduleResetInIdle(void)
+{
+    resetInIdle = true;
+}
+
+bool PlatformManagerImpl::GetResetInIdleValue(void)
+{
+    return resetInIdle;
+}
+
+extern "C" void initiateResetInIdle(void)
+{
+    PlatformMgr().Shutdown();
+    PlatformMgrImpl().ScheduleResetInIdle();
+}
+
+extern "C" void scheduleResetInIdle(void)
+{
+    PlatformMgrImpl().ScheduleResetInIdle();
+}
+
+extern "C" bool getResetInIdleValue(void)
+{
+    return PlatformMgrImpl().GetResetInIdleValue();
+}
+
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
     otError otErr = otPlatEntropyGet(output, (uint16_t) len);
