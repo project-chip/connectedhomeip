@@ -10,7 +10,6 @@
 namespace {
 
 using namespace fuzztest;
-using namespace std;
 
 using namespace chip;
 using namespace mdns::Minimal;
@@ -65,16 +64,16 @@ void PacketParserFuzz(const std::vector<std::uint8_t> & bytes)
     mdns::Minimal::ParsePacket(packet, &delegate);
 }
 
-FUZZ_TEST(MinimalmDNS, PacketParserFuzz).WithDomains(Arbitrary<vector<uint8_t>>());
+FUZZ_TEST(MinimalmDNS, PacketParserFuzz).WithDomains(Arbitrary<std::vector<uint8_t>>());
 
 class TxtRecordAccumulator : public TxtRecordDelegate
 {
 public:
-    using DataType = vector<pair<string, string>>;
+    using DataType = std::vector<std::pair<std::string, std::string>>;
 
     void OnRecord(const BytesRange & name, const BytesRange & value) override
     {
-        mData.push_back(make_pair(AsString(name), AsString(value)));
+        mData.push_back(std::make_pair(AsString(name), AsString(value)));
     }
 
     DataType & Data() { return mData; }
@@ -83,9 +82,9 @@ public:
 private:
     DataType mData;
 
-    static string AsString(const BytesRange & range)
+    static std::string AsString(const BytesRange & range)
     {
-        return string(reinterpret_cast<const char *>(range.Start()), reinterpret_cast<const char *>(range.End()));
+        return std::string(reinterpret_cast<const char *>(range.Start()), reinterpret_cast<const char *>(range.End()));
     }
 };
 
@@ -97,7 +96,7 @@ void TxtResponderFuzz(const std::vector<std::uint8_t> & aRecord)
     auto equal_sign_pos     = aRecord.end();
 
     // This test is only giving a set of values, it can be gives more
-    vector<uint8_t> prefixedRecord{ static_cast<uint8_t>(aRecord.size()) };
+    std::vector<uint8_t> prefixedRecord{ static_cast<std::uint8_t>(aRecord.size()) };
 
     prefixedRecord.insert(prefixedRecord.end(), aRecord.begin(), aRecord.end());
 
@@ -127,6 +126,6 @@ void TxtResponderFuzz(const std::vector<std::uint8_t> & aRecord)
     }
 }
 
-FUZZ_TEST(MinimalmDNS, TxtResponderFuzz).WithDomains(Arbitrary<vector<uint8_t>>().WithMaxSize(254));
+FUZZ_TEST(MinimalmDNS, TxtResponderFuzz).WithDomains(Arbitrary<std::vector<std::uint8_t>>().WithMaxSize(254));
 
 } // namespace

@@ -22,7 +22,7 @@ set -e
 dlogutil CHIP &
 
 # Install lighting Matter app
-pkgcmd -i -t tpk -p /mnt/chip/org.tizen.matter.*
+pkgcmd -i -t tpk -p /mnt/chip/org.tizen.matter.*/out/org.tizen.matter.*.tpk
 # Launch lighting Matter app
 app_launcher -s org.tizen.matter.example.lighting
 
