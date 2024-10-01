@@ -1600,6 +1600,7 @@ xFFF
 xFFFF
 xfffff
 xFFFFFFEFFFFFFFFF
+XMLPICSValidator
 xtensa
 xvzf
 xwayland
