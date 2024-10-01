@@ -91,7 +91,7 @@ pw_proto_library("fabric_admin_service") {
   inputs = [ "protos/fabric_admin_service.options" ]
   deps = [
     ":fabric_sync_common",
-    "$dir_pw_protobuf:common_protos"
+    "$dir_pw_protobuf:common_protos",
   ]
   strip_prefix = "protos"
   prefix = "fabric_admin_service"
@@ -102,7 +102,7 @@ pw_proto_library("fabric_bridge_service") {
   inputs = [ "protos/fabric_bridge_service.options" ]
   deps = [
     ":fabric_sync_common",
-    "$dir_pw_protobuf:common_protos"
+    "$dir_pw_protobuf:common_protos",
   ]
   strip_prefix = "protos"
   prefix = "fabric_bridge_service"
