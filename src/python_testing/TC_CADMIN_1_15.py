@@ -215,7 +215,7 @@ class TC_CADMIN_1_15(MatterBaseTest):
             asserts.fail("Expected number of fabrics not correct")
 
         if fabric_idx_cr2 in fabric_indexes2:
-            asserts.fail("fabricIndexes should consist of indexes 1, 3, and 4 at this time")
+            asserts.fail("fabricIndexes should not consist of fabric_idx_cr2, but it appears it was")
 
         self.step(16)
         fabric_idx_cr2_2 = await self.read_currentfabricindex(th=self.th2)
