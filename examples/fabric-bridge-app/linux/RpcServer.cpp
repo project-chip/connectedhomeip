@@ -54,7 +54,8 @@ pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice
 {
     VerifyOrReturnValue(request.has_id, pw::Status::InvalidArgument());
     ScopedNodeId scopedNodeId(request.id.node_id, request.id.fabric_index);
-    ChipLogProgress(NotSpecified, "Received AddSynchronizedDevice: Id=[%d:" ChipLogFormatX64 "]", scopedNodeId.GetFabricIndex(), ChipLogValueX64(scopedNodeId.GetNodeId()));
+    ChipLogProgress(NotSpecified, "Received AddSynchronizedDevice: Id=[%d:" ChipLogFormatX64 "]", scopedNodeId.GetFabricIndex(),
+                    ChipLogValueX64(scopedNodeId.GetNodeId()));
 
     auto device = std::make_unique<BridgedDevice>(scopedNodeId);
     device->SetReachable(true);
@@ -117,7 +118,8 @@ pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice
     auto result = BridgeDeviceMgr().AddDeviceEndpoint(std::move(device), 1 /* parentEndpointId */);
     if (!result.has_value())
     {
-        ChipLogError(NotSpecified, "Failed to add device with Id=[%d:0x" ChipLogFormatX64 "]", scopedNodeId.GetFabricIndex(), ChipLogValueX64(scopedNodeId.GetNodeId()));
+        ChipLogError(NotSpecified, "Failed to add device with Id=[%d:0x" ChipLogFormatX64 "]", scopedNodeId.GetFabricIndex(),
+                     ChipLogValueX64(scopedNodeId.GetNodeId()));
         return pw::Status::Unknown();
     }
 
@@ -135,12 +137,14 @@ pw::Status FabricBridge::RemoveSynchronizedDevice(const chip_rpc_SynchronizedDev
 {
     VerifyOrReturnValue(request.has_id, pw::Status::InvalidArgument());
     ScopedNodeId scopedNodeId(request.id.node_id, request.id.fabric_index);
-    ChipLogProgress(NotSpecified, "Received RemoveSynchronizedDevice: Id=[%d:" ChipLogFormatX64 "]", scopedNodeId.GetFabricIndex(), ChipLogValueX64(scopedNodeId.GetNodeId()));
+    ChipLogProgress(NotSpecified, "Received RemoveSynchronizedDevice: Id=[%d:" ChipLogFormatX64 "]", scopedNodeId.GetFabricIndex(),
+                    ChipLogValueX64(scopedNodeId.GetNodeId()));
 
     auto removed_idx = BridgeDeviceMgr().RemoveDeviceByScopedNodeId(scopedNodeId);
     if (!removed_idx.has_value())
     {
-        ChipLogError(NotSpecified, "Failed to remove device with Id=[%d:0x" ChipLogFormatX64 "]", scopedNodeId.GetFabricIndex(), ChipLogValueX64(scopedNodeId.GetNodeId()));
+        ChipLogError(NotSpecified, "Failed to remove device with Id=[%d:0x" ChipLogFormatX64 "]", scopedNodeId.GetFabricIndex(),
+                     ChipLogValueX64(scopedNodeId.GetNodeId()));
         return pw::Status::NotFound();
     }
 
@@ -151,7 +155,8 @@ pw::Status FabricBridge::ActiveChanged(const chip_rpc_KeepActiveChanged & reques
 {
     VerifyOrReturnValue(request.has_id, pw::Status::InvalidArgument());
     ScopedNodeId scopedNodeId(request.id.node_id, request.id.fabric_index);
-    ChipLogProgress(NotSpecified, "Received ActiveChanged: Id=[%d:" ChipLogFormatX64 "]", scopedNodeId.GetFabricIndex(), ChipLogValueX64(scopedNodeId.GetNodeId()));
+    ChipLogProgress(NotSpecified, "Received ActiveChanged: Id=[%d:" ChipLogFormatX64 "]", scopedNodeId.GetFabricIndex(),
+                    ChipLogValueX64(scopedNodeId.GetNodeId()));
 
     auto * device = BridgeDeviceMgr().GetDeviceByScopedNodeId(scopedNodeId);
     if (device == nullptr)
@@ -170,7 +175,8 @@ pw::Status FabricBridge::AdminCommissioningAttributeChanged(const chip_rpc_Admin
 {
     VerifyOrReturnValue(request.has_id, pw::Status::InvalidArgument());
     ScopedNodeId scopedNodeId(request.id.node_id, request.id.fabric_index);
-    ChipLogProgress(NotSpecified, "Received CADMIN attribute change: Id=[%d:" ChipLogFormatX64 "]", scopedNodeId.GetFabricIndex(), ChipLogValueX64(scopedNodeId.GetNodeId()));
+    ChipLogProgress(NotSpecified, "Received CADMIN attribute change: Id=[%d:" ChipLogFormatX64 "]", scopedNodeId.GetFabricIndex(),
+                    ChipLogValueX64(scopedNodeId.GetNodeId()));
 
     auto * device = BridgeDeviceMgr().GetDeviceByScopedNodeId(scopedNodeId);
     if (device == nullptr)

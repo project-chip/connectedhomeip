@@ -61,7 +61,7 @@ public:
         // Accessing mPendingCheckIn should only be done while holding ChipStackLock
         assertChipStackLockedByCurrentThread();
         ScopedNodeId scopedNodeId = clientInfo.peer_node;
-        auto it       = mPendingCheckIn.find(scopedNodeId);
+        auto it                   = mPendingCheckIn.find(scopedNodeId);
         VerifyOrReturn(it != mPendingCheckIn.end());
 
         KeepActiveDataForCheckIn checkInData = it->second;
@@ -72,10 +72,10 @@ public:
         auto timeNow = System::SystemClock().GetMonotonicTimestamp();
         if (timeNow > checkInData.mRequestExpiryTimestamp)
         {
-            ChipLogError(
-                NotSpecified,
-                "ICD check-in for device we have been waiting, came after KeepActive expiry. Request dropped for ID: [%d:0x " ChipLogFormatX64 "]",
-                scopedNodeId.GetFabricIndex(), ChipLogValueX64(scopedNodeId.GetNodeId()));
+            ChipLogError(NotSpecified,
+                         "ICD check-in for device we have been waiting, came after KeepActive expiry. Request dropped for ID: "
+                         "[%d:0x " ChipLogFormatX64 "]",
+                         scopedNodeId.GetFabricIndex(), ChipLogValueX64(scopedNodeId.GetNodeId()));
             return;
         }
 
@@ -98,8 +98,8 @@ public:
                                        chip_rpc_OperationStatus & response) override
     {
         VerifyOrReturnValue(request.has_id, pw::Status::InvalidArgument());
-        // TODO: OpenDeviceCommissioningWindow uses the same controller every time and doesn't currently accept FabricIndex. For now we are
-        // dropping fabric index from the scoped node id.
+        // TODO: OpenDeviceCommissioningWindow uses the same controller every time and doesn't currently accept FabricIndex. For now
+        // we are dropping fabric index from the scoped node id.
         NodeId nodeId                    = request.id.node_id;
         uint32_t commissioningTimeoutSec = request.commissioning_timeout;
         uint32_t iterations              = request.iterations;
@@ -165,7 +165,8 @@ public:
     {
         VerifyOrReturnValue(request.has_id, pw::Status::InvalidArgument());
         ScopedNodeId scopedNodeId(request.id.node_id, request.id.fabric_index);
-        ChipLogProgress(NotSpecified, "Received KeepActive request: Id[%d, 0x" ChipLogFormatX64 "], %u", scopedNodeId.GetFabricIndex(), ChipLogValueX64(scopedNodeId.GetNodeId()), request.stay_active_duration_ms);
+        ChipLogProgress(NotSpecified, "Received KeepActive request: Id[%d, 0x" ChipLogFormatX64 "], %u",
+                        scopedNodeId.GetFabricIndex(), ChipLogValueX64(scopedNodeId.GetNodeId()), request.stay_active_duration_ms);
 
         KeepActiveWorkData * data =
             Platform::New<KeepActiveWorkData>(this, scopedNodeId, request.stay_active_duration_ms, request.timeout_ms);
@@ -205,7 +206,8 @@ private:
     {
         KeepActiveWorkData(FabricAdmin * fabricAdmin, ScopedNodeId scopedNodeId, uint32_t stayActiveDurationMs,
                            uint32_t timeoutMs) :
-            mFabricAdmin(fabricAdmin), mScopedNodeId(scopedNodeId), mStayActiveDurationMs(stayActiveDurationMs), mTimeoutMs(timeoutMs)
+            mFabricAdmin(fabricAdmin),
+            mScopedNodeId(scopedNodeId), mStayActiveDurationMs(stayActiveDurationMs), mTimeoutMs(timeoutMs)
         {}
 
         FabricAdmin * mFabricAdmin;
