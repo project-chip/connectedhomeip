@@ -510,7 +510,7 @@ def check_clusters_for_unknown_commands(clusters: dict[int, XmlCluster], problem
 
 class PrebuiltDataModelDirectory(Enum):
     k1_3 = auto()
-    kInProgress = auto()
+    k1_4 = auto()
     kMaster = auto()
 
 
@@ -539,16 +539,16 @@ def _get_data_model_root() -> str:
 def get_data_model_directory(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str], data_model_level: DataModelLevel) -> str:
     if data_model_directory == PrebuiltDataModelDirectory.k1_3:
         return os.path.join(_get_data_model_root(), '1.3', data_model_level)
-    elif data_model_directory == PrebuiltDataModelDirectory.kInProgress:
-        return os.path.join(_get_data_model_root(), 'in_progress', data_model_level)
+    elif data_model_directory == PrebuiltDataModelDirectory.k1_4:
+        return os.path.join(_get_data_model_root(), '1.4', data_model_level)
     elif data_model_directory == PrebuiltDataModelDirectory.kMaster:
         return os.path.join(_get_data_model_root(), 'master', data_model_level)
     else:
         return data_model_directory
 
 
-def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.kMaster) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
-    dir = get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
+def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
+    dir = _get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
 
     clusters: dict[int, XmlCluster] = {}
     pure_base_clusters: dict[str, XmlCluster] = {}
@@ -775,8 +775,8 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNot
     return device_types, problems
 
 
-def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.kInProgress) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
-    dir = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
+def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+    dir = _get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems = []
     for xml in glob.glob(f"{dir}/*.xml"):

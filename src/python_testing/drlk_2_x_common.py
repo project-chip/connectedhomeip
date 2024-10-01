@@ -121,7 +121,6 @@ class DRLK_COMMON:
                                                      credentials=self.createdCredential, userIndex=self.user_index)
 
     async def run_drlk_test_common(self, lockUnlockCommand, lockUnlockCmdRspPICS, lockUnlockText, doAutoRelockTest):
-        is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         self.clear_credential_and_user_flag = True
 
         # Allow for user overrides of these values
@@ -131,7 +130,7 @@ class DRLK_COMMON:
         userCodeTemporaryDisableTime = self.user_params.get("user_code_temporary_disable_time", 15)
         wrongCodeEntryLimit = self.user_params.get("wrong_code_entry_limit", 3)
         autoRelockTime = self.user_params.get("auto_relock_time", 60)
-        if is_ci:
+        if self.is_pics_sdk_ci_only:
             autoRelockTime = 10
 
         cluster = Clusters.Objects.DoorLock

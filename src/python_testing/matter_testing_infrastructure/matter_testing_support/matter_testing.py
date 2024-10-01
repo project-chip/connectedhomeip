@@ -1008,7 +1008,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Use the following environment variables:
 
-         - LINUX_DUT_IP 
+         - LINUX_DUT_IP
             * if not provided, the Matter app is assumed to run on the same machine as the test,
               such as during CI, and the commands are sent to it using a local named pipe
             * if provided, the commands for writing to the named pipe are forwarded to the DUT
@@ -1128,9 +1128,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         super().teardown_class()
 
     def check_pics(self, pics_key: str) -> bool:
-        picsd = self.matter_test_config.pics
-        pics_key = pics_key.strip()
-        return pics_key in picsd and picsd[pics_key]
+        return self.matter_test_config.pics.get(pics_key.strip(), False)
+
+    @property
+    def is_pics_sdk_ci_only(self) -> bool:
+        return self.check_pics('PICS_SDK_CI_ONLY')
 
     async def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int) -> CustomCommissioningParameters:
         rnd_discriminator = random.randint(0, 4095)

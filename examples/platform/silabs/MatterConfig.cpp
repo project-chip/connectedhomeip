@@ -230,13 +230,14 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
+    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
+
     // Provision Manager
     Silabs::Provision::Manager & provision = Silabs::Provision::Manager::GetInstance();
     ReturnErrorOnFailure(provision.Init());
     SetDeviceInstanceInfoProvider(&provision.GetStorage());
     SetCommissionableDataProvider(&provision.GetStorage());
-
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
+    ChipLogProgress(DeviceLayer, "Provision mode %s", provision.IsProvisionRequired() ? "ENABLED" : "disabled");
 
 #if CHIP_ENABLE_OPENTHREAD
     ReturnErrorOnFailure(InitOpenThread());

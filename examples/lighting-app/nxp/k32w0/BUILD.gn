@@ -180,12 +180,17 @@ action("binsign") {
   output_name = "bignsign.log"
   outputs = [ "${root_build_dir}/${output_name}" ]
 
+  args = [
+    "--sdk-root",
+    rebase_path(k32w0_sdk_root),
+  ]
+
   if (chip_simple_hash_verification == 1) {
-    args = [ "--simple-hash" ]
+    args += [ "--simple-hash" ]
   }
 
   if (chip_enable_ota_requestor) {
-    args = [ "--ota-enabled" ]
+    args += [ "--ota-enabled" ]
   }
 }
 
