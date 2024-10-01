@@ -67,10 +67,10 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="utility" picsCode="PS" scope="Node"/>
   <features>
     <feature bit="0" code="WIRED" name="Wired" summary="A wired power source">
-      <optionalConform/>
+      <optionalConform choice="a"/>
     </feature>
     <feature bit="1" code="BAT" name="Battery" summary="A battery power source">
-      <optionalConform/>
+      <optionalConform choice="a"/>
     </feature>
     <feature bit="2" code="RECHG" name="Rechargeable" summary="A rechargeable battery power source">
       <optionalConform>
@@ -636,7 +636,7 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="BAT"/>
       </optionalConform>
-      <constraint type="between" from="0" to="200"/>
+      <constraint type="max" value="200"/>
     </attribute>
     <attribute id="0x000D" name="BatTimeRemaining" type="uint32">
       <access read="true" readPrivilege="view"/>

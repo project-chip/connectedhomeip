@@ -55,21 +55,42 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0090" name="Network Infrastructure Manager" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0013" name="Bridged Node" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added Power Source to device type; Deprecated Power Source Configuration"/>
+    <revision revision="3" summary="Added Ecosystem Information Cluster and FabricSynchronizedNode Condition."/>
   </revisionHistory>
-  <classification class="simple" scope="endpoint"/>
-  <conditions/>
+  <classification class="utility" scope="endpoint"/>
   <clusters>
-    <cluster id="0x0451" name="Wi-Fi Network Management" side="server">
+    <cluster id="0x002E" name="Power Source Configuration" side="server">
+      <otherwiseConform>
+        <mandatoryConform>
+          <condition name="BridgedPowerSourceInfo"/>
+        </mandatoryConform>
+        <deprecateConform/>
+      </otherwiseConform>
+    </cluster>
+    <cluster id="0x002F" name="Power Source" side="server">
+      <mandatoryConform>
+        <condition name="BridgedPowerSourceInfo"/>
+      </mandatoryConform>
+    </cluster>
+    <cluster id="0x0039" name="Bridged Device Basic Information" side="server">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x0452" name="Thread Border Router Management" side="server">
-      <mandatoryConform/>
+    <cluster id="0x003C" name="Administrator Commissioning" side="server">
+      <mandatoryConform>
+        <attribute name="FabricSynchronizedNode"/>
+      </mandatoryConform>
     </cluster>
-    <cluster id="0x0453" name="Thread Network Directory" side="server">
-      <mandatoryConform/>
+    <cluster id="0x0750" name="Ecosystem Information" side="server">
+      <otherwiseConform>
+        <mandatoryConform>
+          <attribute name="FabricSynchronizedNode"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
     </cluster>
   </clusters>
 </deviceType>
