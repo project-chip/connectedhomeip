@@ -48,4 +48,5 @@ struct AppEvent
     };
 
     EventHandler Handler;
+    void * extra;
 };
