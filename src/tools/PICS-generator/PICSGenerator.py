@@ -22,9 +22,8 @@ import sys
 import xml.etree.ElementTree as ET
 
 import chip.clusters as Clusters
+from pics_generator_support import map_cluster_name_to_pics_xml, pics_xml_file_list_loader
 from rich.console import Console
-
-from pics_generator_support import pics_xml_file_list_loader, map_cluster_name_to_pics_xml
 
 # Add the path to python_testing folder, in order to be able to import from matter_testing_support
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
