@@ -628,7 +628,10 @@ example DUT on the host and includes factory reset support
 -   Don’t forget to set the PICS file to the ci-pics-values
 -   If there are steps in your test that will fail on CI (e.g. test vendor
     checks), gate them on the PICS_SDK_CI_ONLY
-    -   `is_ci = self.check_pics('PICS_SDK_CI_ONLY')`
+    -   ```python
+        if not self.is_pics_sdk_ci_only:
+            ...  # Step that will fail on CI
+        ```
 
 The CI test runner uses a structured environment setup that can be declared
 using structured comments at the top of the test file. To use this structured

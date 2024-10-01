@@ -8768,6 +8768,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRChimeClusterChimeSoundStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _chimeID = @(0);
+
+        _name = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRChimeClusterChimeSoundStruct alloc] init];
+
+    other.chimeID = self.chimeID;
+    other.name = self.name;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chimeID:%@; name:%@; >", NSStringFromClass([self class]), _chimeID, _name];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTREcosystemInformationClusterDeviceTypeStruct
 - (instancetype)init
 {
