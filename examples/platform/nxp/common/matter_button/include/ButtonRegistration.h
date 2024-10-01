@@ -1,6 +1,6 @@
 /*
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2021 Nest Labs, Inc.
+ *
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,35 +18,15 @@
 
 #pragma once
 
-#include <cstdint>
+#include <lib/core/CHIPError.h>
 
-struct AppEvent;
-using EventHandler = void (*)(const AppEvent &);
+namespace chip::NXP::App {
 
-struct AppEvent
-{
-    enum AppEventTypes
-    {
-        kEventType_Timer = 0,
-        kEventType_TurnOn,
-        kEventType_Install,
-    };
+/**
+ * @brief API used by app task to register buttons.
+ *
+ * The default implementation will register a single ButtonDefault instance.
+ */
+CHIP_ERROR RegisterButtons();
 
-    uint16_t Type;
-
-    union
-    {
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-        struct
-        {
-            uint8_t Action;
-            int32_t Actor;
-        } ClusterEvent;
-    };
-
-    EventHandler Handler;
-    void * extra;
-};
+} // namespace chip::NXP::App

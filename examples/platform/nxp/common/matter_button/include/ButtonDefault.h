@@ -18,11 +18,26 @@
 
 #pragma once
 
-struct AppEvent;
-typedef void (*EventHandler)(const AppEvent &);
+#include "Button.h"
 
-struct AppEvent
+namespace chip::NXP::App {
+/**
+ * @brief This class implements a default button behavior.
+ *
+ * | Action       | Effect                     |
+ * | ------------ | -------------------------- |
+ * | Short press  | Switch commissioning state |
+ * | Long press   | Schedule a factory reset   |
+ * | Double click | Do nothing                 |
+ *
+ */
+class ButtonDefault : public Button
 {
-    EventHandler Handler;
-    void * extra;
+public:
+    virtual CHIP_ERROR Init() override;
+    virtual void HandleShortPress() override;
+    virtual void HandleLongPress() override;
+    virtual void HandleDoubleClick() override;
 };
+
+} // namespace chip::NXP::App

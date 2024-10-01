@@ -1,6 +1,6 @@
 /*
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2021 Nest Labs, Inc.
+ *
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,37 +16,12 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "ButtonRegistration.h"
 
-#include <cstdint>
+#include <lib/support/CodeUtils.h>
 
-struct AppEvent;
-using EventHandler = void (*)(const AppEvent &);
-
-struct AppEvent
+CHIP_ERROR chip::NXP::App::RegisterButtons()
 {
-    enum AppEventTypes
-    {
-        kEventType_Timer = 0,
-        kEventType_TurnOn,
-        kEventType_Install,
-    };
-
-    uint16_t Type;
-
-    union
-    {
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-        struct
-        {
-            uint8_t Action;
-            int32_t Actor;
-        } ClusterEvent;
-    };
-
-    EventHandler Handler;
-    void * extra;
-};
+    /* Empty content could be re-defined in a dedicated platform RegisterButtons function */
+    return CHIP_NO_ERROR;
+}
