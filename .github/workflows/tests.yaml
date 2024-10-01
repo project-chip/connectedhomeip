@@ -37,7 +37,7 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-tsan-clang]
+                build_variant: [no-ble-no-shell-tsan-clang]
                 chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
@@ -49,7 +49,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:80
+            image: ghcr.io/project-chip/chip-build:81
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -331,7 +331,7 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-asan-clang, no-ble-tsan-clang]
+                build_variant: [no-ble-no-shell-asan-clang, no-ble-no-shell-tsan-clang]
                 chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
@@ -451,7 +451,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:80
+            image: ghcr.io/project-chip/chip-build:81
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
