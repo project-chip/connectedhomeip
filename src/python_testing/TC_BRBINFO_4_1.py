@@ -198,7 +198,6 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_BRBINFO_4_1(self):
-        self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         icdm_cluster = Clusters.Objects.IcdManagement
         icdm_attributes = icdm_cluster.Attributes
         brb_info_cluster = Clusters.Objects.BridgedDeviceBasicInformation
