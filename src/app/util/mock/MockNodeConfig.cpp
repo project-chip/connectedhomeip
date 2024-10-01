@@ -116,7 +116,8 @@ MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAt
                                      std::initializer_list<MockEventConfig> aEvents,
                                      std::initializer_list<CommandId> aAcceptedCommands,
                                      std::initializer_list<CommandId> aGeneratedCommands) :
-    id(aId), attributes(aAttributes), events(aEvents), mEmberCluster{}, mAcceptedCommands(aAcceptedCommands),
+    id(aId),
+    attributes(aAttributes), events(aEvents), mEmberCluster{}, mAcceptedCommands(aAcceptedCommands),
     mGeneratedCommands(aGeneratedCommands)
 {
     VerifyOrDie(aAttributes.size() < UINT16_MAX);
@@ -177,7 +178,8 @@ const MockAttributeConfig * MockClusterConfig::attributeById(AttributeId attribu
 
 MockEndpointConfig::MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters,
                                        std::initializer_list<EmberAfDeviceType> aDeviceTypes) :
-    id(aId), clusters(aClusters), mDeviceTypes(aDeviceTypes), mEmberEndpoint{}
+    id(aId),
+    clusters(aClusters), mDeviceTypes(aDeviceTypes), mEmberEndpoint{}
 {
     VerifyOrDie(aClusters.size() < UINT8_MAX);
 
