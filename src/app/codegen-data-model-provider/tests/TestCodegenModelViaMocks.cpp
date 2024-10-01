@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <optional>
 #include <pw_unit_test/framework.h>
 
 #include <app/codegen-data-model-provider/tests/EmberInvokeOverride.h>
@@ -64,6 +63,7 @@
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <optional>
 #include <vector>
 
 using namespace chip;
