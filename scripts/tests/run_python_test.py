@@ -31,7 +31,6 @@ import typing
 
 import click
 import coloredlogs
-from chip.testing.metadata import Metadata, MetadataReader
 from colorama import Fore, Style
 from matter_testing_support.metadata import Metadata, MetadataReader
 

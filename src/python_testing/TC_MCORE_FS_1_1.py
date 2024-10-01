@@ -63,26 +63,6 @@ class AppServer(Subprocess):
         super().start(expected_output="Server initialization complete")
 
 
-class AppServer(Subprocess):
-    """Wrapper class for starting an application server in a subprocess."""
-
-    # Prefix for log messages from the application server.
-    PREFIX = "[SERVER]"
-
-    def __init__(self, app: str, storage_dir: str, discriminator: int, passcode: int, port: int = 5540):
-        storage_kvs_dir = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")[1]
-        # Start the server application with dedicated KVS storage.
-        super().__init__(app, "--KVS", storage_kvs_dir,
-                         '--secured-device-port', str(port),
-                         "--discriminator", str(discriminator),
-                         "--passcode", str(passcode),
-                         prefix=self.PREFIX)
-
-    def start(self):
-        # Start process and block until it prints the expected output.
-        super().start(expected_output="Server initialization complete")
-
-
 class TC_MCORE_FS_1_1(MatterBaseTest):
 
     @async_test_body
