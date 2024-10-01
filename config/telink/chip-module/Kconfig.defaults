@@ -180,7 +180,8 @@ config PWM
 endif
 
 # Board non-retention config
-if BOARD_TLSR9118BDK40D || BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D
+if  BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1 || \
+    BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D
 config PWM
     default y
 endif
@@ -191,6 +192,10 @@ config DYNAMIC_INTERRUPTS
 
 config CHIP_OTA_REQUESTOR
     default y
+
+config MCUBOOT_SIGNATURE_KEY_FILE
+	default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D
+	depends on BOOTLOADER_MCUBOOT
 
 # In current config/zephyr/Kconfig
 # next deprecated values are selected
@@ -292,7 +297,7 @@ config NET_CONFIG_INIT_TIMEOUT
 
 config CHIP_WIFI
 	bool "Enable Telink Wi-Fi support"
-	default y if BOARD_TLSR9118BDK40D
+	default y if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
 	select WIFI_W91
 	select WIFI
 	select NET_STATISTICS
