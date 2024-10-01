@@ -62,7 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added ProductAppearance attribute"/>
     <revision revision="3" summary="Added SpecificationVersion and MaxPathsPerInvoke attributes"/>
-    <revision revision="4" summary="Updated conformance for UniqueID to mandatory, ProductID to optional when bridging Matter devices, and add the BridgedICDSupport feature. Added DeviceLocation."/>
+    <revision revision="4" summary="Updated conformance for UniqueID to mandatory, ProductID to optional when bridging Matter devices, add the BridgedICDSupport feature."/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0039" name="Bridged Device Basic Information"/>
@@ -140,9 +140,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0016" name="MaxPathsPerInvoke">
       <disallowConform/>
-    </attribute>
-    <attribute id="0x0017" name="DeviceLocation">
-      <optionalConform/>
     </attribute>
   </attributes>
   <commands>

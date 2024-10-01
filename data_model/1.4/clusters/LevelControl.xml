@@ -136,7 +136,7 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="LT"/>
       </optionalConform>
-      <constraint type="min" value="1"/>
+      <constraint type="between" from="1" to="254"/>
     </attribute>
     <attribute id="0x0002" name="MinLevel" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
@@ -145,6 +145,7 @@ Davis, CA 95616, USA
           <feature name="LT"/>
         </notTerm>
       </optionalConform>
+      <constraint type="max" value="254"/>
     </attribute>
     <attribute id="0x0003" name="MaxLevel" type="uint8" default="254">
       <access read="true" readPrivilege="view"/>

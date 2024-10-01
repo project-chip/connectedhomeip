@@ -51,39 +51,33 @@ are the sole property of their respective owners.
 
 This notice and disclaimer must be included on all copies of this document.
 
-Connectivity Standards Alliance +
-508 Second Street, Suite 206 +
+Connectivity Standards Alliance
+508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x050F" name="Water Heater" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0074" name="Robotic Vacuum Cleaner" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Add cluster usage constraints and informative data. Remove the element requirements section, after moving all constraints to the respective cluster specifications."/>
+    <revision revision="3" summary="Add support for the Service Area cluster"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
+      <mandatoryConform/>
+    </cluster>
+    <cluster id="0x0054" name="RVC Run Mode" side="server">
+      <mandatoryConform/>
+    </cluster>
+    <cluster id="0x0055" name="RVC Clean Mode" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x0094" name="Water Heater Management" side="server">
+    <cluster id="0x0061" name="RVC Operational State" side="server">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x0096" name="Demand Response and Load Control" side="server">
+    <cluster id="0x0150" name="Service Area" side="server">
       <optionalConform/>
-    </cluster>
-    <cluster id="0x009E" name="Water Heater Mode" side="server">
-      <mandatoryConform/>
-    </cluster>
-    <cluster id="0x0201" name="Thermostat" side="server">
-      <mandatoryConform/>
-      <features>
-        <feature code="" name="Heating">
-          <mandatoryConform/>
-        </feature>
-        <feature code="" name="ScheduleConfiguration">
-          <mandatoryConform/>
-        </feature>
-      </features>
     </cluster>
   </clusters>
 </deviceType>

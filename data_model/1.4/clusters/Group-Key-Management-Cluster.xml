@@ -220,7 +220,7 @@ Davis, CA 95616, USA
     <command id="0x04" name="KeySetReadAllIndices Command" direction="commandToServer" response="KeySetReadAllIndicesResponse Command">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="0" name="reserved">
+      <field id="0" name="DoNotUse">
         <disallowConform/>
       </field>
     </command>

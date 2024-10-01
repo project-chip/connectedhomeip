@@ -185,7 +185,7 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="TH"/>
         </mandatoryConform>
-        <constraint type="between" from="0" to="65534"/>
+        <constraint type="max" value="65534"/>
       </field>
       <field id="1" name="ExtendedPanId" type="uint64">
         <mandatoryConform>
@@ -452,7 +452,7 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="NetworkIndex" type="uint8">
         <optionalConform/>
-        <constraint type="between" from="0" to="MaxNetworks - 1"/>
+        <constraint type="max" value="MaxNetworks - 1"/>
       </field>
     </command>
     <command id="0x06" name="ConnectNetwork" direction="commandToServer" response="ConnectNetworkResponse">
