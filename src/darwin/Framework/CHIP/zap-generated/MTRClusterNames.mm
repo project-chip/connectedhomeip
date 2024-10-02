@@ -369,6 +369,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeContentAppObserverID:
         result = @"ContentAppObserver";
         break;
+    case MTRClusterIDTypeWebRTCTransportProviderID:
+        result = @"WebRTCTransportProvider";
+        break;
     case MTRClusterIDTypeChimeID:
         result = @"Chime";
         break;
@@ -8139,6 +8142,45 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeWebRTCTransportProviderID:
+
+        switch (attributeID) {
+
+            // Cluster WebRTCTransportProvider attributes
+        case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeCurrentSessionsID:
+            result = @"CurrentSessions";
+            break;
+
+        case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeChimeID:
 
         switch (attributeID) {
@@ -10328,6 +10370,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeContentAppObserverID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %d>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeWebRTCTransportProviderID:
 
         switch (eventID) {
 
