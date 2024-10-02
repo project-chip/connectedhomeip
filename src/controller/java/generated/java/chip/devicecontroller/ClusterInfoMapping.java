@@ -12382,7 +12382,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Boolean credentialExists, @Nullable Integer userIndex, @Nullable Integer creatorFabricIndex, @Nullable Integer lastModifiedFabricIndex, @Nullable Integer nextCredentialIndex) {
+    public void onSuccess(Boolean credentialExists, @Nullable Integer userIndex, @Nullable Integer creatorFabricIndex, @Nullable Integer lastModifiedFabricIndex, @Nullable Integer nextCredentialIndex, @Nullable Optional<byte[]> credentialData) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo credentialExistsResponseValue = new CommandResponseInfo("credentialExists", "Boolean");
@@ -12395,6 +12395,8 @@ public class ClusterInfoMapping {
       responseValues.put(lastModifiedFabricIndexResponseValue, lastModifiedFabricIndex);
       CommandResponseInfo nextCredentialIndexResponseValue = new CommandResponseInfo("nextCredentialIndex", "Integer");
       responseValues.put(nextCredentialIndexResponseValue, nextCredentialIndex);
+      CommandResponseInfo credentialDataResponseValue = new CommandResponseInfo("credentialData", "Optional<byte[]>");
+      responseValues.put(credentialDataResponseValue, credentialData);
       callback.onSuccess(responseValues);
     }
 
@@ -19992,6 +19994,111 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedChimeClusterInstalledChimeSoundsAttributeCallback implements ChipClusters.ChimeCluster.InstalledChimeSoundsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ChimeClusterChimeSoundStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ChimeClusterChimeSoundStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedChimeClusterGeneratedCommandListAttributeCallback implements ChipClusters.ChimeCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedChimeClusterAcceptedCommandListAttributeCallback implements ChipClusters.ChimeCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedChimeClusterEventListAttributeCallback implements ChipClusters.ChimeCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedChimeClusterAttributeListAttributeCallback implements ChipClusters.ChimeCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedEcosystemInformationClusterDeviceDirectoryAttributeCallback implements ChipClusters.EcosystemInformationCluster.DeviceDirectoryAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -22328,6 +22435,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ContentAppObserverCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("contentAppObserver", contentAppObserverClusterInfo);
 
+    ClusterInfo chimeClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.ChimeCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("chime", chimeClusterInfo);
+
     ClusterInfo ecosystemInformationClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.EcosystemInformationCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("ecosystemInformation", ecosystemInformationClusterInfo);
@@ -22469,6 +22580,7 @@ public class ClusterInfoMapping {
     destination.get("accountLogin").combineCommands(source.get("accountLogin"));
     destination.get("contentControl").combineCommands(source.get("contentControl"));
     destination.get("contentAppObserver").combineCommands(source.get("contentAppObserver"));
+    destination.get("chime").combineCommands(source.get("chime"));
     destination.get("ecosystemInformation").combineCommands(source.get("ecosystemInformation"));
     destination.get("commissionerControl").combineCommands(source.get("commissionerControl"));
     destination.get("unitTesting").combineCommands(source.get("unitTesting"));
@@ -28626,6 +28738,22 @@ public class ClusterInfoMapping {
     contentAppObserverClusterInteractionInfoMap.put("contentAppMessage", contentAppObservercontentAppMessageInteractionInfo);
 
     commandMap.put("contentAppObserver", contentAppObserverClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> chimeClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> chimeplayChimeSoundCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo chimeplayChimeSoundInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ChimeCluster) cluster)
+        .playChimeSound((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        chimeplayChimeSoundCommandParams
+    );
+    chimeClusterInteractionInfoMap.put("playChimeSound", chimeplayChimeSoundInteractionInfo);
+
+    commandMap.put("chime", chimeClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> ecosystemInformationClusterInteractionInfoMap = new LinkedHashMap<>();
 

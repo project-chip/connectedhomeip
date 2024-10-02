@@ -128,7 +128,7 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
         asserts.assert_is_instance(abs_min_power, int)
 
         if not self.is_ci:
-            user_response = self.wait_for_user_input(prompt_msg=f"AbsMinPower is {abs_min_power/1000000.0} W - is this correct? Enter 'y' or 'n'",
+            user_response = self.wait_for_user_input(prompt_msg=f"AbsMinPower is {abs_min_power/1000.0} W - is this correct? Enter 'y' or 'n'",
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
             asserts.assert_equal(user_response.lower(), "y")
@@ -143,7 +143,7 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
         asserts.assert_greater_equal(abs_max_power, abs_min_power)
 
         if not self.is_ci:
-            user_response = self.wait_for_user_input(prompt_msg=f"AbsMaxPower is {abs_max_power/1000000.0} W - is this correct? Enter 'y' or 'n'",
+            user_response = self.wait_for_user_input(prompt_msg=f"AbsMaxPower is {abs_max_power/1000.0} W - is this correct? Enter 'y' or 'n'",
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
             asserts.assert_equal(user_response.lower(), "y")
