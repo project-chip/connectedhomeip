@@ -53,7 +53,7 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
 
 bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion)
 {
-    return chip::app::IsClusterDataVersionEqual(path, dataVersion);
+    return IsClusterDataVersionEqual(path, dataVersion);
 }
 
 } // namespace EmberImpl
