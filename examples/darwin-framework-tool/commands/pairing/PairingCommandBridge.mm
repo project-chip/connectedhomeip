@@ -83,7 +83,7 @@ void PairingCommandBridge::SetUpDeviceControllerDelegate()
 
     MTRDeviceController * commissioner = CurrentCommissioner();
     [deviceControllerDelegate setCommissioner:commissioner];
-    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     [commissioner setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
 }
 
@@ -156,7 +156,7 @@ void PairingCommandBridge::PairWithPayload(NSError * __autoreleasing * error)
 
 void PairingCommandBridge::Unpair()
 {
-    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip-tool.command", DISPATCH_QUEUE_SERIAL);
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip-tool.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     auto * device = BaseDeviceWithNodeId(mNodeId);
 
     ChipLogProgress(chipTool, "Attempting to unpair device %llu", mNodeId);
