@@ -19,8 +19,6 @@ on:
         branches:
             - master
             - 'v*-branch'
-        branches-ignore:
-            - 'dependabot/**'
     workflow_dispatch:
 
 concurrency:
