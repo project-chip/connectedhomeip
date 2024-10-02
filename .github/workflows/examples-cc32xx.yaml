@@ -17,8 +17,11 @@ name: Build example - TI CC32XX
 on:
     workflow_dispatch:
     push:
+        branches:
+            - master
+            - 'v*-branch'
         branches-ignore:
-            - "dependabot/**"
+            - 'dependabot/**'
     pull_request:
     merge_group:
 
