@@ -23,7 +23,6 @@ import os.path
 import pathlib
 import re
 import shlex
-import shutil
 import sys
 import time
 
