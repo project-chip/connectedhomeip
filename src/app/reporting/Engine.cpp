@@ -23,7 +23,6 @@
  *
  */
 
-#include "lib/core/DataModelTypes.h"
 #include <app/AppConfig.h>
 #include <app/ConcreteEventPath.h>
 #include <app/InteractionModelEngine.h>
@@ -36,6 +35,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/MatterCallbacks.h>
 #include <app/util/ember-compatibility-functions.h>
+#include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
