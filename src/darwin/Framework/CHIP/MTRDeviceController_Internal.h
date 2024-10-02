@@ -202,12 +202,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (MTRBaseDevice *)baseDeviceForNodeID:(NSNumber *)nodeID;
 
 /**
- * Notify the controller that a new operational instance with the given node id
- * and a compressed fabric id that matches this controller has been observed.
- */
-- (void)operationalInstanceAdded:(chip::NodeId)nodeID;
-
-/**
  * Download log of the desired type from the device.
  */
 - (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
@@ -242,13 +236,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData;
 - (void)removeDevice:(MTRDevice *)device;
-
-/**
- * Since getSessionForNode now enqueues by the subscription pool for Thread
- * devices, MTRDevice needs a direct non-queued access because it already
- * makes use of the subscription pool.
- */
-- (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
 
 @end
 
