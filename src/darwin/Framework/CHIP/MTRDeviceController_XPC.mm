@@ -66,11 +66,32 @@
     NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
     [allowedClasses addObjectsFromArray:@[
         [MTRCommandPath class],
-        [MTRAttributePath class]
+        [MTRAttributePath class],
     ]];
 
     [interface setClasses:allowedClasses
               forSelector:@selector(deviceController:nodeID:invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:serverSideProcessingTimeout:completion:)
+            argumentIndex:0
+                  ofReply:YES];
+
+    // readAttributePaths: gets handed an array of MTRAttributeRequestPath.
+    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray:@[
+        [MTRAttributeRequestPath class],
+    ]];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:readAttributePaths:withReply:)
+            argumentIndex:2
+                  ofReply:NO];
+
+    // readAttributePaths: returns response-value dictionaries that have
+    // attribute paths and values.
+    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray:@[
+        [MTRAttributePath class],
+    ]];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:readAttributePaths:withReply:)
             argumentIndex:0
                   ofReply:YES];
 
@@ -82,7 +103,7 @@
     NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
     NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
     [allowedClasses addObjectsFromArray:@[
-        [MTRAttributePath class]
+        [MTRAttributePath class],
     ]];
 
     [interface setClasses:allowedClasses
@@ -92,7 +113,7 @@
 
     allowedClasses = [MTRDeviceController_XPC _allowedClasses];
     [allowedClasses addObjectsFromArray:@[
-        [MTREventPath class]
+        [MTREventPath class],
     ]];
 
     [interface setClasses:allowedClasses
@@ -310,10 +331,16 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(controllerNodeID, NSNumber *, nil,
 // - (nullable MTRBaseDevice *)deviceController:(NSUUID *)controller deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error;
 // - (oneway void)deviceController:(NSUUID *)controller startBrowseForCommissionables:(id<MTRCommissionableBrowserDelegate>)delegate withReply:(void(^)(BOOL success))reply;
 // - (oneway void)deviceController:(NSUUID *)controller stopBrowseForCommissionablesWithReply:(void(^)(BOOL success))reply;
+// - (oneway void)deviceController:(NSUUID *)controller preWarmCommissioningSession;
 // - (oneway void)deviceController:(NSUUID *)controller attestationChallengeForDeviceID:(NSNumber *)deviceID withReply:(void(^)(NSData * _Nullable))reply;
 
 //- (oneway void)deviceController:(NSUUID *)controller addServerEndpoint:(MTRServerEndpoint *)endpoint withReply:(void(^)(BOOL success))reply;
 //- (oneway void)deviceController:(NSUUID *)controller removeServerEndpoint:(MTRServerEndpoint *)endpoint;
+
+//- (oneway void)deviceController:(NSUUID *)controller setOperationalCertificateIssuer:(nullable id<MTROperationalCertificateIssuer>)operationalCertificateIssuer queue:(nullable dispatch_queue_t)queue withReply:(void(^)(BOOL success))reply;
+
+//- (oneway void)deviceController:(NSUUID *)controller openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration withReply:(void(^)(NSError * _Nullable error))reply;
+//- (oneway void)deviceController:(NSUUID *)controller openPairingWindowWithPIN:(uint64_t)deviceID duration:(NSUInteger)duration discriminator:(NSUInteger)discriminator setupPIN:(NSUInteger)setupPIN  withReply:(void(^)(NSError * _Nullable error))reply;
 
 MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(shutdown, shutdownDeviceController
                                                : self.uniqueIdentifier)

@@ -135,4 +135,9 @@ void * __wrap__realloc_r(void * REENT, void * ptr, size_t new_size)
     return __wrap_realloc(ptr, new_size);
 }
 
+void * __wrap__calloc_r(void * REENT, size_t num, size_t size)
+{
+    return __wrap_calloc(num, size);
+}
+
 } // extern "C"

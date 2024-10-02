@@ -24,4 +24,5 @@ typedef void (*EventHandler)(const AppEvent &);
 struct AppEvent
 {
     EventHandler Handler;
+    void * extra;
 };

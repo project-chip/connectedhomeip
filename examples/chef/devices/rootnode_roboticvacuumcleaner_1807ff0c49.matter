@@ -2012,7 +2012,7 @@ endpoint 1 {
 
   server cluster PowerSource {
     ram      attribute status;
-    ram      attribute order;
+    persist  attribute order;
     ram      attribute description;
     ram      attribute batPercentRemaining default = 95;
     ram      attribute batPresent default = 1;

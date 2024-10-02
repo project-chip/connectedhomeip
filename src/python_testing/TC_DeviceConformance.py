@@ -166,7 +166,6 @@ class DeviceConformanceTests(BasicCompositionTests):
                     if attribute_id not in self.xml_clusters[cluster_id].attributes.keys():
                         # TODO: Consolidate the range checks with IDM-10.1 once that lands
                         if attribute_id <= 0x4FFF:
-                            # manufacturer attribute
                             record_error(location=location, problem='Standard attribute found on device, but not in spec')
                         continue
                     xml_attribute = self.xml_clusters[cluster_id].attributes[attribute_id]
@@ -193,9 +192,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                         if command_id not in xml_commands_dict:
                             # TODO: Consolidate range checks with IDM-10.1 once that lands
                             if command_id <= 0xFF:
-                                # manufacturer command
-                                continue
-                            record_error(location=location, problem='Standard command found on device, but not in spec')
+                                record_error(location=location, problem='Standard command found on device, but not in spec')
                             continue
                         xml_command = xml_commands_dict[command_id]
                         conformance_decision_with_choice = xml_command.conformance(feature_map, attribute_list, all_command_list)
@@ -359,9 +356,8 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         # TODO: Turn this off after TE2
         # https://github.com/project-chip/connectedhomeip/issues/34615
         ignore_in_progress = self.user_params.get("ignore_in_progress", True)
-        is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         allow_provisional = self.user_params.get("allow_provisional", False)
-        success, problems = self.check_conformance(ignore_in_progress, is_ci, allow_provisional)
+        success, problems = self.check_conformance(ignore_in_progress, self.is_pics_sdk_ci_only, allow_provisional)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with conformance")

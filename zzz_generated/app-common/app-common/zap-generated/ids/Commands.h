@@ -1281,20 +1281,6 @@ static constexpr CommandId Id = 0x00000008;
 } // namespace Commands
 } // namespace WindowCovering
 
-namespace BarrierControl {
-namespace Commands {
-
-namespace BarrierControlGoToPercent {
-static constexpr CommandId Id = 0x00000000;
-} // namespace BarrierControlGoToPercent
-
-namespace BarrierControlStop {
-static constexpr CommandId Id = 0x00000001;
-} // namespace BarrierControlStop
-
-} // namespace Commands
-} // namespace BarrierControl
-
 namespace ServiceArea {
 namespace Commands {
 
@@ -1817,6 +1803,16 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace ContentAppObserver
 
+namespace Chime {
+namespace Commands {
+
+namespace PlayChimeSound {
+static constexpr CommandId Id = 0x00000000;
+} // namespace PlayChimeSound
+
+} // namespace Commands
+} // namespace Chime
+
 namespace CommissionerControl {
 namespace Commands {
 
@@ -1834,28 +1830,6 @@ static constexpr CommandId Id = 0x00000002;
 
 } // namespace Commands
 } // namespace CommissionerControl
-
-namespace ElectricalMeasurement {
-namespace Commands {
-
-namespace GetProfileInfoResponseCommand {
-static constexpr CommandId Id = 0x00000000;
-} // namespace GetProfileInfoResponseCommand
-
-namespace GetProfileInfoCommand {
-static constexpr CommandId Id = 0x00000000;
-} // namespace GetProfileInfoCommand
-
-namespace GetMeasurementProfileResponseCommand {
-static constexpr CommandId Id = 0x00000001;
-} // namespace GetMeasurementProfileResponseCommand
-
-namespace GetMeasurementProfileCommand {
-static constexpr CommandId Id = 0x00000001;
-} // namespace GetMeasurementProfileCommand
-
-} // namespace Commands
-} // namespace ElectricalMeasurement
 
 namespace UnitTesting {
 namespace Commands {

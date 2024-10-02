@@ -2581,7 +2581,7 @@ endpoint 1 {
     emits event BatFaultChange;
     emits event BatChargeFaultChange;
     ram      attribute status default = 1;
-    ram      attribute order default = 1;
+    persist  attribute order default = 1;
     ram      attribute description default = "Primary Battery";
     ram      attribute batVoltage default = 4100;
     ram      attribute batPercentRemaining default = 95;
@@ -2613,9 +2613,9 @@ endpoint 1 {
   }
 
   server cluster TemperatureMeasurement {
-    persist  attribute measuredValue default = 0x800;
-    persist  attribute minMeasuredValue default = 0x800;
-    persist  attribute maxMeasuredValue default = 0x800;
+    persist  attribute measuredValue default = 0;
+    persist  attribute minMeasuredValue default = -5000;
+    persist  attribute maxMeasuredValue default = 7500;
     persist  attribute tolerance default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

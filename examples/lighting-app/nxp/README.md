@@ -119,9 +119,9 @@ where `device` can be one of the [Supported devices](#supported-devices).
 
 The application uses an NXP specific data model file:
 
-| path                          | description                             |
-| ----------------------------- | --------------------------------------- |
-| `zap-lit/lighting-on-off.zap` | Data model for On/Off Light device type |
+| path                      | description                             |
+| ------------------------- | --------------------------------------- |
+| `zap/lighting-on-off.zap` | Data model for On/Off Light device type |
 
 The data model can be changed by simply replacing the gn `deps` statement
 corresponding to data model target.

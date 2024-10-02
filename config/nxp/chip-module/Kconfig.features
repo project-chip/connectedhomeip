@@ -24,11 +24,16 @@ config CHIP_WIFI
 	default y
 	select WIFI
 	select WIFI_NXP
-	select WPA_SUPP
-	select WPA_SUPP_AP
-	select WPA_SUPP_WPS
-	select WPA_SUPP_WPA3
-	select WPA_SUPP_CRYPTO_ENTERPRISE
+	select WIFI_NM_WPA_SUPPLICANT
+	select WIFI_NM_WPA_SUPPLICANT_CRYPTO_ENTERPRISE
+	select WIFI_NM_WPA_SUPPLICANT_DPP
+	select WIFI_NM_WPA_SUPPLICANT_EAPOL
+	select WIFI_NM_WPA_SUPPLICANT_WPS
+	select NET_L2_ETHERNET
+	select NET_IPV4
+	select NET_DHCPV4
+	select DNS_RESOLVER
+	imply THREAD_CUSTOM_DATA
 	imply MBEDTLS_ENTROPY_C
 	imply NET_STATISTICS
 	imply NET_PKT_TXTIME
@@ -71,4 +76,27 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
 	  within range [-JITTER; +JITTER].
 
+config CHIP_ETHERNET
+	bool "Enable NXP Ethernet support"
+	default n
+	depends on !CHIP_WIFI
+	select NET_MGMT_EVENT
+	select NET_MGMT_EVENT_INFO
+	select NET_L2_ETHERNET
+	select NET_L2_ETHERNET_MGMT
+	select NET_UDP
+	select NET_IP
+	select NET_CONFIG_SETTINGS
+	select NET_MGMT
+	select NET_IPV4
+	select NET_DHCPV4
+	select NET_NATIVE_IPV4
+	select NET_NATIVE
+	select NET_TCP
+	select DNS_RESOLVER
+	select MDNS_RESOLVER
+	select MBEDTLS_PKCS5_C
+	select MBEDTLS_HKDF_C
+	select MBEDTLS_ECDSA_C
+	select PSA_CRYPTO_ENABLE_ALL
 endif # CHIP

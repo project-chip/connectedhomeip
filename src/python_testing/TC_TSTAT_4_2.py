@@ -101,6 +101,16 @@ class TC_TSTAT_4_2(MatterBaseTest):
             return availableScenarios[0]
         return None
 
+    def make_preset(self, presetScenario,  coolSetpoint, heatSetpoint, presetHandle=NullValue, name=None, builtIn=False):
+        preset = cluster.Structs.PresetStruct(presetHandle=presetHandle, presetScenario=presetScenario, builtIn=builtIn)
+        if self.check_pics("TSTAT.S.F00"):
+            preset.heatingSetpoint = heatSetpoint
+        if self.check_pics("TSTAT.S.F01"):
+            preset.coolingSetpoint = coolSetpoint
+        if name is not None:
+            preset.name = name
+        return preset
+
     async def write_presets(self,
                             endpoint,
                             presets,
@@ -234,7 +244,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
     @ async_test_body
     async def test_TC_TSTAT_4_2(self):
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else 1
 
         self.step("1")
         # Commission DUT - already done
@@ -251,20 +261,66 @@ class TC_TSTAT_4_2(MatterBaseTest):
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
 
+        secondary_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=secondary_controller, endpoint=0, cluster=Clusters.Objects.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
+
         current_presets = []
         presetTypes = []
         presetScenarioCounts = {}
         numberOfPresetsSupported = 0
-        minHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinHeatSetpointLimit)
-        maxHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxHeatSetpointLimit)
-        minCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinCoolSetpointLimit)
-        maxCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxCoolSetpointLimit)
+        minHeatSetpointLimit = 700
+        maxHeatSetpointLimit = 3000
+        minCoolSetpointLimit = 1600
+        maxCoolSetpointLimit = 3200
 
-        asserts.assert_true(minHeatSetpointLimit < maxHeatSetpointLimit, "Heat setpoint range invalid")
-        asserts.assert_true(minCoolSetpointLimit < maxCoolSetpointLimit, "Cool setpoint range invalid")
+        supportsHeat = self.check_pics("TSTAT.S.F00")
+        supportsCool = self.check_pics("TSTAT.S.F01")
 
+        if supportsHeat:
+            # If the server supports MinHeatSetpointLimit & MaxHeatSetpointLimit, use those
+            if self.check_pics("TSTAT.S.A0015") and self.check_pics("TSTAT.S.A0016"):
+                minHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinHeatSetpointLimit)
+                maxHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxHeatSetpointLimit)
+            elif self.check_pics("TSTAT.S.A0003") and self.check_pics("TSTAT.S.A0004"):
+                # Otherwise, if the server supports AbsMinHeatSetpointLimit & AbsMaxHeatSetpointLimit, use those
+                minHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMinHeatSetpointLimit)
+                maxHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMaxHeatSetpointLimit)
+
+            asserts.assert_true(minHeatSetpointLimit < maxHeatSetpointLimit, "Heat setpoint range invalid")
+
+        if supportsCool:
+            # If the server supports MinCoolSetpointLimit & MaxCoolSetpointLimit, use those
+            if self.check_pics("TSTAT.S.A0017") and self.check_pics("TSTAT.S.A0018"):
+                minCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinCoolSetpointLimit)
+                maxCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxCoolSetpointLimit)
+            elif self.check_pics("TSTAT.S.A0005") and self.check_pics("TSTAT.S.A0006"):
+                # Otherwise, if the server supports AbsMinCoolSetpointLimit & AbsMaxCoolSetpointLimit, use those
+                minCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMinCoolSetpointLimit)
+                maxCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMaxCoolSetpointLimit)
+
+            asserts.assert_true(minCoolSetpointLimit < maxCoolSetpointLimit, "Cool setpoint range invalid")
+
+        # Servers that do not support occupancy are always "occupied"
+        occupied = True
+
+        supportsOccupancy = self.check_pics("TSTAT.S.F02")
+        if supportsOccupancy:
+            occupied = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Occupancy) & 1
+
+        # Target setpoints
         heatSetpoint = minHeatSetpointLimit + ((maxHeatSetpointLimit - minHeatSetpointLimit) / 2)
         coolSetpoint = minCoolSetpointLimit + ((maxCoolSetpointLimit - minCoolSetpointLimit) / 2)
+
+        # Set the heating and cooling setpoints to something other than the target setpoints
+        if occupied:
+            if supportsHeat:
+                await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(heatSetpoint-1), endpoint_id=endpoint)
+            if supportsCool:
+                await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedCoolingSetpoint(coolSetpoint-1), endpoint_id=endpoint)
+        else:
+            if supportsHeat:
+                await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedHeatingSetpoint(heatSetpoint-1), endpoint_id=endpoint)
+            if supportsCool:
+                await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(coolSetpoint-1), endpoint_id=endpoint)
 
         self.step("2")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050")):
@@ -296,8 +352,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 for preset in test_presets:
                     preset.builtIn = NullValue
 
-                test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=availableScenario,
-                                                                 coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False))
+                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint))
 
                 await self.send_atomic_request_begin_command()
 
@@ -334,8 +389,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 if len(builtInPresets) > 0:
                     builtInPresets[0].builtIn = NullValue
 
-                test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=availableScenario,
-                                                                 coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False))
+                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint))
 
                 # Send the AtomicRequest begin command
                 await self.send_atomic_request_begin_command()
@@ -415,7 +469,16 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 6 since there were no non-built-in presets to activate and delete")
 
             # Write the occupied cooling setpoint to a different value
-            await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedCoolingSetpoint(2300), endpoint_id=endpoint)
+            if occupied:
+                if supportsHeat:
+                    await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(heatSetpoint+1), endpoint_id=endpoint)
+                elif supportsCool:
+                    await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedCoolingSetpoint(coolSetpoint+1), endpoint_id=endpoint)
+            else:
+                if supportsHeat:
+                    await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedHeatingSetpoint(heatSetpoint+1), endpoint_id=endpoint)
+                elif supportsCool:
+                    await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(coolSetpoint+1), endpoint_id=endpoint)
 
             activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
             logger.info(f"Rx'd ActivePresetHandle: {activePresetHandle}")
@@ -456,8 +519,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 await self.send_atomic_request_begin_command()
 
                 # Write to the presets attribute after adding a preset with builtIn set to True
-                test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=availableScenario,
-                                                                 coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=True))
+                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint, builtIn=True))
 
                 status = await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
 
@@ -475,8 +537,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
             # Write to the presets attribute after adding a preset with a preset handle that doesn't exist in Presets attribute
             test_presets = copy.deepcopy(current_presets)
-            test_presets.append(cluster.Structs.PresetStruct(presetHandle=random.randbytes(16), presetScenario=cluster.Enums.PresetScenarioEnum.kWake,
-                                name="Wake", coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=True))
+            test_presets.append(self.make_preset(cluster.Enums.PresetScenarioEnum.kWake, coolSetpoint,
+                                heatSetpoint,  presetHandle=random.randbytes(16), name="Wake",  builtIn=True))
 
             status = await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.NotFound)
 
@@ -497,8 +559,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 await self.send_atomic_request_begin_command()
 
                 # Write to the presets attribute after adding a duplicate preset
-                test_presets.append(cluster.Structs.PresetStruct(
-                    presetHandle=duplicatePreset.presetHandle, presetScenario=availableScenario, coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False))
+                test_presets.append(self.make_preset(availableScenario, coolSetpoint,
+                                    heatSetpoint, presetHandle=duplicatePreset.presetHandle))
 
                 await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
 
@@ -540,8 +602,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             presets_without_name_support = list(preset for preset in test_presets if preset.presetScenario in availableScenarios)
 
             if len(presets_without_name_support) == 0 and len(availableScenarios) > 0:
-                new_preset = cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=availableScenarios[0],
-                                                          coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=True)
+                new_preset = self.make_preset(availableScenarios[0], coolSetpoint, heatSetpoint, builtIn=True)
                 test_presets.append(new_preset)
                 presets_without_name_support = [new_preset]
 
@@ -570,8 +631,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
                 # Write to the presets attribute with a new valid preset added
                 test_presets = copy.deepcopy(current_presets)
-                test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=availableScenario,
-                                    coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False))
+                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint))
 
                 # Send the AtomicRequest begin command
                 await self.send_atomic_request_begin_command()
@@ -613,7 +673,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_begin_command(dev_ctrl=secondary_controller)
 
             # Primary controller removes the second fabric
-            await self.send_single_cmd(Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=2),  endpoint=0)
+            await self.send_single_cmd(Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=secondary_fabric_index),  endpoint=0)
 
             # Send the AtomicRequest begin command from primary controller, which should succeed, as the secondary controller's atomic write state has been cleared
             status = await self.send_atomic_request_begin_command()
@@ -630,8 +690,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 presetScenario for presetScenario in cluster.Enums.PresetScenarioEnum if presetScenario not in supportedScenarios)
             if len(unavailableScenarios) > 0:
                 test_presets = current_presets.copy()
-                test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=unavailableScenarios[0],
-                                                                 name="Preset", coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False))
+                test_presets.append(self.make_preset(unavailableScenarios[0], coolSetpoint, heatSetpoint, name="Preset"))
 
                 # Send the AtomicRequest begin command
                 await self.send_atomic_request_begin_command()
@@ -664,8 +723,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                             presetsAddedForScenario = presetsAddedForScenario + 1
 
                     while presetsAddedForScenario < presetType.numberOfPresets:
-                        testPresets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=scenario,
-                                                                        coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False))
+                        testPresets.append(self.make_preset(scenario, coolSetpoint, heatSetpoint))
                         presetsAddedForScenario = presetsAddedForScenario + 1
 
                 # Send the AtomicRequest begin command

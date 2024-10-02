@@ -26,6 +26,7 @@ from enum import Enum, auto
 from typing import Callable, Optional
 
 import chip.clusters as Clusters
+import conformance_support
 from chip.tlv import uint
 from conformance_support import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
                                  ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
@@ -508,7 +509,7 @@ def check_clusters_for_unknown_commands(clusters: dict[int, XmlCluster], problem
 
 class PrebuiltDataModelDirectory(Enum):
     k1_3 = auto()
-    kInProgress = auto()
+    k1_4 = auto()
     kMaster = auto()
 
 
@@ -520,15 +521,15 @@ class DataModelLevel(str, Enum):
 def _get_data_model_directory(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str], data_model_level: DataModelLevel) -> str:
     if data_model_directory == PrebuiltDataModelDirectory.k1_3:
         return os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', '1.3', data_model_level)
-    elif data_model_directory == PrebuiltDataModelDirectory.kInProgress:
-        return os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'in_progress', data_model_level)
+    elif data_model_directory == PrebuiltDataModelDirectory.k1_4:
+        return os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', '1.4', data_model_level)
     elif data_model_directory == PrebuiltDataModelDirectory.kMaster:
         return os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'master', data_model_level)
     else:
         return data_model_directory
 
 
-def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.kMaster) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
+def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
     dir = _get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
 
     clusters: dict[int, XmlCluster] = {}
@@ -610,6 +611,25 @@ def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirec
             0x04: XmlAttribute(name='SelectedTemperatureLevel', datatype='uint8', conformance=feature(0x02, 'TL'), read_access=view, write_access=none, write_optional=False),
             0x05: XmlAttribute(name='SupportedTemperatureLevels', datatype='list', conformance=feature(0x02, 'TL'), read_access=view, write_access=none, write_optional=False),
         }
+
+    # TODO: Need automated parsing for atomic attributes.
+    atomic_request_cmd_id = 0xFE
+    atomic_response_cmd_id = 0xFD
+    atomic_request_name = "Atomic Request"
+    atomic_response_name = "Atomic Response"
+    presets_name = "Presets"
+    schedules_name = "Schedules"
+    if clusters[Clusters.Thermostat.id].revision >= 8:
+        presents_id = clusters[Clusters.Thermostat.id].attribute_map[presets_name]
+        schedules_id = clusters[Clusters.Thermostat.id].attribute_map[schedules_name]
+        conformance = or_operation([conformance_support.attribute(presents_id, presets_name),
+                                   conformance_support.attribute(schedules_id, schedules_name)])
+        clusters[Clusters.Thermostat.id].accepted_commands[atomic_request_cmd_id] = XmlCommand(
+            id=atomic_request_cmd_id, name=atomic_request_name, conformance=conformance)
+        clusters[Clusters.Thermostat.id].generated_commands[atomic_response_cmd_id] = XmlCommand(
+            id=atomic_response_cmd_id, name=atomic_response_name, conformance=conformance)
+        clusters[Clusters.Thermostat.id].command_map[atomic_request_name] = atomic_request_cmd_id
+        clusters[Clusters.Thermostat.id].command_map[atomic_response_name] = atomic_response_cmd_id
 
     check_clusters_for_unknown_commands(clusters, problems)
 
@@ -756,7 +776,7 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNot
     return device_types, problems
 
 
-def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.kInProgress) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     dir = _get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems = []
