@@ -111,7 +111,6 @@ class TC_CCTRL_2_3(MatterBaseTest):
 
     @run_if_endpoint_matches(has_cluster(Clusters.CommissionerControl))
     async def test_TC_CCTRL_2_3(self):
-        self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
 
         self.step(1)
         th_server_fabrics = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
@@ -129,7 +128,7 @@ class TC_CCTRL_2_3(MatterBaseTest):
         await self.send_single_cmd(cmd=cmd)
 
         self.step(5)
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input("Approve Commissioning approval request using manufacturer specified mechanism")
 
         self.step(6)

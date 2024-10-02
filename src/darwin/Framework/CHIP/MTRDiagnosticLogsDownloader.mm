@@ -195,10 +195,11 @@ private:
 
     VerifyOrReturn(![status isEqual:@(MTRDiagnosticLogsStatusBusy)], [self failure:[MTRError errorForCHIPErrorCode:CHIP_ERROR_BUSY]]);
     VerifyOrReturn(![status isEqual:@(MTRDiagnosticLogsStatusDenied)], [self failure:[MTRError errorForCHIPErrorCode:CHIP_ERROR_ACCESS_DENIED]]);
+    VerifyOrReturn(![status isEqual:@(MTRDiagnosticLogsStatusNoLogs)], [self failure:[MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_FOUND]]);
 
     // If the whole log content fits into the response LogContent field or if there is no log, forward it to the caller
     // and stop here.
-    if ([status isEqual:@(MTRDiagnosticLogsStatusExhausted)] || [status isEqual:@(MTRDiagnosticLogsStatusNoLogs)]) {
+    if ([status isEqual:@(MTRDiagnosticLogsStatusExhausted)]) {
         NSError * writeError = nil;
         [self writeToFile:response.logContent error:&writeError];
         VerifyOrReturn(nil == writeError, [self failure:writeError]);
