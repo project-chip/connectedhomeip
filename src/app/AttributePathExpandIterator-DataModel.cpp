@@ -25,8 +25,8 @@ namespace app {
 
 AttributePathExpandIteratorDataModel::AttributePathExpandIteratorDataModel(
     DataModel::Provider * provider, SingleLinkedListNode<AttributePathParams> * attributePath) :
-    mDataModelProvider(provider),
-    mpAttributePath(attributePath), mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
+    mDataModelProvider(provider), mpAttributePath(attributePath),
+    mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
 
 {
     mOutputPath.mExpanded = true; // this is reset in 'next' if needed
@@ -42,9 +42,6 @@ bool AttributePathExpandIteratorDataModel::IsValidAttributeId(AttributeId attrib
     {
     case Clusters::Globals::Attributes::GeneratedCommandList::Id:
     case Clusters::Globals::Attributes::AcceptedCommandList::Id:
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-    case Clusters::Globals::Attributes::EventList::Id:
-#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     case Clusters::Globals::Attributes::AttributeList::Id:
         return true;
     default:
