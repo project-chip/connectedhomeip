@@ -51,15 +51,36 @@ namespace Logging {
         void LogByteSpan(
             chip::Logging::LogModule moduleId, char const * moduleName, os_log_type_t type, const chip::ByteSpan & span)
         {
-            os_log_t logger = LoggerForModule(moduleId, moduleName);
-            if (os_log_type_enabled(logger, type)) {
-                auto size = span.size();
-                auto data = span.data();
-                NSMutableString * string = [[NSMutableString alloc] initWithCapacity:(size * 6)]; // 6 characters per byte
-                for (size_t i = 0; i < size; i++) {
-                    [string appendFormat:((i % 8 != 7) ? @"0x%02x, " : @"0x%02x,\n"), data[i]];
+            @autoreleasepool {
+                os_log_t logger = LoggerForModule(moduleId, moduleName);
+                if (os_log_type_enabled(logger, type)) {
+                    auto size = span.size();
+                    auto data = span.data();
+                    NSMutableString * string = [[NSMutableString alloc] initWithCapacity:(size * 6)]; // 6 characters per byte
+                    for (size_t i = 0; i < size; i++) {
+                        [string appendFormat:((i % 8 != 7) ? @"0x%02x, " : @"0x%02x,\n"), data[i]];
+                    }
+                    os_log_with_type(logger, type, "%@", string);
                 }
-                os_log_with_type(logger, type, "%@", string);
+            }
+        }
+
+        void LogAny(
+            chip::Logging::LogModule moduleId, char const * moduleName, os_log_type_t type, const char * msg, ...)
+        {
+            @autoreleasepool {
+                os_log_t logger = LoggerForModule(moduleId, moduleName);
+                if (os_log_type_enabled(logger, type)) {
+                    va_list v;
+                    va_start(v, msg);
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
+                    NSString * string = [[NSString alloc] initWithFormat:@(msg) arguments:v];
+#pragma clang diagnostic pop
+                    va_end(v);
+
+                    os_log_with_type(logger, type, "%@", string);
+                }
             }
         }
 

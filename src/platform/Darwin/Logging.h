@@ -28,11 +28,12 @@
 #define ChipPlatformLog(MOD, CAT, MSG, ...)                                                                                        \
     do                                                                                                                             \
     {                                                                                                                              \
-        ChipPlatformValidateLogFormat(MSG, ##__VA_ARGS__); /* validate once and ignore warnings from os_log() / Log() */           \
+        ChipPlatformValidateLogFormat(MSG, ##__VA_ARGS__); /* validate once and ignore warnings from Log() */                      \
+        chip::Logging::Platform::LogAny(chip::Logging::kLogModule_##MOD, #MOD,                                                     \
+                                        static_cast<os_log_type_t>(chip::Logging::Platform::kOSLogCategory_##CAT), MSG,            \
+                                        ##__VA_ARGS__);                                                                            \
         _Pragma("clang diagnostic push");                                                                                          \
         _Pragma("clang diagnostic ignored \"-Wformat\"");                                                                          \
-        os_log_with_type(chip::Logging::Platform::LoggerForModule(chip::Logging::kLogModule_##MOD, #MOD),                          \
-                         static_cast<os_log_type_t>(chip::Logging::Platform::kOSLogCategory_##CAT), MSG, ##__VA_ARGS__);           \
         ChipInternalLogImpl(MOD, CHIP_LOG_CATEGORY_##CAT, MSG, ##__VA_ARGS__);                                                     \
         _Pragma("clang diagnostic pop");                                                                                           \
     } while (0)
@@ -66,6 +67,7 @@ enum OSLogCategory
 
 os_log_t LoggerForModule(chip::Logging::LogModule moduleId, char const * moduleName);
 void LogByteSpan(chip::Logging::LogModule moduleId, char const * moduleName, os_log_type_t type, const chip::ByteSpan & span);
+void LogAny(chip::Logging::LogModule moduleId, char const * moduleName, os_log_type_t type, const char * msg, ...);
 
 // Helper constructs for compile-time validation of format strings for C++ / ObjC++ contexts.
 // Note that ObjC++ contexts are restricted to NSString style specifiers. Supporting os_log()
