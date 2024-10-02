@@ -16,6 +16,9 @@ name: Build example - QPG
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'
         branches-ignore:
             - 'dependabot/**'
     pull_request:
