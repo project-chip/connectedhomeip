@@ -16,25 +16,19 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements reporting engine for CHIP
- *      Data Model profile.
- *
- */
-
 #include <app/AppConfig.h>
 #include <app/ConcreteEventPath.h>
-#include <app/InteractionModelEngine.h>
-#include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
+#include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
+#include <app/reporting/Read-Checked.h>
 #include <app/reporting/Read.h>
 #include <app/reporting/reporting.h>
-#include <app/util/MatterCallbacks.h>
+#include <app/RequiredPrivilege.h>
 #include <app/util/ember-compatibility-functions.h>
+#include <app/util/MatterCallbacks.h>
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -97,8 +91,10 @@ bool Engine::IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFil
         if (aPath.mEndpointId == filter->mValue.mEndpointId && aPath.mClusterId == filter->mValue.mClusterId)
         {
             existPathMatch = true;
-            if (!IsClusterDataVersionEqual(ConcreteClusterPath(filter->mValue.mEndpointId, filter->mValue.mClusterId),
-                                           filter->mValue.mDataVersion.Value()))
+
+            if (!Impl::IsClusterDataVersionEqualTo(mpImEngine->GetDataModelProvider(),
+                                                   ConcreteClusterPath(filter->mValue.mEndpointId, filter->mValue.mClusterId),
+                                                   filter->mValue.mDataVersion.Value()))
             {
                 existVersionMismatch = true;
             }
