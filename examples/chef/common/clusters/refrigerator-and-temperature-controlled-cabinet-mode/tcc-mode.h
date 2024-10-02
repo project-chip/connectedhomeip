@@ -74,10 +74,10 @@ void Shutdown();
 } // namespace app
 } // namespace chip
 
-chip::Protocols::InteractionModel::Status chefRefrigeratorAndTemperatureControlledCabinetModeExternalReadCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                                     const EmberAfAttributeMetadata * attributeMetadata,
-                                                                     uint8_t * buffer, uint16_t maxReadLength);
+chip::Protocols::InteractionModel::Status
+chefRefrigeratorAndTemperatureControlledCabinetModeExternalReadCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
+                                                                        const EmberAfAttributeMetadata * attributeMetadata,
+                                                                        uint8_t * buffer, uint16_t maxReadLength);
 
-chip::Protocols::InteractionModel::Status chefRefrigeratorAndTemperatureControlledCabinetModeExternalWriteCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                                      const EmberAfAttributeMetadata * attributeMetadata,
-                                                                      uint8_t * buffer);
+chip::Protocols::InteractionModel::Status chefRefrigeratorAndTemperatureControlledCabinetModeExternalWriteCallback(
+    chip::EndpointId endpointId, chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);

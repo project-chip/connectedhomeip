@@ -91,10 +91,10 @@ void RefrigeratorAndTemperatureControlledCabinetMode::Shutdown()
     }
 }
 
-
-chip::Protocols::InteractionModel::Status chefRefrigeratorAndTemperatureControlledCabinetModeExternalReadCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                                     const EmberAfAttributeMetadata * attributeMetadata,
-                                                                     uint8_t * buffer, uint16_t maxReadLength)
+chip::Protocols::InteractionModel::Status
+chefRefrigeratorAndTemperatureControlledCabinetModeExternalReadCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
+                                                                        const EmberAfAttributeMetadata * attributeMetadata,
+                                                                        uint8_t * buffer, uint16_t maxReadLength)
 {
     chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
     chip::AttributeId attributeId                 = attributeMetadata->attributeId;
@@ -108,16 +108,16 @@ chip::Protocols::InteractionModel::Status chefRefrigeratorAndTemperatureControll
     break;
     default:
         ret = chip::Protocols::InteractionModel::Status::UnsupportedRead;
-        ChipLogDetail(DeviceLayer, "Unsupported attributeId %d from reading RefrigeratorAndTemperatureControlledCabinetMode", static_cast<int>(attributeId));
+        ChipLogDetail(DeviceLayer, "Unsupported attributeId %d from reading RefrigeratorAndTemperatureControlledCabinetMode",
+                      static_cast<int>(attributeId));
         break;
     }
 
     return ret;
 }
 
-chip::Protocols::InteractionModel::Status chefRefrigeratorAndTemperatureControlledCabinetModeExternalWriteCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                                      const EmberAfAttributeMetadata * attributeMetadata,
-                                                                      uint8_t * buffer)
+chip::Protocols::InteractionModel::Status chefRefrigeratorAndTemperatureControlledCabinetModeExternalWriteCallback(
+    chip::EndpointId endpointId, chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1
     VerifyOrDie(gTccModeInstance != nullptr);
@@ -143,7 +143,6 @@ chip::Protocols::InteractionModel::Status chefRefrigeratorAndTemperatureControll
 
     return ret;
 }
-
 
 void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(chip::EndpointId endpointId)
 {

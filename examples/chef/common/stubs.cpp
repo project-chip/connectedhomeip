@@ -99,7 +99,8 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
 #endif
 #ifdef MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
     case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
-        return chefRefrigeratorAndTemperatureControlledCabinetModeExternalReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+        return chefRefrigeratorAndTemperatureControlledCabinetModeExternalReadCallback(endpoint, clusterId, attributeMetadata,
+                                                                                       buffer, maxReadLength);
 #endif
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
     case chip::app::Clusters::DishwasherMode::Id:
@@ -176,7 +177,8 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
 #endif
 #ifdef MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
     case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
-        return chefRefrigeratorAndTemperatureControlledCabinetModeExternalWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+        return chefRefrigeratorAndTemperatureControlledCabinetModeExternalWriteCallback(endpoint, clusterId, attributeMetadata,
+                                                                                        buffer);
 #endif
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
     case chip::app::Clusters::DishwasherMode::Id:
