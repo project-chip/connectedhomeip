@@ -713,8 +713,7 @@ for that run, e.g.:
     parameter is specified, the test runner will not run the test script until
     the pattern is found.
 
-    -   Example:
-        `"Manual pairing code: \\[\\d+\\]"`
+    -   Example: `"Manual pairing code: \\[\\d+\\]"`
 
 -   `script-args`: Specifies the arguments to be passed to the test script.
 
