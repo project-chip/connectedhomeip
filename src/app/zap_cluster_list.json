@@ -19,6 +19,7 @@
         "CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "CHANNEL_CLUSTER": [],
+        "CHIME_CLUSTER": [],
         "CLIENT_MONITORING_CLUSTER": [],
         "COLOR_CONTROL_CLUSTER": [],
         "COMMISSIONER_CONTROL_CLUSTER": [],
@@ -165,6 +166,7 @@
             "concentration-measurement-server"
         ],
         "CHANNEL_CLUSTER": ["channel-server"],
+        "CHIME_CLUSTER": [],
         "COLOR_CONTROL_CLUSTER": ["color-control-server"],
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],

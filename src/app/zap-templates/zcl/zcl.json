@@ -22,6 +22,7 @@
         "boolean-state-configuration-cluster.xml",
         "actions-cluster.xml",
         "bridged-device-basic-information.xml",
+        "chime-cluster.xml",
         "chip-ota.xml",
         "channel-cluster.xml",
         "clusters-extensions.xml",
