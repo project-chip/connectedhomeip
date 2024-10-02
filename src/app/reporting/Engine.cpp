@@ -60,8 +60,6 @@ Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eve
         return model->EndpointExists(eventPath.mEndpointId) ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
     }
 
-    // EventList is DEPRECATED in the specification. We explicitly do NOT try to support it here
-    static_assert(!CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE, "EventList attribute is DEPRECATED");
     return Status::Success;
 #else
     return CheckEventSupportStatus(eventPath);
