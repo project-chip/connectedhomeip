@@ -1618,7 +1618,7 @@ endpoint 1 {
   }
 
   server cluster OnOff {
-    ram      attribute onOff default = 0;
+    persist  attribute onOff default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -1646,10 +1646,10 @@ endpoint 1 {
     ram      attribute maxPressure;
     ram      attribute maxSpeed;
     ram      attribute maxFlow;
-    ram      attribute effectiveOperationMode;
-    ram      attribute effectiveControlMode;
+    persist  attribute effectiveOperationMode;
+    persist  attribute effectiveControlMode;
     ram      attribute capacity;
-    ram      attribute operationMode default = 0x00;
+    persist  attribute operationMode default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

@@ -892,6 +892,7 @@ class TC_SwitchTests(MatterBaseTest):
         self.step("7a")
         if not has_msl_feature:
             self.skip_all_remaining_steps("7b")
+            return
 
         # subscription is already established
         self.step("7b")
