@@ -3322,6 +3322,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             _clusterDataToPersist = [NSMutableDictionary dictionary];
         }
         _clusterDataToPersist[clusterPath] = clusterData;
+
+        MTR_LOG("%@ updated DataVersion for %@ to %@", self, clusterPath, dataVersion);
     }
 }
 

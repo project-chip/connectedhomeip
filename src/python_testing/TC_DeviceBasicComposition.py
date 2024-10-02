@@ -455,8 +455,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         self.print_step(
             6, "Validate that none of the global attribute IDs contain values with prefixes outside of the allowed standard or MEI prefix range")
-        is_ci = self.check_pics('PICS_SDK_CI_ONLY')
-        if is_ci:
+        if self.is_pics_sdk_ci_only:
             # test vendor prefixes are allowed in the CI because we use them internally in examples
             bad_prefix_min = 0xFFF5_0000
         else:

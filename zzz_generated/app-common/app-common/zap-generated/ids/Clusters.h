@@ -376,6 +376,9 @@ static constexpr ClusterId Id = 0x0000050F;
 namespace ContentAppObserver {
 static constexpr ClusterId Id = 0x00000510;
 } // namespace ContentAppObserver
+namespace Chime {
+static constexpr ClusterId Id = 0x00000556;
+} // namespace Chime
 namespace EcosystemInformation {
 static constexpr ClusterId Id = 0x00000750;
 } // namespace EcosystemInformation

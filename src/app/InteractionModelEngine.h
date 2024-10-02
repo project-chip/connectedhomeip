@@ -470,9 +470,8 @@ private:
      *
      * aRequestedEventPathCount will be updated to reflect the number of event paths in the request.
      */
-    static CHIP_ERROR ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                      EventPathIBs::Parser & aEventPathListParser, bool & aHasValidEventPath,
-                                      size_t & aRequestedEventPathCount);
+    CHIP_ERROR ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor, EventPathIBs::Parser & aEventPathListParser,
+                               bool & aHasValidEventPath, size_t & aRequestedEventPathCount);
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
@@ -508,6 +507,7 @@ private:
 
     void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
+
     Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
 
     bool HasActiveRead();
@@ -615,7 +615,7 @@ private:
     /**
      * Check if the given attribute path is a valid path in the data model provider.
      */
-    bool IsExistingAttributePath(const ConcreteAttributePath & path);
+    bool IsExistentAttributePath(const ConcreteAttributePath & path);
 
     static void ResumeSubscriptionsTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 

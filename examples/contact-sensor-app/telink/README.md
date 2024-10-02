@@ -142,10 +142,10 @@ feature for another Telink example:
 
 After build application with enabled OTA feature, use next binary files:
 
--   zephyr.bin - main binary to flash PCB (Use at least 2MB PCB).
--   zephyr-ota.bin - binary for OTA Provider
+-   merged.bin - main binary to flash PCB (Use at least 2MB PCB).
+-   matter.ota - binary for OTA Provider
 
-All binaries has the same SW version. To test OTA “zephyr-ota.bin” should have
+All binaries has the same SW version. To test OTA “matter.ota” should have
 higher SW version than base SW. Set CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 in
 corresponding “prj.conf” conﬁguration file.
 
@@ -160,7 +160,7 @@ Usage of OTA:
 -   Run the Linux OTA Provider with OTA image.
 
     ```
-    ./chip-ota-provider-app -f zephyr-ota.bin
+    ./chip-ota-provider-app -f matter.ota
     ```
 
 -   Provision the Linux OTA Provider using chip-tool
