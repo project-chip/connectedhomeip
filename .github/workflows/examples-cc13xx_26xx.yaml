@@ -16,8 +16,11 @@ name: Build example - TI CC13XX_26XX
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'
         branches-ignore:
-            - "dependabot/**"
+            - 'dependabot/**'
     pull_request:
     merge_group:
 
