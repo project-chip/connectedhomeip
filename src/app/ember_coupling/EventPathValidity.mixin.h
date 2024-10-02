@@ -22,35 +22,6 @@ namespace chip {
 namespace app {
 namespace {
 
-/**
- * Find out if the given EventId is reported as supported by the given cluster
- * within its metadata. If cluster has no event metadata (i.e. no event list
- * support is available), clusters are assumed to support any event as there is
- * no way to actually tell.
- *
- * This function is functionally similar to `CheckEventSupportStatus` however
- * it avoids extra lookups to find the underlying cluster (cluster is already
- * passed into the method).
- */
-bool ClusterSupportsEvent(const EmberAfCluster * cluster, EventId eventId)
-{
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-    for (size_t i = 0; i < cluster->eventCount; ++i)
-    {
-        if (cluster->eventList[i] == eventId)
-        {
-            return true;
-        }
-    }
-
-    return false;
-#else
-    // No way to tell. Just claim supported.
-    return true;
-#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-}
-
-#if !CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
 static bool CanAccessEvent(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteClusterPath & aPath,
                            Access::Privilege aNeededPrivilege)
 {
@@ -61,7 +32,6 @@ static bool CanAccessEvent(const Access::SubjectDescriptor & aSubjectDescriptor,
     CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, aNeededPrivilege);
     return (err == CHIP_NO_ERROR);
 }
-#endif
 
 static bool CanAccessEvent(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteEventPath & aPath)
 {
@@ -82,31 +52,10 @@ static bool HasValidEventPathForEndpointAndCluster(EndpointId aEndpoint, const E
 {
     if (aEventPath.HasWildcardEventId())
     {
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        for (decltype(aCluster->eventCount) idx = 0; idx < aCluster->eventCount; ++idx)
-        {
-            ConcreteEventPath path(aEndpoint, aCluster->clusterId, aCluster->eventList[idx]);
-            // If we get here, the path exists.  We just have to do an ACL check for it.
-            bool isValid = CanAccessEvent(aSubjectDescriptor, path);
-            if (isValid)
-            {
-                return true;
-            }
-        }
-
-        return false;
-#else
         // We have no way to expand wildcards.  Just assume that we would need
         // View permissions for whatever events are involved.
         ConcreteClusterPath clusterPath(aEndpoint, aCluster->clusterId);
         return CanAccessEvent(aSubjectDescriptor, clusterPath, Access::Privilege::kView);
-#endif
-    }
-
-    if (!ClusterSupportsEvent(aCluster, aEventPath.mEventId))
-    {
-        // Not an existing event path.
-        return false;
     }
 
     ConcreteEventPath path(aEndpoint, aCluster->clusterId, aEventPath.mEventId);
