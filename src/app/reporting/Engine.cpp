@@ -57,15 +57,7 @@ Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eve
 
     if (!model->GetClusterInfo(eventPath).has_value())
     {
-        // cluster is invalid, return an error.
-        for (EndpointId id = model->FirstEndpoint(); id != kInvalidEndpointId; id = model->NextEndpoint(id))
-        {
-            if (id == eventPath.mEndpointId)
-            {
-                return Status::UnsupportedCluster;
-            }
-        }
-        return Status::UnsupportedEndpoint;
+        return model->EndpointExists(eventPath.mEndpointId) ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
     }
 
     // EventList is DEPRECATED in the specification. We explicitly do NOT try to support it here
