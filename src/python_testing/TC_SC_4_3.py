@@ -295,15 +295,26 @@ class TC_SC_4_3(MatterBaseTest):
         self.step(9)
 
         # Check MCORE.COM PICS
-        is_eth_or_wifi = self.check_pics('MCORE.COM.WIFI') or self.check_pics('MCORE.COM.ETH')
+        mc_wifi = 'MCORE.COM.WIFI'
+        mc_eth = 'MCORE.COM.ETH'
+        mc_thr = 'MCORE.COM.THR'
+
+
+## wildcard read of cnet clusters, featuremaps all endpoints, does it support wifi/thread?
+
+        is_mc_wifi = self.check_pics(mc_wifi)
+        is_mc_eth = self.check_pics(mc_eth)
+        is_thr = self.check_pics(mc_thr)
+        is_eth_or_wifi = is_mc_wifi or is_mc_eth
+
         if is_eth_or_wifi:
+            mcore_com = mc_wifi if is_mc_wifi else mc_eth if is_mc_eth else None
             asserts.assert_true(self.verify_hostname(hostname=server, char_length=12),
-                                f"Hostname for '{server}' is not a 12-character uppercase hexadecimal string")
+                                f"Hostname for '{server}' is not a 12-character uppercase hexadecimal string for PICS {mcore_com}")
         else:
-            is_thr = self.check_pics('MCORE.COM.THR')
             if is_thr:
                 asserts.assert_true(self.verify_hostname(hostname=server, char_length=16),
-                                    f"Hostname for '{server}' is not a 16-character uppercase hexadecimal string")
+                                    f"Hostname for '{server}' is not a 16-character uppercase hexadecimal string for PICS {mc_thr}")
 
         # ICD TXT KEY
         if supports_lit:
