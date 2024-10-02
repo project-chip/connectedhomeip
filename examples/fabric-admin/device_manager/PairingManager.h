@@ -25,6 +25,9 @@
 #include <controller/CurrentFabricRemover.h>
 #include <crypto/CHIPCryptoPAL.h>
 
+// Constants
+constexpr uint16_t kMaxManualCodeLength = 21;
+
 class CommissioningWindowDelegate
 {
 public:
@@ -195,11 +198,24 @@ private:
                                       chip::Credentials::AttestationVerificationResult attestationResult) override;
 
     /////////// Pairing Command Interface /////////
+    struct PairDeviceWithCodeParams
+    {
+        chip::NodeId nodeId;
+        char payloadBuffer[kMaxManualCodeLength + 1];
+    };
+
+    struct PairDeviceParams
+    {
+        chip::NodeId nodeId;
+        uint32_t setupPINCode;
+        uint16_t deviceRemotePort;
+        char ipAddrBuffer[chip::Inet::IPAddress::kMaxStringLength];
+    };
+
     CommissioningDelegate * mCommissioningDelegate = nullptr;
     PairingDelegate * mPairingDelegate             = nullptr;
 
     chip::NodeId mNodeId            = chip::kUndefinedNodeId;
-    uint16_t mRemotePort            = 0;
     uint16_t mDiscriminator         = 0;
     uint32_t mSetupPINCode          = 0;
     const char * mOnboardingPayload = nullptr;
@@ -220,8 +236,11 @@ private:
     chip::Callback::Callback<chip::Controller::OnCurrentFabricRemove> mCurrentFabricRemoveCallback;
 
     chip::Controller::CommissioningParameters GetCommissioningParameters();
-    void InitCommand();
+    void InitPairingCommand();
     CHIP_ERROR Pair(chip::NodeId remoteId, chip::Transport::PeerAddress address);
 
     static void OnCurrentFabricRemove(void * context, chip::NodeId remoteNodeId, CHIP_ERROR status);
+    static void OnPairDeviceWithCode(intptr_t context);
+    static void OnPairDevice(intptr_t context);
+    static void OnUnpairDevice(intptr_t context);
 };

@@ -23,7 +23,6 @@
 
 // Constants
 constexpr uint32_t kCommissionPrepareTimeMs = 500;
-constexpr uint16_t kMaxManualCodeLength     = 21;
 
 class FabricSyncAddBridgeCommand : public CHIPCommand, public CommissioningDelegate
 {

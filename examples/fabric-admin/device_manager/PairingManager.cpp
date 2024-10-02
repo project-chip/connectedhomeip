@@ -564,7 +564,7 @@ void PairingManager::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
     }
 }
 
-void PairingManager::InitCommand()
+void PairingManager::InitPairingCommand()
 {
     mCommissioner->RegisterPairingDelegate(this);
     // Clear the CATs in OperationalCredentialsIssuer
@@ -574,39 +574,102 @@ void PairingManager::InitCommand()
 
 CHIP_ERROR PairingManager::PairDeviceWithCode(NodeId nodeId, const char * payload)
 {
-    InitCommand();
+    if (payload == nullptr || strlen(payload) > kMaxManualCodeLength)
+    {
+        ChipLogError(NotSpecified, "PairDeviceWithCode failed: Invalid pairing payload");
+        return CHIP_ERROR_INVALID_STRING_LENGTH;
+    }
 
-    CommissioningParameters commissioningParams = GetCommissioningParameters();
+    auto params    = Platform::MakeUnique<PairDeviceWithCodeParams>();
+    params->nodeId = nodeId;
 
-    auto discoveryType = DiscoveryType::kDiscoveryNetworkOnly;
+    Platform::CopyString(params->payloadBuffer, kMaxManualCodeLength, payload);
 
-    mNodeId            = nodeId;
-    mOnboardingPayload = payload;
-    return mCommissioner->PairDevice(mNodeId, mOnboardingPayload, commissioningParams, discoveryType);
+    // Schedule work on the Matter thread
+    return DeviceLayer::PlatformMgr().ScheduleWork(OnPairDeviceWithCode, reinterpret_cast<intptr_t>(params.release()));
+}
+
+void PairingManager::OnPairDeviceWithCode(intptr_t context)
+{
+    Platform::UniquePtr<PairDeviceWithCodeParams> params(reinterpret_cast<PairDeviceWithCodeParams *>(context));
+    PairingManager & self = PairingManager::Instance();
+
+    self.InitPairingCommand();
+
+    CommissioningParameters commissioningParams = self.GetCommissioningParameters();
+    auto discoveryType                          = DiscoveryType::kDiscoveryNetworkOnly;
+
+    self.mNodeId            = params->nodeId;
+    self.mOnboardingPayload = params->payloadBuffer;
+
+    CHIP_ERROR err = self.mCommissioner->PairDevice(params->nodeId, params->payloadBuffer, commissioningParams, discoveryType);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to pair device with code, error: %s", ErrorStr(err));
+    }
 }
 
 CHIP_ERROR PairingManager::PairDevice(chip::NodeId nodeId, uint32_t setupPINCode, const char * deviceRemoteIp,
                                       uint16_t deviceRemotePort)
 {
-    InitCommand();
-    mSetupPINCode = setupPINCode;
+    if (deviceRemoteIp == nullptr || strlen(deviceRemoteIp) > Inet::IPAddress::kMaxStringLength)
+    {
+        ChipLogError(NotSpecified, "PairDevice failed: Invalid device remote IP address");
+        return CHIP_ERROR_INVALID_STRING_LENGTH;
+    }
+
+    auto params              = Platform::MakeUnique<PairDeviceParams>();
+    params->nodeId           = nodeId;
+    params->setupPINCode     = setupPINCode;
+    params->deviceRemotePort = deviceRemotePort;
+
+    Platform::CopyString(params->ipAddrBuffer, Inet::IPAddress::kMaxStringLength, deviceRemoteIp);
+
+    // Schedule work on the Matter thread
+    return DeviceLayer::PlatformMgr().ScheduleWork(OnPairDevice, reinterpret_cast<intptr_t>(params.release()));
+}
+
+void PairingManager::OnPairDevice(intptr_t context)
+{
+    Platform::UniquePtr<PairDeviceParams> params(reinterpret_cast<PairDeviceParams *>(context));
+    PairingManager & self = PairingManager::Instance();
+
+    self.InitPairingCommand();
+    self.mSetupPINCode = params->setupPINCode;
 
     Inet::IPAddress address;
     Inet::InterfaceId interfaceId;
 
-    if (!ParseAddressWithInterface(deviceRemoteIp, address, interfaceId))
+    if (!ParseAddressWithInterface(params->ipAddrBuffer, address, interfaceId))
     {
-        ChipLogError(NotSpecified, "Invalid IP address: %s", deviceRemoteIp);
-        return CHIP_ERROR_INVALID_ADDRESS;
+        ChipLogError(NotSpecified, "Invalid IP address: %s", params->ipAddrBuffer);
+        return;
     }
 
-    return Pair(nodeId, Transport::PeerAddress::UDP(address, deviceRemotePort, interfaceId));
+    CHIP_ERROR err = self.Pair(params->nodeId, Transport::PeerAddress::UDP(address, params->deviceRemotePort, interfaceId));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to pair device, error: %s", ErrorStr(err));
+    }
 }
 
 CHIP_ERROR PairingManager::UnpairDevice(NodeId nodeId)
 {
-    InitCommand();
+    // Schedule work on the Matter thread
+    return DeviceLayer::PlatformMgr().ScheduleWork(OnUnpairDevice, static_cast<intptr_t>(nodeId));
+}
 
-    mCurrentFabricRemover = Platform::MakeUnique<Controller::CurrentFabricRemover>(mCommissioner);
-    return mCurrentFabricRemover->RemoveCurrentFabric(nodeId, &mCurrentFabricRemoveCallback);
+void PairingManager::OnUnpairDevice(intptr_t context)
+{
+    NodeId nodeId         = static_cast<NodeId>(context);
+    PairingManager & self = PairingManager::Instance();
+
+    self.InitPairingCommand();
+
+    self.mCurrentFabricRemover = Platform::MakeUnique<Controller::CurrentFabricRemover>(self.mCommissioner);
+    CHIP_ERROR err             = self.mCurrentFabricRemover->RemoveCurrentFabric(nodeId, &self.mCurrentFabricRemoveCallback);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to unpair device, error: %s", ErrorStr(err));
+    }
 }
