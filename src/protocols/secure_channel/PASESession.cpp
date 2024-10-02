@@ -314,7 +314,12 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
 
     mNextExpectedMsg.SetValue(MsgType::PBKDFParamResponse);
 
-    ChipLogDetail(SecureChannel, "Sent PBKDF param request");
+#if CHIP_PROGRESS_LOGGING
+    const auto localMRPConfig = mLocalMRPConfig.Value();
+#endif // CHIP_PROGRESS_LOGGING
+    ChipLogProgress(SecureChannel, "Sent PBKDF param request [II:%" PRIu32 "ms AI:%" PRIu32 "ms AT:%ums)",
+                    localMRPConfig.mIdleRetransTimeout.count(), localMRPConfig.mActiveRetransTimeout.count(),
+                    localMRPConfig.mActiveThresholdTime.count());
 
     return CHIP_NO_ERROR;
 }

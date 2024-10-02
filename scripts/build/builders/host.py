@@ -324,6 +324,7 @@ class HostBuilder(GnBuilder):
                  chip_casting_simplified: Optional[bool] = None,
                  data_model_interface: Optional[str] = None,
                  chip_data_model_check_die_on_failure: Optional[bool] = None,
+                 disable_shell=False
                  ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -348,6 +349,9 @@ class HostBuilder(GnBuilder):
 
         if not enable_thread:
             self.extra_gn_options.append('chip_enable_openthread=false')
+
+        if disable_shell:
+            self.extra_gn_options.append('chip_build_libshell=false')
 
         if use_tsan:
             self.extra_gn_options.append('is_tsan=true')

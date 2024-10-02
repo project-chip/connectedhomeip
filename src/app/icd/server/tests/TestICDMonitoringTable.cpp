@@ -43,6 +43,8 @@ constexpr uint64_t kClientNodeId13      = 0x100003;
 constexpr uint64_t kClientNodeId21      = 0x200001;
 constexpr uint64_t kClientNodeId22      = 0x200002;
 
+constexpr uint64_t kClientNodeMaxValue = std::numeric_limits<uint64_t>::max();
+
 constexpr uint8_t kKeyBuffer0a[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 constexpr uint8_t kKeyBuffer0b[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
                                      0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
@@ -96,6 +98,20 @@ TEST(TestICDMonitoringTable, TestEntryAssignationOverload)
     EXPECT_EQ(entry.clientType, entry2.clientType);
 
     EXPECT_TRUE(entry2.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
+}
+
+TEST(TestICDMonitoringTable, TestEntryMaximumSize)
+{
+    TestPersistentStorageDelegate storage;
+    TestSessionKeystoreImpl keystore;
+    ICDMonitoringTable table(storage, kTestFabricIndex1, kMaxTestClients1, &keystore);
+
+    ICDMonitoringEntry entry(&keystore);
+    entry.checkInNodeID    = kClientNodeMaxValue;
+    entry.monitoredSubject = kClientNodeMaxValue;
+    entry.clientType       = ClientTypeEnum::kPermanent;
+    EXPECT_EQ(CHIP_NO_ERROR, entry.SetKey(ByteSpan(kKeyBuffer1a)));
+    EXPECT_EQ(CHIP_NO_ERROR, table.Set(0, entry));
 }
 
 TEST(TestICDMonitoringTable, TestEntryKeyFunctions)
