@@ -16,8 +16,11 @@ name: TV Casting Example - Darwin
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'
         branches-ignore:
-            - "dependabot/**"
+            - 'dependabot/**'
     pull_request:
     merge_group:
     workflow_dispatch:
