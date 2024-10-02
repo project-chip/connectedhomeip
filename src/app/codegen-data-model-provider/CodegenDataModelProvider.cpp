@@ -292,6 +292,9 @@ std::optional<DataModel::CommandEntry> EnumeratorCommandFinder::FindCommandEntry
     return (*id == kInvalidCommandId) ? DataModel::CommandEntry::kInvalid : CommandEntryFrom(path, *id);
 }
 
+// TODO: DeviceTypeEntry content is IDENTICAL to EmberAfDeviceType, so centralizing
+//       to a common type is probably better. Need to figure out dependencies since
+//       this would make ember return datamodel-provider types.
 DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & other)
 {
     DataModel::DeviceTypeEntry entry;
