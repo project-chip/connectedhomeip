@@ -60,9 +60,6 @@ private:
     int16_t mTemperatureSetpoint;
     int16_t mMinTemperature;
     int16_t mMaxTemperature;
-    int16_t mStep;
-    int16_t mSelectedTemperatureLevel;
-    int16_t mSupportedTemperatureLevels;
 
     chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap mMask;
     chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap mState;

@@ -151,19 +151,6 @@ void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, 
     }
     break;
 
-    case TempCtrlAttr::SelectedTemperatureLevel::Id: {
-        int16_t selectedTemperatureLevel = ConvertToPrintableTemp(static_cast<int16_t>(*value));
-        mSelectedTemperatureLevel        = selectedTemperatureLevel;
-        TempCtrlAttr::SelectedTemperatureLevel::Set(endpointId, selectedTemperatureLevel);
-    }
-    break;
-
-    case TempCtrlAttr::Step::Id: {
-        int16_t step = ConvertToPrintableTemp(static_cast<int16_t>(*value));
-        TempCtrlAttr::MaxTemperature::Set(endpointId, step);
-    }
-    break;
-
     default: {
         ChipLogError(AppServer, "Unhandled Temperature controlled attribute %ld", attributeId);
         return;
