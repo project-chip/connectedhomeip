@@ -16,6 +16,11 @@ name: Doxygen
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'
+        branches-ignore:
+            - 'dependabot/**'    
         paths:
             - "**.do[xc]"
             - "**.c[cs]?"
