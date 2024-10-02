@@ -746,6 +746,11 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
 
 std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceType(EndpointId endpoint)
 {
+    // Use the `Index` version even though `emberAfDeviceTypeListFromEndpoint` would work because
+    // index finding is cached in TryFindEndpointIndex and this avoids an extra `emberAfIndexFromEndpoint`
+    // during `Next` loops. This avoids O(n^2) on number of indexes when iterating over all device types.
+    //
+    // Not actually needed for `First`, however this makes First and Next consistent.
     std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpoint);
     if (!endpoint_index.has_value())
     {
@@ -768,6 +773,9 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceT
 std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceType(EndpointId endpoint,
                                                                                    const DataModel::DeviceTypeEntry & previous)
 {
+    // Use the `Index` version even though `emberAfDeviceTypeListFromEndpoint` would work because
+    // index finding is cached in TryFindEndpointIndex and this avoids an extra `emberAfIndexFromEndpoint`
+    // during `Next` loops. This avoids O(n^2) on number of indexes when iterating over all device types.
     std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpoint);
     if (!endpoint_index.has_value())
     {
