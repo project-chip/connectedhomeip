@@ -1099,7 +1099,7 @@ MTR_DIRECT_MEMBERS
 }
 
 - (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
-                       controller:(MTRDeviceController *)controller
+                       controller:(MTRDeviceController_Concrete *)controller
                              type:(MTRDiagnosticLogType)type
                           timeout:(NSTimeInterval)timeout
                             queue:(dispatch_queue_t)queue
@@ -1132,7 +1132,7 @@ MTR_DIRECT_MEMBERS
         if (compressedFabricId != nil && compressedFabricId.unsignedLongLongValue == operationalID.GetCompressedFabricId()) {
             ChipLogProgress(Controller, "Notifying controller at fabric index %u about new operational node 0x" ChipLogFormatX64,
                 controller.fabricIndex, ChipLogValueX64(operationalID.GetNodeId()));
-            [controller operationalInstanceAdded:operationalID.GetNodeId()];
+            [controller operationalInstanceAdded:@(operationalID.GetNodeId())];
         }
 
         // Keep going: more than one controller might match a given compressed

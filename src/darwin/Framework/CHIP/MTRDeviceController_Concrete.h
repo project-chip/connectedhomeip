@@ -17,9 +17,18 @@
 
 #import <Foundation/Foundation.h>
 
-#import <Matter/Matter.h>
+#import <Matter/MTRDefines.h>
+#import <Matter/MTRDeviceController.h>
+#import <Matter/MTRDeviceControllerFactory.h>
+#import <Matter/MTRDeviceControllerStorageDelegate.h>
+#import <Matter/MTRDeviceStorageBehaviorConfiguration.h>
+#import <Matter/MTROTAProviderDelegate.h>
 
+#import "MTRDeviceConnectionBridge.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+
+#include <credentials/FabricTable.h>
+#include <lib/core/DataModelTypes.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -108,6 +117,19 @@ NS_ASSUME_NONNULL_BEGIN
  * Clear any pending shutdown request.
  */
 - (void)clearPendingShutdown;
+
+/**
+ * Since getSessionForNode now enqueues by the subscription pool for Thread
+ * devices, MTRDevice_Concrete needs a direct non-queued access because it already
+ * makes use of the subscription pool.
+ */
+- (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
+
+/**
+ * Notify the controller that a new operational instance with the given node id
+ * and a compressed fabric id that matches this controller has been observed.
+ */
+- (void)operationalInstanceAdded:(NSNumber *)nodeID;
 
 @end
 

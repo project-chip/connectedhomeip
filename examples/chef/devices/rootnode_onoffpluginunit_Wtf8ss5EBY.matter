@@ -1865,11 +1865,11 @@ endpoint 1 {
   }
 
   server cluster OnOff {
-    ram      attribute onOff default = 0;
+    persist  attribute onOff default = 0;
     ram      attribute globalSceneControl default = 1;
     ram      attribute onTime default = 0;
     ram      attribute offWaitTime default = 0;
-    ram      attribute startUpOnOff default = 0;
+    persist  attribute startUpOnOff default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
