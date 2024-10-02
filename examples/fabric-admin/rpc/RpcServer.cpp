@@ -98,8 +98,8 @@ public:
                                        chip_rpc_OperationStatus & response) override
     {
         VerifyOrReturnValue(request.has_id, pw::Status::InvalidArgument());
-        // TODO: OpenDeviceCommissioningWindow uses the same controller every time and doesn't currently accept FabricIndex. For now
-        // we are dropping fabric index from the scoped node id.
+        // TODO(#35875): OpenDeviceCommissioningWindow uses the same controller every time and doesn't currently accept
+        // FabricIndex. For now we are dropping fabric index from the scoped node id.
         NodeId nodeId                    = request.id.node_id;
         uint32_t commissioningTimeoutSec = request.commissioning_timeout;
         uint32_t iterations              = request.iterations;

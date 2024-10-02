@@ -97,7 +97,7 @@ public:
      *
      * This function attempts to remove a device and the associated dynamic endpoint by iterating through
      * the available device and checking if the device matches the specified ScopedNodeId. If the device is
-     * found, it clears the dynamic endpoint.
+     * found, it removes the dynamic endpoint.
      *
      * @param scopedNodeId The ScopedNodeId of the device to be removed.
      * @return unsigned of the index of the removed dynamic endpoint if successful, nullopt otherwise.
