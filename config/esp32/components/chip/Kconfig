@@ -653,58 +653,6 @@ menu "CHIP Device Layer"
 
     endmenu
 
-    menu "WiFi AP Options"
-
-        config ENABLE_WIFI_AP
-            depends on ESP_WIFI_SOFTAP_SUPPORT
-            bool "Enable CHIP WIFI AP"
-            default y
-            help
-                Enables WiFi AP for CHIP.
-
-        config WIFI_AP_SSID_PREFIX
-            string "WiFi AP SSID Prefix"
-            default "MATTER-"
-            depends on ENABLE_WIFI_AP
-            help
-                A prefix string used in forming the WiFi soft-AP SSID.  The remainder of the SSID
-                consists of the final two bytes of the device's primary WiFi MAC address in hex.
-
-        config WIFI_AP_CHANNEL
-            int "WiFi AP Channel"
-            range 1 14
-            default 1
-            depends on ENABLE_WIFI_AP
-            help
-                The WiFi channel number to be used by the soft-AP.
-
-        config WIFI_AP_MAX_STATIONS
-            int "WiFi AP Max Allowed Stations"
-            range 1 10
-            default 4
-            depends on ENABLE_WIFI_AP
-            help
-                The maximum number of stations allowed to connect to the soft-AP.
-
-        config WIFI_AP_BEACON_INTERVAL
-            int "WiFi AP Beacon Interval (ms)"
-            range 100 60000
-            default 100
-            depends on ENABLE_WIFI_AP
-            help
-                The beacon interval (in milliseconds) for the WiFi soft-AP.
-
-        config WIFI_AP_IDLE_TIMEOUT
-            int "WiFi AP Idle Timeout (ms)"
-            range 0 600000
-            default 120000
-            depends on ENABLE_WIFI_AP
-            help
-                The amount of time (in milliseconds) after which the CHIP platform will deactivate the soft-AP
-                if it has been idle.
-
-    endmenu
-
     menu "BLE Options"
         visible if BT_ENABLED
 
