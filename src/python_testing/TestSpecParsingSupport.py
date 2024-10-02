@@ -37,7 +37,8 @@ ATTRIBUTE_ID = 0x0000
 
 
 def single_attribute_cluster_xml(read_access: str, write_access: str, write_supported: str):
-    xml_cluster = f'<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="{CLUSTER_ID}" name="{CLUSTER_NAME}" revision="3">'
+    xml_cluster = f'<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="{
+        CLUSTER_ID}" name="{CLUSTER_NAME}" revision="3">'
     revision_table = ('<revisionHistory>'
                       '<revision revision="1" summary="Initial Release"/>'
                       '<revision revision="2" summary="Some other revision"/>'
@@ -272,7 +273,7 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_equal(set(one_four_clusters.keys())-set(tot_xml_clusters.keys()),
                              set(), "There are some 1.4 clusters that are not included in the TOT spec")
 
-        str_path = get_data_model_directory(PrebuiltDataModelDirectory.kMaster, DataModelLevel.kCluster)
+        str_path = get_data_model_directory(PrebuiltDataModelDirectory.k1_4, DataModelLevel.kCluster)
         string_override_check, problems = build_xml_clusters(str_path)
 
         asserts.assert_count_equal(string_override_check.keys(), self.spec_xml_clusters.keys(), "Mismatched cluster generation")
