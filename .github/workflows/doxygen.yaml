@@ -18,9 +18,7 @@ on:
     push:
         branches:
             - master
-            - 'v*-branch'
-        branches-ignore:
-            - 'dependabot/**'    
+            - 'v*-branch'   
         paths:
             - "**.do[xc]"
             - "**.c[cs]?"
