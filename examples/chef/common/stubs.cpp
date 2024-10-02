@@ -1,8 +1,8 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/config.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
 
 using chip::app::DataModel::Nullable;
@@ -319,8 +319,8 @@ void ApplicationInit()
     ChipLogProgress(NotSpecified, "Chef Application Init !!!")
 
 #ifdef MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
-    // set Parent Endpoint and Composition Type for an Endpoint
-    EndpointId kRefEndpointId           = 1;
+        // set Parent Endpoint and Composition Type for an Endpoint
+        EndpointId kRefEndpointId       = 1;
     EndpointId kColdCabinetEndpointId   = 2;
     EndpointId kFreezeCabinetEndpointId = 3;
     SetTreeCompositionForEndpoint(kRefEndpointId);
