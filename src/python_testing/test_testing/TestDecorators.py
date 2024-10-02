@@ -77,7 +77,7 @@ class DecoratorTestRunnerHooks:
     def step_skipped(self, name: str, expression: str):
         pass
 
-    def step_start(self, name: str):
+    def step_start(self, name: str, endpoint: Optional[int] = None):
         pass
 
     def step_success(self, logger, logs, duration: int, request):

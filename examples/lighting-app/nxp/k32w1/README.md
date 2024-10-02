@@ -220,8 +220,8 @@ by running:
 The console should have already been installed in the virtual environment. From
 the `chip-console`, a user can send specific commands to the device.
 
-For button commands, please run `rpcs.chip.rpc.Button.Event(index)` based on the
-table below:
+For button commands, please run `rpcs.chip.rpc.Button.Event(idx=index)` based on
+the table below:
 
 | index | action                                        |
 | ----- | --------------------------------------------- |
