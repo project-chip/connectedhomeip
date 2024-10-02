@@ -25,8 +25,8 @@ namespace app {
 
 AttributePathExpandIteratorDataModel::AttributePathExpandIteratorDataModel(
     DataModel::Provider * provider, SingleLinkedListNode<AttributePathParams> * attributePath) :
-    mDataModelProvider(provider), mpAttributePath(attributePath),
-    mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
+    mDataModelProvider(provider),
+    mpAttributePath(attributePath), mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
 
 {
     mOutputPath.mExpanded = true; // this is reset in 'next' if needed
