@@ -338,7 +338,8 @@ unsigned FindNextDeviceTypeIndex(Span<const EmberAfDeviceType> types, const Data
         }
     }
 
-    return types.size();
+    // cast should be safe as we know we do not have that many types
+    return static_cast<unsigned>(types.size());
 }
 
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
