@@ -79,11 +79,20 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             device_clusters |= set(self.endpoints[endpoint].keys())
         return device_clusters
 
+    def all_device_attributes(self) -> set:
+        device_attributes = set()
+        for endpoint in self.endpoints:
+            for cluster in self.endpoints[endpoint]:
+                # device_attributes |= set(self.endpoints[endpoint][cluster])
+                device_attributes |= self.endpoints[endpoint][cluster].keys()
+        return device_attributes
+
     async def check_attribute_read_for_type(self, desired_attribute_type: type) -> None:
         # Get all clusters from device
-
+        # What you want there is the intersection of the set of attributes returned from all_type_attributes_for_cluster and the set of attributes implemented on the device.
         for cluster in self.device_clusters:
             all_types = await self.all_type_attributes_for_cluster(cluster, desired_attribute_type)
+            all_types = list(set(all_types) & self.device_attributes)
             if all_types:
                 chosen_attribute = all_types[0]
                 cluster = Clusters.ClusterObjects.ALL_CLUSTERS[chosen_attribute.cluster_id]
@@ -110,6 +119,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         all_clusters = [cluster for cluster in Clusters.ClusterObjects.ALL_ATTRIBUTES]
 
         self.device_clusters = self.all_device_clusters()
+        self.device_attributes = self.all_device_attributes()
         self.all_supported_clusters = [cluster for cluster in Clusters.__dict__.values(
         ) if inspect.isclass(cluster) and issubclass(cluster, ClusterObjects.Cluster)]
 
@@ -185,7 +195,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         self.print_step(5, "Send Request Message to read all attributes from all clusters on all endpoints")
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [()])
         # NOTE: This is checked in its entirety in IDM-10.1
-        asserts.assert_equal(sorted(read_request), [0, 1, 2, 3, 4], "Endpoint list is not the expected value")
+        asserts.assert_equal(read_request.keys(), self.endpoints.keys(), "Endpoint list is not the expected value")
         all_returned_clusters = []
         for endpoint in read_request:
             all_returned_clusters.extend(read_request[endpoint])
