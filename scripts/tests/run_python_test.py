@@ -20,6 +20,7 @@ import io
 import logging
 import os
 import os.path
+import pathlib
 import re
 import shlex
 import shutil
@@ -134,18 +135,18 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     if factory_reset or factory_reset_app_only:
         # Remove native app config
         for path in glob.glob('/tmp/chip*') + glob.glob('/tmp/repl*'):
-            shutil.rmtree(path)
+            pathlib.Path(path).unlink(missing_ok=True)
 
         # Remove native app KVS if that was used
         if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
             logging.info("Removing KVS path: %s" % match.group("path"))
-            shutil.rmtree(match.group("path"))
+            pathlib.Path(match.group("path")).unlink(missing_ok=True)
 
     if factory_reset:
         # Remove Python test admin storage if provided
         if match := re.search(r"--storage-path (?P<path>[^ ]+)", script_args):
             logging.info("Removing storage path: %s" % match.group("path"))
-            shutil.rmtree(match.group("path"))
+            pathlib.Path(match.group("path")).unlink(missing_ok=True)
 
     app_process = None
     app_exit_code = 0
