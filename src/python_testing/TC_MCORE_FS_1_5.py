@@ -19,13 +19,22 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: examples/fabric-admin/scripts/fabric-sync-app.py
-# test-runner-run/run1/app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
-# test-runner-run/run1/factoryreset: true
-# test-runner-run/run1/script-args: --PICS src/app/tests/suites/certification/ci-pics-values --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_server_app_path:${ALL_CLUSTERS_APP} dut_fsa_stdin_pipe:dut-fsa-stdin --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-# test-runner-run/run1/script-start-delay: 5
-# test-runner-run/run1/quiet: false
+# test-runner-runs:
+#   run1:
+#     app: examples/fabric-admin/scripts/fabric-sync-app.py
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP} dut_fsa_stdin_pipe:dut-fsa-stdin
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     script-start-delay: 5
+#     factoryreset: true
+#     quiet: false
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -155,7 +164,6 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_5(self):
-        self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
 
         min_report_interval_sec = 0
         max_report_interval_sec = 30
@@ -183,7 +191,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         asserts.assert_true(type_matches(step_1_dut_parts_list, list), "PartsList is expected to be a list")
 
         self.step(2)
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             self._ask_for_vendor_commissioning_ux_operation(self.th_server_setup_params)
         else:
             self.dut_fsa_stdin.write(

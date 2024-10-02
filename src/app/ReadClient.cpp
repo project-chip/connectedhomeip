@@ -433,7 +433,7 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
 
         TLV::TLVWriter backup;
         aDataVersionFilterIBsBuilder.Checkpoint(backup);
-        CHIP_ERROR err = EncodeDataVersionFilter(aDataVersionFilterIBsBuilder, filter);
+        CHIP_ERROR err = aDataVersionFilterIBsBuilder.EncodeDataVersionFilterIB(filter);
         if (err == CHIP_NO_ERROR)
         {
 #if CHIP_PROGRESS_LOGGING
@@ -461,19 +461,6 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
                     "%lu data version filters provided, %lu not relevant, %lu encoded, %lu skipped due to lack of space",
                     static_cast<unsigned long>(aDataVersionFilters.size()), static_cast<unsigned long>(irrelevantFilterCount),
                     static_cast<unsigned long>(encodedFilterCount), static_cast<unsigned long>(skippedFilterCount));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ReadClient::EncodeDataVersionFilter(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                               DataVersionFilter const & aFilter)
-{
-    // Caller has checked aFilter.IsValidDataVersionFilter()
-    DataVersionFilterIB::Builder & filterIB = aDataVersionFilterIBsBuilder.CreateDataVersionFilter();
-    ReturnErrorOnFailure(aDataVersionFilterIBsBuilder.GetError());
-    ClusterPathIB::Builder & path = filterIB.CreatePath();
-    ReturnErrorOnFailure(filterIB.GetError());
-    ReturnErrorOnFailure(path.Endpoint(aFilter.mEndpointId).Cluster(aFilter.mClusterId).EndOfClusterPathIB());
-    ReturnErrorOnFailure(filterIB.DataVersion(aFilter.mDataVersion.Value()).EndOfDataVersionFilterIB());
     return CHIP_NO_ERROR;
 }
 

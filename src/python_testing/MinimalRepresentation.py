@@ -129,8 +129,7 @@ class MinimalRunner(MatterBaseTest, MinimalRepresentationChecker):
         # Before we can generate a minimal representation, we need to make sure that the device is conformant.
         # Otherwise, the values we extract aren't fully informative.
         ignore_in_progress = self.user_params.get("ignore_in_progress", False)
-        is_ci = self.check_pics('PICS_SDK_CI_ONLY')
-        representation = self.GenerateMinimals(ignore_in_progress, is_ci)
+        representation = self.GenerateMinimals(ignore_in_progress, self.is_pics_sdk_ci_only)
         print(type(representation[0]))
         self.PrettyPrintRepresentation(representation)
 

@@ -84,7 +84,7 @@ groups:
         reviewers:
             teams: [reviewers-amazon]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
     shared-reviewers-apple:
         type: optional
         conditions:
@@ -92,7 +92,7 @@ groups:
         reviewers:
             teams: [reviewers-apple]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
     shared-reviewers-bosch:
         type: optional
         conditions:
@@ -100,7 +100,7 @@ groups:
         reviewers:
             teams: [reviewers-bosch]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
     shared-reviewers-comcast:
         type: optional
         conditions:
@@ -108,7 +108,7 @@ groups:
         reviewers:
             teams: [reviewers-comcast]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
     shared-reviewers-dyson:
         type: optional
         conditions:
@@ -116,7 +116,7 @@ groups:
         reviewers:
             teams: [reviewers-dyson]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
     shared-reviewers-espressif:
         type: optional
         conditions:
@@ -124,7 +124,7 @@ groups:
         reviewers:
             teams: [reviewers-espressif]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
     shared-reviewers-google:
         type: optional
         conditions:
@@ -132,7 +132,7 @@ groups:
         reviewers:
             teams: [reviewers-google]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
     shared-reviewers-grundfos:
         type: optional
         conditions:
@@ -140,7 +140,7 @@ groups:
         reviewers:
             teams: [reviewers-grundfos]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
     shared-reviewers-irobot:
         type: optional
         conditions:
@@ -148,7 +148,7 @@ groups:
         reviewers:
             teams: [reviewers-irobot]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
     shared-reviewers-lg:
         type: optional
         conditions:
@@ -156,7 +156,7 @@ groups:
         reviewers:
             teams: [reviewers-lg]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
     shared-reviewers-logitech:
         type: optional
         conditions:
@@ -172,7 +172,7 @@ groups:
         reviewers:
             teams: [reviewers-nordic]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
     shared-reviewers-nxp:
         type: optional
         conditions:
@@ -180,7 +180,7 @@ groups:
         reviewers:
             teams: [reviewers-nxp]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
     shared-reviewers-samsung:
         type: optional
         conditions:
@@ -188,7 +188,7 @@ groups:
         reviewers:
             teams: [reviewers-samsung]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
     shared-reviewers-eve:
         type: optional
         conditions:
@@ -196,7 +196,7 @@ groups:
         reviewers:
             teams: [reviewers-eve]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
     # shared-reviewers-signify disabled for now, because the reviewers-signify
     # team is empty and pullapprove seems to mis-handle that badly and treats
     # _all_ reviewers as being in this group.
@@ -210,7 +210,7 @@ groups:
     #     reviewers:
     #         teams: [reviewers-signify]
     #     reviews:
-    #         request: 10
+    #         request: 0 # Do not auto-add
     shared-reviewers-silabs:
         type: optional
         conditions:
@@ -218,7 +218,7 @@ groups:
         reviewers:
             teams: [reviewers-silabs]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
     shared-reviewers-somfy:
         type: optional
         conditions:
@@ -226,7 +226,7 @@ groups:
         reviewers:
             teams: [reviewers-somfy]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
     shared-reviewers-tcl:
         type: optional
         conditions:
@@ -234,7 +234,7 @@ groups:
         reviewers:
             teams: [reviewers-tcl]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
     shared-reviewers-qorvo:
         type: optional
         conditions:
@@ -242,7 +242,7 @@ groups:
         reviewers:
             teams: [reviewers-qorvo]
         reviews:
-            request: 10
+            request: 0 # Do not auto-add
 
     ############################################################
     #  Base Required Reviewers
