@@ -76,12 +76,11 @@ Git: 0.9-fall2024-234-gf4d359001
     <item fieldId="7" name="MetadataOptions" type="WebRTCMetadataOptions" default="0x00" min="0x00" max="0x01"/>
   </struct>
 
-  <cluster>
+  <cluster apiMaturity="provisional">
     <domain name="General"/>
     <name>WebRTC Transport Provider</name>
     <code>0x0553</code>
-    <define>WEBRTC_TRANSPORT_PROVIDER_CLUSTER</define>
-    <description>The following process SHALL be followed when the server receives this command:</description>
+    <define>WEBRTC_TRANSPORT_PROVIDER_CLUSTER</define><description>The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC.</description>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1"/>
