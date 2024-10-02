@@ -184,14 +184,14 @@ class TC_CADMIN_1_11(MatterBaseTest):
                 await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
             except Exception as e:
                 asserts.assert_true(e.clusterStatus == busy_enum,
-                                'Unexpected error code returned from CommissioningComplete')
+                                    'Unexpected error code returned from CommissioningComplete')
 
             self.step("9c")
             try:
                 await self.th2.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
             except Exception as e:
                 asserts.assert_true(e.clusterStatus == busy_enum,
-                                'Unexpected error code returned from CommissioningComplete')
+                                    'Unexpected error code returned from CommissioningComplete')
 
             self.step("9d")
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
