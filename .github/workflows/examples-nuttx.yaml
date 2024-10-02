@@ -16,6 +16,11 @@ name: Build example - NuttX
 
 on:
   push:
+    branches:
+      - master
+      - 'v*-branch'
+    branches-ignore:
+      - 'dependabot/**'
   pull_request:
   merge_group:
   workflow_dispatch:
