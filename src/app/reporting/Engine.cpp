@@ -23,25 +23,60 @@
  *
  */
 
-#include "app/data-model-provider/ActionReturnStatus.h"
-#include <app/icd/server/ICDServerConfig.h>
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/server/ICDNotifier.h> // nogncheck
-#endif
+#include "lib/core/DataModelTypes.h"
 #include <app/AppConfig.h>
+#include <app/ConcreteEventPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/Provider.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/Read.h>
 #include <app/reporting/reporting.h>
 #include <app/util/MatterCallbacks.h>
 #include <app/util/ember-compatibility-functions.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/server/ICDNotifier.h> // nogncheck
+#endif
 
 using namespace chip::Access;
 
 namespace chip {
 namespace app {
 namespace reporting {
+namespace {
+
+using Protocols::InteractionModel::Status;
+
+Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eventPath)
+{
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+
+    if (!model->GetClusterInfo(eventPath).has_value())
+    {
+        // cluster is invalid, return an error.
+        for (EndpointId id = model->FirstEndpoint(); id != kInvalidEndpointId; id = model->NextEndpoint(id))
+        {
+            if (id == eventPath.mEndpointId)
+            {
+                return Status::UnsupportedCluster;
+            }
+        }
+        return Status::UnsupportedEndpoint;
+    }
+
+    // EventList is DEPRECATED in the specification. We explicitly do NOT try to support it here
+    static_assert(!CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE, "EventList attribute is DEPRECATED");
+    return Status::Success;
+#else
+    return CheckEventSupportStatus(path);
+#endif
+}
+
+} // namespace
 
 Engine::Engine(InteractionModelEngine * apImEngine) : mpImEngine(apImEngine) {}
 
@@ -327,7 +362,8 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
         }
 
         ConcreteEventPath path(current->mValue.mEndpointId, current->mValue.mClusterId, current->mValue.mEventId);
-        Status status = CheckEventSupportStatus(path);
+        Status status = EventPathValid(mpImEngine->GetDataModelProvider(), path);
+
         if (status != Status::Success)
         {
             TLV::TLVWriter checkpoint = aWriter;
@@ -1027,6 +1063,6 @@ void Engine::MarkDirty(const AttributePathParams & path)
 // TODO: MatterReportingAttributeChangeCallback should just live in libCHIP,
 // instead of being in ember-compatibility-functions.  It does not depend on any
 // app-specific generated bits.
-void __attribute__((weak))
-MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
+void __attribute__((weak)) MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                  chip::AttributeId attributeId)
 {}
