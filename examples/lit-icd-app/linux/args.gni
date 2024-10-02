@@ -28,6 +28,7 @@ matter_enable_tracing_support = true
 
 # ICD configurations
 chip_enable_icd_server = true
-chip_subscription_timeout_resumption = false
+chip_subscription_timeout_resumption = true
 chip_icd_report_on_active_mode = true
 chip_enable_icd_lit = true
+chip_enable_icd_dsls = true

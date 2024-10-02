@@ -31,7 +31,7 @@ ThermostatDelegate ThermostatDelegate::sInstance;
 
 ThermostatDelegate::ThermostatDelegate()
 {
-    mNumberOfPresets                   = kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType;
+    mNumberOfPresets                   = kMaxNumberOfPresetsSupported;
     mNextFreeIndexInPresetsList        = 0;
     mNextFreeIndexInPendingPresetsList = 0;
 
@@ -85,6 +85,9 @@ CHIP_ERROR ThermostatDelegate::GetPresetTypeAtIndex(size_t index, PresetTypeStru
           .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
           .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
         { .presetScenario     = PresetScenarioEnum::kVacation,
+          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
+          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
+        { .presetScenario     = PresetScenarioEnum::kUserDefined,
           .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
           .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
     };

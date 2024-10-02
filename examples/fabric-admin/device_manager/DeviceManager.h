@@ -24,6 +24,8 @@
 
 #include <set>
 
+constexpr uint32_t kDefaultSetupPinCode    = 20202021;
+constexpr uint16_t kDefaultLocalBridgePort = 5540;
 constexpr uint16_t kResponseTimeoutSeconds = 30;
 
 class Device
@@ -61,6 +63,8 @@ public:
 
     void SetRemoteBridgeNodeId(chip::NodeId nodeId) { mRemoteBridgeNodeId = nodeId; }
 
+    void SetLocalBridgePort(uint16_t port) { mLocalBridgePort = port; }
+    void SetLocalBridgeSetupPinCode(uint32_t pinCode) { mLocalBridgeSetupPinCode = pinCode; }
     void SetLocalBridgeNodeId(chip::NodeId nodeId) { mLocalBridgeNodeId = nodeId; }
 
     bool IsAutoSyncEnabled() const { return mAutoSyncEnabled; }
@@ -90,18 +94,18 @@ public:
      * This function initiates the process to open the commissioning window for a device identified by the given node ID.
      *
      * @param nodeId               The ID of the node that should open the commissioning window.
-     * @param commissioningTimeout The time in seconds before the commissioning window closes. This value determines
+     * @param commissioningTimeoutSec The time in seconds before the commissioning window closes. This value determines
      *                             how long the commissioning window remains open for incoming connections.
      * @param iterations           The number of PBKDF (Password-Based Key Derivation Function) iterations to use
      *                             for deriving the PAKE (Password Authenticated Key Exchange) verifier.
      * @param discriminator        The device-specific discriminator, determined during commissioning, which helps
      *                             to uniquely identify the device among others.
-     * @param saltHex              The hexadecimal-encoded salt used in the cryptographic operations for commissioning.
-     * @param verifierHex          The hexadecimal-encoded PAKE verifier used to authenticate the commissioning process.
+     * @param salt                 The salt used in the cryptographic operations for commissioning.
+     * @param verifier             The PAKE verifier used to authenticate the commissioning process.
      *
      */
-    void OpenDeviceCommissioningWindow(chip::NodeId nodeId, uint32_t commissioningTimeout, uint32_t iterations,
-                                       uint32_t discriminator, const char * saltHex, const char * verifierHex);
+    void OpenDeviceCommissioningWindow(chip::NodeId nodeId, uint32_t commissioningTimeoutSec, uint32_t iterations,
+                                       uint16_t discriminator, const chip::ByteSpan & salt, const chip::ByteSpan & verifier);
 
     /**
      * @brief Open the commissioning window of a device from another fabric via its fabric bridge.
@@ -125,9 +129,11 @@ public:
 
      * @param nodeId            The user-defined ID for the node being commissioned. It doesn’t need to be the same ID,
      *                          as for the first fabric.
+     * @param setupPINCode      The setup PIN code used to authenticate the pairing process.
      * @param deviceRemoteIp    The IP address of the remote device that is being paired as part of the fabric bridge.
+     * @param deviceRemotePort  The secured device port of the remote device that is being paired as part of the fabric bridge.
      */
-    void PairRemoteFabricBridge(chip::NodeId nodeId, const char * deviceRemoteIp);
+    void PairRemoteFabricBridge(chip::NodeId nodeId, uint32_t setupPINCode, const char * deviceRemoteIp, uint16_t deviceRemotePort);
 
     /**
      * @brief Pair a remote Matter device to the current fabric.
@@ -165,6 +171,9 @@ public:
 
     void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
 
+    Device * FindDeviceByEndpoint(chip::EndpointId endpointId);
+    Device * FindDeviceByNode(chip::NodeId nodeId);
+
 private:
     friend DeviceManager & DeviceMgr();
 
@@ -190,6 +199,8 @@ private:
     // This represents the bridge on the other ecosystem.
     chip::NodeId mRemoteBridgeNodeId = chip::kUndefinedNodeId;
 
+    uint16_t mLocalBridgePort         = kDefaultLocalBridgePort;
+    uint32_t mLocalBridgeSetupPinCode = kDefaultSetupPinCode;
     // The Node ID of the local bridge used for Fabric-Sync
     // This represents the bridge within its own ecosystem.
     chip::NodeId mLocalBridgeNodeId = chip::kUndefinedNodeId;
@@ -198,9 +209,6 @@ private:
     bool mAutoSyncEnabled = false;
     bool mInitialized     = false;
     uint64_t mRequestId   = 0;
-
-    Device * FindDeviceByEndpoint(chip::EndpointId endpointId);
-    Device * FindDeviceByNode(chip::NodeId nodeId);
 };
 
 /**

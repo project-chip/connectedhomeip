@@ -418,7 +418,7 @@ void OperationalSessionSetup::NotifyConnectionCallbacks(SuccessFailureCallbackLi
             }
             if (onSetupFailure != nullptr)
             {
-                ConnnectionFailureInfo failureInfo(peerId, error, stage);
+                ConnectionFailureInfo failureInfo(peerId, error, stage);
 #if CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
                 if (error == CHIP_ERROR_BUSY)
                 {

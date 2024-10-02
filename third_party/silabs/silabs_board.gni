@@ -43,9 +43,6 @@ declare_args() {
   # Disable AWS SDK OTA by default
   aws_sdk_ota = false
 
-  # Disable UART log forwarding by default
-  sl_uart_log_output = false
-
   # Self-provision enabled
   use_provision_channel = false
 }
@@ -65,7 +62,7 @@ if (silabs_board == "") {
 assert(silabs_board != "", "silabs_board must be specified")
 
 # Si917 WIFI board ----------
-if (silabs_board == "BRD4338A") {
+if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
   wifi_soc = true
@@ -165,6 +162,10 @@ declare_args() {
   # User can set this arg to false to skip the rps creation for WiFi SoCs.
   # e.g. for CI
   use_rps_extension = wifi_soc
+
+  # UART log forwarding
+  # Default true for the wifi soc and false for EFR32 boards
+  sl_uart_log_output = wifi_soc
 }
 
 # qr code cannot be true if lcd is disabled

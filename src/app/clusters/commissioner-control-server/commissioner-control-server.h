@@ -46,43 +46,6 @@ struct CommissioningWindowParams
     ByteSpan salt;
 };
 
-class ProtectedIPAddress
-{
-public:
-    const Optional<ByteSpan> GetIPAddress() { return ipAddress; }
-
-    CHIP_ERROR SetIPAddress(const Optional<ByteSpan> & address)
-    {
-        if (!address.HasValue())
-        {
-            ipAddress.ClearValue();
-            return CHIP_NO_ERROR;
-        }
-
-        const ByteSpan & addressSpan = address.Value();
-        size_t addressLength         = addressSpan.size();
-        if (addressLength != 4 && addressLength != 16)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-
-        memcpy(ipAddressBuffer, addressSpan.data(), addressLength);
-        ipAddress.SetValue(ByteSpan(ipAddressBuffer, addressLength));
-        return CHIP_NO_ERROR;
-    }
-
-private:
-    Optional<ByteSpan> ipAddress;
-    uint8_t ipAddressBuffer[kIpAddressBufferSize];
-};
-
-struct CommissionNodeInfo
-{
-    CommissioningWindowParams params;
-    ProtectedIPAddress ipAddress;
-    Optional<uint16_t> port;
-};
-
 class Delegate
 {
 public:
@@ -130,12 +93,9 @@ public:
      * Commission a node specified by the previously approved request.
      *
      * @param params The parameters for the commissioning window.
-     * @param ipAddress Optional IP address for the commissioning window.
-     * @param port Optional port for the commissioning window.
      * @return CHIP_ERROR indicating the success or failure of the operation.
      */
-    virtual CHIP_ERROR HandleCommissionNode(const CommissioningWindowParams & params, const Optional<ByteSpan> & ipAddress,
-                                            const Optional<uint16_t> & port) = 0;
+    virtual CHIP_ERROR HandleCommissionNode(const CommissioningWindowParams & params) = 0;
 
     virtual ~Delegate() = default;
 };

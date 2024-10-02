@@ -189,6 +189,7 @@ public:
     CHIP_ERROR SetAbsMinPower(int64_t);
     CHIP_ERROR SetAbsMaxPower(int64_t);
     CHIP_ERROR SetPowerAdjustmentCapability(const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> &);
+    CHIP_ERROR SetPowerAdjustmentCapabilityPowerAdjustReason(const PowerAdjustReasonEnum);
 
     // The DeviceEnergyManagementDelegate owns the master copy of the ForecastStruct object which is accessed via GetForecast and
     // SetForecast. The slots field of forecast is owned and managed by the object that implements the DEMManufacturerDelegate

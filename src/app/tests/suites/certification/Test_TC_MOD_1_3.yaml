@@ -251,6 +251,36 @@ tests:
           time in a manufacturer specific order"
       PICS: MOD.C.AO-READ
       verification: |
+          ./chip-tool modeselect read on-mode 1 1
+
+            Verify the "OnMode response" on the TH (all-cluster-app) log:
+
+            [1666940828.515256][9718:9718] CHIP:DMG: ReportDataMessage =
+            [1666940828.515259][9718:9718] CHIP:DMG: {
+            [1666940828.515261][9718:9718] CHIP:DMG:         AttributeReportIBs =
+            [1666940828.515265][9718:9718] CHIP:DMG:         [
+            [1666940828.515267][9718:9718] CHIP:DMG:                 AttributeReportIB =
+            [1666940828.515272][9718:9718] CHIP:DMG:                 {
+            [1666940828.515275][9718:9718] CHIP:DMG:                         AttributeDataIB =
+            [1666940828.515277][9718:9718] CHIP:DMG:                         {
+            [1666940828.515280][9718:9718] CHIP:DMG:                                 DataVersion = 0xb4a9126f,
+            [1666940828.515282][9718:9718] CHIP:DMG:                                 AttributePathIB =
+            [1666940828.515285][9718:9718] CHIP:DMG:                                 {
+            [1666940828.515288][9718:9718] CHIP:DMG:                                         Endpoint = 0x1,
+            [1666940828.515290][9718:9718] CHIP:DMG:                                         Cluster = 0x50,
+            [1666940828.515293][9718:9718] CHIP:DMG:                                         Attribute = 0x0000_0005,
+            [1666940828.515295][9718:9718] CHIP:DMG:                                 }
+            [1666940828.515298][9718:9718] CHIP:DMG:
+            [1666940828.515301][9718:9718] CHIP:DMG:                                 Data = NULL
+            [1666940828.515304][9718:9718] CHIP:DMG:                         },
+            [1666940828.515307][9718:9718] CHIP:DMG:
+            [1666940828.515309][9718:9718] CHIP:DMG:                 },
+            [1666940828.515312][9718:9718] CHIP:DMG:
+            [1666940828.515314][9718:9718] CHIP:DMG:         ],
+            [1666940828.515317][9718:9718] CHIP:DMG:
+            [1666940828.515320][9718:9718] CHIP:DMG:         SuppressResponse = true,
+            [1666940828.515322][9718:9718] CHIP:DMG:         InteractionModelRevision = 1
+
           ./chip-tool modeselect read start-up-mode 1 1
 
             Verify the "StartUpMode response" on the TH (all-cluster-app) log:

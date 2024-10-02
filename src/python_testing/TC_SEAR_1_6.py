@@ -29,7 +29,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from time import sleep
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
@@ -72,14 +71,6 @@ class TC_SEAR_1_6(MatterBaseTest):
 
         return progress
 
-    # Sends and out-of-band command to the rvc-app
-    def write_to_app_pipe(self, command):
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Allow some time for the command to take effect.
-        # This removes the test flakiness which is very annoying for everyone in CI.
-        sleep(0.001)
-
     def TC_SEAR_1_6(self) -> list[str]:
         return ["SEAR.S", "SEAR.S.A0005", "SEAR.S.A0000", "SEAR.S.A0002", "SEAR.S.M.HAS_MANUAL_OPERATING_STATE_CONTROL"]
 
@@ -98,7 +89,7 @@ class TC_SEAR_1_6(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe('{"Name": "Reset"}')
+            self.write_to_app_pipe({"Name": "Reset"})
 
         test_step = "Manually intervene to put the device in the idle state and ensure SupportedAreas and SelectedAreas are not empty"
         self.print_step("2", test_step)

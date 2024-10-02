@@ -281,15 +281,17 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
                                                           RequiredPrivilege::ForReadAttribute(request.path));
         if (err != CHIP_NO_ERROR)
         {
-            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+            ReturnErrorCodeIf((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
 
             // Implementation of 8.4.3.2 of the spec for path expansion
             if (request.path.mExpanded)
             {
                 return CHIP_NO_ERROR;
             }
-            // access denied has a specific code for IM
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAccess);
+
+            // access denied and access restricted have specific codes for IM
+            return err == CHIP_ERROR_ACCESS_DENIED ? CHIP_IM_GLOBAL_STATUS(UnsupportedAccess)
+                                                   : CHIP_IM_GLOBAL_STATUS(AccessRestricted);
         }
     }
 

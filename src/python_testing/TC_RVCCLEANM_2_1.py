@@ -28,7 +28,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from time import sleep
 
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
@@ -65,14 +64,6 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
                             "Unexpected return type for RVC Run Mode ChangeToMode")
         return ret
 
-    # Sends and out-of-band command to the rvc-app
-    def write_to_app_pipe(self, command):
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests are flaky)
-        # TODO(#31239): centralize pipe write logic and remove the need of sleep
-        sleep(0.001)
-
     def pics_TC_RVCCLEANM_2_1(self) -> list[str]:
         return ["RVCCLEANM.S"]
 
@@ -107,7 +98,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe('{"Name": "Reset"}')
+            self.write_to_app_pipe({"Name": "Reset"})
 
         self.print_step(2, "Read SupportedModes attribute")
         supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)

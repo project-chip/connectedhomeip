@@ -60,13 +60,13 @@ static void RetryConnectionTimerHandler(void * arg)
     }
 }
 /***********************************************************************************
- * @fn  wfx_started_notify()
+ * @fn  wfx_started_notify(void)
  * @brief
  *       Wifi device started notification
  * @param[in]: None
  * @return None
  *************************************************************************************/
-void wfx_started_notify()
+void wfx_started_notify(void)
 {
     sl_wfx_startup_ind_t evt;
     sl_wfx_mac_address_t mac;
@@ -98,7 +98,7 @@ void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t * ap)
 {
     sl_wfx_connect_ind_t evt;
 
-    VerifyOrReturn(status != SUCCESS_STATUS);
+    VerifyOrReturn(status == SUCCESS_STATUS);
 
     memset(&evt, 0, sizeof(evt));
     evt.header.id     = SL_WFX_CONNECT_IND_ID;

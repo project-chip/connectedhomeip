@@ -47,10 +47,11 @@ class TC_BRBINFO_4_1(MatterBaseTest):
     async def _read_attribute_expect_success(self, endpoint, cluster, attribute, node_id):
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute, node_id=node_id)
 
-    # Override default timeout to support a 60 min wait
+    # This test has some manual steps and also multiple sleeps >= 30 seconds. Test typically runs under 3 mins,
+    # so 6 minutes is more than enough.
     @property
     def default_timeout(self) -> int:
-        return 63*60
+        return 6*60
 
     def desc_TC_BRBINFO_4_1(self) -> str:
         """Returns a description of this test"""
@@ -122,6 +123,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.set_of_dut_endpoints_before_adding_device = set(root_part_list)
 
         super().setup_class()
+        self._active_change_event_subscription = None
         self.app_process = None
         self.app_process_paused = False
         app = self.user_params.get("th_icd_server_app_path", None)
@@ -129,14 +131,16 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             asserts.fail('This test requires a TH_ICD_SERVER app. Specify app path with --string-arg th_icd_server_app_path:<path_to_app>')
 
         self.kvs = f'kvs_{str(uuid.uuid4())}'
-        self.port = 5543
         discriminator = 3850
         passcode = 20202021
-        app_args = f'--secured-device-port {self.port} --discriminator {discriminator} --passcode {passcode} --KVS {self.kvs} '
-        cmd = f'{app} {app_args}'
+        cmd = [app]
+        cmd.extend(['--secured-device-port', str(5543)])
+        cmd.extend(['--discriminator', str(discriminator)])
+        cmd.extend(['--passcode', str(passcode)])
+        cmd.extend(['--KVS', self.kvs])
 
         logging.info("Starting ICD Server App")
-        self.app_process = subprocess.Popen(cmd, bufsize=0, shell=True)
+        self.app_process = subprocess.Popen(cmd)
         logging.info("ICD started")
         time.sleep(3)
 
@@ -153,6 +157,10 @@ class TC_BRBINFO_4_1(MatterBaseTest):
                                                          params.commissioningParameters.setupManualCode, params.commissioningParameters.setupQRCode)
 
     def teardown_class(self):
+        if self._active_change_event_subscription is not None:
+            self._active_change_event_subscription.Shutdown()
+            self._active_change_event_subscription = None
+
         # In case the th_icd_server_app_path does not exist, then we failed the test
         # and there is nothing to remove
         if self.app_process is not None:
@@ -190,7 +198,6 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_BRBINFO_4_1(self):
-        self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         icdm_cluster = Clusters.Objects.IcdManagement
         icdm_attributes = icdm_cluster.Attributes
         brb_info_cluster = Clusters.Objects.BridgedDeviceBasicInformation
@@ -236,8 +243,8 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.q = queue.Queue()
         urgent = 1
         cb = SimpleEventCallback("ActiveChanged", event.cluster_id, event.event_id, self.q)
-        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(dynamic_endpoint_id, event, urgent)], reportInterval=[1, 3])
-        subscription.SetEventUpdateCallback(callback=cb)
+        self._active_change_event_subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(dynamic_endpoint_id, event, urgent)], reportInterval=[1, 3])
+        self._active_change_event_subscription.SetEventUpdateCallback(callback=cb)
 
         self.step("3")
         stay_active_duration_ms = 1000

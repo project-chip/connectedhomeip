@@ -31,6 +31,7 @@ namespace app {
 struct ICDClientInfo
 {
     ScopedNodeId peer_node;
+    ScopedNodeId check_in_node;
     uint32_t start_icd_counter                          = 0;
     uint32_t offset                                     = 0;
     Clusters::IcdManagement::ClientTypeEnum client_type = Clusters::IcdManagement::ClientTypeEnum::kPermanent;
@@ -44,6 +45,7 @@ struct ICDClientInfo
     ICDClientInfo & operator=(const ICDClientInfo & other)
     {
         peer_node         = other.peer_node;
+        check_in_node     = other.check_in_node;
         start_icd_counter = other.start_icd_counter;
         offset            = other.offset;
         client_type       = other.client_type;

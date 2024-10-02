@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 44.1.1. [TC-PWRTL-1.1] Global Attributes with DUT as Server
 
@@ -88,7 +87,7 @@ tests:
               hasMasksSet: [0x4, 0x8]
 
     - label: "Step 4a: TH reads AttributeList from DUT"
-      PICS: "!PWRTL.S.F02 && !PWRTL.S.F03"
+      PICS: " !PWRTL.S.F02 && !PWRTL.S.F03 "
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -99,7 +98,7 @@ tests:
     - label:
           "Step 4b: TH reads feature dependent attribute(AvailableEndpoints)
           AttributeList from DUT"
-      PICS: "PWRTL.S.F02 && !PWRTL.S.F03"
+      PICS: PWRTL.S.F02
       command: "readAttribute"
       attribute: "AttributeList"
       response:

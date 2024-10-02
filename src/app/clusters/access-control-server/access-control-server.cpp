@@ -54,7 +54,7 @@ using ArlReviewEvent = Clusters::AccessControl::Events::FabricRestrictionReviewU
 // TODO(#13590): generated code doesn't automatically handle max length so do it manually
 constexpr int kExtensionDataMaxLength = 128;
 
-constexpr uint16_t kClusterRevision = 1;
+constexpr uint16_t kClusterRevision = 2;
 
 namespace {
 
@@ -88,7 +88,7 @@ public:
     void MarkRestrictionListChanged(FabricIndex fabricIndex) override;
 
     void OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, Optional<CharSpan> instruction,
-                                         Optional<CharSpan> redirectUrl) override;
+                                         Optional<CharSpan> arlRequestFlowUrl) override;
 #endif
 
 private:
@@ -517,20 +517,13 @@ void AccessControlAttribute::MarkRestrictionListChanged(FabricIndex fabricIndex)
 }
 
 void AccessControlAttribute::OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token,
-                                                             Optional<CharSpan> instruction, Optional<CharSpan> redirectUrl)
+                                                             Optional<CharSpan> instruction, Optional<CharSpan> arlRequestFlowUrl)
 {
     CHIP_ERROR err;
     ArlReviewEvent event{ .token = token, .fabricIndex = fabricIndex };
 
-    if (instruction.HasValue())
-    {
-        event.instruction.SetNonNull(instruction.Value());
-    }
-
-    if (redirectUrl.HasValue())
-    {
-        event.redirectURL.SetNonNull(redirectUrl.Value());
-    }
+    event.instruction       = instruction;
+    event.ARLRequestFlowUrl = arlRequestFlowUrl;
 
     EventNumber eventNumber;
     SuccessOrExit(err = LogEvent(event, kRootEndpointId, eventNumber));

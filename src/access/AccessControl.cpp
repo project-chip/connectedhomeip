@@ -538,12 +538,7 @@ CHIP_ERROR AccessControl::CheckARL(const SubjectDescriptor & subjectDescriptor, 
     if (result != CHIP_NO_ERROR)
     {
         ChipLogProgress(DataManagement, "AccessControl: %s",
-#if 0
-                        // TODO(#35177): new error code coming when access check plumbing are fixed in callers
                         (result == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL) ? "denied (restricted)" : "denied (restriction error)");
-#else
-                        (result == CHIP_ERROR_ACCESS_DENIED) ? "denied (restricted)" : "denied (restriction error)");
-#endif
         return result;
     }
 

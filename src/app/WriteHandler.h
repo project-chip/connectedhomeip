@@ -21,8 +21,10 @@
 #include <app/AppConfig.h>
 #include <app/AttributeAccessToken.h>
 #include <app/AttributePathParams.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelDelegatePointers.h>
 #include <app/MessageDef/WriteResponseMessage.h>
+#include <app/data-model-provider/Provider.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/BitFlags.h>
@@ -69,6 +71,7 @@ public:
      *  construction until a call to Close is made to terminate the
      *  instance.
      *
+     *  @param[in] apProvider              A valid pointer to the model used to forward writes towards
      *  @param[in] apWriteHandlerDelegate  A Valid pointer to the WriteHandlerDelegate.
      *
      *  @retval #CHIP_ERROR_INVALID_ARGUMENT on invalid pointers
@@ -77,7 +80,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(WriteHandlerDelegate * apWriteHandlerDelegate);
+    CHIP_ERROR Init(DataModel::Provider * apProvider, WriteHandlerDelegate * apWriteHandlerDelegate);
 
     /**
      *  Process a write request.  Parts of the processing may end up being asynchronous, but the WriteHandler
@@ -182,10 +185,19 @@ private:
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
+    // Write the given data to the given path
+    CHIP_ERROR WriteClusterData(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath,
+                                TLV::TLVReader & aData);
+
     Messaging::ExchangeHolder mExchangeCtx;
     WriteResponseMessage::Builder mWriteResponseBuilder;
     Optional<ConcreteAttributePath> mProcessingAttributePath;
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
+
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    DataModel::Provider * mDataModelProvider = nullptr;
+    std::optional<ConcreteAttributePath> mLastSuccessfullyWrittenPath;
+#endif
 
     // This may be a "fake" pointer or a real delegate pointer, depending
     // on CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE setting.

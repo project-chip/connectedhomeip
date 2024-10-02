@@ -46,6 +46,8 @@ public:
     pw::Status AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response) override;
     pw::Status RemoveSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response) override;
     pw::Status ActiveChanged(const chip_rpc_KeepActiveChanged & request, pw_protobuf_Empty & response) override;
+    pw::Status AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommissioningChanged & request,
+                                                  pw_protobuf_Empty & response) override;
 };
 
 pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response)
@@ -157,6 +159,44 @@ pw::Status FabricBridge::ActiveChanged(const chip_rpc_KeepActiveChanged & reques
     }
 
     device->LogActiveChangeEvent(request.promised_active_duration_ms);
+    return pw::OkStatus();
+}
+
+pw::Status FabricBridge::AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommissioningChanged & request,
+                                                            pw_protobuf_Empty & response)
+{
+    NodeId nodeId = request.node_id;
+    ChipLogProgress(NotSpecified, "Received CADMIN attribut change: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+
+    auto * device = BridgeDeviceMgr().GetDeviceByNodeId(nodeId);
+    if (device == nullptr)
+    {
+        ChipLogError(NotSpecified, "Could not find bridged device associated with nodeId=0x" ChipLogFormatX64,
+                     ChipLogValueX64(nodeId));
+        return pw::Status::NotFound();
+    }
+
+    BridgedDevice::AdminCommissioningAttributes adminCommissioningAttributes;
+
+    uint32_t max_window_status_value =
+        static_cast<uint32_t>(chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kUnknownEnumValue);
+    VerifyOrReturnValue(request.window_status < max_window_status_value, pw::Status::InvalidArgument());
+    adminCommissioningAttributes.commissioningWindowStatus =
+        static_cast<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum>(request.window_status);
+    if (request.has_opener_fabric_index)
+    {
+        VerifyOrReturnValue(request.opener_fabric_index >= chip::kMinValidFabricIndex, pw::Status::InvalidArgument());
+        VerifyOrReturnValue(request.opener_fabric_index <= chip::kMaxValidFabricIndex, pw::Status::InvalidArgument());
+        adminCommissioningAttributes.openerFabricIndex = static_cast<FabricIndex>(request.opener_fabric_index);
+    }
+
+    if (request.has_opener_vendor_id)
+    {
+        VerifyOrReturnValue(request.opener_vendor_id != chip::VendorId::NotSpecified, pw::Status::InvalidArgument());
+        adminCommissioningAttributes.openerVendorId = static_cast<chip::VendorId>(request.opener_vendor_id);
+    }
+
+    device->SetAdminCommissioningAttributes(adminCommissioningAttributes);
     return pw::OkStatus();
 }
 

@@ -20631,6 +20631,8 @@ NS_ASSUME_NONNULL_BEGIN
         _lastModifiedFabricIndex = nil;
 
         _nextCredentialIndex = nil;
+
+        _credentialData = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -20645,6 +20647,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.creatorFabricIndex = self.creatorFabricIndex;
     other.lastModifiedFabricIndex = self.lastModifiedFabricIndex;
     other.nextCredentialIndex = self.nextCredentialIndex;
+    other.credentialData = self.credentialData;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -20652,7 +20655,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: credentialExists:%@; userIndex:%@; creatorFabricIndex:%@; lastModifiedFabricIndex:%@; nextCredentialIndex:%@; >", NSStringFromClass([self class]), _credentialExists, _userIndex, _creatorFabricIndex, _lastModifiedFabricIndex, _nextCredentialIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: credentialExists:%@; userIndex:%@; creatorFabricIndex:%@; lastModifiedFabricIndex:%@; nextCredentialIndex:%@; credentialData:%@; >", NSStringFromClass([self class]), _credentialExists, _userIndex, _creatorFabricIndex, _lastModifiedFabricIndex, _nextCredentialIndex, [_credentialData base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -20731,6 +20734,17 @@ NS_ASSUME_NONNULL_BEGIN
             self.nextCredentialIndex = nil;
         } else {
             self.nextCredentialIndex = [NSNumber numberWithUnsignedShort:decodableStruct.nextCredentialIndex.Value()];
+        }
+    }
+    {
+        if (decodableStruct.credentialData.HasValue()) {
+            if (decodableStruct.credentialData.Value().IsNull()) {
+                self.credentialData = nil;
+            } else {
+                self.credentialData = AsData(decodableStruct.credentialData.Value().Value());
+            }
+        } else {
+            self.credentialData = nil;
         }
     }
     return CHIP_NO_ERROR;
@@ -21574,158 +21588,6 @@ NS_ASSUME_NONNULL_BEGIN
     {
         encodableStruct.tiltPercent100thsValue = self.tiltPercent100thsValue.unsignedShortValue;
     }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRBarrierControlClusterBarrierControlGoToPercentParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _percentOpen = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRBarrierControlClusterBarrierControlGoToPercentParams alloc] init];
-
-    other.percentOpen = self.percentOpen;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: percentOpen:%@; >", NSStringFromClass([self class]), _percentOpen];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRBarrierControlClusterBarrierControlGoToPercentParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.percentOpen = self.percentOpen.unsignedCharValue;
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRBarrierControlClusterBarrierControlStopParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRBarrierControlClusterBarrierControlStopParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRBarrierControlClusterBarrierControlStopParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::Type encodableStruct;
-    ListFreer listFreer;
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     if (buffer.IsNull()) {
@@ -31475,16 +31337,89 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRChimeClusterPlayChimeSoundParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRChimeClusterPlayChimeSoundParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRChimeClusterPlayChimeSoundParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Chime::Commands::PlayChimeSound::Type encodableStruct;
+    ListFreer listFreer;
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRCommissionerControlClusterRequestCommissioningApprovalParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _requestId = @(0);
+        _requestID = @(0);
 
-        _vendorId = @(0);
+        _vendorID = @(0);
 
-        _productId = @(0);
+        _productID = @(0);
 
         _label = nil;
         _timedInvokeTimeoutMs = nil;
@@ -31497,9 +31432,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRCommissionerControlClusterRequestCommissioningApprovalParams alloc] init];
 
-    other.requestId = self.requestId;
-    other.vendorId = self.vendorId;
-    other.productId = self.productId;
+    other.requestID = self.requestID;
+    other.vendorID = self.vendorID;
+    other.productID = self.productID;
     other.label = self.label;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -31509,7 +31444,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestId:%@; vendorId:%@; productId:%@; label:%@; >", NSStringFromClass([self class]), _requestId, _vendorId, _productId, _label];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestID:%@; vendorID:%@; productID:%@; label:%@; >", NSStringFromClass([self class]), _requestID, _vendorID, _productID, _label];
     return descriptionString;
 }
 
@@ -31522,13 +31457,13 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::CommissionerControl::Commands::RequestCommissioningApproval::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.requestId = self.requestId.unsignedLongLongValue;
+        encodableStruct.requestID = self.requestID.unsignedLongLongValue;
     }
     {
-        encodableStruct.vendorId = static_cast<std::remove_reference_t<decltype(encodableStruct.vendorId)>>(self.vendorId.unsignedShortValue);
+        encodableStruct.vendorID = static_cast<std::remove_reference_t<decltype(encodableStruct.vendorID)>>(self.vendorID.unsignedShortValue);
     }
     {
-        encodableStruct.productId = self.productId.unsignedShortValue;
+        encodableStruct.productID = self.productID.unsignedShortValue;
     }
     {
         if (self.label != nil) {
@@ -31580,13 +31515,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _requestId = @(0);
+        _requestID = @(0);
 
         _responseTimeoutSeconds = @(0);
-
-        _ipAddress = nil;
-
-        _port = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -31597,10 +31528,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRCommissionerControlClusterCommissionNodeParams alloc] init];
 
-    other.requestId = self.requestId;
+    other.requestID = self.requestID;
     other.responseTimeoutSeconds = self.responseTimeoutSeconds;
-    other.ipAddress = self.ipAddress;
-    other.port = self.port;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -31609,7 +31538,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestId:%@; responseTimeoutSeconds:%@; ipAddress:%@; port:%@; >", NSStringFromClass([self class]), _requestId, _responseTimeoutSeconds, [_ipAddress base64EncodedStringWithOptions:0], _port];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestID:%@; responseTimeoutSeconds:%@; >", NSStringFromClass([self class]), _requestID, _responseTimeoutSeconds];
     return descriptionString;
 }
 
@@ -31622,22 +31551,10 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::CommissionerControl::Commands::CommissionNode::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.requestId = self.requestId.unsignedLongLongValue;
+        encodableStruct.requestID = self.requestID.unsignedLongLongValue;
     }
     {
         encodableStruct.responseTimeoutSeconds = self.responseTimeoutSeconds.unsignedShortValue;
-    }
-    {
-        if (self.ipAddress != nil) {
-            auto & definedValue_0 = encodableStruct.ipAddress.Emplace();
-            definedValue_0 = AsByteSpan(self.ipAddress);
-        }
-    }
-    {
-        if (self.port != nil) {
-            auto & definedValue_0 = encodableStruct.port.Emplace();
-            definedValue_0 = self.port.unsignedShortValue;
-        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -31779,408 +31696,6 @@ NS_ASSUME_NONNULL_BEGIN
     return CHIP_NO_ERROR;
 }
 
-@end
-
-@implementation MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _profileCount = @(0);
-
-        _profileIntervalPeriod = @(0);
-
-        _maxNumberOfIntervals = @(0);
-
-        _listOfAttributes = [NSArray array];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams alloc] init];
-
-    other.profileCount = self.profileCount;
-    other.profileIntervalPeriod = self.profileIntervalPeriod;
-    other.maxNumberOfIntervals = self.maxNumberOfIntervals;
-    other.listOfAttributes = self.listOfAttributes;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: profileCount:%@; profileIntervalPeriod:%@; maxNumberOfIntervals:%@; listOfAttributes:%@; >", NSStringFromClass([self class]), _profileCount, _profileIntervalPeriod, _maxNumberOfIntervals, _listOfAttributes];
-    return descriptionString;
-}
-
-- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
-    return nil;
-}
-
-@end
-
-@implementation MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType &)decodableStruct
-{
-    {
-        self.profileCount = [NSNumber numberWithUnsignedChar:decodableStruct.profileCount];
-    }
-    {
-        self.profileIntervalPeriod = [NSNumber numberWithUnsignedChar:decodableStruct.profileIntervalPeriod];
-    }
-    {
-        self.maxNumberOfIntervals = [NSNumber numberWithUnsignedChar:decodableStruct.maxNumberOfIntervals];
-    }
-    {
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = decodableStruct.listOfAttributes.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                return err;
-            }
-            self.listOfAttributes = array_0;
-        }
-    }
-    return CHIP_NO_ERROR;
-}
-
-@end
-
-@implementation MTRElectricalMeasurementClusterGetProfileInfoCommandParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRElectricalMeasurementClusterGetProfileInfoCommandParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRElectricalMeasurementClusterGetProfileInfoCommandParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoCommand::Type encodableStruct;
-    ListFreer listFreer;
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _startTime = @(0);
-
-        _status = @(0);
-
-        _profileIntervalPeriod = @(0);
-
-        _numberOfIntervalsDelivered = @(0);
-
-        _attributeId = @(0);
-
-        _intervals = [NSArray array];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams alloc] init];
-
-    other.startTime = self.startTime;
-    other.status = self.status;
-    other.profileIntervalPeriod = self.profileIntervalPeriod;
-    other.numberOfIntervalsDelivered = self.numberOfIntervalsDelivered;
-    other.attributeId = self.attributeId;
-    other.intervals = self.intervals;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startTime:%@; status:%@; profileIntervalPeriod:%@; numberOfIntervalsDelivered:%@; attributeId:%@; intervals:%@; >", NSStringFromClass([self class]), _startTime, _status, _profileIntervalPeriod, _numberOfIntervalsDelivered, _attributeId, _intervals];
-    return descriptionString;
-}
-
-- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
-    return nil;
-}
-
-@end
-
-@implementation MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType &)decodableStruct
-{
-    {
-        self.startTime = [NSNumber numberWithUnsignedInt:decodableStruct.startTime];
-    }
-    {
-        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
-    }
-    {
-        self.profileIntervalPeriod = [NSNumber numberWithUnsignedChar:decodableStruct.profileIntervalPeriod];
-    }
-    {
-        self.numberOfIntervalsDelivered = [NSNumber numberWithUnsignedChar:decodableStruct.numberOfIntervalsDelivered];
-    }
-    {
-        self.attributeId = [NSNumber numberWithUnsignedShort:decodableStruct.attributeId];
-    }
-    {
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = decodableStruct.intervals.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                return err;
-            }
-            self.intervals = array_0;
-        }
-    }
-    return CHIP_NO_ERROR;
-}
-
-@end
-
-@implementation MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _attributeId = @(0);
-
-        _startTime = @(0);
-
-        _numberOfIntervals = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams alloc] init];
-
-    other.attributeId = self.attributeId;
-    other.startTime = self.startTime;
-    other.numberOfIntervals = self.numberOfIntervals;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeId:%@; startTime:%@; numberOfIntervals:%@; >", NSStringFromClass([self class]), _attributeId, _startTime, _numberOfIntervals];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileCommand::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.attributeId = self.attributeId.unsignedShortValue;
-    }
-    {
-        encodableStruct.startTime = self.startTime.unsignedIntValue;
-    }
-    {
-        encodableStruct.numberOfIntervals = self.numberOfIntervals.unsignedCharValue;
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
 @end
 
 @implementation MTRUnitTestingClusterTestParams

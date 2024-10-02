@@ -48,5 +48,7 @@
     "Laundry Washer": 115,
     "Robotic Vacuum Cleaner": 116,
     "Dishwasher": 117,
-    "Smoke CO Alarm": 118
+    "Smoke CO Alarm": 118,
+    "Water Valve": 66,
+    "Water Leak Detector": 67
 }

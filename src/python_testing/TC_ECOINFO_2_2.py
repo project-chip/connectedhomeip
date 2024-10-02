@@ -42,6 +42,12 @@ class TC_ECOINFO_2_2(MatterBaseTest):
 
         return steps
 
+    # This test has some manual steps, so we need a longer timeout. Test typically runs under 1 mins so 3 mins should
+    # be enough time for test to run
+    @property
+    def default_timeout(self) -> int:
+        return 3*60
+
     @async_test_body
     async def test_TC_ECOINFO_2_2(self):
         dev_ctrl = self.default_controller

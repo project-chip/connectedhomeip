@@ -26,7 +26,7 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
-static const uint16_t kPairingTimeoutInSeconds = 10;
+static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12341234;
 static const uint64_t kControllerId = 0x56788765;

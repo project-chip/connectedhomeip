@@ -486,14 +486,10 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_sensitive info event access(read: administer) AccessRestrictionEntryChanged = 2 {
-    fabric_idx fabricIndex = 254;
-  }
-
-  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 3 {
+  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 2 {
     int64u token = 0;
-    nullable long_char_string instruction = 1;
-    nullable long_char_string redirectURL = 2;
+    optional long_char_string instruction = 1;
+    optional long_char_string ARLRequestFlowUrl = 2;
     fabric_idx fabricIndex = 254;
   }
 
@@ -520,7 +516,7 @@ cluster AccessControl = 31 {
   }
 
   /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
-  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
@@ -2754,7 +2750,7 @@ endpoint 1 {
   }
 
   server cluster FanControl {
-    ram      attribute fanMode default = 0;
+    persist  attribute fanMode default = 0;
     ram      attribute fanModeSequence default = 2;
     ram      attribute percentSetting default = 0;
     ram      attribute percentCurrent default = 0;
@@ -3140,11 +3136,11 @@ endpoint 5 {
     ram      attribute absMinHeatSetpointLimit default = 700;
     ram      attribute absMaxHeatSetpointLimit default = 3000;
     persist  attribute PIHeatingDemand default = 0;
-    ram      attribute occupiedHeatingSetpoint default = 2000;
-    ram      attribute minHeatSetpointLimit default = 700;
-    ram      attribute maxHeatSetpointLimit default = 3000;
-    ram      attribute controlSequenceOfOperation default = 2;
-    ram      attribute systemMode default = 4;
+    persist  attribute occupiedHeatingSetpoint default = 2000;
+    persist  attribute minHeatSetpointLimit default = 700;
+    persist  attribute maxHeatSetpointLimit default = 3000;
+    persist  attribute controlSequenceOfOperation default = 2;
+    persist  attribute systemMode default = 4;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

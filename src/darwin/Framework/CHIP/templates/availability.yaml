@@ -9681,16 +9681,6 @@
                   - Setpoints
                   - Presets
                   - MatterScheduleConfiguration
-          RVCRunMode:
-              Feature:
-                  # Not really part of the spec, need to think about whether to
-                  # expose this.
-                  - NoFeatures
-          RVCCleanMode:
-              Feature:
-                  # Not really part of the spec, need to think about whether to
-                  # expose this.
-                  - NoFeatures
 
 - release: "Future"
   versions: "future"
@@ -9788,6 +9778,8 @@
               - GlobalStruct
               - NullableGlobalEnum
               - NullableGlobalStruct
+              - ReadFailureCode
+              - FailureInt32U
       commands:
           AccessControl:
               # Targeting 1.4
@@ -9811,6 +9803,10 @@
               - GlobalEchoResponse
               - StringEchoRequest
               - StringEchoResponse
+      command fields:
+          DoorLock:
+              GetCredentialStatusResponse:
+                  - credentialData
       structs:
           AccessControl:
               # Targeting 1.4
@@ -9842,6 +9838,9 @@
           BridgedDeviceBasicInformation:
               # Targeting 1.4
               - ActiveChanged
+          OccupancySensing:
+              # Targeting 1.4
+              - OccupancyChanged
       enums:
           AccessControl:
               # Targeting 1.4
@@ -9869,6 +9868,44 @@
                   - RequiredTCNotAccepted
                   - TCAcknowledgementsNotReceived
                   - TCMinVersionNotMet
+          RVCCleanMode:
+              # Not clear whether these will stay in the XML
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - Vacation
+          RVCOperationalState:
+              # Not clear whether these will stay in the XML
+              ErrorStateEnum:
+                  - NoError
+                  - UnableToStartOrResume
+                  - UnableToCompleteOperation
+                  - CommandInvalidInState
+              OperationalStateEnum:
+                  - Stopped
+                  - Running
+                  - Paused
+                  - Error
+          RVCRunMode:
+              # Not clear whether these will stay in the XML
+              ModeTag:
+                  - Auto
+                  - Quick
+                  - Quiet
+                  - LowNoise
+                  - LowEnergy
+                  - Min
+                  - Max
+                  - Night
+                  - Day
+                  - Vacation
       bitmaps:
           AccessControl:
               # Targeting 1.4
@@ -9890,6 +9927,14 @@
               Feature:
                   # Targeting 1.4
                   - ActionSwitch
+          RVCCleanMode:
+              Feature:
+                  # Targeting 1.4
+                  - DirectModeChange
+          RVCRunMode:
+              Feature:
+                  # Targeting 1.4
+                  - DirectModeChange
   renames:
       enums:
           ColorControl:
@@ -9936,6 +9981,11 @@
               - ColorCapabilities
               - ColorLoopUpdateFlags
   removed:
+      clusters:
+          - BarrierControl
+          - BinaryInputBasic
+          - ElectricalMeasurement
+          - OnOffSwitchConfiguration
       enum values:
           ColorControl:
               # Don't expose the new value names on the old enum names

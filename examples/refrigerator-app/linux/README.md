@@ -128,11 +128,6 @@ details.
 -   To use the chip-rpc console after it has been installed run:
     `chip-console -s localhost:33000 -o /<YourFolder>/pw_log.out`
 
--   Then you can Get and Set the light using the RPCs:
-    `rpcs.chip.rpc.Lighting.Get()`
-
-    `rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))`
-
 ## Device Tracing
 
 Device tracing is available to analyze the device performance. To turn on

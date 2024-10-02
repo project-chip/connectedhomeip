@@ -390,4 +390,18 @@ inline CHIP_ERROR CopyCharSpanToMutableCharSpan(CharSpan cspan_to_copy, MutableC
     return CHIP_NO_ERROR;
 }
 
+/**
+ * Copies a CharSpan into a MutableCharSpan.
+ * If the span_to_copy does not fit in out_span, span_to_copy is truncated to fit in out_span.
+ * @param span_to_copy The CharSpan to copy.
+ * @param out_span The MutableCharSpan in which span_to_copy is to be copied.
+ */
+inline void CopyCharSpanToMutableCharSpanWithTruncation(CharSpan span_to_copy, MutableCharSpan & out_span)
+{
+    size_t size_to_copy = std::min(span_to_copy.size(), out_span.size());
+
+    memcpy(out_span.data(), span_to_copy.data(), size_to_copy);
+    out_span.reduce_size(size_to_copy);
+}
+
 } // namespace chip

@@ -33,7 +33,7 @@ The Flash is divided into different regions as follow :
     (candidate application).
 
 The size reserved for each partition can be found in
-`src/platform/nxp/zephyr/boards/board.overlay`.
+`<example folder>/boards/<board>.overlay`.
 
 Notes :
 
@@ -41,8 +41,7 @@ Notes :
     binary, ensuring compatibility between the application and the controllers.
 -   The sizes of the primary and secondary applications are provided as an
     example. The size can be changed by overriding the partitions located at
-    `board.overlay`.(example:
-    `src/platform/nxp/zephyr/boards/rd_rw612_bga.overlay`)
+    `<board>.overlay`.
 
 ### MCUBoot Bootloader
 

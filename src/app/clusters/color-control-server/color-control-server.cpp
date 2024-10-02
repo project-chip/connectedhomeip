@@ -1040,7 +1040,7 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
     colorHueTransitionState->transitionTime = MAX_INT16U_VALUE;
     colorHueTransitionState->endpoint       = endpoint;
 
-    SetQuietReportRemainingTime(endpoint, MAX_INT16U_VALUE);
+    SetQuietReportRemainingTime(endpoint, MAX_INT16U_VALUE, true /* isNewTransition */);
 
     scheduleTimerCallbackMs(configureHSVEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
 }
@@ -1091,7 +1091,10 @@ void ColorControlServer::SetHSVRemainingTime(chip::EndpointId endpoint)
     // When the hue transition is loop, RemainingTime stays at MAX_INT16
     if (hueTransitionState->repeat == false)
     {
-        SetQuietReportRemainingTime(endpoint, max(hueTransitionState->timeRemaining, saturationTransitionState->timeRemaining));
+        bool hsvTransitionStart = (hueTransitionState->stepsRemaining == hueTransitionState->stepsTotal) ||
+            (saturationTransitionState->stepsRemaining == saturationTransitionState->stepsTotal);
+        SetQuietReportRemainingTime(endpoint, max(hueTransitionState->timeRemaining, saturationTransitionState->timeRemaining),
+                                    hsvTransitionStart);
     }
 }
 
@@ -1484,7 +1487,7 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
     colorHueTransitionState->repeat         = true;
 
     // hue movement can last forever. Indicate this with a remaining time of maxint
-    SetQuietReportRemainingTime(endpoint, MAX_INT16U_VALUE);
+    SetQuietReportRemainingTime(endpoint, MAX_INT16U_VALUE, true /* isNewTransition */);
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureHSVEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
@@ -2052,7 +2055,7 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
                 uint16_t storedEnhancedHue = 0;
                 Attributes::ColorLoopStoredEnhancedHue::Get(endpoint, &storedEnhancedHue);
                 MarkAttributeDirty markDirty =
-                    SetQuietReportAttribute(quietEnhancedHue[epIndex], storedEnhancedHue, true /*isStartOrEndOfTransition*/, 0);
+                    SetQuietReportAttribute(quietEnhancedHue[epIndex], storedEnhancedHue, true /*isEndOfTransition*/, 0);
                 Attributes::EnhancedCurrentHue::Set(endpoint, quietEnhancedHue[epIndex].value().Value(), markDirty);
             }
             else
@@ -2094,10 +2097,6 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
     uint16_t previousSaturation  = colorSaturationTransitionState->currentValue;
     uint16_t previousEnhancedhue = colorHueTransitionState->currentEnhancedHue;
 
-    bool isHueTansitionStart = (colorHueTransitionState->stepsRemaining == colorHueTransitionState->stepsTotal);
-    bool isSaturationTransitionStart =
-        (colorSaturationTransitionState->stepsRemaining == colorSaturationTransitionState->stepsTotal);
-
     bool isHueTansitionDone         = computeNewHueValue(colorHueTransitionState);
     bool isSaturationTransitionDone = computeNewColor16uValue(colorSaturationTransitionState);
 
@@ -2117,7 +2116,7 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
     if (colorHueTransitionState->isEnhancedHue)
     {
         markDirty = SetQuietReportAttribute(quietEnhancedHue[epIndex], colorHueTransitionState->currentEnhancedHue,
-                                            (isHueTansitionStart || isHueTansitionDone), colorHueTransitionState->transitionTime);
+                                            isHueTansitionDone, colorHueTransitionState->transitionTime);
         Attributes::EnhancedCurrentHue::Set(endpoint, quietEnhancedHue[epIndex].value().Value(), markDirty);
         currentHue = static_cast<uint8_t>(colorHueTransitionState->currentEnhancedHue >> 8);
 
@@ -2135,8 +2134,7 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
         }
     }
 
-    markDirty = SetQuietReportAttribute(quietHue[epIndex], currentHue, (isHueTansitionStart || isHueTansitionDone),
-                                        colorHueTransitionState->transitionTime);
+    markDirty = SetQuietReportAttribute(quietHue[epIndex], currentHue, isHueTansitionDone, colorHueTransitionState->transitionTime);
     Attributes::CurrentHue::Set(endpoint, quietHue[epIndex].value().Value(), markDirty);
 
     if (previousSaturation != colorSaturationTransitionState->currentValue)
@@ -2145,8 +2143,7 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
     }
 
     markDirty = SetQuietReportAttribute(quietSaturation[epIndex], colorSaturationTransitionState->currentValue,
-                                        (isSaturationTransitionStart || isSaturationTransitionDone),
-                                        colorSaturationTransitionState->transitionTime);
+                                        isSaturationTransitionDone, colorSaturationTransitionState->transitionTime);
     Attributes::CurrentSaturation::Set(endpoint, quietSaturation[epIndex].value().Value(), markDirty);
 
     computePwmFromHsv(endpoint);
@@ -2298,7 +2295,7 @@ Status ColorControlServer::moveToColor(uint16_t colorX, uint16_t colorY, uint16_
     colorYTransitionState->lowLimit       = MIN_CIE_XY_VALUE;
     colorYTransitionState->highLimit      = MAX_CIE_XY_VALUE;
 
-    SetQuietReportRemainingTime(endpoint, transitionTime);
+    SetQuietReportRemainingTime(endpoint, transitionTime, true /* isNewTransition */);
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureXYEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
@@ -2405,7 +2402,7 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
     colorYTransitionState->lowLimit       = MIN_CIE_XY_VALUE;
     colorYTransitionState->highLimit      = MAX_CIE_XY_VALUE;
 
-    SetQuietReportRemainingTime(endpoint, max(transitionTimeX, transitionTimeY));
+    SetQuietReportRemainingTime(endpoint, max(transitionTimeX, transitionTimeY), true /* isNewTransition */);
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureXYEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
@@ -2485,7 +2482,7 @@ bool ColorControlServer::stepColorCommand(app::CommandHandler * commandObj, cons
     colorYTransitionState->lowLimit       = MIN_CIE_XY_VALUE;
     colorYTransitionState->highLimit      = MAX_CIE_XY_VALUE;
 
-    SetQuietReportRemainingTime(endpoint, transitionTime);
+    SetQuietReportRemainingTime(endpoint, transitionTime, true /* isNewTransition */);
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureXYEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
@@ -2521,15 +2518,10 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
         scheduleTimerCallbackMs(configureXYEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
     }
 
-    bool isXTransitionStart = (colorXTransitionState->stepsRemaining == colorXTransitionState->stepsTotal);
-    bool isYTransitionStart = (colorYTransitionState->stepsRemaining == colorYTransitionState->stepsTotal);
-
-    MarkAttributeDirty markXDirty =
-        SetQuietReportAttribute(quietColorX[epIndex], colorXTransitionState->currentValue,
-                                (isXTransitionStart || isXTransitionDone), colorXTransitionState->transitionTime);
-    MarkAttributeDirty markYDirty =
-        SetQuietReportAttribute(quietColorY[epIndex], colorYTransitionState->currentValue,
-                                (isYTransitionStart || isYTransitionDone), colorYTransitionState->transitionTime);
+    MarkAttributeDirty markXDirty = SetQuietReportAttribute(quietColorX[epIndex], colorXTransitionState->currentValue,
+                                                            isXTransitionDone, colorXTransitionState->transitionTime);
+    MarkAttributeDirty markYDirty = SetQuietReportAttribute(quietColorY[epIndex], colorYTransitionState->currentValue,
+                                                            isYTransitionDone, colorYTransitionState->transitionTime);
 
     Attributes::CurrentX::Set(endpoint, quietColorX[epIndex].value().Value(), markXDirty);
     Attributes::CurrentY::Set(endpoint, quietColorY[epIndex].value().Value(), markYDirty);
@@ -2623,6 +2615,8 @@ Status ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorT
     colorTempTransitionState->lowLimit       = temperatureMin;
     colorTempTransitionState->highLimit      = temperatureMax;
 
+    SetQuietReportRemainingTime(endpoint, transitionTime, true /* isNewTransition */);
+
     // kick off the state machine
     scheduleTimerCallbackMs(configureTempEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
     return Status::Success;
@@ -2687,36 +2681,32 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
 
     if (status == Status::Success && !startUpColorTemp.IsNull())
     {
-        uint16_t updatedColorTemp = MAX_TEMPERATURE_VALUE;
-        status                    = Attributes::ColorTemperatureMireds::Get(endpoint, &updatedColorTemp);
+        uint16_t tempPhysicalMin = MIN_TEMPERATURE_VALUE;
+        Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
+        // Avoid potential divide-by-zero in future Kelvin conversions.
+        tempPhysicalMin = std::max(static_cast<uint16_t>(1u), tempPhysicalMin);
 
-        if (status == Status::Success)
+        uint16_t tempPhysicalMax = MAX_TEMPERATURE_VALUE;
+        Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
+
+        if (tempPhysicalMin <= startUpColorTemp.Value() && startUpColorTemp.Value() <= tempPhysicalMax)
         {
-            uint16_t tempPhysicalMin = MIN_TEMPERATURE_VALUE;
-            Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
-            // Avoid potential divide-by-zero in future Kelvin conversions.
-            tempPhysicalMin = std::max(static_cast<uint16_t>(1u), tempPhysicalMin);
+            // Apply valid startup color temp value that is within physical limits of device.
+            // Otherwise, the startup value is outside the device's supported range, and the
+            // existing setting of ColorTemp attribute will be left unchanged (i.e., treated as
+            // if startup color temp was set to null).
+            uint16_t epIndex             = getEndpointIndex(endpoint);
+            MarkAttributeDirty markDirty = SetQuietReportAttribute(quietTemperatureMireds[epIndex], startUpColorTemp.Value(),
+                                                                   false /* isEndOfTransition */, 0);
+            status = Attributes::ColorTemperatureMireds::Set(endpoint, quietTemperatureMireds[epIndex].value().Value(), markDirty);
 
-            uint16_t tempPhysicalMax = MAX_TEMPERATURE_VALUE;
-            Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
-
-            if (tempPhysicalMin <= startUpColorTemp.Value() && startUpColorTemp.Value() <= tempPhysicalMax)
+            if (status == Status::Success)
             {
-                // Apply valid startup color temp value that is within physical limits of device.
-                // Otherwise, the startup value is outside the device's supported range, and the
-                // existing setting of ColorTemp attribute will be left unchanged (i.e., treated as
-                // if startup color temp was set to null).
-                updatedColorTemp = startUpColorTemp.Value();
-                status           = Attributes::ColorTemperatureMireds::Set(endpoint, updatedColorTemp);
+                // Set ColorMode attributes to reflect ColorTemperature.
+                auto updateColorMode = ColorModeEnum::kColorTemperatureMireds;
+                Attributes::ColorMode::Set(endpoint, updateColorMode);
 
-                if (status == Status::Success)
-                {
-                    // Set ColorMode attributes to reflect ColorTemperature.
-                    auto updateColorMode = ColorModeEnum::kColorTemperatureMireds;
-                    Attributes::ColorMode::Set(endpoint, updateColorMode);
-
-                    Attributes::EnhancedColorMode::Set(endpoint, static_cast<EnhancedColorModeEnum>(updateColorMode));
-                }
+                Attributes::EnhancedColorMode::Set(endpoint, static_cast<EnhancedColorModeEnum>(updateColorMode));
             }
         }
     }
@@ -2729,7 +2719,8 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
  */
 void ColorControlServer::updateTempCommand(EndpointId endpoint)
 {
-    Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
+    uint16_t epIndex                                   = getEndpointIndex(endpoint);
+    Color16uTransitionState * colorTempTransitionState = getTempTransitionStateByIndex(epIndex);
     bool isColorTempTransitionDone;
 
     isColorTempTransitionDone = computeNewColor16uValue(colorTempTransitionState);
@@ -2763,7 +2754,9 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
         scheduleTimerCallbackMs(configureTempEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
     }
 
-    Attributes::ColorTemperatureMireds::Set(endpoint, colorTempTransitionState->currentValue);
+    MarkAttributeDirty markDirty = SetQuietReportAttribute(quietTemperatureMireds[epIndex], colorTempTransitionState->currentValue,
+                                                           isColorTempTransitionDone, colorTempTransitionState->timeRemaining);
+    Attributes::ColorTemperatureMireds::Set(endpoint, quietTemperatureMireds[epIndex].value().Value(), markDirty);
 
     ChipLogProgress(Zcl, "Color Temperature %d", colorTempTransitionState->currentValue);
 
@@ -2882,7 +2875,7 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
     colorTempTransitionState->lowLimit       = colorTemperatureMinimum;
     colorTempTransitionState->highLimit      = colorTemperatureMaximum;
 
-    SetQuietReportRemainingTime(endpoint, transitionTime);
+    SetQuietReportRemainingTime(endpoint, transitionTime, true /* isNewTransition */);
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureTempEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
@@ -3005,7 +2998,7 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
     colorTempTransitionState->lowLimit       = colorTemperatureMinimum;
     colorTempTransitionState->highLimit      = colorTemperatureMaximum;
 
-    SetQuietReportRemainingTime(endpoint, transitionTime);
+    SetQuietReportRemainingTime(endpoint, transitionTime, true /* isNewTransition */);
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureTempEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
@@ -3103,7 +3096,6 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
  * Utility function used to update a color control attribute which has the quiet reporting quality.
  * matching the following report conditions:
  * - At most once per second, or
- * - At the start of the movement/transition, or
  * - At the end of the movement/transition, or
  * - When it changes from null to any other value and vice versa. (Implicit to the QuieterReportingAttribute class)
  *
@@ -3114,20 +3106,20 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
  *
  * @param quietReporter: The QuieterReportingAttribute<TYPE> object for the attribute to update.
  * @param newValue: Value to update the attribute with
- * @param isStartOrEndOfTransition: Boolean that indicatse whether the update is occurring at the start or end of a level transition
+ * @param isEndOfTransition: Boolean that indicates whether the update is occurring at the end of a color transition
  * @return MarkAttributeDirty::kYes when the attribute must be marked dirty and be reported. MarkAttributeDirty::kNo when
  * no report is needed.
  */
 template <typename Q, typename V>
 MarkAttributeDirty ColorControlServer::SetQuietReportAttribute(QuieterReportingAttribute<Q> & quietReporter, V newValue,
-                                                               bool isStartOrEndOfTransition, uint16_t transitionTime)
+                                                               bool isEndOfTransition, uint16_t transitionTime)
 {
     AttributeDirtyState dirtyState;
     auto now = System::SystemClock().GetMonotonicTimestamp();
 
-    if (isStartOrEndOfTransition)
+    if (isEndOfTransition)
     {
-        // At the start or end of the movement/transition we must report if the value changed
+        // At the end of the movement/transition we must report if the value changed
         auto predicate = [](const typename QuieterReportingAttribute<Q>::SufficientChangePredicateCandidate &) -> bool {
             return true;
         };
@@ -3157,23 +3149,42 @@ MarkAttributeDirty ColorControlServer::SetQuietReportAttribute(QuieterReportingA
  * @brief
  * Function used to set the remaining time based on quiet reporting conditions.
  * It will update the attribute storage and report the attribute if it is determined dirty.
- * The condition on which the attribute must be reported are defined by the set QuieterReportingPolicyFlags
- * of the quietRemainingTime object and the implicit conditions of the QuieterReportingAttribute class
+ * The conditions on which the attribute must be reported are:
+ * - When it changes from 0 to any value higher than 10, or
+ * - When it changes, with a delta larger than 10, caused by the invoke of a command, or
+ * - When it changes to 0.
  *
  * @param endpoint: Endpoint of the RemainingTime attribute to set
  * @param newRemainingTime: Value to update the RemainingTime attribute with
  * @return Success in setting the attribute value or the IM error code for the failure.
  */
-Status ColorControlServer::SetQuietReportRemainingTime(EndpointId endpoint, uint16_t newRemainingTime)
+Status ColorControlServer::SetQuietReportRemainingTime(EndpointId endpoint, uint16_t newRemainingTime, bool isNewTransition)
 {
-    uint16_t epIndex = getEndpointIndex(endpoint);
-    auto markDirty   = MarkAttributeDirty::kNo;
-    auto now         = System::SystemClock().GetMonotonicTimestamp();
-    // Establish the quiet report condition for the RemainingTime Attribute
-    // The quiet report is by the previously set policies :
-    // - kMarkDirtyOnChangeToFromZero : When the value changes from 0 to any other value and vice versa, or
-    // - kMarkDirtyOnIncrement : When the value increases.
-    if (quietRemainingTime[epIndex].SetValue(newRemainingTime, now) == AttributeDirtyState::kMustReport)
+    uint16_t epIndex           = getEndpointIndex(endpoint);
+    uint16_t lastRemainingTime = quietRemainingTime[epIndex].value().ValueOr(0);
+    auto markDirty             = MarkAttributeDirty::kNo;
+    auto now                   = System::SystemClock().GetMonotonicTimestamp();
+
+    auto predicate =
+        [isNewTransition, lastRemainingTime](
+            const typename QuieterReportingAttribute<uint16_t>::SufficientChangePredicateCandidate & candidate) -> bool {
+        constexpr uint16_t reportDelta = 10;
+        bool isDirty                   = false;
+        if (candidate.newValue.Value() == 0 || (candidate.lastDirtyValue.Value() == 0 && candidate.newValue.Value() > reportDelta))
+        {
+            isDirty = true;
+        }
+        else if (isNewTransition &&
+                 (candidate.newValue.Value() > static_cast<uint32_t>(lastRemainingTime + reportDelta) ||
+                  static_cast<uint32_t>(candidate.newValue.Value() + reportDelta) < lastRemainingTime ||
+                  candidate.newValue.Value() > static_cast<uint32_t>(candidate.lastDirtyValue.Value() + reportDelta)))
+        {
+            isDirty = true;
+        }
+        return isDirty;
+    };
+
+    if (quietRemainingTime[epIndex].SetValue(newRemainingTime, now, predicate) == AttributeDirtyState::kMustReport)
     {
         markDirty = MarkAttributeDirty::kYes;
     }

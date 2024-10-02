@@ -497,6 +497,61 @@ Fabric admin for default controller:
   second_ctrl = fa.new_fabric_admin.NewController(nodeId=node_id)
 ```
 
+## Automating manual steps
+
+Some test plans have manual steps that require the tester to manually change the
+state of the DUT. To run these tests in a CI environment, specific example apps
+can be built such that these manual steps can be achieved by Matter or
+named-pipe commands.
+
+In the case that all the manual steps in a test script can be achieved just
+using Matter commands, you can check if the `PICS_SDK_CI_ONLY` PICS is set to
+decide if the test script should send the required Matter commands to perform
+the manual step.
+
+```python
+self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
+```
+
+In the case that a test script requires the use of named-pipe commands to
+achieve the manual steps, you can use the `write_to_app_pipe(command)` to send
+these commands. This command requires the test class to define a `self.app_pipe`
+string value with the name of the pipe. This depends on how the app is set up.
+
+If the name of the pipe is dynamic and based on the app's PID, the following
+snippet can be added to the start of tests that use the `write_to_app_pipe`
+method.
+
+```python
+app_pid = self.matter_test_config.app_pid
+if app_pid != 0:
+	self.is_ci = true
+	self.app_pipe = "/tmp/chip_<app name>_fifo_" + str(app_pid)
+```
+
+This requires the test to be executed with the `--app-pid` flag set if the
+manual steps should be executed by the script. This flag sets the process ID of
+the DUT's matter application.
+
+### Running on a separate machines
+
+If the DUT and test script are running on different machines, the
+`write_to_app_pipe` method can send named-pipe commands to the DUT via ssh. This
+requires two additional environment variables:
+
+-   `LINUX_DUT_IP` sets the DUT's IP address
+-   `LINUX_DUT_UNAME` sets the DUT's ssh username. If not set, this is assumed
+    to be `root`.
+
+The `write_to_app_pipe` also requires that ssh-keys are set up to access the DUT
+from the machine running the test script without a password. You can follow
+these steps to set this up:
+
+1. If you do not have a key, create one using `ssh-keygen`.
+2. Authorize this key on the remote host: run `ssh-copy-id user@ip` once, using
+   your password.
+3. From now on `ssh user@ip` will no longer ask for your password.
+
 ## Other support utilities
 
 -   `basic_composition_support`
@@ -573,7 +628,10 @@ example DUT on the host and includes factory reset support
 -   Don’t forget to set the PICS file to the ci-pics-values
 -   If there are steps in your test that will fail on CI (e.g. test vendor
     checks), gate them on the PICS_SDK_CI_ONLY
-    -   `is_ci = self.check_pics('PICS_SDK_CI_ONLY')`
+    -   ```python
+        if not self.is_pics_sdk_ci_only:
+            ...  # Step that will fail on CI
+        ```
 
 The CI test runner uses a structured environment setup that can be declared
 using structured comments at the top of the test file. To use this structured
@@ -582,61 +640,79 @@ format, use the `--load-from-env` flag with the `run_python_tests.py` runner.
 Ex:
 `scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDM_2_1.py'`
 
+## Running ALL or a subset of tests when changing application code
+
+`scripts/tests/local.py` is a wrapper that is able to build and run tests in a
+single command.
+
+Example to compile all prerequisites and then running all python tests:
+
+```shell
+./scripts/tests/local.py build         # will compile python in out/pyenv and ALL application prerequisites
+./scripts/tests/local.py python-tests  # Runs all python tests that are runnable in CI
+```
+
 ## Defining the CI test arguments
 
-Below is the format of the structured environment definition comments:
+Arguments required to run a test can be defined in the comment block at the top
+of the test script. The section with the arguments should be placed between the
+`# === BEGIN CI TEST ARGUMENTS ===` and `# === END CI TEST ARGUMENTS ===`
+markers. Arguments should be structured as a valid YAML dictionary with a root
+key `test-runner-runs`, followed by the run identifier, and then the parameters
+for that run, e.g.:
 
-```
+```python
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: <run_identifier>
-# test-runner-run/<run_identifier>/app: ${TYPE_OF_APP}
-# test-runner-run/<run_identifier>/factoryreset: <True|False>
-# test-runner-run/<run_identifier>/quiet: <True|False>
-# test-runner-run/<run_identifier>/app-args: <app_arguments>
-# test-runner-run/<run_identifier>/script-args: <script_arguments>
+# test-runner-runs:
+#   run1:
+#     app: ${TYPE_OF_APP}
+#     factoryreset: <true|false>
+#     quiet: <true|false>
+#     app-args: <app_arguments>
+#     script-args: <script_arguments>
 # === END CI TEST ARGUMENTS ===
 ```
 
-NOTE: The `=== BEGIN CI TEST ARGUMENTS ===` and `=== END CI TEST ARGUMENTS ===`
-markers must be present.
-
 ### Description of Parameters
 
--   `test-runner-runs`: Specifies the identifier for the run. This can be any
-    unique identifier.
-
-    -   Example: `run1`
-
--   `test-runner-run/<run_identifier>/app`: Indicates the application to be used
-    in the test. Different app types as needed could be referenced from section
-    [name: Generate an argument environment file ] of the file
+-   `app`: Indicates the application to be used in the test. Different app types
+    as needed could be referenced from section [name: Generate an argument
+    environment file ] of the file
     [.github/workflows/tests.yaml](https://github.com/project-chip/connectedhomeip/blob/master/.github/workflows/tests.yaml)
 
-        -   Example: `${TYPE_OF_APP}`
+    -   Example: `${TYPE_OF_APP}`
 
--   `test-runner-run/<run_identifier>/factoryreset`: Determines whether a
-    factory reset should be performed before the test.
+-   `factoryreset`: Determines whether a factory reset should be performed
+    before the test.
 
-    -   Example: `True`
+    -   Example: `true`
 
--   `test-runner-run/<run_identifier>/quiet`: Sets the verbosity level of the
-    test run. When set to True, the test run will be quieter.
+-   `quiet`: Sets the verbosity level of the test run. When set to True, the
+    test run will be quieter.
 
-    -   Example: `True`
+    -   Example: `true`
 
--   `test-runner-run/<run_identifier>/app-args`: Specifies the arguments to be
-    passed to the application during the test.
+-   `app-args`: Specifies the arguments to be passed to the application during
+    the test.
 
     -   Example:
         `--discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json`
 
--   `test-runner-run/<run_identifier>/script-args`: Specifies the arguments to
-    be passed to the test script.
+-   `script-args`: Specifies the arguments to be passed to the test script.
+
     -   Example:
         `--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto`
+
+-   `script-start-delay`: Specifies the number of seconds to wait before
+    starting the test script. This parameter can be used to allow the
+    application to initialize itself properly before the test script will try to
+    commission it (e.g. in case if the application needs to be commissioned to
+    some other controller first). By default, the delay is 0 seconds.
+
+    -   Example: `10`
 
 This structured format ensures that all necessary configurations are clearly
 defined and easily understood, allowing for consistent and reliable test

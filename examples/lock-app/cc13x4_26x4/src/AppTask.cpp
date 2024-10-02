@@ -54,6 +54,10 @@
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+#include "app/icd/server/ICDNotifier.h"
+#endif
+
 /* syscfg */
 #include <ti_drivers_config.h>
 
@@ -518,7 +522,11 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+            PlatformMgr().ScheduleWork([](intptr_t) { app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
+#else
             LockMgr().InitiateAction(LockManager::UNLOCK_ACTION);
+#endif
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {
@@ -529,7 +537,22 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonRight:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+            chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;
+            EndpointId endpointId{ 1 };
+            Attributes::LockState::Get(endpointId, state);
+
+            if (state.Value() == DlLockState::kLocked)
+            {
+                LockMgr().InitiateAction(LockManager::UNLOCK_ACTION);
+            }
+            else
+            {
+                LockMgr().InitiateAction(LockManager::LOCK_ACTION);
+            }
+#else
             LockMgr().InitiateAction(LockManager::LOCK_ACTION);
+#endif
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {

@@ -84,12 +84,10 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
       <field id="4" name="DeviceTypes" type="list">
-        <entry type="ref_DeviceTypeStruct">
-          <constraint type="desc"/>
-        </entry>
+        <entry type="ref_DeviceTypeStruct"/>
         <access fabricSensitive="true"/>
         <mandatoryConform/>
-        <constraint type="minCount" value="1"/>
+        <constraint type="desc"/>
       </field>
       <field id="5" name="UniqueLocationIDs" type="list">
         <entry type="string">
@@ -123,24 +121,17 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="RemovedOn" type="epoch-us">
-      <access read="true" readPrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0001" name="DeviceDirectory" type="list">
+    <attribute id="0x0000" name="DeviceDirectory" type="list">
       <entry type="EcosystemDeviceStruct"/>
       <access read="true" readPrivilege="manage" fabricScoped="true"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
-      <constraint type="countBetween" from="0" to="256"/>
     </attribute>
-    <attribute id="0x0002" name="LocationDirectory" type="list">
+    <attribute id="0x0001" name="LocationDirectory" type="list">
       <entry type="EcosystemLocationStruct"/>
       <access read="true" readPrivilege="manage" fabricScoped="true"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
-      <constraint type="countBetween" from="0" to="64"/>
     </attribute>
   </attributes>
 </cluster>

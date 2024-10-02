@@ -174,7 +174,7 @@ void RunChecks(const CheckData * checkData, size_t count)
 {
     for (size_t i = 0; i < count; i++)
     {
-        CHIP_ERROR expectedResult = checkData[i].allow ? CHIP_NO_ERROR : CHIP_ERROR_ACCESS_DENIED;
+        CHIP_ERROR expectedResult = checkData[i].allow ? CHIP_NO_ERROR : CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL;
         EXPECT_EQ(accessControl.Check(checkData[i].subjectDescriptor, checkData[i].requestPath, checkData[i].privilege),
                   expectedResult);
     }

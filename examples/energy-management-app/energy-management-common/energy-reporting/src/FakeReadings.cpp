@@ -180,3 +180,28 @@ void FakeReadings::FakeReadingsTimerExpiry(System::Layer * systemLayer, void * m
 
     mn->FakeReadingsUpdate();
 }
+
+void FakeReadings::SetPower(Power_mW aPower_mW)
+{
+    mPower_mW = aPower_mW;
+}
+Power_mW FakeReadings::GetPower()
+{
+    return mPower_mW;
+};
+void FakeReadings::SetVoltage(Voltage_mV aVoltage_mV)
+{
+    mVoltage_mV = aVoltage_mV;
+}
+Voltage_mV FakeReadings::GetVoltage()
+{
+    return mVoltage_mV;
+};
+void FakeReadings::SetCurrent(Amperage_mA aCurrent_mA)
+{
+    mCurrent_mA = aCurrent_mA;
+}
+Amperage_mA FakeReadings::GetCurrent()
+{
+    return mCurrent_mA;
+}

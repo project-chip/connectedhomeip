@@ -410,12 +410,13 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
         if (err != CHIP_NO_ERROR)
         {
-            if (err != CHIP_ERROR_ACCESS_DENIED)
+            if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
             {
                 return FallibleAddStatus(concretePath, Status::Failure) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
             }
             // TODO: when wildcard invokes are supported, handle them to discard rather than fail with status
-            return FallibleAddStatus(concretePath, Status::UnsupportedAccess) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
+            Status status = err == CHIP_ERROR_ACCESS_DENIED ? Status::UnsupportedAccess : Status::AccessRestricted;
+            return FallibleAddStatus(concretePath, status) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
         }
     }
 

@@ -1752,7 +1752,11 @@ TEST_F(TestAccessControl, TestCheck)
     for (const auto & checkData : checkData1)
     {
         CHIP_ERROR expectedResult = checkData.allow ? CHIP_NO_ERROR : CHIP_ERROR_ACCESS_DENIED;
-        EXPECT_EQ(accessControl.Check(checkData.subjectDescriptor, checkData.requestPath, checkData.privilege), expectedResult);
+        auto requestPath          = checkData.requestPath;
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+        requestPath.requestType = Access::RequestType::kAttributeReadRequest;
+#endif
+        EXPECT_EQ(accessControl.Check(checkData.subjectDescriptor, requestPath, checkData.privilege), expectedResult);
     }
 }
 
