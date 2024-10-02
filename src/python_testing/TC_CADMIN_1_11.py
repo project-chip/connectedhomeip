@@ -168,24 +168,30 @@ class TC_CADMIN_1_11(MatterBaseTest):
         self.step(9)
 
         AC_cluster = Clusters.AdministratorCommissioning
-        if Clusters.Objects.AdministratorCommissioning.featureMap is not None:
-            fm_attribute = Clusters.AdministratorCommissioning.Attributes
-            features = await self.read_single_attribute_check_success(cluster=AC_cluster, attribute=fm_attribute.FeatureMap)
-        else:
-            features = AC_cluster.Attributes.FeatureMap.value
+        fm_attribute = Clusters.AdministratorCommissioning.Attributes
+        features = await self.read_single_attribute_check_success(cluster=AC_cluster, attribute=fm_attribute.FeatureMap)
 
         self.supports_bc = bool(features & AC_cluster.Bitmaps.Feature.kBasic) != 0
 
         if self.supports_bc:
             self.count = 0
             self.step("9a")
-            await self.OpenBasicCommissioningWindow(self.th1)
+            obcCmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
+            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
 
             self.step("9b")
-            await self.OpenBasicCommissioningWindow(self.th1, busy_enum)
+            try:
+                await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
+            except Exception as e:
+                asserts.assert_true(e.clusterStatus == busy_enum,
+                                'Unexpected error code returned from CommissioningComplete')
 
             self.step("9c")
-            await self.OpenBasicCommissioningWindow2(self.th2, busy_enum)
+            try:
+                await self.th2.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
+            except Exception as e:
+                asserts.assert_true(e.clusterStatus == busy_enum,
+                                'Unexpected error code returned from CommissioningComplete')
 
             self.step("9d")
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
