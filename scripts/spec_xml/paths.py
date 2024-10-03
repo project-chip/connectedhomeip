@@ -23,6 +23,7 @@ from enum import Enum
 class Branch(Enum):
     MASTER = "master"
     V1_3 = "v1_3"
+    V1_4 = "v1_4"
 
 
 def get_chip_root():
@@ -104,4 +105,4 @@ def get_available_branches():
     Return a list of available branches for the data model.
     This can be expanded or dynamically fetched if necessary.
     """
-    return [Branch.MASTER, Branch.V1_3]
+    return [Branch.MASTER, Branch.V1_3, Branch.V1_4]
