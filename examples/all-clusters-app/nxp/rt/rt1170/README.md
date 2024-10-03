@@ -10,27 +10,27 @@ commissioning and different cluster control.
 
 <hr>
 
-- [CHIP RT1170 All-clusters Application](#chip-rt1170-all-clusters-application)
-  - [Introduction](#introduction)
-    - [Configuration(s) supported](#configurations-supported)
-    - [Hardware requirements for RT1170 + IW612](#hardware-requirements-for-rt1170--iw612)
-      - [Hardware rework for SPI support on MIMXRT1170-EVK-B](#hardware-rework-for-spi-support-on-mimxrt1170-evk-b)
-      - [Board settings (Spinel over SPI, I2C, BLE over UART)](#board-settings-spinel-over-spi-i2c-ble-over-uart)
-  - [Building](#building)
-    - [Building with Matter over Wifi configuration on RT1170 + IW612](#building-with-matter-over-wifi-configuration-on-rt1170--iw612)
-    - [Building with Matter over Thread configuration on RT1170 + IW612](#building-with-matter-over-thread-configuration-on-rt1170--iw612)
-    - [Building with Matter over Wifi + OpenThread Border Router configuration on RT1170 + IW612](#building-with-matter-over-wifi--openthread-border-router-configuration-on-rt1170--iw612)
-    - [General information](#general-information)
-  - [Manufacturing data](#manufacturing-data)
-  - [Flashing and debugging](#flashing-and-debugging)
-  - [Testing the example](#testing-the-example)
-      - [Matter over wifi configuration :](#matter-over-wifi-configuration-)
-      - [Matter over thread configuration :](#matter-over-thread-configuration-)
-      - [Matter over wifi with openthread border router configuration :](#matter-over-wifi-with-openthread-border-router-configuration-)
-    - [Testing the all-clusters application without Matter CLI:](#testing-the-all-clusters-application-without-matter-cli)
-    - [Testing the all-clusters application with Matter CLI enabled:](#testing-the-all-clusters-application-with-matter-cli-enabled)
-  - [Thread Border Router overview](#thread-border-router-overview)
-<hr>
+-   [CHIP RT1170 All-clusters Application](#chip-rt1170-all-clusters-application)
+    -   [Introduction](#introduction)
+        -   [Configuration(s) supported](#configurations-supported)
+        -   [Hardware requirements for RT1170 + IW612](#hardware-requirements-for-rt1170--iw612)
+            -   [Hardware rework for SPI support on MIMXRT1170-EVK-B](#hardware-rework-for-spi-support-on-mimxrt1170-evk-b)
+            -   [Board settings (Spinel over SPI, I2C, BLE over UART)](#board-settings-spinel-over-spi-i2c-ble-over-uart)
+    -   [Building](#building)
+        -   [Building with Matter over Wifi configuration on RT1170 + IW612](#building-with-matter-over-wifi-configuration-on-rt1170--iw612)
+        -   [Building with Matter over Thread configuration on RT1170 + IW612](#building-with-matter-over-thread-configuration-on-rt1170--iw612)
+        -   [Building with Matter over Wifi + OpenThread Border Router configuration on RT1170 + IW612](#building-with-matter-over-wifi--openthread-border-router-configuration-on-rt1170--iw612)
+        -   [General information](#general-information)
+    -   [Manufacturing data](#manufacturing-data)
+    -   [Flashing and debugging](#flashing-and-debugging)
+    -   [Testing the example](#testing-the-example)
+        -   [Matter over wifi configuration :](#matter-over-wifi-configuration-)
+        -   [Matter over thread configuration :](#matter-over-thread-configuration-)
+        -   [Matter over wifi with openthread border router configuration :](#matter-over-wifi-with-openthread-border-router-configuration-)
+        -   [Testing the all-clusters application without Matter CLI:](#testing-the-all-clusters-application-without-matter-cli)
+        -   [Testing the all-clusters application with Matter CLI enabled:](#testing-the-all-clusters-application-with-matter-cli-enabled)
+    -   [Thread Border Router overview](#thread-border-router-overview)
+        <hr>
 
 <a name="introduction"></a>
 
@@ -121,7 +121,7 @@ MIMXRT1170-EVK-B (host) to a IW612 transceiver (rcp).
 
 -   SPI connection between RT1170 and uSD-M2 adapter
 
-    |  MIMXRT1170-EVK-B | uSD-M2 adapter |
+    | MIMXRT1170-EVK-B  | uSD-M2 adapter |
     | :---------------: | :------------: |
     | SPI_MOSI (J10.8)  |     J5.10      |
     | SPI_MISO (J10.10) |      J9.7      |
@@ -132,7 +132,7 @@ MIMXRT1170-EVK-B (host) to a IW612 transceiver (rcp).
 
 -   UART BLE and Reset connections between RT1170 and uSD-M2 adapter
 
-    |  MIMXRT1170-EVK-B | uSD-M2 adapter |
+    | MIMXRT1170-EVK-B  | uSD-M2 adapter |
     | :---------------: | :------------: |
     |   RESET (J26.2)   |      J9.3      |
     | UART_RXD (J25.13) |      J9.1      |
@@ -146,9 +146,12 @@ MIMXRT1170-EVK-B (host) to a IW612 transceiver (rcp).
 ## Building
 
 In order to build the Project CHIP example, we recommend using a Linux
-distribution (supported Operating Systems are listed in [BUILDING.md](../../../../../docs/guides/BUILDING.md)).
+distribution (supported Operating Systems are listed in
+[BUILDING.md](../../../../../docs/guides/BUILDING.md)).
 
-- Make sure that below prerequisites are correctly installed (as described in [BUILDING.md](../../../../../docs/guides/BUILDING.md)))
+-   Make sure that below prerequisites are correctly installed (as described in
+    [BUILDING.md](../../../../../docs/guides/BUILDING.md)))
+
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
@@ -156,11 +159,13 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
 ```
 
 -   Step 1: checkout NXP specific submodules only
+
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
 ```
 
--   Step 2: activate local environment 
+-   Step 2: activate local environment
+
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/activate.sh
 ```
@@ -177,7 +182,9 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/bootstrap.sh
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ third_party/nxp/nxp_matter_support/scripts/update_nxp_sdk.py --platform common
 ```
-Note: By default update_nxp_sdk.py will try to initialize all NXP SDKs. Arg "-- help" could be used to view all available options.
+
+Note: By default update_nxp_sdk.py will try to initialize all NXP SDKs. Arg "--
+help" could be used to view all available options.
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-cluster-app/nxp/rt/rt1170/
@@ -205,10 +212,13 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-cluster/nxp/rt/rt1170/$ n
 
 ### Building with Matter over Wifi + OpenThread Border Router configuration on RT1170 + IW612
 
-This configuration supports the Thread Border Router management cluster to provision the Thread credentials. Enabling the Matter CLI in order to control the
-Thread network on the Border Router is optional but recommended for other features like the Thread credential sharing.
+This configuration supports the Thread Border Router management cluster to
+provision the Thread credentials. Enabling the Matter CLI in order to control
+the Thread network on the Border Router is optional but recommended for other
+features like the Thread credential sharing.
 
-Note that the Thread Border Router management cluster is only supported on the thermostat application for now.
+Note that the Thread Border Router management cluster is only supported on the
+thermostat application for now.
 
 -   Build Matter with Border Router configuration with BLE commissioning
     (ble-wifi) :
@@ -227,7 +237,11 @@ Optional GN options that can be added when building an application:
 
 -   To enable the
     [secondary network commissioning interface](../../../../../docs/guides/nxp/nxp_otbr_guide.md#using-the-secondary-network-commissioning-interface),
-    the arguments `chip_enable_secondary_nwk_if=true` and `chip_device_config_thread_network_endpoint_id=3` must be added to the _gn gen_ command. Note that this is only supported when building the Matter over Wifi + OpenThread Border Router configuration. Note that is only supported on the on the thermostat application for now.
+    the arguments `chip_enable_secondary_nwk_if=true` and
+    `chip_device_config_thread_network_endpoint_id=3` must be added to the _gn
+    gen_ command. Note that this is only supported when building the Matter over
+    Wifi + OpenThread Border Router configuration. Note that is only supported
+    on the on the thermostat application for now.
 -   To enable the
     [matter CLI](#testing-the-all-clusters-application-with-matter-cli-enabled),
     the argument `chip_enable_matter_cli=true` must be added to the _gn gen_
@@ -378,9 +392,10 @@ The "ble-thread" pairing method can be used in order to commission the device.
 
 #### Matter over wifi with openthread border router configuration :
 
-In order to create or join a Thread network on the Matter Border Router, the TBR management cluster or the 
-`otcli` commands from the matter CLI can be used. For more information about using the TBR management cluster 
-follow instructions from ['Using the TBR management cluster'](../../../../../docs/guides/nxp/nxp_otbr_guide.md#using-the-thread-border-router-management-cluster).
+In order to create or join a Thread network on the Matter Border Router, the TBR
+management cluster or the `otcli` commands from the matter CLI can be used. For
+more information about using the TBR management cluster follow instructions from
+['Using the TBR management cluster'](../../../../../docs/guides/nxp/nxp_otbr_guide.md#using-the-thread-border-router-management-cluster).
 For more information about using the matter shell, follow instructions from
 ['Testing the all-clusters application with Matter CLI'](#testing-the-all-clusters-application-with-matter-cli-enabled).
 
@@ -494,10 +509,13 @@ Done
 leader
 Done
 ```
+
 <a name="thread-border-router-overview"></a>
 
 ## Thread Border Router overview
 
-To enable Thread Border Router support see the [build](README.md#building) section.
+To enable Thread Border Router support see the [build](README.md#building)
+section.
 
-The complete Border Router guide is located [here](../../../../../docs/guides/nxp/nxp_otbr_guide.md).
+The complete Border Router guide is located
+[here](../../../../../docs/guides/nxp/nxp_otbr_guide.md).
