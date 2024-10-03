@@ -25,9 +25,9 @@
 #include <cinttypes>
 #include <optional>
 
-#include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <app/AppConfig.h>
 #include <app/CommandHandlerImpl.h>
 #include <app/InteractionModelEngine.h>
