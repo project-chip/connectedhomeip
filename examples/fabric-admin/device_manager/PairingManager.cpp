@@ -316,7 +316,7 @@ void PairingManager::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     if (mCommissioningDelegate)
     {
         mCommissioningDelegate->OnCommissioningComplete(nodeId, err);
-        this->SetCommissioningDelegate(nullptr);
+        SetCommissioningDelegate(nullptr);
     }
 }
 
