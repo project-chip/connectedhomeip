@@ -19,6 +19,7 @@
 #include <access/SubjectDescriptor.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 
 #include <cstdint>
@@ -99,6 +100,7 @@ struct InvokeRequest : OperationRequest
 {
     ConcreteCommandPath path;
     BitFlags<InvokeFlags> invokeFlags;
+    FabricIndex accessingFabricIndex = kUndefinedFabricIndex;
 };
 
 } // namespace DataModel

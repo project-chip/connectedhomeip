@@ -24,6 +24,9 @@
  */
 
 #include "InteractionModelEngine.h"
+#include "app/data-model-provider/MetadataTypes.h"
+#include "app/data-model-provider/OperationTypes.h"
+#include "protocols/interaction_model/StatusCode.h"
 
 #include <cinttypes>
 
@@ -1646,6 +1649,8 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 
     DataModel::InvokeRequest request;
     request.path = aCommandPath;
+    request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, apCommandObj.IsTimedInvoke());
+    request.subjectDescriptor = apCommandObj.GetSubjectDescriptor();
 
     std::optional<DataModel::ActionReturnStatus> status = GetDataModelProvider()->Invoke(request, apPayload, &apCommandObj);
 
@@ -1678,7 +1683,93 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 #endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 }
 
-Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request)
+{
+
+    Status status = CommandCheckExists(request.path);
+
+    if (status != Status::Success)
+    {
+        ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%x",
+                      ChipLogValueMEI(request.path.mCommandId), ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId);
+        return status;
+    }
+
+    status = CommandCheckACL(request);
+    VerifyOrReturnValue(status == Status::Success, status);
+
+    return CommandCheckFlags(request);
+}
+
+Protocols::InteractionModel::Status InteractionModelEngine::CommandCheckACL(const DataModel::InvokeRequest & aRequest)
+{
+    if (!aRequest.subjectDescriptor.has_value())
+    {
+        return Status::UnsupportedAccess; // we require a subject for invoke
+    }
+
+    Access::RequestPath requestPath{ .cluster     = aRequest.path.mClusterId,
+                                     .endpoint    = aRequest.path.mEndpointId,
+                                     .requestType = Access::RequestType::kCommandInvokeRequest,
+                                     .entityId    = aRequest.path.mCommandId };
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    std::optional<DataModel::CommandInfo> commandInfo = mDataModelProvider->GetAcceptedCommandInfo(aRequest.path);
+    // This is checked by previous validations, so it should not happen
+    VerifyOrReturnValue(commandInfo.has_value(), Status::UnsupportedCommand);
+
+    Access::Privilege requestPrivilege = commandInfo->invokePrivilege;
+#else
+    Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(aRequest.path);
+#endif
+    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, requestPrivilege);
+    if (err != CHIP_NO_ERROR)
+    {
+        if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
+        {
+            return Status::Failure;
+        }
+        return err == CHIP_ERROR_ACCESS_DENIED ? Status::UnsupportedAccess : Status::AccessRestricted;
+    }
+
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status InteractionModelEngine::CommandCheckFlags(const DataModel::InvokeRequest & aRequest)
+{
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    std::optional<DataModel::CommandInfo> commandInfo = mDataModelProvider->GetAcceptedCommandInfo(aRequest.path);
+    // This is checked by previous validations, so it should not happen
+    VerifyOrReturnValue(commandInfo.has_value(), Status::UnsupportedCommand);
+
+    const bool commandNeedsTimedInvoke = commandInfo->flags.Has(DataModel::CommandQualityFlags::kTimed);
+    const bool CommandIsFabricScoped   = commandInfo->flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
+#else
+    const bool commandNeedsTimedInvoke = CommandNeedsTimedInvoke(aRequest.path.mClusterId, aRequest.path.mCommandId);
+    const bool CommandIsFabricScoped   = CommandIsFabricScoped(aRequest.path.mClusterId, aRequest.path.mCommandId);
+#endif
+
+    if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
+    {
+        return Status::NeedsTimedInteraction;
+    }
+
+    if (CommandIsFabricScoped)
+    {
+        // SPEC: Else if the command in the path is fabric-scoped and there is no accessing fabric,
+        // a CommandStatusIB SHALL be generated with the UNSUPPORTED_ACCESS Status Code.
+
+        // Fabric-scoped commands are not allowed before a specific accessing fabric is available.
+        // This is mostly just during a PASE session before AddNOC.
+        if (!aRequest.subjectDescriptor.has_value() || aRequest.accessingFabricIndex == kUndefinedFabricIndex)
+        {
+            return Status::UnsupportedAccess;
+        }
+    }
+
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status InteractionModelEngine::CommandCheckExists(const ConcreteCommandPath & aCommandPath)
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     auto provider = GetDataModelProvider();

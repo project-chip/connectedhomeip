@@ -26,6 +26,7 @@
 #pragma once
 
 // TODO(#32628): Remove the CHIPCore.h header when the esp32 build is correctly fixed
+#include "app/data-model-provider/OperationTypes.h"
 #include <lib/core/CHIPCore.h>
 
 #include <access/AccessControl.h>
@@ -508,7 +509,7 @@ private:
     void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
 
-    Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
+    Protocols::InteractionModel::Status ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request) override;
 
     bool HasActiveRead();
 
@@ -611,6 +612,10 @@ private:
      */
     void ShutdownMatchingSubscriptions(const Optional<FabricIndex> & aFabricIndex = NullOptional,
                                        const Optional<NodeId> & aPeerNodeId       = NullOptional);
+
+    Status CommandCheckExists(const ConcreteCommandPath & aCommandPath);
+    Status CommandCheckACL(const DataModel::InvokeRequest & aRequest);
+    Status CommandCheckFlags(const DataModel::InvokeRequest & aRequest);
 
     /**
      * Check if the given attribute path is a valid path in the data model provider.
