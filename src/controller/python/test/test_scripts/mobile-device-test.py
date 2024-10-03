@@ -23,12 +23,18 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --log-level INFO -t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --log-level INFO
+#       --timeout 3600
+#       --disable-test ClusterObjectTests.TestTimedRequestTimeout
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factoryreset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio

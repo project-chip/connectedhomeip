@@ -205,10 +205,12 @@ void DeviceSynchronizer::StartDeviceSynchronization(Controller::DeviceController
     mNodeId = nodeId;
 
 #if defined(PW_RPC_ENABLED)
-    mCurrentDeviceData            = chip_rpc_SynchronizedDevice_init_default;
-    mCurrentDeviceData.node_id    = nodeId;
-    mCurrentDeviceData.has_is_icd = true;
-    mCurrentDeviceData.is_icd     = deviceIsIcd;
+    mCurrentDeviceData                 = chip_rpc_SynchronizedDevice_init_default;
+    mCurrentDeviceData.has_id          = true;
+    mCurrentDeviceData.id.node_id      = nodeId;
+    mCurrentDeviceData.id.fabric_index = controller->GetFabricIndex();
+    mCurrentDeviceData.has_is_icd      = true;
+    mCurrentDeviceData.is_icd          = deviceIsIcd;
 #endif
 
     ReturnOnFailure(controller->GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback));
