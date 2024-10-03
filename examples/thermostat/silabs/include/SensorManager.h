@@ -31,20 +31,15 @@ class SensorManager
 {
 public:
     CHIP_ERROR Init();
-    struct AttributeUpdateInfo
-    {
-        int16_t temperature;
-        uint16_t endPoint;
-    };
 
 private:
-    static void UpdateTemperatureAttribute(intptr_t context);
     friend SensorManager & SensorMgr();
 
     osTimerId_t mSensorTimer;
 
-    // Reads new generated sensor value, stores it, and updates local temperature attribute
     static void SensorTimerEventHandler(void * arg);
+    // Reads new generated sensor value, stores it, and updates local temperature attribute
+    static void TemperatureUpdateEventHandler(AppEvent * aEvent);
 
     static SensorManager sSensorManager;
 };

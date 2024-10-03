@@ -78,6 +78,15 @@ CHIP_ERROR SensorManager::Init()
 
 void SensorManager::SensorTimerEventHandler(void * arg)
 {
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_Timer;
+    event.Handler = TemperatureUpdateEventHandler;
+
+    AppTask::GetAppTask().PostEvent(&event);
+}
+
+void SensorManager::TemperatureUpdateEventHandler(AppEvent * aEvent)
+{
     int16_t temperature            = 0;
     static int16_t lastTemperature = 0;
 
@@ -115,20 +124,11 @@ void SensorManager::SensorTimerEventHandler(void * arg)
 
     if ((temperature >= (lastTemperature + kMinTemperatureDelta)) || temperature <= (lastTemperature - kMinTemperatureDelta))
     {
-        lastTemperature            = temperature;
-        AttributeUpdateInfo * data = chip::Platform::New<AttributeUpdateInfo>();
-        data->endPoint             = kThermostatEndpoint;
-        data->temperature          = temperature;
+        lastTemperature = temperature;
+        PlatformMgr().LockChipStack();
         // The SensorMagager shouldn't be aware of the Endpoint ID TODO Fix this.
         // TODO Per Spec we should also apply the Offset stored in the same cluster before saving the temp
-
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateTemperatureAttribute, reinterpret_cast<intptr_t>(data));
+        app::Clusters::Thermostat::Attributes::LocalTemperature::Set(kThermostatEndpoint, temperature);
+        PlatformMgr().UnlockChipStack();
     }
-}
-
-void SensorManager::UpdateTemperatureAttribute(intptr_t context)
-{
-    SensorManager::AttributeUpdateInfo * data = reinterpret_cast<SensorManager::AttributeUpdateInfo *>(context);
-    app::Clusters::Thermostat::Attributes::LocalTemperature::Set(data->endPoint, data->temperature);
-    chip::Platform::Delete(data);
 }
