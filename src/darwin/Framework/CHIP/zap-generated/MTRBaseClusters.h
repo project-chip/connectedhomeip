@@ -20111,9 +20111,9 @@ typedef NS_ENUM(uint8_t, MTRContentLauncherContentLaunchStatus) {
 typedef NS_OPTIONS(uint32_t, MTRContentLauncherFeature) {
     MTRContentLauncherFeatureContentSearch MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
     MTRContentLauncherFeatureURLPlayback MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
-    MTRContentLauncherFeatureAdvancedSeek MTR_PROVISIONALLY_AVAILABLE = 0x3,
-    MTRContentLauncherFeatureTextTracks MTR_PROVISIONALLY_AVAILABLE = 0x4,
-    MTRContentLauncherFeatureAudioTracks MTR_PROVISIONALLY_AVAILABLE = 0x5,
+    MTRContentLauncherFeatureAdvancedSeek MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRContentLauncherFeatureTextTracks MTR_PROVISIONALLY_AVAILABLE = 0x8,
+    MTRContentLauncherFeatureAudioTracks MTR_PROVISIONALLY_AVAILABLE = 0x10,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRContentLauncherSupportedProtocolsBitmap) {
