@@ -326,7 +326,7 @@ void PairingManager::OnReadCommissioningInfo(const Controller::ReadCommissioning
                     info.basic.productId);
 
     // The string in CharSpan received from the device is not null-terminated, we use std::string here for coping and
-    // appending a numm-terminator at the end of the string.
+    // appending a null-terminator at the end of the string.
     std::string userActiveModeTriggerInstruction;
 
     // Note: the callback doesn't own the buffer, should make a copy if it will be used it later.
