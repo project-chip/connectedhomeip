@@ -66,10 +66,9 @@ config("openthread_rt1060_config") {
       ]
     }
   }
+
   # ot cli configs
-  defines += [
-    "OPENTHREAD_CONFIG_PING_SENDER_ENABLE=1"
-  ]
+  defines += [ "OPENTHREAD_CONFIG_PING_SENDER_ENABLE=1" ]
 }
 
 #Config used by the openthread stack to get the path to OpenthreadConfig.h
@@ -95,13 +94,13 @@ source_set("libopenthread-rt1060") {
 
   if (chip_enable_wifi && chip_enable_openthread) {
     sources += [
-      "${openthread_nxp_root}/src/common/br/infra_if.c",
-      "${openthread_nxp_root}/src/common/br/udp_plat.c",
       "${openthread_nxp_root}/src/common/br/border_agent.c",
       "${openthread_nxp_root}/src/common/br/br_rtos_manager.c",
+      "${openthread_nxp_root}/src/common/br/infra_if.c",
       "${openthread_nxp_root}/src/common/br/lwip_hooks.c",
       "${openthread_nxp_root}/src/common/br/lwip_mcast.c",
       "${openthread_nxp_root}/src/common/br/mdns_socket.c",
+      "${openthread_nxp_root}/src/common/br/udp_plat.c",
       "${openthread_nxp_root}/src/common/br/utils.c",
     ]
 
@@ -129,12 +128,13 @@ source_set("libopenthread-rt1060") {
     sources +=
         [ "${openthread_nxp_root}/src/common/spinel/spinel_hci_hdlc.cpp" ]
   } else if (spinel_over_spi == true) {
-    defines += [ "OT_PLAT_SPINEL_OVER_SPI",
+    defines += [
+      "OT_PLAT_SPINEL_OVER_SPI",
       "OT_PLATFORM_CONFIG_SPI_INSTANCE=4",
       "OT_PLATFORM_CONFIG_SPI_INT_PORT=2",
       "OT_PLATFORM_CONFIG_SPI_INT_PIN=4",
-      "LPSPI_MASTER_CLK_FREQ=CLOCK_GetClockRootFreq(kCLOCK_LpspiClkRoot)"
-      ]
+      "LPSPI_MASTER_CLK_FREQ=CLOCK_GetClockRootFreq(kCLOCK_LpspiClkRoot)",
+    ]
     sources += [ "${openthread_nxp_root}/src/common/spinel/spi_interface.cpp" ]
   } else {
     defines += [ "OT_PLAT_SPINEL_OVER_HDLC" ]
