@@ -376,6 +376,11 @@ DataVersion GetVersion()
     return dataVersion;
 }
 
+void SetVersionTo(DataVersion version)
+{
+    dataVersion = version;
+}
+
 CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
                                      AttributeReportIBs::Builder & aAttributeReports, AttributeEncodeState * apEncoderState)
 {

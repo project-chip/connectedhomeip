@@ -82,11 +82,11 @@ void ReportAttributeChangedWork(intptr_t arg)
 
 using namespace chip::app::Clusters::Actions;
 
-BridgedDevice::BridgedDevice(chip::NodeId nodeId)
+BridgedDevice::BridgedDevice(chip::ScopedNodeId scopedNodeId)
 {
-    mReachable  = false;
-    mNodeId     = nodeId;
-    mEndpointId = chip::kInvalidEndpointId;
+    mReachable    = false;
+    mScopedNodeId = scopedNodeId;
+    mEndpointId   = chip::kInvalidEndpointId;
 }
 
 void BridgedDevice::LogActiveChangeEvent(uint32_t promisedActiveDurationMs)
