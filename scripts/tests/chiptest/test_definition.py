@@ -159,10 +159,15 @@ class App:
         if self.process:
             self.process.terminate()  # sends SIGTERM
             try:
-                self.process.wait(10)
+                exit_code = self.process.wait(10)
+                if exit_code:
+                    raise Exception('Subprocess failed with exit code: %d' % exit_code)
             except subprocess.TimeoutExpired:
                 logging.debug('Subprocess did not terminate on SIGTERM, killing it now')
                 self.process.kill()
+                # The exit code when using Python subprocess will be the signal used to kill it.
+                # Ideally, we would recover the original exit code, but the process was already
+                # ignoring SIGTERM, indicating something was already wrong.
                 self.process.wait(10)
             self.process = None
             self.outpipe = None

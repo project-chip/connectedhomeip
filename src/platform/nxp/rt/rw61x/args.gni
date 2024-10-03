@@ -34,9 +34,6 @@ chip_ble_project_config_include = "<CHIPProjectConfig.h>"
 
 chip_build_tests = false
 
-#This enables the EventList global attribute
-enable_eventlist_attribute = true
-
 declare_args() {
   spinel_interface_rpmsg = true
 
