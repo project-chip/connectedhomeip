@@ -47,29 +47,9 @@ import time
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.testing.tasks import Subprocess
+from chip.testing.tasks import AppServerSubprocess
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-
-
-class AppServer(Subprocess):
-    """Wrapper class for starting an application server in a subprocess."""
-
-    # Prefix for log messages from the application server.
-    PREFIX = b"[SERVER]"
-
-    def __init__(self, app: str, storage_dir: str, discriminator: int, passcode: int, port: int = 5540):
-        storage_kvs_dir = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")[1]
-        # Start the server application with dedicated KVS storage.
-        super().__init__(app, "--KVS", storage_kvs_dir,
-                         '--secured-device-port', str(port),
-                         "--discriminator", str(discriminator),
-                         "--passcode", str(passcode),
-                         output_cb=lambda line, is_stderr: self.PREFIX + line)
-
-    def start(self):
-        # Start process and block until it prints the expected output.
-        super().start(expected_output="Server initialization complete")
 
 
 class TC_MCORE_FS_1_1(MatterBaseTest):
@@ -96,13 +76,15 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         self.th_server_passcode = 20202021
 
         # Start the TH_SERVER app.
-        self.th_server = AppServer(
+        self.th_server = AppServerSubprocess(
             th_server_app,
             storage_dir=self.storage.name,
             port=self.th_server_port,
             discriminator=self.th_server_discriminator,
             passcode=self.th_server_passcode)
-        self.th_server.start()
+        self.th_server.start(
+            expected_output="Server initialization complete",
+            timeout=30)
 
         logging.info("Commissioning from separate fabric")
         # Create a second controller on a new fabric to communicate to the server

@@ -13,9 +13,11 @@
 # limitations under the License.
 
 import logging
+import os
 import re
 import subprocess
 import sys
+import tempfile
 import threading
 from typing import BinaryIO, Callable, List, Optional, Union
 
@@ -152,3 +154,24 @@ class Subprocess(threading.Thread):
         """Wait for the subprocess to finish."""
         self.join(timeout)
         return self.returncode
+
+
+class AppServerSubprocess(Subprocess):
+    """Wrapper class for starting an application server in a subprocess."""
+
+    # Prefix for log messages from the application server.
+    PREFIX = b"[SERVER]"
+
+    def __init__(self, app: str, storage_dir: str, discriminator: int,
+                 passcode: int, port: int = 5540):
+        self.kvs_fd, kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
+        # Start the server application with dedicated KVS storage.
+        super().__init__(app, "--KVS", kvs_path,
+                         '--secured-device-port', str(port),
+                         "--discriminator", str(discriminator),
+                         "--passcode", str(passcode),
+                         output_cb=lambda line, is_stderr: self.PREFIX + line)
+
+    def __del__(self):
+        # Do not leak KVS file descriptor.
+        os.close(self.kvs_fd)

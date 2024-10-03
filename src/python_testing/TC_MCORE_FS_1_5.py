@@ -50,10 +50,10 @@ from dataclasses import dataclass
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
+from chip.testing.tasks import AppServerSubprocess
 from ecdsa.curves import NIST256p
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
-from TC_MCORE_FS_1_1 import AppServer
 from TC_SC_3_6 import AttributeChangeAccumulator
 
 # Length of `w0s` and `w1s` elements
@@ -112,13 +112,15 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
             passcode=20202021)
 
         # Start the TH_SERVER app.
-        self.th_server = AppServer(
+        self.th_server = AppServerSubprocess(
             th_server_app,
             storage_dir=self.storage.name,
             port=self.th_server_port,
             discriminator=self.th_server_setup_params.discriminator,
             passcode=self.th_server_setup_params.passcode)
-        self.th_server.start()
+        self.th_server.start(
+            expected_output="Server initialization complete",
+            timeout=30)
 
     def teardown_class(self):
         if self._partslist_subscription is not None:

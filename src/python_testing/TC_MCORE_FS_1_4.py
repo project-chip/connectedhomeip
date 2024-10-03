@@ -50,9 +50,9 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
 from chip.testing.tasks import Subprocess
+from chip.testing.tasks import AppServerSubprocess
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
-from TC_MCORE_FS_1_1 import AppServer
 
 
 class FabricSyncApp(Subprocess):
@@ -170,13 +170,15 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         self.th_server_passcode = 20202022
 
         # Start the TH_SERVER_NO_UID app.
-        self.th_server = AppServer(
+        self.th_server = AppServerSubprocess(
             th_server_app,
             storage_dir=self.storage.name,
             port=self.th_server_port,
             discriminator=self.th_server_discriminator,
             passcode=self.th_server_passcode)
-        self.th_server.start()
+        self.th_server.start(
+            expected_output="Server initialization complete",
+            timeout=30)
 
     def teardown_class(self):
         if self.th_fsa_controller is not None:
