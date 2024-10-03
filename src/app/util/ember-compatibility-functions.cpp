@@ -806,20 +806,8 @@ Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventP
         return Status::UnsupportedCluster;
     }
 
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-    for (size_t i = 0; i < cluster->eventCount; ++i)
-    {
-        if (cluster->eventList[i] == aPath.mEventId)
-        {
-            return Status::Success;
-        }
-    }
-
-    return Status::UnsupportedEvent;
-#else
     // No way to tell. Just claim supported.
     return Status::Success;
-#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
 }
 
 } // namespace app

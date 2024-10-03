@@ -361,6 +361,12 @@ template("bl_iot_sdk") {
     if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) &&
         invoker.bouffalo_sdk_component_easyflash_enabled) {
       include_dirs += [ "${bl_iot_sdk_root}/components/stage/easyflash4/inc" ]
+    } else {
+      defines = [ "LFS_THREADSAFE" ]
+
+      include_dirs +=
+          [ "${bl_iot_sdk_root}/components/stage/littlefs/littlefs" ]
+      include_dirs += [ "${bl_iot_sdk_root}/components/stage/littlefs/port" ]
     }
   }
 
@@ -406,6 +412,18 @@ template("bl_iot_sdk") {
         "${bl_iot_sdk_root}/components/stage/easyflash4/src/ef_port.c",
         "${bl_iot_sdk_root}/components/stage/easyflash4/src/ef_utils.c",
       ]
+    } else {
+      defines += [
+        "CONFIG_LITTLEFS",
+        "CONFIG_FREERTOS",
+      ]
+
+      sources += [
+        "${bl_iot_sdk_root}/components/stage/littlefs/littlefs/lfs.c",
+        "${bl_iot_sdk_root}/components/stage/littlefs/littlefs/lfs_util.c",
+        "${bl_iot_sdk_root}/components/stage/littlefs/port/lfs_xip_flash.c",
+      ]
+      configs += [ ":${sdk_target_name}_config_hosal" ]
     }
 
     public_configs = [ ":${sdk_target_name}_config_stage" ]

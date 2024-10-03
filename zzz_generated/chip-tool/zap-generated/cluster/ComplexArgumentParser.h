@@ -658,6 +658,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentControl:
 
 static void Finalize(chip::app::Clusters::ContentControl::Structs::RatingNameStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::Type & request,
                         Json::Value & value);

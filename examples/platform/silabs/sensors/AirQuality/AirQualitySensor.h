@@ -1,7 +1,7 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
- *    Copyright 2023-2024 NXP
+ *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,10 +17,12 @@
  *    limitations under the License.
  */
 
-#include "AppMatterButton.h"
+#pragma once
 
-CHIP_ERROR chip::NXP::App::AppMatterButton_registerButtons(void)
-{
-    /* Empty content could be re-defined in a dedicated platform AppMatterButton_registerButtons function */
-    return CHIP_NO_ERROR;
-}
+#include <sl_status.h>
+#include <stdint.h>
+
+namespace AirQualitySensor {
+sl_status_t Init();
+sl_status_t GetAirQuality(int32_t & air_quality);
+}; // namespace AirQualitySensor

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
- *    Copyright 2023-2024 NXP
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,29 +16,23 @@
  *    limitations under the License.
  */
 
-#ifndef _MATTER_BUTTON_H_
-#define _MATTER_BUTTON_H_
+#pragma once
 
-#include <lib/core/CHIPError.h>
+#include "demo-ui-bitmaps.h"
+#include "dmd.h"
+#include "glib.h"
+#include "lcd.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+class AirQualitySensorUI
+{
 
-namespace chip {
-namespace NXP {
-namespace App {
-/**
- * API allowing to register matter buttons
- */
-CHIP_ERROR AppMatterButton_registerButtons(void);
+public:
+    static void DrawUI(GLIB_Context_t * glibContext);
 
-} // namespace App
-} // namespace NXP
-} // namespace chip
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* _MATTER_BUTTON_H_ */
+private:
+    static void DrawHeader(GLIB_Context_t * glibContext);
+    static void DrawFooter(GLIB_Context_t * glibContext);
+    static void DrawCurrentAirQuality(GLIB_Context_t * glibContext);
+    static void DrawFont(GLIB_Context_t * glibContext, uint8_t initial_x, uint8_t initial_y, uint8_t width, uint8_t * data,
+                         uint32_t size);
+};
