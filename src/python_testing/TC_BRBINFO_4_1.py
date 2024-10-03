@@ -47,8 +47,8 @@ import logging
 import os
 import queue
 import random
-import tempfile
 import signal
+import tempfile
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
@@ -59,6 +59,34 @@ from mobly import asserts
 
 logger = logging.getLogger(__name__)
 _ROOT_ENDPOINT_ID = 0
+
+
+class IcdAppServerSubprocess(AppServerSubprocess):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.paused = False
+
+    def pause(self, check_state: bool = True):
+        if check_state:
+            asserts.assert_false(self.paused, "ICD TH Server unexpectedly is already paused")
+        if not self.paused:
+            # Stop (halt) the ICD server process by sending a SIGTOP signal
+            self.p.send_signal(signal.SIGSTOP)
+            self.paused = True
+
+    def resume(self, check_state: bool = True):
+        if check_state:
+            asserts.assert_true(self.paused, "ICD TH Server unexpectedly is already running")
+        if self.paused:
+            # Resume (continue) the ICD server process by sending a SIGCONT signal
+            self.p.send_signal(signal.SIGCONT)
+            self.paused = False
+
+    def terminate(self):
+        # Make sure the ICD server process is not paused before terminating it
+        self.resume(check_state=False)
+        super().terminate()
 
 
 class TC_BRBINFO_4_1(MatterBaseTest):
@@ -144,7 +172,6 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.set_of_dut_endpoints_before_adding_device = set(root_part_list)
 
         self._active_change_event_subscription = None
-        self.app_process_paused = False
         self.th_icd_server = None
         self.storage = None
 
@@ -165,12 +192,12 @@ class TC_BRBINFO_4_1(MatterBaseTest):
                 asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
             self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
 
-        self.th_icd_server_port = 5544
+        self.th_icd_server_port = 5543
         self.th_icd_server_discriminator = random.randint(0, 4095)
-        self.th_icd_server_passcode = 20202022
+        self.th_icd_server_passcode = 20202021
 
         # Start the TH_ICD_SERVER app.
-        self.th_icd_server = AppServerSubprocess(
+        self.th_icd_server = IcdAppServerSubprocess(
             th_icd_server_app,
             storage_dir=self.storage.name,
             port=self.th_icd_server_port,
@@ -215,24 +242,6 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         if self.storage is not None:
             self.storage.cleanup()
         super().teardown_class()
-
-    def pause_th_icd_server(self, check_state):
-        if check_state:
-            asserts.assert_false(self.app_process_paused, "ICD TH Server unexpectedly is already paused")
-        if self.app_process_paused:
-            return
-        # stops (halts) the ICD server process by sending a SIGTOP signal
-        self.th_icd_server.p.send_signal(signal.SIGSTOP.value)
-        self.app_process_paused = True
-
-    def resume_th_icd_server(self, check_state):
-        if check_state:
-            asserts.assert_true(self.app_process_paused, "ICD TH Server unexpectedly is already running")
-        if not self.app_process_paused:
-            return
-        # resumes (continues) the ICD server process by sending a SIGCONT signal
-        self.th_icd_server.p.send_signal(signal.SIGCONT.value)
-        self.app_process_paused = False
 
     #
     # BRBINFO 4.1 Test Body
@@ -342,7 +351,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         asserts.assert_equal(self.q.qsize(), 0, "Unexpected event received from DUT")
 
         self.step("9")
-        self.pause_th_icd_server(check_state=True)
+        self.th_icd_server.pause()
         # sends 3x keep active commands
         stay_active_duration_ms = 2000
         keep_active_timeout_ms = 60000
@@ -354,7 +363,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         await self._send_keep_active_command(stay_active_duration_ms, keep_active_timeout_ms, dynamic_endpoint_id)
 
         self.step("10")
-        self.resume_th_icd_server(check_state=True)
+        self.th_icd_server.resume()
         await self.default_controller.WaitForActive(self.icd_nodeid, timeoutSeconds=wait_for_icd_checkin_timeout_s, stayActiveDurationMs=5000)
         promised_active_duration_ms = await self._wait_for_active_changed_event(timeout_s=wait_for_dut_event_subscription_s)
         asserts.assert_equal(self.q.qsize(), 0, "More than one event received from DUT")
@@ -364,14 +373,14 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         asserts.assert_equal(self.q.qsize(), 0, "More than one event received from DUT")
 
         self.step("12")
-        self.pause_th_icd_server(check_state=True)
+        self.th_icd_server.pause()
         stay_active_duration_ms = 2000
         keep_active_timeout_ms = 30000
         await self._send_keep_active_command(stay_active_duration_ms, keep_active_timeout_ms, dynamic_endpoint_id)
 
         self.step("13")
         await asyncio.sleep(30)
-        self.resume_th_icd_server(check_state=True)
+        self.th_icd_server.resume()
 
         self.step("14")
         await self.default_controller.WaitForActive(self.icd_nodeid, timeoutSeconds=wait_for_icd_checkin_timeout_s, stayActiveDurationMs=5000)
@@ -379,7 +388,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         asserts.assert_equal(self.q.qsize(), 0, "Unexpected event received from DUT")
 
         self.step("15")
-        self.pause_th_icd_server(check_state=True)
+        self.th_icd_server.pause()
         stay_active_duration_ms = 2000
         keep_active_timeout_ms = 30000
         await self._send_keep_active_command(stay_active_duration_ms, keep_active_timeout_ms, dynamic_endpoint_id)
@@ -392,7 +401,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
         self.step("17")
         await asyncio.sleep(15)
-        self.resume_th_icd_server(check_state=True)
+        self.th_icd_server.resume()
 
         self.step("18")
         await self.default_controller.WaitForActive(self.icd_nodeid, timeoutSeconds=wait_for_icd_checkin_timeout_s, stayActiveDurationMs=5000)
