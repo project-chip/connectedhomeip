@@ -98,6 +98,10 @@ public:
     EndpointId NextEndpoint(EndpointId before) override;
     bool EndpointExists(EndpointId endpoint) override;
 
+    std::optional<DataModel::DeviceTypeEntry> FirstDeviceType(EndpointId endpoint) override;
+    std::optional<DataModel::DeviceTypeEntry> NextDeviceType(EndpointId endpoint,
+                                                             const DataModel::DeviceTypeEntry & previous) override;
+
     DataModel::ClusterEntry FirstCluster(EndpointId endpoint) override;
     DataModel::ClusterEntry NextCluster(const ConcreteClusterPath & before) override;
     std::optional<DataModel::ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) override;
@@ -116,9 +120,10 @@ public:
 private:
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
-    uint16_t mEndpointIterationHint  = 0;
-    unsigned mClusterIterationHint   = 0;
-    unsigned mAttributeIterationHint = 0;
+    uint16_t mEndpointIterationHint   = 0;
+    unsigned mClusterIterationHint    = 0;
+    unsigned mAttributeIterationHint  = 0;
+    unsigned mDeviceTypeIterationHint = 0;
     EmberCommandListIterator mAcceptedCommandsIterator;
     EmberCommandListIterator mGeneratedCommandsIterator;
 
