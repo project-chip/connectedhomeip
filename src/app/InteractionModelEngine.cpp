@@ -24,9 +24,6 @@
  */
 
 #include "InteractionModelEngine.h"
-#include "app/data-model-provider/MetadataTypes.h"
-#include "app/data-model-provider/OperationTypes.h"
-#include "protocols/interaction_model/StatusCode.h"
 
 #include <cinttypes>
 
@@ -35,6 +32,8 @@
 #include <app/AppConfig.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/RequiredPrivilege.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
 #include <app/util/ember-compatibility-functions.h>
@@ -45,6 +44,7 @@
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FibonacciUtils.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 #include <app/data-model-provider/ActionReturnStatus.h>
