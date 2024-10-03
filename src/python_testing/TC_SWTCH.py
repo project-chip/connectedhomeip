@@ -300,6 +300,12 @@ class TC_SwitchTests(MatterBaseTest):
                          "Verify that the value is 0, and that a subscription report was received for that change."),
                 ]
 
+    def pics_TC_SWTCH_2_2(self) -> list[str]:
+        return [
+            "SWTCH.S",
+            "SWTCH.S.F00"
+        ]
+
     @run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kLatchingSwitch))
     async def test_TC_SWTCH_2_2(self):
         post_prompt_settle_delay_seconds = 10.0
@@ -410,6 +416,12 @@ class TC_SwitchTests(MatterBaseTest):
                 TestStep(9, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
                 ]
 
+    def pics_TC_SWTCH_2_3(self) -> list[str]:
+        return [
+            "SWTCH.S",
+            "SWTCH.S.F01"
+        ]
+
     @run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
     async def test_TC_SWTCH_2_3(self):
         # Commissioning - already done
@@ -487,6 +499,12 @@ class TC_SwitchTests(MatterBaseTest):
                 * if (MSR & !MSL) features present, TH expects receiving ShortRelease event.
                 """)
                 ]
+
+    def pics_TC_SWTCH_2_4(self) -> list[str]:
+        return [
+            "SWTCH.S",
+            "SWTCH.S.F01"
+        ]
 
     @run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
     async def test_TC_SWTCH_2_4(self):
@@ -655,6 +673,12 @@ class TC_SwitchTests(MatterBaseTest):
                          "TH receives MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 2 from the DUT")
 
                 ]
+
+    def pics_TC_SWTCH_2_5(self) -> list[str]:
+        return [
+            "SWTCH.S",
+            "SWTCH.S.F04"
+        ]
 
     @staticmethod
     def should_run_SWTCH_2_5(wildcard, endpoint):
@@ -834,6 +858,13 @@ class TC_SwitchTests(MatterBaseTest):
                 TestStep("9b", "Operator does not operate switch on the DUT"
                          "Verify that the TH receives MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 1 from the DUT"),
                 ]
+
+    def pics_TC_SWTCH_2_6(self) -> list[str]:
+        return [
+            "SWTCH.S",
+            "SWTCH.S.F04",
+            "SWTCH.S.F05"
+        ]
 
     @staticmethod
     def should_run_SWTCH_2_6(wildcard, endpoint):
