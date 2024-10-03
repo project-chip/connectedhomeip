@@ -10956,6 +10956,36 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeWebRTCTransportProviderID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandSolicitOfferID:
+            result = @"SolicitOffer";
+            break;
+
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideOfferID:
+            result = @"ProvideOffer";
+            break;
+
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideAnswerID:
+            result = @"ProvideAnswer";
+            break;
+
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideICECandidateID:
+            result = @"ProvideICECandidate";
+            break;
+
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandEndSessionID:
+            result = @"EndSession";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %d>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeChimeID:
 
         switch (commandID) {
@@ -12560,6 +12590,24 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
 
         case MTRCommandIDTypeClusterContentAppObserverCommandContentAppMessageResponseID:
             result = @"ContentAppMessageResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %d>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeWebRTCTransportProviderID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandSolicitOfferResponseID:
+            result = @"SolicitOfferResponse";
+            break;
+
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideOfferResponseID:
+            result = @"ProvideOfferResponse";
             break;
 
         default:
