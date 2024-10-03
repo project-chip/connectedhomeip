@@ -73,8 +73,12 @@ using namespace chip::Tracing::DarwinFramework;
 static bool sExitHandlerRegistered = false;
 static void ShutdownOnExit()
 {
-    MTR_LOG("ShutdownOnExit invoked on exit");
-    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+    // Depending on the structure of the software, this code might execute *after* the main autorelease pool has exited.
+    // Therefore, it needs to be enclosed in its own autorelease pool.
+    @autoreleasepool {
+        MTR_LOG("ShutdownOnExit invoked on exit");
+        [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+    }
 }
 
 @interface MTRDeviceControllerFactoryParams ()
@@ -975,9 +979,9 @@ MTR_DIRECT_MEMBERS
     return [_controllers copy];
 }
 
-- (nullable MTRDeviceController *)runningControllerForFabricIndex:(FabricIndex)fabricIndex
-                                      includeControllerStartingUp:(BOOL)includeControllerStartingUp
-                                    includeControllerShuttingDown:(BOOL)includeControllerShuttingDown
+- (nullable MTRDeviceController_Concrete *)runningControllerForFabricIndex:(FabricIndex)fabricIndex
+                                               includeControllerStartingUp:(BOOL)includeControllerStartingUp
+                                             includeControllerShuttingDown:(BOOL)includeControllerShuttingDown
 {
     assertChipStackLockedByCurrentThread();
 
@@ -1006,7 +1010,7 @@ MTR_DIRECT_MEMBERS
     return nil;
 }
 
-- (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
+- (nullable MTRDeviceController_Concrete *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
 {
     return [self runningControllerForFabricIndex:fabricIndex includeControllerStartingUp:YES includeControllerShuttingDown:YES];
 }
@@ -1099,7 +1103,7 @@ MTR_DIRECT_MEMBERS
 }
 
 - (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
-                       controller:(MTRDeviceController *)controller
+                       controller:(MTRDeviceController_Concrete *)controller
                              type:(MTRDiagnosticLogType)type
                           timeout:(NSTimeInterval)timeout
                             queue:(dispatch_queue_t)queue
@@ -1132,7 +1136,7 @@ MTR_DIRECT_MEMBERS
         if (compressedFabricId != nil && compressedFabricId.unsignedLongLongValue == operationalID.GetCompressedFabricId()) {
             ChipLogProgress(Controller, "Notifying controller at fabric index %u about new operational node 0x" ChipLogFormatX64,
                 controller.fabricIndex, ChipLogValueX64(operationalID.GetNodeId()));
-            [controller operationalInstanceAdded:operationalID.GetNodeId()];
+            [controller operationalInstanceAdded:@(operationalID.GetNodeId())];
         }
 
         // Keep going: more than one controller might match a given compressed

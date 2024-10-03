@@ -34,8 +34,6 @@
 #include <lib/support/TypeTraits.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-// using namespace std;
-using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;

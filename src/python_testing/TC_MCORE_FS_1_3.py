@@ -23,13 +23,22 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: examples/fabric-admin/scripts/fabric-sync-app.py
-# test-runner-run/run1/app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
-# test-runner-run/run1/factoryreset: true
-# test-runner-run/run1/script-args: --PICS src/app/tests/suites/certification/ci-pics-values --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID} --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-# test-runner-run/run1/script-start-delay: 5
-# test-runner-run/run1/quiet: true
+# test-runner-runs:
+#   run1:
+#     app: examples/fabric-admin/scripts/fabric-sync-app.py
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-ready-pattern: "Successfully opened pairing window on the device"
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --string-arg th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID}
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factoryreset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -124,7 +133,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             ),
         )
 
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input("Approve Commissioning Approval Request on DUT using manufacturer specified mechanism")
 
         resp = await self.send_single_cmd(
@@ -152,7 +161,6 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_3(self):
-        self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
 
         # Commissioning - done
         self.step(0)

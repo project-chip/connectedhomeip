@@ -321,10 +321,6 @@ if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
 endif()
 
-if (CONFIG_ENABLE_MATTER_EVENT_LIST)
-    chip_gn_arg_append  ("enable_eventlist_attribute" "true")
-endif()
-
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
 

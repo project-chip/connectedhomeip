@@ -212,6 +212,13 @@ enum TestGlobalEnum : enum8 {
   kFinalValue = 2;
 }
 
+enum ThreeLevelAutoEnum : enum8 {
+  kLow = 0;
+  kMedium = 1;
+  kHigh = 2;
+  kAutomatic = 3;
+}
+
 bitmap TestGlobalBitmap : bitmap32 {
   kFirstBit = 0x1;
   kSecondBit = 0x2;
@@ -4055,6 +4062,7 @@ cluster DoorLock = 257 {
     nullable fabric_idx creatorFabricIndex = 2;
     nullable fabric_idx lastModifiedFabricIndex = 3;
     nullable int16u nextCredentialIndex = 4;
+    optional nullable octet_string credentialData = 5;
   }
 
   request struct ClearCredentialRequest {
@@ -4706,6 +4714,7 @@ cluster DoorLock = 257 {
     nullable fabric_idx creatorFabricIndex = 2;
     nullable fabric_idx lastModifiedFabricIndex = 3;
     nullable int16u nextCredentialIndex = 4;
+    optional nullable octet_string credentialData = 5;
   }
 
   request struct ClearCredentialRequest {
@@ -7863,9 +7872,9 @@ cluster ContentLauncher = 1290 {
   bitmap Feature : bitmap32 {
     kContentSearch = 0x1;
     kURLPlayback = 0x2;
-    kAdvancedSeek = 0x3;
-    kTextTracks = 0x4;
-    kAudioTracks = 0x5;
+    kAdvancedSeek = 0x4;
+    kTextTracks = 0x8;
+    kAudioTracks = 0x10;
   }
 
   bitmap SupportedProtocolsBitmap : bitmap32 {
@@ -8016,9 +8025,9 @@ cluster ContentLauncher = 1290 {
   bitmap Feature : bitmap32 {
     kContentSearch = 0x1;
     kURLPlayback = 0x2;
-    kAdvancedSeek = 0x3;
-    kTextTracks = 0x4;
-    kAudioTracks = 0x5;
+    kAdvancedSeek = 0x4;
+    kTextTracks = 0x8;
+    kAudioTracks = 0x10;
   }
 
   bitmap SupportedProtocolsBitmap : bitmap32 {
