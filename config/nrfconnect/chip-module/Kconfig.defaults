@@ -472,6 +472,9 @@ config SHELL_MINIMAL
 config KERNEL_SHELL
     default n if !CHIP_MEMORY_PROFILING
 
+config SHELL_WILDCARD
+	default n
+
 config SENSOR_SHELL
     default n
 
