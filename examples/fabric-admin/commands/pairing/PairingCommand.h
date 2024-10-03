@@ -207,7 +207,6 @@ public:
 
     /////////// DeviceAttestationDelegate Interface /////////
     chip::Optional<uint16_t> FailSafeExpiryTimeoutSecs() const override;
-    bool ShouldWaitAfterDeviceAttestation() override;
     void OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner, chip::DeviceProxy * device,
                                       const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
                                       chip::Credentials::AttestationVerificationResult attestationResult) override;
