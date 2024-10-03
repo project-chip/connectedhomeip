@@ -128,6 +128,7 @@ public:
 
     virtual EndpointId FirstEndpoint()                 = 0;
     virtual EndpointId NextEndpoint(EndpointId before) = 0;
+    virtual bool EndpointExists(EndpointId id);
 
     virtual ClusterEntry FirstCluster(EndpointId endpoint)                              = 0;
     virtual ClusterEntry NextCluster(const ConcreteClusterPath & before)                = 0;

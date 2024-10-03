@@ -5296,9 +5296,9 @@ enum class Feature : uint32_t
 {
     kContentSearch = 0x1,
     kURLPlayback   = 0x2,
-    kAdvancedSeek  = 0x3,
-    kTextTracks    = 0x4,
-    kAudioTracks   = 0x5,
+    kAdvancedSeek  = 0x4,
+    kTextTracks    = 0x8,
+    kAudioTracks   = 0x10,
 };
 
 // Bitmap for SupportedProtocolsBitmap
