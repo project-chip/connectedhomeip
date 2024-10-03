@@ -10,32 +10,32 @@ commissioning and different cluster control.
 
 <hr>
 
-- [CHIP RT1060 All-clusters Application](#chip-rt1060-all-clusters-application)
-  - [Introduction](#introduction)
-    - [Configurations supported](#configurations-supported)
-    - [Hardware requirements RT1060 + transceiver](#hardware-requirements-rt1060--transceiver)
-      - [Hardware requirements RT1060+IW416](#hardware-requirements-rt1060iw416)
-      - [Hardware requirements RT1060+88W8801](#hardware-requirements-rt106088w8801)
-      - [Hardware requirements RT1060 + K32W0](#hardware-requirements-rt1060--k32w0)
-      - [Hardware requirements RT1060-EVK-C+IW612](#hardware-requirements-rt1060-evk-ciw612)
-      - [Hardware requirements RT1060 + 88W8801 + K32W0x1DK6](#hardware-requirements-rt1060--88w8801--k32w0x1dk6)
-  - [Building](#building)
-    - [Building with Matter over Wifi configuration on RT1060 + transceiver](#building-with-matter-over-wifi-configuration-on-rt1060--transceiver)
-    - [Build with Matter over Thread configuration on RT1060 + transceiver](#build-with-matter-over-thread-configuration-on-rt1060--transceiver)
-      - [Build with Matter over Thread configuration on RT1060 + K32W0](#build-with-matter-over-thread-configuration-on-rt1060--k32w0)
-      - [Build with Matter over Thread configuration on RT1060-EVK-C + IW612](#build-with-matter-over-thread-configuration-on-rt1060-evk-c--iw612)
-    - [Build with Matter over Wi-Fi + OpenThread Border Router configuration on RT1060 + 88W8801 + K32W0x1DK6](#build-with-matter-over-wi-fi--openthread-border-router-configuration-on-rt1060--88w8801--k32w0x1dk6)
-    - [General Information](#general-information)
-  - [Manufacturing data](#manufacturing-data)
-  - [Flashing and debugging](#flashing-and-debugging)
-  - [Testing the example](#testing-the-example)
-      - [Matter over wifi configuration :](#matter-over-wifi-configuration-)
-      - [Matter over thread configuration :](#matter-over-thread-configuration-)
-      - [Matter over wifi with openthread border router configuration :](#matter-over-wifi-with-openthread-border-router-configuration-)
-    - [Testing the all-clusters application without Matter CLI:](#testing-the-all-clusters-application-without-matter-cli)
-    - [Testing the all-clusters application with Matter CLI enabled:](#testing-the-all-clusters-application-with-matter-cli-enabled)
-  - [Thread Border Router overview](#thread-border-router-overview)
-<hr>
+-   [CHIP RT1060 All-clusters Application](#chip-rt1060-all-clusters-application)
+    -   [Introduction](#introduction)
+        -   [Configurations supported](#configurations-supported)
+        -   [Hardware requirements RT1060 + transceiver](#hardware-requirements-rt1060--transceiver)
+            -   [Hardware requirements RT1060+IW416](#hardware-requirements-rt1060iw416)
+            -   [Hardware requirements RT1060+88W8801](#hardware-requirements-rt106088w8801)
+            -   [Hardware requirements RT1060 + K32W0](#hardware-requirements-rt1060--k32w0)
+            -   [Hardware requirements RT1060-EVK-C+IW612](#hardware-requirements-rt1060-evk-ciw612)
+            -   [Hardware requirements RT1060 + 88W8801 + K32W0x1DK6](#hardware-requirements-rt1060--88w8801--k32w0x1dk6)
+    -   [Building](#building)
+        -   [Building with Matter over Wifi configuration on RT1060 + transceiver](#building-with-matter-over-wifi-configuration-on-rt1060--transceiver)
+        -   [Build with Matter over Thread configuration on RT1060 + transceiver](#build-with-matter-over-thread-configuration-on-rt1060--transceiver)
+            -   [Build with Matter over Thread configuration on RT1060 + K32W0](#build-with-matter-over-thread-configuration-on-rt1060--k32w0)
+            -   [Build with Matter over Thread configuration on RT1060-EVK-C + IW612](#build-with-matter-over-thread-configuration-on-rt1060-evk-c--iw612)
+        -   [Build with Matter over Wi-Fi + OpenThread Border Router configuration on RT1060 + 88W8801 + K32W0x1DK6](#build-with-matter-over-wi-fi--openthread-border-router-configuration-on-rt1060--88w8801--k32w0x1dk6)
+        -   [General Information](#general-information)
+    -   [Manufacturing data](#manufacturing-data)
+    -   [Flashing and debugging](#flashing-and-debugging)
+    -   [Testing the example](#testing-the-example)
+        -   [Matter over wifi configuration :](#matter-over-wifi-configuration-)
+        -   [Matter over thread configuration :](#matter-over-thread-configuration-)
+        -   [Matter over wifi with openthread border router configuration :](#matter-over-wifi-with-openthread-border-router-configuration-)
+        -   [Testing the all-clusters application without Matter CLI:](#testing-the-all-clusters-application-without-matter-cli)
+        -   [Testing the all-clusters application with Matter CLI enabled:](#testing-the-all-clusters-application-with-matter-cli-enabled)
+    -   [Thread Border Router overview](#thread-border-router-overview)
+        <hr>
 
 <a name="intro"></a>
 
@@ -104,10 +104,10 @@ Jumper settings for MIMXRT1060-EVK (enables external 5V supply):
 
 The hardware should be reworked according to the chapter _Hardware Rework Guide
 for MIMXRT1060-EVK-B and AW-AM510-uSD_ or the chapter _Hardware Rework Guide for
-MIMXRT1060-EVK and AW-AM510-uSD_ in the document _`Hardware Rework Guide for
-EdgeFast BT PAL`_ which can be found in the NXP RT1060 SDK
-(*docs/wireless/bluetooth/edgefast_bluetooth/Hardware Rework Guide for EdgeFast
-BT PAL.pdf*):
+MIMXRT1060-EVK and AW-AM510-uSD_ in the document
+_`Hardware Rework Guide for EdgeFast BT PAL`_ which can be found in the NXP
+RT1060 SDK (_docs/wireless/bluetooth/edgefast_bluetooth/Hardware Rework Guide
+for EdgeFast BT PAL.pdf_):
 
 -   Make sure resistors R368/R376/R347/R349/R365/R363/R193/R186 are removed.
 
@@ -157,14 +157,14 @@ Transceiver part :
 -   1 88W8801 2DS M.2 Module (rev A)
 -   1 Murata uSD-M.2 Adapter (rev B1)
 
-The 88W8801 2DS M.2 Module should be inserted into the Murata uSD-M.2 Adapter and
-inserted in the uSD slot J22 of MIMXRT1060-EVK-B. The Murata uSD-M.2 Adapter can
-be powered up using uSD pins. For that, set the J1 jumper of Murata uSD-M.2 to
-position 2-3 (Position 2-3: VBAT supply, typical 3.1 ~ 3.3V, from microSD
+The 88W8801 2DS M.2 Module should be inserted into the Murata uSD-M.2 Adapter
+and inserted in the uSD slot J22 of MIMXRT1060-EVK-B. The Murata uSD-M.2 Adapter
+can be powered up using uSD pins. For that, set the J1 jumper of Murata uSD-M.2
+to position 2-3 (Position 2-3: VBAT supply, typical 3.1 ~ 3.3V, from microSD
 connector).
 
-Note: as the 88W8801 module supports only the 2.4 GHz Wi-Fi band, it is mandatory
-to connect it to a Wi-Fi access point on the 2.4 GHz band.
+Note: as the 88W8801 module supports only the 2.4 GHz Wi-Fi band, it is
+mandatory to connect it to a Wi-Fi access point on the 2.4 GHz band.
 
 #### Hardware requirements RT1060 + K32W0
 
@@ -226,17 +226,20 @@ Transceiver part :
 -   88W8801 module (for Wi-Fi connection), for example 88W8801 2DS M.2 Module
     (rev A) and Murata uSD-M.2 Adapter (rev B1)
 -   K32W0x1 mezzanine module (for Thread connection)
--   IOT_ZTB-DK006 carrier board for the K32W0x1 module (referenced as DK6 carrier
-    board)
+-   IOT_ZTB-DK006 carrier board for the K32W0x1 module (referenced as DK6
+    carrier board)
 
 <a name="building"></a>
 
 ## Building
 
 In order to build the Project CHIP example, we recommend using a Linux
-distribution (supported Operating Systems are listed in [BUILDING.md](../../../../../docs/guides/BUILDING.md)).
+distribution (supported Operating Systems are listed in
+[BUILDING.md](../../../../../docs/guides/BUILDING.md)).
 
-- Make sure that below prerequisites are correctly installed (as described in [BUILDING.md](../../../../../docs/guides/BUILDING.md)).
+-   Make sure that below prerequisites are correctly installed (as described in
+    [BUILDING.md](../../../../../docs/guides/BUILDING.md)).
+
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
@@ -244,11 +247,13 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
 ```
 
 -   Step 1: checkout NXP specific submodules only
+
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
 ```
 
--   Step 2: activate local environment 
+-   Step 2: activate local environment
+
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/activate.sh
 ```
@@ -265,7 +270,9 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/bootstrap.sh
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ third_party/nxp/nxp_matter_support/scripts/update_nxp_sdk.py --platform common
 ```
-Note: By default update_nxp_sdk.py will try to initialize all NXP SDKs. Arg "-- help" could be used to view all available options.
+
+Note: By default update_nxp_sdk.py will try to initialize all NXP SDKs. Arg "--
+help" could be used to view all available options.
 
 -   Start building the application.
 
@@ -346,7 +353,7 @@ optional:
     `k32w0_transceiver_bin_path=\"/home/ot-nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h\"`
     This argument is optional, by default, if not set, the binary file located
     in
-    "${chip_root}/third_party/openthread/ot_nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h"
+    "\${chip_root}/third_party/openthread/ot_nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h"
     will be used. If the K32W061 transceiver binary is saved at another location
     an absolute path of its location should be given.
 -   Optional: `otw_logs_enabled=true` This argument is optional, by default
@@ -365,8 +372,8 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt106
 
 #### Build with Matter over Thread configuration on RT1060-EVK-C + IW612
 
-Build the OpenThread configuration for MIMXRT1060-EVK-C board + IW612 transceiver
-(with BLE for commissioning).
+Build the OpenThread configuration for MIMXRT1060-EVK-C board + IW612
+transceiver (with BLE for commissioning).
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_openthread=true  iwx12_transceiver=true evkname=\"evkcmimxrt1060\" chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true" " out/debug
@@ -375,10 +382,13 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt106
 
 ### Build with Matter over Wi-Fi + OpenThread Border Router configuration on RT1060 + 88W8801 + K32W0x1DK6
 
-This configuration supports the Thread Border Router management cluster to provision the Thread credentials. Enabling the Matter CLI in order to control the
-Thread network on the Border Router is optional but recommended for other features like the Thread credential sharing.
+This configuration supports the Thread Border Router management cluster to
+provision the Thread credentials. Enabling the Matter CLI in order to control
+the Thread network on the Border Router is optional but recommended for other
+features like the Thread credential sharing.
 
-Note that the Thread Border Router management cluster is only supported on the thermostat application for now.
+Note that the Thread Border Router management cluster is only supported on the
+thermostat application for now.
 
 -   Build Matter with Border Router configuration with ble-wifi commissioning:
 
@@ -403,7 +413,11 @@ Optional GN options that can be added when building an application:
 
 -   To enable the
     [secondary network commissioning interface](../../../../../docs/guides/nxp/nxp_otbr_guide.md#using-the-secondary-network-commissioning-interface),
-    the arguments `chip_enable_secondary_nwk_if=true` and `chip_device_config_thread_network_endpoint_id=3` must be added to the _gn gen_ command. Note that this is only supported when building the Matter over Wifi + OpenThread Border Router configuration. Note that is only supported on the on the thermostat application for now.
+    the arguments `chip_enable_secondary_nwk_if=true` and
+    `chip_device_config_thread_network_endpoint_id=3` must be added to the _gn
+    gen_ command. Note that this is only supported when building the Matter over
+    Wifi + OpenThread Border Router configuration. Note that is only supported
+    on the on the thermostat application for now.
 -   To enable the [matter CLI](README.md#matter-shell), the argument
     `chip_enable_matter_cli=true` must be added to the _gn gen_ command.
 -   To build the application in debug mode, the argument
@@ -458,10 +472,12 @@ the menu, select the "Import local SDK Git repository" menu item.
 ![Import local SDK Git repository](../../../../platform/nxp/rt/rt1060/doc/images/import-local-repository.png)
 
 The "Import SDK Git" window will open. The "Repository location" text field
-should point to the west workspace (third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo subfolder of the
+should point to the west workspace
+(third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo subfolder of the
 Matter repository). The "Manifest(s) folder" text field should point to its core
-subfolder (third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/core subfolder of the Matter repository).
-Click "OK" and wait for MCUXpresso IDE to import the SDK.
+subfolder (third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/core
+subfolder of the Matter repository). Click "OK" and wait for MCUXpresso IDE to
+import the SDK.
 
 ![Import SDK Git](../../../../platform/nxp/rt/rt1060/doc/images/import-sdk-git.png)
 
@@ -581,8 +597,10 @@ The "ble-thread" pairing method can be used in order to commission the device.
 
 #### Matter over wifi with openthread border router configuration :
 
-In order to create or join a Thread network on the Matter Border Router, the TBR management cluster or the 
-`otcli` commands from the matter CLI can be used. For more information about using the TBR management cluster follow instructions from ['Using the TBR management cluster'](../../../../../docs/guides/nxp/nxp_otbr_guide.md#using-the-thread-border-router-management-cluster).
+In order to create or join a Thread network on the Matter Border Router, the TBR
+management cluster or the `otcli` commands from the matter CLI can be used. For
+more information about using the TBR management cluster follow instructions from
+['Using the TBR management cluster'](../../../../../docs/guides/nxp/nxp_otbr_guide.md#using-the-thread-border-router-management-cluster).
 For more information about using the matter shell, follow instructions from
 ['Testing the all-clusters application with Matter CLI'](#testing-the-all-clusters-application-with-matter-cli-enabled).
 
@@ -693,10 +711,13 @@ Done
 leader
 Done
 ```
+
 <a name="thread-border-router-overview"></a>
 
 ## Thread Border Router overview
 
-To enable Thread Border Router support see the [build](README.md#building) section.
+To enable Thread Border Router support see the [build](README.md#building)
+section.
 
-The complete Border Router guide is located [here](../../../../../docs/guides/nxp/nxp_otbr_guide.md).
+The complete Border Router guide is located
+[here](../../../../../docs/guides/nxp/nxp_otbr_guide.md).
