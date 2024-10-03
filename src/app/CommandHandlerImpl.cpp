@@ -15,7 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/data-model-provider/OperationTypes.h"
 #include <app/CommandHandlerImpl.h>
 
 #include <access/AccessControl.h>
@@ -23,6 +22,7 @@
 #include <app/MessageDef/StatusIB.h>
 #include <app/RequiredPrivilege.h>
 #include <app/StatusResponse.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPConfig.h>
