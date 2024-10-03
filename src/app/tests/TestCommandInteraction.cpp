@@ -372,9 +372,21 @@ public:
     {
         DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
     }
-    Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath)
+
+    Protocols::InteractionModel::Status ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request) override
     {
-        return ServerClusterCommandExists(aCommandPath);
+        using Protocols::InteractionModel::Status;
+
+        Status status = ServerClusterCommandExists(request.path);
+        if (status != Status::Success)
+        {
+            return status;
+        }
+
+        // NOTE: IM does more validation here, however for now we do minimal options
+        //       to pass the test.
+
+        return Status::Success;
     }
 
     void ResetCounter() { onFinalCalledTimes = 0; }
