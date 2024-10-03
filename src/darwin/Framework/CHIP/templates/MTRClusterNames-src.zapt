@@ -87,6 +87,62 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
     return result;
 }
 
+#pragma mark - Command IDs
+
+{{!Takes "source" as an argument, can be "client" or "server"}}
+{{~#*inline "commandIDOutput"}}
+    NSString * result = nil;
+
+    switch (clusterID) {
+
+{{#zcl_clusters}}
+{{#if (isSupported (asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
+{{~#*inline "cluster"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+        case MTRClusterIDType{{>cluster}}ID:
+
+            switch (commandID) {
+
+{{#*inline "commandIDs"}}
+{{#zcl_commands}}
+{{~#*inline "cluster"}}{{asUpperCamelCase ../clusterName preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "command"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+{{#if (and (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) command=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)
+           (isStrEqual source ../../../source))}}
+            case MTRCommandIDTypeCluster{{>cluster}}Command{{>command}}ID:
+                result = @"{{>command}}";
+                break;
+
+{{/if}}
+{{/zcl_commands}}
+{{/inline}}
+
+{{> commandIDs clusterName=label}}
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown commandID %d>", commandID];
+                break;
+        }
+        break;
+{{/if}}
+
+{{/zcl_clusters}}
+        default:
+           result = [NSString stringWithFormat:@"<Unknown clusterID %d>", clusterID];
+           break;
+        }
+
+    return result;
+{{/inline}}
+
+NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDType commandID)
+{
+{{> commandIDOutput source="client"}}
+}
+
+NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDType commandID)
+{
+{{> commandIDOutput source="server"}}
+}
 
 #pragma mark - Event IDs
 
