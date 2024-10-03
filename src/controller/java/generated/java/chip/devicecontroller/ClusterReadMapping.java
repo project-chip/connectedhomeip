@@ -18236,6 +18236,87 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readWebRTCTransportProviderInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readWebRTCTransportProviderCurrentSessionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWebRTCTransportProviderCurrentSessionsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WebRTCTransportProviderCluster) cluster).readCurrentSessionsAttribute(
+              (ChipClusters.WebRTCTransportProviderCluster.CurrentSessionsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWebRTCTransportProviderClusterCurrentSessionsAttributeCallback(),
+          readWebRTCTransportProviderCurrentSessionsCommandParams
+        );
+        result.put("readCurrentSessionsAttribute", readWebRTCTransportProviderCurrentSessionsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWebRTCTransportProviderGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWebRTCTransportProviderGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WebRTCTransportProviderCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.WebRTCTransportProviderCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWebRTCTransportProviderClusterGeneratedCommandListAttributeCallback(),
+          readWebRTCTransportProviderGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readWebRTCTransportProviderGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWebRTCTransportProviderAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWebRTCTransportProviderAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WebRTCTransportProviderCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.WebRTCTransportProviderCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWebRTCTransportProviderClusterAcceptedCommandListAttributeCallback(),
+          readWebRTCTransportProviderAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readWebRTCTransportProviderAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWebRTCTransportProviderEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWebRTCTransportProviderEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WebRTCTransportProviderCluster) cluster).readEventListAttribute(
+              (ChipClusters.WebRTCTransportProviderCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWebRTCTransportProviderClusterEventListAttributeCallback(),
+          readWebRTCTransportProviderEventListCommandParams
+        );
+        result.put("readEventListAttribute", readWebRTCTransportProviderEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWebRTCTransportProviderAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWebRTCTransportProviderAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WebRTCTransportProviderCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.WebRTCTransportProviderCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWebRTCTransportProviderClusterAttributeListAttributeCallback(),
+          readWebRTCTransportProviderAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readWebRTCTransportProviderAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWebRTCTransportProviderFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWebRTCTransportProviderFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WebRTCTransportProviderCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readWebRTCTransportProviderFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readWebRTCTransportProviderFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWebRTCTransportProviderClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWebRTCTransportProviderClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WebRTCTransportProviderCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readWebRTCTransportProviderClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readWebRTCTransportProviderClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readChimeInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readChimeInstalledChimeSoundsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readChimeInstalledChimeSoundsAttributeInteractionInfo = new InteractionInfo(
@@ -19789,6 +19870,7 @@ public class ClusterReadMapping {
             put("accountLogin", readAccountLoginInteractionInfo());
             put("contentControl", readContentControlInteractionInfo());
             put("contentAppObserver", readContentAppObserverInteractionInfo());
+            put("webRTCTransportProvider", readWebRTCTransportProviderInteractionInfo());
             put("chime", readChimeInteractionInfo());
             put("ecosystemInformation", readEcosystemInformationInteractionInfo());
             put("commissionerControl", readCommissionerControlInteractionInfo());
