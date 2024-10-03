@@ -39,7 +39,7 @@ from mobly import asserts
 
 class TC_CADMIN_1_11(MatterBaseTest):
     async def OpenCommissioningWindow(self, th, expectedErrCode) -> CommissioningParameters:
-        if expectedErrCode == None:
+        if expectedErrCode is None:
             params = await th.OpenCommissioningWindow(
                 nodeid=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
             return params
