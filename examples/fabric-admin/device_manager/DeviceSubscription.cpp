@@ -215,8 +215,10 @@ CHIP_ERROR DeviceSubscription::StartSubscription(OnDoneCallback onDoneCallback, 
     mNodeId = nodeId;
 
 #if defined(PW_RPC_ENABLED)
-    mCurrentAdministratorCommissioningAttributes         = chip_rpc_AdministratorCommissioningChanged_init_default;
-    mCurrentAdministratorCommissioningAttributes.node_id = nodeId;
+    mCurrentAdministratorCommissioningAttributes                 = chip_rpc_AdministratorCommissioningChanged_init_default;
+    mCurrentAdministratorCommissioningAttributes.has_id          = true;
+    mCurrentAdministratorCommissioningAttributes.id.node_id      = nodeId;
+    mCurrentAdministratorCommissioningAttributes.id.fabric_index = controller.GetFabricIndex();
     mCurrentAdministratorCommissioningAttributes.window_status =
         static_cast<uint32_t>(Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
 #endif
