@@ -39,7 +39,7 @@ from mobly import asserts
 
 class TC_CADMIN_1_11(MatterBaseTest):
     async def OpenCommissioningWindow(self, th, expectedErrCode) -> CommissioningParameters:
-        if expectedErrCode == 0x00:
+        if expectedErrCode == None:
             params = await th.OpenCommissioningWindow(
                 nodeid=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
             return params
@@ -108,12 +108,6 @@ class TC_CADMIN_1_11(MatterBaseTest):
                      "TH_CR1 removes TH_CR2 fabric using th2_idx"),
         ]
 
-    def generate_unique_random_value(self, value):
-        while True:
-            random_value = random.randint(10000000, 99999999)
-            if random_value != value:
-                return random_value
-
     async def CommissionAttempt(
             self, setupPinCode: int):
 
@@ -134,7 +128,7 @@ class TC_CADMIN_1_11(MatterBaseTest):
         self.discriminator = random.randint(0, 4095)
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
-        self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
+        self.th2 = th2_fabric_admin.NewController(nodeId=2)
 
         self.step(2)
         GC_cluster = Clusters.GeneralCommissioning
@@ -143,7 +137,7 @@ class TC_CADMIN_1_11(MatterBaseTest):
         self.timeout = duration.maxCumulativeFailsafeSeconds
 
         self.step(3)
-        params = await self.OpenCommissioningWindow(self.th1, 0x00)
+        params = await self.OpenCommissioningWindow(self.th1, None)
         setupPinCode = params.setupPinCode
         busy_enum = Clusters.AdministratorCommissioning.Enums.StatusCode.kBusy
 
@@ -151,7 +145,7 @@ class TC_CADMIN_1_11(MatterBaseTest):
         await self.CommissionAttempt(setupPinCode)
 
         self.step(5)
-        await self.OpenCommissioningWindow(self.th1, 0x00)
+        await self.OpenCommissioningWindow(self.th1, None)
 
         self.step(6)
         await self.OpenCommissioningWindow(self.th1, busy_enum)
