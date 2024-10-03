@@ -78,7 +78,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         self.th_server_discriminator = random.randint(0, 4095)
         self.th_server_passcode = 20202021
 
-        # Start the TH_SERVER_NO_UID app.
+        # Start the TH_SERVER app.
         self.th_server = AppServer(
             th_server_app,
             storage_dir=self.storage.name,
