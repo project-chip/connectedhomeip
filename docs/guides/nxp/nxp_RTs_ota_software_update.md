@@ -4,8 +4,8 @@
 
 This document describes OTA feature on NXP devices:
 -   RW61x
--   RT1060_EVKC
--   RT1170_EVKB
+-   RT1060_EVK-C
+-   RT1170_EVK-B
 
 The OTA Requestor feature enables the device to be informed of, download and
 apply a software update from an OTA Provider.
@@ -96,32 +96,32 @@ For RW61x
 ```
 J-Link > erase 0x8000000, 0x88a0000
 ```
-For RT1060-EVKC
+For RT1060-EVK-C
 ```
 J-Link > erase 0x60000000, 0x61000000
 ```
-For RT1170-EVKB
+For RT1170-EVK-B
 ```
 J-Link > erase 0x30000000, 0x34000000
 ```
 
--   MCUBoot application can be built with SDK installed, using intructions
+-   MCUBoot application can be built with SDK installed, using instructions
     below.
--   Retrieve the mcuboot directory located at 
->*<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<`RT_board`><sup>[1](#RT_board)</sup>/ota_examples/mcuboot_opensource/armgcc*
+-   Retrieve the mcuboot directory located at *'<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<a href="#1" id="1-ref">`RTboard`<sup>1</sup></a>/ota_examples/mcuboot_opensource/armgcc'*
 
-*<a name="RT_board">1</a> : `rdrw612bga` or `frdmrw612` for RW61x, `evkcmimxrt1060` for RT1060-EVKC, `evkbmimxrt1170` for RT1170-EVKB*
+*<a id="1" href="#1-ref"><sup>1</sup></a>  `rdrw612bga` or `frdmrw612` for RW61x, `evkcmimxrt1060` for RT1060-EVK-C, `evkbmimxrt1170` for RT1170-EVK-B*
+
 ```
 user@ubuntu: cd ~/Desktop/connectedhomeip/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<RT_board>/ota_examples/mcuboot_opensource/armgcc
 ```
--   Build the mcuboot application with running <`build_script`><sup>[2](#mcuboot_build_script)</sup>
+-   Build the mcuboot application with running  <a href="#2" id="2-ref">`build_script`<sup>2</sup></a>
  
 ```
 user@ubuntu: chmod +x <build_script>
 user@ubuntu: export ARMGCC_DIR=/opt/gcc-arm-none-eabi-10.3-2021.10   # with ARMGCC_DIR referencing the compiler path
 user@ubuntu: ./<build_script>
 ```
-*<a name="mcuboot_build_script">2</a> : `build_flash_release.sh` for RW61x, `build_flexspi_nor_release.sh` for RT1060 and RT1170*
+*<a id="2" href="#2ref"><sup>2</sup></a>  `build_flash_release.sh` for RW61x, `build_flexspi_nor_release.sh` for RT1060 and RT1170*
 
 
 -   Program the generated binary to the target board.
@@ -148,7 +148,7 @@ partitions to be the size of 4.4 MB. If the size is to be changed, the partition
 addresses should be modified in the flash_partitioning.h accordingly. For more
 information about the flash partitioning with mcuboot, please refer to the
 dedicated *readme.txt* located in
->*<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<`RT_board`><sup>[1](#RT_board)</sup>/ota_examples/mcuboot_opensource/.*
+>*<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<a href="#1" id="1ref">`RTboard`<sup>1</sup></a>/ota_examples/mcuboot_opensource/.*
 
 ### Generating and flashing the signed application image
 
@@ -163,20 +163,20 @@ The image must have the following format :
 
 The all-clusters application can be generated using the instructions from the
 
-README.md<sup>[3](#board)</sup> 'Building'
+README.md<a href="#3" id="3-ref"><sup>3</sup></a>'Building'
 section. The application is automatically linked to be executed from the primary
 image partition, taking into consideration the offset imposed by mcuboot.
 
-<a name="board">3</a> : [RW61x README.md 'Building'](../../../examples/all-clusters-app/nxp/rt/rw61x/README.md#building), [RT1060 README.md 'Building'](../../../examples/all-clusters-app/nxp/rt/rt1060/README.md#building), [RT1170 README.md 'Building'](../../../examples/all-clusters-app/nxp/rt/rt1170/README.md#building)
+*<a id="3" href="#3-ref"><sup>3</sup></a>  [RW61x README.md 'Building'](../../../examples/all-clusters-app/nxp/rt/rw61x/README.md#building), [RT1060 README.md 'Building'](../../../examples/all-clusters-app/nxp/rt/rt1060/README.md#building), [RT1170 README.md 'Building'](../../../examples/all-clusters-app/nxp/rt/rt1170/README.md#building)*
 
-The resulting executable file found in out/release/chip-<`rt_board`><sup>[4](#rt_board)</sup>-all-cluster-example
+The resulting executable file found in out/release/chip-<a href="#4" id="4-ref">`board`<sup>4</sup></a>-all-cluster-example
 needs to be converted into raw binary format as shown below.
 
-*<a name="rt_board">4</a> : `rw61x` for RW61x, `rt1060` for RT1060-EVKC, `rt1170` for RT1170-EVKB*
+*<a id="4" href="#4-ref"><sup>4</sup></a>  `rw61x` for RW61x, `rt1060` for RT1060-EVK-C, `rt1170` for RT1170-EVK-B*
 
 
 ```sh
-arm-none-eabi-objcopy -R .flash_config -R .NVM -O binary chip-<"rt_board">-all-cluster-example chip-<"rt_board">-all-cluster-example.bin
+arm-none-eabi-objcopy -R .flash_config -R .NVM -O binary chip-<"board">-all-cluster-example chip-<"board">-all-cluster-example.bin
 ```
 
 To sign the image and wrap the raw binary of the application with the header and
@@ -231,11 +231,11 @@ For RW61x
 ```
 J-Link > loadbin chip-rw61x-all-cluster-example_SIGNED.bin 0x8020000
 ```
-For RT1060-EVKC
+For RT1060-EVK-C
 ```
 J-Link > loadbin chip-rt1060-all-cluster-example_SIGNED.bin 0x60040000
 ```
-For RT1170-EVKB
+For RT1170-EVK-B
 ```
 J-Link > loadbin chip-rt1170-all-cluster-example_SIGNED.bin 0x30040000
 ```

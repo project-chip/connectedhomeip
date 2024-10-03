@@ -1,6 +1,6 @@
 # CHIP RT1060 All-clusters Application
 
-The all-clusters example implements a server which can be accesed by a CHIP
+The all-clusters example implements a server which can be accessed by a CHIP
 controller and can accept basic cluster commands.
 
 The example is based on
@@ -17,13 +17,13 @@ commissioning and different cluster control.
       - [Hardware requirements RT1060+IW416](#hardware-requirements-rt1060iw416)
       - [Hardware requirements RT1060+88W8801](#hardware-requirements-rt106088w8801)
       - [Hardware requirements RT1060 + K32W0](#hardware-requirements-rt1060--k32w0)
-      - [Hardware requirements RT1060-EVKC+IW612](#hardware-requirements-rt1060-evkciw612)
+      - [Hardware requirements RT1060-EVK-C+IW612](#hardware-requirements-rt1060-evk-ciw612)
       - [Hardware requirements RT1060 + 88W8801 + K32W0x1DK6](#hardware-requirements-rt1060--88w8801--k32w0x1dk6)
   - [Building](#building)
-    - [Building with Matter over Wifi configuratiom on RT1060 + transceiver](#building-with-matter-over-wifi-configuratiom-on-rt1060--transceiver)
+    - [Building with Matter over Wifi configuration on RT1060 + transceiver](#building-with-matter-over-wifi-configuration-on-rt1060--transceiver)
     - [Build with Matter over Thread configuration on RT1060 + transceiver](#build-with-matter-over-thread-configuration-on-rt1060--transceiver)
       - [Build with Matter over Thread configuration on RT1060 + K32W0](#build-with-matter-over-thread-configuration-on-rt1060--k32w0)
-      - [Build with Matter over Thread configuration on RT1060-EVKC + IW612](#build-with-matter-over-thread-configuration-on-rt1060-evkc--iw612)
+      - [Build with Matter over Thread configuration on RT1060-EVK-C + IW612](#build-with-matter-over-thread-configuration-on-rt1060-evk-c--iw612)
     - [Build with Matter over Wi-Fi + OpenThread Border Router configuration on RT1060 + 88W8801 + K32W0x1DK6](#build-with-matter-over-wi-fi--openthread-border-router-configuration-on-rt1060--88w8801--k32w0x1dk6)
     - [General Information](#general-information)
   - [Manufacturing data](#manufacturing-data)
@@ -34,14 +34,14 @@ commissioning and different cluster control.
       - [Matter over wifi with openthread border router configuration :](#matter-over-wifi-with-openthread-border-router-configuration-)
     - [Testing the all-clusters application without Matter CLI:](#testing-the-all-clusters-application-without-matter-cli)
     - [Testing the all-clusters application with Matter CLI enabled:](#testing-the-all-clusters-application-with-matter-cli-enabled)
-  - [Thread Border Router overwiew](#thread-border-router-overwiew)
+  - [Thread Border Router overview](#thread-border-router-overview)
 <hr>
 
 <a name="intro"></a>
 
 ## Introduction
 
-![RT1060 EVKB](../../../../platform/nxp/rt/rt1060/doc/images/MIMXRT1060-EVKB-TOP.png)
+![RT1060 EVK-B](../../../../platform/nxp/rt/rt1060/doc/images/MIMXRT1060-EVKB-TOP.png)
 
 The RT1060 all-cluster application provides a working demonstration of the
 RT1060 board integration, built using the Project CHIP codebase and the NXP
@@ -54,8 +54,8 @@ The example supports:
 -   Matter over Wi-Fi with Openthread Border Router support
 
 The example targets the
-[NXP MIMXRT1060-EVKB](https://www.nxp.com/design/development-boards/i-mx-evaluation-and-development-boards/mimxrt1060-evk-i-mx-rt1060-evaluation-kit:MIMXRT1060-EVK)
-board by default. It is also possible to use the older EVK-MIMXRT1060 board,
+[NXP MIMXRT1060-EVK-B](https://www.nxp.com/design/development-boards/i-mx-evaluation-and-development-boards/mimxrt1060-evk-i-mx-rt1060-evaluation-kit:MIMXRT1060-EVK)
+board by default. It is also possible to use the older MIMXRT1060-EVK board,
 build and board setup instructions differ in some steps.
 
 ### Configurations supported
@@ -66,12 +66,12 @@ Matter over Wi-Fi :
 
 -   RT1060 + IW416 (Wi-Fi + BLE)
 -   RT1060 + 88W8801 (Wi-Fi)
--   **Experimental:** _RT1060-EVKC + IW612 (Wi-fi +BLE)_
+-   **Experimental:** _RT1060-EVK-C + IW612 (Wi-fi +BLE)_
 
 Matter over Thread :
 
 -   RT1060 + K32W0 (15.4 + BLE)
--   **Experimental:** _RT1060-EVKC + IW612 (15.4 + BLE)_
+-   **Experimental:** _RT1060-EVK-C + IW612 (15.4 + BLE)_
 
 Matter over Wi-Fi with Openthread Border Router support :
 
@@ -83,31 +83,31 @@ Matter over Wi-Fi with Openthread Border Router support :
 
 Host part:
 
--   1 MIMXRT1060-EVKB or EVK-MIMXRT1060 board
+-   1 MIMXRT1060-EVK-B or MIMXRT1060-EVK board
 -   external 5V supply
 
 Transceiver part:
 
 -   1 AzureWave AW-AM510-uSD evaluation board
 
-Jumper settings for MIMXRT1060-EVKB (enables external 5V supply):
+Jumper settings for MIMXRT1060-EVK-B (enables external 5V supply):
 
 -   remove J40 5-6
 -   connect J40 1-2
 -   connect J45 with external power (controlled by SW6 - position 3)
 
-Jumper settings for EVK-MIMXRT1060 (enables external 5V supply):
+Jumper settings for MIMXRT1060-EVK (enables external 5V supply):
 
 -   remove J1 5-6
 -   connect J1 1-2
 -   connect J2 with external power (enabled by SW1 - position 3)
 
 The hardware should be reworked according to the chapter _Hardware Rework Guide
-for MIMXRT1060-EVKB and AW-AM510-uSD_ or the chapter _Hardware Rework Guide for
-MIMXRT1060-EVK and AW-AM510-uSD_ in the document _Hardware Rework Guide for
-EdgeFast BT PAL_ which can be found in the NXP RT1060 SDK
-(docs/wireless/Bluetooth/Edgefast_bluetooth/Hardware Rework Guide for EdgeFast
-BT PAL.pdf):
+for MIMXRT1060-EVK-B and AW-AM510-uSD_ or the chapter _Hardware Rework Guide for
+MIMXRT1060-EVK and AW-AM510-uSD_ in the document _`Hardware Rework Guide for
+EdgeFast BT PAL`_ which can be found in the NXP RT1060 SDK
+(*docs/wireless/bluetooth/edgefast_bluetooth/Hardware Rework Guide for EdgeFast
+BT PAL.pdf*):
 
 -   Make sure resistors R368/R376/R347/R349/R365/R363/R193/R186 are removed.
 
@@ -117,24 +117,24 @@ using the west tool.
 
 Jumper settings for AzureWave AW-AM510-uSD Module:
 
--   J4 1-2: VIO 1.8V (Voltage level of SDIO pins is 1.8V)
+-   J4 1-2: VIO 1.8V (Voltage level of SD-IO pins is 1.8V)
 -   J2 1-2: 3.3V VIO_uSD (Power Supply from uSD connector)
 -   The pin 1 of J4 is not marked on the board. Please note that pin numbering
     of J4 is opposite to J2.
 
-Plug AW-AM510-uSD into uSD connector J22 on MIMXRT1060-EVKB or J39 on
-EVK-MIMXRT1060.
+Plug AW-AM510-uSD into uSD connector J22 on MIMXRT1060-EVK-B or J39 on
+MIMXRT1060-EVK.
 
 Connect the following pins between RT1060 and AW-AM510-uSD to enable Bluetooth
 HCI UART:
 
-| PIN NAME | AW-AM510-USD | MIMXRT1060-EVKB | EVK-MIMXRT1060 | PIN NAME OF RT1060 | GPIO NAME OF RT1060 |
-| -------- | ------------ | --------------- | -------------- | ------------------ | ------------------- |
-| UART_TXD | J10 (pin 4)  | J16 (pin 1)     | J22 (pin 1)    | LPUART3_RXD        | GPIO_AD_B1_07       |
-| UART_RXD | J10 (pin 2)  | J16 (pin 2)     | J22 (pin 2)    | LPUART3_TXD        | GPIO_AD_B1_06       |
-| UART_RTS | J10 (pin 6)  | J33 (pin 3)     | J23 (pin 3)    | LPUART3_CTS        | GPIO_AD_B1_04       |
-| UART_CTS | J10 (pin 8\) | J33 (pin 4)     | J23 (pin 4)    | LPUART3_RTS        | GPIO_AD_B1_05       |
-| GND      | J6 (pin 7)   | J32 (pin 7)     | J25 (pin 7)    | GND                | GND                 |
+| PIN NAME | AW-AM510-uSD | MIMXRT1060-EVK-B | MIMXRT1060-EVK | PIN NAME OF RT1060 | GPIO NAME OF RT1060 |
+| -------- | ------------ | ---------------- | -------------- | ------------------ | ------------------- |
+| UART_TXD | J10 (pin 4)  | J16 (pin 1)      | J22 (pin 1)    | LPUART3_RXD        | GPIO_AD_B1_07       |
+| UART_RXD | J10 (pin 2)  | J16 (pin 2)      | J22 (pin 2)    | LPUART3_TXD        | GPIO_AD_B1_06       |
+| UART_RTS | J10 (pin 6)  | J33 (pin 3)      | J23 (pin 3)    | LPUART3_CTS        | GPIO_AD_B1_04       |
+| UART_CTS | J10 (pin 8\) | J33 (pin 4)      | J23 (pin 4)    | LPUART3_RTS        | GPIO_AD_B1_05       |
+| GND      | J6 (pin 7)   | J32 (pin 7)      | J25 (pin 7)    | GND                | GND                 |
 
 Attach external antenna into connector on AW-AM510-uSD.
 
@@ -150,7 +150,7 @@ tool.
 
 Host part:
 
--   1 MIMXRT1060-EVKB
+-   1 MIMXRT1060-EVK-B
 
 Transceiver part :
 
@@ -158,7 +158,7 @@ Transceiver part :
 -   1 Murata uSD-M.2 Adapter (rev B1)
 
 The 88W8801 2DS M.2 Module should be inserted into the Murata uSD-M.2 Adapter and
-inserted in the uSD slot J22 of MIMXRT1060-EVKB. The Murata uSD-M.2 Adapter can
+inserted in the uSD slot J22 of MIMXRT1060-EVK-B. The Murata uSD-M.2 Adapter can
 be powered up using uSD pins. For that, set the J1 jumper of Murata uSD-M.2 to
 position 2-3 (Position 2-3: VBAT supply, typical 3.1 ~ 3.3V, from microSD
 connector).
@@ -170,7 +170,7 @@ to connect it to a Wi-Fi access point on the 2.4 GHz band.
 
 Host part:
 
--   1 MIMXRT1060-EVKB or EVK-MIMXRT1060 board
+-   1 MIMXRT1060-EVK-B or MIMXRT1060-EVK board
 
 Transceiver part:
 
@@ -180,27 +180,27 @@ Transceiver part:
 **Board settings**
 
 The below table explains pin settings (UART settings) to connect the
-evkbmimxrt1060 (host) to a k32w061 transceiver (rcp).
+MIMXRT1060-EVK-B (host) to a k32w061 transceiver (rcp).
 
-|    PIN NAME    | DK6 (K32W061) | I.MXRT1060-EVKB | I.MXRT1060-EVK | PIN NAME OF RT1060 | GPIO NAME OF RT1060 |
-| :------------: | :-----------: | :-------------: | :------------: | :----------------: | :-----------------: |
-|    UART_TXD    |  PIO, pin 8   |   J16, pin 1    |   J22, pin 1   |    LPUART3_RXD     |    GPIO_AD_B1_07    |
-|    UART_RXD    |  PIO, pin 9   |   J16, pin 2    |   J22, pin 2   |    LPUART3_TXD     |    GPIO_AD_B1_06    |
-|    UART_RTS    |  PIO, pin 6   |   J33, pin 3    |   J23, pin 3   |    LPUART3_CTS     |    GPIO_AD_B1_04    |
-|    UART_CTS    |  PIO, pin 7   |   J33, pin 4    |   J23, pin 4   |    LPUART3_RTS     |    GPIO_AD_B1_05    |
-|      GND       |   J3, pin 1   |   J32, pin 7    |   J25, pin 7   |         XX         |         XX          |
-|     RESET      |     RSTN      |   J33, pin 2    |   J23, pin 2   |   GPIO_AD_B1_11    |    GPIO_AD_B1_11    |
-| DIO5/ISP Entry |  PIO, pin 5   |   J33, pin 1    |   J23, pin 1   |   GPIO_AD_B1_10    |    GPIO_AD_B1_10    |
+|    PIN NAME    | DK6 (K32W061) | MIMXRT1060-EVK-B | MIMXRT1060-EVK | PIN NAME OF RT1060 | GPIO NAME OF RT1060 |
+| :------------: | :-----------: | :--------------: | :------------: | :----------------: | :-----------------: |
+|    UART_TXD    |  PIO, pin 8   |    J16, pin 1    |   J22, pin 1   |    LPUART3_RXD     |    GPIO_AD_B1_07    |
+|    UART_RXD    |  PIO, pin 9   |    J16, pin 2    |   J22, pin 2   |    LPUART3_TXD     |    GPIO_AD_B1_06    |
+|    UART_RTS    |  PIO, pin 6   |    J33, pin 3    |   J23, pin 3   |    LPUART3_CTS     |    GPIO_AD_B1_04    |
+|    UART_CTS    |  PIO, pin 7   |    J33, pin 4    |   J23, pin 4   |    LPUART3_RTS     |    GPIO_AD_B1_05    |
+|      GND       |   J3, pin 1   |    J32, pin 7    |   J25, pin 7   |         XX         |         XX          |
+|     RESET      |     RSTN      |    J33, pin 2    |   J23, pin 2   |   GPIO_AD_B1_11    |    GPIO_AD_B1_11    |
+| DIO5/ISP Entry |  PIO, pin 5   |    J33, pin 1    |   J23, pin 1   |   GPIO_AD_B1_10    |    GPIO_AD_B1_10    |
 
-The below picture shows pins connections for the EVK-MIMXRT1060.
+The below picture shows pins connections for the MIMXRT1060-EVK.
 
 ![rt1060_k32w061_pin_settings](../../../../platform/nxp/rt/rt1060/doc/images/rt1060_k32w061_pin_settings.jpg)
 
-#### Hardware requirements RT1060-EVKC+IW612
+#### Hardware requirements RT1060-EVK-C+IW612
 
 Host part:
 
--   1 MIMXRT1060-EVKC
+-   1 MIMXRT1060-EVK-C
 
     Hardware should be reworked as below:
 
@@ -215,17 +215,18 @@ Host part:
 
 Transceiver part :
 
--   1 IW612 ( Firecrest) 2EL M.2 Module (rev A1)
+-   1
+    [2EL M2 A1 IW612 Secure Module](https://www.nxp.com/products/wireless/wi-fi-plus-bluetooth-plus-802-15-4/2-4-5-ghz-dual-band-1x1-wi-fi-6-802-11ax-plus-bluetooth-5-2-plus-802-15-4-tri-radio-solution:IW612)
 
-The IW612 module should be plugged to the M.2 connector on RT1060-EVKC board.
+![](../../../../platform/nxp/rt/rt1170/doc/images/iwx612_2EL.jpg)
 
 #### Hardware requirements RT1060 + 88W8801 + K32W0x1DK6
 
--   i.MX RT1060 EVKA or EVKB board
+-   i.MX RT1060 EVK-A or EVK-B board
 -   88W8801 module (for Wi-Fi connection), for example 88W8801 2DS M.2 Module
     (rev A) and Murata uSD-M.2 Adapter (rev B1)
 -   K32W0x1 mezzanine module (for Thread connection)
--   IOTZTB-DK006 carrier board for the K32W0x1 module (referenced as DK6 carrier
+-   IOT_ZTB-DK006 carrier board for the K32W0x1 module (referenced as DK6 carrier
     board)
 
 <a name="building"></a>
@@ -235,7 +236,7 @@ The IW612 module should be plugged to the M.2 connector on RT1060-EVKC board.
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (supported Operating Systems are listed in [BUILDING.md](../../../../../docs/guides/BUILDING.md)).
 
-- Make sure that below prerequisites are correctly installed (as described in [BUILDING.md](../../../../../docs/guides/BUILDING.md)))
+- Make sure that below prerequisites are correctly installed (as described in [BUILDING.md](../../../../../docs/guides/BUILDING.md)).
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
@@ -268,9 +269,9 @@ Note: By default update_nxp_sdk.py will try to initialize all NXP SDKs. Arg "-- 
 
 -   Start building the application.
 
-### Building with Matter over Wifi configuratiom on RT1060 + transceiver
+### Building with Matter over Wifi configuration on RT1060 + transceiver
 
--   Build the Wi-fi configuration for **MIMXRT1060-EVKB board + IW416
+-   Build the Wi-fi configuration for **MIMXRT1060-EVK-B board + IW416
     transceiver** (with BLE for commissioning).
 
 ```
@@ -278,7 +279,7 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt106
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
 ```
 
--   Build the Wi-fi configuration for **EVKB-MIMXRT1060 board + 88W8801
+-   Build the Wi-fi configuration for **MIMXRT1060-EVK-B board + 88W8801
     transceiver** with Matter-over-Wifi configuration and only onnetwork
     commissioning (without BLE, the WiFi network credentials are provided at
     build-time which will enable the device to join the Wi-Fi AP at startup):
@@ -288,7 +289,7 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt106
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
 ```
 
--   Build the Wi-fi configuration for **MIMXRT1060-EVKC board + IW612
+-   Build the Wi-fi configuration for **MIMXRT1060-EVK-C board + IW612
     transceiver** (with BLE for commissioning).
 
 ```
@@ -296,7 +297,7 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt106
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
 ```
 
--   Build the Wi-fi configuration for **MIMXRT1060-EVKC board + IW612
+-   Build the Wi-fi configuration for **MIMXRT1060-EVK-C board + IW612
     transceiver** with Matter-over-Wifi configuration and only onnetwork
     commissioning (without BLE, the WiFi network credentials are provided at
     build-time which will enable the device to join the Wi-Fi AP at startup):
@@ -312,16 +313,16 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt106
 
 For this configuration a K32W0 RCP image is required and must support in a
 single image the openthread RCP configuration and the BLE HCI BB configuration.
-Messages between the host and the K32W0 transceiver are transfered on a single
+Messages between the host and the K32W0 transceiver are transferred on a single
 UART with flow control support. For that the HDLC-Lite framing protocol is used
-to transfert spinel and hci frames. In addition, hci and spinel frames can be
+to transfer spinel and hci frames. In addition, hci and spinel frames can be
 distinguished by using the Spinel convention which is line compatible with
 BT/BLE HCI.
 
 Before building the Matter host application, it is required to generate the
 K32W0 image supporting features as described above. To build this binary the
 target `ot_rcp_ble_hci_bb_single_uart_fc` should be built by following the
-[Readme.md][ot_rcp_ble_hci_bb_k32w0_readme]. After a successfull build, a `".h"`
+[Readme.md][ot_rcp_ble_hci_bb_k32w0_readme]. After a successful build, a `".h"`
 file will be generated and would contain the K32W0 RCP binary. As described in
 the [Readme.md][ot_rcp_ble_hci_bb_k32w0_readme], the application binaries will
 be generated in
@@ -362,9 +363,9 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt106
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
 ```
 
-#### Build with Matter over Thread configuration on RT1060-EVKC + IW612
+#### Build with Matter over Thread configuration on RT1060-EVK-C + IW612
 
-Build the OpenThread configuration for MIMXRT1060-EVKC board + IW612 transceiver
+Build the OpenThread configuration for MIMXRT1060-EVK-C board + IW612 transceiver
 (with BLE for commissioning).
 
 ```
@@ -407,7 +408,7 @@ Optional GN options that can be added when building an application:
     `chip_enable_matter_cli=true` must be added to the _gn gen_ command.
 -   To build the application in debug mode, the argument
     `is_debug=true optimize_debug=false` must be added to the _gn gen_ command.
--   By default, the MIMXRT1060-EVKB will be chosen. To switch to an
+-   By default, the MIMXRT1060-EVK-B will be chosen. To switch to an
     MIMXRT1060-EVK, the argument `evkname=\"evkmimxrt1060\"` must be added to
     the _gn gen_ command.
 -   To build with the option to have Matter certificates/keys pre-loaded in a
@@ -436,11 +437,11 @@ For production usage, it is recommended to use the OTP key which needs to be
 fused in the RT1060 SW_GP2. The application note AN12800 should be followed to
 get more information. In this case the all cluster app should be updated to
 indicate to the DCP module to use the OTP key instead of the software key. For
-that the call to "FactoryDataPrvdImpl().SetAes128Key()" should be changed to
-"FactoryDataPrvdImpl().SetKeySelected(KeySelect::)" with the arg value
-specifying where the OTP key is stored (kDCP_OCOTPKeyLow for [127:0] of SW_GP2
-or kDCP_OCOTPKeyHigh for [255:128] of SW_GP2). For more information the RT1060
-FactoryDataProviderImpl class description should be checked.
+that the call to `FactoryDataPrvdImpl().SetAes128Key()` should be changed to
+`FactoryDataPrvdImpl().SetKeySelected(KeySelect::)` with the arg value
+specifying where the OTP key is stored (`kDCP_OCOTPKeyLow` for [127:0] of SW_GP2
+or `kDCP_OCOTPKeyHigh` for [255:128] of SW_GP2). For more information the RT1060
+`FactoryDataProviderImpl` class description should be checked.
 
 <a name="flashdebug"></a>
 
@@ -451,7 +452,7 @@ In order to flash the application we recommend using
 
 -   Import the previously downloaded NXP SDK into MCUXpresso IDE.
 
-Right click the empty space in the MCUXpresso IDE's "Installed SDKs" tab to show
+Right click the empty space in the MCUXpresso IDE "Installed SDKs" tab to show
 the menu, select the "Import local SDK Git repository" menu item.
 
 ![Import local SDK Git repository](../../../../platform/nxp/rt/rt1060/doc/images/import-local-repository.png)
@@ -484,8 +485,8 @@ Right click on the Project -> Properties -> C/C++ Build -> MCU Settings -> Selec
 ![MCU_Set](../../../../platform/nxp/rt/rt1060/doc/images/mcu-set.png)
 
 Sometimes when the MCU is selected it will not initialize all the memory regions
-(usualy the BOARD_FLASH, BOARD_SDRAM and NCAHCE_REGION) so it is required that
-this regions are added manualy like in the image above. In addition to that on
+(usually the BOARD_FLASH, BOARD_SDRAM and NCACHE_REGION) so it is required that
+this regions are added manually like in the image above. In addition to that on
 the BOARD_FLASH line, in the driver tab:
 
 ```
@@ -556,7 +557,7 @@ Right click on the Project -> Utilities -> Open Directory Browser here -> edit *
 
 ## Testing the example
 
-To know how to commision a device over BLE, follow the instructions from
+To know how to commission a device over BLE, follow the instructions from
 [chip-tool's README.md 'Commission a device over
 BLE'][readme_ble_commissioning_section].
 
@@ -592,7 +593,7 @@ In this configuration, the device can be commissioned over Wi-Fi with the
 
 1. Prepare the board with the flashed `All-cluster application` (as shown
    above).
-2. The All-cluster example uses UART1 to print logs while runing the server. To
+2. The All-cluster example uses UART1 to print logs while running the server. To
    view raw UART output, start a terminal emulator like PuTTY and connect to the
    used COM port with the following UART settings:
 
@@ -642,10 +643,10 @@ Here are described steps to use the all-cluster-app with the Matter CLI enabled
     - No parity
     - No flow control
 
-3. The All-cluster example uses UART2 to print logs while runing the server. To
+3. The All-cluster example uses UART2 to print logs while running the server. To
    view raw UART output, a pin should be plugged to an USB to UART adapter
-   (connector J16 pin 7 in case of MIMXRT1060-EVKB board or connector J22 pin 7
-   in case of EVK-MIMXRT1060 board), then start a terminal emulator like PuTTY
+   (connector J16 pin 7 in case of MIMXRT1060-EVK-B board or connector J22 pin 7
+   in case of MIMXRT1060-EVK board), then start a terminal emulator like PuTTY
    and connect to the used COM port with the following UART settings:
 
     - Baud rate: 115200
@@ -692,9 +693,9 @@ Done
 leader
 Done
 ```
-<a name="thread-border-router-overwiew"></a>
+<a name="thread-border-router-overview"></a>
 
-## Thread Border Router overwiew
+## Thread Border Router overview
 
 To enable Thread Border Router support see the [build](README.md#building) section.
 
