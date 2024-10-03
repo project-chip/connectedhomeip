@@ -73,7 +73,6 @@ extern "C" {
 #include "sl_si91x_driver_gpio.h"
 #include "sl_si91x_power_manager.h"
 namespace {
-bool sl_btn0_pressed = false;
 #ifdef ENABLE_CHIP_SHELL
 bool ps_requirement_added = false;
 #endif // ENABLE_CHIP_SHELL
@@ -261,7 +260,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #if SLI_SI91X_MCU_INTERFACE
-// Required to invoke button press event during sleep as falling edge is not detected
+// This function is called when the button is pressed when in sleep then the idleTask is handling the button press event
 void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
 {
     // UULP_GPIO_2 is used to detect the button 0 press
@@ -272,30 +271,18 @@ void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
     {
         // BTN_0 is pressed
         // NOTE: the GPIO is masked since the interrupt is invoked before scheduler is started, thus this is required to hand over
-        // control to scheduler
+        // control to scheduler, the PIN is unmasked in the power manager flow before going to sleep
         status = sl_si91x_gpio_driver_mask_uulp_npss_interrupt(BIT(pin_intr));
         VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(DeviceLayer, "failed to mask interrupt: %ld", status));
     }
 }
+// Required to invoke button press event during sleep as falling edge is not detected
 // NOTE: flow is GPIO wakeup due to BTN0 press -> check button state in idle task
-void sl_si91x_btn_power_requirement_handler(void)
+// required as the GPIO interrupt is not detected during sleep for BUTTON RELEASED
+void sl_si91x_btn_event_handler(void)
 {
-    if (sl_si91x_gpio_get_uulp_npss_pin(SL_BUTTON_BTN0_PIN) == LOW)
-    {
-        if (!sl_btn0_pressed)
-        {
-            sl_btn0_pressed = true;
-            sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_PRESSED);
-        }
-    }
-    else
-    {
-        if (sl_btn0_pressed)
-        {
-            sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_RELEASED);
-            sl_btn0_pressed = false;
-        }
-    }
+    sl_button_on_change(SL_BUTTON_BTN0_NUMBER,
+                        (sl_si91x_gpio_get_uulp_npss_pin(SL_BUTTON_BTN0_PIN) == LOW) ? BUTTON_PRESSED : BUTTON_RELEASED);
 }
 
 void sl_si91x_uart_power_requirement_handler(void)
