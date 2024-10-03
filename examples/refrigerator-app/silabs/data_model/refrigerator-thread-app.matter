@@ -1723,8 +1723,6 @@ endpoint 1 {
   server cluster RefrigeratorAndTemperatureControlledCabinetMode {
     callback attribute supportedModes;
     callback attribute currentMode;
-    callback attribute startUpMode;
-    callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
