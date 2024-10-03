@@ -47,12 +47,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         ChipLogProgress(Zcl, "Identify cluster ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
         break;
-    case app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
-        RefrigeratorMgr().RefAndTempCtrlAttributeChangeHandler(attributePath.mEndpointId, attributeId, value, size);
-#ifdef DIC_ENABLE
-        dic::control::AttributeHandler(attributePath.mEndpointId, attributeId);
-#endif // DIC_ENABLE
-        break;
     case app::Clusters::RefrigeratorAlarm::Id:
         RefrigeratorMgr().RefAlaramAttributeChangeHandler(attributePath.mEndpointId, attributeId, value, size);
 #ifdef DIC_ENABLE

@@ -96,25 +96,6 @@ int8_t RefrigeratorManager::ConvertToPrintableTemp(int16_t temperature)
     return static_cast<int8_t>(temperature / 100);
 }
 
-void RefrigeratorManager::RefAndTempCtrlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value,
-                                                               uint16_t size)
-{
-    switch (attributeId)
-    {
-    case RefAndTempAttr::CurrentMode::Id: {
-        int16_t currentMode = static_cast<int16_t>(*value);
-        mCurrentMode        = currentMode;
-    }
-    break;
-
-    default: {
-        ChipLogError(AppServer, "Unhandled Refrigerator and Temperature attribute %ld", attributeId);
-        return;
-    }
-    break;
-    }
-}
-
 void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value,
                                                          uint16_t size)
 {
