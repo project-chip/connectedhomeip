@@ -27,8 +27,8 @@ template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
-static TccModeDelegate * gTccModeDelegate    = nullptr;
-static ModeBase::Instance * gTccModeInstance = nullptr;
+static std::unique_ptr<TccModeDelegate> gTccModeDelegate;
+static std::unique_ptr<ModeBase::Instance> gTccModeInstance;
 
 CHIP_ERROR TccModeDelegate::Init()
 {
@@ -79,16 +79,8 @@ CHIP_ERROR TccModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagSt
 
 void RefrigeratorAndTemperatureControlledCabinetMode::Shutdown()
 {
-    if (gTccModeInstance != nullptr)
-    {
-        delete gTccModeInstance;
-        gTccModeInstance = nullptr;
-    }
-    if (gTccModeDelegate != nullptr)
-    {
-        delete gTccModeDelegate;
-        gTccModeDelegate = nullptr;
-    }
+        gTccModeInstance.reset();
+        gTccModeDelegate.reset();
 }
 
 chip::Protocols::InteractionModel::Status
@@ -148,8 +140,8 @@ void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(c
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gTccModeDelegate == nullptr && gTccModeInstance == nullptr);
-    gTccModeDelegate = new RefrigeratorAndTemperatureControlledCabinetMode::TccModeDelegate;
-    gTccModeInstance = new ModeBase::Instance(gTccModeDelegate, 0x1, RefrigeratorAndTemperatureControlledCabinetMode::Id, 0);
+    gTccModeDelegate = std::make_unique<RefrigeratorAndTemperatureControlledCabinetMode::TccModeDelegate>();
+    gTccModeInstance = std::make_unique<ModeBase::Instance>(gTccModeDelegate.get(), 0x1, RefrigeratorAndTemperatureControlledCabinetMode::Id, 0);
     gTccModeInstance->Init();
 }
 
