@@ -106,9 +106,9 @@ PairingManager::PairingManager() :
 CHIP_ERROR PairingManager::Init(Controller::DeviceCommissioner * commissioner, CredentialIssuerCommands * credIssuerCmds)
 {
     VerifyOrReturnError(commissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mCommissioner = commissioner;
-
     VerifyOrReturnError(credIssuerCmds != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    mCommissioner = commissioner;
     mCredIssuerCmds = credIssuerCmds;
 
     return CHIP_NO_ERROR;
