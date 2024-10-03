@@ -1,6 +1,6 @@
 # CHIP RT1170 All-clusters Application
 
-The all-clusters example implements a server which can be accesed by a CHIP
+The all-clusters example implements a server which can be accessed by a CHIP
 controller and can accept basic cluster commands.
 
 The example is based on
@@ -13,13 +13,13 @@ commissioning and different cluster control.
 - [CHIP RT1170 All-clusters Application](#chip-rt1170-all-clusters-application)
   - [Introduction](#introduction)
     - [Configuration(s) supported](#configurations-supported)
-    - [Hardware requirements for RT1170 + IWX12](#hardware-requirements-for-rt1170--iwx12)
-      - [Hardware rework for SPI support on EVKB-MIMXRT1170](#hardware-rework-for-spi-support-on-evkb-mimxrt1170)
+    - [Hardware requirements for RT1170 + IW612](#hardware-requirements-for-rt1170--iw612)
+      - [Hardware rework for SPI support on MIMXRT1170-EVK-B](#hardware-rework-for-spi-support-on-mimxrt1170-evk-b)
       - [Board settings (Spinel over SPI, I2C, BLE over UART)](#board-settings-spinel-over-spi-i2c-ble-over-uart)
   - [Building](#building)
-    - [Building with Matter over Wifi configuration on RT1170 + IWX12](#building-with-matter-over-wifi-configuration-on-rt1170--iwx12)
-    - [Building with Matter over Thread configuration on RT1170 + IWX12](#building-with-matter-over-thread-configuration-on-rt1170--iwx12)
-    - [Building with Matter over Wifi + OpenThread Border Router configuration on RT1170 + IWX12](#building-with-matter-over-wifi--openthread-border-router-configuration-on-rt1170--iwx12)
+    - [Building with Matter over Wifi configuration on RT1170 + IW612](#building-with-matter-over-wifi-configuration-on-rt1170--iw612)
+    - [Building with Matter over Thread configuration on RT1170 + IW612](#building-with-matter-over-thread-configuration-on-rt1170--iw612)
+    - [Building with Matter over Wifi + OpenThread Border Router configuration on RT1170 + IW612](#building-with-matter-over-wifi--openthread-border-router-configuration-on-rt1170--iw612)
     - [General information](#general-information)
   - [Manufacturing data](#manufacturing-data)
   - [Flashing and debugging](#flashing-and-debugging)
@@ -29,7 +29,7 @@ commissioning and different cluster control.
       - [Matter over wifi with openthread border router configuration :](#matter-over-wifi-with-openthread-border-router-configuration-)
     - [Testing the all-clusters application without Matter CLI:](#testing-the-all-clusters-application-without-matter-cli)
     - [Testing the all-clusters application with Matter CLI enabled:](#testing-the-all-clusters-application-with-matter-cli-enabled)
-  - [Thread Border Router overwiew](#thread-border-router-overwiew)
+  - [Thread Border Router overview](#thread-border-router-overview)
 <hr>
 
 <a name="introduction"></a>
@@ -57,15 +57,15 @@ default.
 Here are listed configurations that allow to support Matter over Wi-Fi & Matter
 over Thread on RT1170 :
 
--   RT1170 + IWX12 (Wi-Fi + BLE + 15.4)
+-   RT1170 + IW612 (Wi-Fi + BLE + 15.4)
 
-<a name="hardware-requirements-for-rt1170-and-iwx12"></a>
+<a name="hardware-requirements-for-rt1170-and-iw612"></a>
 
-### Hardware requirements for RT1170 + IWX12
+### Hardware requirements for RT1170 + IW612
 
 Host part:
 
--   1 EVKB-MIMXRT1170
+-   1 MIMXRT1170-EVK-B
 
 Transceiver part :
 
@@ -81,19 +81,19 @@ Transceiver part :
 
 -   Male to female Burg cables
 
-#### Hardware rework for SPI support on EVKB-MIMXRT1170
+#### Hardware rework for SPI support on MIMXRT1170-EVK-B
 
-To support SPI on the EVKB-MIMXRT1170 board, it is required to remove 0Ω
+To support SPI on the MIMXRT1170-EVK-B board, it is required to remove 0Ω
 resistors R404,R406,R2015.
 
 #### Board settings (Spinel over SPI, I2C, BLE over UART)
 
-Plug IW612 Firecrest module to M.2 connector on Murata uSD to M2 adapter
+Plug IW612 module to M.2 connector on Murata uSD to M2 adapter
 
-The murata uSD-M2 adapter should be plugged to the RT1170 via SDIO.
+The Murata uSD-M2 adapter should be plugged to the RT1170 via SD-IO.
 
 The below tables explain pin settings (SPI settings) to connect the
-evkbmimxrt1170 (host) to a IWX12 transceiver (rcp).
+MIMXRT1170-EVK-B (host) to a IW612 transceiver (rcp).
 
 -   Murata uSD to M2 adapter connections description:
 
@@ -106,22 +106,22 @@ evkbmimxrt1170 (host) to a IWX12 transceiver (rcp).
     Use USB-C power supply | Jumper | Position| | :----: | :-----: | | J1 | 1-2
     | | J12 | 1-2 | | J13 | 1-2 | | J14 | 1-2 | | JP1.1 (back side)| ON |
 
--   Jumpers positions on MIMXRT1170-EVKB:
+-   Jumpers positions on MIMXRT1170-EVK-B:
 
     | Jumper | Position |
     | :----: | :------: |
     |  J56   |   2-3    |
 
--   I2C connection to program IO-Expander on the IW612 module
+-   I2C connection to program IO_Expander on the IW612 module
 
-    | MIMXRT1170-EVKB  | uSD-M2 adapter |
+    | MIMXRT1170-EVK-B | uSD-M2 adapter |
     | :--------------: | :------------: |
     | I2C_SDA (J10.18) |      J5.2      |
     | I2C_SDL (J10.20) |      J5.4      |
 
 -   SPI connection between RT1170 and uSD-M2 adapter
 
-    |  MIMXRT1170-EVKB  | uSD-M2 adapter |
+    |  MIMXRT1170-EVK-B | uSD-M2 adapter |
     | :---------------: | :------------: |
     | SPI_MOSI (J10.8)  |     J5.10      |
     | SPI_MISO (J10.10) |      J9.7      |
@@ -132,13 +132,13 @@ evkbmimxrt1170 (host) to a IWX12 transceiver (rcp).
 
 -   UART BLE and Reset connections between RT1170 and uSD-M2 adapter
 
-    |  MIMXRT1170-EVKB  | uSD-M2 adapter |
+    |  MIMXRT1170-EVK-B | uSD-M2 adapter |
     | :---------------: | :------------: |
     |   RESET (J26.2)   |      J9.3      |
-    | UART RXD (J25.13) |      J9.1      |
-    | UART TXD (J25.15) |      J9.2      |
-    | UART CTS (J25.9)  |      J8.4      |
-    | UART RTS (J25.11) |      J8.3      |
+    | UART_RXD (J25.13) |      J9.1      |
+    | UART_TXD (J25.15) |      J9.2      |
+    | UART_CTS (J25.9)  |      J8.4      |
+    | UART_RTS (J25.11) |      J8.3      |
     |    GND (J26.1)    |      J7.6      |
 
 <a name="building"></a>
@@ -183,9 +183,9 @@ Note: By default update_nxp_sdk.py will try to initialize all NXP SDKs. Arg "-- 
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-cluster-app/nxp/rt/rt1170/
 ```
 
-### Building with Matter over Wifi configuration on RT1170 + IWX12
+### Building with Matter over Wifi configuration on RT1170 + IW612
 
--   Build the Wi-fi configuration for MIMXRT1170 board + IWX12 transceiver (with
+-   Build the Wi-fi configuration for MIMXRT1170 board + IW612 transceiver (with
     BLE for commissioning).
 
 ```
@@ -193,9 +193,9 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt117
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1170$ ninja -C out/debug
 ```
 
-### Building with Matter over Thread configuration on RT1170 + IWX12
+### Building with Matter over Thread configuration on RT1170 + IW612
 
--   Build the Openthread configuration for MIMXRT1170 board + IWX12 transceiver
+-   Build the Openthread configuration for MIMXRT1170 board + IW612 transceiver
     (with BLE for commissioning).
 
 ```
@@ -203,7 +203,7 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-cluster/nxp/rt/rt1170$ gn
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-cluster/nxp/rt/rt1170/$ ninja -C out/debug
 ```
 
-### Building with Matter over Wifi + OpenThread Border Router configuration on RT1170 + IWX12
+### Building with Matter over Wifi + OpenThread Border Router configuration on RT1170 + IW612
 
 This configuration supports the Thread Border Router management cluster to provision the Thread credentials. Enabling the Matter CLI in order to control the
 Thread network on the Border Router is optional but recommended for other features like the Thread credential sharing.
@@ -264,7 +264,7 @@ In order to flash the application we recommend using
 [MCUXpresso IDE (version >= 11.5.0)](https://www.nxp.com/design/software/development-software/mcuxpresso-software-and-tools-/mcuxpresso-integrated-development-environment-ide:MCUXpresso-IDE).
 
 -   Import the previously downloaded NXP SDK into MCUXpresso IDE. This can be
-    done by drag-and-dropping the SDK archive into MCUXpresso IDE's "Installed
+    done by drag-and-dropping the SDK archive into MCUXpresso IDE "Installed
     SDKs" tab;
     ![Select SDK](../../../../platform/nxp/rt/rt1170/doc/images/select-sdk.png)
 -   Import the connectedhomeip repo in MCUXpresso IDE as Makefile Project. Use
@@ -283,8 +283,8 @@ Right click on the Project -> Properties -> C/C++ Build -> MCU Settings -> Selec
 ![MCU_Sett](../../../../platform/nxp/rt/rt1170/doc/images/mcu-set.png)
 
 Sometimes when the MCU is selected it will not initialize all the memory regions
-(usualy the BOARD_FLASH, BOARD_SDRAM and NCAHCE_REGION) so it is required that
-this regions are added manualy like in the image above. In addition to that on
+(usually the BOARD_FLASH, BOARD_SDRAM and NCACHE_REGION) so it is required that
+this regions are added manually like in the image above. In addition to that on
 the BOARD_FLASH line, in the driver tab:
 
 ```
@@ -305,7 +305,7 @@ Right click on the Project -> C/C++ Build-> Tool Chain Editor -> NXP MCU Tools -
 
 -   Create a debug configuration:
 
-    MIMXRT1170-EVKB board supports CMSIS-DAP debug protocol by default. It
+    MIMXRT1170-EVK-B board supports CMSIS-DAP debug protocol by default. It
     should be switched to JLink.
 
     -   download and install
@@ -354,7 +354,7 @@ Right click on the Project -> Utilities -> Open Directory Browser here -> edit *
 
 ## Testing the example
 
-To know how to commision a device over BLE, follow the instructions from
+To know how to commission a device over BLE, follow the instructions from
 [chip-tool's README.md 'Commission a device over
 BLE'][readme_ble_commissioning_section].
 
@@ -494,9 +494,9 @@ Done
 leader
 Done
 ```
-<a name="thread-border-router-overwiew"></a>
+<a name="thread-border-router-overview"></a>
 
-## Thread Border Router overwiew
+## Thread Border Router overview
 
 To enable Thread Border Router support see the [build](README.md#building) section.
 
