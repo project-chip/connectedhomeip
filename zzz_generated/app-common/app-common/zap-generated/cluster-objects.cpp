@@ -5275,6 +5275,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, TCAcknowledgements);
     case Attributes::TCAcknowledgementsRequired::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, TCAcknowledgementsRequired);
+    case Attributes::TCUpdateDeadline::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, TCUpdateDeadline);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

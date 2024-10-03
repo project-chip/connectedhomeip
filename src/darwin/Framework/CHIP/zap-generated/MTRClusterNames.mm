@@ -1456,6 +1456,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"TCAcknowledgementsRequired";
             break;
 
+        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCUpdateDeadlineID:
+            result = @"TCUpdateDeadline";
+            break;
+
         case MTRAttributeIDTypeClusterGeneralCommissioningAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
