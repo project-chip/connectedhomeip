@@ -113,28 +113,57 @@ limitations under the License.
       <description>ACL</description>
       <access op="read" privilege="administer"/>
       <access op="write" privilege="administer"/>
+      <mandatoryConform/>
     </attribute>
 
     <attribute side="server" code="0x0001" define="EXTENSION" type="array" entryType="AccessControlExtensionStruct" writable="true" optional="true">
       <description>Extension</description>
       <access op="read" privilege="administer"/>
       <access op="write" privilege="administer"/>
+      <mandatoryConform>
+        <feature name="EXTS"/>
+      </mandatoryConform>
     </attribute>
 
-    <attribute side="server" code="0x0002" define="SUBJECTS_PER_ACCESS_CONTROL_ENTRY" type="int16u" min="4" default="4">SubjectsPerAccessControlEntry</attribute>
-    <attribute side="server" code="0x0003" define="TARGETS_PER_ACCESS_CONTROL_ENTRY" type="int16u" min="3" default="3">TargetsPerAccessControlEntry</attribute>
-    <attribute side="server" code="0x0004" define="ACCESS_CONTROL_ENTRIES_PER_FABRIC" type="int16u" min="4" default="4">AccessControlEntriesPerFabric</attribute>
-    <attribute code="0x0005" side="server" define="COMMISSIONING_ARL" type="array" entryType="CommissioningAccessRestrictionEntryStruct" optional="true">CommissioningARL</attribute>
-    <attribute code="0x0006" side="server" define="ARL" type="array" entryType="AccessRestrictionEntryStruct" optional="true">ARL</attribute>
+    <attribute side="server" code="0x0002" define="SUBJECTS_PER_ACCESS_CONTROL_ENTRY" type="int16u" min="4" default="4">
+      <description>SubjectsPerAccessControlEntry</description>
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0003" define="TARGETS_PER_ACCESS_CONTROL_ENTRY" type="int16u" min="3" default="3">
+      <description>TargetsPerAccessControlEntry</description>
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0004" define="ACCESS_CONTROL_ENTRIES_PER_FABRIC" type="int16u" min="4" default="4">
+      <description>AccessControlEntriesPerFabric</description>
+      <mandatoryConform/>
+    </attribute>
+    <attribute code="0x0005" side="server" define="COMMISSIONING_ARL" type="array" entryType="CommissioningAccessRestrictionEntryStruct" optional="true">
+      <description>CommissioningARL</description>
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x0006" side="server" define="ARL" type="array" entryType="AccessRestrictionEntryStruct" optional="true">
+      <description>ARL</description>
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
+    </attribute>
 
     <command code="0x00" source="client" name="ReviewFabricRestrictions" isFabricScoped="true" optional="true" response="ReviewFabricRestrictionsResponse">
       <description>This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric.</description>
-       <access op="invoke" privilege="administer"/>
+      <access op="invoke" privilege="administer"/>
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
       <arg id="0" name="ARL" array="true" type="CommissioningAccessRestrictionEntryStruct"/>
      </command>
 
     <command code="0x01" source="server" name="ReviewFabricRestrictionsResponse" optional="true" disableDefaultResponse="true">
       <description>Returns the review token for the request, which can be used to correlate with a FabricRestrictionReviewUpdate event.</description>
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
       <arg id="0" name="Token" type="int64u"/>
     </command>
 

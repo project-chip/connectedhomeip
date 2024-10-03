@@ -46,6 +46,7 @@ limitations under the License.
         <server tick="false" init="false">true</server>
         <command source="client" code="0x00" name="QueryImage" response="QueryImageResponse" optional="false" cli="chip ota queryimage">
             <description>Determine availability of a new Software Image</description>
+            <mandatoryConform/>
             <arg name="VendorID" type="vendor_id"/>
             <arg name="ProductID" type="int16u"/>
             <arg name="SoftwareVersion" type="int32u"/>
@@ -57,6 +58,7 @@ limitations under the License.
         </command>
         <command source="server" code="0x01" name="QueryImageResponse" optional="false" cli="chip ota queryimageresponse">
             <description>Response to QueryImage command</description>
+            <mandatoryConform/>
             <arg name="Status" type="StatusEnum"/>
             <arg name="DelayedActionTime" type="int32u" optional="true"/>
             <arg name="ImageURI" type="char_string" length="256" optional="true"/>
@@ -68,16 +70,19 @@ limitations under the License.
         </command>
         <command source="client" code="0x02" name="ApplyUpdateRequest" response="ApplyUpdateResponse" optional="false" cli="chip ota applyupdaterequest">
             <description>Determine next action to take for a downloaded Software Image</description>
+            <mandatoryConform/>
             <arg name="UpdateToken" type="octet_string" length="32"/>
             <arg name="NewVersion" type="int32u"/>
         </command>
         <command source="server" code="0x03" name="ApplyUpdateResponse" optional="false" cli="chip ota applyupdateresponse">
             <description>Reponse to ApplyUpdateRequest command</description>
+            <mandatoryConform/>
             <arg name="Action" type="ApplyUpdateActionEnum"/>
             <arg name="DelayedActionTime" type="int32u"/>
         </command>
         <command source="client" code="0x04" name="NotifyUpdateApplied" optional="false" cli="chip ota notifyupdateapplied">
             <description>Notify OTA Provider that an update was applied</description>
+            <mandatoryConform/>
             <arg name="UpdateToken" type="octet_string" length="32"/>
             <arg name="SoftwareVersion" type="int32u"/>
         </command>

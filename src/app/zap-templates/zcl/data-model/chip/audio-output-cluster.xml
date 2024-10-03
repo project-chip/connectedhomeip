@@ -31,17 +31,27 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="AUDIO_OUTPUT_LIST"           type="array" entryType="OutputInfoStruct" length="254"          writable="false"  optional="false">OutputList</attribute>
-    <attribute side="server" code="0x0001" define="AUDIO_OUTPUT_CURRENT_OUTPUT" type="int8u" default="0x00"               min="0x00" max="0xFF" writable="false"  optional="false">CurrentOutput</attribute>
+    <attribute side="server" code="0x0000" define="AUDIO_OUTPUT_LIST"           type="array" entryType="OutputInfoStruct" length="254"          writable="false"  optional="false">
+      <description>OutputList</description>
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" define="AUDIO_OUTPUT_CURRENT_OUTPUT" type="int8u" default="0x00"               min="0x00" max="0xFF" writable="false"  optional="false">
+      <description>CurrentOutput</description>
+      <mandatoryConform/>
+    </attribute>
 
     <command source="client" code="0x00" name="SelectOutput" optional="false">
       <description>Upon receipt, this SHALL change the output on the media device to the output at a specific index in the Output List.</description>
+      <mandatoryConform/>
       <arg name="Index" type="int8u"/>
     </command>
 
     <command source="client" code="0x01" name="RenameOutput" optional="true">
       <description>Upon receipt, this SHALL rename the output at a specific index in the Output List. Updates to the output name SHALL appear in the TV settings menus.</description>
       <access op="invoke" role="manage" />
+      <mandatoryConform>
+        <feature name="NU"/>
+      </mandatoryConform>
       <arg name="Index" type="int8u"/>
       <arg name="Name" type="char_string"/>
     </command>
