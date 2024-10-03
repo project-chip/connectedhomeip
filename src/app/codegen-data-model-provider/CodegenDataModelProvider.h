@@ -96,6 +96,7 @@ public:
     /// attribute tree iteration
     EndpointId FirstEndpoint() override;
     EndpointId NextEndpoint(EndpointId before) override;
+    bool EndpointExists(EndpointId endpoint) override;
 
     DataModel::ClusterEntry FirstCluster(EndpointId endpoint) override;
     DataModel::ClusterEntry NextCluster(const ConcreteClusterPath & before) override;
