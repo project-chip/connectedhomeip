@@ -5912,6 +5912,36 @@ static BOOL AttributeIsSpecifiedInContentAppObserverCluster(AttributeId aAttribu
     }
     }
 }
+static BOOL AttributeIsSpecifiedInWebRTCTransportProviderCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WebRTCTransportProvider;
+    switch (aAttributeId) {
+    case Attributes::CurrentSessions::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInChimeCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Chime;
@@ -6680,6 +6710,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ContentAppObserver::Id: {
         return AttributeIsSpecifiedInContentAppObserverCluster(aAttributeId);
+    }
+    case Clusters::WebRTCTransportProvider::Id: {
+        return AttributeIsSpecifiedInWebRTCTransportProviderCluster(aAttributeId);
     }
     case Clusters::Chime::Id: {
         return AttributeIsSpecifiedInChimeCluster(aAttributeId);
