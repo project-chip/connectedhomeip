@@ -27,8 +27,10 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
 assert(chip_device_platform == "nxp")
 
-source_set("nxp_factory_data") {}
-source_set("nxp_ota") {}
+source_set("nxp_factory_data") {
+}
+source_set("nxp_ota") {
+}
 
 config("nxp_platform_config") {
   defines = [ "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/common/ble_zephyr/BLEManagerImpl.h\"" ]
@@ -44,8 +46,10 @@ config("nxp_platform_config") {
     defines += [ "CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA=1" ]
     defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rt1060/FactoryDataProviderImpl.h\"" ]
   }
-  # When OTBR is enabled Thread network commissioning cluster is enabled using chip_enable_secondary_nwk_if  
-  if (chip_enable_wifi && chip_enable_openthread && !chip_enable_secondary_nwk_if) {
+
+  # When OTBR is enabled Thread network commissioning cluster is enabled using chip_enable_secondary_nwk_if
+  if (chip_enable_wifi && chip_enable_openthread &&
+      !chip_enable_secondary_nwk_if) {
     defines += [ "_NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_" ]
   }
 }
@@ -88,14 +92,15 @@ static_library("nxp_platform") {
       "${nxp_sdk_build_root}/rt_sdk/sdk_hook/zephyr/random/random.cpp",
       "../../common/ble_zephyr/BLEAdvertisingArbiter.cpp",
       "../../common/ble_zephyr/BLEManagerImpl.cpp",
-      "../../common/ble_zephyr/BLEManagerImpl.h",    ]
+      "../../common/ble_zephyr/BLEManagerImpl.h",
+    ]
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
-  deps += [ 
-    "${chip_root}/src/platform/logging:headers",
+  deps += [
     "${chip_root}/src/lib/dnssd:constants",
+    "${chip_root}/src/platform/logging:headers",
   ]
 
   # define CHIP_PLAT_NVM_SUPPORT - See NXPConfig.cpp for definition
@@ -133,7 +138,8 @@ static_library("nxp_platform") {
 
     if (!nxp_build_matter_standalone_lib) {
       deps += [ "${chip_root}/third_party/openthread:openthread" ]
-      public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
+      public_deps +=
+          [ "${chip_root}/third_party/openthread:openthread-platform" ]
     }
 
     # dep required to include 'lib/spinel/spinel.h' in PlatformManagerImpl.cpp
@@ -141,13 +147,13 @@ static_library("nxp_platform") {
 
     if (chip_mdns == "platform") {
       if (chip_enable_wifi) {
-        sources += [ 
-          "../../common/DnssdImpl.cpp",
-          "../../common/DnssdImplBr.cpp",
-          "../../common/DnssdImplBr.h",
+        sources += [
           "../../../OpenThread/DnssdImpl.cpp",
           "../../../OpenThread/OpenThreadDnssdImpl.cpp",
           "../../../OpenThread/OpenThreadDnssdImpl.h",
+          "../../common/DnssdImpl.cpp",
+          "../../common/DnssdImplBr.cpp",
+          "../../common/DnssdImplBr.h",
         ]
       } else {
         sources += [
@@ -178,7 +184,5 @@ static_library("nxp_platform") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:syscalls_stub",
   ]
-  public_configs = [
-    ":nxp_platform_config",
-  ]
+  public_configs = [ ":nxp_platform_config" ]
 }
