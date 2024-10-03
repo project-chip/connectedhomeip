@@ -45,6 +45,8 @@ EndpointId kRefEndpointId           = 1;
 EndpointId kColdCabinetEndpointId   = 2;
 EndpointId kFreezeCabinetEndpointId = 3;
 
+
+
 RefrigeratorManager RefrigeratorManager::sRefrigeratorMgr;
 
 namespace {
@@ -71,6 +73,11 @@ CHIP_ERROR RefrigeratorManager::Init()
     // set TagList
     SetTagList(kColdCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
     SetTagList(kFreezeCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
+
+    TempCtrlAttr::MinTemperature::Set(kColdCabinetEndpointId, MIN_TEMP_COLD_CABINATE);
+    TempCtrlAttr::MaxTemperature::Set(kColdCabinetEndpointId, MAX_TEMP_COLD_CABINATE);
+    TempCtrlAttr::MinTemperature::Set(kFreezeCabinetEndpointId, MIN_TEMP_FREEZER_CABINATE);
+    TempCtrlAttr::MaxTemperature::Set(kFreezeCabinetEndpointId, MAX_TEMP_FREEZER_CABINATE);
 
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
     return CHIP_NO_ERROR;
@@ -105,18 +112,6 @@ void RefrigeratorManager::RefAndTempCtrlAttributeChangeHandler(EndpointId endpoi
     }
     break;
 
-    case RefAndTempAttr::StartUpMode::Id: {
-        int16_t startUpMode = static_cast<int16_t>(*value);
-        mStartUpMode        = startUpMode;
-    }
-    break;
-
-    case RefAndTempAttr::OnMode::Id: {
-        int16_t onMode = static_cast<int16_t>(*value);
-        mOnMode        = onMode;
-    }
-    break;
-
     default: {
         ChipLogError(AppServer, "Unhandled Refrigerator and Temperature attribute %ld", attributeId);
         return;
@@ -136,21 +131,6 @@ void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, 
         TempCtrlAttr::TemperatureSetpoint::Set(endpointId, temperatureSetpoint);
     }
     break;
-
-    case TempCtrlAttr::MinTemperature::Id: {
-        int16_t minTemperature = ConvertToPrintableTemp(static_cast<int16_t>(*value));
-        mMinTemperature        = minTemperature;
-        TempCtrlAttr::MinTemperature::Set(endpointId, minTemperature);
-    }
-    break;
-
-    case TempCtrlAttr::MaxTemperature::Id: {
-        int16_t maxTemperature = ConvertToPrintableTemp(static_cast<int16_t>(*value));
-        mMaxTemperature        = maxTemperature;
-        TempCtrlAttr::MaxTemperature::Set(endpointId, maxTemperature);
-    }
-    break;
-
     default: {
         ChipLogError(AppServer, "Unhandled Temperature controlled attribute %ld", attributeId);
         return;
@@ -177,14 +157,7 @@ void RefrigeratorManager::RefAlaramAttributeChangeHandler(EndpointId endpointId,
         RefAlarmAttr::State::Set(endpointId, mState);
     }
     break;
-
-    case RefAlarmAttr::Supported::Id: {
-        auto supported = static_cast<uint32_t>(*value);
-        mSupported     = static_cast<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>(supported);
-        RefAlarmAttr::Supported::Set(endpointId, mSupported);
-    }
-    break;
-
+    
     default: {
         ChipLogError(AppServer, "Unhandled Refrigerator Alarm attribute %ld", attributeId);
         return;

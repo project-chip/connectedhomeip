@@ -39,6 +39,11 @@ using namespace chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet
 using namespace chip::DeviceLayer;
 using chip::Protocols::InteractionModel::Status;
 
+#define MIN_TEMP_COLD_CABINATE 0
+#define MAX_TEMP_COLD_CABINATE 7
+#define MIN_TEMP_FREEZER_CABINATE -25
+#define MAX_TEMP_FREEZER_CABINATE -15
+
 class RefrigeratorManager
 {
 public:
