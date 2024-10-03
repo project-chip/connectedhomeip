@@ -15,10 +15,9 @@
 name: Build example - EFR32
 
 on:
-    push:
-        branches:
-            - master
-            - 'v*-branch'
+  push:
+    branches-ignore:
+      - 'dependabot/**'
   pull_request:
   merge_group:
 
