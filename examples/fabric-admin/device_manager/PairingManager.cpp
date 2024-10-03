@@ -108,7 +108,7 @@ CHIP_ERROR PairingManager::Init(Controller::DeviceCommissioner * commissioner, C
     VerifyOrReturnError(commissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(credIssuerCmds != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mCommissioner = commissioner;
+    mCommissioner   = commissioner;
     mCredIssuerCmds = credIssuerCmds;
 
     return CHIP_NO_ERROR;
@@ -253,7 +253,6 @@ void PairingManager::OnStatusUpdate(DevicePairingDelegate::Status status)
     switch (status)
     {
     case DevicePairingDelegate::Status::SecurePairingSuccess:
-        ChipLogProgress(NotSpecified, "Secure Pairing Success");
         ChipLogProgress(NotSpecified, "CASE establishment successful");
         break;
     case DevicePairingDelegate::Status::SecurePairingFailed:
@@ -266,14 +265,12 @@ void PairingManager::OnPairingComplete(CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
-        ChipLogProgress(NotSpecified, "Pairing Success");
         ChipLogProgress(NotSpecified, "PASE establishment successful");
     }
     else
     {
         ChipLogProgress(NotSpecified, "Pairing Failure: %s", ErrorStr(err));
     }
-
 }
 
 void PairingManager::OnPairingDeleted(CHIP_ERROR err)
@@ -293,8 +290,9 @@ void PairingManager::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     if (err == CHIP_NO_ERROR)
     {
         // print to console
-        fprintf(stderr, "New device with Node ID: 0x%lx has been successfully added.\n", nodeId);
-        // CurrentCommissioner() has a lifetime that is the entire life of the application itself
+        fprintf(stderr, "New device with Node ID: " ChipLogFormatX64 "has been successfully added.\n", ChipLogValueX64(nodeId));
+
+        // mCommissioner has a lifetime that is the entire life of the application itself
         // so it is safe to provide to StartDeviceSynchronization.
         DeviceSynchronizer::Instance().StartDeviceSynchronization(mCommissioner, nodeId, mDeviceIsICD);
     }
@@ -418,6 +416,7 @@ void PairingManager::OnDiscoveredDevice(const Dnssd::CommissionNodeData & nodeDa
     err              = Pair(mNodeId, peerAddress);
     if (CHIP_NO_ERROR != err)
     {
+        ChipLogProgress(NotSpecified, "Failed to pair device: " ChipLogFormatX64 " %s", ChipLogValueX64(mNodeId), ErrorStr(err));
     }
 }
 
@@ -473,17 +472,19 @@ void PairingManager::OnDeviceAttestationCompleted(Controller::DeviceCommissioner
         }
 
         // NOTE: This will log errors even if the attestion was successful.
-        auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(device, attestationResult);
+        CHIP_ERROR err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(device, attestationResult);
         if (CHIP_NO_ERROR != err)
         {
+            ChipLogError(NotSpecified, "Failed to continue commissioning after device attestation, error: %s", ErrorStr(err));
         }
         return;
     }
 
     // Don't bypass attestation, continue with error.
-    auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(device, attestationResult);
+    CHIP_ERROR err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(device, attestationResult);
     if (CHIP_NO_ERROR != err)
     {
+        ChipLogError(NotSpecified, "Failed to continue commissioning after device attestation, error: %s", ErrorStr(err));
     }
 }
 
@@ -548,11 +549,13 @@ void PairingManager::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
     if (err == CHIP_NO_ERROR)
     {
         // print to console
-        fprintf(stderr, "Device with Node ID: 0x%lx has been successfully removed.\n", nodeId);
+        fprintf(stderr, "Device with Node ID: " ChipLogFormatX64 "has been successfully removed.\n", ChipLogValueX64(nodeId));
 
 #if defined(PW_RPC_ENABLED)
-        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(self->CurrentCommissioner().GetFabricIndex(), nodeId);
-        RemoveSynchronizedDevice(nodeId);
+        FabricIndex fabricIndex = self->CurrentCommissioner().GetFabricIndex();
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(fabricIndex, nodeId);
+        ScopedNodeId scopedNodeId(nodeId, fabricIndex);
+        RemoveSynchronizedDevice(scopedNodeId);
 #endif
     }
     else
@@ -571,16 +574,17 @@ void PairingManager::InitPairingCommand()
 
 CHIP_ERROR PairingManager::PairDeviceWithCode(NodeId nodeId, const char * payload)
 {
-    if (payload == nullptr || strlen(payload) > kMaxManualCodeLength)
+    if (payload == nullptr || strlen(payload) > kMaxManualCodeLength + 1)
     {
         ChipLogError(NotSpecified, "PairDeviceWithCode failed: Invalid pairing payload");
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
 
-    auto params    = Platform::MakeUnique<PairDeviceWithCodeParams>();
-    params->nodeId = nodeId;
+    auto params = Platform::MakeUnique<PairDeviceWithCodeParams>();
+    VerifyOrReturnError(params != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    Platform::CopyString(params->payloadBuffer, kMaxManualCodeLength, payload);
+    params->nodeId = nodeId;
+    Platform::CopyString(params->payloadBuffer, sizeof(params->payloadBuffer), payload);
 
     // Schedule work on the Matter thread
     return DeviceLayer::PlatformMgr().ScheduleWork(OnPairDeviceWithCode, reinterpret_cast<intptr_t>(params.release()));
@@ -615,12 +619,14 @@ CHIP_ERROR PairingManager::PairDevice(chip::NodeId nodeId, uint32_t setupPINCode
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
 
-    auto params              = Platform::MakeUnique<PairDeviceParams>();
+    auto params = Platform::MakeUnique<PairDeviceParams>();
+    VerifyOrReturnError(params != nullptr, CHIP_ERROR_NO_MEMORY);
+
     params->nodeId           = nodeId;
     params->setupPINCode     = setupPINCode;
     params->deviceRemotePort = deviceRemotePort;
 
-    Platform::CopyString(params->ipAddrBuffer, Inet::IPAddress::kMaxStringLength, deviceRemoteIp);
+    Platform::CopyString(params->ipAddrBuffer, sizeof(params->ipAddrBuffer), deviceRemoteIp);
 
     // Schedule work on the Matter thread
     return DeviceLayer::PlatformMgr().ScheduleWork(OnPairDevice, reinterpret_cast<intptr_t>(params.release()));
@@ -652,19 +658,31 @@ void PairingManager::OnPairDevice(intptr_t context)
 
 CHIP_ERROR PairingManager::UnpairDevice(NodeId nodeId)
 {
+    auto params = Platform::MakeUnique<UnpairDeviceParams>();
+    VerifyOrReturnError(params != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    params->nodeId = nodeId;
+
     // Schedule work on the Matter thread
-    return DeviceLayer::PlatformMgr().ScheduleWork(OnUnpairDevice, static_cast<intptr_t>(nodeId));
+    return DeviceLayer::PlatformMgr().ScheduleWork(OnUnpairDevice, reinterpret_cast<intptr_t>(params.release()));
 }
 
 void PairingManager::OnUnpairDevice(intptr_t context)
 {
-    NodeId nodeId         = static_cast<NodeId>(context);
+    Platform::UniquePtr<PairDeviceParams> params(reinterpret_cast<PairDeviceParams *>(context));
     PairingManager & self = PairingManager::Instance();
 
     self.InitPairingCommand();
 
     self.mCurrentFabricRemover = Platform::MakeUnique<Controller::CurrentFabricRemover>(self.mCommissioner);
-    CHIP_ERROR err             = self.mCurrentFabricRemover->RemoveCurrentFabric(nodeId, &self.mCurrentFabricRemoveCallback);
+
+    if (!self.mCurrentFabricRemover)
+    {
+        ChipLogError(NotSpecified, "Failed to unpair device, mCurrentFabricRemover is null");
+        return;
+    }
+
+    CHIP_ERROR err = self.mCurrentFabricRemover->RemoveCurrentFabric(params->nodeId, &self.mCurrentFabricRemoveCallback);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to unpair device, error: %s", ErrorStr(err));

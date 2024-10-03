@@ -26,7 +26,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 
 // Constants
-constexpr uint16_t kMaxManualCodeLength = 21;
+constexpr uint16_t kMaxManualCodeLength = 22;
 
 class CommissioningWindowDelegate
 {
@@ -140,14 +140,6 @@ public:
     CHIP_ERROR UnpairDevice(chip::NodeId nodeId);
 
 private:
-    PairingManager();
-    PairingManager(const PairingManager &)             = delete;
-    PairingManager & operator=(const PairingManager &) = delete;
-
-    chip::Controller::DeviceCommissioner * mCommissioner = nullptr;
-    CredentialIssuerCommands * mCredIssuerCmds;
-
-    /////////// Open Commissioning Window Command Interface /////////
     struct CommissioningWindowParams
     {
         chip::NodeId nodeId;
@@ -162,21 +154,34 @@ private:
         chip::ByteSpan salt;
     };
 
-    CommissioningWindowDelegate * mCommissioningWindowDelegate = nullptr;
+    struct PairDeviceWithCodeParams
+    {
+        chip::NodeId nodeId;
+        char payloadBuffer[kMaxManualCodeLength + 1];
+    };
 
-    /**
-     * Holds the unique_ptr to the current CommissioningWindowOpener.
-     * Only one commissioning window opener can be active at a time.
-     * The pointer is reset when the commissioning window is closed or when an error occurs.
-     */
-    chip::Platform::UniquePtr<chip::Controller::CommissioningWindowOpener> mWindowOpener;
-    chip::Callback::Callback<chip::Controller::OnOpenCommissioningWindow> mOnOpenCommissioningWindowCallback;
-    chip::Callback::Callback<chip::Controller::OnOpenCommissioningWindowWithVerifier> mOnOpenCommissioningWindowVerifierCallback;
+    struct PairDeviceParams
+    {
+        chip::NodeId nodeId;
+        uint32_t setupPINCode;
+        uint16_t deviceRemotePort;
+        char ipAddrBuffer[chip::Inet::IPAddress::kMaxStringLength];
+    };
 
-    static void OnOpenCommissioningWindow(intptr_t context);
-    static void OnOpenCommissioningWindowResponse(void * context, chip::NodeId deviceId, CHIP_ERROR status,
-                                                  chip::SetupPayload payload);
-    static void OnOpenCommissioningWindowVerifierResponse(void * context, chip::NodeId deviceId, CHIP_ERROR status);
+    struct UnpairDeviceParams
+    {
+        chip::NodeId nodeId;
+    };
+
+    // Constructors
+    PairingManager();
+    PairingManager(const PairingManager &)             = delete;
+    PairingManager & operator=(const PairingManager &) = delete;
+
+    // Private member functions (static and non-static)
+    chip::Controller::CommissioningParameters GetCommissioningParameters();
+    void InitPairingCommand();
+    CHIP_ERROR Pair(chip::NodeId remoteId, chip::Transport::PeerAddress address);
 
     /////////// DevicePairingDelegate Interface /////////
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
@@ -197,31 +202,28 @@ private:
                                       const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
                                       chip::Credentials::AttestationVerificationResult attestationResult) override;
 
-    /////////// Pairing Command Interface /////////
-    struct PairDeviceWithCodeParams
-    {
-        chip::NodeId nodeId;
-        char payloadBuffer[kMaxManualCodeLength + 1];
-    };
+    static void OnOpenCommissioningWindow(intptr_t context);
+    static void OnOpenCommissioningWindowResponse(void * context, chip::NodeId deviceId, CHIP_ERROR status,
+                                                  chip::SetupPayload payload);
+    static void OnOpenCommissioningWindowVerifierResponse(void * context, chip::NodeId deviceId, CHIP_ERROR status);
+    static void OnCurrentFabricRemove(void * context, chip::NodeId remoteNodeId, CHIP_ERROR status);
+    static void OnPairDeviceWithCode(intptr_t context);
+    static void OnPairDevice(intptr_t context);
+    static void OnUnpairDevice(intptr_t context);
 
-    struct PairDeviceParams
-    {
-        chip::NodeId nodeId;
-        uint32_t setupPINCode;
-        uint16_t deviceRemotePort;
-        char ipAddrBuffer[chip::Inet::IPAddress::kMaxStringLength];
-    };
+    // Private data members
+    chip::Controller::DeviceCommissioner * mCommissioner = nullptr;
+    CredentialIssuerCommands * mCredIssuerCmds           = nullptr;
 
-    CommissioningDelegate * mCommissioningDelegate = nullptr;
-    PairingDelegate * mPairingDelegate             = nullptr;
+    CommissioningWindowDelegate * mCommissioningWindowDelegate = nullptr;
+    CommissioningDelegate * mCommissioningDelegate             = nullptr;
+    PairingDelegate * mPairingDelegate                         = nullptr;
 
     chip::NodeId mNodeId            = chip::kUndefinedNodeId;
     uint16_t mDiscriminator         = 0;
     uint32_t mSetupPINCode          = 0;
     const char * mOnboardingPayload = nullptr;
-
-    // For ICD
-    bool mDeviceIsICD = false;
+    bool mDeviceIsICD               = false;
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
     chip::Optional<bool> mICDRegistration;
@@ -231,16 +233,16 @@ private:
     chip::Optional<uint64_t> mICDMonitoredSubject;
     chip::Optional<uint32_t> mICDStayActiveDurationMsec;
 
+    /**
+     * Holds the unique_ptr to the current CommissioningWindowOpener.
+     * Only one commissioning window opener can be active at a time.
+     * The pointer is reset when the commissioning window is closed or when an error occurs.
+     */
+    chip::Platform::UniquePtr<chip::Controller::CommissioningWindowOpener> mWindowOpener;
+    chip::Callback::Callback<chip::Controller::OnOpenCommissioningWindow> mOnOpenCommissioningWindowCallback;
+    chip::Callback::Callback<chip::Controller::OnOpenCommissioningWindowWithVerifier> mOnOpenCommissioningWindowVerifierCallback;
+
     // For Unpair
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;
     chip::Callback::Callback<chip::Controller::OnCurrentFabricRemove> mCurrentFabricRemoveCallback;
-
-    chip::Controller::CommissioningParameters GetCommissioningParameters();
-    void InitPairingCommand();
-    CHIP_ERROR Pair(chip::NodeId remoteId, chip::Transport::PeerAddress address);
-
-    static void OnCurrentFabricRemove(void * context, chip::NodeId remoteNodeId, CHIP_ERROR status);
-    static void OnPairDeviceWithCode(intptr_t context);
-    static void OnPairDevice(intptr_t context);
-    static void OnUnpairDevice(intptr_t context);
 };
