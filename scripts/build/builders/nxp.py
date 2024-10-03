@@ -113,6 +113,7 @@ class NxpBoardVariant(Enum):
         elif self == NxpBoardVariant.EVKC:
             return "evkcmimxrt1060"
 
+
 class NxpApp(Enum):
     LIGHTING = auto()
     CONTACT = auto()
@@ -284,7 +285,7 @@ class NxpBuilder(GnBuilder):
             args.append('iw416_transceiver=true')
 
         if self.w8801_transceiver:
-            #BLE not supported on this transceiver
+            # BLE not supported on this transceiver
             args.append('w8801_transceiver=true chip_enable_ble=false')
 
         if self.iwx12_transceiver:
