@@ -274,9 +274,6 @@ void PairingManager::OnPairingComplete(CHIP_ERROR err)
         ChipLogProgress(NotSpecified, "Pairing Failure: %s", ErrorStr(err));
     }
 
-    if (err != CHIP_NO_ERROR)
-    {
-    }
 }
 
 void PairingManager::OnPairingDeleted(CHIP_ERROR err)
