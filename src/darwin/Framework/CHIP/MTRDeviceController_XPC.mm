@@ -24,13 +24,11 @@
 #import "MTRXPCClientProtocol.h"
 #import "MTRXPCServerProtocol.h"
 
-#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME)                 \
-    MTR_SIMPLE_REMOTE_XPC_GETTER(self.xpcConnection, NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController \
-                                 : self.uniqueIdentifier)
+#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME) \
+    MTR_SIMPLE_REMOTE_XPC_GETTER(self.xpcConnection, NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController : self.uniqueIdentifier)
 
-#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS)                 \
-    MTR_SIMPLE_REMOTE_XPC_COMMAND(self.xpcConnection, METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController \
-                                  : self.uniqueIdentifier)
+#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS) \
+    MTR_SIMPLE_REMOTE_XPC_COMMAND(self.xpcConnection, METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController : self.uniqueIdentifier)
 
 @interface MTRDeviceController_XPC ()
 
@@ -341,9 +339,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(controllerNodeID, NSNumber *, nil,
 
 //- (oneway void)deviceController:(NSUUID *)controller openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration withReply:(void(^)(NSError * _Nullable error))reply;
 //- (oneway void)deviceController:(NSUUID *)controller openPairingWindowWithPIN:(uint64_t)deviceID duration:(NSUInteger)duration discriminator:(NSUInteger)discriminator setupPIN:(NSUInteger)setupPIN  withReply:(void(^)(NSError * _Nullable error))reply;
-
-MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(shutdown, shutdownDeviceController
-                                               : self.uniqueIdentifier)
 
 #pragma mark - MTRDeviceProtocol Client
 
