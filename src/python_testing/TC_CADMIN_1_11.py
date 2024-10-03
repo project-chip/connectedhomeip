@@ -73,7 +73,7 @@ class TC_CADMIN_1_11(MatterBaseTest):
                                 'Unexpected error code returned from CommissioningComplete')
 
     async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
-        cluster = Clusters.Objects.OperationalCredentials
+        cluster = Clusters.OperationalCredentials
         attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
         current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
         return current_fabric_index
