@@ -79,8 +79,8 @@ CHIP_ERROR TccModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagSt
 
 void RefrigeratorAndTemperatureControlledCabinetMode::Shutdown()
 {
-        gTccModeInstance.reset();
-        gTccModeDelegate.reset();
+    gTccModeInstance.reset();
+    gTccModeDelegate.reset();
 }
 
 chip::Protocols::InteractionModel::Status
@@ -141,7 +141,8 @@ void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(c
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gTccModeDelegate == nullptr && gTccModeInstance == nullptr);
     gTccModeDelegate = std::make_unique<RefrigeratorAndTemperatureControlledCabinetMode::TccModeDelegate>();
-    gTccModeInstance = std::make_unique<ModeBase::Instance>(gTccModeDelegate.get(), 0x1, RefrigeratorAndTemperatureControlledCabinetMode::Id, 0);
+    gTccModeInstance =
+        std::make_unique<ModeBase::Instance>(gTccModeDelegate.get(), 0x1, RefrigeratorAndTemperatureControlledCabinetMode::Id, 0);
     gTccModeInstance->Init();
 }
 
