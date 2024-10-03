@@ -1741,10 +1741,10 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandCheckFlags(co
     VerifyOrReturnValue(commandInfo.has_value(), Status::UnsupportedCommand);
 
     const bool commandNeedsTimedInvoke = commandInfo->flags.Has(DataModel::CommandQualityFlags::kTimed);
-    const bool CommandIsFabricScoped   = commandInfo->flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
+    const bool commandIsFabricScoped   = commandInfo->flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
 #else
     const bool commandNeedsTimedInvoke = CommandNeedsTimedInvoke(aRequest.path.mClusterId, aRequest.path.mCommandId);
-    const bool CommandIsFabricScoped   = CommandIsFabricScoped(aRequest.path.mClusterId, aRequest.path.mCommandId);
+    const bool commandIsFabricScoped   = CommandIsFabricScoped(aRequest.path.mClusterId, aRequest.path.mCommandId);
 #endif
 
     if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
@@ -1752,7 +1752,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandCheckFlags(co
         return Status::NeedsTimedInteraction;
     }
 
-    if (CommandIsFabricScoped)
+    if (commandIsFabricScoped)
     {
         // SPEC: Else if the command in the path is fabric-scoped and there is no accessing fabric,
         // a CommandStatusIB SHALL be generated with the UNSUPPORTED_ACCESS Status Code.
