@@ -19,7 +19,6 @@
 #include <app/util/config.h>
 #include <static-supported-temperature-levels.h>
 
-using namespace std;
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::TemperatureControl;

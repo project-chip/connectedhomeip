@@ -1,7 +1,6 @@
 #include <app/util/config.h>
 #include <static-supported-modes-manager.h>
 
-using namespace std;
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeSelect;

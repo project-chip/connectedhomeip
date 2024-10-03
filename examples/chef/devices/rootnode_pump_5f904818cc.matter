@@ -212,6 +212,13 @@ enum TestGlobalEnum : enum8 {
   kFinalValue = 2;
 }
 
+enum ThreeLevelAutoEnum : enum8 {
+  kLow = 0;
+  kMedium = 1;
+  kHigh = 2;
+  kAutomatic = 3;
+}
+
 bitmap TestGlobalBitmap : bitmap32 {
   kFirstBit = 0x1;
   kSecondBit = 0x2;
@@ -1675,7 +1682,7 @@ endpoint 1 {
   }
 
   server cluster OnOff {
-    ram      attribute onOff default = 0;
+    persist  attribute onOff default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -1706,12 +1713,12 @@ endpoint 1 {
     ram      attribute minConstTemp default = 0;
     ram      attribute maxConstTemp default = 10000;
     ram      attribute pumpStatus default = 5;
-    ram      attribute effectiveOperationMode default = 0;
-    ram      attribute effectiveControlMode default = 5;
+    persist  attribute effectiveOperationMode default = 0;
+    persist  attribute effectiveControlMode default = 5;
     ram      attribute capacity;
     ram      attribute speed default = 1000;
-    ram      attribute operationMode default = 0;
-    ram      attribute controlMode default = 5;
+    persist  attribute operationMode default = 0;
+    persist  attribute controlMode default = 5;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
