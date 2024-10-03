@@ -406,6 +406,17 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
+        class ThreeLevelAutoEnum(MatterIntEnum):
+            kLow = 0x00
+            kMedium = 0x01
+            kHigh = 0x02
+            kAutomatic = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4,
+
     class Bitmaps:
         class TestGlobalBitmap(IntFlag):
             kFirstBit = 0x1
@@ -44534,9 +44545,9 @@ class ContentLauncher(Cluster):
         class Feature(IntFlag):
             kContentSearch = 0x1
             kURLPlayback = 0x2
-            kAdvancedSeek = 0x3
-            kTextTracks = 0x4
-            kAudioTracks = 0x5
+            kAdvancedSeek = 0x4
+            kTextTracks = 0x8
+            kAudioTracks = 0x10
 
         class SupportedProtocolsBitmap(IntFlag):
             kDash = 0x1
