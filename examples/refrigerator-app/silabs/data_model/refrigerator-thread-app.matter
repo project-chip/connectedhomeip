@@ -1768,8 +1768,6 @@ endpoint 2 {
     ram      attribute minTemperature;
     ram      attribute maxTemperature;
     ram      attribute step;
-    ram      attribute selectedTemperatureLevel;
-    callback attribute supportedTemperatureLevels;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -1801,8 +1799,6 @@ endpoint 3 {
     ram      attribute minTemperature;
     ram      attribute maxTemperature;
     ram      attribute step;
-    ram      attribute selectedTemperatureLevel;
-    callback attribute supportedTemperatureLevels;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
