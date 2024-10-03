@@ -295,6 +295,7 @@ std::optional<DataModel::CommandEntry> EnumeratorCommandFinder::FindCommandEntry
 // TODO: DeviceTypeEntry content is IDENTICAL to EmberAfDeviceType, so centralizing
 //       to a common type is probably better. Need to figure out dependencies since
 //       this would make ember return datamodel-provider types.
+//       See: https://github.com/project-chip/connectedhomeip/issues/35889
 DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & other)
 {
     DataModel::DeviceTypeEntry entry;
