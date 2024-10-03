@@ -23,7 +23,7 @@
 
 CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
 {
-    mWorkQueue = dispatch_queue_create("com.chip.open_commissioning_window", DISPATCH_QUEUE_SERIAL);
+    mWorkQueue = dispatch_queue_create("com.chip.open_commissioning_window", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     auto * controller = CurrentCommissioner();
     auto * device = [MTRDevice deviceWithNodeID:mNodeId deviceController:controller];
 

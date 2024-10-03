@@ -41,8 +41,6 @@ declare_args() {
   # By default, the resources used by each fabric is unlimited if they are allocated on heap. This flag is for checking the resource usage even when they are allocated on heap to increase code coverage in integration tests.
   chip_im_force_fabric_quota_check = false
 
-  enable_eventlist_attribute = false
-
   # Allow building ota-requestor-app with a non-spec-compliant floor
   # (i.e. smaller than 2 minutes) for action delays.
   non_spec_compliant_ota_action_delay_floor = -1
@@ -71,7 +69,6 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY=${chip_access_control_policy_logging_verbosity}",
     "CHIP_CONFIG_PERSIST_SUBSCRIPTIONS=${chip_persist_subscriptions}",
     "CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION=${chip_subscription_timeout_resumption}",
-    "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
     "CHIP_CONFIG_ENABLE_READ_CLIENT=${chip_enable_read_client}",
     "CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE=${chip_im_static_global_interaction_model_engine}",
     "TIME_SYNC_ENABLE_TSC_FEATURE=${time_sync_enable_tsc_feature}",
@@ -257,6 +254,7 @@ static_library("interaction-model") {
       "reporting/Read-Ember.cpp",
       "reporting/Read-Ember.h",
     ]
+    public_deps += [ "${chip_root}/src/app/ember_coupling" ]
   } else if (chip_use_data_model_interface == "check") {
     sources += [
       "reporting/Read-Checked.cpp",
@@ -266,7 +264,10 @@ static_library("interaction-model") {
       "reporting/Read-Ember.cpp",
       "reporting/Read-Ember.h",
     ]
-    public_deps += [ "${chip_root}/src/app/data-model-provider" ]
+    public_deps += [
+      "${chip_root}/src/app/data-model-provider",
+      "${chip_root}/src/app/ember_coupling",
+    ]
   } else {  # enabled
     sources += [
       "reporting/Read-DataModel.cpp",

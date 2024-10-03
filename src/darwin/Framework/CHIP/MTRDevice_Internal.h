@@ -128,11 +128,6 @@ MTR_DIRECT_MEMBERS
 // called by controller to clean up and shutdown
 - (void)invalidate;
 
-// Called by controller when a new operational advertisement for what we think
-// is this device's identity has been observed.  This could have
-// false-positives, for example due to compressed fabric id collisions.
-- (void)nodeMayBeAdvertisingOperational;
-
 - (BOOL)_callDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
 
 // Called by MTRDevice_XPC to forward delegate callbacks

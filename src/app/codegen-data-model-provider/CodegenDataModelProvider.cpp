@@ -16,18 +16,24 @@
  */
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
+#include <access/AccessControl.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/EventPathParams.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/util/IMClusterCommandHandler.h>
+#include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+
+// separated out for code-reuse
+#include <app/ember_coupling/EventPathValidity.mixin.h>
 
 #include <optional>
 #include <variant>
@@ -286,6 +292,57 @@ std::optional<DataModel::CommandEntry> EnumeratorCommandFinder::FindCommandEntry
     return (*id == kInvalidCommandId) ? DataModel::CommandEntry::kInvalid : CommandEntryFrom(path, *id);
 }
 
+// TODO: DeviceTypeEntry content is IDENTICAL to EmberAfDeviceType, so centralizing
+//       to a common type is probably better. Need to figure out dependencies since
+//       this would make ember return datamodel-provider types.
+//       See: https://github.com/project-chip/connectedhomeip/issues/35889
+DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & other)
+{
+    DataModel::DeviceTypeEntry entry;
+
+    entry.deviceTypeId      = other.deviceId;
+    entry.deviceTypeVersion = other.deviceVersion;
+
+    return entry;
+}
+
+// Explicitly compare for identical entries. note that types are different,
+// so you must do `a == b` and the `b == a` will not work.
+bool operator==(const DataModel::DeviceTypeEntry & a, const EmberAfDeviceType & b)
+{
+    return (a.deviceTypeId == b.deviceId) && (a.deviceTypeVersion == b.deviceVersion);
+}
+
+/// Find the `index` where one of the following holds:
+///    - types[index - 1] == previous OR
+///    - index == types.size()  // i.e. not found or there is no next
+///
+/// hintWherePreviousMayBe represents a search hint where previous may exist.
+unsigned FindNextDeviceTypeIndex(Span<const EmberAfDeviceType> types, const DataModel::DeviceTypeEntry previous,
+                                 unsigned hintWherePreviousMayBe)
+{
+    if (hintWherePreviousMayBe < types.size())
+    {
+        // this is a valid hint ... see if we are lucky
+        if (previous == types[hintWherePreviousMayBe])
+        {
+            return hintWherePreviousMayBe + 1; // return the next index
+        }
+    }
+
+    // hint was not useful. We have to do a full search
+    for (unsigned idx = 0; idx < types.size(); idx++)
+    {
+        if (previous == types[idx])
+        {
+            return idx + 1;
+        }
+    }
+
+    // cast should be safe as we know we do not have that many types
+    return static_cast<unsigned>(types.size());
+}
+
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
 
 } // namespace
@@ -378,6 +435,11 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
     // Ember always sets the return in the handler
     DispatchSingleClusterCommand(request.path, input_arguments, handler);
     return std::nullopt;
+}
+
+bool CodegenDataModelProvider::EndpointExists(EndpointId endpoint)
+{
+    return (emberAfIndexFromEndpoint(endpoint) != kEmberInvalidEndpointIndex);
 }
 
 EndpointId CodegenDataModelProvider::FirstEndpoint()
@@ -718,6 +780,83 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
     VerifyOrReturnValue(commandId.has_value(), kInvalidCommandPath);
 
     return ConcreteCommandPath(before.mEndpointId, before.mClusterId, *commandId);
+}
+
+std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceType(EndpointId endpoint)
+{
+    // Use the `Index` version even though `emberAfDeviceTypeListFromEndpoint` would work because
+    // index finding is cached in TryFindEndpointIndex and this avoids an extra `emberAfIndexFromEndpoint`
+    // during `Next` loops. This avoids O(n^2) on number of indexes when iterating over all device types.
+    //
+    // Not actually needed for `First`, however this makes First and Next consistent.
+    std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpoint);
+    if (!endpoint_index.has_value())
+    {
+        return std::nullopt;
+    }
+
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
+    Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
+
+    if (deviceTypes.empty())
+    {
+        return std::nullopt;
+    }
+
+    // we start at the beginning
+    mDeviceTypeIterationHint = 0;
+    return DeviceTypeEntryFromEmber(deviceTypes[0]);
+}
+
+std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceType(EndpointId endpoint,
+                                                                                   const DataModel::DeviceTypeEntry & previous)
+{
+    // Use the `Index` version even though `emberAfDeviceTypeListFromEndpoint` would work because
+    // index finding is cached in TryFindEndpointIndex and this avoids an extra `emberAfIndexFromEndpoint`
+    // during `Next` loops. This avoids O(n^2) on number of indexes when iterating over all device types.
+    std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpoint);
+    if (!endpoint_index.has_value())
+    {
+        return std::nullopt;
+    }
+
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
+    Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
+
+    unsigned idx = FindNextDeviceTypeIndex(deviceTypes, previous, mDeviceTypeIterationHint);
+
+    if (idx >= deviceTypes.size())
+    {
+        return std::nullopt;
+    }
+
+    mDeviceTypeIterationHint = idx;
+    return DeviceTypeEntryFromEmber(deviceTypes[idx]);
+}
+
+bool CodegenDataModelProvider::EventPathIncludesAccessibleConcretePath(const EventPathParams & path,
+                                                                       const Access::SubjectDescriptor & descriptor)
+{
+
+    if (!path.HasWildcardEndpointId())
+    {
+        // No need to check whether the endpoint is enabled, because
+        // emberAfFindEndpointType returns null for disabled endpoints.
+        return HasValidEventPathForEndpoint(path.mEndpointId, path, descriptor);
+    }
+
+    for (uint16_t endpointIndex = 0; endpointIndex < emberAfEndpointCount(); ++endpointIndex)
+    {
+        if (!emberAfEndpointIndexIsEnabled(endpointIndex))
+        {
+            continue;
+        }
+        if (HasValidEventPathForEndpoint(emberAfEndpointFromIndex(endpointIndex), path, descriptor))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 } // namespace app

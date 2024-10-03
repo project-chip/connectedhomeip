@@ -30,6 +30,7 @@ class CommissionerControlDelegate : public Delegate
 {
 public:
     CHIP_ERROR HandleCommissioningApprovalRequest(const CommissioningApprovalRequest & request) override;
+    // TODO(#35627) clientNodeId should move towards ScopedNodeId.
     CHIP_ERROR ValidateCommissionNodeCommand(NodeId clientNodeId, uint64_t requestId) override;
     CHIP_ERROR GetCommissioningWindowParams(CommissioningWindowParams & outParams) override;
     CHIP_ERROR HandleCommissionNode(const CommissioningWindowParams & params) override;

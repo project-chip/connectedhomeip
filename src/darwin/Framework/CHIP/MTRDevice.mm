@@ -295,6 +295,15 @@ using namespace chip::Tracing::DarwinFramework;
     return self;
 }
 
+// For now, implement an initWithNodeID in case some sub-class outside the
+// framework called it (by manually declaring it, even though it's not public
+// API).  Ideally we would not have this thing, since its signature does not
+// match the initWithNodeID signatures of our subclasses.
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
+{
+    return [self initForSubclassesWithNodeID:nodeID controller:controller];
+}
+
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:_systemTimeChangeObserverToken];
@@ -305,6 +314,17 @@ using namespace chip::Tracing::DarwinFramework;
 
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
+    if (nodeID == nil || controller == nil) {
+        // These are not nullable in our API, but clearly someone is not
+        // actually turning on the relevant compiler checks (or is doing dynamic
+        // dispatch with bad values).  While we promise to not return nil from
+        // this method, if the caller is ignoring the nullability API contract,
+        // there's not much we can do here.
+        MTR_LOG_ERROR("Can't create device with nodeID: %@, controller: %@",
+            nodeID, controller);
+        return nil;
+    }
+
     return [controller deviceForNodeID:nodeID];
 }
 
@@ -430,13 +450,6 @@ using namespace chip::Tracing::DarwinFramework;
     std::lock_guard lock(_lock);
 
     [_delegates removeAllObjects];
-}
-
-- (void)nodeMayBeAdvertisingOperational
-{
-    assertChipStackLockedByCurrentThread();
-
-    MTR_LOG("%@ saw new operational advertisement", self);
 }
 
 - (BOOL)_delegateExists
@@ -1050,7 +1063,7 @@ using namespace chip::Tracing::DarwinFramework;
     }
 
     MTRDeviceDataValueDictionary fieldsDataValue = commandFields;
-    if (fieldsDataValue[MTRTypeKey] != MTRStructureValueType) {
+    if (![MTRStructureValueType isEqual:fieldsDataValue[MTRTypeKey]]) {
         MTR_LOG_ERROR("%@ invokeCommandWithEndpointID passed a commandFields (%@) that is not a structure-typed data-value object",
             self, commandFields);
         completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);

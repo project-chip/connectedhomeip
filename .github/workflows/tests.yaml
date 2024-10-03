@@ -37,7 +37,7 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-tsan-clang]
+                build_variant: [no-ble-no-shell-tsan-clang]
                 chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
@@ -49,7 +49,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:80
+            image: ghcr.io/project-chip/chip-build:81
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -91,6 +91,7 @@ jobs:
                       --no-print \
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
+                      src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-bitmaps.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-structs.xml \
@@ -197,6 +198,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/washer-controls-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/water-heater-management-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/webrtc-provider-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wifi-network-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wifi-network-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/window-covering.xml \
@@ -331,7 +333,7 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-asan-clang, no-ble-tsan-clang]
+                build_variant: [no-ble-no-shell-asan-clang, no-ble-no-shell-tsan-clang]
                 chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
@@ -451,7 +453,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:80
+            image: ghcr.io/project-chip/chip-build:81
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
