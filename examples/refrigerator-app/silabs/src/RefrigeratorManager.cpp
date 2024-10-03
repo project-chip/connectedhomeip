@@ -74,11 +74,6 @@ CHIP_ERROR RefrigeratorManager::Init()
     SetTagList(kColdCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
     SetTagList(kFreezeCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
 
-    TempCtrlAttr::MinTemperature::Set(kColdCabinetEndpointId, MIN_TEMP_COLD_CABINATE);
-    TempCtrlAttr::MaxTemperature::Set(kColdCabinetEndpointId, MAX_TEMP_COLD_CABINATE);
-    TempCtrlAttr::MinTemperature::Set(kFreezeCabinetEndpointId, MIN_TEMP_FREEZER_CABINATE);
-    TempCtrlAttr::MaxTemperature::Set(kFreezeCabinetEndpointId, MAX_TEMP_FREEZER_CABINATE);
-
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
     return CHIP_NO_ERROR;
 }
