@@ -57,7 +57,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         if desired_type == MatterIntEnum:
             all_attributes_of_type = [attribute for attribute in all_attributes if type(
                 attribute.attribute_type.Type) == type(ClusterObjects.ClusterObjectFieldDescriptor(Type=desired_type).Type)]
-                
+
         elif desired_type == IntFlag:
             if hasattr(cluster, 'Attributes'):
                 attributes_class = getattr(cluster, 'Attributes')
@@ -70,7 +70,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         else:
             all_attributes_of_type = [attribute for attribute in all_attributes if attribute.attribute_type ==
                                       ClusterObjects.ClusterObjectFieldDescriptor(Type=desired_type)]
-        
+
         return all_attributes_of_type
 
     def all_device_clusters(self) -> set:
@@ -138,7 +138,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Objects.Descriptor.Attributes.ServerList)])
 
         asserts.assert_in(Clusters.Objects.Descriptor, read_request[0].keys(), "Descriptor cluster not in output")
-        asserts.assert_in(Clusters.Objects.Descriptor.Attributes.ServerList, read_request[0][Clusters.Objects.Descriptor], "ServerList not in output")
+        asserts.assert_in(Clusters.Objects.Descriptor.Attributes.ServerList,
+                          read_request[0][Clusters.Objects.Descriptor], "ServerList not in output")
 
         # Step 2
         # TH sends the Read Request Message to the DUT to read all attributes on a given cluster and Endpoint
@@ -150,8 +151,9 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Objects.Descriptor)])
         asserts.assert_equal({0}, read_request.keys(), "Endpoint 0 not in output")
         asserts.assert_equal({Clusters.Objects.Descriptor}, read_request[0].keys(), "Descriptor cluster not in output")
-        
-        returned_attributes = [a for a in read_request[0][Clusters.Objects.Descriptor].keys() if a != Clusters.Attribute.DataVersion]
+
+        returned_attributes = [a for a in read_request[0][Clusters.Objects.Descriptor].keys() if a !=
+                               Clusters.Attribute.DataVersion]
         expected_descriptor_attributes = ClusterObjects.ALL_ATTRIBUTES[Clusters.Objects.Descriptor.id]
         # Actual failure
         asserts.assert_equal(set(returned_attributes), set(expected_descriptor_attributes.values()))
@@ -165,18 +167,19 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         self.print_step(3, "Send Request Message to read one attribute on a given cluster at all endpoints")
         all_attributes = await self.default_controller.ReadAttribute(self.dut_node_id, [Clusters.Objects.Descriptor])
         for endpoint in all_attributes:
-            asserts.assert_in(Clusters.Objects.Descriptor, all_attributes[endpoint], f"Descriptor attribute not found in endpoint: {endpoint}")
+            asserts.assert_in(Clusters.Objects.Descriptor,
+                              all_attributes[endpoint], f"Descriptor attribute not found in endpoint: {endpoint}")
 
         # Step 4
 
         # TH sends the Read Request Message to the DUT to read a global attribute from all clusters at that Endpoint
         # AttributePath = [[Endpoint = Specific Endpoint, Attribute = Specific Global Attribute]]
         # On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
-        self.print_step(4, "Send Request Message to read one global attribute from all clusters at that endpoint")        
+        self.print_step(4, "Send Request Message to read one global attribute from all clusters at that endpoint")
         attribute_path_1 = AttributePath(
-        EndpointId = 0,
-        ClusterId = None,
-        AttributeId = global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
+            EndpointId=0,
+            ClusterId=None,
+            AttributeId=global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
 
         read_request = await self.default_controller.ReadAttribute(
             self.dut_node_id,
@@ -184,7 +187,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         )
         for endpoint in read_request:
             asserts.assert_in(Clusters.Objects.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
-            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList, read_request[endpoint][Clusters.Objects.Descriptor], "AttributeList not in output")
+            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList,
+                              read_request[endpoint][Clusters.Objects.Descriptor], "AttributeList not in output")
 
         # Step 5
         # TH sends the Read Request Message to the DUT to read all attributes from all clusters on all Endpoints
@@ -198,7 +202,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         for endpoint in read_request:
             all_returned_clusters.extend(read_request[endpoint])
         asserts.assert_equal(set(self.device_clusters), set(all_returned_clusters), "Mismatch of expected returned clusters")
-        
+
         attr_count = 0
         for endpoint in read_request:
             cluster_list = iter(read_request[endpoint])
@@ -215,9 +219,9 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         self.print_step(6, "Send Request Message to read one global attribute from all clusters on all endpoints")
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [Clusters.Objects.Descriptor.Attributes.AttributeList])
         attribute_path_2 = AttributePath(
-        EndpointId = None,
-        ClusterId = None,
-        AttributeId = global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
+            EndpointId=None,
+            ClusterId=None,
+            AttributeId=global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
 
         read_request = await self.default_controller.ReadAttribute(
             self.dut_node_id,
@@ -226,8 +230,9 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         for endpoint in read_request:
             asserts.assert_in(Clusters.Objects.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
-            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList, read_request[endpoint][Clusters.Objects.Descriptor], "AttributeList not in output")
-        
+            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList,
+                              read_request[endpoint][Clusters.Objects.Descriptor], "AttributeList not in output")
+
         # Step 7
         # TH sends the Read Request Message to the DUT to read all attributes from a cluster at all Endpoints
         # AttributePath = [[Cluster = Specific ClusterID]]
@@ -237,7 +242,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         for endpoint in read_request:
             asserts.assert_in(Clusters.Objects.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
-            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList, read_request[endpoint][Clusters.Objects.Descriptor], "AttributeList not in output")
+            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList,
+                              read_request[endpoint][Clusters.Objects.Descriptor], "AttributeList not in output")
 
         # Step 8
         # TH sends the Read Request Message to the DUT to read all attributes from all clusters at one Endpoint
@@ -248,20 +254,22 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         for endpoint in read_request:
             asserts.assert_in(Clusters.Objects.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
-            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.ServerList, read_request[endpoint][Clusters.Objects.Descriptor], "ServerList not in output")
+            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.ServerList,
+                              read_request[endpoint][Clusters.Objects.Descriptor], "ServerList not in output")
 
             for cluster in read_request[endpoint]:
-                attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster].keys() if a != Clusters.Attribute.DataVersion]
+                attribute_ids = [a.attribute_id for a in read_request[endpoint]
+                                 [cluster].keys() if a != Clusters.Attribute.DataVersion]
                 asserts.assert_equal(sorted(attribute_ids),
-                sorted(read_request[endpoint][cluster][cluster.Attributes.AttributeList]),
-                f"Expected attribute list does not match actual list for cluster {cluster} on endpoint: {endpoint}")
+                                     sorted(read_request[endpoint][cluster][cluster.Attributes.AttributeList]),
+                                     f"Expected attribute list does not match actual list for cluster {cluster} on endpoint: {endpoint}")
 
             cluster_ids = [c.id for c in read_request[endpoint].keys()]
             asserts.assert_equal(
                 sorted(read_request[endpoint][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.ServerList]),
                 sorted(cluster_ids),
                 f"ServerList doesn't match the expected server list for endpoint: {endpoint}"
-                )
+            )
 
         # Step 9
         # TH sends the Read Request Message to the DUT to read an attribute of data type bool.
@@ -358,7 +366,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # Verify on the TH that the DUT sends the status code UNSUPPORTED_CLUSTER
         self.print_step(20, "Send the Read Request Message to the DUT to read any attribute to an unsupported cluster")
-        
+
         for endpoint_id, endpoint in self.endpoints.items():
             for cluster_type, cluster in endpoint.items():
                 if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
@@ -432,7 +440,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         read_request_2 = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Objects.Descriptor.Attributes.ServerList)], dataVersionFilters=data_version_filter)
         asserts.assert_equal(read_request_2, {})
-        
+
         # Step 24
         # TH sends a Read Request Message to the DUT to read a particular attribute with the DataVersionFilter Field not set.
         # DUT sends back the attribute value with the DataVersion of the cluster.
@@ -454,7 +462,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             self.dut_node_id, [(0, Clusters.BasicInformation.Attributes.NodeLabel)], dataVersionFilters=data_version_filter)
         data_version_2 = read_request[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
 
-        asserts.assert_equal(int(read_request[0][Clusters.Objects.BasicInformation][Clusters.Objects.BasicInformation.Attributes.NodeLabel]), data_version_value, f"Data version does not equal {data_version_value}")
+        asserts.assert_equal(int(read_request[0][Clusters.Objects.BasicInformation][Clusters.Objects.BasicInformation.Attributes.NodeLabel]),
+                             data_version_value, f"Data version does not equal {data_version_value}")
         asserts.assert_equal((data_version_1 + 1), data_version_2, "DataVersion was not incremented")
 
         # Step 25
@@ -468,7 +477,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         self.print_step(
             25, "Send the Read Request Message to the DUT to read all attributes on a cluster with the DataVersionFilter Field not set")
-    
+
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Objects.BasicInformation)])
         data_version_1 = read_request[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
         data_version_value = 654321
@@ -479,7 +488,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         read_request = await self.default_controller.ReadAttribute(
             self.dut_node_id, [(0, Clusters.Objects.BasicInformation)], dataVersionFilters=data_version_filter)
         data_version_2 = read_request[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
-        asserts.assert_equal(int(read_request[0][Clusters.Objects.BasicInformation][Clusters.Objects.BasicInformation.Attributes.NodeLabel]), data_version_value, f"Data version does not equal {data_version_value}")
+        asserts.assert_equal(int(read_request[0][Clusters.Objects.BasicInformation][Clusters.Objects.BasicInformation.Attributes.NodeLabel]),
+                             data_version_value, f"Data version does not equal {data_version_value}")
         asserts.assert_equal((data_version_1 + 1), data_version_2, "DataVersion was not incremented")
 
         # Step 26
@@ -501,7 +511,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         data_version_filter_2 = [(0, Clusters.BasicInformation, data_version-1)]
         read_request_3 = await self.default_controller.ReadAttribute(
             self.dut_node_id, [(0, Clusters.Objects.BasicInformation.Attributes.NodeLabel)], dataVersionFilters=data_version_filter_2)
-        asserts.assert_equal(int(read_request_3[0][Clusters.Objects.BasicInformation][Clusters.Objects.BasicInformation.Attributes.NodeLabel]), data_version_value, f"Data version does not equal {data_version_value}")
+        asserts.assert_equal(int(read_request_3[0][Clusters.Objects.BasicInformation][Clusters.Objects.BasicInformation.Attributes.NodeLabel]),
+                             data_version_value, f"Data version does not equal {data_version_value}")
 
         # Step 27
 
@@ -530,7 +541,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # Verify on the TH that the DUT sends a chunked data message with the SuppressResponse field set to False for all the messages except the last one.
         # Verify the last chunked message sent has the SuppressResponse field set to True.
 
-        self.print_step(28, "Send the Read Request Message to read something(Attribute) which is larger than 1 MTU(1280 bytes) and per spec can be chunked +")
+        self.print_step(
+            28, "Send the Read Request Message to read something(Attribute) which is larger than 1 MTU(1280 bytes) and per spec can be chunked +")
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, "*")
 
         # Step 29
@@ -541,7 +553,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # On the TH verify that the DUT sends an error message and not the value of the attribute.
         self.print_step(29, "Send the Read Request Message to the DUT to read a non global attribute from all clusters at that Endpoint")
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [Clusters.Objects.Descriptor.Attributes.ServerList])
-        
+
         # Step 30
 
         # TH sends a Read Request Message to the DUT to read a non global attribute from all clusters at all Endpoints
