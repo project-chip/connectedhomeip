@@ -784,14 +784,11 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
 
 std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceType(EndpointId endpoint)
 {
-<<<<<<< HEAD
-=======
     // Use the `Index` version even though `emberAfDeviceTypeListFromEndpoint` would work because
     // index finding is cached in TryFindEndpointIndex and this avoids an extra `emberAfIndexFromEndpoint`
     // during `Next` loops. This avoids O(n^2) on number of indexes when iterating over all device types.
     //
     // Not actually needed for `First`, however this makes First and Next consistent.
->>>>>>> master
     std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpoint);
     if (!endpoint_index.has_value())
     {
@@ -814,12 +811,9 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceT
 std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceType(EndpointId endpoint,
                                                                                    const DataModel::DeviceTypeEntry & previous)
 {
-<<<<<<< HEAD
-=======
     // Use the `Index` version even though `emberAfDeviceTypeListFromEndpoint` would work because
     // index finding is cached in TryFindEndpointIndex and this avoids an extra `emberAfIndexFromEndpoint`
     // during `Next` loops. This avoids O(n^2) on number of indexes when iterating over all device types.
->>>>>>> master
     std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpoint);
     if (!endpoint_index.has_value())
     {
@@ -829,26 +823,7 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceTy
     CHIP_ERROR err                            = CHIP_NO_ERROR;
     Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
 
-<<<<<<< HEAD
-    unsigned idx = 0;
-    if ((mDeviceTypeIterationHint < deviceTypes.size()) && IsSameDeviceTypeEntry(previous, deviceTypes[mDeviceTypeIterationHint]))
-    {
-        idx = mDeviceTypeIterationHint + 1; // target the NEXT device
-    }
-    else
-    {
-        while (idx < deviceTypes.size())
-        {
-            idx++;
-            if (IsSameDeviceTypeEntry(previous, deviceTypes[idx - 1]))
-            {
-                break;
-            }
-        }
-    }
-=======
     unsigned idx = FindNextDeviceTypeIndex(deviceTypes, previous, mDeviceTypeIterationHint);
->>>>>>> master
 
     if (idx >= deviceTypes.size())
     {
