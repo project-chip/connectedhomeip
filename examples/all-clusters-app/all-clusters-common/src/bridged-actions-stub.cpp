@@ -24,31 +24,23 @@ using namespace chip::app::Clusters::Actions;
 using namespace chip::app::Clusters::Actions::Attributes;
 using namespace chip::Protocols::InteractionModel;
 
-CHIP_ERROR ActionsDelegateImpl::ReadActionAtIndex(uint16_t index, ActionListStructType & action)
+CHIP_ERROR ActionsDelegateImpl::ReadActionAtIndex(uint16_t index, GenericActionStruct & action)
 {
     if (index >= ArraySize(kActionList))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    action.actionID          = kActionList[index].actionID;
-    action.name              = kActionList[index].name;
-    action.type              = kActionList[index].type;
-    action.endpointListID    = kActionList[index].endpointListID;
-    action.supportedCommands = kActionList[index].supportedCommands;
-    action.state             = kActionList[index].state;
+    action = kActionList[index];
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ActionsDelegateImpl::ReadEndpointListAtIndex(uint16_t index, EndpointListStructType & epList)
+CHIP_ERROR ActionsDelegateImpl::ReadEndpointListAtIndex(uint16_t index, GenericEndpointList & epList)
 {
     if (index >= ArraySize(kEndpointList))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    epList.endpointListID = kEndpointList[index].endpointListID;
-    epList.name           = kEndpointList[index].name;
-    epList.type           = kEndpointList[index].type;
-    epList.endpoints      = kEndpointList[index].endpoints;
+    epList = kEndpointList[index];
     return CHIP_NO_ERROR;
 }
 
