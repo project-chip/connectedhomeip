@@ -263,7 +263,7 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
                      timedInvokeTimeout:timeout
             serverSideProcessingTimeout:serverSideProcessingTimeout
                              completion:completion];
-    } @catch (NSException *exception) {
+    } @catch (NSException * exception) {
         MTR_LOG_ERROR("Exception sending XPC messsage: %@", exception);
     }
 }
