@@ -21,6 +21,7 @@
 #include "attributes_service/attributes_service.rpc.pb.h"
 #include "pigweed/rpc_services/internal/StatusUtils.h"
 
+#include <app/AppConfig.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -31,6 +32,13 @@
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>
 #include <platform/PlatformManager.h>
+
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+#include <app/data-model-provider/Provider.h>
+#include <app/AttributeValueEncoder.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/OperationTypes.h>
+#endif
 
 namespace chip {
 namespace rpc {
@@ -202,11 +210,40 @@ private:
         writer.Init(tlvBuffer);
         PW_TRY(ChipErrorToPwStatus(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer)));
         PW_TRY(ChipErrorToPwStatus(attributeReports.Init(&writer, kReportContextTag)));
+
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+        // TODO: this assumes a singleton data model provider
+        app::DataModel::Provider *provider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+
+        app::DataModel::ReadAttributeRequest request;
+        request.path = path;
+        request.operationFlags.Set(app::DataModel::OperationFlags::kInternal);
+        request.subjectDescriptor = subjectDescriptor;
+
+        std::optional<app::DataModel::ClusterInfo> info = provider->GetClusterInfo(path);
+        if (!info.has_value()) {
+            return ::pw::Status::NotFound();
+        }
+
+        app::AttributeValueEncoder encoder(attributeReports, subjectDescriptor, path, info->dataVersion, false /* isFabricFiltered */, nullptr  /* attributeEncodingState */);
+        app::DataModel::ActionReturnStatus result = provider->ReadAttribute(request, encoder);
+
+        if (!result.IsSuccess()) 
+        {
+            app::DataModel::ActionReturnStatus::StringStorage storage;
+            ChipLogError(Support, "Failed to read data: %s", result.c_str(storage));
+            return ::pw::Status::Internal();
+        }
+
+#else
         PW_TRY(ChipErrorToPwStatus(app::ReadSingleClusterData(subjectDescriptor, false, path, attributeReports, nullptr)));
+#endif
+
         attributeReports.EndOfContainer();
         PW_TRY(ChipErrorToPwStatus(writer.EndContainer(outer)));
         PW_TRY(ChipErrorToPwStatus(writer.Finalize()));
         tlvBuffer.reduce_size(writer.GetLengthWritten());
+// FIXME: do not implement
 
         return ::pw::OkStatus();
     }
