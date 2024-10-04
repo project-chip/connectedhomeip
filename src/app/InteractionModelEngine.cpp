@@ -1716,11 +1716,11 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandCheckACL(cons
     // This is checked by previous validations, so it should not happen
     VerifyOrReturnValue(commandInfo.has_value(), Status::UnsupportedCommand);
 
-    Access::Privilege requestPrivilege = commandInfo->invokePrivilege;
+    Access::Privilege minimumRequiredPrivilege = commandInfo->invokePrivilege;
 #else
-    Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(aRequest.path);
+    Access::Privilege minimumRequiredPrivilege = RequiredPrivilege::ForInvokeCommand(aRequest.path);
 #endif
-    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, requestPrivilege);
+    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, minimumRequiredPrivilege);
     if (err != CHIP_NO_ERROR)
     {
         if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
