@@ -64,7 +64,7 @@
             MTR_LOG_ERROR("Unregister node error: %@   nodeID: %@", error, nodeID);
         }] deviceController:self.uniqueIdentifier unregisterNodeID:nodeID];
     } @catch (NSException * exception) {
-        MTR_LOG_ERROR("Exception registering nodeID: %@", exception);
+        MTR_LOG_ERROR("Exception unregistering nodeID: %@", exception);
     }
 }
 
@@ -78,7 +78,7 @@
             MTR_LOG_ERROR("Checkin error: %@", error);
         }] deviceController:self.uniqueIdentifier checkInWithContext:context];
     } @catch (NSException * exception) {
-        MTR_LOG_ERROR("Exception registering nodeID: %@", exception);
+        MTR_LOG_ERROR("Exception checking in with context: %@", exception);
     }
 }
 
