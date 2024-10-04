@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2024 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -479,11 +479,19 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     // once up front and discard all the paths at once.  Ordering with respect
     // to ACL and command presence checks does not matter, because the behavior
     // is the same for all of them: ignore the path.
+#if !CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+
+    // Without data model interface, we can query individual commands.
+    // Data model interface queries commands by a full path so we need endpointID as well.
+    //
+    // Since this is a performance update and group commands are never timed,
+    // missing this should not be that noticeable.
     if (CommandNeedsTimedInvoke(clusterId, commandId))
     {
         // Group commands are never timed.
         return Status::Success;
     }
+#endif
 
     // No check for `CommandIsFabricScoped` unlike in `ProcessCommandDataIB()` since group commands
     // always have an accessing fabric, by definition.
