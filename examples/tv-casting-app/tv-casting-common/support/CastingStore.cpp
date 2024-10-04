@@ -252,8 +252,9 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
                         if (endpointContainerTagNum == kCastingPlayerEndpointIdTag)
                         {
                             err = reader.Get(endpointAttributes.mId);
-                            //Log which endpoints we cached.
-                            ChipLogProgress(AppServer, "CastingStore::ReadAll() Endpoints container endpointAttributes.mId: %d", endpointAttributes.mId);
+                            // Log which endpoints we cached.
+                            ChipLogProgress(AppServer, "CastingStore::ReadAll() Endpoints container endpointAttributes.mId: %d",
+                                            endpointAttributes.mId);
                             VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
                                                 ChipLogError(AppServer, "TLVReader.Get failed %" CHIP_ERROR_FORMAT, err.Format()));
                             continue;
@@ -642,7 +643,8 @@ void CastingStore::OnFabricRemoved(const chip::FabricTable & fabricTable, chip::
         }
     }
     CHIP_ERROR err = chip::Server::GetInstance().GetSessionResumptionStorage()->DeleteAll(fabricIndex);
-    ChipLogProgress(AppServer, "CastingStore::OnFabricRemoved() SessionResumptionStorage.DeleteAll(%d) status %" CHIP_ERROR_FORMAT, fabricIndex, err.Format());
+    ChipLogProgress(AppServer, "CastingStore::OnFabricRemoved() SessionResumptionStorage.DeleteAll(%d) status %" CHIP_ERROR_FORMAT,
+                    fabricIndex, err.Format());
 }
 
 }; // namespace support

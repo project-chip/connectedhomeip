@@ -51,14 +51,17 @@ void EndpointListLoader::Initialize(chip::Messaging::ExchangeManager * exchangeM
     mExchangeMgr   = exchangeMgr;
     mSessionHandle = sessionHandle;
 
-    chip::NodeId targetCastingPlayerNodeId = CastingPlayer::GetTargetCastingPlayer()->GetNodeId();
+    chip::NodeId targetCastingPlayerNodeId           = CastingPlayer::GetTargetCastingPlayer()->GetNodeId();
     chip::FabricIndex targetCastingPlayerFabricIndex = CastingPlayer::GetTargetCastingPlayer()->GetFabricIndex();
-    ChipLogProgress(AppServer, "EndpointListLoader::Initialize() targetCastingPlayerNodeId: 0x" ChipLogFormatX64, ChipLogValueX64(targetCastingPlayerNodeId));
-    ChipLogProgress(AppServer, "EndpointListLoader::Initialize() targetCastingPlayerFabricIndex: %d", targetCastingPlayerFabricIndex);
+    ChipLogProgress(AppServer, "EndpointListLoader::Initialize() targetCastingPlayerNodeId: 0x" ChipLogFormatX64,
+                    ChipLogValueX64(targetCastingPlayerNodeId));
+    ChipLogProgress(AppServer, "EndpointListLoader::Initialize() targetCastingPlayerFabricIndex: %d",
+                    targetCastingPlayerFabricIndex);
 
     for (const auto & binding : chip::BindingTable::GetInstance())
     {
-        if (binding.type == MATTER_UNICAST_BINDING && targetCastingPlayerNodeId == binding.nodeId && targetCastingPlayerFabricIndex == binding.fabricIndex)
+        if (binding.type == MATTER_UNICAST_BINDING && targetCastingPlayerNodeId == binding.nodeId &&
+            targetCastingPlayerFabricIndex == binding.fabricIndex)
         {
             // check to see if we discovered a new endpoint in the bindings
             chip::EndpointId endpointId                     = binding.remote;
@@ -71,7 +74,8 @@ void EndpointListLoader::Initialize(chip::Messaging::ExchangeManager * exchangeM
             }
         }
     }
-    ChipLogProgress(AppServer, "EndpointListLoader::Initialize() mNewEndpointsToLoad++, mNewEndpointsToLoad: %lu", mNewEndpointsToLoad);
+    ChipLogProgress(AppServer, "EndpointListLoader::Initialize() mNewEndpointsToLoad++, mNewEndpointsToLoad: %lu",
+                    mNewEndpointsToLoad);
 
     mPendingAttributeReads  = mNewEndpointsToLoad * kTotalDesiredAttributes;
     mEndpointAttributesList = new EndpointAttributes[mNewEndpointsToLoad];
@@ -84,9 +88,10 @@ CHIP_ERROR EndpointListLoader::Load()
 
     VerifyOrReturnError(CastingPlayer::GetTargetCastingPlayer() != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    chip::NodeId targetCastingPlayerNodeId = CastingPlayer::GetTargetCastingPlayer()->GetNodeId();
+    chip::NodeId targetCastingPlayerNodeId           = CastingPlayer::GetTargetCastingPlayer()->GetNodeId();
     chip::FabricIndex targetCastingPlayerFabricIndex = CastingPlayer::GetTargetCastingPlayer()->GetFabricIndex();
-    ChipLogProgress(AppServer, "EndpointListLoader::Load() targetCastingPlayerNodeId: 0x" ChipLogFormatX64, ChipLogValueX64(targetCastingPlayerNodeId));
+    ChipLogProgress(AppServer, "EndpointListLoader::Load() targetCastingPlayerNodeId: 0x" ChipLogFormatX64,
+                    ChipLogValueX64(targetCastingPlayerNodeId));
     ChipLogProgress(AppServer, "EndpointListLoader::Load() targetCastingPlayerFabricIndex: %d", targetCastingPlayerFabricIndex);
 
     int endpointIndex      = -1;
@@ -98,7 +103,8 @@ CHIP_ERROR EndpointListLoader::Load()
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
-        if (binding.type == MATTER_UNICAST_BINDING && targetCastingPlayerNodeId == binding.nodeId && targetCastingPlayerFabricIndex == binding.fabricIndex)
+        if (binding.type == MATTER_UNICAST_BINDING && targetCastingPlayerNodeId == binding.nodeId &&
+            targetCastingPlayerFabricIndex == binding.fabricIndex)
         {
             // if we discovered a new Endpoint from the bindings, read its EndpointAttributes
             chip::EndpointId endpointId = binding.remote;
@@ -109,7 +115,8 @@ CHIP_ERROR EndpointListLoader::Load()
                 }) == endpoints.end())
             {
                 // Read attributes and mEndpointAttributesList for (endpointIndex + 1)
-                ChipLogProgress(AppServer, "EndpointListLoader::Load() Reading attributes for endpointId: %d, on fabricIndex: %d", endpointId, binding.fabricIndex);
+                ChipLogProgress(AppServer, "EndpointListLoader::Load() Reading attributes for endpointId: %d, on fabricIndex: %d",
+                                endpointId, binding.fabricIndex);
                 isLoadingRequired                            = true;
                 mEndpointAttributesList[++endpointIndex].mId = endpointId;
                 ReadVendorId(&mEndpointAttributesList[endpointIndex]);
@@ -191,7 +198,8 @@ CHIP_ERROR EndpointListLoader::ReadVendorId(EndpointAttributes * endpointAttribu
         },
         [](void * context, CHIP_ERROR err) {
             EndpointAttributes * _endpointAttributes = static_cast<EndpointAttributes *>(context);
-            ChipLogError(AppServer, "EndpointListLoader::ReadAttribute(VendorID) failed for endpointID %d. Err: %" CHIP_ERROR_FORMAT,
+            ChipLogError(AppServer,
+                         "EndpointListLoader::ReadAttribute(VendorID) failed for endpointID %d. Err: %" CHIP_ERROR_FORMAT,
                          _endpointAttributes->mId, err.Format());
             EndpointListLoader::GetInstance()->Complete();
         });
@@ -262,7 +270,9 @@ CHIP_ERROR EndpointListLoader::ReadServerList(std::vector<chip::ClusterId> * end
             EndpointListLoader::GetInstance()->Complete();
         },
         [](void * context, CHIP_ERROR err) {
-            ChipLogError(AppServer, "EndpointListLoader::ReadServerList() ReadAttribute(ServerList) failed. Err: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(AppServer,
+                         "EndpointListLoader::ReadServerList() ReadAttribute(ServerList) failed. Err: %" CHIP_ERROR_FORMAT,
+                         err.Format());
             EndpointListLoader::GetInstance()->Complete();
         });
 }
