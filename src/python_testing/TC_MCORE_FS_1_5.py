@@ -98,9 +98,11 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
         logging.info("Temporary storage directory: %s", self.storage.name)
 
-        # Get the named pipe path for the DUT_FSA app input from the user params.
-        dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe", None)
-        if dut_fsa_stdin_pipe is not None:
+        if self.is_pics_sdk_ci_only:
+            # Get the named pipe path for the DUT_FSA app input from the user params.
+            dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
+            if not dut_fsa_stdin_pipe:
+                asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
             self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
 
         self.th_server_port = th_server_port

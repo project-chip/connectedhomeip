@@ -160,9 +160,11 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             vendor_id=0xFFF1)
         self.th_fsa_controller.start()
 
-        # Get the named pipe path for the DUT_FSA app input from the user params.
-        dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe", None)
-        if dut_fsa_stdin_pipe is not None:
+        if self.is_pics_sdk_ci_only:
+            # Get the named pipe path for the DUT_FSA app input from the user params.
+            dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
+            if not dut_fsa_stdin_pipe:
+                asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
             self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
 
         self.th_server_port = 5544

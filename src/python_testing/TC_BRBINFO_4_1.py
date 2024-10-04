@@ -176,7 +176,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         params = await self.openCommissioningWindow(dev_ctrl=self.default_controller, node_id=self.icd_nodeid)
 
         self._ask_for_vendor_commissioning_ux_operation(params.randomDiscriminator, params.commissioningParameters.setupPinCode,
-                                                         params.commissioningParameters.setupManualCode, params.commissioningParameters.setupQRCode)
+                                                        params.commissioningParameters.setupManualCode, params.commissioningParameters.setupQRCode)
 
     def teardown_class(self):
         if self._active_change_event_subscription is not None:
