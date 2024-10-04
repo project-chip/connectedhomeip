@@ -80,13 +80,13 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             TestStep("18", "Wait for TH_ICD to check into TH, then confirm we have received new event from DUT"),
         ]
 
-    def _ask_for_vendor_commissioniong_ux_operation(self, discriminator, setupPinCode, setupManualCode, setupQRCode):
+    def _ask_for_vendor_commissioning_ux_operation(self, discriminator, setupPinCode, setupManualCode, setupQRCode):
         self.wait_for_user_input(
             prompt_msg=f"Using the DUT vendor's provided interface, commission the ICD device using the following parameters:\n"
             f"- discriminator: {discriminator}\n"
             f"- setupPinCode: {setupPinCode}\n"
             f"- setupQRCode: {setupQRCode}\n"
-            f"- setupManualcode: {setupManualCode}\n"
+            f"- setupManualCode: {setupManualCode}\n"
             f"If using FabricSync Admin test app, you may type:\n"
             f">>> pairing onnetwork 111 {setupPinCode} --icd-registration true")
 
@@ -153,7 +153,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         logging.info("Commissioning of ICD to fabric two (DUT)")
         params = await self.openCommissioningWindow(dev_ctrl=self.default_controller, node_id=self.icd_nodeid)
 
-        self._ask_for_vendor_commissioniong_ux_operation(params.randomDiscriminator, params.commissioningParameters.setupPinCode,
+        self._ask_for_vendor_commissioning_ux_operation(params.randomDiscriminator, params.commissioningParameters.setupPinCode,
                                                          params.commissioningParameters.setupManualCode, params.commissioningParameters.setupQRCode)
 
     def teardown_class(self):

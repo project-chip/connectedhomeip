@@ -141,7 +141,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
             f"- discriminator: {setup_params.discriminator}\n"
             f"- setupPinCode: {setup_params.passcode}\n"
             f"- setupQRCode: {setup_params.setup_qr_code}\n"
-            f"- setupManualcode: {setup_params.manual_code}\n"
+            f"- setupManualCode: {setup_params.manual_code}\n"
             f"If using FabricSync Admin test app, you may type:\n"
             f">>> pairing onnetwork 111 {setup_params.passcode}")
 
