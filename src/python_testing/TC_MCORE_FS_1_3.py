@@ -27,6 +27,7 @@
 #   run1:
 #     app: examples/fabric-admin/scripts/fabric-sync-app.py
 #     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-ready-pattern: "Successfully opened pairing window on the device"
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
@@ -36,7 +37,6 @@
 #       --string-arg th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     script-start-delay: 5
 #     factoryreset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -197,7 +197,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             device_node_id=th_server_th_node_id)
 
         # Wait for the device to appear on the DUT_FSA_BRIDGE.
-        await asyncio.sleep(2)
+        await asyncio.sleep(2 if self.is_pics_sdk_ci_only else 30)
 
         # Get the list of endpoints on the DUT_FSA_BRIDGE after adding the TH_SERVER_NO_UID.
         dut_fsa_bridge_endpoints_new = set(await self.read_single_attribute_check_success(

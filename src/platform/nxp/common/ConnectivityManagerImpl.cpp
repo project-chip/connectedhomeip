@@ -75,9 +75,11 @@ using namespace ::chip::System;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace ::chip::DeviceLayer::DeviceEventType;
 
+#if !SDK_2_16_100
 // Table 9-50 "Status codes" of IEEE 802.11-2020: Unspecified failure
 // Temporary default status code before SDK API to map wlan_event_reason to IEEE Status codes
 #define WLAN_REFUSED_REASON_UNSPECIFIED 1
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -243,6 +245,12 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
     uint8_t associationFailureCause =
         chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
 
+#if SDK_2_16_100
+    uint16_t wlan_status_code = wlan_get_status_code(wlanEvent);
+#else
+    uint16_t wlan_status_code = WLAN_REFUSED_REASON_UNSPECIFIED;
+#endif
+
 #if CHIP_DETAIL_LOGGING
     enum wlan_connection_state state;
     int result;
@@ -283,7 +291,7 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
             chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAssociationFailed);
         if (delegate)
         {
-            delegate->OnAssociationFailureDetected(associationFailureCause, WLAN_REFUSED_REASON_UNSPECIFIED);
+            delegate->OnAssociationFailureDetected(associationFailureCause, wlan_status_code);
         }
         UpdateInternetConnectivityState();
         break;
@@ -296,7 +304,7 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
             chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kSsidNotFound);
         if (delegate)
         {
-            delegate->OnAssociationFailureDetected(associationFailureCause, WLAN_REFUSED_REASON_UNSPECIFIED);
+            delegate->OnAssociationFailureDetected(associationFailureCause, wlan_status_code);
         }
         break;
 
@@ -309,7 +317,7 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
             chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAuthenticationFailed);
         if (delegate)
         {
-            delegate->OnAssociationFailureDetected(associationFailureCause, WLAN_REFUSED_REASON_UNSPECIFIED);
+            delegate->OnAssociationFailureDetected(associationFailureCause, wlan_status_code);
         }
         break;
 
@@ -321,7 +329,7 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
             sInstance.OnStationDisconnected();
             if (delegate)
             {
-                delegate->OnAssociationFailureDetected(associationFailureCause, WLAN_REFUSED_REASON_UNSPECIFIED);
+                delegate->OnAssociationFailureDetected(associationFailureCause, wlan_status_code);
             }
         }
         break;
@@ -332,7 +340,7 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
         sInstance.OnStationDisconnected();
         if (delegate)
         {
-            delegate->OnAssociationFailureDetected(associationFailureCause, WLAN_REFUSED_REASON_UNSPECIFIED);
+            delegate->OnAssociationFailureDetected(associationFailureCause, wlan_status_code);
         }
         break;
 

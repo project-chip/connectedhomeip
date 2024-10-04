@@ -145,7 +145,7 @@ void BLEManagerImpl::ProcessEvent(SilabsBleWrapper::BleEvent_t inEvent)
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
         if (inEvent.eventData->rsi_ble_read_req->type == 0)
         {
-            BLEMgrImpl().HandleC3ReadRequest(&inEvent.eventData);
+            BLEMgrImpl().HandleC3ReadRequest(inEvent.eventData);
         }
 #endif // CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     }
@@ -999,7 +999,7 @@ exit:
 
 void BLEManagerImpl::HandleC3ReadRequest(SilabsBleWrapper::sl_wfx_msg_t * evt)
 {
-    sl_status_t ret = rsi_ble_gatt_read_response(evt->rsi_ble_read_req.dev_addr, GATT_READ_RESP, evt->rsi_ble_read_req.handle,
+    sl_status_t ret = rsi_ble_gatt_read_response(evt->rsi_ble_read_req->dev_addr, GATT_READ_RESP, evt->rsi_ble_read_req->handle,
                                                  GATT_READ_ZERO_OFFSET, sInstance.c3AdditionalDataBufferHandle->DataLength(),
                                                  sInstance.c3AdditionalDataBufferHandle->Start());
     if (ret != SL_STATUS_OK)
