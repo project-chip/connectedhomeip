@@ -2171,8 +2171,9 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
     """
     def run_if_endpoint_matches_internal(body):
         def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
-            asserts.assert_false(self.get_test_pics(self.current_test_info.name),
-                                 "pics_ method supplied for run_if_endpoint_matches.")
+            # Disabling this for now so the TH does not need to spend the time to run these tests. We can PICS-gate these and re-evaluate in 1.5
+            # asserts.assert_false(self.get_test_pics(self.current_test_info.name),
+            #                     "pics_ method supplied for run_if_endpoint_matches.")
             runner_with_timeout = asyncio.wait_for(should_run_test_on_endpoint(self, accept_function), timeout=60)
             should_run_test = asyncio.run(runner_with_timeout)
             if not should_run_test:

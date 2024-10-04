@@ -253,11 +253,12 @@ def main():
     if not ok:
         failures.append("Test case failure: test_endpoints")
 
-    test_name = 'test_endpoint_with_pics'
-    test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
-    ok = test_runner.run_test_with_mock_read(read_resp, hooks)
-    if ok:
-        failures.append(f"Did not get expected test assertion on {test_name}")
+    # Disabling this for now - in 1.4 we will allow self-selecting tests that are also gated by PICS
+    # test_name = 'test_endpoint_with_pics'
+    # test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
+    # ok = test_runner.run_test_with_mock_read(read_resp, hooks)
+    # if ok:
+    #    failures.append(f"Did not get expected test assertion on {test_name}")
 
     # Test should run once for the whole node, regardless of the number of endpoints
     def run_check(test_name: str, read_response: Attribute.AsyncReadTransaction.ReadResponse, expect_skip: bool) -> None:
