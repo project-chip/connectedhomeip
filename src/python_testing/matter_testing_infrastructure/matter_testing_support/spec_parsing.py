@@ -27,6 +27,7 @@ from typing import Callable, Optional
 
 import chip.clusters as Clusters
 from chip.tlv import uint
+import matter_testing_support.conformance as conformance_support
 from matter_testing_support.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision,
                                                 ConformanceException, ConformanceParseParameters, feature, is_disallowed, mandatory,
                                                 optional, or_operation, parse_callable_from_xml,
@@ -640,8 +641,8 @@ def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirec
     if clusters[Clusters.Thermostat.id].revision >= 8:
         presents_id = clusters[Clusters.Thermostat.id].attribute_map[presets_name]
         schedules_id = clusters[Clusters.Thermostat.id].attribute_map[schedules_name]
-        conformance = or_operation([conformance.attribute(presents_id, presets_name),
-                                   conformance.attribute(schedules_id, schedules_name)])
+        conformance = or_operation([conformance_support.attribute(presents_id, presets_name),
+                                   conformance_support.attribute(schedules_id, schedules_name)])
         clusters[Clusters.Thermostat.id].accepted_commands[atomic_request_cmd_id] = XmlCommand(
             id=atomic_request_cmd_id, name=atomic_request_name, conformance=conformance)
         clusters[Clusters.Thermostat.id].generated_commands[atomic_response_cmd_id] = XmlCommand(
