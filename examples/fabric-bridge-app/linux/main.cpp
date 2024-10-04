@@ -16,10 +16,6 @@
  *    limitations under the License.
  */
 
-#include <cstdlib>
-#include <sys/ioctl.h>
-#include <thread>
-
 #include <AppMain.h>
 
 #include "BridgedAdministratorCommissioning.h"
@@ -54,8 +50,6 @@ using namespace chip::app::Clusters::AdministratorCommissioning;
 using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
 
 namespace {
-
-constexpr uint16_t kPollIntervalMs = 100;
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 constexpr uint16_t kRetryIntervalS = 3;
@@ -102,33 +96,6 @@ bool HandleCustomOption(const char * aProgram, ArgParser::OptionSet * aOptions, 
 
 ArgParser::OptionSet sProgramCustomOptions = { HandleCustomOption, sProgramCustomOptionDefs, "GENERAL OPTIONS",
                                                sProgramCustomOptionHelp };
-
-bool KeyboardHit()
-{
-    int bytesWaiting;
-    ioctl(0, FIONREAD, &bytesWaiting);
-    return bytesWaiting > 0;
-}
-
-void BridgePollingThread()
-{
-    while (true)
-    {
-        if (KeyboardHit())
-        {
-            int ch = getchar();
-            if (ch == 'e')
-            {
-                ChipLogProgress(NotSpecified, "Exiting.....");
-                exit(0);
-            }
-            continue;
-        }
-
-        // Sleep to avoid tight loop reading commands
-        usleep(kPollIntervalMs * 1000);
-    }
-}
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
@@ -291,10 +258,6 @@ void ApplicationInit()
     InitRpcServer(gLocalServerPort);
     AttemptRpcClientConnect(&DeviceLayer::SystemLayer(), nullptr);
 #endif
-
-    // Start a thread for bridge polling
-    std::thread pollingThread(BridgePollingThread);
-    pollingThread.detach();
 
     BridgeDeviceMgr().Init();
     VerifyOrDie(gBridgedAdministratorCommissioning.Init() == CHIP_NO_ERROR);
