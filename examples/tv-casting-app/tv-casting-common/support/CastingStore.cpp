@@ -78,8 +78,9 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
     size_t castingStoreDataSize = 0;
     err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kCastingStoreDataKey, castingStoreData,
                                                                       kCastingStoreDataMaxBytes, &castingStoreDataSize);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
-                        ChipLogError(AppServer, "KeyValueStoreMgr.Get failed %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrReturnValue(
+        err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
+        ChipLogError(AppServer, "CastingStore::ReadAll() KeyValueStoreMgr.Get failed %" CHIP_ERROR_FORMAT, err.Format()));
     ChipLogProgress(AppServer, "CastingStore::ReadAll() Read TLV(CastingStoreData) from KVS store with size: %lu bytes",
                     static_cast<unsigned long>(castingStoreDataSize));
 
@@ -478,7 +479,7 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
 
     for (auto & castingPlayer : castingPlayers)
     {
-        ChipLogProgress(AppServer, "CastingStore::WriteAll() writing castingPlayer:");
+        ChipLogProgress(AppServer, "CastingStore::WriteAll() writing CastingPlayer:");
         chip::TLV::TLVType castingPlayerContainerType;
         // CastingPlayer container starts
         ReturnErrorOnFailure(
@@ -550,7 +551,8 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
             ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::ContextTag(kCastingPlayerEndpointServerListContainerTag),
                                                           chip::TLV::kTLVType_Structure, serverListContainerType));
             std::vector<chip::ClusterId> serverList = endpoint->GetServerList();
-            ChipLogProgress(AppServer, "CastingStore::WriteAll() writing CastingPlayer Endpoint ServerList:");
+            ChipLogProgress(AppServer, "CastingStore::WriteAll() writing CastingPlayer Endpoint ID: %d ServerList.size(): %d",
+                            endpoint->GetId(), static_cast<int>(serverList.size()));
             for (chip::ClusterId clusterId : serverList)
             {
                 ChipLogProgress(AppServer, "CastingStore::WriteAll() clusterId: %d", clusterId);

@@ -53,10 +53,10 @@ void EndpointListLoader::Initialize(chip::Messaging::ExchangeManager * exchangeM
 
     chip::NodeId targetCastingPlayerNodeId           = CastingPlayer::GetTargetCastingPlayer()->GetNodeId();
     chip::FabricIndex targetCastingPlayerFabricIndex = CastingPlayer::GetTargetCastingPlayer()->GetFabricIndex();
-    ChipLogProgress(AppServer, "EndpointListLoader::Initialize() targetCastingPlayerNodeId: 0x" ChipLogFormatX64,
-                    ChipLogValueX64(targetCastingPlayerNodeId));
-    ChipLogProgress(AppServer, "EndpointListLoader::Initialize() targetCastingPlayerFabricIndex: %d",
-                    targetCastingPlayerFabricIndex);
+    ChipLogProgress(AppServer,
+                    "EndpointListLoader::Initialize() targetCastingPlayerNodeId: 0x" ChipLogFormatX64
+                    ", targetCastingPlayerFabricIndex: %d",
+                    ChipLogValueX64(targetCastingPlayerNodeId), targetCastingPlayerFabricIndex);
 
     for (const auto & binding : chip::BindingTable::GetInstance())
     {
@@ -90,9 +90,10 @@ CHIP_ERROR EndpointListLoader::Load()
 
     chip::NodeId targetCastingPlayerNodeId           = CastingPlayer::GetTargetCastingPlayer()->GetNodeId();
     chip::FabricIndex targetCastingPlayerFabricIndex = CastingPlayer::GetTargetCastingPlayer()->GetFabricIndex();
-    ChipLogProgress(AppServer, "EndpointListLoader::Load() targetCastingPlayerNodeId: 0x" ChipLogFormatX64,
-                    ChipLogValueX64(targetCastingPlayerNodeId));
-    ChipLogProgress(AppServer, "EndpointListLoader::Load() targetCastingPlayerFabricIndex: %d", targetCastingPlayerFabricIndex);
+    ChipLogProgress(AppServer,
+                    "EndpointListLoader::Load() targetCastingPlayerNodeId: 0x" ChipLogFormatX64
+                    ", targetCastingPlayerFabricIndex: %d",
+                    ChipLogValueX64(targetCastingPlayerNodeId), targetCastingPlayerFabricIndex);
 
     int endpointIndex      = -1;
     bool isLoadingRequired = false;

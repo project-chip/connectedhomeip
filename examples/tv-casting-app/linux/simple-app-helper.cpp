@@ -451,7 +451,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         targetCastingPlayer->VerifyOrEstablishConnection(connectionCallbacks, matter::casting::core::kCommissioningWindowTimeoutSec,
                                                          idOptions);
         ChipLogProgress(AppServer, "CommandHandler() request, VerifyOrEstablishConnection() called, calling StopDiscovery()");
-        // Stop discovery since we have found are connecting to the desired CastingPlayer.
+        // Stop discovery since we have discovered, and are now connecting to the desired CastingPlayer.
         matter::casting::core::CastingPlayerDiscovery::GetInstance()->StopDiscovery();
         return CHIP_NO_ERROR;
     }

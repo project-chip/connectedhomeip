@@ -105,7 +105,6 @@ public:
      */
     std::vector<chip::ClusterId> GetServerList()
     {
-        ChipLogProgress(AppServer, "Endpoint::GetServerList() mClusters.size(): %d", static_cast<int>(mClusters.size()));
         std::vector<chip::ClusterId> serverList;
         for (auto const & cluster : mClusters)
         {
@@ -151,8 +150,8 @@ public:
 
     void LogDetail() const
     {
-        ChipLogProgress(AppServer, "Endpoint::LogDetail() Endpoint ID: %d, Vendor ID: %d, Product ID: %d", mAttributes.mId,
-                        mAttributes.mVendorId, mAttributes.mProductId);
+        ChipLogProgress(AppServer, "Endpoint::LogDetail() Endpoint ID: %d, Vendor ID: %d, Product ID: %d, Clusters: %d",
+                        mAttributes.mId, mAttributes.mVendorId, mAttributes.mProductId, static_cast<int>(mClusters.size()));
     }
 };
 
