@@ -135,7 +135,6 @@ public:
     memory::Strong<T> GetCluster()
     {
         static_assert(std::is_base_of<BaseCluster, T>::value, "T must be derived from BaseCluster");
-        ChipLogProgress(AppServer, "Endpoint::GetCluster() mClusters.size(): %d", static_cast<int>(mClusters.size()));
         for (const auto & pair : mClusters)
         {
             auto cluster = std::dynamic_pointer_cast<T>(pair.second);
