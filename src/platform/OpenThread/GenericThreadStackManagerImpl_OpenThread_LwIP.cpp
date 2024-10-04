@@ -108,9 +108,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::DoInit(otIn
     // IPv6 packet is received.
     otIp6SetReceiveCallback(Impl()->OTInstance(), ReceivePacket, NULL);
 
-    // Disable automatic echo mode in OpenThread.
-    otIcmp6SetEchoMode(Impl()->OTInstance(), OT_ICMP6_ECHO_HANDLER_DISABLED);
-
     // Enable the receive filter for Thread control traffic.
     otIp6SetReceiveFilterEnabled(Impl()->OTInstance(), true);
 
