@@ -61,7 +61,15 @@ CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & curTime)
 #ifdef CONFIG_ENABLE_AMEBA_SNTP
     time_t seconds = 0, uSeconds = 0;
 
-    matter_sntp_get_current_time(&seconds, &uSeconds);
+    if(matter_sntp_rtc_is_sync()) // if RTC is already sync with SNTP, read directly from RTC
+    {
+        seconds = matter_rtc_read(); // ameba rtc precission is in seconds only
+    }
+    else // read from SNTP and sync RTC with SNTP
+    {
+        matter_sntp_get_current_time(&seconds, &uSeconds);
+    }
+
     if (seconds < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
         return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
@@ -107,7 +115,7 @@ CHIP_ERROR InitClock_RealTime()
     time_t seconds = 0, uSeconds = 0;
 
     matter_sntp_init();
-    matter_sntp_get_current_time(&seconds, &uSeconds);
+    matter_sntp_get_current_time(&seconds, &uSeconds); // try to read from SNTP and sync RTC with SNTP
     if ((seconds > CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD) && (uSeconds > 0))
     {
         curTime = Microseconds64((static_cast<uint64_t>(seconds) * UINT64_C(1000000)) + static_cast<uint64_t>(uSeconds));
