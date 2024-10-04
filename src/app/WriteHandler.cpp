@@ -97,7 +97,7 @@ bool WriteHandler::IsAttributeList(const ConcreteAttributePath & path)
     return info->flags.Has(DataModel::AttributeQualityFlags::kListAttribute);
 #else
     constexpr uint8_t kListAttributeType = 0x48;
-    const auto attributeMetadata         = GetAttributeMetadata(dataAttributePath);
+    const auto attributeMetadata         = GetAttributeMetadata(path);
     return (attributeMetadata != nullptr && attributeMetadata->attributeType == kListAttributeType);
 #endif
 }
