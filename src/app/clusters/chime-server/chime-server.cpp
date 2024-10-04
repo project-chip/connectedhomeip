@@ -21,7 +21,6 @@
  * @brief Implementation for the Chime Server Cluster
  ***************************************************************************/
 
-
 #include "chime-server.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
@@ -40,14 +39,13 @@ using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::Chime::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-
 namespace chip {
 namespace app {
 namespace Clusters {
 
 ChimeServer::ChimeServer(EndpointId endpointId, ChimeDelegate & delegate) :
-    AttributeAccessInterface(MakeOptional(endpointId), Chime::Id),
-    CommandHandlerInterface(MakeOptional(endpointId), Chime::Id), mDelegate(delegate)
+    AttributeAccessInterface(MakeOptional(endpointId), Chime::Id), CommandHandlerInterface(MakeOptional(endpointId), Chime::Id),
+    mDelegate(delegate)
 {
     mDelegate.SetChimeServer(this);
 }
@@ -57,7 +55,6 @@ ChimeServer::~ChimeServer()
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
 }
-
 
 CHIP_ERROR ChimeServer::Init()
 {
@@ -75,7 +72,6 @@ CHIP_ERROR ChimeServer::Read(const ConcreteReadAttributePath & aPath, AttributeV
     {
     case InstalledChimeSounds::Id:
         return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-
             uint8_t index  = 0;
             CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -118,7 +114,6 @@ CHIP_ERROR ChimeServer::Write(const ConcreteDataAttributePath & aPath, Attribute
         ReturnErrorOnFailure(aDecoder.Decode(newValue));
         ReturnErrorOnFailure(mDelegate.SetActiveChimeId(newValue));
         return CHIP_NO_ERROR;
-
     }
     case Enabled::Id: {
         bool newValue;
@@ -131,13 +126,12 @@ CHIP_ERROR ChimeServer::Write(const ConcreteDataAttributePath & aPath, Attribute
         // Unknown attribute
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
-
 }
 
 CHIP_ERROR ChimeServer::SetActiveChimeId(uint8_t soundId)
 {
     uint8_t currentSoundId = mDelegate.GetActiveChimeId();
-    bool activeIdChanged = !(currentSoundId == soundId);
+    bool activeIdChanged   = !(currentSoundId == soundId);
 
     VerifyOrReturnError(activeIdChanged, CHIP_NO_ERROR);
     VerifyOrDie(mDelegate.SetActiveChimeId(soundId) == CHIP_NO_ERROR);
@@ -149,7 +143,7 @@ CHIP_ERROR ChimeServer::SetActiveChimeId(uint8_t soundId)
 CHIP_ERROR ChimeServer::SetEnabled(bool enabled)
 {
     bool currentlyEnabled = mDelegate.GetEnabled();
-    bool enableChanged = !(currentlyEnabled == enabled);
+    bool enableChanged    = !(currentlyEnabled == enabled);
 
     VerifyOrReturnError(enableChanged, CHIP_NO_ERROR);
     VerifyOrDie(mDelegate.SetEnabled(enabled) == CHIP_NO_ERROR);
@@ -188,4 +182,4 @@ void ChimeServer::HandlePlayChimeSound(HandlerContext & ctx, const Commands::Pla
  * Server Init
  *
  */
-void MatterChimePluginServerInitCallback(){}
+void MatterChimePluginServerInitCallback() {}
