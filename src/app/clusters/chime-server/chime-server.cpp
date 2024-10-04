@@ -70,7 +70,7 @@ CHIP_ERROR ChimeServer::Init()
 CHIP_ERROR ChimeServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == Chime::Id);
-    
+
     switch (aPath.mAttributeId)
     {
     case InstalledChimeSounds::Id:
@@ -103,7 +103,7 @@ CHIP_ERROR ChimeServer::Read(const ConcreteReadAttributePath & aPath, AttributeV
     case Enabled::Id:
         return aEncoder.Encode(mDelegate.GetEnabled());
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -126,7 +126,7 @@ CHIP_ERROR ChimeServer::Write(const ConcreteDataAttributePath & aPath, Attribute
         ReturnErrorOnFailure(mDelegate.SetEnabled(newValue));
         return CHIP_NO_ERROR;
     }
-        
+
     default:
         // Unknown attribute
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
@@ -174,7 +174,7 @@ void ChimeServer::HandlePlayChimeSound(HandlerContext & ctx, const Commands::Pla
 
     ChipLogDetail(Zcl, "Chime: PlayChimeSound");
 
-    // call the delegate to play the chime 
+    // call the delegate to play the chime
     Status status = mDelegate.playChimeSound();
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
