@@ -71,7 +71,7 @@
 - (void)_checkinWithContext:(NSDictionary *)context {
     @try {
         if ( !context ) context = [NSDictionary dictionary];
-        
+
         [[self.xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
             MTR_LOG_ERROR("Checkin error: %@", error);
         }] deviceController:self.uniqueIdentifier checkInWithContext:context];
