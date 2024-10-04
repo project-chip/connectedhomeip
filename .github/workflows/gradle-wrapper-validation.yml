@@ -1,8 +1,9 @@
 name: "Validate Gradle Wrapper"
 on:
     push:
-        branches-ignore:
-            - 'dependabot/**'
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
 
 jobs:
