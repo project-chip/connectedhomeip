@@ -27,7 +27,93 @@ namespace app {
 namespace Clusters {
 namespace Actions {
 
+inline constexpr size_t kActionNameMaxSize       = 128u;
+inline constexpr size_t kEndpointListNameMaxSize = 128u;
+
 class Delegate;
+
+struct GenericActionStruct : public Structs::ActionStruct::Type
+{
+    GenericActionStruct(){};
+
+    GenericActionStruct(uint16_t action, CharSpan label, ActionTypeEnum actionType, uint16_t epListID,
+                        BitMask<CommandBits> commands, ActionStateEnum actionState)
+    {
+        Set(action, label, actionType, epListID, commands, actionState);
+    }
+
+    GenericActionStruct(const GenericActionStruct & action) { *this = action; }
+
+    GenericActionStruct & operator=(const GenericActionStruct & action)
+    {
+        Set(action.actionID, action.name, action.type, action.endpointListID, action.supportedCommands, action.state);
+        return *this;
+    }
+
+    void Set(uint16_t action, CharSpan label, ActionTypeEnum actionType, uint16_t epListID, BitMask<CommandBits> commands,
+             ActionStateEnum actionState)
+    {
+        actionID          = action;
+        type              = actionType;
+        endpointListID    = epListID;
+        supportedCommands = commands;
+        state             = actionState;
+        memset(mActionNameBuffer, 0, sizeof(mActionNameBuffer));
+        if (label.size() > sizeof(mActionNameBuffer))
+        {
+            memcpy(mActionNameBuffer, label.data(), sizeof(mActionNameBuffer));
+            name = CharSpan(mActionNameBuffer, sizeof(mActionNameBuffer));
+        }
+        else
+        {
+            memcpy(mActionNameBuffer, label.data(), label.size());
+            name = CharSpan(mActionNameBuffer, label.size());
+        }
+    }
+
+private:
+    char mActionNameBuffer[kActionNameMaxSize];
+};
+
+struct GenericEndpointList : public Structs::EndpointListStruct::Type
+{
+    GenericEndpointList(){};
+
+    GenericEndpointList(uint16_t epListId, CharSpan label, EndpointListTypeEnum epListType,
+                        DataModel::List<const EndpointId> endpointList)
+    {
+        Set(epListId, label, epListType, endpointList);
+    }
+
+    GenericEndpointList(const GenericEndpointList & epList) { *this = epList; }
+
+    GenericEndpointList & operator=(const GenericEndpointList & epList)
+    {
+        Set(epList.endpointListID, epList.name, epList.type, epList.endpoints);
+        return *this;
+    }
+
+    void Set(uint16_t epListId, CharSpan label, EndpointListTypeEnum epListType, DataModel::List<const EndpointId> endpointList)
+    {
+        endpointListID = epListId;
+        type           = epListType;
+        endpoints      = endpointList;
+        memset(mEndpointListNameBuffer, 0, sizeof(mEndpointListNameBuffer));
+        if (label.size() > sizeof(mEndpointListNameBuffer))
+        {
+            memcpy(mEndpointListNameBuffer, label.data(), sizeof(mEndpointListNameBuffer));
+            name = CharSpan(mEndpointListNameBuffer, sizeof(mEndpointListNameBuffer));
+        }
+        else
+        {
+            memcpy(mEndpointListNameBuffer, label.data(), label.size());
+            name = CharSpan(mEndpointListNameBuffer, label.size());
+        }
+    }
+
+private:
+    char mEndpointListNameBuffer[kEndpointListNameMaxSize];
+};
 
 class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
@@ -37,6 +123,19 @@ public:
         AttributeAccessInterface(Optional<EndpointId>::Missing(), Actions::Id),
         CommandHandlerInterface(Optional<EndpointId>::Missing(), Actions::Id)
     {}
+
+    /**
+     * @brief
+     *   Called when the state of action is changed.
+     */
+    void OnStateChanged(EndpointId endpoint, uint16_t actionId, uint32_t invokeId, ActionStateEnum actionState);
+
+    /**
+     * @brief
+     *   Called when the action is failed..
+     */
+    void OnActionFailed(EndpointId endpoint, uint16_t actionId, uint32_t invokeId, ActionStateEnum actionState,
+                        ActionErrorEnum actionError);
 
     static Instance * GetInstance();
     void SetDefaultDelegate(Delegate * aDelegate);
@@ -82,26 +181,24 @@ public:
     /**
      * Get the action at the Nth index from list of actions.
      * @param index The index of the action to be returned. It is assumed that actions are indexable from 0 and with no gaps.
-     * @param action A reference to the action struct which copies existing initialised buffer at index.
+     * @param action A reference to the GenericActionStruct which copies the buffer into it's own memory.
      *               Name field (CharSpan) of ActionStruct contails the name of an action.
-     *               The underlying data must remain allocated throughout the lifetime of the device,
-     *               as the API does not make a copy.
+     *               The API makes a copy of name.
      * @return Returns a CHIP_NO_ERROR if there was no error and the action was returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index in beyond the list of available actions.
      */
-    virtual CHIP_ERROR ReadActionAtIndex(uint16_t index, Structs::ActionStruct::Type & action);
+    virtual CHIP_ERROR ReadActionAtIndex(uint16_t index, GenericActionStruct & action);
 
     /**
      * Get the EndpointList at the Nth index from list of endpointList.
      * @param index The index of the endpointList to be returned. It is assumed that actions are indexable from 0 and with no gaps.
-     * @param epList A reference to the endpointList struct which copies existing initialised buffer at index.
-     *               Name field (CharSpan) of EndpointList contails the name of an endpointList.
-     *               The underlying data must remain allocated throughout the lifetime of the device,
-     *               as the API does not make a copy.
+     * @param epList A reference to the GenericEndpointList which copies the buffer into it's own memory.
+     *               Name field (CharSpan) of EndpointList contails the name of an endpoint list.
+     *               The API makes a copy of name.
      * @return Returns a CHIP_NO_ERROR if there was no error and the epList was returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index in beyond the list of available endpointList.
      */
-    virtual CHIP_ERROR ReadEndpointListAtIndex(uint16_t index, Structs::EndpointListStruct::Type & epList);
+    virtual CHIP_ERROR ReadEndpointListAtIndex(uint16_t index, GenericEndpointList & epList);
 
     /**
      * Find the action with matching actionId in the list of action.
