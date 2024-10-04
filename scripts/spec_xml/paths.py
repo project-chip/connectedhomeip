@@ -24,6 +24,7 @@ class Branch(Enum):
     MASTER = "master"
     V1_3 = "v1_3"
     V1_4 = "v1_4"
+    IN_PROGRESS = "in_progress"
 
 
 def get_chip_root():
