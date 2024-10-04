@@ -43,7 +43,7 @@ namespace chip {
 namespace app {
 
 using namespace Protocols::InteractionModel;
-using Status                         = Protocols::InteractionModel::Status;
+using Status = Protocols::InteractionModel::Status;
 
 CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDelegate * apWriteHandlerDelegate)
 {
@@ -97,7 +97,7 @@ bool WriteHandler::IsAttributeList(const ConcreteAttributePath & path)
     return info->flags.Has(DataModel::AttributeQualityFlags::kListAttribute);
 #else
     constexpr uint8_t kListAttributeType = 0x48;
-    const auto attributeMetadata = GetAttributeMetadata(dataAttributePath);
+    const auto attributeMetadata         = GetAttributeMetadata(dataAttributePath);
     return (attributeMetadata != nullptr && attributeMetadata->attributeType == kListAttributeType);
 #endif
 }
