@@ -29,7 +29,7 @@ import time
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter_testing_support import AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
 
@@ -44,13 +44,14 @@ class TC_VALCC_3_1(MatterBaseTest):
     def steps_TC_VALCC_3_1(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Send Open command"),
-            TestStep(3, "Read CurrentState and TargetState attribute until CurrentState is Open",
-                     "Target state is Open while CurrentState is Transitioning"),
+            TestStep(2, "Set up a subscription to all attributes on the DUT"),
+            TestStep(2, "Send Open command", "DUT returns SUCCESS"),
+            TestStep(3, "Wait until TH receives and data report for TargetState set to NULL and an attribute report for CurrentState set to Open (ordering does not matter)",
+                     "Expected attribute reports are received"),
             TestStep(4, "Read CurrentState and TargetState attribute", "CurrentState is Open, TargetState is NULL"),
-            TestStep(5, "Send Close command"),
-            TestStep(6, "Read CurrentState and TargetState attribute until CurrentState is Open",
-                     "Target state is Closed while CurrentState is Transitioning"),
+            TestStep(5, "Send Close command", "DUT returns SUCCESS"),
+            TestStep(3, "Wait until TH receives and data report for TargetState set to NULL and an attribute report for CurrentState set to Closed (ordering does not matter)",
+                     "Expected attribute reports are received"),
             TestStep(7, "Read CurrentState and TargetState attribute", "CurrentState is Closed, TargetState is NULL"),
         ]
         return steps
@@ -63,6 +64,8 @@ class TC_VALCC_3_1(MatterBaseTest):
         self.step(1)
         cluster = Clusters.ValveConfigurationAndControl
         attributes = cluster.Attributes
+        attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
+        await attribute_subscription.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(2)
         try:
@@ -72,6 +75,13 @@ class TC_VALCC_3_1(MatterBaseTest):
             pass
 
         self.step(3)
+
+        # Wait until the current state is open and the target state is Null.
+        # Wait for the entire duration of the test because this valve may be slow. The test will time out before this does. That's fine.
+        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+        expected_final_state = [AttributeValue(endpoint_id=endpoint, attribute=attributes.TargetState, value=NullValue), AttributeValue(
+            endpoint_id=endpoint, attribute=attributes.CurrentState, value=cluster.Enums.ValveStateEnum.kOpen)]
+        attribute_subscription.await_all_final_values_reported(expected_final_values=expected_final_state, timeout_sec=timeout)
 
         # Read target state first in case the current state goes to open between these calls.
         # The test re-reads target state after CurrentState goes to open.
