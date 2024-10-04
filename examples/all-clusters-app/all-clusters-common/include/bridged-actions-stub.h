@@ -34,30 +34,10 @@ const uint16_t kEndpointListSize = 3;
 class ActionsDelegateImpl : public Delegate
 {
 private:
-    using ActionListStructType   = Structs::ActionStruct::Type;
-    using EndpointListStructType = Structs::EndpointListStruct::Type;
-
-    const ActionListStructType kActionList[kActionListSize] = {
-        ActionListStructType{ .actionID          = 0,
-                              .name              = CharSpan::fromCharString("TurnOnLight"),
-                              .type              = ActionTypeEnum::kScene,
-                              .endpointListID    = 0,
-                              .supportedCommands = 0,
-                              .state             = ActionStateEnum::kInactive },
-
-        ActionListStructType{ .actionID          = 1,
-                              .name              = CharSpan::fromCharString("TurnOffLight"),
-                              .type              = ActionTypeEnum::kScene,
-                              .endpointListID    = 1,
-                              .supportedCommands = 0,
-                              .state             = ActionStateEnum::kInactive },
-
-        ActionListStructType{ .actionID          = 2,
-                              .name              = CharSpan::fromCharString("ToggleLight"),
-                              .type              = ActionTypeEnum::kScene,
-                              .endpointListID    = 2,
-                              .supportedCommands = 0,
-                              .state             = ActionStateEnum::kInactive },
+    const GenericActionStruct kActionList[kActionListSize] = {
+        GenericActionStruct(0, CharSpan::fromCharString("TurnOnLight"), ActionTypeEnum::kScene, 0, 0, ActionStateEnum::kInactive),
+        GenericActionStruct(1, CharSpan::fromCharString("TurnOffLight"), ActionTypeEnum::kScene, 1, 0, ActionStateEnum::kInactive),
+        GenericActionStruct(2, CharSpan::fromCharString("ToggleLight"), ActionTypeEnum::kScene, 2, 0, ActionStateEnum::kInactive),
     };
 
     // Dummy endpoint list.
@@ -65,24 +45,17 @@ private:
     const EndpointId secondEpList[1] = { 0 };
     const EndpointId thirdEpList[1]  = { 0 };
 
-    const EndpointListStructType kEndpointList[kEndpointListSize] = {
-        EndpointListStructType{ .endpointListID = 0,
-                                .name           = CharSpan::fromCharString("On"),
-                                .type           = EndpointListTypeEnum::kOther,
-                                .endpoints      = DataModel::List<const EndpointId>(firstEpList) },
-
-        EndpointListStructType{ .endpointListID = 1,
-                                .name           = CharSpan::fromCharString("Off"),
-                                .type           = EndpointListTypeEnum::kOther,
-                                .endpoints      = DataModel::List<const EndpointId>(secondEpList) },
-
-        EndpointListStructType{ .endpointListID = 2,
-                                .name           = CharSpan::fromCharString("Toggle"),
-                                .type           = EndpointListTypeEnum::kOther,
-                                .endpoints      = DataModel::List<const EndpointId>(thirdEpList) },
+    const GenericEndpointList kEndpointList[kEndpointListSize] = {
+        GenericEndpointList(0, CharSpan::fromCharString("On"), EndpointListTypeEnum::kOther,
+                            DataModel::List<const EndpointId>(firstEpList)),
+        GenericEndpointList(1, CharSpan::fromCharString("Off"), EndpointListTypeEnum::kOther,
+                            DataModel::List<const EndpointId>(secondEpList)),
+        GenericEndpointList(2, CharSpan::fromCharString("Toggle"), EndpointListTypeEnum::kOther,
+                            DataModel::List<const EndpointId>(thirdEpList)),
     };
-    CHIP_ERROR ReadActionAtIndex(uint16_t index, ActionListStructType & action) override;
-    CHIP_ERROR ReadEndpointListAtIndex(uint16_t index, EndpointListStructType & epList) override;
+
+    CHIP_ERROR ReadActionAtIndex(uint16_t index, GenericActionStruct & action) override;
+    CHIP_ERROR ReadEndpointListAtIndex(uint16_t index, GenericEndpointList & epList) override;
     CHIP_ERROR FindActionIdInActionList(uint16_t actionId) override;
 
     Protocols::InteractionModel::Status HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
