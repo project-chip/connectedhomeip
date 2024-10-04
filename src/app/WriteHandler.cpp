@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include "app/data-model-provider/MetadataTypes.h"
+#include "lib/support/logging/TextOnlyLogging.h"
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueDecoder.h>
@@ -77,6 +79,27 @@ void WriteHandler::Close()
     mDataModelProvider = nullptr;
 #endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     MoveToState(State::Uninitialized);
+}
+
+bool WriteHandler::IsAttributeList(const ConcreteAttributePath & path)
+{
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    VerifyOrReturnValue(mDataModelProvider != nullptr, false,
+                        ChipLogError(DataManagement, "Null data model while checking attribute properties."));
+
+    auto info = mDataModelProvider->GetAttributeInfo(path);
+
+    if (!info.has_value())
+    {
+        ChipLogError(DataManagement, "Attribute does not exist while checking attribute properties.");
+        return false;
+    }
+
+    return info->flags.Has(DataModel::AttributeQualityFlags::kListAttribute);
+#else
+    const auto attributeMetadata = GetAttributeMetadata(dataAttributePath);
+    return (attributeMetadata != nullptr && attributeMetadata->attributeType == kListAttributeType);
+#endif
 }
 
 Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
@@ -317,10 +340,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
 
-        const auto attributeMetadata = GetAttributeMetadata(dataAttributePath);
-        bool currentAttributeIsList  = (attributeMetadata != nullptr && attributeMetadata->attributeType == kListAttributeType);
-
-        if (!dataAttributePath.IsListOperation() && currentAttributeIsList)
+        if (!dataAttributePath.IsListOperation() && IsAttributeList(dataAttributePath))
         {
             dataAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
         }
@@ -446,7 +466,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             mProcessingAttributePath, mStateFlags.Has(StateBits::kProcessingAttributeIsList), dataAttributePath);
         bool shouldReportListWriteBegin = false; // This will be set below.
 
-        const EmberAfAttributeMetadata * attributeMetadata = nullptr;
+
+        bool needToCheckListOperation = true;
 
         while (iterator->Next(mapping))
         {
@@ -460,12 +481,11 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             // Try to get the metadata from for the attribute from one of the expanded endpoints (it doesn't really matter which
             // endpoint we pick, as long as it's valid) and update the path info according to it and recheck if we need to report
             // list write begin.
-            if (attributeMetadata == nullptr)
+            if (needToCheckListOperation)
             {
-                attributeMetadata = GetAttributeMetadata(dataAttributePath);
-                bool currentAttributeIsList =
-                    (attributeMetadata != nullptr && attributeMetadata->attributeType == kListAttributeType);
-                if (!dataAttributePath.IsListOperation() && currentAttributeIsList)
+                needToCheckListOperation = false;
+
+                if (!dataAttributePath.IsListOperation() && IsAttributeList(dataAttributePath))
                 {
                     dataAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
                 }
