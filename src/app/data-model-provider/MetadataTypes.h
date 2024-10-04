@@ -140,6 +140,7 @@ public:
 
     virtual EndpointId FirstEndpoint()                 = 0;
     virtual EndpointId NextEndpoint(EndpointId before) = 0;
+    virtual bool EndpointExists(EndpointId id);
 
     // This iteration describes device types registered on an endpoint
     virtual std::optional<DeviceTypeEntry> FirstDeviceType(EndpointId endpoint)                                  = 0;

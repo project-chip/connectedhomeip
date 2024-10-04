@@ -96,6 +96,11 @@ public:
     /// attribute tree iteration
     EndpointId FirstEndpoint() override;
     EndpointId NextEndpoint(EndpointId before) override;
+    bool EndpointExists(EndpointId endpoint) override;
+
+    std::optional<DataModel::DeviceTypeEntry> FirstDeviceType(EndpointId endpoint) override;
+    std::optional<DataModel::DeviceTypeEntry> NextDeviceType(EndpointId endpoint,
+                                                             const DataModel::DeviceTypeEntry & previous) override;
 
     std::optional<DataModel::DeviceTypeEntry> FirstDeviceType(EndpointId endpoint) override;
     std::optional<DataModel::DeviceTypeEntry> NextDeviceType(EndpointId endpoint,

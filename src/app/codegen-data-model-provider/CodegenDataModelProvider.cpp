@@ -292,6 +292,10 @@ std::optional<DataModel::CommandEntry> EnumeratorCommandFinder::FindCommandEntry
     return (*id == kInvalidCommandId) ? DataModel::CommandEntry::kInvalid : CommandEntryFrom(path, *id);
 }
 
+// TODO: DeviceTypeEntry content is IDENTICAL to EmberAfDeviceType, so centralizing
+//       to a common type is probably better. Need to figure out dependencies since
+//       this would make ember return datamodel-provider types.
+//       See: https://github.com/project-chip/connectedhomeip/issues/35889
 DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & other)
 {
     DataModel::DeviceTypeEntry entry;
@@ -302,9 +306,41 @@ DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & ot
     return entry;
 }
 
-bool IsSameDeviceTypeEntry(const DataModel::DeviceTypeEntry & a, const EmberAfDeviceType & b)
+// Explicitly compare for identical entries. note that types are different,
+// so you must do `a == b` and the `b == a` will not work.
+bool operator==(const DataModel::DeviceTypeEntry & a, const EmberAfDeviceType & b)
 {
     return (a.deviceTypeId == b.deviceId) && (a.deviceTypeVersion == b.deviceVersion);
+}
+
+/// Find the `index` where one of the following holds:
+///    - types[index - 1] == previous OR
+///    - index == types.size()  // i.e. not found or there is no next
+///
+/// hintWherePreviousMayBe represents a search hint where previous may exist.
+unsigned FindNextDeviceTypeIndex(Span<const EmberAfDeviceType> types, const DataModel::DeviceTypeEntry previous,
+                                 unsigned hintWherePreviousMayBe)
+{
+    if (hintWherePreviousMayBe < types.size())
+    {
+        // this is a valid hint ... see if we are lucky
+        if (previous == types[hintWherePreviousMayBe])
+        {
+            return hintWherePreviousMayBe + 1; // return the next index
+        }
+    }
+
+    // hint was not useful. We have to do a full search
+    for (unsigned idx = 0; idx < types.size(); idx++)
+    {
+        if (previous == types[idx])
+        {
+            return idx + 1;
+        }
+    }
+
+    // cast should be safe as we know we do not have that many types
+    return static_cast<unsigned>(types.size());
 }
 
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
@@ -399,6 +435,11 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
     // Ember always sets the return in the handler
     DispatchSingleClusterCommand(request.path, input_arguments, handler);
     return std::nullopt;
+}
+
+bool CodegenDataModelProvider::EndpointExists(EndpointId endpoint)
+{
+    return (emberAfIndexFromEndpoint(endpoint) != kEmberInvalidEndpointIndex);
 }
 
 EndpointId CodegenDataModelProvider::FirstEndpoint()
@@ -743,6 +784,14 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
 
 std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceType(EndpointId endpoint)
 {
+<<<<<<< HEAD
+=======
+    // Use the `Index` version even though `emberAfDeviceTypeListFromEndpoint` would work because
+    // index finding is cached in TryFindEndpointIndex and this avoids an extra `emberAfIndexFromEndpoint`
+    // during `Next` loops. This avoids O(n^2) on number of indexes when iterating over all device types.
+    //
+    // Not actually needed for `First`, however this makes First and Next consistent.
+>>>>>>> master
     std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpoint);
     if (!endpoint_index.has_value())
     {
@@ -765,6 +814,12 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceT
 std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceType(EndpointId endpoint,
                                                                                    const DataModel::DeviceTypeEntry & previous)
 {
+<<<<<<< HEAD
+=======
+    // Use the `Index` version even though `emberAfDeviceTypeListFromEndpoint` would work because
+    // index finding is cached in TryFindEndpointIndex and this avoids an extra `emberAfIndexFromEndpoint`
+    // during `Next` loops. This avoids O(n^2) on number of indexes when iterating over all device types.
+>>>>>>> master
     std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpoint);
     if (!endpoint_index.has_value())
     {
@@ -774,6 +829,7 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceTy
     CHIP_ERROR err                            = CHIP_NO_ERROR;
     Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
 
+<<<<<<< HEAD
     unsigned idx = 0;
     if ((mDeviceTypeIterationHint < deviceTypes.size()) && IsSameDeviceTypeEntry(previous, deviceTypes[mDeviceTypeIterationHint]))
     {
@@ -790,6 +846,9 @@ std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceTy
             }
         }
     }
+=======
+    unsigned idx = FindNextDeviceTypeIndex(deviceTypes, previous, mDeviceTypeIterationHint);
+>>>>>>> master
 
     if (idx >= deviceTypes.size())
     {

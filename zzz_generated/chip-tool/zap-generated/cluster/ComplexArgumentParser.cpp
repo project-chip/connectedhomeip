@@ -430,6 +430,53 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::Error
     ComplexArgumentParser::Finalize(request.errorStateDetails);
 }
 
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::detail::Structs::ICEServerStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ICEServerStruct.urls", "urls", value.isMember("urls")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "urls");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.urls, value["urls"]));
+    valueCopy.removeMember("urls");
+
+    if (value.isMember("username"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "username");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.username, value["username"]));
+    }
+    valueCopy.removeMember("username");
+
+    if (value.isMember("credential"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "credential");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.credential, value["credential"]));
+    }
+    valueCopy.removeMember("credential");
+
+    if (value.isMember("caid"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "caid");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.caid, value["caid"]));
+    }
+    valueCopy.removeMember("caid");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::ICEServerStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.urls);
+    ComplexArgumentParser::Finalize(request.username);
+    ComplexArgumentParser::Finalize(request.credential);
+    ComplexArgumentParser::Finalize(request.caid);
+}
+
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::detail::Structs::LabelStruct::Type & request,
                                         Json::Value & value)
 {
@@ -491,6 +538,72 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::Opera
 {
     ComplexArgumentParser::Finalize(request.operationalStateID);
     ComplexArgumentParser::Finalize(request.operationalStateLabel);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::detail::Structs::WebRTCSessionStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.id", "id", value.isMember("id")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.peerNodeID", "peerNodeID", value.isMember("peerNodeID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.peerFabricIndex", "peerFabricIndex",
+                                                                  value.isMember("peerFabricIndex")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.streamType", "streamType", value.isMember("streamType")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.videoStreamID", "videoStreamID",
+                                                                  value.isMember("videoStreamID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.audioStreamID", "audioStreamID",
+                                                                  value.isMember("audioStreamID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.metadataOptions", "metadataOptions",
+                                                                  value.isMember("metadataOptions")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "id");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.id, value["id"]));
+    valueCopy.removeMember("id");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "peerNodeID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.peerNodeID, value["peerNodeID"]));
+    valueCopy.removeMember("peerNodeID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "peerFabricIndex");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.peerFabricIndex, value["peerFabricIndex"]));
+    valueCopy.removeMember("peerFabricIndex");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "streamType");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.streamType, value["streamType"]));
+    valueCopy.removeMember("streamType");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "videoStreamID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.videoStreamID, value["videoStreamID"]));
+    valueCopy.removeMember("videoStreamID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "audioStreamID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.audioStreamID, value["audioStreamID"]));
+    valueCopy.removeMember("audioStreamID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "metadataOptions");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.metadataOptions, value["metadataOptions"]));
+    valueCopy.removeMember("metadataOptions");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::WebRTCSessionStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.id);
+    ComplexArgumentParser::Finalize(request.peerNodeID);
+    ComplexArgumentParser::Finalize(request.peerFabricIndex);
+    ComplexArgumentParser::Finalize(request.streamType);
+    ComplexArgumentParser::Finalize(request.videoStreamID);
+    ComplexArgumentParser::Finalize(request.audioStreamID);
+    ComplexArgumentParser::Finalize(request.metadataOptions);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
@@ -5669,6 +5782,36 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentControl::Struct
 {
     ComplexArgumentParser::Finalize(request.ratingName);
     ComplexArgumentParser::Finalize(request.ratingNameDesc);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ChimeSoundStruct.chimeID", "chimeID", value.isMember("chimeID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ChimeSoundStruct.name", "name", value.isMember("name")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "chimeID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.chimeID, value["chimeID"]));
+    valueCopy.removeMember("chimeID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    valueCopy.removeMember("name");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.chimeID);
+    ComplexArgumentParser::Finalize(request.name);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
