@@ -516,7 +516,10 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
             Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
             if (preCheckStatus != Status::Success)
             {
-                return FallibleAddStatus(concretePath, preCheckStatus) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
+                // NOTE: an expected error is CHIP_ERROR_ACCESS_DENIED, but there could be other unexpected errors;
+                // therefore, keep processing subsequent commands, and if any errors continue, those subsequent
+                // commands will likewise fail.
+                continue;
             }
         }
 
