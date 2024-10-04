@@ -342,9 +342,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(controllerNodeID, NSNumber *, nil,
 //- (oneway void)deviceController:(NSUUID *)controller openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration withReply:(void(^)(NSError * _Nullable error))reply;
 //- (oneway void)deviceController:(NSUUID *)controller openPairingWindowWithPIN:(uint64_t)deviceID duration:(NSUInteger)duration discriminator:(NSUInteger)discriminator setupPIN:(NSUInteger)setupPIN  withReply:(void(^)(NSError * _Nullable error))reply;
 
-MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(shutdown, shutdownDeviceController
-                                               : self.uniqueIdentifier)
-
 #pragma mark - MTRDeviceProtocol Client
 
 // All pass through, we could do some fancy redirection here based on protocol, but that's that for another day
