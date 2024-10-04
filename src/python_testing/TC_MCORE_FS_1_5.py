@@ -111,7 +111,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
             discriminator=3840,
             passcode=20202021)
 
-        # Start the TH_SERVER_NO_UID app.
+        # Start the TH_SERVER app.
         self.th_server = AppServer(
             th_server_app,
             storage_dir=self.storage.name,
