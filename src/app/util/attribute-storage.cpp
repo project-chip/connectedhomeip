@@ -1007,13 +1007,15 @@ uint8_t emberAfGetClusterCountForEndpoint(EndpointId endpoint)
 
 Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(EndpointId endpoint, CHIP_ERROR & err)
 {
-    uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
-    Span<const EmberAfDeviceType> ret;
+    return emberAfDeviceTypeListFromEndpointIndex(emberAfIndexFromEndpoint(endpoint), err);
+}
 
+chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsigned endpointIndex, CHIP_ERROR & err)
+{
     if (endpointIndex == 0xFFFF)
     {
         err = CHIP_ERROR_INVALID_ARGUMENT;
-        return ret;
+        return Span<const EmberAfDeviceType>();
     }
 
     err = CHIP_NO_ERROR;
