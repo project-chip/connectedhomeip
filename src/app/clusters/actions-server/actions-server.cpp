@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/EventLogging.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -38,6 +39,35 @@ Instance * Instance::GetInstance()
     return &instance;
 }
 
+void Instance::OnStateChanged(EndpointId endpoint, uint16_t actionId, uint32_t invokeId, ActionStateEnum actionState)
+{
+    ChipLogProgress(Zcl, "ActionsServer: OnStateChanged");
+
+    // Record StateChanged event
+    EventNumber eventNumber;
+    Events::StateChanged::Type event{ actionId, invokeId, actionState };
+
+    if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+    {
+        ChipLogError(Zcl, "ActionsServer: Failed to record OnStateChanged event");
+    }
+}
+
+void Instance::OnActionFailed(EndpointId endpoint, uint16_t actionId, uint32_t invokeId, ActionStateEnum actionState,
+                              ActionErrorEnum actionError)
+{
+    ChipLogProgress(Zcl, "ActionsServer: OnActionFailed");
+
+    // Record ActionFailed event
+    EventNumber eventNumber;
+    Events::ActionFailed::Type event{ actionId, invokeId, actionState, actionError };
+
+    if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+    {
+        ChipLogError(Zcl, "ActionsServer: Failed to record OnActionFailed event");
+    }
+}
+
 CHIP_ERROR Instance::ReadActionListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
     if (GetInstance()->mDelegate == nullptr)
@@ -47,7 +77,7 @@ CHIP_ERROR Instance::ReadActionListAttribute(const AttributeValueEncoder::ListEn
     }
     for (uint16_t i = 0; true; i++)
     {
-        Actions::Structs::ActionStruct::Type action;
+        GenericActionStruct action;
 
         CHIP_ERROR err = GetInstance()->mDelegate->ReadActionAtIndex(i, action);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
@@ -69,7 +99,7 @@ CHIP_ERROR Instance::ReadEndpointListAttribute(const AttributeValueEncoder::List
     }
     for (uint16_t i = 0; true; i++)
     {
-        Actions::Structs::EndpointListStruct::Type epList;
+        GenericEndpointList epList;
 
         CHIP_ERROR err = GetInstance()->mDelegate->ReadEndpointListAtIndex(i, epList);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
