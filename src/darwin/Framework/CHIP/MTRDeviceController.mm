@@ -315,7 +315,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (void)shutdown
 {
-    MTR_ABSTRACT_METHOD();
+    // Subclass hook; nothing to do.
 }
 
 - (NSNumber *)controllerNodeID

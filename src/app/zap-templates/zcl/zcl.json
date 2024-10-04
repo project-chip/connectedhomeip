@@ -125,6 +125,7 @@
         "washer-controls-cluster.xml",
         "water-heater-management-cluster.xml",
         "water-heater-mode-cluster.xml",
+        "webrtc-provider-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "wifi-network-management-cluster.xml",
         "window-covering.xml",
@@ -280,8 +281,7 @@
             "ActiveModeThreshold",
             "RegisteredClients",
             "ICDCounter",
-            "ClientsSupportedPerFabric",
-            "MaximumCheckInBackOff"
+            "ClientsSupportedPerFabric"
         ],
         "Occupancy Sensing": ["HoldTimeLimits", "HoldTime", "FeatureMap"],
         "Operational Credentials": [
@@ -410,13 +410,7 @@
             "DSTOffsetListMaxSize"
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
-        "Dishwasher Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "StartUpMode",
-            "OnMode",
-            "FeatureMap"
-        ],
+        "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Control": [
             "CookTime",
@@ -430,18 +424,10 @@
             "WattRating",
             "FeatureMap"
         ],
-        "Laundry Washer Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "StartUpMode",
-            "OnMode",
-            "FeatureMap"
-        ],
+        "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
             "SupportedModes",
             "CurrentMode",
-            "StartUpMode",
-            "OnMode",
             "FeatureMap"
         ],
         "RVC Clean Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
