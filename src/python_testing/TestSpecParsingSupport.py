@@ -466,8 +466,6 @@ class TestSpecParsingSupport(MatterBaseTest):
     def test_atomic_thermostat(self):
         tot_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.kMaster)
         one_three_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
-        # Confirm the directory location for 1.4 clusters
-        print(f"Loading 1.4 clusters from directory: {PrebuiltDataModelDirectory.k1_4}")
         one_four_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
 
         asserts.assert_in("Atomic Request", tot_xml_clusters[Clusters.Thermostat.id].command_map,
