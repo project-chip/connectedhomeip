@@ -34,12 +34,11 @@ from enum import IntFlag
 
 import chip.clusters as Clusters
 import global_attribute_ids
-
 from basic_composition_support import BasicCompositionTests
 from chip.clusters import ClusterObjects as ClusterObjects
+from chip.clusters.Attribute import AttributePath
 from chip.clusters.ClusterObjects import ClusterObject
 from chip.clusters.enum import MatterIntEnum
-from chip.clusters.Attribute import AttributePath
 from chip.interaction_model import InteractionModelError, Status
 from chip.tlv import uint
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
