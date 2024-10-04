@@ -370,6 +370,12 @@ CHIP_ERROR ClusterLogic::HandleOpenLevel(const std::optional<Percent> & targetLe
     {
         return err;
     }
+
+    mState.SetTargetLevel(realTargetLevel);
+    mState.SetCurrentLevel(returnedCurrentLevel);
+    mState.SetTargetState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kOpen));
+    mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
+
     if (returnedCurrentLevel == realTargetLevel)
     {
         mState.SetTargetLevel(DataModel::NullNullable);
@@ -379,10 +385,6 @@ CHIP_ERROR ClusterLogic::HandleOpenLevel(const std::optional<Percent> & targetLe
     }
     else
     {
-        mState.SetTargetLevel(realTargetLevel);
-        mState.SetCurrentLevel(returnedCurrentLevel);
-        mState.SetTargetState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kOpen));
-        mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
         // TODO: Need to start a timer to continue querying the device for updates. Or just let the delegate handle this?
     }
     return CHIP_NO_ERROR;
@@ -396,6 +398,10 @@ CHIP_ERROR ClusterLogic::HandleOpenNoLevel()
     ValveStateEnum returnedState                 = ValveStateEnum::kUnknownEnumValue;
     BitMask<ValveFaultBitmap> returnedValveFault = 0;
 
+    // Per the spec, set these to transitioning regardless
+    mState.SetTargetState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kOpen));
+    mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
+
     CHIP_ERROR err = mClusterDriver.HandleOpenValve(returnedState, returnedValveFault);
     if (mConformance.supportsValveFault)
     {
@@ -403,17 +409,17 @@ CHIP_ERROR ClusterLogic::HandleOpenNoLevel()
     }
     if (err != CHIP_NO_ERROR)
     {
+        // TODO: How should the target and current be set in this case?
         return err;
     }
+
     if (returnedState == ValveStateEnum::kOpen)
     {
-        mState.SetTargetLevel(DataModel::NullNullable);
+        mState.SetTargetState(DataModel::NullNullable);
         mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kOpen));
     }
     else
     {
-        mState.SetTargetState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kOpen));
-        mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
         // TODO: Need to start a timer to continue querying the device for updates. Or just let the delegate handle this?
     }
     return CHIP_NO_ERROR;
@@ -480,6 +486,9 @@ CHIP_ERROR ClusterLogic::HandleCloseInternal()
     if (mConformance.HasFeature(Feature::kLevel))
     {
         Percent currentLevel;
+        mState.SetTargetLevel(0);
+        mState.SetTargetState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
+        mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
         err = mClusterDriver.HandleCloseValve(currentLevel, faults);
         if (err == CHIP_NO_ERROR)
         {
@@ -487,16 +496,20 @@ CHIP_ERROR ClusterLogic::HandleCloseInternal()
             if (currentLevel == 0)
             {
                 mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
+                mState.SetTargetState(DataModel::NullNullable);
+                mState.SetTargetLevel(DataModel::NullNullable);
             }
             else
             {
-                mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
+                // TODO: start a timer here to query the delegate?
             }
         }
     }
     else
     {
         ValveStateEnum state;
+        mState.SetTargetState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
+        mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
         err = mClusterDriver.HandleCloseValve(state, faults);
         if (err == CHIP_NO_ERROR)
         {
