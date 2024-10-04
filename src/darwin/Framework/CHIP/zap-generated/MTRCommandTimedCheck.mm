@@ -1133,6 +1133,15 @@ static BOOL CommandNeedsTimedInvokeInWebRTCTransportProviderCluster(AttributeId 
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInWebRTCTransportRequestorCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WebRTCTransportRequestor;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInChimeCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Chime;
@@ -1532,6 +1541,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::WebRTCTransportProvider::Id: {
         return CommandNeedsTimedInvokeInWebRTCTransportProviderCluster(commandID);
+    }
+    case Clusters::WebRTCTransportRequestor::Id: {
+        return CommandNeedsTimedInvokeInWebRTCTransportRequestorCluster(commandID);
     }
     case Clusters::Chime::Id: {
         return CommandNeedsTimedInvokeInChimeCluster(commandID);

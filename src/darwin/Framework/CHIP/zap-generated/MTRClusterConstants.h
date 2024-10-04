@@ -198,6 +198,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeContentControlID MTR_PROVISIONALLY_AVAILABLE = 0x0000050F,
     MTRClusterIDTypeContentAppObserverID MTR_PROVISIONALLY_AVAILABLE = 0x00000510,
     MTRClusterIDTypeWebRTCTransportProviderID MTR_PROVISIONALLY_AVAILABLE = 0x00000553,
+    MTRClusterIDTypeWebRTCTransportRequestorID MTR_PROVISIONALLY_AVAILABLE = 0x00000554,
     MTRClusterIDTypeChimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000556,
     MTRClusterIDTypeEcosystemInformationID MTR_PROVISIONALLY_AVAILABLE = 0x00000750,
     MTRClusterIDTypeCommissionerControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000751,
@@ -4749,6 +4750,15 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
+    // Cluster WebRTCTransportRequestor attributes
+    MTRAttributeIDTypeClusterWebRTCTransportRequestorAttributeCurrentSessionsID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterWebRTCTransportRequestorAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterWebRTCTransportRequestorAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterWebRTCTransportRequestorAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
+    MTRAttributeIDTypeClusterWebRTCTransportRequestorAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterWebRTCTransportRequestorAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterWebRTCTransportRequestorAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
     // Cluster Chime attributes
     MTRAttributeIDTypeClusterChimeAttributeInstalledChimeSoundsID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterChimeAttributeActiveChimeIDID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
@@ -6961,6 +6971,12 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideAnswerID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
     MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideICECandidateID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
     MTRCommandIDTypeClusterWebRTCTransportProviderCommandEndSessionID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
+
+    // Cluster WebRTCTransportRequestor commands
+    MTRCommandIDTypeClusterWebRTCTransportRequestorCommandOfferID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterWebRTCTransportRequestorCommandAnswerID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterWebRTCTransportRequestorCommandICECandidateID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterWebRTCTransportRequestorCommandEndID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
 
     // Cluster Chime commands
     MTRCommandIDTypeClusterChimeCommandPlayChimeSoundID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
