@@ -63,13 +63,6 @@ _ROOT_ENDPOINT_ID = 0
 
 class TC_BRBINFO_4_1(MatterBaseTest):
 
-    #
-    # Class Helper functions
-    #
-
-    async def _read_attribute_expect_success(self, endpoint, cluster, attribute, node_id):
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute, node_id=node_id)
-
     # This test has some manual steps and also multiple sleeps >= 30 seconds. Test typically runs under 3 mins,
     # so 6 minutes is more than enough.
     @property
@@ -260,32 +253,40 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         logging.info("Ensuring DUT is commissioned to TH")
 
         # Confirms commissioning of DUT on TH as it reads its feature map
-        await self._read_attribute_expect_success(
-            _ROOT_ENDPOINT_ID,
-            basic_info_cluster,
-            basic_info_attributes.FeatureMap,
-            self.dut_node_id
+        await self.read_single_attribute_check_success(
+            endpoint=_ROOT_ENDPOINT_ID,
+            cluster=basic_info_cluster,
+            attribute=basic_info_attributes.FeatureMap,
+            node_id=self.dut_node_id,
         )
 
         logging.info("Ensuring ICD is commissioned to TH")
 
         self.step("1")
 
-        idle_mode_duration_s = await self._read_attribute_expect_success(
-            _ROOT_ENDPOINT_ID,
-            icdm_cluster,
-            icdm_attributes.IdleModeDuration,
-            self.icd_nodeid
+        idle_mode_duration_s = await self.read_single_attribute_check_success(
+            endpoint=_ROOT_ENDPOINT_ID,
+            cluster=icdm_cluster,
+            attribute=icdm_attributes.IdleModeDuration,
+            node_id=self.icd_nodeid,
         )
         logging.info(f"IdleModeDurationS: {idle_mode_duration_s}")
 
-        active_mode_duration_ms = await self._read_attribute_expect_success(
-            _ROOT_ENDPOINT_ID,
-            icdm_cluster,
-            icdm_attributes.ActiveModeDuration,
-            self.icd_nodeid
+        active_mode_duration_ms = await self.read_single_attribute_check_success(
+            endpoint=_ROOT_ENDPOINT_ID,
+            cluster=icdm_cluster,
+            attribute=icdm_attributes.ActiveModeDuration,
+            node_id=self.icd_nodeid,
         )
         logging.info(f"ActiveModeDurationMs: {active_mode_duration_ms}")
+
+        active_mode_threshold_ms = await self.read_single_attribute_check_success(
+            endpoint=_ROOT_ENDPOINT_ID,
+            cluster=icdm_cluster,
+            attribute=icdm_attributes.ActiveModeThreshold,
+            node_id=self.icd_nodeid,
+        )
+        logging.info(f"ActiveModeThresholdMs: {active_mode_threshold_ms}")
 
         self.step("2")
         event = brb_info_cluster.Events.ActiveChanged
