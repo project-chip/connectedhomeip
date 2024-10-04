@@ -466,7 +466,6 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             mProcessingAttributePath, mStateFlags.Has(StateBits::kProcessingAttributeIsList), dataAttributePath);
         bool shouldReportListWriteBegin = false; // This will be set below.
 
-
         bool needToCheckListOperation = true;
 
         while (iterator->Next(mapping))
