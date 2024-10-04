@@ -31,8 +31,8 @@
 # files, then add the extra dependencies. From the root:
 #
 # . scripts/activate.sh
-# ./scripts/build_python.sh -i py
-# source py/bin/activate
+# ./scripts/build_python.sh -i out/python_env
+# source out/python_env/bin/activate
 # pip install opencv-python requests click_option_group
 # python src/python_testing/post_certification_tests/production_device_checks.py
 

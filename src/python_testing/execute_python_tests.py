@@ -57,9 +57,6 @@ def main(search_directory, env_file):
     excluded_patterns = {
         "MinimalRepresentation.py",  # Code/Test not being used or not shared code for any other tests
         "TC_CNET_4_4.py",  # It has no CI execution block, is not executed in CI
-        "TC_CCTRL_2_1.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
-        "TC_CCTRL_2_2.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
-        "TC_CCTRL_2_3.py",  # They rely on example applications that inter-communicate and there is no example app that works right now
         "TC_DGGEN_3_2.py",  # src/python_testing/test_testing/test_TC_DGGEN_3_2.py is the Unit test of this test
         "TC_EEVSE_Utils.py",  # Shared code for TC_EEVSE, not a standalone test
         "TC_EWATERHTRBase.py",  # Shared code for TC_EWATERHTR, not a standalone test
