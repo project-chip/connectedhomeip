@@ -30,15 +30,6 @@
 
 using namespace ::chip;
 
-namespace {
-
-void CheckFabricBridgeSynchronizationSupport(intptr_t ignored)
-{
-    DeviceMgr().ReadSupportedDeviceCategories();
-}
-
-} // namespace
-
 void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
 {
     if (mBridgeNodeId != deviceId)
@@ -73,7 +64,9 @@ void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_E
             //
             // Note: The Fabric-Admin MUST NOT send the RequestCommissioningApproval command
             // if the remote Fabric-Bridge lacks Fabric Synchronization support.
-            DeviceLayer::PlatformMgr().ScheduleWork(CheckFabricBridgeSynchronizationSupport, 0);
+            DeviceLayer::SystemLayer().ScheduleLambda([]() {
+                DeviceMgr().ReadSupportedDeviceCategories();
+            });
         }
     }
     else
