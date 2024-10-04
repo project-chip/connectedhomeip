@@ -369,6 +369,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeContentAppObserverID:
         result = @"ContentAppObserver";
         break;
+    case MTRClusterIDTypeWebRTCTransportProviderID:
+        result = @"WebRTCTransportProvider";
+        break;
     case MTRClusterIDTypeChimeID:
         result = @"Chime";
         break;
@@ -1451,6 +1454,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCAcknowledgementsRequiredID:
             result = @"TCAcknowledgementsRequired";
+            break;
+
+        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCUpdateDeadlineID:
+            result = @"TCUpdateDeadline";
             break;
 
         case MTRAttributeIDTypeClusterGeneralCommissioningAttributeGeneratedCommandListID:
@@ -8139,6 +8146,45 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeWebRTCTransportProviderID:
+
+        switch (attributeID) {
+
+            // Cluster WebRTCTransportProvider attributes
+        case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeCurrentSessionsID:
+            result = @"CurrentSessions";
+            break;
+
+        case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeChimeID:
 
         switch (attributeID) {
@@ -10914,6 +10960,36 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeWebRTCTransportProviderID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandSolicitOfferID:
+            result = @"SolicitOffer";
+            break;
+
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideOfferID:
+            result = @"ProvideOffer";
+            break;
+
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideAnswerID:
+            result = @"ProvideAnswer";
+            break;
+
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideICECandidateID:
+            result = @"ProvideICECandidate";
+            break;
+
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandEndSessionID:
+            result = @"EndSession";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %d>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeChimeID:
 
         switch (commandID) {
@@ -12518,6 +12594,24 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
 
         case MTRCommandIDTypeClusterContentAppObserverCommandContentAppMessageResponseID:
             result = @"ContentAppMessageResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %d>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeWebRTCTransportProviderID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandSolicitOfferResponseID:
+            result = @"SolicitOfferResponse";
+            break;
+
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideOfferResponseID:
+            result = @"ProvideOfferResponse";
             break;
 
         default:
@@ -14278,6 +14372,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeContentAppObserverID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %d>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeWebRTCTransportProviderID:
 
         switch (eventID) {
 

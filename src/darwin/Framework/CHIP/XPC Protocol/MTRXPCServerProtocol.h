@@ -59,7 +59,6 @@ MTR_NEWLY_AVAILABLE
 // - (oneway void)deviceController:(NSUUID *)controller addServerEndpoint:(MTRServerEndpoint *)endpoint withReply:(void (^)(BOOL success))reply;
 // - (oneway void)deviceController:(NSUUID *)controller removeServerEndpoint:(MTRServerEndpoint *)endpoint;
 
-- (oneway void)deviceController:(NSUUID *)controller shutdownDeviceController:(NSUUID *)controller;
 - (oneway void)deviceController:(NSUUID *)controller registerNodeID:(NSNumber *)nodeID;
 - (oneway void)deviceController:(NSUUID *)controller unregisterNodeID:(NSNumber *)nodeID;
 
