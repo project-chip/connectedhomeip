@@ -245,7 +245,6 @@ private:
         PW_TRY(ChipErrorToPwStatus(writer.EndContainer(outer)));
         PW_TRY(ChipErrorToPwStatus(writer.Finalize()));
         tlvBuffer.reduce_size(writer.GetLengthWritten());
-        // FIXME: do not implement
 
         return ::pw::OkStatus();
     }
