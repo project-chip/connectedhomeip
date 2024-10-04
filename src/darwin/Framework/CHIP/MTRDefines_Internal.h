@@ -84,7 +84,7 @@ typedef struct {} variable_hidden_by_mtr_hide;
                 }];                                                                                         \
         } @catch (NSException *exception) {                                                                 \
             MTR_LOG_ERROR("Exception sending XPC messsage: %@", exception);                                 \
-            outValue = DEFAULT_VALUE;                                                                               \
+            outValue = DEFAULT_VALUE;                                                                       \
         }                                                                                                   \
         return outValue;                                                                                    \
     }
