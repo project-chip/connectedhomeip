@@ -83,13 +83,11 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         device_attributes = set()
         for endpoint in self.endpoints:
             for cluster in self.endpoints[endpoint]:
-                # device_attributes |= set(self.endpoints[endpoint][cluster])
                 device_attributes |= self.endpoints[endpoint][cluster].keys()
         return device_attributes
 
-    async def check_attribute_read_for_type(self, desired_attribute_type: type) -> None:
+    async def check_attribute_read_for_type(self, desired_attribute_type: type) -> bool:
         # Get all clusters from device
-        # What you want there is the intersection of the set of attributes returned from all_type_attributes_for_cluster and the set of attributes implemented on the device.
         for cluster in self.device_clusters:
             all_types = await self.all_type_attributes_for_cluster(cluster, desired_attribute_type)
             all_types = list(set(all_types) & self.device_attributes)
@@ -251,10 +249,18 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         for endpoint in read_request:
             asserts.assert_in(Clusters.Objects.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
             asserts.assert_in(Clusters.Objects.Descriptor.Attributes.ServerList, read_request[endpoint][Clusters.Objects.Descriptor], "ServerList not in output")
+
+            for cluster in read_request[endpoint]:
+                attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster].keys() if a != Clusters.Attribute.DataVersion]
+                asserts.assert_equal(sorted(attribute_ids),
+                sorted(read_request[endpoint][cluster][cluster.Attributes.AttributeList]),
+                f"Expected attribute list does not match actual list for cluster {cluster} on endpoint: {endpoint}")
+
+            cluster_ids = [c.id for c in read_request[endpoint].keys()]
             asserts.assert_equal(
-                read_request[endpoint][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.ServerList],
-                [3, 4, 29, 30, 31, 40, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 60, 62, 63, 64, 65, 1029, 4294048774],
-                "ServerList doesn't match the expected server list"
+                sorted(read_request[endpoint][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.ServerList]),
+                sorted(cluster_ids),
+                f"ServerList doesn't match the expected server list for endpoint: {endpoint}"
                 )
 
         # Step 9
