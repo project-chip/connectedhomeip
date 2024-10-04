@@ -122,7 +122,6 @@ public:
     template <typename T>
     void RegisterCluster(const chip::ClusterId clusterId)
     {
-        ChipLogProgress(AppServer, "Endpoint::RegisterCluster() Registering clusterId %d for endpointId %d", clusterId, GetId());
         static_assert(std::is_base_of<BaseCluster, T>::value, "T must be derived from BaseCluster");
         auto cluster = std::make_shared<T>(shared_from_this());
         cluster->SetUp();
