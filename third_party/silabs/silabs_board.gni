@@ -13,7 +13,7 @@
 # limitations under the License.
 
 declare_args() {
-  # Silabs wireless starter kit plug-in boards featuring specific mcu family and mcu model. 
+  # Silabs wireless starter kit plug-in boards featuring specific mcu family and mcu model.
   # Find more information at https://www.silabs.com/development-tools/wireless.
   # A board tailored for specific mcu family and mcu model can be created with "CUSTOM".
   silabs_board = ""
