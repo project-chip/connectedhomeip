@@ -16,8 +16,6 @@
  *    limitations under the License.
  */
 
-#include "app/data-model-provider/MetadataTypes.h"
-#include "lib/support/logging/TextOnlyLogging.h"
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueDecoder.h>
@@ -26,6 +24,7 @@
 #include <app/MessageDef/StatusIB.h>
 #include <app/StatusResponse.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
@@ -34,6 +33,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
+#include <lib/support/logging/TextOnlyLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/interaction_model/StatusCode.h>
 
