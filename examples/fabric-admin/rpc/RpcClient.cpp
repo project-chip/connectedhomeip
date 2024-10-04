@@ -144,12 +144,14 @@ CHIP_ERROR AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & data)
     return WaitForResponse(call);
 }
 
-CHIP_ERROR RemoveSynchronizedDevice(NodeId nodeId)
+CHIP_ERROR RemoveSynchronizedDevice(ScopedNodeId scopedNodeId)
 {
     ChipLogProgress(NotSpecified, "RemoveSynchronizedDevice");
 
     chip_rpc_SynchronizedDevice device = chip_rpc_SynchronizedDevice_init_default;
-    device.node_id                     = nodeId;
+    device.has_id                      = true;
+    device.id.node_id                  = scopedNodeId.GetNodeId();
+    device.id.fabric_index             = scopedNodeId.GetFabricIndex();
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.
@@ -164,12 +166,14 @@ CHIP_ERROR RemoveSynchronizedDevice(NodeId nodeId)
     return WaitForResponse(call);
 }
 
-CHIP_ERROR ActiveChanged(NodeId nodeId, uint32_t promisedActiveDurationMs)
+CHIP_ERROR ActiveChanged(ScopedNodeId scopedNodeId, uint32_t promisedActiveDurationMs)
 {
     ChipLogProgress(NotSpecified, "ActiveChanged");
 
     chip_rpc_KeepActiveChanged parameters;
-    parameters.node_id                     = nodeId;
+    parameters.has_id                      = true;
+    parameters.id.node_id                  = scopedNodeId.GetNodeId();
+    parameters.id.fabric_index             = scopedNodeId.GetFabricIndex();
     parameters.promised_active_duration_ms = promisedActiveDurationMs;
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler

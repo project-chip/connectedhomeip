@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <commands/pairing/PairingCommand.h>
+#include <device_manager/PairingManager.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <set>

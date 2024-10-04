@@ -1298,15 +1298,6 @@ menu "CHIP Device Layer"
 
     endmenu
 
-    menu "Enable Matter Event List"
-        config ENABLE_MATTER_EVENT_LIST
-            bool "Enable Matter support Event List attribute"
-            default n
-            help
-                Enable Matter support Event List attribute.
-
-    endmenu
-
     menu "Enable BLE Extended Announcement"
         config ENABLE_BLE_EXT_ANNOUNCEMENT
             bool "Enable BLE Extended Announcement"

@@ -73,8 +73,12 @@ using namespace chip::Tracing::DarwinFramework;
 static bool sExitHandlerRegistered = false;
 static void ShutdownOnExit()
 {
-    MTR_LOG("ShutdownOnExit invoked on exit");
-    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+    // Depending on the structure of the software, this code might execute *after* the main autorelease pool has exited.
+    // Therefore, it needs to be enclosed in its own autorelease pool.
+    @autoreleasepool {
+        MTR_LOG("ShutdownOnExit invoked on exit");
+        [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+    }
 }
 
 @interface MTRDeviceControllerFactoryParams ()
