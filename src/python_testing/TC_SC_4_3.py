@@ -278,7 +278,8 @@ class TC_SC_4_3(MatterBaseTest):
 
         # Verify AAAA record is returned
         asserts.assert_equal(hostname, quada_record.name, f"Server name mismatch: {hostname} vs {quada_record.name}")
-        asserts.assert_equal(quada_record_type, answer_record_type, f"Record type should be {quada_record_type} but got {answer_record_type}")
+        asserts.assert_equal(quada_record_type, answer_record_type,
+                             f"Record type should be {quada_record_type} but got {answer_record_type}")
 
         # # *** STEP 9 ***
         # TH verifies the following from the returned records: The hostname must be a fixed-length twelve-character (or sixteen-character)
@@ -294,7 +295,7 @@ class TC_SC_4_3(MatterBaseTest):
 
         # Verify hostname character length (12 or 16)
         asserts.assert_true(self.verify_hostname(hostname=hostname),
-                                f"Hostname for '{hostname}' is not a 12 or 16 character uppercase hexadecimal string")
+                            f"Hostname for '{hostname}' is not a 12 or 16 character uppercase hexadecimal string")
 
         # ICD TXT KEY
         if supports_lit:
