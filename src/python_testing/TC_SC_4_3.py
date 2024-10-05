@@ -64,7 +64,7 @@ class TC_SC_4_3(MatterBaseTest):
                 TestStep(8, "TH performs a query for the AAAA record against the target listed in the SRV record",
                          "Verify AAAA record is returned"),
                 TestStep(9, "TH verifies the following from the returned records:",
-                         "Hostname: • If (MCORE.COM.WIFI OR MCORE.COM.ETH) target, the hostname must be a 12-character uppercase hexadecimal string. • If (MCORE.COM.THR) target, the hostname must be a 16-character hex string using capital letters. ICD TXT key: • If supports_lit is false, verify that the ICD key is NOT present in the TXT record • If supports_lit is true, verify the ICD key IS present in the TXT record, and it has the value of 0 or 1 (ASCII) SII TXT key: • If supports_icd is true and supports_lit is false, set sit_mode to true • If supports_icd is true and supports_lit is true, set sit_mode to true if ICD=0 otherwise set sit_mode to false • If supports_icd is false, set sit_mode to false • If sit_mode is true, verify that the SII key IS present in the TXT record • if the SII key is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms) SAI TXT key: • if supports_icd is true, verify that the SAI key is present in the TXT record • If the SAI key is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms)"),
+                         "TH verifies the following from the returned records: The hostname must be a fixed-length twelve-character (or sixteen-character) hexadecimal string, encoded as ASCII (UTF-8) text using capital letters.. ICD TXT key: • If supports_lit is false, verify that the ICD key is NOT present in the TXT record • If supports_lit is true, verify the ICD key IS present in the TXT record, and it has the value of 0 or 1 (ASCII) SII TXT key: • If supports_icd is true and supports_lit is false, set sit_mode to true • If supports_icd is true and supports_lit is true, set sit_mode to true if ICD=0 otherwise set sit_mode to false • If supports_icd is false, set sit_mode to false • If sit_mode is true, verify that the SII key IS present in the TXT record • if the SII key is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms) SAI TXT key: • if supports_icd is true, verify that the SAI key is present in the TXT record • If the SAI key is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms)"),
                 TestStep(10, "TH performs a DNS-SD browse for _I<hhhh>._sub._matter._tcp.local, where <hhhh> is the 64-bit compressed Fabric identifier, expressed as a fixed-length, sixteencharacter hexadecimal string, encoded as ASCII (UTF-8) text using capital letters.",
                          "Verify DUT returns a PTR record with DNS-SD instance name set to instance_name"),
                 TestStep(11, "TH performs a DNS-SD browse for _matter._tcp.local",
@@ -169,15 +169,15 @@ class TC_SC_4_3(MatterBaseTest):
         return items[-1]
 
     @staticmethod
-    def verify_hostname(hostname: str, char_length: int) -> bool:
+    def verify_hostname(hostname: str) -> bool:
         # Remove '.local' or '.local.' suffix if present
         if hostname.endswith('.local'):
             hostname = hostname[:-6]
         elif hostname.endswith('.local.'):
             hostname = hostname[:-7]
 
-        # Regular expression to match an uppercase hexadecimal string of the specified length
-        pattern = re.compile(rf'^[0-9A-F]{{{char_length}}}$')
+        # Regular expression to match an uppercase hexadecimal string of 12 or 16 characters
+        pattern = re.compile(r'^[0-9A-F]{12}$|^[0-9A-F]{16}$')
         return bool(pattern.match(hostname))
 
     @async_test_body
@@ -186,8 +186,6 @@ class TC_SC_4_3(MatterBaseTest):
         supports_lit = None
         active_mode_threshold_ms = None
         instance_name = None
-        # icd_value = None
-        # sit_mode = None
 
         # *** STEP 1 ***
         # DUT is commissioned on the same fabric as TH.
@@ -243,7 +241,7 @@ class TC_SC_4_3(MatterBaseTest):
 
         # Will be used in Step 8 and 11
         # This is the hostname
-        server = operational_record.server
+        hostname = operational_record.server
 
         # Verify SRV record is returned
         srv_record_returned = operational_record is not None and operational_record.service_name == instance_qname
@@ -270,51 +268,33 @@ class TC_SC_4_3(MatterBaseTest):
         self.step(8)
 
         quada_record = await mdns.get_service_by_record_type(
-            service_name=server,
+            service_name=hostname,
             record_type=DNSRecordType.AAAA,
             log_output=True
         )
 
         answer_record_type = quada_record.get_type(quada_record.type)
-        quada = _TYPES[_TYPE_AAAA]
+        quada_record_type = _TYPES[_TYPE_AAAA]
 
         # Verify AAAA record is returned
-        asserts.assert_equal(server, quada_record.name, f"Server name mismatch: {server} vs {quada_record.name}")
-        asserts.assert_equal(quada, answer_record_type, f"Record type should be {quada} but got {answer_record_type}")
+        asserts.assert_equal(hostname, quada_record.name, f"Server name mismatch: {hostname} vs {quada_record.name}")
+        asserts.assert_equal(quada_record_type, answer_record_type, f"Record type should be {quada_record_type} but got {answer_record_type}")
 
         # # *** STEP 9 ***
-        # TH verifies the following from the returned records: Hostname: • If (MCORE.COM.WIFI OR MCORE.COM.ETH) target, the hostname must be a
-        # 12-character uppercase hexadecimal string. • If (MCORE.COM.THR) target, the hostname must be a 16-character hex string using capital
-        # letters. ICD TXT key: • If supports_lit is false, verify that the ICD key is NOT present in the TXT record • If supports_lit is true,
-        # verify the ICD key IS present in the TXT record, and it has the value of 0 or 1 (ASCII) SII TXT key: • If supports_icd is true and
-        # supports_lit is false, set sit_mode to true • If supports_icd is true and supports_lit is true, set sit_mode to true if ICD=0
-        # otherwise set sit_mode to false • If supports_icd is false, set sit_mode to false • If sit_mode is true, verify that the SII key IS
-        # present in the TXT record • if the SII key is present, verify it is a decimal value with no leading zeros and is less than or equal
-        # to 3600000 (1h in ms) SAI TXT key: • if supports_icd is true, verify that the SAI key is present in the TXT record • If the SAI key
-        # is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms)
+        # TH verifies the following from the returned records: The hostname must be a fixed-length twelve-character (or sixteen-character)
+        # hexadecimal string, encoded as ASCII (UTF-8) text using capital letters.. ICD TXT key: • If supports_lit is false, verify that the
+        # ICD key is NOT present in the TXT record • If supports_lit is true, verify the ICD key IS present in the TXT record, and it has the
+        # value of 0 or 1 (ASCII) SII TXT key: • If supports_icd is true and supports_lit is false, set sit_mode to true • If supports_icd is
+        # true and supports_lit is true, set sit_mode to true if ICD=0 otherwise set sit_mode to false • If supports_icd is false, set
+        # sit_mode to false • If sit_mode is true, verify that the SII key IS present in the TXT record • if the SII key is present, verify
+        # it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms) SAI TXT key: • if supports_icd is true,
+        # verify that the SAI key is present in the TXT record • If the SAI key is present, verify it is a decimal value with no leading
+        # zeros and is less than or equal to 3600000 (1h in ms)
         self.step(9)
 
-        # Check MCORE.COM PICS
-        mc_wifi = 'MCORE.COM.WIFI'
-        mc_eth = 'MCORE.COM.ETH'
-        mc_thr = 'MCORE.COM.THR'
-
-
-## wildcard read of cnet clusters, featuremaps all endpoints, does it support wifi/thread?
-
-        is_mc_wifi = self.check_pics(mc_wifi)
-        is_mc_eth = self.check_pics(mc_eth)
-        is_thr = self.check_pics(mc_thr)
-        is_eth_or_wifi = is_mc_wifi or is_mc_eth
-
-        if is_eth_or_wifi:
-            mcore_com = mc_wifi if is_mc_wifi else mc_eth if is_mc_eth else None
-            asserts.assert_true(self.verify_hostname(hostname=server, char_length=12),
-                                f"Hostname for '{server}' is not a 12-character uppercase hexadecimal string for PICS {mcore_com}")
-        else:
-            if is_thr:
-                asserts.assert_true(self.verify_hostname(hostname=server, char_length=16),
-                                    f"Hostname for '{server}' is not a 16-character uppercase hexadecimal string for PICS {mc_thr}")
+        # Verify hostname character length (12 or 16)
+        asserts.assert_true(self.verify_hostname(hostname=hostname),
+                                f"Hostname for '{hostname}' is not a 12 or 16 character uppercase hexadecimal string")
 
         # ICD TXT KEY
         if supports_lit:
@@ -388,12 +368,13 @@ class TC_SC_4_3(MatterBaseTest):
         asserts.assert_true(result, message)
 
         # # *** STEP 10 ***
-        # TH performs a DNS-SD browse for _I<hhhh>._sub._matter._tcp.local, where <hhhh> is the 64-bit compressed Fabric identifier, expressed as a fixed-length, sixteencharacter hexadecimal string, encoded as
-        # ASCII (UTF-8) text using capital letters. Verify DUT returns a PTR record with DNS-SD instance name set to instance_name
+        # TH performs a DNS-SD browse for _I<hhhh>._sub._matter._tcp.local, where <hhhh> is the 64-bit compressed
+        # Fabric identifier, expressed as a fixed-length, sixteencharacter hexadecimal string, encoded as ASCII (UTF-8)
+        # text using capital letters. Verify DUT returns a PTR record with DNS-SD instance name set to instance_name
         self.step(10)
         service_types = await mdns.get_service_types(log_output=True)
         op_sub_type = self.get_operational_subtype()
-        asserts.assert_in(op_sub_type, service_types, f"No PTR record with DNS-SD instance name '{op_sub_type}'")
+        asserts.assert_in(op_sub_type, service_types, f"No PTR record with DNS-SD instance name '{op_sub_type}' wsa found.")
 
         # # *** STEP 11 ***
         # TH performs a DNS-SD browse for _matter._tcp.local
@@ -406,7 +387,7 @@ class TC_SC_4_3(MatterBaseTest):
         )
 
         # Verify DUT returns a PTR record with DNS-SD instance name set instance_name
-        asserts.assert_equal(op_service_info.server, server,
+        asserts.assert_equal(op_service_info.server, hostname,
                              f"No PTR record with DNS-SD instance name '{MdnsServiceType.OPERATIONAL.value}'")
         asserts.assert_equal(instance_name, op_service_info.instance_name, "Instance name mismatch")
 
