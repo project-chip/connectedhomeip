@@ -81,10 +81,10 @@ bool HandleCustomOption(const char * aProgram, ArgParser::OptionSet * aOptions, 
     switch (aIdentifier)
     {
     case kOptionFabricAdminServerPortNumber:
-        gFabricAdminServerPort = atoi(aValue);
+        gFabricAdminServerPort = static_cast<uint16_t>(atoi(aValue));
         break;
     case kOptionLocalServerPortNumber:
-        gLocalServerPort = atoi(aValue);
+        gLocalServerPort = static_cast<uint16_t>(atoi(aValue));
         break;
     default:
         ArgParser::PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
