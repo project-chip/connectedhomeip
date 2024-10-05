@@ -13,8 +13,16 @@
 # limitations under the License.
 
 declare_args() {
-  # EFR32 board used
+  # Silabs wireless starter kit plug-in boards featuring specific mcu family and mcu model.
+  # Find more information at https://www.silabs.com/development-tools/wireless.
+  # A board tailored for specific mcu family and mcu model can be created with "CUSTOM".
   silabs_board = ""
+
+  # Silabs mcu family used
+  silabs_family = ""
+
+  # Silabs mcu model used
+  silabs_mcu = ""
 
   # LCD is enabled by default
   # Boards BRD4166A, BRD2601B, BRD2703A and BRD4319A do not have a LCD so they disable it explicitly
@@ -150,6 +158,12 @@ if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A") {
   # ThunderBoards don't have a LCD,
   show_qr_code = false
   disable_lcd = true
+
+  # Custom Board ----------
+} else if (silabs_board == "CUSTOM") {
+  print("Using custom board configuration")
+  print("silabs_family:", silabs_family)
+  print("silabs_mcu:", silabs_mcu)
 } else {
   assert(
       false,
@@ -167,6 +181,10 @@ declare_args() {
   # Default true for the wifi soc and false for EFR32 boards
   sl_uart_log_output = wifi_soc
 }
+
+# Silabs mcu family and mcu model must be specified
+assert(silabs_family != "", "Must specify silabs_family")
+assert(silabs_mcu != "", "Must specify silabs_mcu")
 
 # qr code cannot be true if lcd is disabled
 assert(!(disable_lcd && show_qr_code))

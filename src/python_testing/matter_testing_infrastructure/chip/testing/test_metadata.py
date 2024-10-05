@@ -64,7 +64,7 @@ class TestMetadataReader(unittest.TestCase):
         app_args="--discriminator 1234 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json",
         run="run1",
         app="out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app",
-        factoryreset=True,
+        factory_reset=True,
         quiet=True
     )
 

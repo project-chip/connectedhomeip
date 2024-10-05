@@ -16,8 +16,9 @@ name: Full builds - Android
 
 on:
     push:
-        branches-ignore:
-            - 'dependabot/**'
+        branches:
+            - master
+            - 'v*-branch'
     workflow_dispatch:
 
 concurrency:
