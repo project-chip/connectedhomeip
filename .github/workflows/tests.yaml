@@ -92,9 +92,16 @@ jobs:
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/energy-calendar-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/energy-price-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-bitmaps.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-structs.xml \
+                      src/app/zap-templates/zcl/data-model/chip/humidistat-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/joint-fabric-datastore-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/joint-fabric-pki-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/meter-identification-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/network-identity-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/semantic-tag-namespace-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/access-control-definitions.xml \
                       src/app/zap-templates/zcl/data-model/chip/access-control-cluster.xml \
