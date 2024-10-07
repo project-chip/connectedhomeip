@@ -31,18 +31,17 @@
 #    pandas
 #    plotly
 
-import cxxfilt
-import click
-import coloredlogs
 import logging
 import subprocess
+from dataclasses import dataclass
 from enum import Enum, auto
+from pathlib import Path
+
+import click
+import coloredlogs
+import cxxfilt
 import plotly.express as px
 import plotly.graph_objects as go
-
-
-from pathlib import Path
-from dataclasses import dataclass
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
