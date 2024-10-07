@@ -388,7 +388,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
                 try:
                     cert = x509.load_der_x509_certificate(f.read())
                 except ValueError:
-                    logging.info(f'File is not a valid certificate, skipping')
+                    logging.info(f'File {filename} is not a valid certificate, skipping')
                     pass
                 pub = cert.public_key()
                 ski = x509.SubjectKeyIdentifier.from_public_key(pub).digest
