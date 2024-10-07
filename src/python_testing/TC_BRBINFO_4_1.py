@@ -20,12 +20,12 @@
 # E.g: python3 src/python_testing/TC_BRBINFO_4_1.py --commissioning-method on-network --qr-code MT:-24J042C00KA0648G00 \
 #      --string-arg th_icd_server_app_path:out/linux-x64-lit-icd/lit-icd-app
 
+import asyncio
 import logging
 import os
 import queue
 import signal
 import subprocess
-import time
 import uuid
 
 import chip.clusters as Clusters
@@ -58,7 +58,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         return "[TC_BRBINFO_4_1] Verification of KeepActive Command [DUT-Server]"
 
     def steps_TC_BRBINFO_4_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("0",  "DUT commissioned and preconditions", is_commissioning=True),
             TestStep("1", "TH reads from the ICD the A_IDLE_MODE_DURATION, A_ACTIVE_MODE_DURATION, and ACTIVE_MODE_THRESHOLD attributes"),
             TestStep("2", "Setting up subscribe to ActiveChange event"),
@@ -77,8 +77,8 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             TestStep("15", "Send KeepActive command with shortest TimeoutMs value while TH_ICD is prevented from sending check-ins"),
             TestStep("16", "Wait 15 seconds then send second KeepActive command with double the TimeoutMs value of the previous step"),
             TestStep("17", "TH allows TH_ICD to resume sending check-ins after timeout from step 15 expired but before second timeout from step 16 still valid"),
-            TestStep("18", "Wait for TH_ICD to check into TH, then confirm we have received new event from DUT")]
-        return steps
+            TestStep("18", "Wait for TH_ICD to check into TH, then confirm we have received new event from DUT"),
+        ]
 
     def _ask_for_vendor_commissioniong_ux_operation(self, discriminator, setupPinCode, setupManualCode, setupQRCode):
         self.wait_for_user_input(
@@ -142,7 +142,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         logging.info("Starting ICD Server App")
         self.app_process = subprocess.Popen(cmd)
         logging.info("ICD started")
-        time.sleep(3)
+        await asyncio.sleep(3)
 
         logging.info("Commissioning of ICD to fabric one (TH)")
         self.icd_nodeid = 1111
@@ -320,7 +320,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         await self._send_keep_active_command(stay_active_duration_ms, keep_active_timeout_ms, dynamic_endpoint_id)
 
         self.step("13")
-        time.sleep(30)
+        await asyncio.sleep(30)
         self.resume_th_icd_server(check_state=True)
 
         self.step("14")
@@ -335,13 +335,13 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         await self._send_keep_active_command(stay_active_duration_ms, keep_active_timeout_ms, dynamic_endpoint_id)
 
         self.step("16")
-        time.sleep(15)
+        await asyncio.sleep(15)
         stay_active_duration_ms = 2000
         keep_active_timeout_ms = 60000
         await self._send_keep_active_command(stay_active_duration_ms, keep_active_timeout_ms, dynamic_endpoint_id)
 
         self.step("17")
-        time.sleep(15)
+        await asyncio.sleep(15)
         self.resume_th_icd_server(check_state=True)
 
         self.step("18")
