@@ -18,17 +18,33 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
-# TODO: Skip CI for now, we don't have any way to run this. Needs setup. See test_TC_CCTRL.py
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: examples/fabric-admin/scripts/fabric-sync-app.py
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-ready-pattern: "Successfully opened pairing window on the device"
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 0
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factoryreset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
 
 # This test requires a TH_SERVER application. Please specify with --string-arg th_server_app_path:<path_to_app>
 
 import logging
 import os
 import random
-import signal
-import subprocess
+import tempfile
 import time
-import uuid
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
@@ -36,6 +52,7 @@ from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
                                     run_if_endpoint_matches)
 from mobly import asserts
+from TC_MCORE_FS_1_1 import AppServer
 
 
 class TC_CCTRL_2_2(MatterBaseTest):
@@ -43,25 +60,32 @@ class TC_CCTRL_2_2(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
-        self.app_process = None
-        app = self.user_params.get("th_server_app_path", None)
-        if not app:
-            asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
 
-        self.kvs = f'kvs_{str(uuid.uuid4())}'
-        self.port = 5543
-        discriminator = random.randint(0, 4095)
-        passcode = 20202021
-        cmd = [app]
-        cmd.extend(['--secured-device-port', str(5543)])
-        cmd.extend(['--discriminator', str(discriminator)])
-        cmd.extend(['--passcode', str(passcode)])
-        cmd.extend(['--KVS', self.kvs])
-        # TODO: Determine if we want these logs cooked or pushed to somewhere else
-        logging.info("Starting TH_SERVER")
-        self.app_process = subprocess.Popen(cmd)
-        logging.info("TH_SERVER started")
-        time.sleep(3)
+        self.th_server = None
+        self.storage = None
+
+        th_server_app = self.user_params.get("th_server_app_path", None)
+        if not th_server_app:
+            asserts.fail("This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>")
+        if not os.path.exists(th_server_app):
+            asserts.fail(f"The path {th_server_app} does not exist")
+
+        # Create a temporary storage directory for keeping KVS files.
+        self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
+        logging.info("Temporary storage directory: %s", self.storage.name)
+
+        self.th_server_port = 5543
+        self.th_server_discriminator = random.randint(0, 4095)
+        self.th_server_passcode = 20202021
+
+        # Start the TH_SERVER app.
+        self.th_server = AppServer(
+            th_server_app,
+            storage_dir=self.storage.name,
+            port=self.th_server_port,
+            discriminator=self.th_server_discriminator,
+            passcode=self.th_server_passcode)
+        self.th_server.start()
 
         logging.info("Commissioning from separate fabric")
 
@@ -71,20 +95,18 @@ class TC_CCTRL_2_2(MatterBaseTest):
         paa_path = str(self.matter_test_config.paa_trust_store_path)
         self.TH_server_controller = new_fabric_admin.NewController(nodeId=112233, paaTrustStorePath=paa_path)
         self.server_nodeid = 1111
-        await self.TH_server_controller.CommissionOnNetwork(nodeId=self.server_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
+        await self.TH_server_controller.CommissionOnNetwork(
+            nodeId=self.server_nodeid,
+            setupPinCode=self.th_server_passcode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=self.th_server_discriminator)
         logging.info("Commissioning TH_SERVER complete")
 
     def teardown_class(self):
-        # In case the th_server_app_path does not exist, then we failed the test
-        # and there is nothing to remove
-        if self.app_process is not None:
-            logging.warning("Stopping app with SIGTERM")
-            self.app_process.send_signal(signal.SIGTERM.value)
-            self.app_process.wait()
-
-            if os.path.exists(self.kvs):
-                os.remove(self.kvs)
-
+        if self.th_server is not None:
+            self.th_server.terminate()
+        if self.storage is not None:
+            self.storage.cleanup()
         super().teardown_class()
 
     def steps_TC_CCTRL_2_2(self) -> list[TestStep]:

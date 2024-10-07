@@ -101,9 +101,9 @@ public:
         // TODO(#35875): OpenDeviceCommissioningWindow uses the same controller every time and doesn't currently accept
         // FabricIndex. For now we are dropping fabric index from the scoped node id.
         NodeId nodeId                    = request.id.node_id;
-        uint32_t commissioningTimeoutSec = request.commissioning_timeout;
         uint32_t iterations              = request.iterations;
         uint16_t discriminator           = request.discriminator;
+        uint16_t commissioningTimeoutSec = static_cast<uint16_t>(request.commissioning_timeout);
 
         // Log the request details for debugging
         ChipLogProgress(NotSpecified,
@@ -111,7 +111,7 @@ public:
                         static_cast<unsigned long>(nodeId), commissioningTimeoutSec, iterations, discriminator);
 
         // Open the device commissioning window using raw binary data for salt and verifier
-        DeviceMgr().OpenDeviceCommissioningWindow(nodeId, commissioningTimeoutSec, iterations, discriminator,
+        DeviceMgr().OpenDeviceCommissioningWindow(nodeId, iterations, commissioningTimeoutSec, discriminator,
                                                   ByteSpan(request.salt.bytes, request.salt.size),
                                                   ByteSpan(request.verifier.bytes, request.verifier.size));
 

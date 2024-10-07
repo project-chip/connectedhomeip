@@ -16,6 +16,9 @@ name: Doxygen
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'   
         paths:
             - "**.do[xc]"
             - "**.c[cs]?"
