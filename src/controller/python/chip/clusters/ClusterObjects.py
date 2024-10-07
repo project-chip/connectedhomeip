@@ -374,8 +374,8 @@ class ClusterEvent(ClusterObject):
         """Register a subclass."""
         super().__init_subclass__(*args, **kwargs)
         try:
-            if cls.event_id not in ALL_EVENTS:
-                ALL_EVENTS[cls.event_id] = {}
+            if cls.cluster_id not in ALL_EVENTS:
+                ALL_EVENTS[cls.cluster_id] = {}
             # register this clusterattribute in the ALL_ATTRIBUTES dict for quick lookups
             ALL_EVENTS[cls.cluster_id][cls.event_id] = cls
         except NotImplementedError:
