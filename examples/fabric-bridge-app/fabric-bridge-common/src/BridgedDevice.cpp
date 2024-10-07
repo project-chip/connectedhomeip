@@ -40,8 +40,8 @@ void BridgedDevice::LogActiveChangeEvent(uint32_t promisedActiveDurationMs)
 
     DeviceLayer::SystemLayer().ScheduleLambda([endpointId, promisedActiveDurationMs]() {
         app::Clusters::BridgedDeviceBasicInformation::Events::ActiveChanged::Type event{};
-        event.promisedActiveDuration  = promisedActiveDurationMs;
-        EventNumber eventNumber = 0;
+        event.promisedActiveDuration = promisedActiveDurationMs;
+        EventNumber eventNumber      = 0;
 
         CHIP_ERROR err = app::LogEvent(event, endpointId, eventNumber);
         if (err != CHIP_NO_ERROR)
@@ -70,7 +70,8 @@ void BridgedDevice::SetAdminCommissioningAttributes(const AdminCommissioningAttr
     mAdminCommissioningAttributes = aAdminCommissioningAttributes;
 
     EndpointId endpointId = mEndpointId;
-    bool windowChanged      = (aAdminCommissioningAttributes.commissioningWindowStatus != mAdminCommissioningAttributes.commissioningWindowStatus);
+    bool windowChanged =
+        (aAdminCommissioningAttributes.commissioningWindowStatus != mAdminCommissioningAttributes.commissioningWindowStatus);
     bool fabricIndexChanged = (aAdminCommissioningAttributes.openerFabricIndex != mAdminCommissioningAttributes.openerFabricIndex);
     bool vendorChanged      = (aAdminCommissioningAttributes.openerVendorId != mAdminCommissioningAttributes.openerVendorId);
 
