@@ -189,8 +189,11 @@ private:
     CHIP_ERROR WriteClusterData(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath,
                                 TLV::TLVReader & aData);
 
-    // Checks if the given path corresponds to a list attribute
-    bool IsListAttributePath(const ConcreteAttributePath & path);
+    /// Checks if the given path corresponds to a list attribute
+    /// Return values:
+    ///    true/false: valid attribute path, known if list or not
+    ///    std::nulloptr - path not available/valid, unknown if attribute is a list or not
+    std::optional<bool> IsListAttributePath(const ConcreteAttributePath & path);
 
     Messaging::ExchangeHolder mExchangeCtx;
     WriteResponseMessage::Builder mWriteResponseBuilder;

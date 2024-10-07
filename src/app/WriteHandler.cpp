@@ -80,25 +80,27 @@ void WriteHandler::Close()
     MoveToState(State::Uninitialized);
 }
 
-bool WriteHandler::IsListAttributePath(const ConcreteAttributePath & path)
+std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePath & path)
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-    VerifyOrReturnValue(mDataModelProvider != nullptr, false,
+    VerifyOrReturnValue(mDataModelProvider != nullptr, std::nullopt,
                         ChipLogError(DataManagement, "Null data model while checking attribute properties."));
 
     auto info = mDataModelProvider->GetAttributeInfo(path);
-
     if (!info.has_value())
     {
-        ChipLogError(DataManagement, "Attribute does not exist while checking attribute properties.");
-        return false;
+        return std::nullopt;
     }
 
     return info->flags.Has(DataModel::AttributeQualityFlags::kListAttribute);
 #else
     constexpr uint8_t kListAttributeType = 0x48;
     const auto attributeMetadata         = GetAttributeMetadata(path);
-    return (attributeMetadata != nullptr && attributeMetadata->attributeType == kListAttributeType);
+    if (attributeMetadata == nullptr)
+    {
+        return std::nullopt;
+    }
+    return (attributeMetadata->attributeType == kListAttributeType);
 #endif
 }
 
@@ -340,7 +342,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
 
-        if (!dataAttributePath.IsListOperation() && IsListAttributePath(dataAttributePath))
+        if (!dataAttributePath.IsListOperation() && IsListAttributePath(dataAttributePath).value_or(false))
         {
             dataAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
         }
@@ -466,7 +468,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             mProcessingAttributePath, mStateFlags.Has(StateBits::kProcessingAttributeIsList), dataAttributePath);
         bool shouldReportListWriteBegin = false; // This will be set below.
 
-        bool needToCheckListOperation = true;
+        std::optional<bool> isListAttribute = std::nullopt;
 
         while (iterator->Next(mapping))
         {
@@ -480,11 +482,12 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             // Try to get the metadata from for the attribute from one of the expanded endpoints (it doesn't really matter which
             // endpoint we pick, as long as it's valid) and update the path info according to it and recheck if we need to report
             // list write begin.
-            if (needToCheckListOperation)
+            if (!isListAttribute.has_value())
             {
-                needToCheckListOperation = false;
+                isListAttribute             = IsListAttributePath(dataAttributePath);
+                bool currentAttributeIsList = isListAttribute.value_or(false);
 
-                if (!dataAttributePath.IsListOperation() && IsListAttributePath(dataAttributePath))
+                if (!dataAttributePath.IsListOperation() && currentAttributeIsList)
                 {
                     dataAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
                 }
