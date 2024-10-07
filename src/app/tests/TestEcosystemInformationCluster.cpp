@@ -44,7 +44,7 @@ const RequiredEcosystemDeviceParams kDefaultRequiredDeviceParams;
 
 const EndpointId kAnotherValidEndpointId = 2;
 static_assert(kValidEndpointId != kAnotherValidEndpointId);
-const char * kValidLocationName = "AValidLocationName";
+const char * kValidLocationName                 = "AValidLocationName";
 const ClusterId kEcosystemInfoClusterId         = EcosystemInformation::Id;
 const AttributeId kDeviceDirectoryAttributeId   = EcosystemInformation::Attributes::DeviceDirectory::Id;
 const AttributeId kLocationDirectoryAttributeId = EcosystemInformation::Attributes::LocationDirectory::Id;
