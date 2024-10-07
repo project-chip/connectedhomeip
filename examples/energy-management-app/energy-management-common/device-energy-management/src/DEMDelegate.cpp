@@ -67,7 +67,7 @@ chip::BitMask<chip::app::Clusters::DeviceEnergyManagement::Feature> GetDEMFeatur
 
 void SetDEMFeatureMap(uint32_t featureMap)
 {
-    sFeatureMap = BitMask<chip::app::Clusters::DeviceEnergyManagement::Feature>(featureMap); 
+    sFeatureMap = BitMask<chip::app::Clusters::DeviceEnergyManagement::Feature>(featureMap);
 }
 
 std::unique_ptr<DeviceEnergyManagementDelegate> gDEMDelegate;
