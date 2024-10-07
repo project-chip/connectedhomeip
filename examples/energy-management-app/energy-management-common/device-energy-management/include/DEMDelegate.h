@@ -28,3 +28,6 @@ extern std::unique_ptr<chip::app::Clusters::DeviceEnergyManagement::DeviceEnergy
 
 CHIP_ERROR DeviceEnergyManagementInit();
 CHIP_ERROR DeviceEnergyManagementShutdown();
+
+chip::BitMask<chip::app::Clusters::DeviceEnergyManagement::Feature> GetDEMFeatureMap();
+void SetDEMFeatureMap(uint32_t);

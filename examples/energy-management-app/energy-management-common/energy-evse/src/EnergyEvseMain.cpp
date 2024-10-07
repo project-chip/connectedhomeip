@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include "EnergyManagementAppCmdLineOptions.h"
 
 #include <DEMDelegate.h>
 #include <DeviceEnergyManagementManager.h>

@@ -17,7 +17,6 @@
  */
 
 #include <DeviceEnergyManagementManager.h>
-#include <EnergyManagementAppCmdLineOptions.h>
 #include <device-energy-management-modes.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -32,6 +31,44 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace DeviceEnergyManagement {
+
+// Keep track of the parsed featureMap option
+#if defined(CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING) && defined(CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING)
+#error Cannot define CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING and CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING
+#endif
+
+#if defined(CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING)
+static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kPowerForecastReporting,
+                                          Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
+                                          Feature::kConstraintBasedAdjustment);
+#elif defined(CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING)
+static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kStateForecastReporting,
+                                          Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
+                                          Feature::kConstraintBasedAdjustment);
+#else
+static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment);
+#endif
+
+} // namespace DeviceEnergyManagement
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+
+chip::BitMask<chip::app::Clusters::DeviceEnergyManagement::Feature> GetDEMFeatureMap()
+{
+    return sFeatureMap;
+}
+
+void SetDEMFeatureMap(uint32_t featureMap)
+{
+    sFeatureMap = BitMask<chip::app::Clusters::DeviceEnergyManagement::Feature>(featureMap); 
+}
 
 std::unique_ptr<DeviceEnergyManagementDelegate> gDEMDelegate;
 std::unique_ptr<DeviceEnergyManagementManager> gDEMInstance;
@@ -65,7 +102,7 @@ CHIP_ERROR DeviceEnergyManagementInit()
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMapFromCmdLine();
+    BitMask<DeviceEnergyManagement::Feature> featureMap = GetDEMFeatureMap();
 
     /* Manufacturer may optionally not support all features, commands & attributes */
     gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(EndpointId(DEM_ENDPOINT), *gDEMDelegate, featureMap);

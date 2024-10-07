@@ -21,6 +21,8 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
+
+#include <DEMDelegate.h>
 #if SL_MATTER_CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 #include <EnergyEvseMain.h>
 #endif
@@ -96,37 +98,7 @@ static EnergyReportingTestEventTriggerHandler sEnergyReportingTestEventTriggerHa
 static DeviceEnergyManagementTestEventTriggerHandler sDeviceEnergyManagementTestEventTriggerHandler;
 #endif
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace DeviceEnergyManagement {
 
-// Keep track of the parsed featureMap option
-#if (SL_MATTER_CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING) && (SL_MATTER_CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING)
-#error Cannot define SL_MATTER_CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING and SL_MATTER_CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING
-#endif
-
-#if SL_MATTER_CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING
-static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kPowerForecastReporting,
-                                          Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
-                                          Feature::kConstraintBasedAdjustment);
-#elif SL_MATTER_CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING
-static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kStateForecastReporting,
-                                          Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
-                                          Feature::kConstraintBasedAdjustment);
-#else
-static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment);
-#endif
-
-chip::BitMask<Feature> GetFeatureMapFromCmdLine()
-{
-    return sFeatureMap;
-}
-
-} // namespace DeviceEnergyManagement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
 
 AppTask AppTask::sAppTask;
 
@@ -135,15 +107,15 @@ void ApplicationInit()
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     SILABS_LOG("==================================================");
 #if SL_MATTER_CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
-    SILABS_LOG("energy-management-example EVSE starting. featureMap 0x%08lx", DeviceEnergyManagement::sFeatureMap.Raw());
+    SILABS_LOG("energy-management-example EVSE starting. featureMap 0x%08lx", GetDEMFeatureMap().Raw());
 
     EvseApplicationInit();
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #if SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-    SILABS_LOG("energy-management-example WaterHeater starting. featureMap 0x%08lx", DeviceEnergyManagement::sFeatureMap.Raw());
+    SILABS_LOG("energy-management-example WaterHeater starting. featureMap 0x%08lx", GetDEMFeatureMap().Raw());
 
-    FullWhmApplicationInit();
+    WhmApplicationInit();
 #endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
     SILABS_LOG("==================================================");
 
@@ -224,7 +196,7 @@ CHIP_ERROR AppTask::Init()
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED
-    GetLCD().WriteDemoUI(LightMgr().IsLightOn());
+    //GetLCD().WriteDemoUI(LightMgr().IsLightOn());
 #ifdef QR_CODE_ENABLED
 #ifdef SL_WIFI
     if (!chip::DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned())

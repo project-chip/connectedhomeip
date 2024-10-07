@@ -119,37 +119,6 @@ chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
 
 } // namespace
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace DeviceEnergyManagement {
-
-// Keep track of the parsed featureMap option
-#if defined(CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING) && defined(CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING)
-#error Cannot define CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING and CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING
-#endif
-
-#ifdef CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING
-static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kPowerForecastReporting,
-                                          Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
-                                          Feature::kConstraintBasedAdjustment);
-#elif CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING
-static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kStateForecastReporting,
-                                          Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
-                                          Feature::kConstraintBasedAdjustment);
-#else
-static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment);
-#endif
-
-chip::BitMask<Feature> GetFeatureMapFromCmdLine()
-{
-    return sFeatureMap;
-}
-
-} // namespace DeviceEnergyManagement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
 
 // Check we are not trying to build in both app types simultaneously
 #if defined(CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE) && defined(CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)

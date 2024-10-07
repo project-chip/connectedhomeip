@@ -19,6 +19,7 @@
 #include <AppMain.h>
 #include <EnergyEvseMain.h>
 #include <WhmMain.h>
+#include <DEMDelegate.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/BitMask.h>
@@ -59,28 +60,10 @@ static chip::ArgParser::OptionSet sCmdLineOptions = { EnergyAppOptionHandler, //
                                                       "-a, --application <evse|water-heater>\n"
                                                       "-f, --featureSet <value>\n" };
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace DeviceEnergyManagement {
 
-// Keep track of the parsed featureMap option
-static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kPowerForecastReporting,
-                                          Feature::kStateForecastReporting, Feature::kStartTimeAdjustment, Feature::kPausable,
-                                          Feature::kForecastAdjustment, Feature::kConstraintBasedAdjustment);
 
 // Make EVSE the default app
 static const char * spApp = kEvseApp;
-
-chip::BitMask<Feature> GetFeatureMapFromCmdLine()
-{
-    return sFeatureMap;
-}
-
-} // namespace DeviceEnergyManagement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
 
 static uint32_t ParseNumber(const char * pString)
 {
@@ -150,8 +133,8 @@ static bool EnergyAppOptionHandler(const char * aProgram, chip::ArgParser::Optio
         }
         break;
     case kOptionFeatureMap:
-        sFeatureMap = BitMask<chip::app::Clusters::DeviceEnergyManagement::Feature>(ParseNumber(aValue));
-        ChipLogDetail(Support, "Using FeatureMap 0x%04x", sFeatureMap.Raw());
+        SetDEMFeatureMap(ParseNumber(aValue));
+        ChipLogDetail(Support, "Using FeatureMap 0x%04x", GetDEMFeatureMap().Raw());
         break;
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
