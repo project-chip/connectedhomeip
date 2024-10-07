@@ -246,6 +246,7 @@ def build_treemap(
     style: ChartStyle,
     max_depth: int,
     zoom: Optional[str],
+    strip: Optional[str],
 ):
     # A treemap is based on parents (with title)
 
@@ -271,6 +272,15 @@ def build_treemap(
                 partial += "::" + tree_name[0]
                 tree_name = tree_name[1:]
             if not tree_name:
+                continue
+
+        if strip is not None:
+            partial = ""
+            for part_name in tree_name:
+                partial = "::" + part_name
+                if partial == strip:
+                    break
+            if partial == strip:
                 continue
 
         partial = ""
@@ -346,9 +356,19 @@ def build_treemap(
     default=None,
     help="Zoom in the graph to ONLY the specified path as root (e.g. ::chip::app)",
 )
+@click.option(
+    "--strip",
+    default=None,
+    help="Strip out a tree subset (e.g. ::C)",
+)
 @click.argument("elf-file", type=Path)
 def main(
-    log_level, elf_file: Path, display_type: str, max_depth: int, zoom: Optional[str]
+    log_level,
+    elf_file: Path,
+    display_type: str,
+    max_depth: int,
+    zoom: Optional[str],
+    strip: Optional[str],
 ):
     log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
@@ -404,7 +424,7 @@ def main(
             logging.error("SKIPPING SECTION %s", t)
 
     build_treemap(
-        elf_file.name, symbols, __CHART_STYLES__[display_type], max_depth, zoom
+        elf_file.name, symbols, __CHART_STYLES__[display_type], max_depth, zoom, strip
     )
 
 
