@@ -32,8 +32,6 @@ commissioning and different cluster control.
     -   [Thread Border Router overview](#thread-border-router-overview)
         <hr>
 
-<a name="introduction"></a>
-
 ## Introduction
 
 ![RT1170 EVK](../../../../platform/nxp/rt/rt1170/doc/images/IMX-RT1170-EVK-TOP.jpg)
@@ -58,8 +56,6 @@ Here are listed configurations that allow to support Matter over Wi-Fi & Matter
 over Thread on RT1170 :
 
 -   RT1170 + IW612 (Wi-Fi + BLE + 15.4)
-
-<a name="hardware-requirements-for-rt1170-and-iw612"></a>
 
 ### Hardware requirements for RT1170 + IW612
 
@@ -110,47 +106,45 @@ MIMXRT1170-EVK-B (host) to a IW612 transceiver (rcp).
 
     | Jumper | Position |
     | :----: | :------: |
-    |  J56   |   2-3    |
+    | `J56`  |  `2-3`   |
 
--   I2C connection to program IO_Expander on the IW612 module
+-   I2C connection to program `IO_Expander` on the IW612 module
 
-    | MIMXRT1170-EVK-B | uSD-M2 adapter |
-    | :--------------: | :------------: |
-    | I2C_SDA (J10.18) |      J5.2      |
-    | I2C_SDL (J10.20) |      J5.4      |
+    |  MIMXRT1170-EVK-B  | uSD-M2 adapter |
+    | :----------------: | :------------: |
+    | `I2C_SDA (J10.18)` |     `J5.2`     |
+    | `I2C_SDL (J10.20)` |     `J5.4`     |
 
 -   SPI connection between RT1170 and uSD-M2 adapter
 
-    | MIMXRT1170-EVK-B  | uSD-M2 adapter |
-    | :---------------: | :------------: |
-    | SPI_MOSI (J10.8)  |     J5.10      |
-    | SPI_MISO (J10.10) |      J9.7      |
-    | SPI_CLK (J10.12)  |      J9.8      |
-    |  SPI_CS (J10.6)   |      J5.8      |
-    |  SPI_INT (J26.4)  |      J5.6      |
-    |   GND (J10.14)    |     J5.15      |
+    |  MIMXRT1170-EVK-B   | uSD-M2 adapter |
+    | :-----------------: | :------------: |
+    | `SPI_MOSI (J10.8)`  |    `J5.10`     |
+    | `SPI_MISO (J10.10)` |     `J9.7`     |
+    | `SPI_CLK (J10.12)`  |     `J9.8`     |
+    |  `SPI_CS (J10.6)`   |     `J5.8`     |
+    |  `SPI_INT (J26.4)`  |     `J5.6`     |
+    |   `GND (J10.14)`    |    `J5.15`     |
 
 -   UART BLE and Reset connections between RT1170 and uSD-M2 adapter
 
-    | MIMXRT1170-EVK-B  | uSD-M2 adapter |
-    | :---------------: | :------------: |
-    |   RESET (J26.2)   |      J9.3      |
-    | UART_RXD (J25.13) |      J9.1      |
-    | UART_TXD (J25.15) |      J9.2      |
-    | UART_CTS (J25.9)  |      J8.4      |
-    | UART_RTS (J25.11) |      J8.3      |
-    |    GND (J26.1)    |      J7.6      |
-
-<a name="building"></a>
+    |  MIMXRT1170-EVK-B   | uSD-M2 adapter |
+    | :-----------------: | :------------: |
+    |   `RESET (J26.2)`   |     `J9.3`     |
+    | `UART_RXD (J25.13)` |     `J9.1`     |
+    | `UART_TXD (J25.15)` |     `J9.2`     |
+    | `UART_CTS (J25.9)`  |     `J8.4`     |
+    | `UART_RTS (J25.11)` |     `J8.3`     |
+    |    `GND (J26.1)`    |     `J7.6`     |
 
 ## Building
 
 In order to build the Project CHIP example, we recommend using a Linux
-distribution (supported Operating Systems are listed in
-[BUILDING.md](../../../../../docs/guides/BUILDING.md)).
+distribution. Supported Operating Systems are listed in
+[BUILDING.md](../../../../../docs/guides/BUILDING.md).
 
--   Make sure that below prerequisites are correctly installed (as described in
-    [BUILDING.md](../../../../../docs/guides/BUILDING.md)))
+-   Make sure that below prerequisites are correctly installed, as described in
+    [BUILDING.md](../../../../../docs/guides/BUILDING.md).
 
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
@@ -257,8 +251,6 @@ Optional GN options that can be added when building an application:
     gen_ command. (More information about the OTA Requestor feature in
     [OTA Requestor README](../../../../../docs/platforms/nxp/nxp_RTs_ota_software_update.md)))
 
-<a name="manufacturing-data"></a>
-
 ## Manufacturing data
 
 See
@@ -269,8 +261,6 @@ Other comments:
 The all cluster app demonstrates the usage of encrypted Matter manufacturing
 data storage. Matter manufacturing data should be encrypted using an AES 128
 software key before flashing them to the device flash.
-
-<a name="flashing-and-debugging"></a>
 
 ## Flashing and debugging
 
@@ -297,9 +287,9 @@ Right click on the Project -> Properties -> C/C++ Build -> MCU Settings -> Selec
 ![MCU_Sett](../../../../platform/nxp/rt/rt1170/doc/images/mcu-set.png)
 
 Sometimes when the MCU is selected it will not initialize all the memory regions
-(usually the BOARD_FLASH, BOARD_SDRAM and NCACHE_REGION) so it is required that
-this regions are added manually like in the image above. In addition to that on
-the BOARD_FLASH line, in the driver tab:
+(usually the `BOARD_FLASH`, `BOARD_SDRAM` and `NCACHE_REGION`) so it is required
+that this regions are added manually like in the image above. In addition to
+that on the `BOARD_FLASH` line, in the driver tab:
 
 ```
 click inside the tab and on the right side a button with three horizontal dots will appear
@@ -364,7 +354,6 @@ Right click on the Project -> Utilities -> Open Directory Browser here -> edit *
 
 -   Debug using the newly created configuration file:
 
-<a name="testing-the-example"></a>
 
 ## Testing the example
 
@@ -421,8 +410,6 @@ In this configuration, the device can be commissioned over Wi-Fi with the
 4. On the client side, start sending commands using the chip-tool application as
    it is described
    [here](../../../../chip-tool/README.md#using-the-client-to-send-matter-commands).
-
-<a name="testing-the-all-clusters-application-with-matter-cli-enabled"></a>
 
 ### Testing the all-clusters application with Matter CLI enabled:
 
@@ -509,8 +496,6 @@ Done
 leader
 Done
 ```
-
-<a name="thread-border-router-overview"></a>
 
 ## Thread Border Router overview
 

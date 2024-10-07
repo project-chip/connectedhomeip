@@ -73,7 +73,6 @@ argc
 args
 argv
 armeabi
-armgcc
 armino
 ARMmbed
 armv
@@ -243,7 +242,6 @@ CLA
 clapre
 CLI
 CLIs
-CLK
 cloudbuild
 CLRF
 clusterAttrs
@@ -306,8 +304,8 @@ conv
 CopperConcentrationMeasurement
 Corstone
 cortexa
-cp`
-cpio`
+cp
+cpio
 cpp
 cppreference
 CPROTO
@@ -323,7 +321,6 @@ csu
 csv
 ctl
 ctrl
-CTS
 ctypes
 CurrentHue
 CurrentLevel
@@ -357,7 +354,6 @@ DCL
 DCMAKE
 DCONF
 DCONFIG
-DCP
 debianutils
 debugText
 decrypt
@@ -421,7 +417,6 @@ dialout
 diffstat
 diffsyms
 dimmable
-DIO
 dirname
 dirs
 disableNotifyUpdateApplied
@@ -480,7 +475,6 @@ EchoService
 ECW
 edaf
 edc
-edgefast
 EDR
 ee
 eea
@@ -535,7 +529,6 @@ ExchangeContext
 exe
 ExecStart
 executables
-expander
 ExtendedPAN
 ExtensionEntry
 extern
@@ -698,7 +691,6 @@ imager
 imagetool
 imageUri
 img
-imgtool
 Impl
 ImplClass
 implementers
@@ -743,7 +735,7 @@ isUpperCase
 itemName
 iterable
 itsfoss
-iw
+IW
 JDK
 jinja
 JLink
@@ -831,7 +823,6 @@ LogEvent
 loopback
 LowPower
 LPC
-LPUART
 LSP
 LTE
 LTS
@@ -903,6 +894,7 @@ microcontroller
 microcontrollers
 MicroSD
 middleware
+MIMXRT
 minApplicableSoftwareVersion
 Minicom
 MinInterval
@@ -910,8 +902,6 @@ MinIntervalFloorSeconds
 minLength
 MinRtrAdvInterval
 minValue
-MISO
-mimxrt
 mkdir
 mlan
 MLD
@@ -921,7 +911,6 @@ Mobly
 ModeSelect
 modprobe
 Modustoolbox
-MOSI
 moveMode
 MoveToHue
 MoveToLevel
@@ -953,7 +942,6 @@ nano
 natively
 navpad
 nbsp
-ncache
 NCP
 ncs
 nding
@@ -1015,7 +1003,6 @@ OO
 openiotsdk
 openjdk
 OpenOCD
-opensource
 OpenSSL
 OpenThread
 OpenThreadDemo
@@ -1056,8 +1043,6 @@ otatesting
 otaURL
 OTBR
 otcli
-OTP
-OTW
 outform
 outgoingCommands
 overridable
@@ -1104,7 +1089,6 @@ PID
 Pigweed
 PinCode
 pinrequest
-PIO
 PIXIT
 PIXITs
 pkgconfig
@@ -1242,14 +1226,12 @@ RSA
 rsn
 RSSI
 RST
-RSTN
 rsync
 RTC
 rtd
 RTL
 rtld
 RTOS
-RTS
 RTT
 RTX
 runArgs
@@ -1272,7 +1254,6 @@ scm
 sco
 scp
 ScriptBinding
-SDA
 SDB
 SDC
 SDHC
@@ -1282,7 +1263,6 @@ sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
-SDRAM
 SecureCertDACProvider
 SED
 SEGGER
@@ -1544,7 +1524,6 @@ UUID
 ux
 validator
 valgrind
-VBAT
 vcom
 VCP
 Vectorcall
@@ -1557,7 +1536,6 @@ Verifier
 Verifiers
 VID
 vids
-VIO
 virtualenv
 visualstudio
 vlatest
@@ -1657,5 +1635,4 @@ Zigbee
 zigbeealliance
 zigbeethread
 zsdk
-ZTB
 TBR

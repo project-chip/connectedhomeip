@@ -106,7 +106,7 @@ The hardware should be reworked according to the chapter _Hardware Rework Guide
 for MIMXRT1060-EVK-B and AW-AM510-uSD_ or the chapter _Hardware Rework Guide for
 MIMXRT1060-EVK and AW-AM510-uSD_ in the document
 _`Hardware Rework Guide for EdgeFast BT PAL`_ which can be found in the NXP
-RT1060 SDK (_docs/wireless/bluetooth/edgefast_bluetooth/Hardware Rework Guide
+RT1060 SDK (_docs/wireless/bluetooth/`edgefast_bluetooth`/Hardware Rework Guide
 for EdgeFast BT PAL.pdf_):
 
 -   Make sure resistors R368/R376/R347/R349/R365/R363/R193/R186 are removed.
@@ -117,8 +117,8 @@ using the west tool.
 
 Jumper settings for AzureWave AW-AM510-uSD Module:
 
--   J4 1-2: VIO 1.8V (Voltage level of SD-IO pins is 1.8V)
--   J2 1-2: 3.3V VIO_uSD (Power Supply from uSD connector)
+-   J4 1-2: `VIO` 1.8V (Voltage level of SD-IO pins is 1.8V)
+-   J2 1-2: 3.3V `VIO_uSD` (Power Supply from uSD connector)
 -   The pin 1 of J4 is not marked on the board. Please note that pin numbering
     of J4 is opposite to J2.
 
@@ -128,13 +128,13 @@ MIMXRT1060-EVK.
 Connect the following pins between RT1060 and AW-AM510-uSD to enable Bluetooth
 HCI UART:
 
-| PIN NAME | AW-AM510-uSD | MIMXRT1060-EVK-B | MIMXRT1060-EVK | PIN NAME OF RT1060 | GPIO NAME OF RT1060 |
-| -------- | ------------ | ---------------- | -------------- | ------------------ | ------------------- |
-| UART_TXD | J10 (pin 4)  | J16 (pin 1)      | J22 (pin 1)    | LPUART3_RXD        | GPIO_AD_B1_07       |
-| UART_RXD | J10 (pin 2)  | J16 (pin 2)      | J22 (pin 2)    | LPUART3_TXD        | GPIO_AD_B1_06       |
-| UART_RTS | J10 (pin 6)  | J33 (pin 3)      | J23 (pin 3)    | LPUART3_CTS        | GPIO_AD_B1_04       |
-| UART_CTS | J10 (pin 8\) | J33 (pin 4)      | J23 (pin 4)    | LPUART3_RTS        | GPIO_AD_B1_05       |
-| GND      | J6 (pin 7)   | J32 (pin 7)      | J25 (pin 7)    | GND                | GND                 |
+|  PIN NAME  | AW-AM510-uSD  | MIMXRT1060-EVK-B | MIMXRT1060-EVK | PIN NAME OF RT1060 | GPIO NAME OF RT1060 |
+| :--------: | :-----------: | :--------------: | :------------: | :----------------: | :-----------------: |
+| `UART_TXD` | `J10 (pin 4)` |  `J16 (pin 1)`   | `J22 (pin 1)`  |   `LPUART3_RXD`    |   `GPIO_AD_B1_07`   |
+| `UART_RXD` | `J10 (pin 2)` |  `J16 (pin 2)`   | `J22 (pin 2)`  |   `LPUART3_TXD`    |   `GPIO_AD_B1_06`   |
+| `UART_RTS` | `J10 (pin 6)` |  `J33 (pin 3)`   | `J23 (pin 3)`  |   `LPUART3_CTS`    |   `GPIO_AD_B1_04`   |
+| `UART_CTS` | `J10 (pin 8)` |  `J33 (pin 4)`   | `J23 (pin 4)`  |   `LPUART3_RTS`    |   `GPIO_AD_B1_05`   |
+|   `GND`    | `J6 (pin 7)`  |  `J32 (pin 7)`   | `J25 (pin 7)`  |       `GND`        |        `GND`        |
 
 Attach external antenna into connector on AW-AM510-uSD.
 
@@ -160,7 +160,7 @@ Transceiver part :
 The 88W8801 2DS M.2 Module should be inserted into the Murata uSD-M.2 Adapter
 and inserted in the uSD slot J22 of MIMXRT1060-EVK-B. The Murata uSD-M.2 Adapter
 can be powered up using uSD pins. For that, set the J1 jumper of Murata uSD-M.2
-to position 2-3 (Position 2-3: VBAT supply, typical 3.1 ~ 3.3V, from microSD
+to position 2-3 (Position 2-3: `VBAT supply`, typical 3.1 ~ 3.3V, from microSD
 connector).
 
 Note: as the 88W8801 module supports only the 2.4 GHz Wi-Fi band, it is
@@ -182,15 +182,15 @@ Transceiver part:
 The below table explains pin settings (UART settings) to connect the
 MIMXRT1060-EVK-B (host) to a k32w061 transceiver (rcp).
 
-|    PIN NAME    | DK6 (K32W061) | MIMXRT1060-EVK-B | MIMXRT1060-EVK | PIN NAME OF RT1060 | GPIO NAME OF RT1060 |
-| :------------: | :-----------: | :--------------: | :------------: | :----------------: | :-----------------: |
-|    UART_TXD    |  PIO, pin 8   |    J16, pin 1    |   J22, pin 1   |    LPUART3_RXD     |    GPIO_AD_B1_07    |
-|    UART_RXD    |  PIO, pin 9   |    J16, pin 2    |   J22, pin 2   |    LPUART3_TXD     |    GPIO_AD_B1_06    |
-|    UART_RTS    |  PIO, pin 6   |    J33, pin 3    |   J23, pin 3   |    LPUART3_CTS     |    GPIO_AD_B1_04    |
-|    UART_CTS    |  PIO, pin 7   |    J33, pin 4    |   J23, pin 4   |    LPUART3_RTS     |    GPIO_AD_B1_05    |
-|      GND       |   J3, pin 1   |    J32, pin 7    |   J25, pin 7   |         XX         |         XX          |
-|     RESET      |     RSTN      |    J33, pin 2    |   J23, pin 2   |   GPIO_AD_B1_11    |    GPIO_AD_B1_11    |
-| DIO5/ISP Entry |  PIO, pin 5   |    J33, pin 1    |   J23, pin 1   |   GPIO_AD_B1_10    |    GPIO_AD_B1_10    |
+|     PIN NAME     | DK6 (K32W061) | MIMXRT1060-EVK-B | MIMXRT1060-EVK | PIN NAME OF RT1060 | GPIO NAME OF RT1060 |
+| :--------------: | :-----------: | :--------------: | :------------: | :----------------: | :-----------------: |
+|    `UART_TXD`    | `PIO, pin 8`  |   `J16, pin 1`   |  `J22, pin 1`  |   `LPUART3_RXD`    |   `GPIO_AD_B1_07`   |
+|    `UART_RXD`    | `PIO, pin 9`  |   `J16, pin 2`   |  `J22, pin 2`  |   `LPUART3_TXD`    |   `GPIO_AD_B1_06`   |
+|    `UART_RTS`    | `PIO, pin 6`  |   `J33, pin 3`   |  `J23, pin 3`  |   `LPUART3_CTS`    |   `GPIO_AD_B1_04`   |
+|    `UART_CTS`    | `PIO, pin 7`  |   `J33, pin 4`   |  `J23, pin 4`  |   `LPUART3_RTS`    |   `GPIO_AD_B1_05`   |
+|      `GND`       |  `J3, pin 1`  |   `J32, pin 7`   |  `J25, pin 7`  |        `XX`        |        `XX`         |
+|     `RESET`      |    `RSTN`     |   `J33, pin 2`   |  `J23, pin 2`  |  `GPIO_AD_B1_11`   |   `GPIO_AD_B1_11`   |
+| `DIO5/ISP Entry` | `PIO, pin 5`  |   `J33, pin 1`   |  `J23, pin 1`  |  `GPIO_AD_B1_10`   |   `GPIO_AD_B1_10`   |
 
 The below picture shows pins connections for the MIMXRT1060-EVK.
 
@@ -226,7 +226,7 @@ Transceiver part :
 -   88W8801 module (for Wi-Fi connection), for example 88W8801 2DS M.2 Module
     (rev A) and Murata uSD-M.2 Adapter (rev B1)
 -   K32W0x1 mezzanine module (for Thread connection)
--   IOT_ZTB-DK006 carrier board for the K32W0x1 module (referenced as DK6
+-   `IOT_ZTB-DK006` carrier board for the K32W0x1 module (referenced as DK6
     carrier board)
 
 <a name="building"></a>
@@ -234,11 +234,11 @@ Transceiver part :
 ## Building
 
 In order to build the Project CHIP example, we recommend using a Linux
-distribution (supported Operating Systems are listed in
-[BUILDING.md](../../../../../docs/guides/BUILDING.md)).
+distribution. Supported Operating Systems are listed in
+[BUILDING.md](../../../../../docs/guides/BUILDING.md).
 
--   Make sure that below prerequisites are correctly installed (as described in
-    [BUILDING.md](../../../../../docs/guides/BUILDING.md)).
+-   Make sure that below prerequisites are correctly installed, as described in
+    [BUILDING.md](../../../../../docs/guides/BUILDING.md).
 
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
@@ -340,7 +340,7 @@ host Matter application build. In fact the Matter host application is in charge
 of storing the K32W0 firmware in its flash to be able to use the
 `The Over The Wire (OTW) protocol (over UART)` to download (at host startup) the
 k32w0 transceiver image from the host to the K32W0 internal flash. For more
-information on the k32w0 OTW protocol, user can consult the doxygen header of
+information on the k32w0 `OTW` protocol, user can consult the doxygen header of
 the file located in
 `<repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/middleware/wireless/framework/OTW/k32w0_transceiver/fwk_otw.c`.
 
@@ -357,7 +357,7 @@ optional:
     will be used. If the K32W061 transceiver binary is saved at another location
     an absolute path of its location should be given.
 -   Optional: `otw_logs_enabled=true` This argument is optional, by default
-    being set to false. If set to true, RT logging will print the OTW logs.
+    being set to false. If set to true, RT logging will print the `OTW` logs.
 
 [ot_rcp_ble_hci_bb_k32w0_readme]:
     https://github.com/NXP/ot-nxp/blob/v1.0.0.2-tag-nxp/examples/hybrid/ot_rcp_ble_hci_bb/k32w061/README.md#building-the-examples
@@ -447,15 +447,15 @@ For development purpose the RT1060 all cluster app code could use the hardcoded
 AES 128 software key. This software key should be used only during development
 stage.
 
-For production usage, it is recommended to use the OTP key which needs to be
+For production usage, it is recommended to use the `OTP key` which needs to be
 fused in the RT1060 SW_GP2. The application note AN12800 should be followed to
 get more information. In this case the all cluster app should be updated to
-indicate to the DCP module to use the OTP key instead of the software key. For
-that the call to `FactoryDataPrvdImpl().SetAes128Key()` should be changed to
+indicate to the `DCP` module to use the `OTP key` instead of the software key.
+For that the call to `FactoryDataPrvdImpl().SetAes128Key()` should be changed to
 `FactoryDataPrvdImpl().SetKeySelected(KeySelect::)` with the arg value
-specifying where the OTP key is stored (`kDCP_OCOTPKeyLow` for [127:0] of SW_GP2
-or `kDCP_OCOTPKeyHigh` for [255:128] of SW_GP2). For more information the RT1060
-`FactoryDataProviderImpl` class description should be checked.
+specifying where the `OTP key` is stored (`kDCP_OCOTPKeyLow` for [127:0] of
+SW_GP2 or `kDCP_OCOTPKeyHigh` for [255:128] of SW_GP2). For more information the
+RT1060 `FactoryDataProviderImpl` class description should be checked.
 
 <a name="flashdebug"></a>
 
@@ -501,9 +501,9 @@ Right click on the Project -> Properties -> C/C++ Build -> MCU Settings -> Selec
 ![MCU_Set](../../../../platform/nxp/rt/rt1060/doc/images/mcu-set.png)
 
 Sometimes when the MCU is selected it will not initialize all the memory regions
-(usually the BOARD_FLASH, BOARD_SDRAM and NCACHE_REGION) so it is required that
-this regions are added manually like in the image above. In addition to that on
-the BOARD_FLASH line, in the driver tab:
+(usually the `BOARD_FLASH`, `BOARD_SDRAM` and `NCACHE_REGION`) so it is required
+that this regions are added manually like in the image above. In addition to
+that on the `BOARD_FLASH` line, in the driver tab:
 
 ```
 click inside the tab and on the right side a button with three horizontal dots will appear
