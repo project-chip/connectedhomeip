@@ -67,13 +67,13 @@ void BridgedDevice::SetReachable(bool reachable)
 
 void BridgedDevice::SetAdminCommissioningAttributes(const AdminCommissioningAttributes & aAdminCommissioningAttributes)
 {
-    mAdminCommissioningAttributes = aAdminCommissioningAttributes;
-
     EndpointId endpointId = mEndpointId;
     bool windowChanged =
         (aAdminCommissioningAttributes.commissioningWindowStatus != mAdminCommissioningAttributes.commissioningWindowStatus);
     bool fabricIndexChanged = (aAdminCommissioningAttributes.openerFabricIndex != mAdminCommissioningAttributes.openerFabricIndex);
     bool vendorChanged      = (aAdminCommissioningAttributes.openerVendorId != mAdminCommissioningAttributes.openerVendorId);
+
+    mAdminCommissioningAttributes = aAdminCommissioningAttributes;
 
     DeviceLayer::SystemLayer().ScheduleLambda([endpointId, windowChanged, fabricIndexChanged, vendorChanged]() {
         if (windowChanged)
