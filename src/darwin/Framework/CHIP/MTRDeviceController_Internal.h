@@ -265,8 +265,6 @@ static NSString * const kDeviceControllerErrorKeyAllocation = @"Generating new o
 static NSString * const kDeviceControllerErrorCSRValidation = @"Extracting public key from CSR failed";
 static NSString * const kDeviceControllerErrorGetCommissionee = @"Failure obtaining device being commissioned";
 static NSString * const kDeviceControllerErrorGetAttestationChallenge = @"Failure getting attestation challenge";
-static NSString * const kDeviceControllerErrorSpake2pVerifierGenerationFailed = @"PASE verifier generation failed";
-static NSString * const kDeviceControllerErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
 static NSString * const kDeviceControllerErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
 
 NS_ASSUME_NONNULL_END
