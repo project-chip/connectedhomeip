@@ -46,13 +46,14 @@ import asyncio
 import logging
 import os
 import queue
+import random
+import tempfile
 import signal
-import subprocess
-import uuid
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing.tasks import AppServerSubprocess
 from matter_testing_support import MatterBaseTest, SimpleEventCallback, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -139,61 +140,87 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
     @async_test_body
     async def setup_class(self):
+        super().setup_class()
+
         # These steps are not explicitly, but they help identify the dynamically added endpoint
         # The second part of this process happens on _get_dynamic_endpoint()
-        root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=_ROOT_ENDPOINT_ID)
+        root_part_list = await self.read_single_attribute_check_success(
+            cluster=Clusters.Descriptor,
+            attribute=Clusters.Descriptor.Attributes.PartsList,
+            endpoint=_ROOT_ENDPOINT_ID)
         self.set_of_dut_endpoints_before_adding_device = set(root_part_list)
 
-        super().setup_class()
         self._active_change_event_subscription = None
-        self.app_process = None
         self.app_process_paused = False
-        app = self.user_params.get("th_icd_server_app_path", None)
-        if not app:
+        self.th_icd_server = None
+        self.storage = None
+
+        th_icd_server_app = self.user_params.get("th_icd_server_app_path", None)
+        if not th_icd_server_app:
             asserts.fail('This test requires a TH_ICD_SERVER app. Specify app path with --string-arg th_icd_server_app_path:<path_to_app>')
+        if not os.path.exists(th_icd_server_app):
+            asserts.fail(f'The path {th_icd_server_app} does not exist')
 
-        self.kvs = f'kvs_{str(uuid.uuid4())}'
-        discriminator = 3850
-        passcode = 20202021
-        cmd = [app]
-        cmd.extend(['--secured-device-port', str(5543)])
-        cmd.extend(['--discriminator', str(discriminator)])
-        cmd.extend(['--passcode', str(passcode)])
-        cmd.extend(['--KVS', self.kvs])
+        # Create a temporary storage directory for keeping KVS files.
+        self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
+        logging.info("Temporary storage directory: %s", self.storage.name)
 
-        logging.info("Starting ICD Server App")
-        self.app_process = subprocess.Popen(cmd)
-        logging.info("ICD started")
-        await asyncio.sleep(3)
+        if self.is_pics_sdk_ci_only:
+            # Get the named pipe path for the DUT_FSA app input from the user params.
+            dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
+            if not dut_fsa_stdin_pipe:
+                asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
+            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
+
+        self.th_icd_server_port = 5544
+        self.th_icd_server_discriminator = random.randint(0, 4095)
+        self.th_icd_server_passcode = 20202022
+
+        # Start the TH_ICD_SERVER app.
+        self.th_icd_server = AppServerSubprocess(
+            th_icd_server_app,
+            storage_dir=self.storage.name,
+            port=self.th_icd_server_port,
+            discriminator=self.th_icd_server_discriminator,
+            passcode=self.th_icd_server_passcode)
+        self.th_icd_server.start(
+            expected_output="Server initialization complete",
+            timeout=30)
 
         logging.info("Commissioning of ICD to fabric one (TH)")
         self.icd_nodeid = 1111
 
         self.default_controller.EnableICDRegistration(self.default_controller.GenerateICDRegistrationParameters())
-        await self.default_controller.CommissionOnNetwork(nodeId=self.icd_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
+        await self.default_controller.CommissionOnNetwork(
+            nodeId=self.icd_nodeid,
+            setupPinCode=self.th_icd_server_passcode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=self.th_icd_server_discriminator)
 
         logging.info("Commissioning of ICD to fabric two (DUT)")
         params = await self.openCommissioningWindow(dev_ctrl=self.default_controller, node_id=self.icd_nodeid)
 
-        self._ask_for_vendor_commissioning_ux_operation(params.randomDiscriminator, params.commissioningParameters.setupPinCode,
-                                                        params.commissioningParameters.setupManualCode, params.commissioningParameters.setupQRCode)
+        if not self.is_pics_sdk_ci_only:
+            self._ask_for_vendor_commissioning_ux_operation(
+                params.randomDiscriminator,
+                params.commissioningParameters.setupPinCode,
+                params.commissioningParameters.setupManualCode,
+                params.commissioningParameters.setupQRCode)
+        else:
+            self.dut_fsa_stdin.write(
+                f"pairing onnetwork 2 {params.commissioningParameters.setupPinCode} --icd-registration true\n")
+            self.dut_fsa_stdin.flush()
+            # Wait for the commissioning to complete.
+            await asyncio.sleep(5)
 
     def teardown_class(self):
         if self._active_change_event_subscription is not None:
             self._active_change_event_subscription.Shutdown()
             self._active_change_event_subscription = None
-
-        # In case the th_icd_server_app_path does not exist, then we failed the test
-        # and there is nothing to remove
-        if self.app_process is not None:
-            self.resume_th_icd_server(check_state=False)
-            logging.warning("Stopping app with SIGTERM")
-            self.app_process.send_signal(signal.SIGTERM.value)
-            self.app_process.wait()
-
-            if os.path.exists(self.kvs):
-                os.remove(self.kvs)
-
+        if self.th_icd_server is not None:
+            self.th_icd_server.terminate()
+        if self.storage is not None:
+            self.storage.cleanup()
         super().teardown_class()
 
     def pause_th_icd_server(self, check_state):
@@ -202,7 +229,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         if self.app_process_paused:
             return
         # stops (halts) the ICD server process by sending a SIGTOP signal
-        self.app_process.send_signal(signal.SIGSTOP.value)
+        self.th_icd_server.p.send_signal(signal.SIGSTOP.value)
         self.app_process_paused = True
 
     def resume_th_icd_server(self, check_state):
@@ -211,7 +238,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         if not self.app_process_paused:
             return
         # resumes (continues) the ICD server process by sending a SIGCONT signal
-        self.app_process.send_signal(signal.SIGCONT.value)
+        self.th_icd_server.p.send_signal(signal.SIGCONT.value)
         self.app_process_paused = False
 
     #
@@ -232,7 +259,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.step("0")
         logging.info("Ensuring DUT is commissioned to TH")
 
-        # Confirms commissioning of DUT on TH as it reads its fature map
+        # Confirms commissioning of DUT on TH as it reads its feature map
         await self._read_attribute_expect_success(
             _ROOT_ENDPOINT_ID,
             basic_info_cluster,
