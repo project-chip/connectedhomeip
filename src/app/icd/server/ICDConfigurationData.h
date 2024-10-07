@@ -77,14 +77,11 @@ public:
     System::Clock::Seconds32 GetMaximumCheckInBackoff() { return mMaximumCheckInBackOff; }
 
     /**
-     * If ICD_ENFORCE_SIT_SLOW_POLL_LIMIT is set to 0, function will always return the configured Slow Polling interval
-     * (CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL).
-     *
-     * If ICD_ENFORCE_SIT_SLOW_POLL_LIMIT is set to 1, the returned value will depend on the devices operating mode.
+     * The returned value will depend on the devices operating mode.
      * If ICDMode == SIT && the configured slow poll interval is superior to the maximum threshold (15s), the function will return
-     * the threshold (15s). If ICDMode == SIT but the configured slow poll interval is equal or inferior to the threshold, the
-     * function will the return the configured slow poll interval. If ICDMode == LIT, the function will return the configured slow
-     * poll interval.
+     * the threshold kSITPollingThreshold (<= 15s). If ICDMode == SIT but the configured slow poll interval is equal or inferior to
+     * the threshold, the function will the return the configured slow poll interval. If ICDMode == LIT, the function will return
+     * the configured slow poll interval.
      *
      * @return System::Clock::Milliseconds32
      */
