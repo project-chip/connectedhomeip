@@ -90,5 +90,5 @@ void BridgedDevice::SetAdminCommissioningAttributes(const AdminCommissioningAttr
             MatterReportingAttributeChangeCallback(endpointId, app::Clusters::AdministratorCommissioning::Id,
                                                    app::Clusters::AdministratorCommissioning::Attributes::AdminVendorId::Id);
         }
-    });    
+    });
 }
