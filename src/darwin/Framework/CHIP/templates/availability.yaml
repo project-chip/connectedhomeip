@@ -9753,6 +9753,9 @@
           - WaterHeaterManagement
           - WaterHeaterMode
           - WiFiNetworkManagement
+          # Targeting Camera enablement
+          - Chime
+          - WebRTCTransportProvider
       attributes:
           AccessControl:
               # Targeting 1.4
@@ -9856,6 +9859,8 @@
               - LandmarkTag
               - PositionTag
               - RelativePositionTag
+              # Targeting Camera enablement
+              - ThreeLevelAutoEnum
       enum values:
           ApplicationLauncher:
               StatusEnum:

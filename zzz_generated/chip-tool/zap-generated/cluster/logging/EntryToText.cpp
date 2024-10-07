@@ -261,6 +261,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ContentAppObserver";
     case chip::app::Clusters::WebRTCTransportProvider::Id:
         return "WebRTCTransportProvider";
+    case chip::app::Clusters::WebRTCTransportRequestor::Id:
+        return "WebRTCTransportRequestor";
     case chip::app::Clusters::Chime::Id:
         return "Chime";
     case chip::app::Clusters::EcosystemInformation::Id:
@@ -4402,6 +4404,27 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::WebRTCTransportRequestor::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::CurrentSessions::Id:
+            return "CurrentSessions";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::EventList::Id:
+            return "EventList";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::Chime::Id: {
         switch (id)
         {
@@ -5766,6 +5789,21 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "ProvideICECandidate";
         case chip::app::Clusters::WebRTCTransportProvider::Commands::EndSession::Id:
             return "EndSession";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::WebRTCTransportRequestor::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WebRTCTransportRequestor::Commands::Offer::Id:
+            return "Offer";
+        case chip::app::Clusters::WebRTCTransportRequestor::Commands::Answer::Id:
+            return "Answer";
+        case chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::Id:
+            return "ICECandidate";
+        case chip::app::Clusters::WebRTCTransportRequestor::Commands::End::Id:
+            return "End";
         default:
             return "Unknown";
         }

@@ -1837,6 +1837,28 @@ static constexpr CommandId Id = 0x00000007;
 } // namespace Commands
 } // namespace WebRTCTransportProvider
 
+namespace WebRTCTransportRequestor {
+namespace Commands {
+
+namespace Offer {
+static constexpr CommandId Id = 0x00000001;
+} // namespace Offer
+
+namespace Answer {
+static constexpr CommandId Id = 0x00000002;
+} // namespace Answer
+
+namespace ICECandidate {
+static constexpr CommandId Id = 0x00000003;
+} // namespace ICECandidate
+
+namespace End {
+static constexpr CommandId Id = 0x00000004;
+} // namespace End
+
+} // namespace Commands
+} // namespace WebRTCTransportRequestor
+
 namespace Chime {
 namespace Commands {
 
