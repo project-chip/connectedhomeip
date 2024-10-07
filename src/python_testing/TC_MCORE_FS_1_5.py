@@ -50,7 +50,7 @@ from dataclasses import dataclass
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.testing.tasks import AppServerSubprocess
+from chip.testing.apps import AppServerSubprocess
 from ecdsa.curves import NIST256p
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts

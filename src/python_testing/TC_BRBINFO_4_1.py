@@ -47,46 +47,17 @@ import logging
 import os
 import queue
 import random
-import signal
 import tempfile
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.tasks import AppServerSubprocess
+from chip.testing.apps import IcdAppServerSubprocess
 from matter_testing_support import MatterBaseTest, SimpleEventCallback, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
 _ROOT_ENDPOINT_ID = 0
-
-
-class IcdAppServerSubprocess(AppServerSubprocess):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.paused = False
-
-    def pause(self, check_state: bool = True):
-        if check_state:
-            asserts.assert_false(self.paused, "ICD TH Server unexpectedly is already paused")
-        if not self.paused:
-            # Stop (halt) the ICD server process by sending a SIGTOP signal
-            self.p.send_signal(signal.SIGSTOP)
-            self.paused = True
-
-    def resume(self, check_state: bool = True):
-        if check_state:
-            asserts.assert_true(self.paused, "ICD TH Server unexpectedly is already running")
-        if self.paused:
-            # Resume (continue) the ICD server process by sending a SIGCONT signal
-            self.p.send_signal(signal.SIGCONT)
-            self.paused = False
-
-    def terminate(self):
-        # Make sure the ICD server process is not paused before terminating it
-        self.resume(check_state=False)
-        super().terminate()
 
 
 class TC_BRBINFO_4_1(MatterBaseTest):
