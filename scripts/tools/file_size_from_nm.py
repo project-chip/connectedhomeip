@@ -358,8 +358,9 @@ def build_treemap(
 )
 @click.option(
     "--strip",
-    default=None,
-    help="Strip out a tree subset (e.g. ::C)",
+    default="::C",
+    help="Strip out a tree subset (e.g. ::C). Set to empty to not strip anything.",
+    show_default=True,
 )
 @click.argument("elf-file", type=Path)
 def main(
@@ -368,7 +369,7 @@ def main(
     display_type: str,
     max_depth: int,
     zoom: Optional[str],
-    strip: Optional[str],
+    strip: str,
 ):
     log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
