@@ -106,7 +106,8 @@ def tree_display_name(name: str) -> list[str]:
         elif c == " " and indent == 0:
             # FOUND A SPACE, move it to the last
             type_prefix = name[:space_pos] + " "
-            name = name[space_pos + 1:]
+            space_pos += 1
+            name = name[space_pos:]
             break
         elif c == "(" and indent == 0:
             # a bracket not within templates means we are done!
@@ -143,7 +144,8 @@ def tree_display_name(name: str) -> list[str]:
                 name = name[2:]
         else:
             result.append(name[:ns_idx])
-            name = name[ns_idx + 2:]
+            ns_idx += 2
+            name = name[ns_idx:]
     result.append(type_prefix + name)
 
     if result[0].startswith("non-virtual thunk to "):
@@ -249,7 +251,6 @@ def build_treemap(
                 tree_name = tree_name[1:]
             if not tree_name:
                 continue
-            tree_name = tree_name[1:]
 
         if "AdvertiseOperational" in symbol.name:
             print(tree_name)
