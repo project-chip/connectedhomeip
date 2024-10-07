@@ -318,16 +318,10 @@ using namespace chip::Tracing::DarwinFramework;
     // Subclass hook; nothing to do.
 }
 
-- (NSNumber *)controllerNodeID
+- (nullable NSNumber *)controllerNodeID
 {
-    auto block = ^NSNumber * { return @(self->_cppCommissioner->GetNodeId()); };
-
-    NSNumber * nodeID = [self syncRunOnWorkQueueWithReturnValue:block error:nil];
-    if (!nodeID) {
-        MTR_LOG_ERROR("%@ A controller has no node id if it has not been started", self);
-    }
-
-    return nodeID;
+    MTR_ABSTRACT_METHOD();
+    return nil;
 }
 
 - (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
