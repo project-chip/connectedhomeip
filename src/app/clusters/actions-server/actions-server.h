@@ -21,36 +21,39 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <vector>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Actions {
 
-inline constexpr size_t kActionNameMaxSize       = 128u;
-inline constexpr size_t kEndpointListNameMaxSize = 128u;
+static constexpr size_t kActionNameMaxSize       = 128u;
+static constexpr size_t kEndpointListNameMaxSize = 128u;
+static constexpr size_t kEndpointListMaxSize     = 256u;
 
 class Delegate;
 
-struct GenericActionStruct : public Structs::ActionStruct::Type
+struct ActionStructStorage : public Structs::ActionStruct::Type
 {
-    GenericActionStruct(){};
+    ActionStructStorage() : mActionName(mBuffer, sizeof(mBuffer)){};
 
-    GenericActionStruct(uint16_t action, CharSpan label, ActionTypeEnum actionType, uint16_t epListID,
-                        BitMask<CommandBits> commands, ActionStateEnum actionState)
+    ActionStructStorage(uint16_t action, CharSpan actionName, ActionTypeEnum actionType, uint16_t epListID,
+                        BitMask<CommandBits> commands, ActionStateEnum actionState) :
+        mActionName(mBuffer, sizeof(mBuffer))
     {
-        Set(action, label, actionType, epListID, commands, actionState);
+        Set(action, actionName, actionType, epListID, commands, actionState);
     }
 
-    GenericActionStruct(const GenericActionStruct & action) { *this = action; }
+    ActionStructStorage(const ActionStructStorage & action) : mActionName(mBuffer, sizeof(mBuffer)) { *this = action; }
 
-    GenericActionStruct & operator=(const GenericActionStruct & action)
+    ActionStructStorage & operator=(const ActionStructStorage & action)
     {
         Set(action.actionID, action.name, action.type, action.endpointListID, action.supportedCommands, action.state);
         return *this;
     }
 
-    void Set(uint16_t action, CharSpan label, ActionTypeEnum actionType, uint16_t epListID, BitMask<CommandBits> commands,
+    void Set(uint16_t action, CharSpan actionName, ActionTypeEnum actionType, uint16_t epListID, BitMask<CommandBits> commands,
              ActionStateEnum actionState)
     {
         actionID          = action;
@@ -58,61 +61,55 @@ struct GenericActionStruct : public Structs::ActionStruct::Type
         endpointListID    = epListID;
         supportedCommands = commands;
         state             = actionState;
-        memset(mActionNameBuffer, 0, sizeof(mActionNameBuffer));
-        if (label.size() > sizeof(mActionNameBuffer))
-        {
-            memcpy(mActionNameBuffer, label.data(), sizeof(mActionNameBuffer));
-            name = CharSpan(mActionNameBuffer, sizeof(mActionNameBuffer));
-        }
-        else
-        {
-            memcpy(mActionNameBuffer, label.data(), label.size());
-            name = CharSpan(mActionNameBuffer, label.size());
-        }
+        CopyCharSpanToMutableCharSpanWithTruncation(actionName, mActionName);
+        name = mActionName;
     }
 
 private:
-    char mActionNameBuffer[kActionNameMaxSize];
+    char mBuffer[kActionNameMaxSize];
+    MutableCharSpan mActionName;
 };
 
-struct GenericEndpointList : public Structs::EndpointListStruct::Type
+struct EndpointListStorage : public Structs::EndpointListStruct::Type
 {
-    GenericEndpointList(){};
+    EndpointListStorage() : mEpListName(mBuffer, sizeof(mBuffer)){};
 
-    GenericEndpointList(uint16_t epListId, CharSpan label, EndpointListTypeEnum epListType,
-                        DataModel::List<const EndpointId> endpointList)
+    EndpointListStorage(uint16_t epListId, CharSpan epListName, EndpointListTypeEnum epListType,
+                        DataModel::List<const EndpointId> endpointList) :
+        mEpListName(mBuffer, sizeof(mBuffer))
     {
-        Set(epListId, label, epListType, endpointList);
+        Set(epListId, epListName, epListType, endpointList);
     }
 
-    GenericEndpointList(const GenericEndpointList & epList) { *this = epList; }
+    EndpointListStorage(const EndpointListStorage & epList) : mEpListName(mBuffer, sizeof(mBuffer)) { *this = epList; }
 
-    GenericEndpointList & operator=(const GenericEndpointList & epList)
+    EndpointListStorage & operator=(const EndpointListStorage & epList)
     {
         Set(epList.endpointListID, epList.name, epList.type, epList.endpoints);
         return *this;
     }
 
-    void Set(uint16_t epListId, CharSpan label, EndpointListTypeEnum epListType, DataModel::List<const EndpointId> endpointList)
+    void Set(uint16_t epListId, CharSpan epListName, EndpointListTypeEnum epListType,
+             DataModel::List<const EndpointId> endpointList)
     {
         endpointListID = epListId;
         type           = epListType;
-        endpoints      = endpointList;
-        memset(mEndpointListNameBuffer, 0, sizeof(mEndpointListNameBuffer));
-        if (label.size() > sizeof(mEndpointListNameBuffer))
+
+        for (uint8_t index = 0; index < std::min(endpointList.size(), kEndpointListMaxSize); index++)
         {
-            memcpy(mEndpointListNameBuffer, label.data(), sizeof(mEndpointListNameBuffer));
-            name = CharSpan(mEndpointListNameBuffer, sizeof(mEndpointListNameBuffer));
+            mEpList.push_back(endpointList[index]);
         }
-        else
-        {
-            memcpy(mEndpointListNameBuffer, label.data(), label.size());
-            name = CharSpan(mEndpointListNameBuffer, label.size());
-        }
+        mEpListSpan = Span(mEpList.data(), mEpList.size());
+        endpoints   = DataModel::List<const EndpointId>(mEpListSpan);
+        CopyCharSpanToMutableCharSpanWithTruncation(epListName, mEpListName);
+        name = mEpListName;
     }
 
 private:
-    char mEndpointListNameBuffer[kEndpointListNameMaxSize];
+    char mBuffer[kEndpointListNameMaxSize];
+    MutableCharSpan mEpListName;
+    std::vector<EndpointId> mEpList;
+    Span<const EndpointId> mEpListSpan;
 };
 
 class Instance : public AttributeAccessInterface, public CommandHandlerInterface
@@ -148,7 +145,7 @@ private:
 
     CHIP_ERROR ReadActionListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder);
     CHIP_ERROR ReadEndpointListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder);
-    CHIP_ERROR FindActionIdInActionList(uint16_t actionId);
+    bool FindActionIdInActionList(uint16_t actionId);
 
     // CommandHandlerInterface
     template <typename RequestT, typename FuncT>
@@ -181,35 +178,30 @@ public:
     /**
      * Get the action at the Nth index from list of actions.
      * @param index The index of the action to be returned. It is assumed that actions are indexable from 0 and with no gaps.
-     * @param action A reference to the GenericActionStruct which copies the buffer into it's own memory.
-     *               Name field (CharSpan) of ActionStruct contails the name of an action.
-     *               The API makes a copy of name.
+     * @param action A reference to the ActionStructStorage which should be initialized via copy/assignments or calling Set().
      * @return Returns a CHIP_NO_ERROR if there was no error and the action was returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index in beyond the list of available actions.
      */
-    virtual CHIP_ERROR ReadActionAtIndex(uint16_t index, GenericActionStruct & action);
+    virtual CHIP_ERROR ReadActionAtIndex(uint16_t index, ActionStructStorage & action) = 0;
 
     /**
      * Get the EndpointList at the Nth index from list of endpointList.
      * @param index The index of the endpointList to be returned. It is assumed that actions are indexable from 0 and with no gaps.
-     * @param epList A reference to the GenericEndpointList which copies the buffer into it's own memory.
-     *               Name field (CharSpan) of EndpointList contails the name of an endpoint list.
-     *               The API makes a copy of name.
+     * @param action A reference to the EndpointListStorage which should be initialized via copy/assignments or calling Set().
      * @return Returns a CHIP_NO_ERROR if there was no error and the epList was returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index in beyond the list of available endpointList.
      */
-    virtual CHIP_ERROR ReadEndpointListAtIndex(uint16_t index, GenericEndpointList & epList);
+    virtual CHIP_ERROR ReadEndpointListAtIndex(uint16_t index, EndpointListStorage & epList) = 0;
 
     /**
      * Find the action with matching actionId in the list of action.
      * @param actionId The action to be find in the list of action.
-     * @return Returns a CHIP_NO_ERROR if matching action is found.
-     * CHIP_ERROR_NOT_FOUND if the matching action does not found in the list of action.
+     * @return Returns a true if matching action is found otherwise false.
      */
-    virtual CHIP_ERROR FindActionIdInActionList(uint16_t actionId);
+    virtual bool FindActionIdInActionList(uint16_t actionId) = 0;
 
     /**
-     * On reciept of each and every command,
+     * On receipt of each and every command,
      * if the InvokeID data field is provided by the client when invoking a command, the server SHALL generate a StateChanged event
      * when the action changes to a new state or an ActionFailed event when execution of the action fails.
      *
@@ -218,16 +210,16 @@ public:
      */
 
     /**
-     * When an InstantAction command is recieved, an action (state change) on the involved endpoints shall trigger,
+     * When an InstantAction command is received, an action (state change) on the involved endpoints shall trigger,
      * in a "fire and forget" manner. Afterwards, the action’s state SHALL be Inactive.
      *
      * @param actionId The id of an action on which an action shall takes place.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Protocols::InteractionModel::Status HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When an InstantActionWithTransition command is recieved, an action (state change) on the involved endpoints shall trigger,
+     * When an InstantActionWithTransition command is received, an action (state change) on the involved endpoints shall trigger,
      * with a specified time to transition from the current state to the new state. During the transition, the action’s state SHALL
      * be Active. Afterwards, the action’s state SHALL be Inactive.
      *
@@ -236,19 +228,19 @@ public:
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
     virtual Protocols::InteractionModel::Status HandleInstantActionWithTransition(uint16_t actionId, uint16_t transitionTime,
-                                                                                  Optional<uint32_t> invokeId);
+                                                                                  Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When a StartAction command is recieved, the commencement of an action on the involved endpoints shall trigger. Afterwards,
+     * When a StartAction command is received, the commencement of an action on the involved endpoints shall trigger. Afterwards,
      * the action’s state SHALL be Inactive.
      *
      * @param actionId The id of an action on which an action shall takes place.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Protocols::InteractionModel::Status HandleStartAction(uint16_t actionId, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandleStartAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When a StartActionWithDuration command is recieved, the commencement of an action on the involved endpoints shall trigger,
+     * When a StartActionWithDuration command is received, the commencement of an action on the involved endpoints shall trigger,
      * and SHALL change the action’s state to Active. After the specified Duration, the action will stop, and the action’s state
      * SHALL change to Inactive.
      *
@@ -257,28 +249,28 @@ public:
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
     virtual Protocols::InteractionModel::Status HandleStartActionWithDuration(uint16_t actionId, uint32_t duration,
-                                                                              Optional<uint32_t> invokeId);
+                                                                              Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When a StopAction command is recieved, the ongoing action on the involved endpoints shall stop. Afterwards, the action’s
+     * When a StopAction command is received, the ongoing action on the involved endpoints shall stop. Afterwards, the action’s
      * state SHALL be Inactive.
      *
      * @param actionId The id of an action on which an action shall takes place.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Protocols::InteractionModel::Status HandleStopAction(uint16_t actionId, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandleStopAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When a PauseAction command is recieved, the ongoing action on the involved endpoints shall pause and SHALL change the
+     * When a PauseAction command is received, the ongoing action on the involved endpoints shall pause and SHALL change the
      * action’s state to Paused.
      *
      * @param actionId The id of an action on which an action shall takes place.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Protocols::InteractionModel::Status HandlePauseAction(uint16_t actionId, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandlePauseAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When a PauseActionWithDuration command is recieved, pauses an ongoing action, and SHALL change the action’s state to Paused.
+     * When a PauseActionWithDuration command is received, pauses an ongoing action, and SHALL change the action’s state to Paused.
      * After the specified Duration, the ongoing action will be automatically resumed. which SHALL change the action’s state to
      * Active.
      *
@@ -287,28 +279,28 @@ public:
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
     virtual Protocols::InteractionModel::Status HandlePauseActionWithDuration(uint16_t actionId, uint32_t duration,
-                                                                              Optional<uint32_t> invokeId);
+                                                                              Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When a ResumeAction command is recieved, the previously paused action shall resume and SHALL change the action’s state to
+     * When a ResumeAction command is received, the previously paused action shall resume and SHALL change the action’s state to
      * Active.
      *
      * @param actionId The id of an action on which an action shall takes place.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Protocols::InteractionModel::Status HandleResumeAction(uint16_t actionId, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandleResumeAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When an EnableAction command is recieved, it enables a certain action or automation. Afterwards, the action’s state SHALL be
+     * When an EnableAction command is received, it enables a certain action or automation. Afterwards, the action’s state SHALL be
      * Active.
      *
      * @param actionId The id of an action on which an action shall takes place.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Protocols::InteractionModel::Status HandleEnableAction(uint16_t actionId, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandleEnableAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When an EnableActionWithDuration command is recieved, it enables a certain action or automation, and SHALL change the
+     * When an EnableActionWithDuration command is received, it enables a certain action or automation, and SHALL change the
      * action’s state to be Active. After the specified Duration, the action or automation will stop, and the action’s state SHALL
      * change to Disabled.
      *
@@ -317,19 +309,19 @@ public:
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
     virtual Protocols::InteractionModel::Status HandleEnableActionWithDuration(uint16_t actionId, uint32_t duration,
-                                                                               Optional<uint32_t> invokeId);
+                                                                               Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When a DisableAction command is recieved, it disables a certain action or automation, and SHALL change the action’s state to
+     * When a DisableAction command is received, it disables a certain action or automation, and SHALL change the action’s state to
      * Inactive.
      *
      * @param actionId The id of an action on which an action shall takes place.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Protocols::InteractionModel::Status HandleDisableAction(uint16_t actionId, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandleDisableAction(uint16_t actionId, Optional<uint32_t> invokeId) = 0;
 
     /**
-     * When a DisableActionWithDuration command is recieved, it disables a certain action or automation, and SHALL change the
+     * When a DisableActionWithDuration command is received, it disables a certain action or automation, and SHALL change the
      * action’s state to Disabled. After the specified Duration, the action or automation will re-start, and the action’s state
      * SHALL change to either Inactive or Active, depending on the actions.
      *
@@ -338,7 +330,7 @@ public:
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
     virtual Protocols::InteractionModel::Status HandleDisableActionWithDuration(uint16_t actionId, uint32_t duration,
-                                                                                Optional<uint32_t> invokeId);
+                                                                                Optional<uint32_t> invokeId) = 0;
 };
 
 } // namespace Actions
