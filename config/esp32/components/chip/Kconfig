@@ -31,11 +31,11 @@ menu "CHIP Core"
             range 0 65535
             default 8
             help
-        The maximum number of simultaneously active CHIP exchange contexts.
-
-        An exchange context object is used to track the state of an ongoing CHIP message
+                The maximum number of simultaneously active CHIP exchange contexts.
+                
+                An exchange context object is used to track the state of an ongoing CHIP message
                 exchange (conversation) with a peer, e.g. a cloud service, a mobile application, or
-        another device.
+                another device.
 
         config MAX_BINDINGS
             int "Max Bindings"
@@ -1084,8 +1084,7 @@ menu "CHIP Device Layer"
             help
                 The IP address and port of the server to which the device should establish a service tunnel.
                 The supplied address must be a dot-notation IP address--not a host name.  The port number is
-                optional;
-if present it should be separated from the IP address with a colon (e.g. 192.168.1.100:5540).
+                optional; if present it should be separated from the IP address with a colon (e.g. 192.168.1.100:5540).
 
     endmenu
 
