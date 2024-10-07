@@ -207,11 +207,9 @@ extern "C" void app_main()
 
     ESP_LOGI(TAG, "==================================================");
 #if defined(CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE)
-    ESP_LOGI(TAG, "chip-esp32-energy-management-example evse starting. featureMap 0x%08lx",
-             GetDEMFeatureMap().Raw());
+    ESP_LOGI(TAG, "chip-esp32-energy-management-example evse starting. featureMap 0x%08lx", GetDEMFeatureMap().Raw());
 #elif defined(CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)
-    ESP_LOGI(TAG, "chip-esp32-energy-management-example water-heater starting. featureMap 0x%08lx",
-             GetDEMFeatureMap().Raw());
+    ESP_LOGI(TAG, "chip-esp32-energy-management-example water-heater starting. featureMap 0x%08lx", GetDEMFeatureMap().Raw());
 #else
     ESP_LOGI(TAG, "chip-esp32-energy-management-example starting. featureMap 0x%08lx", GetDEMFeatureMap().Raw());
 #endif
