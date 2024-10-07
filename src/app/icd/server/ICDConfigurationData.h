@@ -155,12 +155,18 @@ private:
                   "Spec requires the MaximumCheckInBackOff to be equal or superior to the IdleModeDuration");
     System::Clock::Seconds32 mMaximumCheckInBackOff = System::Clock::Seconds32(CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF_SEC);
 
-    // SIT ICDs should have a SlowPollingThreshold shorter than or equal to 15s (spec 9.16.1.5)
-    static_assert((CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT).count() <= 15000,
+    // SIT ICDs SHALL have a SlowPollingThreshold shorter than or equal to 15s (spec 9.16.1.5)
+    static constexpr System::Clock::Milliseconds32 kSitIcdSlowPollMaximum = System::Clock::Milliseconds32(15000);
+    static_assert((CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT).count() <= kSitIcdSlowPollMaximum.count(),
                   "Spec requires the maximum slow poll interval for the SIT device to be smaller or equal than 15 s.");
     static constexpr System::Clock::Milliseconds32 kSITPollingThreshold = CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT;
-    System::Clock::Milliseconds32 mSlowPollingInterval                  = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
-    System::Clock::Milliseconds32 mFastPollingInterval                  = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
+
+#if CHIP_CONFIG_ENABLE_ICD_LIT == 0
+    static_assert((CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL <= kSitIcdSlowPollMaximum),
+                  "LIT support is required for slow polling intervals superior to 15 seconds");
+#endif
+    System::Clock::Milliseconds32 mSlowPollingInterval = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+    System::Clock::Milliseconds32 mFastPollingInterval = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
 
     ICDMode mICDMode = ICDMode::SIT;
 };
