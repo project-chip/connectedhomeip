@@ -20153,6 +20153,111 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedWebRTCTransportRequestorClusterCurrentSessionsAttributeCallback implements ChipClusters.WebRTCTransportRequestorCluster.CurrentSessionsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.WebRTCTransportRequestorClusterWebRTCSessionStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.WebRTCTransportRequestorClusterWebRTCSessionStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWebRTCTransportRequestorClusterGeneratedCommandListAttributeCallback implements ChipClusters.WebRTCTransportRequestorCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWebRTCTransportRequestorClusterAcceptedCommandListAttributeCallback implements ChipClusters.WebRTCTransportRequestorCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWebRTCTransportRequestorClusterEventListAttributeCallback implements ChipClusters.WebRTCTransportRequestorCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWebRTCTransportRequestorClusterAttributeListAttributeCallback implements ChipClusters.WebRTCTransportRequestorCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedChimeClusterInstalledChimeSoundsAttributeCallback implements ChipClusters.ChimeCluster.InstalledChimeSoundsAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -22598,6 +22703,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.WebRTCTransportProviderCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("webRTCTransportProvider", webRTCTransportProviderClusterInfo);
 
+    ClusterInfo webRTCTransportRequestorClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.WebRTCTransportRequestorCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("webRTCTransportRequestor", webRTCTransportRequestorClusterInfo);
+
     ClusterInfo chimeClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ChimeCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("chime", chimeClusterInfo);
@@ -22744,6 +22853,7 @@ public class ClusterInfoMapping {
     destination.get("contentControl").combineCommands(source.get("contentControl"));
     destination.get("contentAppObserver").combineCommands(source.get("contentAppObserver"));
     destination.get("webRTCTransportProvider").combineCommands(source.get("webRTCTransportProvider"));
+    destination.get("webRTCTransportRequestor").combineCommands(source.get("webRTCTransportRequestor"));
     destination.get("chime").combineCommands(source.get("chime"));
     destination.get("ecosystemInformation").combineCommands(source.get("ecosystemInformation"));
     destination.get("commissionerControl").combineCommands(source.get("commissionerControl"));
@@ -29076,6 +29186,106 @@ public class ClusterInfoMapping {
     webRTCTransportProviderClusterInteractionInfoMap.put("endSession", webRTCTransportProviderendSessionInteractionInfo);
 
     commandMap.put("webRTCTransportProvider", webRTCTransportProviderClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> webRTCTransportRequestorClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> webRTCTransportRequestorofferCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo webRTCTransportRequestorofferwebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportRequestorofferCommandParams.put("webRTCSessionID",webRTCTransportRequestorofferwebRTCSessionIDCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportRequestoroffersdpCommandParameterInfo = new CommandParameterInfo("sdp", String.class, String.class);
+    webRTCTransportRequestorofferCommandParams.put("sdp",webRTCTransportRequestoroffersdpCommandParameterInfo);
+
+
+    CommandParameterInfo webRTCTransportRequestorofferICETransportPolicyCommandParameterInfo = new CommandParameterInfo("ICETransportPolicy", Optional.class, String.class);
+    webRTCTransportRequestorofferCommandParams.put("ICETransportPolicy",webRTCTransportRequestorofferICETransportPolicyCommandParameterInfo);
+    InteractionInfo webRTCTransportRequestorofferInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WebRTCTransportRequestorCluster) cluster)
+        .offer((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("webRTCSessionID")
+        , (String)
+        commandArguments.get("sdp")
+        , (Optional<ArrayList<ChipStructs.WebRTCTransportRequestorClusterICEServerStruct>>)
+        commandArguments.get("ICEServers")
+        , (Optional<String>)
+        commandArguments.get("ICETransportPolicy")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        webRTCTransportRequestorofferCommandParams
+    );
+    webRTCTransportRequestorClusterInteractionInfoMap.put("offer", webRTCTransportRequestorofferInteractionInfo);
+
+    Map<String, CommandParameterInfo> webRTCTransportRequestoranswerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo webRTCTransportRequestoranswerwebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportRequestoranswerCommandParams.put("webRTCSessionID",webRTCTransportRequestoranswerwebRTCSessionIDCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportRequestoranswersdpCommandParameterInfo = new CommandParameterInfo("sdp", String.class, String.class);
+    webRTCTransportRequestoranswerCommandParams.put("sdp",webRTCTransportRequestoranswersdpCommandParameterInfo);
+    InteractionInfo webRTCTransportRequestoranswerInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WebRTCTransportRequestorCluster) cluster)
+        .answer((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("webRTCSessionID")
+        , (String)
+        commandArguments.get("sdp")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        webRTCTransportRequestoranswerCommandParams
+    );
+    webRTCTransportRequestorClusterInteractionInfoMap.put("answer", webRTCTransportRequestoranswerInteractionInfo);
+
+    Map<String, CommandParameterInfo> webRTCTransportRequestorICECandidateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo webRTCTransportRequestorICECandidatewebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportRequestorICECandidateCommandParams.put("webRTCSessionID",webRTCTransportRequestorICECandidatewebRTCSessionIDCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportRequestorICECandidateICECandidateCommandParameterInfo = new CommandParameterInfo("ICECandidate", String.class, String.class);
+    webRTCTransportRequestorICECandidateCommandParams.put("ICECandidate",webRTCTransportRequestorICECandidateICECandidateCommandParameterInfo);
+    InteractionInfo webRTCTransportRequestorICECandidateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WebRTCTransportRequestorCluster) cluster)
+        .ICECandidate((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("webRTCSessionID")
+        , (String)
+        commandArguments.get("ICECandidate")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        webRTCTransportRequestorICECandidateCommandParams
+    );
+    webRTCTransportRequestorClusterInteractionInfoMap.put("ICECandidate", webRTCTransportRequestorICECandidateInteractionInfo);
+
+    Map<String, CommandParameterInfo> webRTCTransportRequestorendCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo webRTCTransportRequestorendwebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportRequestorendCommandParams.put("webRTCSessionID",webRTCTransportRequestorendwebRTCSessionIDCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportRequestorendreasonCommandParameterInfo = new CommandParameterInfo("reason", Integer.class, Integer.class);
+    webRTCTransportRequestorendCommandParams.put("reason",webRTCTransportRequestorendreasonCommandParameterInfo);
+    InteractionInfo webRTCTransportRequestorendInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WebRTCTransportRequestorCluster) cluster)
+        .end((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("webRTCSessionID")
+        , (Integer)
+        commandArguments.get("reason")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        webRTCTransportRequestorendCommandParams
+    );
+    webRTCTransportRequestorClusterInteractionInfoMap.put("end", webRTCTransportRequestorendInteractionInfo);
+
+    commandMap.put("webRTCTransportRequestor", webRTCTransportRequestorClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> chimeClusterInteractionInfoMap = new LinkedHashMap<>();
 

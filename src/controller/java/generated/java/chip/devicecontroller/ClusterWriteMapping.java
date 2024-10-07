@@ -3474,6 +3474,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("contentAppObserver", writeContentAppObserverInteractionInfo);
     Map<String, InteractionInfo> writeWebRTCTransportProviderInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("webRTCTransportProvider", writeWebRTCTransportProviderInteractionInfo);
+    Map<String, InteractionInfo> writeWebRTCTransportRequestorInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("webRTCTransportRequestor", writeWebRTCTransportRequestorInteractionInfo);
     Map<String, InteractionInfo> writeChimeInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeChimeActiveChimeIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo chimeactiveChimeIDCommandParameterInfo =
