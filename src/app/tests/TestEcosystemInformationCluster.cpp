@@ -40,10 +40,11 @@ struct RequiredEcosystemDeviceParams
     FabricIndex fabicIndex                     = kValidFabricIndex;
 };
 
+const RequiredEcosystemDeviceParams kDefaultRequiredDeviceParams;
+
 const EndpointId kAnotherValidEndpointId = 2;
 static_assert(kValidEndpointId != kAnotherValidEndpointId);
 const char * kValidLocationName = "AValidLocationName";
-const RequiredEcosystemDeviceParams kDefaultRequiredDeviceParams;
 const ClusterId kEcosystemInfoClusterId         = EcosystemInformation::Id;
 const AttributeId kDeviceDirectoryAttributeId   = EcosystemInformation::Attributes::DeviceDirectory::Id;
 const AttributeId kLocationDirectoryAttributeId = EcosystemInformation::Attributes::LocationDirectory::Id;
