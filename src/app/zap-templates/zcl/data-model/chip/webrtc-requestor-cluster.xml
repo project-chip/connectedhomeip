@@ -33,7 +33,7 @@ Git: 0.9-fall2024-228-g54b1ae035
     <globalAttribute code="0xFFFD" side="either" value="1"/>
     <attribute code="0x0000" side="server" define="CURRENT_SESSIONS" type="array" entryType="WebRTCSessionStruct" default="0">CurrentSessions</attribute>
     <command code="0x01" source="client" name="Offer" optional="false">
-      <description>This command provides the stream requestor with WebRTC session details.</description>
+      <description>This command provides the stream requestor with WebRTC session details. It is sent following the receipt of a SolicitOffer command or a re-Offer initiated by the Provider.</description>
       <arg id="1" name="WebRTCSessionID" type="int16u"/>
       <arg id="2" name="SDP" type="char_string"/>
       <arg id="3" name="ICEServers" array="true" type="ICEServerStruct" optional="true"/>
@@ -41,7 +41,7 @@ Git: 0.9-fall2024-228-g54b1ae035
     </command>
 
     <command code="0x02" source="client" name="Answer" optional="false">
-      <description>This command provides the stream requestor with the WebRTC session details (i.e.</description>
+      <description>This command provides the stream requestor with the WebRTC session details (i.e. Session ID and SDP answer). It is the next command in the Offer/Answer flow to the ProvideOffer command.</description>
       <arg id="1" name="WebRTCSessionID" type="int16u"/>
       <arg id="2" name="SDP" type="char_string"/>
     </command>
