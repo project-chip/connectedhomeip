@@ -30,7 +30,8 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
                 write_access = xml_attribute.write_access
                 if write_access:
-                    if cluster_id in Clusters.ClusterObjects.ALL_ATTRIBUTES:
+                    if cluster_id in Clusters.ClusterObjects.ALL_ATTRIBUTES and attribute_id in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
+
                         try:
                             if hasattr(Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id], 'value'):
                                 writable_attributes.append((cluster_id, attribute_id, write_access))
