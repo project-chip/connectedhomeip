@@ -43,7 +43,6 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
-#import "MTROperationalCredentialsDelegate.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "MTRServerEndpoint_Internal.h"
@@ -124,7 +123,6 @@ using namespace chip::Tracing::DarwinFramework;
     chip::Credentials::PartialDACVerifier * _partialDACVerifier;
     chip::Credentials::DefaultDACVerifier * _defaultDACVerifier;
     MTRDeviceControllerDelegateBridge * _deviceControllerDelegateBridge;
-    MTROperationalCredentialsDelegate * _operationalCredentialsDelegate;
     MTRDeviceAttestationDelegateBridge * _deviceAttestationDelegateBridge;
     os_unfair_lock _underlyingDeviceMapLock;
     MTRCommissionableBrowser * _commissionableBrowser;
@@ -586,27 +584,8 @@ using namespace chip::Tracing::DarwinFramework;
 - (void)asyncGetCommissionerOnMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
                              errorHandler:(nullable MTRDeviceErrorHandler)errorHandler
 {
-    {
-        NSError * error;
-        if (![self checkIsRunning:&error]) {
-            if (errorHandler != nil) {
-                errorHandler(error);
-            }
-            return;
-        }
-    }
-
-    dispatch_async(_chipWorkQueue, ^{
-        NSError * error;
-        if (![self checkIsRunning:&error]) {
-            if (errorHandler != nil) {
-                errorHandler(error);
-            }
-            return;
-        }
-
-        block(self->_cppCommissioner);
-    });
+    MTR_ABSTRACT_METHOD();
+    errorHandler([MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
 }
 
 - (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler
