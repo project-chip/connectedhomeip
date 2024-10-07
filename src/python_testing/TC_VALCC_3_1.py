@@ -45,14 +45,14 @@ class TC_VALCC_3_1(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Set up a subscription to all attributes on the DUT"),
-            TestStep(2, "Send Open command", "DUT returns SUCCESS"),
-            TestStep(3, "Wait until TH receives and data report for TargetState set to NULL and an attribute report for CurrentState set to Open (ordering does not matter)",
+            TestStep(3, "Send Open command", "DUT returns SUCCESS"),
+            TestStep(4, "Wait until TH receives and data report for TargetState set to NULL and an attribute report for CurrentState set to Open (ordering does not matter)",
                      "Expected attribute reports are received"),
-            TestStep(4, "Read CurrentState and TargetState attribute", "CurrentState is Open, TargetState is NULL"),
-            TestStep(5, "Send Close command", "DUT returns SUCCESS"),
-            TestStep(3, "Wait until TH receives and data report for TargetState set to NULL and an attribute report for CurrentState set to Closed (ordering does not matter)",
+            TestStep(5, "Read CurrentState and TargetState attribute", "CurrentState is Open, TargetState is NULL"),
+            TestStep(6, "Send Close command", "DUT returns SUCCESS"),
+            TestStep(7, "Wait until TH receives and data report for TargetState set to NULL and an attribute report for CurrentState set to Closed (ordering does not matter)",
                      "Expected attribute reports are received"),
-            TestStep(7, "Read CurrentState and TargetState attribute", "CurrentState is Closed, TargetState is NULL"),
+            TestStep(8, "Read CurrentState and TargetState attribute", "CurrentState is Closed, TargetState is NULL"),
         ]
         return steps
 
@@ -67,21 +67,18 @@ class TC_VALCC_3_1(MatterBaseTest):
 
         endpoint = self.user_params.get("endpoint", 1)
 
-        self.step(1)
+        self.step(1)  # commissioning - already done
+
+        self.step(2)
         cluster = Clusters.ValveConfigurationAndControl
         attributes = cluster.Attributes
         attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
         await attribute_subscription.start(self.default_controller, self.dut_node_id, endpoint)
 
-        self.step(2)
-        try:
-            await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Open(), endpoint=endpoint)
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
-
         self.step(3)
+        await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Open(), endpoint=endpoint)
 
+        self.step(4)
         # Wait until the current state is open and the target state is Null.
         # Wait for the entire duration of the test because this valve may be slow. The test will time out before this does. That's fine.
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
@@ -89,51 +86,26 @@ class TC_VALCC_3_1(MatterBaseTest):
             endpoint_id=endpoint, attribute=attributes.CurrentState, value=cluster.Enums.ValveStateEnum.kOpen)]
         attribute_subscription.await_all_final_values_reported(expected_final_values=expected_final_state, timeout_sec=timeout)
 
-        # Read target state first in case the current state goes to open between these calls.
-        # The test re-reads target state after CurrentState goes to open.
-        target_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-        current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-
-        while current_state_dut is cluster.Enums.ValveStateEnum.kTransitioning:
-            asserts.assert_equal(target_state_dut, cluster.Enums.ValveStateEnum.kOpen, "TargetState is incorrect")
-            time.sleep(1)
-
-            target_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-            current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-            asserts.assert_true(current_state_dut is not NullValue, "CurrentState is null")
-            asserts.assert_true(target_state_dut is not NullValue, "TargetState is null")
-
-        self.step(4)
-        current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-        asserts.assert_equal(current_state_dut, cluster.Enums.ValveStateEnum.kOpen, "CurrentState is incorrect")
-        target_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-        asserts.assert_true(target_state_dut is NullValue, "TargetState is not null")
-
         self.step(5)
-        try:
-            await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Close(), endpoint=endpoint)
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
+        target_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+        current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+        asserts.assert_equal(current_state_dut, cluster.Enums.ValveStateEnum.kOpen, "CurrentState is not open")
+        asserts.assert_equal(target_state_dut, NullValue, "TargetState is not null")
 
         self.step(6)
-        target_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-        current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-
-        while current_state_dut is cluster.Enums.ValveStateEnum.kTransitioning:
-            asserts.assert_equal(target_state_dut, cluster.Enums.ValveStateEnum.kClosed, "TargetState is incorrect")
-            time.sleep(1)
-
-            target_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-            current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-            asserts.assert_true(current_state_dut is not NullValue, "CurrentState is null")
-            asserts.assert_true(target_state_dut is not NullValue, "TargetState is null")
+        attribute_subscription.reset()
+        await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Close(), endpoint=endpoint)
 
         self.step(7)
-        current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-        asserts.assert_equal(current_state_dut, cluster.Enums.ValveStateEnum.kClosed, "CurrentState is incorrect")
+        expected_final_state = [AttributeValue(endpoint_id=endpoint, attribute=attributes.TargetState, value=NullValue), AttributeValue(
+            endpoint_id=endpoint, attribute=attributes.CurrentState, value=cluster.Enums.ValveStateEnum.kClosed)]
+        attribute_subscription.await_all_final_values_reported(expected_final_values=expected_final_state, timeout_sec=timeout)
+
+        self.step(8)
         target_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-        asserts.assert_true(target_state_dut is NullValue, "TargetState is not null")
+        current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+        asserts.assert_equal(current_state_dut, cluster.Enums.ValveStateEnum.kClosed, "CurrentState is not closed")
+        asserts.assert_equal(target_state_dut, NullValue, "TargetState is not null")
 
 
 if __name__ == "__main__":
