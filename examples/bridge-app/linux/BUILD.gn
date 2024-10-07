@@ -28,6 +28,14 @@ executable("chip-bridge-app") {
     "main.cpp",
   ]
 
+  # Generic implementation of the actions cluster is not introduced in this app as this app has
+  # an interface to test actions.
+  # TODO: Generic implementation can be used here instead of having its own.
+  excludes = [ "${chip_root}/src/app/clusters/actions-server/**" ]
+
+  # Apply excludes to the sources
+  sources -= excludes
+
   deps = [
     "${chip_root}/examples/bridge-app/bridge-common",
     "${chip_root}/examples/platform/linux:app-main",

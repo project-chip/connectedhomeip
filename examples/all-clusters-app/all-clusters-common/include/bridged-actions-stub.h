@@ -34,10 +34,10 @@ const uint16_t kEndpointListSize = 3;
 class ActionsDelegateImpl : public Delegate
 {
 private:
-    const GenericActionStruct kActionList[kActionListSize] = {
-        GenericActionStruct(0, CharSpan::fromCharString("TurnOnLight"), ActionTypeEnum::kScene, 0, 0, ActionStateEnum::kInactive),
-        GenericActionStruct(1, CharSpan::fromCharString("TurnOffLight"), ActionTypeEnum::kScene, 1, 0, ActionStateEnum::kInactive),
-        GenericActionStruct(2, CharSpan::fromCharString("ToggleLight"), ActionTypeEnum::kScene, 2, 0, ActionStateEnum::kInactive),
+    const ActionStructStorage kActionList[kActionListSize] = {
+        ActionStructStorage(0, CharSpan::fromCharString("TurnOnLight"), ActionTypeEnum::kScene, 0, 0, ActionStateEnum::kInactive),
+        ActionStructStorage(1, CharSpan::fromCharString("TurnOffLight"), ActionTypeEnum::kScene, 1, 0, ActionStateEnum::kInactive),
+        ActionStructStorage(2, CharSpan::fromCharString("ToggleLight"), ActionTypeEnum::kScene, 2, 0, ActionStateEnum::kInactive),
     };
 
     // Dummy endpoint list.
@@ -45,18 +45,18 @@ private:
     const EndpointId secondEpList[1] = { 0 };
     const EndpointId thirdEpList[1]  = { 0 };
 
-    const GenericEndpointList kEndpointList[kEndpointListSize] = {
-        GenericEndpointList(0, CharSpan::fromCharString("On"), EndpointListTypeEnum::kOther,
+    const EndpointListStorage kEndpointList[kEndpointListSize] = {
+        EndpointListStorage(0, CharSpan::fromCharString("On"), EndpointListTypeEnum::kOther,
                             DataModel::List<const EndpointId>(firstEpList)),
-        GenericEndpointList(1, CharSpan::fromCharString("Off"), EndpointListTypeEnum::kOther,
+        EndpointListStorage(1, CharSpan::fromCharString("Off"), EndpointListTypeEnum::kOther,
                             DataModel::List<const EndpointId>(secondEpList)),
-        GenericEndpointList(2, CharSpan::fromCharString("Toggle"), EndpointListTypeEnum::kOther,
+        EndpointListStorage(2, CharSpan::fromCharString("Toggle"), EndpointListTypeEnum::kOther,
                             DataModel::List<const EndpointId>(thirdEpList)),
     };
 
-    CHIP_ERROR ReadActionAtIndex(uint16_t index, GenericActionStruct & action) override;
-    CHIP_ERROR ReadEndpointListAtIndex(uint16_t index, GenericEndpointList & epList) override;
-    CHIP_ERROR FindActionIdInActionList(uint16_t actionId) override;
+    CHIP_ERROR ReadActionAtIndex(uint16_t index, ActionStructStorage & action) override;
+    CHIP_ERROR ReadEndpointListAtIndex(uint16_t index, EndpointListStorage & epList) override;
+    bool FindActionIdInActionList(uint16_t actionId) override;
 
     Protocols::InteractionModel::Status HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
     Protocols::InteractionModel::Status HandleInstantActionWithTransition(uint16_t actionId, uint16_t transitionTime,

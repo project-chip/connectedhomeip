@@ -16,7 +16,6 @@
  */
 
 #include "actions-server.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
@@ -77,7 +76,7 @@ CHIP_ERROR Instance::ReadActionListAttribute(const AttributeValueEncoder::ListEn
     }
     for (uint16_t i = 0; true; i++)
     {
-        GenericActionStruct action;
+        ActionStructStorage action;
 
         CHIP_ERROR err = GetInstance()->mDelegate->ReadActionAtIndex(i, action);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
@@ -99,7 +98,7 @@ CHIP_ERROR Instance::ReadEndpointListAttribute(const AttributeValueEncoder::List
     }
     for (uint16_t i = 0; true; i++)
     {
-        GenericEndpointList epList;
+        EndpointListStorage epList;
 
         CHIP_ERROR err = GetInstance()->mDelegate->ReadEndpointListAtIndex(i, epList);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
@@ -146,12 +145,12 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::FindActionIdInActionList(uint16_t actionId)
+bool Instance::FindActionIdInActionList(uint16_t actionId)
 {
     if (GetInstance()->mDelegate == nullptr)
     {
         ChipLogError(Zcl, "Actions delegate is null!!!");
-        return CHIP_ERROR_INCORRECT_STATE;
+        return false;
     }
     return GetInstance()->mDelegate->FindActionIdInActionList(actionId);
 }
@@ -178,8 +177,7 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
         }
 
         uint16_t actionId = requestPayload.actionID;
-        CHIP_ERROR err    = GetInstance()->FindActionIdInActionList(actionId);
-        if (err != CHIP_NO_ERROR)
+        if (!GetInstance()->FindActionIdInActionList(actionId))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::NotFound);
             return;
