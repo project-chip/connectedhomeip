@@ -28,7 +28,6 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             attributes = xml_cluster.attributes
             for attribute_id, xml_attribute in attributes.items():
 
-                xml_attribute = attributes[attribute_id]
                 write_access = xml_attribute.write_access
                 if write_access:
                     if cluster_id in Clusters.ClusterObjects.ALL_ATTRIBUTES:
