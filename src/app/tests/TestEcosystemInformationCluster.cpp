@@ -158,7 +158,7 @@ TEST_F(TestEcosystemInformationCluster, BuildingEcosystemDeviceStruct)
     deviceInfoBuilder.AddDeviceType(deviceType);
     deviceInfo = deviceInfoBuilder.Build();
     ASSERT_FALSE(deviceInfo);
-    
+
     deviceInfoBuilder.SetFabricIndex(1);
     deviceInfo = deviceInfoBuilder.Build();
     ASSERT_TRUE(deviceInfo);
@@ -190,7 +190,7 @@ TEST_F(TestEcosystemInformationCluster, BuildingInvalidEcosystemDeviceStruct)
     deviceInfoBuilder.SetFabricIndex(1);
     // At this point deviceInfoBuilder would be able to be built successfully.
 
-    std::string nameThatsTooLong(65, 'x'); 
+    std::string nameThatsTooLong(65, 'x');
     uint64_t nameEpochValueUs = 0;  // This values doesn't matter.
     deviceInfoBuilder.SetDeviceName(std::move(nameThatsTooLong), nameEpochValueUs);
     deviceInfo = deviceInfoBuilder.Build();
@@ -198,7 +198,7 @@ TEST_F(TestEcosystemInformationCluster, BuildingInvalidEcosystemDeviceStruct)
 
     // Ending unit test by building something that should work just to make sure
     // Builder isn't silently failing on building for some other reason.
-    std::string nameThatsMaxLength(64, 'x'); 
+    std::string nameThatsMaxLength(64, 'x');
     deviceInfoBuilder.SetDeviceName(std::move(nameThatsMaxLength), nameEpochValueUs);
     deviceInfo = deviceInfoBuilder.Build();
     ASSERT_TRUE(deviceInfo);
@@ -286,7 +286,7 @@ TEST_F(TestEcosystemInformationCluster, BuildingInvalidEcosystemLocationStruct)
 {
     EcosystemLocationStruct::Builder locationInfoBuilder;
 
-    std::string nameThatsTooLong(129, 'x'); 
+    std::string nameThatsTooLong(129, 'x');
     locationInfoBuilder.SetLocationName(nameThatsTooLong);
 
     std::unique_ptr<EcosystemLocationStruct> locationInfo = locationInfoBuilder.Build();
@@ -294,7 +294,7 @@ TEST_F(TestEcosystemInformationCluster, BuildingInvalidEcosystemLocationStruct)
 
     // Ending unit test by building something that should work just to make sure
     // Builder isn't silently failing on building for some other reason.
-    std::string nameThatsMaxLength(128, 'x'); 
+    std::string nameThatsMaxLength(128, 'x');
     locationInfoBuilder.SetLocationName(nameThatsMaxLength);
     locationInfo = locationInfoBuilder.Build();
     ASSERT_TRUE(locationInfo);
