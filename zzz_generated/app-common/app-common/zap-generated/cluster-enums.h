@@ -5457,6 +5457,15 @@ using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
 using WebRTCMetadataOptions = Clusters::detail::WebRTCMetadataOptions;
 } // namespace WebRTCTransportProvider
 
+namespace WebRTCTransportRequestor {
+
+using StreamTypeEnum = Clusters::detail::StreamTypeEnum;
+
+using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
+
+using WebRTCMetadataOptions = Clusters::detail::WebRTCMetadataOptions;
+} // namespace WebRTCTransportRequestor
+
 namespace Chime {} // namespace Chime
 
 namespace EcosystemInformation {} // namespace EcosystemInformation

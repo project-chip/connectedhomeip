@@ -8258,6 +8258,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::WebRTCTransportRequestor::Id: {
+        using namespace app::Clusters::WebRTCTransportRequestor;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::Chime::Id: {
         using namespace app::Clusters::Chime;
         switch (aPath.mEventId)
