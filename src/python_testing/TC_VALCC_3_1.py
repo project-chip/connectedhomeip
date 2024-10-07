@@ -45,14 +45,15 @@ class TC_VALCC_3_1(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Set up a subscription to all attributes on the DUT"),
-            TestStep(3, "Send Open command", "DUT returns SUCCESS"),
-            TestStep(4, "Wait until TH receives and data report for TargetState set to NULL and an attribute report for CurrentState set to Open (ordering does not matter)",
+            TestStep(3, "Send a close command to the DUT and wait until the CurrentState is closed", "DUT returns SUCCESS"),
+            TestStep(4, "Send Open command", "DUT returns SUCCESS"),
+            TestStep(5, "Wait until TH receives and data report for TargetState set to NULL and an attribute report for CurrentState set to Open (ordering does not matter)",
                      "Expected attribute reports are received"),
-            TestStep(5, "Read CurrentState and TargetState attribute", "CurrentState is Open, TargetState is NULL"),
-            TestStep(6, "Send Close command", "DUT returns SUCCESS"),
-            TestStep(7, "Wait until TH receives and data report for TargetState set to NULL and an attribute report for CurrentState set to Closed (ordering does not matter)",
+            TestStep(6, "Read CurrentState and TargetState attribute", "CurrentState is Open, TargetState is NULL"),
+            TestStep(7, "Send Close command", "DUT returns SUCCESS"),
+            TestStep(8, "Wait until TH receives and data report for TargetState set to NULL and an attribute report for CurrentState set to Closed (ordering does not matter)",
                      "Expected attribute reports are received"),
-            TestStep(8, "Read CurrentState and TargetState attribute", "CurrentState is Closed, TargetState is NULL"),
+            TestStep(9, "Read CurrentState and TargetState attribute", "CurrentState is Closed, TargetState is NULL"),
         ]
         return steps
 
@@ -76,9 +77,18 @@ class TC_VALCC_3_1(MatterBaseTest):
         await attribute_subscription.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(3)
-        await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Open(), endpoint=endpoint)
+        await self.send_single_cmd(cmd=cluster.Commands.Close(), endpoint=endpoint)
+        current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+        if current_state_dut != cluster.Enums.ValveStateEnum.kClosed:
+            current_state_closed = AttributeValue(
+                endpoint_id=endpoint, attribute=attributes.CurrentState, value=cluster.Enums.ValveStateEnum.kClosed)
+            attribute_subscription.await_all_final_values_reported(expected_final_values=[current_state_closed])
 
         self.step(4)
+        attribute_subscription.reset()
+        await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Open(), endpoint=endpoint)
+
+        self.step(5)
         # Wait until the current state is open and the target state is Null.
         # Wait for the entire duration of the test because this valve may be slow. The test will time out before this does. That's fine.
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
@@ -86,22 +96,22 @@ class TC_VALCC_3_1(MatterBaseTest):
             endpoint_id=endpoint, attribute=attributes.CurrentState, value=cluster.Enums.ValveStateEnum.kOpen)]
         attribute_subscription.await_all_final_values_reported(expected_final_values=expected_final_state, timeout_sec=timeout)
 
-        self.step(5)
+        self.step(6)
         target_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
         current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
         asserts.assert_equal(current_state_dut, cluster.Enums.ValveStateEnum.kOpen, "CurrentState is not open")
         asserts.assert_equal(target_state_dut, NullValue, "TargetState is not null")
 
-        self.step(6)
-        attribute_subscription.reset()
-        await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Close(), endpoint=endpoint)
-
         self.step(7)
+        attribute_subscription.reset()
+        await self.send_single_cmd(cmd=cluster.Commands.Close(), endpoint=endpoint)
+
+        self.step(8)
         expected_final_state = [AttributeValue(endpoint_id=endpoint, attribute=attributes.TargetState, value=NullValue), AttributeValue(
             endpoint_id=endpoint, attribute=attributes.CurrentState, value=cluster.Enums.ValveStateEnum.kClosed)]
         attribute_subscription.await_all_final_values_reported(expected_final_values=expected_final_state, timeout_sec=timeout)
 
-        self.step(8)
+        self.step(9)
         target_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
         current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
         asserts.assert_equal(current_state_dut, cluster.Enums.ValveStateEnum.kClosed, "CurrentState is not closed")
