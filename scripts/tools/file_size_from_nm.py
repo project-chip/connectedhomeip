@@ -114,6 +114,23 @@ def tree_display_name(name: str) -> list[str]:
             break
         space_pos += 1
 
+    # completely skip any arguments ... i.e. anything after (
+    brace_pos = 0
+    indent = 0
+    type_suffix = ""
+    while brace_pos < len(name):
+        c = name[brace_pos]
+        if c == "<":
+            indent += 1
+        elif c == ">":
+            indent -= 1
+        elif c == "(" and indent == 0:
+            # FOUND A SPACE, move it to the last
+            type_suffix = name[brace_pos:]
+            name = name[:brace_pos]
+            break
+        brace_pos += 1
+
     # name may be split by namespace and looks like foo::bar::baz
     # HOWEVER for templates we want to split foo::Bar<x::y>::Baz into
     #   [foo, Bar<x::y>::Baz]
@@ -146,7 +163,7 @@ def tree_display_name(name: str) -> list[str]:
             result.append(name[:ns_idx])
             ns_idx += 2
             name = name[ns_idx:]
-    result.append(type_prefix + name)
+    result.append(type_prefix + name + type_suffix)
 
     if result[0].startswith("non-virtual thunk to "):
         result[0] = result[0][21:]
@@ -217,6 +234,10 @@ def test_tree_display_name():
         "app",
         "AdvertiseAsOperational()",
     ]
+
+    assert tree_display_name(
+        "void foo::bar<baz>::method(my::arg name, other::arg::type)"
+    ) == ["foo", "bar<baz>", "void method(my::arg name, other::arg::type)"]
 
 
 def build_treemap(
