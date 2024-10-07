@@ -83,6 +83,11 @@ def tree_display_name(name: str) -> list[str]:
 
     name = cxxfilt.demangle(name)
 
+    if name.startswith("non-virtual thunk to "):
+        name = name[21:]
+    if name.startswith("vtable for "):
+        name = name[11:]
+
     # These are C-style methods really, we have no top-level namespaces named
     # like this but still want to see these differently
     for special_prefix in {"emberAf", "Matter"}:
@@ -164,11 +169,6 @@ def tree_display_name(name: str) -> list[str]:
             ns_idx += 2
             name = name[ns_idx:]
     result.append(type_prefix + name + type_suffix)
-
-    if result[0].startswith("non-virtual thunk to "):
-        result[0] = result[0][21:]
-    if result[0].startswith("vtable for "):
-        result[0] = result[0][11:]
 
     if len(result) == 1:
         if result[0].startswith("ot"):  # Show openthread methods a bit grouped
@@ -272,9 +272,6 @@ def build_treemap(
                 tree_name = tree_name[1:]
             if not tree_name:
                 continue
-
-        if "AdvertiseOperational" in symbol.name:
-            print(tree_name)
 
         partial = ""
         for name in tree_name[:-1]:
