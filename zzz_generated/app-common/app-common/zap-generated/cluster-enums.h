@@ -139,7 +139,49 @@ enum class ProductIdentifierTypeEnum : uint8_t
     kUnknownEnumValue = 5,
 };
 
+// Enum for StreamTypeEnum
+enum class StreamTypeEnum : uint8_t
+{
+    kInternal  = 0x00,
+    kRecording = 0x01,
+    kAnalysis  = 0x02,
+    kLiveView  = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for WebRTCEndReasonEnum
+enum class WebRTCEndReasonEnum : uint8_t
+{
+    kIceFailed         = 0x00,
+    kIceTimeout        = 0x01,
+    kUserHangup        = 0x02,
+    kUserBusy          = 0x03,
+    kReplaced          = 0x04,
+    kNoUserMedia       = 0x05,
+    kInviteTimeout     = 0x06,
+    kAnsweredElsewhere = 0x07,
+    kOutOfResources    = 0x08,
+    kMediaTimeout      = 0x09,
+    kLowPower          = 0x0A,
+    kUnknownReason     = 0x0B,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 12,
+};
+
 // Bitmaps shared across multiple clusters.
+
+// Bitmap for WebRTCMetadataOptions
+enum class WebRTCMetadataOptions : uint8_t
+{
+    kDataTLV = 0x1,
+};
 
 } // namespace detail
 
@@ -404,6 +446,20 @@ enum class TestGlobalEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
+};
+
+// Enum for ThreeLevelAutoEnum
+enum class ThreeLevelAutoEnum : uint8_t
+{
+    kLow       = 0x00,
+    kMedium    = 0x01,
+    kHigh      = 0x02,
+    kAutomatic = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
 };
 
 // Global bitmaps.
@@ -5282,9 +5338,9 @@ enum class Feature : uint32_t
 {
     kContentSearch = 0x1,
     kURLPlayback   = 0x2,
-    kAdvancedSeek  = 0x3,
-    kTextTracks    = 0x4,
-    kAudioTracks   = 0x5,
+    kAdvancedSeek  = 0x4,
+    kTextTracks    = 0x8,
+    kAudioTracks   = 0x10,
 };
 
 // Bitmap for SupportedProtocolsBitmap
@@ -5391,6 +5447,26 @@ enum class StatusEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 } // namespace ContentAppObserver
+
+namespace WebRTCTransportProvider {
+
+using StreamTypeEnum = Clusters::detail::StreamTypeEnum;
+
+using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
+
+using WebRTCMetadataOptions = Clusters::detail::WebRTCMetadataOptions;
+} // namespace WebRTCTransportProvider
+
+namespace WebRTCTransportRequestor {
+
+using StreamTypeEnum = Clusters::detail::StreamTypeEnum;
+
+using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
+
+using WebRTCMetadataOptions = Clusters::detail::WebRTCMetadataOptions;
+} // namespace WebRTCTransportRequestor
+
+namespace Chime {} // namespace Chime
 
 namespace EcosystemInformation {} // namespace EcosystemInformation
 

@@ -376,6 +376,15 @@ static constexpr ClusterId Id = 0x0000050F;
 namespace ContentAppObserver {
 static constexpr ClusterId Id = 0x00000510;
 } // namespace ContentAppObserver
+namespace WebRTCTransportProvider {
+static constexpr ClusterId Id = 0x00000553;
+} // namespace WebRTCTransportProvider
+namespace WebRTCTransportRequestor {
+static constexpr ClusterId Id = 0x00000554;
+} // namespace WebRTCTransportRequestor
+namespace Chime {
+static constexpr ClusterId Id = 0x00000556;
+} // namespace Chime
 namespace EcosystemInformation {
 static constexpr ClusterId Id = 0x00000750;
 } // namespace EcosystemInformation

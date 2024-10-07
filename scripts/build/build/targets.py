@@ -146,6 +146,7 @@ def BuildHostTarget():
         TargetPart('air-quality-sensor', app=HostApp.AIR_QUALITY_SENSOR),
         TargetPart('network-manager', app=HostApp.NETWORK_MANAGER),
         TargetPart('energy-management', app=HostApp.ENERGY_MANAGEMENT),
+        TargetPart('water-leak-detector', app=HostApp.WATER_LEAK_DETECTOR),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -169,6 +170,7 @@ def BuildHostTarget():
     target.AppendModifier("no-ble", enable_ble=False)
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("no-thread", enable_thread=False)
+    target.AppendModifier('no-shell', disable_shell=True)
     target.AppendModifier(
         "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
     target.AppendModifier(
@@ -266,7 +268,8 @@ def BuildEfr32Target():
         TargetPart('light', app=Efr32App.LIGHT),
         TargetPart('lock', app=Efr32App.LOCK),
         TargetPart('thermostat', app=Efr32App.THERMOSTAT),
-        TargetPart('pump', app=Efr32App.PUMP)
+        TargetPart('pump', app=Efr32App.PUMP),
+        TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR)
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
@@ -711,6 +714,7 @@ def BuildBouffalolabTarget():
     target.AppendModifier('wifi', enable_wifi=True)
     target.AppendModifier('thread', enable_thread=True)
     target.AppendModifier('easyflash', enable_easyflash=True)
+    target.AppendModifier('littlefs', enable_littlefs=True)
     target.AppendModifier('shell', enable_shell=True)
     target.AppendModifier('mfd', enable_mfd=True)
     target.AppendModifier('rotating_device_id', enable_rotating_device_id=True)
