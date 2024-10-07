@@ -16,7 +16,6 @@
  */
 
 #include "ICDConfigurationData.h"
-#include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {

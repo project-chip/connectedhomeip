@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/Optional.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
