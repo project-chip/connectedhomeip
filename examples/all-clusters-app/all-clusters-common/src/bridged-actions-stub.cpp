@@ -24,7 +24,7 @@ using namespace chip::app::Clusters::Actions;
 using namespace chip::app::Clusters::Actions::Attributes;
 using namespace chip::Protocols::InteractionModel;
 
-CHIP_ERROR ActionsDelegateImpl::ReadActionAtIndex(uint16_t index, GenericActionStruct & action)
+CHIP_ERROR ActionsDelegateImpl::ReadActionAtIndex(uint16_t index, ActionStructStorage & action)
 {
     if (index >= ArraySize(kActionList))
     {
@@ -34,7 +34,7 @@ CHIP_ERROR ActionsDelegateImpl::ReadActionAtIndex(uint16_t index, GenericActionS
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ActionsDelegateImpl::ReadEndpointListAtIndex(uint16_t index, GenericEndpointList & epList)
+CHIP_ERROR ActionsDelegateImpl::ReadEndpointListAtIndex(uint16_t index, EndpointListStorage & epList)
 {
     if (index >= ArraySize(kEndpointList))
     {
@@ -44,14 +44,14 @@ CHIP_ERROR ActionsDelegateImpl::ReadEndpointListAtIndex(uint16_t index, GenericE
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ActionsDelegateImpl::FindActionIdInActionList(uint16_t actionId)
+bool ActionsDelegateImpl::FindActionIdInActionList(uint16_t actionId)
 {
     for (uint16_t i = 0; i < kActionListSize; i++)
     {
         if (kActionList[i].actionID == actionId)
-            return CHIP_NO_ERROR;
+            return true;
     }
-    return CHIP_ERROR_NOT_FOUND;
+    return false;
 }
 
 Status ActionsDelegateImpl::HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId)
