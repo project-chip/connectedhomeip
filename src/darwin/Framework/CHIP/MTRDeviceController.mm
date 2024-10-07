@@ -43,7 +43,6 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
-#import "MTROperationalCredentialsDelegate.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "MTRServerEndpoint_Internal.h"
@@ -124,7 +123,6 @@ using namespace chip::Tracing::DarwinFramework;
     chip::Credentials::PartialDACVerifier * _partialDACVerifier;
     chip::Credentials::DefaultDACVerifier * _defaultDACVerifier;
     MTRDeviceControllerDelegateBridge * _deviceControllerDelegateBridge;
-    MTROperationalCredentialsDelegate * _operationalCredentialsDelegate;
     MTRDeviceAttestationDelegateBridge * _deviceAttestationDelegateBridge;
     os_unfair_lock _underlyingDeviceMapLock;
     MTRCommissionableBrowser * _commissionableBrowser;
@@ -315,19 +313,13 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (void)shutdown
 {
-    MTR_ABSTRACT_METHOD();
+    // Subclass hook; nothing to do.
 }
 
-- (NSNumber *)controllerNodeID
+- (nullable NSNumber *)controllerNodeID
 {
-    auto block = ^NSNumber * { return @(self->_cppCommissioner->GetNodeId()); };
-
-    NSNumber * nodeID = [self syncRunOnWorkQueueWithReturnValue:block error:nil];
-    if (!nodeID) {
-        MTR_LOG_ERROR("%@ A controller has no node id if it has not been started", self);
-    }
-
-    return nodeID;
+    MTR_ABSTRACT_METHOD();
+    return nil;
 }
 
 - (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
@@ -592,27 +584,8 @@ using namespace chip::Tracing::DarwinFramework;
 - (void)asyncGetCommissionerOnMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
                              errorHandler:(nullable MTRDeviceErrorHandler)errorHandler
 {
-    {
-        NSError * error;
-        if (![self checkIsRunning:&error]) {
-            if (errorHandler != nil) {
-                errorHandler(error);
-            }
-            return;
-        }
-    }
-
-    dispatch_async(_chipWorkQueue, ^{
-        NSError * error;
-        if (![self checkIsRunning:&error]) {
-            if (errorHandler != nil) {
-                errorHandler(error);
-            }
-            return;
-        }
-
-        block(self->_cppCommissioner);
-    });
+    MTR_ABSTRACT_METHOD();
+    errorHandler([MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
 }
 
 - (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler
@@ -689,43 +662,6 @@ using namespace chip::Tracing::DarwinFramework;
     dispatch_async(queue, ^{
         completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
     });
-}
-
-- (NSArray<MTRAccessGrant *> *)accessGrantsForClusterPath:(MTRClusterPath *)clusterPath
-{
-    assertChipStackLockedByCurrentThread();
-
-    for (MTRServerEndpoint * endpoint in _serverEndpoints) {
-        if ([clusterPath.endpoint isEqual:endpoint.endpointID]) {
-            return [endpoint matterAccessGrantsForCluster:clusterPath.cluster];
-        }
-    }
-
-    // Nothing matched, no grants.
-    return @[];
-}
-
-- (nullable NSNumber *)neededReadPrivilegeForClusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID
-{
-    assertChipStackLockedByCurrentThread();
-
-    for (MTRServerEndpoint * endpoint in _serverEndpoints) {
-        for (MTRServerCluster * cluster in endpoint.serverClusters) {
-            if (![cluster.clusterID isEqual:clusterID]) {
-                continue;
-            }
-
-            for (MTRServerAttribute * attr in cluster.attributes) {
-                if (![attr.attributeID isEqual:attributeID]) {
-                    continue;
-                }
-
-                return @(attr.requiredReadPrivilege);
-            }
-        }
-    }
-
-    return nil;
 }
 
 #ifdef DEBUG

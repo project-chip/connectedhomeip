@@ -21,13 +21,22 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: examples/fabric-admin/scripts/fabric-sync-app.py
-# test-runner-run/run1/app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
-# test-runner-run/run1/factoryreset: true
-# test-runner-run/run1/script-args: --PICS src/app/tests/suites/certification/ci-pics-values --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_server_app_path:${ALL_CLUSTERS_APP} --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-# test-runner-run/run1/script-start-delay: 5
-# test-runner-run/run1/quiet: true
+# test-runner-runs:
+#   run1:
+#     app: examples/fabric-admin/scripts/fabric-sync-app.py
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-ready-pattern: "Successfully opened pairing window on the device"
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factoryreset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -47,7 +56,7 @@ class AppServer(Subprocess):
     """Wrapper class for starting an application server in a subprocess."""
 
     # Prefix for log messages from the application server.
-    PREFIX = "[SERVER]"
+    PREFIX = b"[SERVER]"
 
     def __init__(self, app: str, storage_dir: str, discriminator: int, passcode: int, port: int = 5540):
         storage_kvs_dir = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")[1]
@@ -56,7 +65,7 @@ class AppServer(Subprocess):
                          '--secured-device-port', str(port),
                          "--discriminator", str(discriminator),
                          "--passcode", str(passcode),
-                         prefix=self.PREFIX)
+                         output_cb=lambda line, is_stderr: self.PREFIX + line)
 
     def start(self):
         # Start process and block until it prints the expected output.
@@ -86,7 +95,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         self.th_server_discriminator = random.randint(0, 4095)
         self.th_server_passcode = 20202021
 
-        # Start the TH_SERVER_NO_UID app.
+        # Start the TH_SERVER app.
         self.th_server = AppServer(
             th_server_app,
             storage_dir=self.storage.name,

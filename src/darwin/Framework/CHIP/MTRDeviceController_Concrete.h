@@ -17,6 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Matter/MTRAccessGrant.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
 #import <Matter/MTRDeviceControllerFactory.h>
@@ -130,6 +131,23 @@ NS_ASSUME_NONNULL_BEGIN
  * and a compressed fabric id that matches this controller has been observed.
  */
 - (void)operationalInstanceAdded:(NSNumber *)nodeID;
+
+/**
+ * Get the access grants that apply for the given cluster path.
+ */
+- (NSArray<MTRAccessGrant *> *)accessGrantsForClusterPath:(MTRClusterPath *)clusterPath;
+
+/**
+ * Get the privilege level needed to read the given attribute.  There's no
+ * endpoint provided because the expectation is that this information is the
+ * same for all cluster instances.
+ *
+ * Returns nil if we have no such attribute defined on any endpoint, otherwise
+ * one of MTRAccessControlEntry* constants wrapped in NSNumber.
+ *
+ * Only called on the Matter queue.
+ */
+- (nullable NSNumber *)neededReadPrivilegeForClusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID;
 
 @end
 
