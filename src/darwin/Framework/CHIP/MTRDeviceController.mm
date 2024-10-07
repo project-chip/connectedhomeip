@@ -691,43 +691,6 @@ using namespace chip::Tracing::DarwinFramework;
     });
 }
 
-- (NSArray<MTRAccessGrant *> *)accessGrantsForClusterPath:(MTRClusterPath *)clusterPath
-{
-    assertChipStackLockedByCurrentThread();
-
-    for (MTRServerEndpoint * endpoint in _serverEndpoints) {
-        if ([clusterPath.endpoint isEqual:endpoint.endpointID]) {
-            return [endpoint matterAccessGrantsForCluster:clusterPath.cluster];
-        }
-    }
-
-    // Nothing matched, no grants.
-    return @[];
-}
-
-- (nullable NSNumber *)neededReadPrivilegeForClusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID
-{
-    assertChipStackLockedByCurrentThread();
-
-    for (MTRServerEndpoint * endpoint in _serverEndpoints) {
-        for (MTRServerCluster * cluster in endpoint.serverClusters) {
-            if (![cluster.clusterID isEqual:clusterID]) {
-                continue;
-            }
-
-            for (MTRServerAttribute * attr in cluster.attributes) {
-                if (![attr.attributeID isEqual:attributeID]) {
-                    continue;
-                }
-
-                return @(attr.requiredReadPrivilege);
-            }
-        }
-    }
-
-    return nil;
-}
-
 #ifdef DEBUG
 + (void)forceLocalhostAdvertisingOnly
 {
