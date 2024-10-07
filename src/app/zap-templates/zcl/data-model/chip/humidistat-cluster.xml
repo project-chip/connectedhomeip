@@ -47,7 +47,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster>
-    <domain name="HVAC"/>
+    <domain>HVAC</domain>
     <name>Humidistat</name>
     <code>0x0205</code>
     <define>HUMIDISTAT_CLUSTER</define>

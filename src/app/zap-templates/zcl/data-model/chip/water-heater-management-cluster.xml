@@ -48,7 +48,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </struct>
 
   <cluster code="0x0094" apiMaturity="provisional">
-    <domain name="Energy Management"/>
+    <domain>Energy Management</domain>
     <name>Water Heater Management</name>
     <code>0x0094</code>
     <define>WATER_HEATER_MANAGEMENT_CLUSTER</define>

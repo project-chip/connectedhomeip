@@ -43,7 +43,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster>
-    <domain name="Appliances"/>
+    <domain>Appliances</domain>
     <name>Microwave Oven Mode</name>
     <code>0x005E</code>
     <define>MICROWAVE_OVEN_MODE_CLUSTER</define>

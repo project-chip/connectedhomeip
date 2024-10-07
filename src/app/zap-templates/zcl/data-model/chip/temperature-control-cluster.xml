@@ -24,7 +24,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   <domain name="CHIP"/>
   <cluster>
     <name>Temperature Control</name>
-    <domain name="Appliances"/>
+    <domain>Appliances</domain>
     <description>Attributes and commands for configuring the temperature control, and reporting temperature.</description>
     <code>0x0056</code>
     <define>TEMPERATURE_CONTROL_CLUSTER</define>

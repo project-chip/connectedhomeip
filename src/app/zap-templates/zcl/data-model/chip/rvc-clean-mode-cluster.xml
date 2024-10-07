@@ -44,7 +44,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster>
-    <domain name="Robots"/>
+    <domain>Robots</domain>
     <name>RVC Clean Mode</name>
     <code>0x0055</code>
     <define>RVC_CLEAN_MODE_CLUSTER</define>

@@ -21,7 +21,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   <domain name="Energy Management"/>
   <cluster apiMaturity="provisional">
     <name>Energy Preference</name>
-    <domain name="Energy Management"/>
+    <domain>Energy Management</domain>
     <code>0x009B</code>
     <define>ENERGY_PREFERENCE_CLUSTER</define>
     <client init="false" tick="false">true</client>

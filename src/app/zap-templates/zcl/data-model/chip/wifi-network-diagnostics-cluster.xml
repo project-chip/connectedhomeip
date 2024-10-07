@@ -58,7 +58,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster>
-    <domain name="General"/>
+    <domain>General</domain>
     <name>Wi-Fi Network Diagnostics</name>
     <code>0x0036</code>
     <define>WIFI_NETWORK_DIAGNOSTICS_CLUSTER</define>

@@ -75,7 +75,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster singleton="true">
     <name>Basic Information</name>
-    <domain name="CHIP"/>
+    <domain>CHIP</domain>
     <code>0x0028</code>
     <define>BASIC_INFORMATION_CLUSTER</define>
     <description>This cluster provides attributes and events for determining basic information about Nodes, which supports both

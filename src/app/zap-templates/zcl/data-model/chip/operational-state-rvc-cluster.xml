@@ -38,7 +38,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster>
-    <domain name="Robots"/>
+    <domain>Robots</domain>
     <name>RVC Operational State</name>
     <code>0x0061</code>
     <define>OPERATIONAL_STATE_RVC_CLUSTER</define>

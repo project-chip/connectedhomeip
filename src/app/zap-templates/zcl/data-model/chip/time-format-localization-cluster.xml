@@ -47,7 +47,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster>
-    <domain name="General"/>
+    <domain>General</domain>
     <name>Time Format Localization</name>
     <code>0x002c</code>
     <define>TIME_FORMAT_LOCALIZATION_CLUSTER</define>

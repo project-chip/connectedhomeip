@@ -24,7 +24,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   <domain name="CHIP"/>
   <cluster>
     <name>Boolean State</name>
-    <domain name="General"/>
+    <domain>General</domain>
     <description>This cluster provides an interface to a boolean state called StateValue.</description>
     <code>0x0045</code>
     <define>BOOLEAN_STATE_CLUSTER</define>

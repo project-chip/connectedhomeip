@@ -24,7 +24,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   <domain name="CHIP"/>
   <cluster>
     <name>Relative Humidity Measurement</name>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements.</description>
     <code>0x0405</code>
     <define>RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER</define>

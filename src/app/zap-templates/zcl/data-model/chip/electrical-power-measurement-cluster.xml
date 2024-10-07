@@ -24,7 +24,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   <domain name="CHIP"/>
   <cluster>
     <name>Electrical Power Measurement</name>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <code>0x0090</code>
     <define>ELECTRICAL_POWER_MEASUREMENT_CLUSTER</define>
     <client init="false" tick="false">true</client>

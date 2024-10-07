@@ -48,7 +48,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster>
-    <domain name="General"/>
+    <domain>General</domain>
     <name>Identify</name>
     <code>0x0003</code>
     <define>IDENTIFY_CLUSTER</define>

@@ -24,7 +24,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   <domain name="CHIP"/>
   <cluster>
     <name>Temperature Measurement</name>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements.</description>
     <code>0x0402</code>
     <define>TEMPERATURE_MEASUREMENT_CLUSTER</define>

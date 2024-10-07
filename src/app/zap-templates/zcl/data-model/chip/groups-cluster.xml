@@ -29,7 +29,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>Groups</name>
-    <domain name="General"/>
+    <domain>General</domain>
     <description>Attributes and commands for group configuration and manipulation.</description>
     <code>0x0004</code>
     <define>GROUPS_CLUSTER</define>

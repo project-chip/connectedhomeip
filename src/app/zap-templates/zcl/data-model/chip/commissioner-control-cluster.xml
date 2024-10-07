@@ -28,7 +28,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </bitmap>
 
   <cluster apiMaturity="provisional">
-    <domain name="General"/>
+    <domain>General</domain>
     <name>Commissioner Control</name>
     <code>0x0751</code>
     <define>COMMISSIONER_CONTROL_CLUSTER</define>

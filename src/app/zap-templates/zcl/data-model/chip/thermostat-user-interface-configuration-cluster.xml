@@ -24,7 +24,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   <domain name="HVAC"/>
   <cluster>
     <name>Thermostat User Interface Configuration</name>
-    <domain name="HVAC"/>
+    <domain>HVAC</domain>
     <description>An interface for configuring the user interface of a thermostat (which may be remote from the thermostat).</description>
     <code>0x0204</code>
     <define>THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER</define>

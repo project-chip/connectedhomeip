@@ -34,7 +34,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </bitmap>
 
   <cluster>
-    <domain name="General"/>
+    <domain>General</domain>
     <name>Boolean State Configuration</name>
     <code>0x0080</code>
     <define>BOOLEAN_STATE_CONFIGURATION_CLUSTER</define>

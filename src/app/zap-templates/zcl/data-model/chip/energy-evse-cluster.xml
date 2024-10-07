@@ -94,7 +94,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>Energy EVSE</name>
-    <domain name="Energy Management"/>
+    <domain>Energy Management</domain>
     <code>0x0099</code>
     <define>ENERGY_EVSE_CLUSTER</define>
     <client init="false" tick="false">true</client>

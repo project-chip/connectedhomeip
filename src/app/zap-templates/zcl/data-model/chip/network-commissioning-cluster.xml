@@ -101,7 +101,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>Network Commissioning</name>
-    <domain name="General"/>
+    <domain>General</domain>
     <description>Functionality to configure, enable, disable network credentials and access on a Matter device.</description>
     <code>0x0031</code>
     <define>NETWORK_COMMISSIONING_CLUSTER</define>

@@ -42,7 +42,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>On/Off</name>
-    <domain name="General"/>
+    <domain>General</domain>
     <code>0x0006</code>
     <define>ON_OFF_CLUSTER</define>
     <description>Attributes and commands for switching devices between &apos;On&apos; and &apos;Off&apos; states.</description>

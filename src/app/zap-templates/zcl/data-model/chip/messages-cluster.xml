@@ -68,7 +68,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster apiMaturity="provisional">
     <name>Messages</name>
-    <domain name="General"/>
+    <domain>General</domain>
     <description>This cluster provides an interface for passing messages to be presented by a device.</description>
     <code>0x0097</code>
     <define>MESSAGES_CLUSTER</define>

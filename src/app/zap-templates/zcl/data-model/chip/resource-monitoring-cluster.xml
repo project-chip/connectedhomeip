@@ -24,7 +24,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   <domain name="CHIP"/>
   <cluster>
     <name>HEPA Filter Monitoring</name>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for monitoring HEPA filters in a device</description>
     <code>0x0071</code>
     <define>HEPA_FILTER_MONITORING_CLUSTER</define>
@@ -83,7 +83,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>Activated Carbon Filter Monitoring</name>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for monitoring activated carbon filters in a device</description>
     <code>0x0072</code>
     <define>ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER</define>
@@ -141,7 +141,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </cluster>
 
   <cluster>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <name>Water Tank Level Monitoring</name>
     <code>0x0079</code>
     <define>WATER_TANK_LEVEL_MONITORING_CLUSTER</define>

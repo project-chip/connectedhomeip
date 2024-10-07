@@ -37,7 +37,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster>
-    <domain name="General"/>
+    <domain>General</domain>
     <name>Ethernet Network Diagnostics</name>
     <code>0x0037</code>
     <define>ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER</define>

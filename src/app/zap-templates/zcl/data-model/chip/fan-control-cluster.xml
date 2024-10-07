@@ -70,7 +70,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>Fan Control</name>
-    <domain name="HVAC"/>
+    <domain>HVAC</domain>
     <description>An interface for controlling a fan in a heating/cooling system.</description>
     <code>0x0202</code>
     <define>FAN_CONTROL_CLUSTER</define>

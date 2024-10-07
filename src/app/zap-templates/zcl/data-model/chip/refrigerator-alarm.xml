@@ -29,7 +29,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>Refrigerator Alarm</name>
-    <domain name="Appliances"/>
+    <domain>Appliances</domain>
     <description>Attributes and commands for configuring the Refrigerator alarm.</description>
     <code>0x0057</code>
     <define>REFRIGERATOR_ALARM_CLUSTER</define>

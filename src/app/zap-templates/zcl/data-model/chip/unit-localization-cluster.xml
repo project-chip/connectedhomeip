@@ -30,7 +30,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster>
-    <domain name="CHIP"/>
+    <domain>CHIP</domain>
     <name>Unit Localization</name>
     <code>0x002d</code>
     <define>UNIT_LOCALIZATION_CLUSTER</define>

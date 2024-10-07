@@ -266,7 +266,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>Thermostat</name>
-    <domain name="HVAC"/>
+    <domain>HVAC</domain>
     <description>An interface for configuring and controlling the functionality of a thermostat.</description>
     <code>0x0201</code>
     <define>THERMOSTAT_CLUSTER</define>

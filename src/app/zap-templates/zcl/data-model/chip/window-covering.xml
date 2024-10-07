@@ -21,7 +21,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   <domain name="CHIP"/>
   <cluster>
     <name>Window Covering</name>
-    <domain name="Closures"/>
+    <domain>Closures</domain>
     <code>0x0102</code>
     <define>WINDOW_COVERING_CLUSTER</define>
     <description>Provides an interface for controlling and adjusting automatic window coverings. </description>

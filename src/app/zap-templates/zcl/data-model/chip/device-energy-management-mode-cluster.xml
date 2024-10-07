@@ -45,7 +45,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster apiMaturity="provisional">
-    <domain name="Energy Management"/>
+    <domain>Energy Management</domain>
     <name>Device Energy Management Mode</name>
     <code>0x009F</code>
     <define>DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER</define>

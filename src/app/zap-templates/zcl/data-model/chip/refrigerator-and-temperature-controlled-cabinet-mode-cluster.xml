@@ -43,7 +43,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster>
-    <domain name="Appliances"/>
+    <domain>Appliances</domain>
     <name>Refrigerator And Temperature Controlled Cabinet Mode</name>
     <code>0x0052</code>
     <define>REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER</define>

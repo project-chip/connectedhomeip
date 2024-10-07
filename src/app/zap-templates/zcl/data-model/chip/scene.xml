@@ -73,7 +73,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   <domain name="CHIP"/>
   <cluster apiMaturity="provisional">
     <name>Scenes Management</name>
-    <domain name="General"/>
+    <domain>General</domain>
     <description>Attributes and commands for scene configuration and manipulation.</description>
     <code>0x0062</code>
     <define>SCENES_CLUSTER</define>

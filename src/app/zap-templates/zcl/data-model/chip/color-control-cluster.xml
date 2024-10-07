@@ -104,7 +104,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>Color Control</name>
-    <domain name="Lighting"/>
+    <domain>Lighting</domain>
     <description>Attributes and commands for controlling the color properties of a color-capable light.</description>
     <code>0x0300</code>
     <define>COLOR_CONTROL_CLUSTER</define>

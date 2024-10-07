@@ -139,7 +139,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster apiMaturity="provisional">
     <name>Demand Response Load Control</name>
-    <domain name="Energy Management"/>
+    <domain>Energy Management</domain>
     <description>This cluster provides an interface to the functionality of Smart Energy Demand Response and Load Control.</description>
     <code>0x0096</code>
     <define>DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER</define>

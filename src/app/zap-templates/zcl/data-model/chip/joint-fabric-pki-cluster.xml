@@ -42,7 +42,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster apiMaturity="provisional">
-    <domain name="General"/>
+    <domain>General</domain>
     <name>Joint Fabric PKI</name>
     <code>0x0753</code>
     <define>JOINT_FABRIC_PKI_CLUSTER</define>

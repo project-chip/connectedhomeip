@@ -45,7 +45,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster>
-    <domain name="HVAC"/>
+    <domain>HVAC</domain>
     <name>Valve Configuration and Control</name>
     <code>0x0081</code>
     <define>VALVE_CONFIGURATION_AND_CONTROL_CLUSTER</define>

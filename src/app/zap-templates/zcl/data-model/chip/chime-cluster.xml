@@ -29,7 +29,7 @@ Git: 0.9-fall2024-225-g1da0e33be
   </struct>
 
   <cluster apiMaturity="provisional">
-    <domain name="General"/>
+    <domain>General</domain>
     <name>Chime</name>
     <code>0x0556</code>
     <define>CHIME_CLUSTER</define>

@@ -28,7 +28,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </struct>
 
   <cluster apiMaturity="provisional">
-    <domain name="General"/>
+    <domain>General</domain>
     <name>Valid Proxies</name>
     <code>0x0044</code>
     <define>PROXY_VALID_CLUSTER</define>

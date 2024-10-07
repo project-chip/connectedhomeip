@@ -51,7 +51,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster>
-    <domain name="Appliances"/>
+    <domain>Appliances</domain>
     <name>Oven Mode</name>
     <code>0x0049</code>
     <define>OVEN_MODE_CLUSTER</define>

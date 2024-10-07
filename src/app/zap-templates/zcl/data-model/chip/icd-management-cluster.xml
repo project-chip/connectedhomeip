@@ -65,7 +65,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster>
-    <domain name="General"/>
+    <domain>General</domain>
     <name>ICD Management</name>
     <code>0x0046</code>
     <define>ICD_MANAGEMENT_CLUSTER</define>

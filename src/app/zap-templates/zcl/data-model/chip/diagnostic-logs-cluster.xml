@@ -46,7 +46,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>Diagnostic Logs</name>
-    <domain name="CHIP"/>
+    <domain>CHIP</domain>
     <description>The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics.</description>
     <code>0x0032</code>
     <define>DIAGNOSTIC_LOGS_CLUSTER</define>

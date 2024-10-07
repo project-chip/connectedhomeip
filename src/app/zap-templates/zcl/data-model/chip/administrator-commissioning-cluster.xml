@@ -38,7 +38,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>Administrator Commissioning</name>
-    <domain name="General"/>
+    <domain>General</domain>
     <code>0x003c</code>
     <define>ADMINISTRATOR_COMMISSIONING_CLUSTER</define>
     <description>Commands to trigger a Node to allow a new Administrator to commission it.</description>

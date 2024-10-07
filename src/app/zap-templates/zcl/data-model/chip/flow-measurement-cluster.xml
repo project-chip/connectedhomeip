@@ -24,7 +24,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   <domain name="CHIP"/>
   <cluster>
     <name>Flow Measurement</name>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for configuring the measurement of flow, and reporting flow measurements.</description>
     <code>0x0404</code>
     <define>FLOW_MEASUREMENT_CLUSTER</define>

@@ -84,7 +84,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </struct>
 
   <cluster>
-    <domain name="Energy Management"/>
+    <domain>Energy Management</domain>
     <name>Energy Calendar</name>
     <code>0x009A</code>
     <define>ENERGY_CALENDAR_CLUSTER</define>

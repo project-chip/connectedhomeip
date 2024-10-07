@@ -23,7 +23,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
   <domain name="CHIP"/>
   <cluster>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <name>Smoke CO Alarm</name>
     <code>0x005C</code>
     <define>SMOKE_CO_ALARM_CLUSTER</define>

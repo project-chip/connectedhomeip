@@ -24,7 +24,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   <domain name="CHIP"/>
   <cluster>
     <name>Pump Configuration and Control</name>
-    <domain name="HVAC"/>
+    <domain>HVAC</domain>
     <description>An interface for configuring and controlling pumps.</description>
     <code>0x0200</code>
     <define>PUMP_CONFIGURATION_AND_CONTROL_CLUSTER</define>

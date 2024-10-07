@@ -42,7 +42,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>Level Control</name>
-    <domain name="General"/>
+    <domain>General</domain>
     <description>Attributes and commands for controlling devices that can be set to a level between fully &apos;On&apos; and fully &apos;Off.&apos;</description>
     <code>0x0008</code>
     <define>LEVEL_CONTROL_CLUSTER</define>

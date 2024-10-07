@@ -31,7 +31,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster>
-    <domain name="Appliances"/>
+    <domain>Appliances</domain>
     <name>Laundry Washer Controls</name>
     <code>0x0053</code>
     <define>LAUNDRY_WASHER_CONTROLS_CLUSTER</define>

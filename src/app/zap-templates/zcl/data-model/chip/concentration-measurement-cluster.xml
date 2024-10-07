@@ -24,7 +24,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   <domain name="CHIP"/>
   <cluster>
     <name>Carbon Monoxide Concentration Measurement</name>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting carbon monoxide concentration measurements</description>
     <code>0x040C</code>
     <define>CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
@@ -127,7 +127,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>Carbon Dioxide Concentration Measurement</name>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting carbon dioxide concentration measurements</description>
     <code>0x040D</code>
     <define>CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
@@ -231,7 +231,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>Nitrogen Dioxide Concentration Measurement</name>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting nitrogen dioxide concentration measurements</description>
     <code>0x0413</code>
     <define>NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
@@ -334,7 +334,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>Ozone Concentration Measurement</name>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting ozone concentration measurements</description>
     <code>0x0415</code>
     <define>OZONE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
@@ -437,7 +437,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>PM2.5 Concentration Measurement</name>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting PM2.5 concentration measurements</description>
     <code>0x042a</code>
     <define>PM2_5_CONCENTRATION_MEASUREMENT_CLUSTER</define>
@@ -540,7 +540,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>Formaldehyde Concentration Measurement</name>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting formaldehyde concentration measurements</description>
     <code>0x042b</code>
     <define>FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
@@ -643,7 +643,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>PM1 Concentration Measurement</name>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting PM1 concentration measurements</description>
     <code>0x042c</code>
     <define>PM1_CONCENTRATION_MEASUREMENT_CLUSTER</define>
@@ -746,7 +746,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>PM10 Concentration Measurement</name>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting PM10 concentration measurements</description>
     <code>0x042d</code>
     <define>PM10_CONCENTRATION_MEASUREMENT_CLUSTER</define>
@@ -849,7 +849,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>Total Volatile Organic Compounds Concentration Measurement</name>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting total volatile organic compounds concentration measurements</description>
     <code>0x042e</code>
     <define>TVOC_CONCENTRATION_MEASUREMENT_CLUSTER</define>
@@ -952,7 +952,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 
   <cluster>
     <name>Radon Concentration Measurement</name>
-    <domain name="Measurement &amp; Sensing"/>
+    <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting radon concentration measurements</description>
     <code>0x042f</code>
     <define>RADON_CONCENTRATION_MEASUREMENT_CLUSTER</define>

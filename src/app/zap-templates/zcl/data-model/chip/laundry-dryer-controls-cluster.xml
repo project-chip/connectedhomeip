@@ -31,7 +31,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster>
-    <domain name="Appliances"/>
+    <domain>Appliances</domain>
     <name>Laundry Dryer Controls</name>
     <code>0x004A</code>
     <define>LAUNDRY_DRYER_CONTROLS_CLUSTER</define>

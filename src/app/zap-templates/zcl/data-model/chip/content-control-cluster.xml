@@ -48,7 +48,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster apiMaturity="provisional">
-    <domain name="Media"/>
+    <domain>Media</domain>
     <name>Content Control</name>
     <code>0x050F</code>
     <define>CONTENT_CONTROL_CLUSTER</define>

@@ -31,7 +31,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </struct>
 
   <cluster apiMaturity="provisional">
-    <domain name="General"/>
+    <domain>General</domain>
     <name>Thread Network Directory</name>
     <code>0x0453</code>
     <define>THREAD_NETWORK_DIRECTORY_CLUSTER</define>

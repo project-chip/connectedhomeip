@@ -24,7 +24,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   <domain name="CHIP"/>
   <cluster>
     <name>Microwave Oven Control</name>
-    <domain name="Appliances"/>
+    <domain>Appliances</domain>
     <description>Attributes and commands for configuring the microwave oven control, and reporting cooking stats.</description>
     <code>0x005F</code>
     <define>MICROWAVE_OVEN_CONTROL_CLUSTER</define>

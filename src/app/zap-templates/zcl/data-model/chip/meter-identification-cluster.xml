@@ -37,7 +37,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster>
-    <domain name="Energy Management"/>
+    <domain>Energy Management</domain>
     <name>Meter Identification</name>
     <code>0x0B06</code>
     <define>METER_IDENTIFICATION_CLUSTER</define>

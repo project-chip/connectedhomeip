@@ -23,7 +23,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
   <domain name="Measurement &amp; Sensing"/>
   <cluster code="0x009C">
-    <domain name="General"/>
+    <domain>General</domain>
     <name>Power Topology</name>
     <code>0x009C</code>
     <define>POWER_TOPOLOGY_CLUSTER</define>

@@ -44,7 +44,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </enum>
 
   <cluster>
-    <domain name="Appliances"/>
+    <domain>Appliances</domain>
     <name>Dishwasher Mode</name>
     <code>0x0059</code>
     <define>DISHWASHER_MODE_CLUSTER</define>

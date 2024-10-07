@@ -60,7 +60,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
   </struct>
 
   <cluster>
-    <domain name="General"/>
+    <domain>General</domain>
     <name>Operational State</name>
     <code>0x0060</code>
     <define>OPERATIONAL_STATE_CLUSTER</define>

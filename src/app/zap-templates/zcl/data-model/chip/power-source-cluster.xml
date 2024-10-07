@@ -23,7 +23,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
   <domain name="CHIP"/>
   <cluster>
-    <domain name="CHIP"/>
+    <domain>CHIP</domain>
     <name>Power Source</name>
     <code>0x002F</code>
     <define>POWER_SOURCE_CLUSTER</define>
