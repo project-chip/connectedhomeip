@@ -118,7 +118,7 @@ J-Link > erase 0x30000000, 0x34000000
 -   MCUBoot application can be built with SDK installed, using instructions
     below.
 -   Retrieve the mcuboot directory located at
-    _'<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<a href="#1" id="1-ref">`RTboard`<sup>1</sup></a>/ota_examples/mcuboot_opensource/armgcc'_
+    _'<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<a href="#1" id="1-ref">`RTboard`<sup>1</sup></a>/ota_examples/`mcuboot_opensource/armgcc`'_
 
 _<a id="1" href="#1-ref"><sup>1</sup></a> `rdrw612bga` or `frdmrw612` for RW61x,
 `evkcmimxrt1060` for RT1060-EVK-C, `evkbmimxrt1170` for RT1170-EVK-B_
@@ -160,11 +160,11 @@ Unable to find bootable image
 
 Note : By default, mcuboot application considers the primary and secondary
 partitions to be the size of 4.4 MB. If the size is to be changed, the partition
-addresses should be modified in the flash_partitioning.h accordingly. For more
+addresses should be modified in the `flash_partitioning.h` accordingly. For more
 information about the flash partitioning with mcuboot, please refer to the
-dedicated _readme.txt_ located in
+dedicated `readme.txt` located in
 
-> _<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<a href="#1" id="1ref">`RTboard`<sup>1</sup></a>/ota_examples/mcuboot_opensource/._
+> _<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<a href="#1" id="1ref">`RTboard`<sup>1</sup></a>/ota_examples/`mcuboot_opensource`/._
 
 ### Generating and flashing the signed application image
 
@@ -274,7 +274,7 @@ To generate the OTA update image the same procedure can be followed from the
 [Generating and flashing the signed application image](#generating-and-flashing-the-signed-application-image)
 sub-section, replacing the "--version "1.0"" argument with "--version "2.0""
 (recent version of the update), without arguments "--pad" "--confirm" when
-running imgtool script during OTA Update Image generation.
+running `imgtool` script during OTA Update Image generation.
 
 Note : When building the update image, the build arguments
 nxp_software_version=2 nxp_software_version_string=\"2.0\" can be added to the
