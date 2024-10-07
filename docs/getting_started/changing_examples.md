@@ -3,7 +3,7 @@
 The composition of most examples in the SDK is static and code generated.
 
 The tool used to describe and change the composition of an example is called
-ZAP. More information about ZAP and a walkthrough of the tool can be found in
+ZAP. More information about ZAP and a walk-through of the tool can be found in
 the [ZAP introduction](./zap.md). The composition of the device is captured in a
 .zap file, which is readable by the ZAP tool. This is then compiled into a
 human-readable .matter file, which is used to build the static features of the
@@ -17,9 +17,9 @@ To change the composition of a device example, you need to
 
 ## Changing the zap file in an example
 
-Most examples in the SDK keep the .zap file in a directory called
-examplename-common. To load an existing .zap file into the ZAP tool, from the
-chip-root use
+Most examples in the SDK keep the .zap file in a sub-directory called
+example-name-common (ex. lighting-common). To load an existing .zap file into
+the ZAP tool, from the chip-root use
 
 ```
 ./scripts/tools/zap/run_zaptool.sh <location of the .zap file>
