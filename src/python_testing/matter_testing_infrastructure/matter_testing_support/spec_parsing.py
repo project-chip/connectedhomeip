@@ -638,6 +638,10 @@ def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirec
     atomic_response_name = "Atomic Response"
     presets_name = "Presets"
     schedules_name = "Schedules"
+
+    # Print statement to check the value of Clusters.Thermostat.id's revision
+    print(f"Cluster Thermostat's revision: {clusters[Clusters.Thermostat.id].revision}")
+
     if clusters[Clusters.Thermostat.id].revision >= 8:
         presents_id = clusters[Clusters.Thermostat.id].attribute_map[presets_name]
         schedules_id = clusters[Clusters.Thermostat.id].attribute_map[schedules_name]
