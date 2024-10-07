@@ -59,7 +59,6 @@ static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment);
 } // namespace app
 } // namespace chip
 
-
 chip::BitMask<chip::app::Clusters::DeviceEnergyManagement::Feature> GetDEMFeatureMap()
 {
     return sFeatureMap;

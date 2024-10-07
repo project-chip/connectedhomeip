@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 #include <DEMDelegate.h>
 #include <DeviceEnergyManagementManager.h>
 #include <EVSEManufacturerImpl.h>

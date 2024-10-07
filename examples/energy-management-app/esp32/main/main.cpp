@@ -119,7 +119,6 @@ chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
 
 } // namespace
 
-
 // Check we are not trying to build in both app types simultaneously
 #if defined(CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE) && defined(CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)
 #error Cannot define CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE and CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE

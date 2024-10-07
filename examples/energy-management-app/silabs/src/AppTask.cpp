@@ -98,8 +98,6 @@ static EnergyReportingTestEventTriggerHandler sEnergyReportingTestEventTriggerHa
 static DeviceEnergyManagementTestEventTriggerHandler sDeviceEnergyManagementTestEventTriggerHandler;
 #endif
 
-
-
 AppTask AppTask::sAppTask;
 
 void ApplicationInit()
@@ -196,7 +194,7 @@ CHIP_ERROR AppTask::Init()
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED
-    //GetLCD().WriteDemoUI(LightMgr().IsLightOn());
+    // GetLCD().WriteDemoUI(LightMgr().IsLightOn());
 #ifdef QR_CODE_ENABLED
 #ifdef SL_WIFI
     if (!chip::DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned())

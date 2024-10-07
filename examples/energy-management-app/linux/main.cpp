@@ -17,9 +17,9 @@
  */
 
 #include <AppMain.h>
+#include <DEMDelegate.h>
 #include <EnergyEvseMain.h>
 #include <WhmMain.h>
-#include <DEMDelegate.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/BitMask.h>
@@ -59,8 +59,6 @@ static chip::ArgParser::OptionSet sCmdLineOptions = { EnergyAppOptionHandler, //
                                                       "PROGRAM OPTIONS",      // help group
                                                       "-a, --application <evse|water-heater>\n"
                                                       "-f, --featureSet <value>\n" };
-
-
 
 // Make EVSE the default app
 static const char * spApp = kEvseApp;
