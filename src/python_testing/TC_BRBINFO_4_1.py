@@ -15,6 +15,28 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: examples/fabric-admin/scripts/fabric-sync-app.py
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-ready-pattern: "Successfully opened pairing window on the device"
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --string-arg th_icd_server_app_path:${LIT_ICD_APP} dut_fsa_stdin_pipe:dut-fsa-stdin
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factoryreset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
 # This test requires a TH_ICD_SERVER application. Please specify with --string-arg th_icd_server_app_path:<path_to_app>
 # TH_ICD_SERVER must support following arguments: --secured-device-port --discriminator --passcode --KVS
 # E.g: python3 src/python_testing/TC_BRBINFO_4_1.py --commissioning-method on-network --qr-code MT:-24J042C00KA0648G00 \
