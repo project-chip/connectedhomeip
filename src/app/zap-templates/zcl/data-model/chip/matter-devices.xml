@@ -2695,7 +2695,7 @@ limitations under the License.
         <clusters lockOthers="true">
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Device Energy Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Device Energy Management Mode" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Device Energy Management Mode" client="false" server="true" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
 </configurator>
