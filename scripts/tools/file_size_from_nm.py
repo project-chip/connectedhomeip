@@ -36,6 +36,7 @@ import subprocess
 from dataclasses import dataclass
 from enum import Enum, auto
 from pathlib import Path
+from typing import Optional
 
 import click
 import coloredlogs
@@ -82,11 +83,6 @@ def tree_display_name(name: str) -> list[str]:
 
     name = cxxfilt.demangle(name)
 
-    if name.startswith("non-virtual thunk to "):
-        name = name[21:]
-    if name.startswith("vtable for "):
-        name = name[11:]
-
     # These are C-style methods really, we have no top-level namespaces named
     # like this but still want to see these differently
     for special_prefix in {"emberAf", "Matter"}:
@@ -110,7 +106,7 @@ def tree_display_name(name: str) -> list[str]:
         elif c == " " and indent == 0:
             # FOUND A SPACE, move it to the last
             type_prefix = name[:space_pos] + " "
-            name = name[space_pos + 1:]
+            name = name[space_pos + 1 :]
             break
         elif c == "(" and indent == 0:
             # a bracket not within templates means we are done!
@@ -147,8 +143,13 @@ def tree_display_name(name: str) -> list[str]:
                 name = name[2:]
         else:
             result.append(name[:ns_idx])
-            name = name[ns_idx + 2:]
+            name = name[ns_idx + 2 :]
     result.append(type_prefix + name)
+
+    if result[0].startswith("non-virtual thunk to "):
+        result[0] = result[0][21:]
+    if result[0].startswith("vtable for "):
+        result[0] = result[0][11:]
 
     if len(result) == 1:
         if result[0].startswith("ot"):  # Show openthread methods a bit grouped
@@ -206,9 +207,23 @@ def test_tree_display_name():
         "function",
         "chip::test<foo::bar, 1, 2>::baz call()",
     ]
+    assert tree_display_name(
+        "chip::app::CommandIsFabricScoped(unsigned int, unsigned int)"
+    ) == ["chip", "app", "CommandIsFabricScoped(unsigned int, unsigned int)"]
+    assert tree_display_name("chip::app::AdvertiseAsOperational()") == [
+        "chip",
+        "app",
+        "AdvertiseAsOperational()",
+    ]
 
 
-def build_treemap(name: str, symbols: list[Symbol], style: ChartStyle, max_depth: int):
+def build_treemap(
+    name: str,
+    symbols: list[Symbol],
+    style: ChartStyle,
+    max_depth: int,
+    zoom: Optional[str],
+):
     # A treemap is based on parents (with title)
 
     # Naming rules:
@@ -216,6 +231,8 @@ def build_treemap(name: str, symbols: list[Symbol], style: ChartStyle, max_depth
     #   Actual names will be parented by their suffixes
 
     root = f"FILE: {name}"
+    if zoom:
+        root = root + f" (FILTER: {zoom})"
     data: dict[str, list] = dict(name=[root], parent=[""], size=[0], hover=[""])
 
     known_parents: set[str] = set()
@@ -223,6 +240,19 @@ def build_treemap(name: str, symbols: list[Symbol], style: ChartStyle, max_depth
 
     for symbol in symbols:
         tree_name = tree_display_name(symbol.name)
+
+        if zoom is not None:
+            partial = ""
+            # try to filter out the tree name. If it contains the zoom item, keep it, otherwise discard
+            while tree_name and partial != zoom:
+                partial += "::" + tree_name[0]
+                tree_name = tree_name[1:]
+            if not tree_name:
+                continue
+            tree_name = tree_name[1:]
+
+        if "AdvertiseOperational" in symbol.name:
+            print(tree_name)
 
         partial = ""
         for name in tree_name[:-1]:
@@ -238,7 +268,7 @@ def build_treemap(name: str, symbols: list[Symbol], style: ChartStyle, max_depth
 
         # the name MUST be added
         data["name"].append(cxxfilt.demangle(symbol.name))
-        data["parent"].append(partial)
+        data["parent"].append(partial if partial else root)
         data["size"].append(symbol.size)
         data["hover"].append(f"{symbol.name} of type {symbol.symbol_type}")
 
@@ -292,8 +322,15 @@ def build_treemap(name: str, symbols: list[Symbol], style: ChartStyle, max_depth
     type=int,
     help="Display depth by default",
 )
+@click.option(
+    "--zoom",
+    default=None,
+    help="Zoom in the graph to ONLY the specified path as root (e.g. ::chip::app)",
+)
 @click.argument("elf-file", type=Path)
-def main(log_level, elf_file: Path, display_type: str, max_depth: int):
+def main(
+    log_level, elf_file: Path, display_type: str, max_depth: int, zoom: Optional[str]
+):
     log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
@@ -347,7 +384,9 @@ def main(log_level, elf_file: Path, display_type: str, max_depth: int):
         else:
             logging.error("SKIPPING SECTION %s", t)
 
-    build_treemap(elf_file.name, symbols, __CHART_STYLES__[display_type], max_depth)
+    build_treemap(
+        elf_file.name, symbols, __CHART_STYLES__[display_type], max_depth, zoom
+    )
 
 
 if __name__ == "__main__":
