@@ -111,7 +111,7 @@ def tree_display_name(name: str) -> list[str]:
         elif c == " " and indent == 0:
             # FOUND A SPACE, move it to the last
             type_prefix = name[:space_pos] + " "
-            name = name[space_pos + 1 :]
+            name = name[space_pos + 1:]
             break
         elif c == "(" and indent == 0:
             # a bracket not within templates means we are done!
@@ -148,7 +148,7 @@ def tree_display_name(name: str) -> list[str]:
                 name = name[2:]
         else:
             result.append(name[:ns_idx])
-            name = name[ns_idx + 2 :]
+            name = name[ns_idx + 2:]
     result.append(type_prefix + name)
 
     if len(result) == 1:
