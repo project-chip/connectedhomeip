@@ -38,7 +38,7 @@ MTROTAImageTransferHandler::MTROTAImageTransferHandler()
     MTROTAUnsolicitedBDXMessageHandler::IncrementNumberOfDelegates();
 }
 
-CHIP_ERROR MTROTAImageTransferHandler::PrepareForTransfer(System::Layer * layer,
+CHIP_ERROR MTROTAImageTransferHandler::Init(System::Layer * layer,
     Messaging::ExchangeContext * exchangeCtx, FabricIndex fabricIndex, NodeId nodeId)
 {
     assertChipStackLockedByCurrentThread();
@@ -50,7 +50,7 @@ CHIP_ERROR MTROTAImageTransferHandler::PrepareForTransfer(System::Layer * layer,
 
     BitFlags<bdx::TransferControlFlags> flags(bdx::TransferControlFlags::kReceiverDrive);
 
-    return AsyncResponder::PrepareForTransfer(layer, exchangeCtx, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout);
+    return AsyncResponder::Init(mSystemLayer, exchangeCtx, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout);
 }
 
 MTROTAImageTransferHandler::~MTROTAImageTransferHandler()
@@ -350,7 +350,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnMessageReceived(
         FabricIndex fabricIndex = ec->GetSessionHandle()->GetFabricIndex();
 
         if (nodeId != kUndefinedNodeId && fabricIndex != kUndefinedFabricIndex) {
-            err = PrepareForTransfer(&DeviceLayer::SystemLayer(), ec, fabricIndex, nodeId);
+            err = Init(&DeviceLayer::SystemLayer(), ec, fabricIndex, nodeId);
             if (err != CHIP_NO_ERROR) {
                 ChipLogError(Controller, "OnMessageReceived: Failed to prepare for transfer for BDX");
                 return err;
