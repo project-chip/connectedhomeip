@@ -18,9 +18,6 @@ declare_args() {
 
   chip_enable_icd_lit = false
 
-  # Matter SDK Configuration flag to enable ICD client functionality
-  chip_enable_icd_client = false
-
   # Matter SDK Configuration flag to make the ICD manager emit a report on entering active mode
   chip_icd_report_on_active_mode = false
 
