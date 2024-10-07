@@ -28,23 +28,24 @@ namespace {
 using namespace Clusters;
 using namespace Clusters::EcosystemInformation;
 
-const EndpointId kValidEndpointId = 1;
-const Structs::DeviceTypeStruct::Type kValidDeviceType = {.deviceType = 0, .revision = 1};
+const EndpointId kValidEndpointId                      = 1;
+const Structs::DeviceTypeStruct::Type kValidDeviceType = { .deviceType = 0, .revision = 1 };
 constexpr Access::SubjectDescriptor kSubjectDescriptor = Testing::kAdminSubjectDescriptor;
-const FabricIndex kValidFabricIndex = kSubjectDescriptor.fabricIndex;
+const FabricIndex kValidFabricIndex                    = kSubjectDescriptor.fabricIndex;
 
-struct RequiredEcosystemDeviceParams {
-    EndpointId originalEndpointId = kValidEndpointId;
+struct RequiredEcosystemDeviceParams
+{
+    EndpointId originalEndpointId              = kValidEndpointId;
     Structs::DeviceTypeStruct::Type deviceType = kValidDeviceType;
-    FabricIndex fabicIndex = kValidFabricIndex;
+    FabricIndex fabicIndex                     = kValidFabricIndex;
 };
 
 const EndpointId kAnotherValidEndpointId = 2;
 static_assert(kValidEndpointId != kAnotherValidEndpointId);
 const char * kValidLocationName = "AValidLocationName";
 const RequiredEcosystemDeviceParams kDefaultRequiredDeviceParams;
-const ClusterId kEcosystemInfoClusterId = EcosystemInformation::Id;
-const AttributeId kDeviceDirectoryAttributeId = EcosystemInformation::Attributes::DeviceDirectory::Id;
+const ClusterId kEcosystemInfoClusterId         = EcosystemInformation::Id;
+const AttributeId kDeviceDirectoryAttributeId   = EcosystemInformation::Attributes::DeviceDirectory::Id;
 const AttributeId kLocationDirectoryAttributeId = EcosystemInformation::Attributes::LocationDirectory::Id;
 
 } // namespace
@@ -52,23 +53,19 @@ const AttributeId kLocationDirectoryAttributeId = EcosystemInformation::Attribut
 class TestEcosystemInformationCluster : public ::testing::Test
 {
 public:
-    static void SetUpTestSuite()
-    {
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-    }
-    static void TearDownTestSuite()
-    {
-        chip::Platform::MemoryShutdown();
-    }
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    Clusters::EcosystemInformation::EcosystemInformationServer & EcoInfoCluster()
-    {
-        return mClusterServer;
-    }
+    Clusters::EcosystemInformation::EcosystemInformationServer & EcoInfoCluster() { return mClusterServer; }
 
-    std::unique_ptr<EcosystemDeviceStruct> CreateSimplestValidDeviceStruct(const RequiredEcosystemDeviceParams & requiredParams = kDefaultRequiredDeviceParams)
+    std::unique_ptr<EcosystemDeviceStruct>
+    CreateSimplestValidDeviceStruct(const RequiredEcosystemDeviceParams & requiredParams = kDefaultRequiredDeviceParams)
     {
-        std::unique_ptr<EcosystemDeviceStruct> deviceInfo = EcosystemDeviceStruct::Builder().SetOriginalEndpoint(requiredParams.originalEndpointId).AddDeviceType(requiredParams.deviceType).SetFabricIndex(requiredParams.fabicIndex).Build();
+        std::unique_ptr<EcosystemDeviceStruct> deviceInfo = EcosystemDeviceStruct::Builder()
+                                                                .SetOriginalEndpoint(requiredParams.originalEndpointId)
+                                                                .AddDeviceType(requiredParams.deviceType)
+                                                                .SetFabricIndex(requiredParams.fabicIndex)
+                                                                .Build();
         VerifyOrDie(deviceInfo);
         return deviceInfo;
     }
@@ -76,7 +73,8 @@ public:
     std::unique_ptr<EcosystemLocationStruct> CreateValidLocationStruct(const char * requiredLocationName = kValidLocationName)
     {
         std::string locationName(requiredLocationName);
-        std::unique_ptr<EcosystemLocationStruct> locationInfo = EcosystemLocationStruct::Builder().SetLocationName(locationName).Build();
+        std::unique_ptr<EcosystemLocationStruct> locationInfo =
+            EcosystemLocationStruct::Builder().SetLocationName(locationName).Build();
         VerifyOrDie(locationInfo);
         return locationInfo;
     }
@@ -153,7 +151,7 @@ TEST_F(TestEcosystemInformationCluster, BuildingEcosystemDeviceStruct)
     deviceInfo = deviceInfoBuilder.Build();
     ASSERT_FALSE(deviceInfo);
 
-    auto deviceType = Structs::DeviceTypeStruct::Type();
+    auto deviceType     = Structs::DeviceTypeStruct::Type();
     deviceType.revision = 1;
     deviceInfoBuilder.AddDeviceType(deviceType);
     deviceInfo = deviceInfoBuilder.Build();
@@ -171,9 +169,9 @@ TEST_F(TestEcosystemInformationCluster, BuildingEcosystemDeviceStruct)
 
 TEST_F(TestEcosystemInformationCluster, BuildingInvalidEcosystemDeviceStruct)
 {
-    auto deviceType = Structs::DeviceTypeStruct::Type();
-    deviceType.revision = 1;
-    const FabricIndex kFabricIndexTooLow = 0;
+    auto deviceType                       = Structs::DeviceTypeStruct::Type();
+    deviceType.revision                   = 1;
+    const FabricIndex kFabricIndexTooLow  = 0;
     const FabricIndex kFabricIndexTooHigh = kMaxValidFabricIndex + 1;
 
     EcosystemDeviceStruct::Builder deviceInfoBuilder;
@@ -191,7 +189,7 @@ TEST_F(TestEcosystemInformationCluster, BuildingInvalidEcosystemDeviceStruct)
     // At this point deviceInfoBuilder would be able to be built successfully.
 
     std::string nameThatsTooLong(65, 'x');
-    uint64_t nameEpochValueUs = 0;  // This values doesn't matter.
+    uint64_t nameEpochValueUs = 0; // This values doesn't matter.
     deviceInfoBuilder.SetDeviceName(std::move(nameThatsTooLong), nameEpochValueUs);
     deviceInfo = deviceInfoBuilder.Build();
     ASSERT_FALSE(deviceInfo);
@@ -302,7 +300,7 @@ TEST_F(TestEcosystemInformationCluster, BuildingInvalidEcosystemLocationStruct)
 
 TEST_F(TestEcosystemInformationCluster, AddLocationInfoInvalidArguments)
 {
-    const FabricIndex kFabricIndexTooLow = 0;
+    const FabricIndex kFabricIndexTooLow  = 0;
     const FabricIndex kFabricIndexTooHigh = kMaxValidFabricIndex + 1;
     const std::string kEmptyLocationIdStr = "";
     const std::string kValidLocationIdStr = "SomeLocationString";
@@ -310,44 +308,55 @@ TEST_F(TestEcosystemInformationCluster, AddLocationInfoInvalidArguments)
 
     std::unique_ptr<EcosystemLocationStruct> locationInfo = CreateValidLocationStruct();
     ASSERT_TRUE(locationInfo);
-    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kInvalidEndpointId, kValidLocationIdStr, kValidFabricIndex, std::move(locationInfo)), CHIP_ERROR_INVALID_ARGUMENT);
+    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kInvalidEndpointId, kValidLocationIdStr, kValidFabricIndex, std::move(locationInfo)),
+              CHIP_ERROR_INVALID_ARGUMENT);
 
     locationInfo = CreateValidLocationStruct();
     ASSERT_TRUE(locationInfo);
-    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kRootEndpointId, kValidLocationIdStr, kValidFabricIndex, std::move(locationInfo)), CHIP_ERROR_INVALID_ARGUMENT);
+    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kRootEndpointId, kValidLocationIdStr, kValidFabricIndex, std::move(locationInfo)),
+              CHIP_ERROR_INVALID_ARGUMENT);
 
     locationInfo = CreateValidLocationStruct();
     ASSERT_TRUE(locationInfo);
-    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kValidEndpointId, kEmptyLocationIdStr, kValidFabricIndex, std::move(locationInfo)), CHIP_ERROR_INVALID_ARGUMENT);
+    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kValidEndpointId, kEmptyLocationIdStr, kValidFabricIndex, std::move(locationInfo)),
+              CHIP_ERROR_INVALID_ARGUMENT);
 
     locationInfo = CreateValidLocationStruct();
     ASSERT_TRUE(locationInfo);
-    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kValidEndpointId, kInvalidLocationIdTooLongStr, kValidFabricIndex, std::move(locationInfo)), CHIP_ERROR_INVALID_ARGUMENT);
+    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kValidEndpointId, kInvalidLocationIdTooLongStr, kValidFabricIndex,
+                                               std::move(locationInfo)),
+              CHIP_ERROR_INVALID_ARGUMENT);
 
     locationInfo = CreateValidLocationStruct();
     ASSERT_TRUE(locationInfo);
-    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kValidEndpointId, kValidLocationIdStr, kFabricIndexTooLow, std::move(locationInfo)), CHIP_ERROR_INVALID_ARGUMENT);
+    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kValidEndpointId, kValidLocationIdStr, kFabricIndexTooLow, std::move(locationInfo)),
+              CHIP_ERROR_INVALID_ARGUMENT);
 
     locationInfo = CreateValidLocationStruct();
     ASSERT_TRUE(locationInfo);
-    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kValidEndpointId, kValidLocationIdStr, kFabricIndexTooHigh, std::move(locationInfo)), CHIP_ERROR_INVALID_ARGUMENT);
+    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kValidEndpointId, kValidLocationIdStr, kFabricIndexTooHigh, std::move(locationInfo)),
+              CHIP_ERROR_INVALID_ARGUMENT);
 
     // Sanity check that we can successfully add something after all the previously failed attempts
     locationInfo = CreateValidLocationStruct();
     ASSERT_TRUE(locationInfo);
-    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kValidEndpointId, kValidLocationIdStr, kValidFabricIndex, std::move(locationInfo)), CHIP_NO_ERROR);
+    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kValidEndpointId, kValidLocationIdStr, kValidFabricIndex, std::move(locationInfo)),
+              CHIP_NO_ERROR);
 
     // Adding a second identical entry is expected to fail
     locationInfo = CreateValidLocationStruct();
     ASSERT_TRUE(locationInfo);
-    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kValidEndpointId, kValidLocationIdStr, kValidFabricIndex, std::move(locationInfo)), CHIP_ERROR_INVALID_ARGUMENT);
+    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kValidEndpointId, kValidLocationIdStr, kValidFabricIndex, std::move(locationInfo)),
+              CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 TEST_F(TestEcosystemInformationCluster, AddLocationInfo)
 {
     std::unique_ptr<EcosystemLocationStruct> locationInfo = CreateValidLocationStruct();
-    const char * kValidLocationIdStr = "SomeLocationIdString";
-    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kValidEndpointId, kValidLocationIdStr, Testing::kAdminSubjectDescriptor.fabricIndex, std::move(locationInfo)), CHIP_NO_ERROR);
+    const char * kValidLocationIdStr                      = "SomeLocationIdString";
+    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kValidEndpointId, kValidLocationIdStr, Testing::kAdminSubjectDescriptor.fabricIndex,
+                                               std::move(locationInfo)),
+              CHIP_NO_ERROR);
 
     ConcreteAttributePath locationDirectoryPath(kValidEndpointId, kEcosystemInfoClusterId, kLocationDirectoryAttributeId);
     Testing::ReadOperation testLocationDirectoryRequest(locationDirectoryPath);
