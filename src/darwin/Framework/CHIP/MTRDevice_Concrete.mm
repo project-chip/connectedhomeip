@@ -2404,8 +2404,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            NSNumber * _Nullable retryDelay) {
                            if (error != nil) {
                                MTR_LOG_ERROR("%@ getSessionForNode error %@", self, error);
-                               [self _handleSubscriptionError:error];
-                               [self _handleSubscriptionReset:retryDelay];
+                               [self->_deviceController asyncDispatchToMatterQueue:^{
+                                   [self _handleSubscriptionError:error];
+                                   [self _handleSubscriptionReset:retryDelay];
+                               } errorHandler:nil];
                                return;
                            }
 
