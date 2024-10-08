@@ -34,13 +34,6 @@ overrides:
     explanation: "Review not required unless merging to master"
 
   ############################################################
-  #  Required status checks
-  ############################################################
-  - if: "*restyled*' not in statuses.successful"
-    status: failure
-    explanation: "Restyled workflow must be successful"
-
-  ############################################################
   #  Require Issues
   ############################################################
   # disabling until we have PRs up to date
