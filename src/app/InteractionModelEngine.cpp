@@ -1685,7 +1685,7 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request)
 {
 
-    Status status = CommandCheckExists(request.path);
+    Status status = CheckCommandExistence(request.path);
 
     if (status != Status::Success)
     {
@@ -1694,10 +1694,10 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
         return status;
     }
 
-    status = CommandCheckACL(request);
+    status = CheckCommandAccess(request);
     VerifyOrReturnValue(status == Status::Success, status);
 
-    return CommandCheckFlags(request);
+    return CheckCommandFlags(request);
 }
 
 Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(const DataModel::InvokeRequest & aRequest)
