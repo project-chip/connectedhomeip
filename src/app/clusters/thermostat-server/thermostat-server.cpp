@@ -443,12 +443,12 @@ void EnsureHeatingSetpointDeadband(EndpointId endpoint, int16_t currentHeatingSe
     int16_t maxValidHeatingSetpoint = static_cast<int16_t>(newCoolingSetpoint - deadband);
     if (currentHeatingSetpoint <= maxValidHeatingSetpoint)
     {
-        // The current cooling setpoint doesn't violate the deadband
+        // The current heating setpoint doesn't violate the deadband
         return;
     }
     if (maxValidHeatingSetpoint < minHeatingSetpoint)
     {
-        // Adjusting the heating setpoint to preserve the deadband would violate the max cooling setpoint
+        // Adjusting the heating setpoint to preserve the deadband would violate the min heating setpoint
         // This should have been caught in CheckHeatingSetpointDeadband, so log and exit
         ChipLogError(Zcl, "Failed ensuring heating setpoint deadband");
         return;
@@ -462,7 +462,7 @@ void EnsureHeatingSetpointDeadband(EndpointId endpoint, int16_t currentHeatingSe
 }
 
 /**
- * @brief For thermostats that support auto, shift endpoints to maintain the current deadband
+ * @brief For thermostats that support auto, shift setpoints to maintain the current deadband
  * Note: this assumes that the shift is possible; setpoint changes which prevent the deadband
  * from being maintained due to the min/max limits for setpoints should be rejected by
  * MatterThermostatClusterServerPreAttributeChangedCallback
