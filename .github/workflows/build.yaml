@@ -186,6 +186,10 @@ jobs:
             - name: Clean output
               run: rm -rf ./out
             - name: Run Tests with sanitizers
+              # Sanotizer tests are not likely to find extra issues so running the same tests
+              # as above repeateadly on every pull request seems extra time. Instead keep this run
+              # for branch merge only
+              if: github.event.pull_request.number == null
               env:
                   LSAN_OPTIONS: detect_leaks=1
               run: |
