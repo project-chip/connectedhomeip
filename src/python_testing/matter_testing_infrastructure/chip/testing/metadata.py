@@ -40,7 +40,7 @@ class Metadata:
     factory_reset: bool = False
     factory_reset_app_only: bool = False
     script_gdb: bool = False
-    quiet: bool = True
+    quiet: bool = False
 
 
 class NamedStringIO(StringIO):

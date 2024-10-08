@@ -594,7 +594,7 @@ Next build the python wheels and create / activate a venv (called `pyenv` here,
 but any name may be used)
 
 ```
-./scripts/build_python.sh -i pyenv
+./scripts/build_python.sh -i out/python_env
 source pyenv/bin/activate
 ```
 
