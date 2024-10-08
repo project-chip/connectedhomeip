@@ -38,7 +38,7 @@ overrides:
   ############################################################
   - if: "'*restyled*' not in statuses.successful"
     status: failure
-    explanation: "Style must be inline before reviewing can be complete"
+    explanation: "Restyled workflow must be successful"
 
   ############################################################
   #  Require Issues
