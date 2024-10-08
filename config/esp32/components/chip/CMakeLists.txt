@@ -143,9 +143,6 @@ endif()
 
 if(CONFIG_ENABLE_ICD_SERVER)
     chip_gn_arg_append("chip_enable_icd_server"               "true")
-    if(CONFIG_ICD_ENFORCE_SIT_SLOW_POLL_LIMIT)
-        chip_gn_arg_append("icd_enforce_sit_slow_poll_limit"               "true")
-    endif()
     if(CONFIG_ICD_REPORT_ON_ACTIVE_MODE)
         chip_gn_arg_append("chip_icd_report_on_active_mode"               "true")
     endif()
@@ -319,10 +316,6 @@ endif()
 
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
-endif()
-
-if (CONFIG_ENABLE_MATTER_EVENT_LIST)
-    chip_gn_arg_append  ("enable_eventlist_attribute" "true")
 endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")

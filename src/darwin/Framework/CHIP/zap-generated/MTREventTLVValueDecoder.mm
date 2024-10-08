@@ -4543,6 +4543,30 @@ static id _Nullable DecodeEventPayloadForContentAppObserverCluster(EventId aEven
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForWebRTCTransportProviderCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::WebRTCTransportProvider;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForWebRTCTransportRequestorCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::WebRTCTransportRequestor;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForChimeCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::Chime;
@@ -5144,6 +5168,12 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ContentAppObserver::Id: {
         return DecodeEventPayloadForContentAppObserverCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::WebRTCTransportProvider::Id: {
+        return DecodeEventPayloadForWebRTCTransportProviderCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::WebRTCTransportRequestor::Id: {
+        return DecodeEventPayloadForWebRTCTransportRequestorCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::Chime::Id: {
         return DecodeEventPayloadForChimeCluster(aPath.mEventId, aReader, aError);

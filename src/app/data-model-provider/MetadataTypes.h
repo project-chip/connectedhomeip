@@ -105,6 +105,18 @@ struct CommandEntry
     static const CommandEntry kInvalid;
 };
 
+/// Represents a device type that resides on an endpoint
+struct DeviceTypeEntry
+{
+    DeviceTypeId deviceTypeId;
+    uint8_t deviceTypeVersion;
+
+    bool operator==(const DeviceTypeEntry & other) const
+    {
+        return (deviceTypeId == other.deviceTypeId) && (deviceTypeVersion == other.deviceTypeVersion);
+    }
+};
+
 /// Provides metadata information for a data model
 ///
 /// The data model can be viewed as a tree of endpoint/cluster/(attribute+commands+events)
@@ -128,7 +140,13 @@ public:
 
     virtual EndpointId FirstEndpoint()                 = 0;
     virtual EndpointId NextEndpoint(EndpointId before) = 0;
+    virtual bool EndpointExists(EndpointId id);
 
+    // This iteration describes device types registered on an endpoint
+    virtual std::optional<DeviceTypeEntry> FirstDeviceType(EndpointId endpoint)                                  = 0;
+    virtual std::optional<DeviceTypeEntry> NextDeviceType(EndpointId endpoint, const DeviceTypeEntry & previous) = 0;
+
+    // This iteration will list all clusters on a given endpoint
     virtual ClusterEntry FirstCluster(EndpointId endpoint)                              = 0;
     virtual ClusterEntry NextCluster(const ConcreteClusterPath & before)                = 0;
     virtual std::optional<ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) = 0;

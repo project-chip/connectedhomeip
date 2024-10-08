@@ -679,6 +679,17 @@ EndpointId CustomDataModel::NextEndpoint(EndpointId before)
     return CodegenDataModelProviderInstance()->NextEndpoint(before);
 }
 
+std::optional<DataModel::DeviceTypeEntry> CustomDataModel::FirstDeviceType(EndpointId endpoint)
+{
+    return std::nullopt;
+}
+
+std::optional<DataModel::DeviceTypeEntry> CustomDataModel::NextDeviceType(EndpointId endpoint,
+                                                                          const DataModel::DeviceTypeEntry & previous)
+{
+    return std::nullopt;
+}
+
 ClusterEntry CustomDataModel::FirstCluster(EndpointId endpoint)
 {
     return CodegenDataModelProviderInstance()->FirstCluster(endpoint);

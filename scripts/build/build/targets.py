@@ -146,6 +146,7 @@ def BuildHostTarget():
         TargetPart('air-quality-sensor', app=HostApp.AIR_QUALITY_SENSOR),
         TargetPart('network-manager', app=HostApp.NETWORK_MANAGER),
         TargetPart('energy-management', app=HostApp.ENERGY_MANAGEMENT),
+        TargetPart('water-leak-detector', app=HostApp.WATER_LEAK_DETECTOR),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -267,7 +268,8 @@ def BuildEfr32Target():
         TargetPart('light', app=Efr32App.LIGHT),
         TargetPart('lock', app=Efr32App.LOCK),
         TargetPart('thermostat', app=Efr32App.THERMOSTAT),
-        TargetPart('pump', app=Efr32App.PUMP)
+        TargetPart('pump', app=Efr32App.PUMP),
+        TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR)
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)

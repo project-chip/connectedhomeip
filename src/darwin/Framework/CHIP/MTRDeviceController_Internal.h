@@ -20,7 +20,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <Matter/MTRAccessGrant.h>
 #import <Matter/MTRBaseDevice.h> // for MTRClusterPath
 
 #import "MTRDeviceConnectionBridge.h" // For MTRInternalDeviceConnectionCallback
@@ -210,23 +209,6 @@ NS_ASSUME_NONNULL_BEGIN
                             queue:(dispatch_queue_t)queue
                        completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
 
-/**
- * Get the access grants that apply for the given cluster path.
- */
-- (NSArray<MTRAccessGrant *> *)accessGrantsForClusterPath:(MTRClusterPath *)clusterPath;
-
-/**
- * Get the privilege level needed to read the given attribute.  There's no
- * endpoint provided because the expectation is that this information is the
- * same for all cluster instances.
- *
- * Returns nil if we have no such attribute defined on any endpoint, otherwise
- * one of MTRAccessControlEntry* constants wrapped in NSNumber.
- *
- * Only called on the Matter queue.
- */
-- (nullable NSNumber *)neededReadPrivilegeForClusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID;
-
 #pragma mark - Device-specific data and SDK access
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID;
@@ -265,8 +247,6 @@ static NSString * const kDeviceControllerErrorKeyAllocation = @"Generating new o
 static NSString * const kDeviceControllerErrorCSRValidation = @"Extracting public key from CSR failed";
 static NSString * const kDeviceControllerErrorGetCommissionee = @"Failure obtaining device being commissioned";
 static NSString * const kDeviceControllerErrorGetAttestationChallenge = @"Failure getting attestation challenge";
-static NSString * const kDeviceControllerErrorSpake2pVerifierGenerationFailed = @"PASE verifier generation failed";
-static NSString * const kDeviceControllerErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
 static NSString * const kDeviceControllerErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
 
 NS_ASSUME_NONNULL_END
