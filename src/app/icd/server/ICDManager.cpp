@@ -80,9 +80,6 @@ void ICDManager::Init()
         VerifyOrDieWithMsg(ICDConfigurationData::GetInstance().GetMinLitActiveModeThreshold() <=
                                ICDConfigurationData::GetInstance().GetActiveModeThreshold(),
                            AppServer, "The minimum ActiveModeThreshold value for a LIT ICD is 5 seconds.");
-        // Disabling check until LIT support is compelte
-        // VerifyOrDieWithMsg((GetSlowPollingInterval() <= GetSITPollingThreshold()) , AppServer,
-        //                    "LIT support is required for slow polling intervals superior to 15 seconds");
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
