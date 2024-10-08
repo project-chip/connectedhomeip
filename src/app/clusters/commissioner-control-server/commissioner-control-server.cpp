@@ -132,10 +132,11 @@ CommissionerControlServer::SetSupportedDeviceCategoriesValue(EndpointId endpoint
 }
 
 CHIP_ERROR
-CommissionerControlServer::GenerateCommissioningRequestResultEvent(const Events::CommissioningRequestResult::Type & result)
+CommissionerControlServer::GenerateCommissioningRequestResultEvent(EndpointId endpoint,
+                                                                   const Events::CommissioningRequestResult::Type & result)
 {
     EventNumber eventNumber;
-    CHIP_ERROR error = LogEvent(result, kRootEndpointId, eventNumber);
+    CHIP_ERROR error = LogEvent(result, endpoint, eventNumber);
     if (CHIP_NO_ERROR != error)
     {
         ChipLogError(Zcl, "CommissionerControl: Unable to emit CommissioningRequestResult event: %" CHIP_ERROR_FORMAT,

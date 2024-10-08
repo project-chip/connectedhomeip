@@ -125,7 +125,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
     @async_test_body
     async def test_TC_MCORE_FS_1_1(self):
         # TODO this value should either be determined or passed in from command line
-        dut_commissioning_control_endpoint = 0
+        dut_commissioning_control_endpoint = 1
         self.step(1)
         self.step(2)
         self.step(3)

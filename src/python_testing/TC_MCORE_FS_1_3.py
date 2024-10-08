@@ -109,6 +109,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
                      "TH verifies a value is visible for the UniqueID from the DUT_FSA's Bridged Device Basic Information Cluster."),
         ]
 
+    # TODO: Dynamically identify the endpoint hosting the aggregator at runtime. (#35976)
     async def commission_via_commissioner_control(self, controller_node_id: int, device_node_id: int):
         """Commission device_node_id to controller_node_id using CommissionerControl cluster."""
 
@@ -128,6 +129,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
 
         await self.send_single_cmd(
             node_id=controller_node_id,
+            endpoint=1,
             cmd=Clusters.CommissionerControl.Commands.RequestCommissioningApproval(
                 requestID=request_id,
                 vendorID=vendor_id,
@@ -140,6 +142,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
 
         resp = await self.send_single_cmd(
             node_id=controller_node_id,
+            endpoint=1,
             cmd=Clusters.CommissionerControl.Commands.CommissionNode(
                 requestID=request_id,
                 responseTimeoutSeconds=30,
