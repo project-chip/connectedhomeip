@@ -46577,7 +46577,7 @@ class ZoneManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 0,
+            kUnknownEnumValue = 0
 
         class ZoneEventStoppedReasonEnum(MatterIntEnum):
             kActionStopped = 0x00
@@ -46586,7 +46586,7 @@ class ZoneManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class ZoneEventTriggeredReasonEnum(MatterIntEnum):
             kMotion = 0x00
@@ -46594,7 +46594,7 @@ class ZoneManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 1,
+            kUnknownEnumValue = 1
 
         class ZoneSourceEnum(MatterIntEnum):
             kMfg = 0x00
@@ -46603,7 +46603,7 @@ class ZoneManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class ZoneTypeEnum(MatterIntEnum):
             kTwoDCARTZone = 0x00
@@ -46611,7 +46611,7 @@ class ZoneManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 1,
+            kUnknownEnumValue = 1
 
         class ZoneUseEnum(MatterIntEnum):
             kMotion = 0x00
@@ -46621,7 +46621,7 @@ class ZoneManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
     class Bitmaps:
         class Feature(IntFlag):
