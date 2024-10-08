@@ -15,10 +15,11 @@
 # limitations under the License.
 #
 
-from github import Github
+import logging
+
 import click
 import coloredlogs
-import logging
+from github import Github
 
 __LOG_LEVELS__ = {
     "debug": logging.DEBUG,
