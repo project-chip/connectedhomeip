@@ -1679,15 +1679,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return nil;
 }
 
-#ifdef DEBUG
-+ (void)forceLocalhostAdvertisingOnly
-{
-    auto interfaceIndex = chip::Inet::InterfaceId::PlatformType(kDNSServiceInterfaceIndexLocalOnly);
-    auto interfaceId = chip::Inet::InterfaceId(interfaceIndex);
-    chip::app::DnssdServer::Instance().SetInterfaceId(interfaceId);
-}
-#endif // DEBUG
-
 @end
 
 /**
