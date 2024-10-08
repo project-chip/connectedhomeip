@@ -389,7 +389,7 @@ Status CheckCoolingSetpointDeadband(bool autoSupported, int16_t newHeatingSetpoi
     return Status::Success;
 }
 
-typedef Status (*SetpointSetter)(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
+typedef Status (*SetpointSetter)(EndpointId endpoint, int16_t value);
 
 /**
  * @brief Attempts to ensure that a change to the heating setpoint maintains the deadband with the cooling setpoint
@@ -419,7 +419,7 @@ void EnsureCoolingSetpointDeadband(EndpointId endpoint, int16_t currentCoolingSe
         return;
     }
     // Adjust the cool setpoint to preserve deadband
-    auto status = setter(endpoint, minValidCoolingSetpoint, MarkAttributeDirty::kYes);
+    auto status = setter(endpoint, minValidCoolingSetpoint);
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "Error: EnsureCoolingSetpointDeadband failed!");
@@ -454,7 +454,7 @@ void EnsureHeatingSetpointDeadband(EndpointId endpoint, int16_t currentHeatingSe
         return;
     }
     // Adjust the heating setpoint to preserve deadband
-    auto status = setter(endpoint, maxValidHeatingSetpoint, MarkAttributeDirty::kYes);
+    auto status = setter(endpoint, maxValidHeatingSetpoint);
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "Error: EnsureHeatingSetpointDeadband failed!");
