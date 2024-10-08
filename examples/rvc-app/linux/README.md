@@ -134,5 +134,4 @@ Obtain tracing json file.
      -o {OUTPUT_FILE} -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
 ```
 
-.. toctree::
-   :orphan:
+.. toctree:: :orphan:
