@@ -11,9 +11,8 @@ jobs:
   restyled:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - uses: restyled-io/actions/setup@v4
       - id: restyler
