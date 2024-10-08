@@ -24,7 +24,8 @@ import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.tlv import uint
 from matter_testing_support.matter_testing import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main,
-                                                   get_wait_seconds_from_set_time, parse_matter_test_args, type_matches, utc_time_in_matter_epoch)
+                                                   get_wait_seconds_from_set_time, parse_matter_test_args, type_matches,
+                                                   utc_time_in_matter_epoch)
 from matter_testing_support.pics import parse_pics, parse_pics_xml
 from matter_testing_support.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root,
                                                               create_device_type_lists, find_tag_list_problems, find_tree_roots,
