@@ -1,3 +1,6 @@
+```{toctree}
+:orphan:
+```
 # Matter Linux Robotic Vacuum Cleaner Example
 
 An example showing the use of Matter on Linux. The document will describe how to
@@ -132,8 +135,4 @@ Obtain tracing json file.
 ```
     $ ./{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py -s localhost:33000 \
      -o {OUTPUT_FILE} -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
-```
-
-```{toctree}
-:orphan:
 ```
