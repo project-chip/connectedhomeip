@@ -256,6 +256,13 @@ public:
     // when new fabric is created, this list needs to be updated,
     // when client init DefaultICDClientStorage, this table needs to be loaded.
     static StorageKeyName ICDFabricList() { return StorageKeyName::FromConst("g/icdfl"); }
+
+    // Valve configuration and control
+    static StorageKeyName VCCDefaultOpenDuration(EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/vcc/dod/%x", endpoint);
+    }
+    static StorageKeyName VCCDefaultOpenLevel(EndpointId endpoint) { return StorageKeyName::Formatted("g/vcc/dol/%x", endpoint); }
 };
 
 } // namespace chip

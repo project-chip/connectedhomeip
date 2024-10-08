@@ -30,7 +30,7 @@ import time
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
 
@@ -55,34 +55,24 @@ class TC_VALCC_4_2(MatterBaseTest):
             TestStep(8, "Send Close command"),
             TestStep(9, "Read OpenDuration attribute"),
             TestStep(10, "Read RemainingDuration attribute"),
+            TestStep(11, "Write DefaultOpenDuration back to original value")
         ]
         return steps
 
-    def pics_TC_VALCC_4_2(self) -> list[str]:
-        pics = [
-            "VALCC.S",
-        ]
-        return pics
-
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.ValveConfigurationAndControl))
     async def test_TC_VALCC_4_2(self):
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.matter_test_config.endpoint
 
         self.step(1)
         attributes = Clusters.ValveConfigurationAndControl.Attributes
 
         self.step("2a")
-        defaultOpenDuration = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultOpenDuration)
+        originalDefaultOpenDuration = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultOpenDuration)
 
         self.step("2b")
-        if defaultOpenDuration is NullValue:
-            defaultOpenDuration = 60
-
-            result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.DefaultOpenDuration(defaultOpenDuration))])
-            asserts.assert_equal(result[0].Status, Status.Success, "DefaultOpenDuration write failed")
-        else:
-            logging.info("Test step skipped")
+        defaultOpenDuration = 60
+        await self.write_single_attribute(attributes.DefaultOpenDuration(defaultOpenDuration))
 
         self.step(3)
         try:
@@ -128,6 +118,9 @@ class TC_VALCC_4_2(MatterBaseTest):
         self.step(10)
         remaining_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
         asserts.assert_true(remaining_duration_dut is NullValue, "RemainingDuration is not null")
+
+        self.step(11)
+        await self.write_single_attribute(attributes.DefaultOpenDuration(originalDefaultOpenDuration))
 
 
 if __name__ == "__main__":
