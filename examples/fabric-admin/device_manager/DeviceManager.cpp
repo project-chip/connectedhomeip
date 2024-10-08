@@ -20,7 +20,6 @@
 
 #include <commands/interactive/InteractiveCommands.h>
 #include <crypto/RandUtils.h>
-#include <device_manager/PairingManager.h>
 #include <lib/support/StringBuilder.h>
 
 #include <cstdio>
@@ -115,7 +114,7 @@ void DeviceManager::RemoveSyncedDevice(NodeId nodeId)
                     ChipLogValueX64(device->GetNodeId()), device->GetEndpointId());
 }
 
-void DeviceManager::OpenDeviceCommissioningWindow(NodeId nodeId, uint32_t commissioningTimeoutSec, uint32_t iterations,
+void DeviceManager::OpenDeviceCommissioningWindow(NodeId nodeId, uint32_t iterations, uint16_t commissioningTimeoutSec,
                                                   uint16_t discriminator, const ByteSpan & salt, const ByteSpan & verifier)
 {
     ChipLogProgress(NotSpecified, "Opening commissioning window for Node ID: " ChipLogFormatX64, ChipLogValueX64(nodeId));
@@ -153,52 +152,42 @@ void DeviceManager::OpenRemoteDeviceCommissioningWindow(EndpointId remoteEndpoin
 void DeviceManager::PairRemoteFabricBridge(NodeId nodeId, uint32_t setupPINCode, const char * deviceRemoteIp,
                                            uint16_t deviceRemotePort)
 {
-    StringBuilder<kMaxCommandSize> commandBuilder;
-
-    commandBuilder.Add("pairing already-discovered ");
-    commandBuilder.AddFormat("%lu %d %s %d", nodeId, setupPINCode, deviceRemoteIp, deviceRemotePort);
-
-    PushCommand(commandBuilder.c_str());
+    if (PairingManager::Instance().PairDevice(nodeId, setupPINCode, deviceRemoteIp, deviceRemotePort) != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to pair remote fabric bridge " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    }
 }
 
 void DeviceManager::PairRemoteDevice(NodeId nodeId, const char * payload)
 {
-    StringBuilder<kMaxCommandSize> commandBuilder;
-
-    commandBuilder.Add("pairing code ");
-    commandBuilder.AddFormat("%lu %s", nodeId, payload);
-
-    PushCommand(commandBuilder.c_str());
+    if (PairingManager::Instance().PairDeviceWithCode(nodeId, payload) != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to pair remote device " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    }
 }
 
 void DeviceManager::PairLocalFabricBridge(NodeId nodeId)
 {
-    StringBuilder<kMaxCommandSize> commandBuilder;
-
-    commandBuilder.Add("pairing already-discovered ");
-    commandBuilder.AddFormat("%lu %d ::1 %d", nodeId, mLocalBridgeSetupPinCode, mLocalBridgePort);
-
-    PushCommand(commandBuilder.c_str());
+    if (PairingManager::Instance().PairDevice(nodeId, mLocalBridgeSetupPinCode, "::1", mLocalBridgePort) != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to pair local fabric bridge " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    }
 }
 
 void DeviceManager::UnpairRemoteFabricBridge()
 {
-    StringBuilder<kMaxCommandSize> commandBuilder;
-
-    commandBuilder.Add("pairing unpair ");
-    commandBuilder.AddFormat("%lu", mRemoteBridgeNodeId);
-
-    PushCommand(commandBuilder.c_str());
+    if (PairingManager::Instance().UnpairDevice(mRemoteBridgeNodeId) != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to unpair remote bridge device " ChipLogFormatX64, ChipLogValueX64(mRemoteBridgeNodeId));
+    }
 }
 
 void DeviceManager::UnpairLocalFabricBridge()
 {
-    StringBuilder<kMaxCommandSize> commandBuilder;
-
-    commandBuilder.Add("pairing unpair ");
-    commandBuilder.AddFormat("%lu", mLocalBridgeNodeId);
-
-    PushCommand(commandBuilder.c_str());
+    if (PairingManager::Instance().UnpairDevice(mLocalBridgeNodeId) != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to unpair local bridge device " ChipLogFormatX64, ChipLogValueX64(mLocalBridgeNodeId));
+    }
 }
 
 void DeviceManager::SubscribeRemoteFabricBridge()
@@ -390,20 +379,15 @@ void DeviceManager::HandleAttributePartsListUpdate(TLV::TLVReader & data)
 
         if (mAutoSyncEnabled)
         {
-            StringBuilder<kMaxCommandSize> commandBuilder;
-            commandBuilder.Add("pairing unpair ");
-            commandBuilder.AddFormat("%lu", device->GetNodeId());
-
-            PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "unpair"));
-
-            if (pairingCommand == nullptr)
+            NodeId nodeId = device->GetNodeId();
+            if (PairingManager::Instance().UnpairDevice(nodeId) != CHIP_NO_ERROR)
             {
-                ChipLogError(NotSpecified, "Pairing code command is not available");
-                return;
+                ChipLogError(NotSpecified, "Failed to unpair device " ChipLogFormatX64, ChipLogValueX64(nodeId));
             }
-
-            pairingCommand->RegisterPairingDelegate(this);
-            PushCommand(commandBuilder.c_str());
+            else
+            {
+                PairingManager::Instance().SetPairingDelegate(this);
+            }
         }
     }
 }
@@ -438,7 +422,7 @@ void DeviceManager::HandleReverseOpenCommissioningWindow(TLV::TLVReader & data)
     ChipLogProgress(NotSpecified, "  PAKEPasscodeVerifier size: %lu", value.PAKEPasscodeVerifier.size());
     ChipLogProgress(NotSpecified, "  salt size: %lu", value.salt.size());
 
-    OpenDeviceCommissioningWindow(mLocalBridgeNodeId, value.commissioningTimeout, value.iterations, value.discriminator,
+    OpenDeviceCommissioningWindow(mLocalBridgeNodeId, value.iterations, value.commissioningTimeout, value.discriminator,
                                   ByteSpan(value.salt.data(), value.salt.size()),
                                   ByteSpan(value.PAKEPasscodeVerifier.data(), value.PAKEPasscodeVerifier.size()));
 }

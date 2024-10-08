@@ -16,32 +16,51 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements reporting engine for CHIP
- *      Data Model profile.
- *
- */
-
-#include "app/data-model-provider/ActionReturnStatus.h"
-#include <app/icd/server/ICDServerConfig.h>
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/server/ICDNotifier.h> // nogncheck
-#endif
 #include <app/AppConfig.h>
+#include <app/ConcreteEventPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/Provider.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/Engine.h>
+#include <app/reporting/Read-Checked.h>
 #include <app/reporting/Read.h>
 #include <app/reporting/reporting.h>
 #include <app/util/MatterCallbacks.h>
 #include <app/util/ember-compatibility-functions.h>
+#include <lib/core/DataModelTypes.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/server/ICDNotifier.h> // nogncheck
+#endif
 
 using namespace chip::Access;
 
 namespace chip {
 namespace app {
 namespace reporting {
+namespace {
+
+using Protocols::InteractionModel::Status;
+
+Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eventPath)
+{
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+
+    if (!model->GetClusterInfo(eventPath).has_value())
+    {
+        return model->EndpointExists(eventPath.mEndpointId) ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
+    }
+
+    return Status::Success;
+#else
+    return CheckEventSupportStatus(eventPath);
+#endif
+}
+
+} // namespace
 
 Engine::Engine(InteractionModelEngine * apImEngine) : mpImEngine(apImEngine) {}
 
@@ -72,8 +91,10 @@ bool Engine::IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFil
         if (aPath.mEndpointId == filter->mValue.mEndpointId && aPath.mClusterId == filter->mValue.mClusterId)
         {
             existPathMatch = true;
-            if (!IsClusterDataVersionEqual(ConcreteClusterPath(filter->mValue.mEndpointId, filter->mValue.mClusterId),
-                                           filter->mValue.mDataVersion.Value()))
+
+            if (!Impl::IsClusterDataVersionEqualTo(mpImEngine->GetDataModelProvider(),
+                                                   ConcreteClusterPath(filter->mValue.mEndpointId, filter->mValue.mClusterId),
+                                                   filter->mValue.mDataVersion.Value()))
             {
                 existVersionMismatch = true;
             }
@@ -327,7 +348,8 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
         }
 
         ConcreteEventPath path(current->mValue.mEndpointId, current->mValue.mClusterId, current->mValue.mEventId);
-        Status status = CheckEventSupportStatus(path);
+        Status status = EventPathValid(mpImEngine->GetDataModelProvider(), path);
+
         if (status != Status::Success)
         {
             TLV::TLVWriter checkpoint = aWriter;

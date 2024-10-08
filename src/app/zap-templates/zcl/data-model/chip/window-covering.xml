@@ -126,22 +126,22 @@ limitations under the License.
     <!-- Conformance feature [LF & ABS] - for now optional -->
     <command source="client" code="0x04" name="GoToLiftValue" optional="true" cli="zcl WindowCovering GoToLiftValue">
       <description>Go to lift value specified</description>
-      <arg name="liftValue" type="int16u"/>
+      <arg name="LiftValue" type="int16u"/>
     </command>
     <!-- Conformance feature LF & PA_LF | [LF] - for now optional -->
     <command source="client" code="0x05" name="GoToLiftPercentage" optional="true" cli="zcl WindowCovering GoToLiftPercentage">
       <description>Go to lift percentage specified</description>
-      <arg name="liftPercent100thsValue" type="percent100ths"/>
+      <arg name="LiftPercent100thsValue" type="percent100ths"/>
     </command>
     <!-- Conformance feature [TL & ABS] - for now optional -->
     <command source="client" code="0x07" name="GoToTiltValue" optional="true" cli="zcl WindowCovering GoToTiltValue">
       <description>Go to tilt value specified</description>
-      <arg name="tiltValue" type="int16u"/>
+      <arg name="TiltValue" type="int16u"/>
     </command>
     <!-- Conformance feature TL & PA_TL | [TL] - for now optional -->
     <command source="client" code="0x08" name="GoToTiltPercentage" optional="true" cli="zcl WindowCovering GoToTiltPercentage">
       <description>Go to tilt percentage specified</description>
-      <arg name="tiltPercent100thsValue" type="percent100ths"/>
+      <arg name="TiltPercent100thsValue" type="percent100ths"/>
     </command>
   </cluster>
 

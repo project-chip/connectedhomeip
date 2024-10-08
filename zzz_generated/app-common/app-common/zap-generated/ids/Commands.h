@@ -1803,6 +1803,72 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace ContentAppObserver
 
+namespace WebRTCTransportProvider {
+namespace Commands {
+
+namespace SolicitOffer {
+static constexpr CommandId Id = 0x00000001;
+} // namespace SolicitOffer
+
+namespace SolicitOfferResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace SolicitOfferResponse
+
+namespace ProvideOffer {
+static constexpr CommandId Id = 0x00000003;
+} // namespace ProvideOffer
+
+namespace ProvideOfferResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace ProvideOfferResponse
+
+namespace ProvideAnswer {
+static constexpr CommandId Id = 0x00000005;
+} // namespace ProvideAnswer
+
+namespace ProvideICECandidate {
+static constexpr CommandId Id = 0x00000006;
+} // namespace ProvideICECandidate
+
+namespace EndSession {
+static constexpr CommandId Id = 0x00000007;
+} // namespace EndSession
+
+} // namespace Commands
+} // namespace WebRTCTransportProvider
+
+namespace WebRTCTransportRequestor {
+namespace Commands {
+
+namespace Offer {
+static constexpr CommandId Id = 0x00000001;
+} // namespace Offer
+
+namespace Answer {
+static constexpr CommandId Id = 0x00000002;
+} // namespace Answer
+
+namespace ICECandidate {
+static constexpr CommandId Id = 0x00000003;
+} // namespace ICECandidate
+
+namespace End {
+static constexpr CommandId Id = 0x00000004;
+} // namespace End
+
+} // namespace Commands
+} // namespace WebRTCTransportRequestor
+
+namespace Chime {
+namespace Commands {
+
+namespace PlayChimeSound {
+static constexpr CommandId Id = 0x00000000;
+} // namespace PlayChimeSound
+
+} // namespace Commands
+} // namespace Chime
+
 namespace CommissionerControl {
 namespace Commands {
 

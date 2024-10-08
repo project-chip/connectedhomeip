@@ -259,6 +259,12 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ContentControl";
     case chip::app::Clusters::ContentAppObserver::Id:
         return "ContentAppObserver";
+    case chip::app::Clusters::WebRTCTransportProvider::Id:
+        return "WebRTCTransportProvider";
+    case chip::app::Clusters::WebRTCTransportRequestor::Id:
+        return "WebRTCTransportRequestor";
+    case chip::app::Clusters::Chime::Id:
+        return "Chime";
     case chip::app::Clusters::EcosystemInformation::Id:
         return "EcosystemInformation";
     case chip::app::Clusters::CommissionerControl::Id:
@@ -830,6 +836,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "TCAcknowledgements";
         case chip::app::Clusters::GeneralCommissioning::Attributes::TCAcknowledgementsRequired::Id:
             return "TCAcknowledgementsRequired";
+        case chip::app::Clusters::GeneralCommissioning::Attributes::TCUpdateDeadline::Id:
+            return "TCUpdateDeadline";
         case chip::app::Clusters::GeneralCommissioning::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::GeneralCommissioning::Attributes::AcceptedCommandList::Id:
@@ -4375,6 +4383,73 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::WebRTCTransportProvider::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WebRTCTransportProvider::Attributes::CurrentSessions::Id:
+            return "CurrentSessions";
+        case chip::app::Clusters::WebRTCTransportProvider::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::WebRTCTransportProvider::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::WebRTCTransportProvider::Attributes::EventList::Id:
+            return "EventList";
+        case chip::app::Clusters::WebRTCTransportProvider::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::WebRTCTransportProvider::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::WebRTCTransportProvider::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::WebRTCTransportRequestor::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::CurrentSessions::Id:
+            return "CurrentSessions";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::EventList::Id:
+            return "EventList";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::Chime::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Chime::Attributes::InstalledChimeSounds::Id:
+            return "InstalledChimeSounds";
+        case chip::app::Clusters::Chime::Attributes::ActiveChimeID::Id:
+            return "ActiveChimeID";
+        case chip::app::Clusters::Chime::Attributes::Enabled::Id:
+            return "Enabled";
+        case chip::app::Clusters::Chime::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::Chime::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::Chime::Attributes::EventList::Id:
+            return "EventList";
+        case chip::app::Clusters::Chime::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::Chime::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::Chime::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::EcosystemInformation::Id: {
         switch (id)
         {
@@ -5701,6 +5776,47 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::WebRTCTransportProvider::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Id:
+            return "SolicitOffer";
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id:
+            return "ProvideOffer";
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Id:
+            return "ProvideAnswer";
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::Id:
+            return "ProvideICECandidate";
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::EndSession::Id:
+            return "EndSession";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::WebRTCTransportRequestor::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WebRTCTransportRequestor::Commands::Offer::Id:
+            return "Offer";
+        case chip::app::Clusters::WebRTCTransportRequestor::Commands::Answer::Id:
+            return "Answer";
+        case chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::Id:
+            return "ICECandidate";
+        case chip::app::Clusters::WebRTCTransportRequestor::Commands::End::Id:
+            return "End";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::Chime::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Chime::Commands::PlayChimeSound::Id:
+            return "PlayChimeSound";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::CommissionerControl::Id: {
         switch (id)
         {
@@ -6220,6 +6336,17 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessageResponse::Id:
             return "ContentAppMessageResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::WebRTCTransportProvider::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::SolicitOfferResponse::Id:
+            return "SolicitOfferResponse";
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOfferResponse::Id:
+            return "ProvideOfferResponse";
         default:
             return "Unknown";
         }

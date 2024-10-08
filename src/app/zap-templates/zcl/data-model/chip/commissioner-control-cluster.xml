@@ -21,7 +21,7 @@ limitations under the License.
     <field name="FabricSynchronization" mask="0x1"/>
   </bitmap>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <domain>General</domain>
     <name>Commissioner Control</name>
     <code>0x0751</code>
