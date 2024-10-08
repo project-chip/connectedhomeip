@@ -1713,10 +1713,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
                                      .entityId    = aRequest.path.mCommandId };
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     std::optional<DataModel::CommandInfo> commandInfo = mDataModelProvider->GetAcceptedCommandInfo(aRequest.path);
-    // This is checked by previous validations, so it should not happen
-    VerifyOrDie(commandInfo.has_value());
-
-    Access::Privilege minimumRequiredPrivilege = commandInfo->invokePrivilege;
+    Access::Privilege minimumRequiredPrivilege =
+        commandInfo.has_value() ? commandInfo->invokePrivilege : Access::Privilege::kOperate;
 #else
     Access::Privilege minimumRequiredPrivilege = RequiredPrivilege::ForInvokeCommand(aRequest.path);
 #endif
@@ -1743,8 +1741,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
     const bool commandNeedsTimedInvoke = commandInfo->flags.Has(DataModel::CommandQualityFlags::kTimed);
     const bool commandIsFabricScoped   = commandInfo->flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
 #else
-    const bool commandNeedsTimedInvoke         = CommandNeedsTimedInvoke(aRequest.path.mClusterId, aRequest.path.mCommandId);
-    const bool commandIsFabricScoped           = CommandIsFabricScoped(aRequest.path.mClusterId, aRequest.path.mCommandId);
+    const bool commandNeedsTimedInvoke = CommandNeedsTimedInvoke(aRequest.path.mClusterId, aRequest.path.mCommandId);
+    const bool commandIsFabricScoped   = CommandIsFabricScoped(aRequest.path.mClusterId, aRequest.path.mCommandId);
 #endif
 
     if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
