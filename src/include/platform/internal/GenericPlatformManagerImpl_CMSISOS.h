@@ -47,14 +47,14 @@ class GenericPlatformManagerImpl_CMSISOS : public GenericPlatformManagerImpl<Imp
 {
 
 protected:
-    osMutexId_t mChipStackLock         = NULL;
-    osMessageQueueId_t mChipEventQueue = NULL;
-    osThreadId_t mEventLoopTask        = NULL;
+    osMutexId_t mChipStackLock         = nullptr;
+    osMessageQueueId_t mChipEventQueue = nullptr;
+    osThreadId_t mEventLoopTask        = nullptr;
     bool mChipTimerActive;
 
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
-    osMessageQueueId_t mBackgroundEventQueue = NULL;
-    osThreadId_t mBackgroundEventLoopTask    = NULL;
+    osMessageQueueId_t mBackgroundEventQueue = nullptr;
+    osThreadId_t mBackgroundEventLoopTask    = nullptr;
 #endif
 
     // ===== Methods that implement the PlatformManager abstract interface.
@@ -90,8 +90,8 @@ private:
 
     static void EventLoopTaskMain(void * pvParameter);
     uint32_t SyncNextChipTimerHandling();
-    uint32_t mNextTimerBaseTime;
-    uint32_t mNextTimerDurationTicks;
+    uint32_t mNextTimerBaseTime      = 0;
+    uint32_t mNextTimerDurationTicks = 0;
     std::atomic<bool> mShouldRunEventLoop;
 
 #if defined(CHIP_CONFIG_CMSISOS_USE_STATIC_QUEUE) && CHIP_CONFIG_CMSISOS_USE_STATIC_QUEUE
