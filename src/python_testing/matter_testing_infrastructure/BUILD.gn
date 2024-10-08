@@ -29,6 +29,7 @@ pw_python_package("matter_testing_support") {
 
   sources = [
     "matter_testing_support/__init__.py",
+    "matter_testing_support/apps.py",
     "matter_testing_support/basic_composition.py",
     "matter_testing_support/choice_conformance.py",
     "matter_testing_support/conformance.py",
