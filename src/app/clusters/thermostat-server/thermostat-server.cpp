@@ -235,8 +235,7 @@ struct SetpointLimits
     int16_t absMaxCoolSetpointLimit;
     int16_t minCoolSetpointLimit;
     int16_t maxCoolSetpointLimit;
-    int8_t deadBand      = 0;
-    int16_t deadBandTemp = 0;
+    int16_t deadBand = 0;
     int16_t occupiedCoolingSetpoint;
     int16_t occupiedHeatingSetpoint;
     int16_t unoccupiedCoolingSetpoint;
@@ -267,12 +266,12 @@ Status GetSetpointLimits(EndpointId endpoint, SetpointLimits & setpointLimits)
 
     if (setpointLimits.autoSupported)
     {
-        setpointLimits.deadBand = 0;
-        if (MinSetpointDeadBand::Get(endpoint, &setpointLimits.deadBand) != Status::Success)
+        int8_t deadBand;
+        if (MinSetpointDeadBand::Get(endpoint, &deadBand) != Status::Success)
         {
-            setpointLimits.deadBand = kDefaultDeadBand;
+            deadBand = kDefaultDeadBand;
         }
-        setpointLimits.deadBandTemp = static_cast<int16_t>(setpointLimits.deadBand * 10);
+        setpointLimits.deadBand = static_cast<int16_t>(deadBand * 10);
     }
 
     if (AbsMinCoolSetpointLimit::Get(endpoint, &setpointLimits.absMinCoolSetpointLimit) != Status::Success)
@@ -486,23 +485,19 @@ void EnsureDeadband(const ConcreteAttributePath & attributePath)
     {
     case OccupiedHeatingSetpoint::Id:
         EnsureCoolingSetpointDeadband(endpoint, setpointLimits.occupiedCoolingSetpoint, setpointLimits.occupiedHeatingSetpoint,
-                                      setpointLimits.maxCoolSetpointLimit, setpointLimits.deadBandTemp,
-                                      OccupiedCoolingSetpoint::Set);
+                                      setpointLimits.maxCoolSetpointLimit, setpointLimits.deadBand, OccupiedCoolingSetpoint::Set);
         break;
     case OccupiedCoolingSetpoint::Id:
         EnsureHeatingSetpointDeadband(endpoint, setpointLimits.occupiedHeatingSetpoint, setpointLimits.occupiedCoolingSetpoint,
-                                      setpointLimits.minHeatSetpointLimit, setpointLimits.deadBandTemp,
-                                      OccupiedHeatingSetpoint::Set);
+                                      setpointLimits.minHeatSetpointLimit, setpointLimits.deadBand, OccupiedHeatingSetpoint::Set);
         break;
     case UnoccupiedHeatingSetpoint::Id:
         EnsureCoolingSetpointDeadband(endpoint, setpointLimits.unoccupiedCoolingSetpoint, setpointLimits.unoccupiedHeatingSetpoint,
-                                      setpointLimits.maxCoolSetpointLimit, setpointLimits.deadBandTemp,
-                                      UnoccupiedCoolingSetpoint::Set);
+                                      setpointLimits.maxCoolSetpointLimit, setpointLimits.deadBand, UnoccupiedCoolingSetpoint::Set);
         break;
     case UnoccupiedCoolingSetpoint::Id:
         EnsureHeatingSetpointDeadband(endpoint, setpointLimits.unoccupiedHeatingSetpoint, setpointLimits.unoccupiedCoolingSetpoint,
-                                      setpointLimits.minHeatSetpointLimit, setpointLimits.deadBandTemp,
-                                      UnoccupiedHeatingSetpoint::Set);
+                                      setpointLimits.minHeatSetpointLimit, setpointLimits.deadBand, UnoccupiedHeatingSetpoint::Set);
         break;
     }
 }
