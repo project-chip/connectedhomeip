@@ -384,6 +384,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeCommissionerControlID:
         result = @"CommissionerControl";
         break;
+    case MTRClusterIDTypeMeterIdentificationID:
+        result = @"MeterIdentification";
+        break;
     case MTRClusterIDTypeUnitTestingID:
         result = @"UnitTesting";
         break;
@@ -8356,6 +8359,61 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeMeterIdentificationID:
+
+        switch (attributeID) {
+
+            // Cluster MeterIdentification attributes
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeMeterTypeID:
+            result = @"MeterType";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeUtilityNameID:
+            result = @"UtilityName";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributePointOfDeliveryID:
+            result = @"PointOfDelivery";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributePowerThresholdID:
+            result = @"PowerThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributePowerThresholdSourceID:
+            result = @"PowerThresholdSource";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeUnitTestingID:
 
         switch (attributeID) {
@@ -14510,6 +14568,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeMeterIdentificationID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %d>", eventID];
             break;
         }
         break;

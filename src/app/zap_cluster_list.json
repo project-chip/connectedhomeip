@@ -34,6 +34,7 @@
         "DIAGNOSTIC_LOGS_CLUSTER": [],
         "DISHWASHER_ALARM_CLUSTER": [],
         "DISHWASHER_MODE_CLUSTER": [],
+        "METER_IDENTIFICATION_CLUSTER": [],
         "MICROWAVE_OVEN_MODE_CLUSTER": [],
         "DOOR_LOCK_CLUSTER": [],
         "ECOSYSTEM_INFORMATION_CLUSTER": [],
@@ -223,6 +224,7 @@
         "MEDIA_PLAYBACK_CLUSTER": ["media-playback-server"],
         "MICROWAVE_OVEN_CONTROL_CLUSTER": ["microwave-oven-control-server"],
         "MESSAGES_CLUSTER": ["messages-server"],
+        "METER_IDENTIFICATION_CLUSTER": [],
         "MODE_SELECT_CLUSTER": ["mode-select-server"],
         "NETWORK_COMMISSIONING_CLUSTER": ["network-commissioning"],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
