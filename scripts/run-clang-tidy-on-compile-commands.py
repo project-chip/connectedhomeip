@@ -40,6 +40,7 @@ import sys
 import tempfile
 import threading
 import traceback
+from pathlib import Path
 
 import click
 import coloredlogs
@@ -213,7 +214,7 @@ def find_darwin_gcc_sysroot():
     ):
         if not line.startswith("Path: "):
             continue
-        path = line[line.find(": ") + 2:]
+        path = line[line.find(": ") + 2 :]
         if "/MacOSX.platform/" not in path:
             continue
         logging.info("Found %s" % path)
@@ -468,9 +469,9 @@ def main(
         acceptable = set()
         with open(file_list_file, "rt") as f:
             for file_name in f.readlines():
-                logging.warning("DEBUG: file %s in file", file_name.strip())
-                acceptable.add(file_name.strip())
-        runner.FilterEntries(lambda e: e.file in acceptable)
+                acceptable.add(Path(file_name.strip()).resolve().as_posix())
+
+        runner.FilterEntries(lambda e: e.full_path in acceptable)
 
     if export_fixes:
         runner.ExportFixesTo(export_fixes)

@@ -235,7 +235,7 @@ jobs:
                     "./scripts/run-clang-tidy-on-compile-commands.py \
                        --compile-database out/sanitizers/compile_commands.json \
                        --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|-ReadImpl|-InvokeSubscribeImpl|CodegenDataModel_Write|QuieterReporting' \
-                       --file-list-file out/changed_files.txt
+                       --file-list-file out/changed_files.txt \
                        check \
                     "
             - name: Clean output
@@ -469,7 +469,7 @@ jobs:
                     "./scripts/run-clang-tidy-on-compile-commands.py \
                        --compile-database out/default/compile_commands.json \
                        --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|CodegenDataModel_Write|QuieterReporting' \
-                       --file-list-file out/changed_files.txt
+                       --file-list-file out/changed_files.txt \
                        check \
                     "
             - name: Uploading diagnostic logs
