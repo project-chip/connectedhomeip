@@ -77,7 +77,7 @@ class TC_VALCC_4_2(MatterBaseTest):
 
         self.step("2b")
         defaultOpenDuration = 60
-        await self.write_single_attribute(attributes.DefaultOpenDuration(defaultOpenDuration))
+        await self.write_single_attribute(attributes.DefaultOpenDuration(defaultOpenDuration), endpoint_id=endpoint)
 
         self.step(3)
         try:
