@@ -1689,7 +1689,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
 
     if (status != Status::Success)
     {
-        ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%u",
+        ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint %u",
                       ChipLogValueMEI(request.path.mCommandId), ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId);
         return status;
     }
