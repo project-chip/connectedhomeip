@@ -210,8 +210,14 @@ jobs:
             - name: Clang-tidy validation
               # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
               #       See https://github.com/llvm/llvm-project/issues/97426
+              env:
+                  ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
               run: |
-                  echo "${{ steps.changed-files.outputs.all}}" >out/changed_files.txt
+                  touch out/changed_files.txt
+                  for file in ${ALL_CHANGED_FILES}; do
+                      echo "$file changed and will be considered for tidy"
+                      echo "$file" >>out/changed_files.txt
+                  done
 
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
@@ -438,7 +444,11 @@ jobs:
               # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
               #       See https://github.com/llvm/llvm-project/issues/97426
               run: |
-                  echo "${{ steps.changed-files.outputs.all}}" >out/changed_files.txt
+                  touch out/changed_files.txt
+                  for file in ${ALL_CHANGED_FILES}; do
+                      echo "$file changed and will be considered for tidy"
+                      echo "$file" >>out/changed_files.txt
+                  done
 
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
