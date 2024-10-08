@@ -32189,6 +32189,418 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation MTRWebRTCTransportRequestorClusterOfferParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _webRTCSessionID = @(0);
+
+        _sdp = @"";
+
+        _iceServers = nil;
+
+        _iceTransportPolicy = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRWebRTCTransportRequestorClusterOfferParams alloc] init];
+
+    other.webRTCSessionID = self.webRTCSessionID;
+    other.sdp = self.sdp;
+    other.iceServers = self.iceServers;
+    other.iceTransportPolicy = self.iceTransportPolicy;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; sdp:%@; iceServers:%@; iceTransportPolicy:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _sdp, _iceServers, _iceTransportPolicy];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWebRTCTransportRequestorClusterOfferParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::WebRTCTransportRequestor::Commands::Offer::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.webRTCSessionID = self.webRTCSessionID.unsignedShortValue;
+    }
+    {
+        encodableStruct.sdp = AsCharSpan(self.sdp);
+    }
+    {
+        if (self.iceServers != nil) {
+            auto & definedValue_0 = encodableStruct.ICEServers.Emplace();
+            {
+                using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.iceServers.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.iceServers.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.iceServers.count; ++i_1) {
+                        if (![self.iceServers[i_1] isKindOfClass:[MTRWebRTCTransportRequestorClusterICEServerStruct class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_1 = (MTRWebRTCTransportRequestorClusterICEServerStruct *) self.iceServers[i_1];
+                        {
+                            using ListType_3 = std::remove_reference_t<decltype(listHolder_1->mList[i_1].urls)>;
+                            using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
+                            if (element_1.urls.count != 0) {
+                                auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_1.urls.count);
+                                if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                listFreer.add(listHolder_3);
+                                for (size_t i_3 = 0; i_3 < element_1.urls.count; ++i_3) {
+                                    if (![element_1.urls[i_3] isKindOfClass:[NSString class]]) {
+                                        // Wrong kind of value.
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    auto element_3 = (NSString *) element_1.urls[i_3];
+                                    listHolder_3->mList[i_3] = AsCharSpan(element_3);
+                                }
+                                listHolder_1->mList[i_1].urls = ListType_3(listHolder_3->mList, element_1.urls.count);
+                            } else {
+                                listHolder_1->mList[i_1].urls = ListType_3();
+                            }
+                        }
+                        if (element_1.username != nil) {
+                            auto & definedValue_3 = listHolder_1->mList[i_1].username.Emplace();
+                            definedValue_3 = AsCharSpan(element_1.username);
+                        }
+                        if (element_1.credential != nil) {
+                            auto & definedValue_3 = listHolder_1->mList[i_1].credential.Emplace();
+                            definedValue_3 = AsCharSpan(element_1.credential);
+                        }
+                        if (element_1.caid != nil) {
+                            auto & definedValue_3 = listHolder_1->mList[i_1].caid.Emplace();
+                            definedValue_3 = element_1.caid.unsignedShortValue;
+                        }
+                    }
+                    definedValue_0 = ListType_1(listHolder_1->mList, self.iceServers.count);
+                } else {
+                    definedValue_0 = ListType_1();
+                }
+            }
+        }
+    }
+    {
+        if (self.iceTransportPolicy != nil) {
+            auto & definedValue_0 = encodableStruct.ICETransportPolicy.Emplace();
+            definedValue_0 = AsCharSpan(self.iceTransportPolicy);
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRWebRTCTransportRequestorClusterAnswerParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _webRTCSessionID = @(0);
+
+        _sdp = @"";
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRWebRTCTransportRequestorClusterAnswerParams alloc] init];
+
+    other.webRTCSessionID = self.webRTCSessionID;
+    other.sdp = self.sdp;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; sdp:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _sdp];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWebRTCTransportRequestorClusterAnswerParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::WebRTCTransportRequestor::Commands::Answer::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.webRTCSessionID = self.webRTCSessionID.unsignedShortValue;
+    }
+    {
+        encodableStruct.sdp = AsCharSpan(self.sdp);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRWebRTCTransportRequestorClusterICECandidateParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _webRTCSessionID = @(0);
+
+        _iceCandidate = @"";
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRWebRTCTransportRequestorClusterICECandidateParams alloc] init];
+
+    other.webRTCSessionID = self.webRTCSessionID;
+    other.iceCandidate = self.iceCandidate;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; iceCandidate:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _iceCandidate];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWebRTCTransportRequestorClusterICECandidateParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.webRTCSessionID = self.webRTCSessionID.unsignedShortValue;
+    }
+    {
+        encodableStruct.ICECandidate = AsCharSpan(self.iceCandidate);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRWebRTCTransportRequestorClusterEndParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _webRTCSessionID = @(0);
+
+        _reason = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRWebRTCTransportRequestorClusterEndParams alloc] init];
+
+    other.webRTCSessionID = self.webRTCSessionID;
+    other.reason = self.reason;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; reason:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _reason];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWebRTCTransportRequestorClusterEndParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::WebRTCTransportRequestor::Commands::End::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.webRTCSessionID = self.webRTCSessionID.unsignedShortValue;
+    }
+    {
+        encodableStruct.reason = static_cast<std::remove_reference_t<decltype(encodableStruct.reason)>>(self.reason.unsignedCharValue);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRChimeClusterPlayChimeSoundParams
 - (instancetype)init
 {

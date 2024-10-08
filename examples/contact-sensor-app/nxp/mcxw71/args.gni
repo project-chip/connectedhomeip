@@ -30,7 +30,6 @@ chip_with_lwip = false
 
 chip_enable_icd_server = true
 chip_enable_icd_lit = false
-icd_enforce_sit_slow_poll_limit = true
 chip_persist_subscriptions = true
 chip_subscription_timeout_resumption = true
 

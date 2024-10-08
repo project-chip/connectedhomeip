@@ -30,6 +30,7 @@ pw_python_package("chip-testing") {
 
   sources = [
     "chip/testing/__init__.py",
+    "chip/testing/apps.py",
     "chip/testing/metadata.py",
     "chip/testing/tasks.py",
   ]
