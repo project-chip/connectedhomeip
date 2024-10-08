@@ -48,6 +48,7 @@
         "microwave-oven-control-cluster.xml",
         "door-lock-cluster.xml",
         "ecosystem-information-cluster.xml",
+        "energy-calendar-cluster.xml",
         "energy-preference-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
         "electrical-power-measurement-cluster.xml",
@@ -645,6 +646,16 @@
             "HarmonicPhases",
             "PowerFactor",
             "NeutralCurrent",
+            "FeatureMap"
+        ],
+        "Energy Calendar": [
+            "CalendarPeriods",
+            "SpecialDays",
+            "CurrentDay",
+            "NextDay",
+            "CurrentTransition",
+            "CurrentPeakPeriod",
+            "NextPeakPeriod",
             "FeatureMap"
         ],
         "Power Topology": ["FeatureMap"],

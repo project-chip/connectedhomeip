@@ -44,6 +44,7 @@
         "ecosystem-information-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
         "electrical-power-measurement-cluster.xml",
+        "energy-calendar-cluster.xml",
         "energy-evse-cluster.xml",
         "energy-evse-mode-cluster.xml",
         "energy-preference-cluster.xml",
@@ -639,6 +640,16 @@
             "HarmonicPhases",
             "PowerFactor",
             "NeutralCurrent",
+            "FeatureMap"
+        ],
+        "Energy Calendar": [
+            "CalendarPeriods",
+            "SpecialDays",
+            "CurrentDay",
+            "NextDay",
+            "CurrentTransition",
+            "CurrentPeakPeriod",
+            "NextPeakPeriod",
             "FeatureMap"
         ],
         "Power Topology": ["FeatureMap"],
