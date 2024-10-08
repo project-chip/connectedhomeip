@@ -3222,7 +3222,7 @@ endpoint 2 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 2;
+    ram      attribute featureMap default = 6;
     ram      attribute clusterRevision default = 2;
   }
 }
