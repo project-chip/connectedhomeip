@@ -125,7 +125,7 @@ class TC_VALCC_4_2(MatterBaseTest):
         asserts.assert_true(remaining_duration_dut is NullValue, "RemainingDuration is not null")
 
         self.step(11)
-        await self.write_single_attribute(attributes.DefaultOpenDuration(originalDefaultOpenDuration))
+        await self.write_single_attribute(attributes.DefaultOpenDuration(originalDefaultOpenDuration), endpoint_id=endpoint)
 
 
 if __name__ == "__main__":
