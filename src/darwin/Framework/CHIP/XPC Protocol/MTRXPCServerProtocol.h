@@ -74,6 +74,8 @@ MTR_NEWLY_AVAILABLE
 - (oneway void)deviceController:(NSUUID *)controller registerNodeID:(NSNumber *)nodeID;
 - (oneway void)deviceController:(NSUUID *)controller unregisterNodeID:(NSNumber *)nodeID;
 
+// Register Node and get initial internal state
+- (oneway void)deviceController:(NSUUID *)controller registerNodeID:(NSNumber *)nodeID reply:(void (^)(NSDictionary * internalState))reply;
 @end
 
 MTR_NEWLY_AVAILABLE
@@ -81,6 +83,9 @@ MTR_NEWLY_AVAILABLE
 @optional
 - (oneway void)deviceController:(NSUUID *)controller checkInWithContext:(NSDictionary *)context;
 - (oneway void)deviceController:(NSUUID *)controller updateControllerConfiguration:(NSDictionary *)controllerState;
+
+// Check-in and get initial state
+- (oneway void)deviceController:(NSUUID *)controller checkInWithContext:(NSDictionary *)context reply:(void (^)(NSDictionary * controllerInfo))reply;
 @end
 
 NS_ASSUME_NONNULL_END
