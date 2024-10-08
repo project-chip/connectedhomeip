@@ -36,7 +36,7 @@ overrides:
   ############################################################
   #  Required status checks
   ############################################################
-  - if: "*restyled*' not in statuses.successful"
+  - if: "'restyled' not in check_runs.successful"
     status: failure
     explanation: "Restyled workflow must be successful"
 
