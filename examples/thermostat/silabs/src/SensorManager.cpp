@@ -83,7 +83,7 @@ void SensorManager::SensorTimerEventHandler(void * arg)
     static int16_t lastTemperature = 0;
 
 #if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
-    int16_t tempSum   = 0;
+    int32_t tempSum   = 0;
     uint16_t humidity = 0;
 
     for (uint8_t i = 0; i < 100; i++)
@@ -118,7 +118,7 @@ void SensorManager::SensorTimerEventHandler(void * arg)
     MarkAttributeDirty reportState = MarkAttributeDirty::kNo;
     if ((temperature >= (lastTemperature + kMinTemperatureDelta)) || temperature <= (lastTemperature - kMinTemperatureDelta))
     {
-        reportState = MarkAttributeDirty::kYes;
+        reportState = MarkAttributeDirty::kIfChanged;
     }
 
     lastTemperature = temperature;

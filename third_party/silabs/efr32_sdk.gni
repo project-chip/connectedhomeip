@@ -91,15 +91,6 @@ declare_args() {
 
   # Enable TestEventTrigger in GeneralDiagnostics cluster
   sl_enable_test_event_trigger = false
-
-  # Temperature Sensor support
-  sl_enable_si70xx_sensor = false
-}
-
-declare_args() {
-  # This argument is for retro-compatibility since use_temp_sensor was used by the thermostat app.
-  # It should not be used anymore.
-  use_temp_sensor = sl_enable_si70xx_sensor
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
@@ -693,12 +684,7 @@ template("efr32_sdk") {
     }
 
     if (sl_enable_si70xx_sensor) {
-      defines += [
-        "SL_MATTER_USE_SI70XX_SENSOR=1",
-
-        # Define is left of retro-compatibility. It should not be used anymore.
-        "USE_TEMP_SENSOR",
-      ]
+      defines += [ "SL_MATTER_USE_SI70XX_SENSOR=1" ]
     } else {
       defines += [ "SL_MATTER_USE_SI70XX_SENSOR=0" ]
     }
