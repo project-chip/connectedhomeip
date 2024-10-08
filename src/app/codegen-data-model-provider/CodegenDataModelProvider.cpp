@@ -318,7 +318,7 @@ bool operator==(const DataModel::DeviceTypeEntry & a, const EmberAfDeviceType & 
 ///    - index == types.size()  // i.e. not found or there is no next
 ///
 /// hintWherePreviousMayBe represents a search hint where previous may exist.
-unsigned FindNextDeviceTypeIndex(Span<const EmberAfDeviceType> types, const DataModel::DeviceTypeEntry previous,
+unsigned FindNextDeviceTypeIndex(Span<const EmberAfDeviceType> types, const DataModel::DeviceTypeEntry & previous,
                                  unsigned hintWherePreviousMayBe)
 {
     if (hintWherePreviousMayBe < types.size())
