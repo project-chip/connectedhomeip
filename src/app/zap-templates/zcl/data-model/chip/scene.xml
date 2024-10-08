@@ -167,9 +167,9 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
       <access op="invoke" privilege="manage"/>
       <arg id="0" name="Mode" type="CopyModeBitmap" min="0x00" max="0x01"/>
       <arg id="1" name="GroupIdentifierFrom" type="group_id"/>
-      <arg id="2" name="SceneIdentifierFrom" type="max 254"/>
+      <arg id="2" name="SceneIdentifierFrom" type="int8u"/>
       <arg id="3" name="GroupIdentifierTo" type="group_id"/>
-      <arg id="4" name="SceneIdentifierTo" type="max 254"/>
+      <arg id="4" name="SceneIdentifierTo" type="int8u"/>
       <optionalConform/>
     </command>
 
