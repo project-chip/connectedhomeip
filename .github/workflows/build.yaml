@@ -186,6 +186,10 @@ jobs:
             - name: Clean output
               run: rm -rf ./out
             - name: Run Tests with sanitizers
+              # Sanotizer tests are not likely to find extra issues so running the same tests
+              # as above repeateadly on every pull request seems extra time. Instead keep this run
+              # for master onlyu
+              if: github.event.pull_request.number == null
               env:
                   LSAN_OPTIONS: detect_leaks=1
               run: |
@@ -201,6 +205,11 @@ jobs:
                       BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS chip_data_model_check_die_on_failure=true" --export-compile-commands
                       BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
                   done
+            - name: Generate tests with sanitizers (for tidy)
+              if: github.event.pull_request.number != null
+              run: |
+                  rm -rf ./out/sanitizers
+                  BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="is_clang=true is_asan=true chip_data_model_check_die_on_failure=true" --export-compile-commands
             - name: Ensure codegen is done for sanitize
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
