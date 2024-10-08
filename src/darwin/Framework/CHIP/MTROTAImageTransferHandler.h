@@ -46,8 +46,8 @@ protected:
                                  chip::System::PacketBufferHandle && payload) override;
 
 private:
-    CHIP_ERROR Init(chip::System::Layer * layer, chip::Messaging::ExchangeContext * exchangeCtx,
-                                  chip::FabricIndex fabricIndex, chip::NodeId nodeId);
+    CHIP_ERROR Init(chip::System::Layer * layer, chip::Messaging::ExchangeContext * exchangeCtx, chip::FabricIndex fabricIndex,
+                    chip::NodeId nodeId);
 
     CHIP_ERROR ConfigureState(chip::FabricIndex fabricIndex, chip::NodeId nodeId);
 

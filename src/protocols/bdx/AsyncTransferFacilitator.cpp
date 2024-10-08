@@ -55,7 +55,7 @@ bdx::StatusCode AsyncTransferFacilitator::GetBdxStatusCodeFromChipError(CHIP_ERR
 }
 
 CHIP_ERROR AsyncTransferFacilitator::Init(System::Layer * layer, Messaging::ExchangeContext * exchangeCtx,
-                                  System::Clock::Timeout timeout)
+                                          System::Clock::Timeout timeout)
 {
     VerifyOrReturnError(layer != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(exchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -176,8 +176,8 @@ void AsyncTransferFacilitator::OnResponseTimeout(Messaging::ExchangeContext * ec
 }
 
 CHIP_ERROR AsyncResponder::Init(System::Layer * layer, Messaging::ExchangeContext * exchangeCtx, TransferRole role,
-                                              BitFlags<TransferControlFlags> xferControlOpts, uint16_t maxBlockSize,
-                                              System::Clock::Timeout timeout)
+                                BitFlags<TransferControlFlags> xferControlOpts, uint16_t maxBlockSize,
+                                System::Clock::Timeout timeout)
 {
     AsyncTransferFacilitator::Init(layer, exchangeCtx, timeout);
     ReturnErrorOnFailure(mTransfer.WaitForTransfer(role, xferControlOpts, maxBlockSize, timeout));
