@@ -441,18 +441,6 @@ using namespace chip::Tracing::DarwinFramework;
     }
 }
 
-#ifdef DEBUG
-- (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
-{
-    std::lock_guard lock(*self.deviceMapLock);
-    NSMutableDictionary<NSNumber *, NSNumber *> * deviceAttributeCounts = [NSMutableDictionary dictionary];
-    for (NSNumber * nodeID in _nodeIDToDeviceMap) {
-        deviceAttributeCounts[nodeID] = @([[_nodeIDToDeviceMap objectForKey:nodeID] unitTestAttributeCount]);
-    }
-    return deviceAttributeCounts;
-}
-#endif
-
 - (BOOL)setOperationalCertificateIssuer:(nullable id<MTROperationalCertificateIssuer>)operationalCertificateIssuer
                                   queue:(nullable dispatch_queue_t)queue
 {
