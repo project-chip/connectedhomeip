@@ -66,7 +66,6 @@ def main(search_directory, env_file):
         "TC_TMP_2_1.py",  # src/python_testing/test_testing/test_TC_TMP_2_1.py is the Unit test of this test
         "TC_OCC_3_1.py",  # There are CI issues for the test cases that implements manually controlling sensor device for the occupancy state ON/OFF change
         "TC_OCC_3_2.py",  # There are CI issues for the test cases that implements manually controlling sensor device for the occupancy state ON/OFF change
-        "TC_BRBINFO_4_1.py",  # This test requires a TH_ICD_SERVER application, hence not ready run with CI
         "TestCommissioningTimeSync.py",  # Code/Test not being used or not shared code for any other tests
         "TestConformanceSupport.py",  # Unit test - does not run against an app
         "TestChoiceConformanceSupport.py",  # Unit test - does not run against an app
