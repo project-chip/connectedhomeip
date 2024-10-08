@@ -116,7 +116,6 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
-      "${chip_root}/examples/energy-management-app/energy-management-common/common/include",
       "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/include",
       "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/include",
       "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/include",
