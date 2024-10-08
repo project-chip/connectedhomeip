@@ -350,7 +350,7 @@ window-app/**/README
 :glob:
 :maxdepth: 1
 
-rvc-app/README
+rvc-app/**/README
 ```
 
 ## Air Purifier Example
