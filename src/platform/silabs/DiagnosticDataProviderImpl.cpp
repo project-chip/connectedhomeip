@@ -88,7 +88,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
     uint32_t threadCount         = osThreadGetCount();
     osThreadId_t * threadIdTable = static_cast<osThreadId_t *>(chip::Platform::MemoryCalloc(threadCount, sizeof(osThreadId_t)));
 
-    if (threadIdTable != NULL)
+    if (threadIdTable != nullptr)
     {
         osThreadEnumerate(threadIdTable, threadCount);
         for (uint8_t tIdIndex = 0; tIdIndex < threadCount; tIdIndex++)
