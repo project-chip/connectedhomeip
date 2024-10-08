@@ -613,9 +613,9 @@ private:
     void ShutdownMatchingSubscriptions(const Optional<FabricIndex> & aFabricIndex = NullOptional,
                                        const Optional<NodeId> & aPeerNodeId       = NullOptional);
 
-    Status CommandCheckExists(const ConcreteCommandPath & aCommandPath);
-    Status CommandCheckACL(const DataModel::InvokeRequest & aRequest);
-    Status CommandCheckFlags(const DataModel::InvokeRequest & aRequest);
+    Status CheckCommandExistence(const ConcreteCommandPath & aCommandPath);
+    Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest);
+    Status CheckCommandFlags(const DataModel::InvokeRequest & aRequest);
 
     /**
      * Check if the given attribute path is a valid path in the data model provider.

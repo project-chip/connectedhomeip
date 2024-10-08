@@ -1689,7 +1689,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
 
     if (status != Status::Success)
     {
-        ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%x",
+        ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%u",
                       ChipLogValueMEI(request.path.mCommandId), ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId);
         return status;
     }
@@ -1700,7 +1700,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
     return CommandCheckFlags(request);
 }
 
-Protocols::InteractionModel::Status InteractionModelEngine::CommandCheckACL(const DataModel::InvokeRequest & aRequest)
+Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(const DataModel::InvokeRequest & aRequest)
 {
     if (!aRequest.subjectDescriptor.has_value())
     {
@@ -1714,7 +1714,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandCheckACL(cons
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     std::optional<DataModel::CommandInfo> commandInfo = mDataModelProvider->GetAcceptedCommandInfo(aRequest.path);
     // This is checked by previous validations, so it should not happen
-    VerifyOrReturnValue(commandInfo.has_value(), Status::UnsupportedCommand);
+    VerifyOrDie(commandInfo.has_value());
 
     Access::Privilege minimumRequiredPrivilege = commandInfo->invokePrivilege;
 #else
@@ -1733,12 +1733,12 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandCheckACL(cons
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status InteractionModelEngine::CommandCheckFlags(const DataModel::InvokeRequest & aRequest)
+Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(const DataModel::InvokeRequest & aRequest)
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     std::optional<DataModel::CommandInfo> commandInfo = mDataModelProvider->GetAcceptedCommandInfo(aRequest.path);
     // This is checked by previous validations, so it should not happen
-    VerifyOrReturnValue(commandInfo.has_value(), Status::UnsupportedCommand);
+    VerifyOrDie(commandInfo.has_value());
 
     const bool commandNeedsTimedInvoke = commandInfo->flags.Has(DataModel::CommandQualityFlags::kTimed);
     const bool commandIsFabricScoped   = commandInfo->flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
@@ -1768,7 +1768,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandCheckFlags(co
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status InteractionModelEngine::CommandCheckExists(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistence(const ConcreteCommandPath & aCommandPath)
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     auto provider = GetDataModelProvider();
