@@ -216,7 +216,7 @@ class NrfConnectBuilder(Builder):
         logging.info('Compiling NrfConnect at %s', self.output_dir)
 
         cmd = ['ninja', '-C', self.output_dir]
-        
+
         if self.ninja_jobs is not None:
             cmd.append('-j' + str(self.ninja_jobs))
 
