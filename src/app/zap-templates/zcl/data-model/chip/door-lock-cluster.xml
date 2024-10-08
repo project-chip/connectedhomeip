@@ -1016,7 +1016,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
     </event>
 
     <!-- Conformance feature DPS - for now optional -->
-    <event side="server" code="1" name="DoorStateChange" priority="desc" optional="true">
+    <event side="server" code="1" name="DoorStateChange" priority="critical" optional="true">
       <description>The door lock server sends out a DoorStateChange event when the door lock door state changes.</description>
       <field id="0" name="DoorState" type="DoorStateEnum" min="0x00" max="0x05"/>
       <mandatoryConform>
@@ -1024,7 +1024,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
       </mandatoryConform>
     </event>
 
-    <event side="server" code="2" name="LockOperation" priority="desc">
+    <event side="server" code="2" name="LockOperation" priority="critical">
       <description>The door lock server sends out a LockOperation event when the event is triggered by the various lock operation sources.</description>
       <field id="0" name="LockOperationType" type="LockOperationTypeEnum" min="0x00" max="0x04"/>
       <field id="1" name="OperationSource" type="OperationSourceEnum" min="0x00" max="0x0A"/>
@@ -1036,7 +1036,7 @@ Git: 0.9-fall2024-87-gcdfdb86be-dirty
       <mandatoryConform/>
     </event>
 
-    <event side="server" code="3" name="LockOperationError" priority="desc">
+    <event side="server" code="3" name="LockOperationError" priority="critical">
       <description>The door lock server sends out a LockOperationError event when a lock operation fails for various reasons.</description>
       <field id="0" name="LockOperationType" type="LockOperationTypeEnum" min="0x00" max="0x04"/>
       <field id="1" name="OperationSource" type="OperationSourceEnum" min="0x00" max="0x0A"/>
