@@ -157,6 +157,9 @@ jobs:
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  fetch-depth: 2
+                  persist-credentials: true
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -403,6 +406,9 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  fetch-depth: 2
+                  persist-credentials: true
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
