@@ -54,10 +54,9 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
     default 1536 if CHIP_ICD_LIT_SUPPORT
 
 config HEAP_MEM_POOL_SIZE
-    default 80000 if CHIP_WIFI
+    default 110720 if CHIP_WIFI
 
 config CHIP_MALLOC_SYS_HEAP_SIZE
-    default 30720 if CHIP_WIFI
     default 8192 if NET_L2_OPENTHREAD
 
 # We use sys_heap based allocators, so make sure we don't reserve unused libc heap anyway
