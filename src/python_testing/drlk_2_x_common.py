@@ -313,19 +313,21 @@ class DRLK_COMMON:
                 autoRelockTime_dut = await self.read_drlk_attribute_expect_success(attribute=attributes.AutoRelockTime)
                 logging.info("AutoRelockTime value is %s" % (autoRelockTime_dut))
 
-            if self.check_pics(lockUnlockCmdRspPICS):
-                self.print_step("17", "Send %s with valid Pincode and verify success" % lockUnlockText)
-                command = lockUnlockCommand(PINCode=pin_code)
-                await self.send_drlk_cmd_expect_success(command=command)
-            # Add additional wait time buffer for motor movement, etc.
-            time.sleep(autoRelockTime_dut + 5)
+                if self.check_pics(lockUnlockCmdRspPICS):
+                    self.print_step("17", "Send %s with valid Pincode and verify success" % lockUnlockText)
+                    command = lockUnlockCommand(PINCode=pin_code)
+                    await self.send_drlk_cmd_expect_success(command=command)
 
-            if self.check_pics("DRLK.S.A0000"):
-                self.print_step("18", "TH reads LockState attribute after AutoRelockTime Expires")
-                lockstate_dut = await self.read_drlk_attribute_expect_success(attribute=attributes.LockState)
-                logging.info("Current LockState is %s" % (lockstate_dut))
-                asserts.assert_equal(lockstate_dut, Clusters.DoorLock.Enums.DlLockState.kLocked,
-                                     "LockState expected to be value==Locked")
+                if self.check_pics("DRLK.S.A0000"):
+                    self.print_step("18", "TH reads LockState attribute after AutoRelockTime Expires")
+                    # Add additional wait time buffer for motor movement, etc.
+                    time.sleep(autoRelockTime_dut + 5)
+                    lockstate_dut = await self.read_drlk_attribute_expect_success(attribute=attributes.LockState)
+                    logging.info("Current LockState is %s" % (lockstate_dut))
+                    asserts.assert_equal(lockstate_dut, Clusters.DoorLock.Enums.DlLockState.kLocked,
+                                         "LockState expected to be value==Locked")
+            else:
+                logging.info("Steps 15 to 18 are Skipped as the PICs DRLK.S.A0023 not enabled")
             await self.cleanup_users_and_credentials(user_clear_step="20", clear_credential_step="19",
                                                      credentials=credential, userIndex=1)
 

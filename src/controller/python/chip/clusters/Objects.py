@@ -157,6 +157,7 @@ __all__ = [
     "ContentControl",
     "ContentAppObserver",
     "WebRTCTransportProvider",
+    "WebRTCTransportRequestor",
     "Chime",
     "EcosystemInformation",
     "CommissionerControl",
@@ -6542,6 +6543,7 @@ class GeneralCommissioning(Cluster):
                 ClusterObjectFieldDescriptor(Label="TCMinRequiredVersion", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="TCAcknowledgements", Tag=0x00000007, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="TCAcknowledgementsRequired", Tag=0x00000008, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="TCUpdateDeadline", Tag=0x00000009, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -6559,6 +6561,7 @@ class GeneralCommissioning(Cluster):
     TCMinRequiredVersion: 'typing.Optional[uint]' = None
     TCAcknowledgements: 'typing.Optional[uint]' = None
     TCAcknowledgementsRequired: 'typing.Optional[bool]' = None
+    TCUpdateDeadline: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -6894,6 +6897,22 @@ class GeneralCommissioning(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
             value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class TCUpdateDeadline(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000030
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000009
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -46874,6 +46893,298 @@ class WebRTCTransportProvider(Cluster):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000553
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+
+@dataclass
+class WebRTCTransportRequestor(Cluster):
+    id: typing.ClassVar[int] = 0x00000554
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="currentSessions", Tag=0x00000000, Type=typing.List[WebRTCTransportRequestor.Structs.WebRTCSessionStruct]),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    currentSessions: 'typing.List[WebRTCTransportRequestor.Structs.WebRTCSessionStruct]' = None
+    generatedCommandList: 'typing.List[uint]' = None
+    acceptedCommandList: 'typing.List[uint]' = None
+    eventList: 'typing.List[uint]' = None
+    attributeList: 'typing.List[uint]' = None
+    featureMap: 'uint' = None
+    clusterRevision: 'uint' = None
+
+    class Enums:
+        class StreamTypeEnum(MatterIntEnum):
+            kInternal = 0x00
+            kRecording = 0x01
+            kAnalysis = 0x02
+            kLiveView = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4,
+
+        class WebRTCEndReasonEnum(MatterIntEnum):
+            kIceFailed = 0x00
+            kIceTimeout = 0x01
+            kUserHangup = 0x02
+            kUserBusy = 0x03
+            kReplaced = 0x04
+            kNoUserMedia = 0x05
+            kInviteTimeout = 0x06
+            kAnsweredElsewhere = 0x07
+            kOutOfResources = 0x08
+            kMediaTimeout = 0x09
+            kLowPower = 0x0A
+            kUnknownReason = 0x0B
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 12,
+
+    class Bitmaps:
+        class WebRTCMetadataOptions(IntFlag):
+            kDataTLV = 0x1
+
+    class Structs:
+        @dataclass
+        class ICEServerStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="urls", Tag=1, Type=typing.List[str]),
+                        ClusterObjectFieldDescriptor(Label="username", Tag=2, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="credential", Tag=3, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="caid", Tag=4, Type=typing.Optional[uint]),
+                    ])
+
+            urls: 'typing.List[str]' = field(default_factory=lambda: [])
+            username: 'typing.Optional[str]' = None
+            credential: 'typing.Optional[str]' = None
+            caid: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class WebRTCSessionStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="id", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="peerFabricIndex", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamType", Tag=4, Type=WebRTCTransportRequestor.Enums.StreamTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=6, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=7, Type=uint),
+                    ])
+
+            id: 'uint' = 0
+            peerNodeID: 'uint' = 0
+            peerFabricIndex: 'uint' = 0
+            streamType: 'WebRTCTransportRequestor.Enums.StreamTypeEnum' = 0
+            videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
+            audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
+            metadataOptions: 'uint' = 0
+
+    class Commands:
+        @dataclass
+        class Offer(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000554
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sdp", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="ICEServers", Tag=2, Type=typing.Optional[typing.List[WebRTCTransportRequestor.Structs.ICEServerStruct]]),
+                        ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=3, Type=typing.Optional[str]),
+                    ])
+
+            webRTCSessionID: 'uint' = 0
+            sdp: 'str' = ""
+            ICEServers: 'typing.Optional[typing.List[WebRTCTransportRequestor.Structs.ICEServerStruct]]' = None
+            ICETransportPolicy: 'typing.Optional[str]' = None
+
+        @dataclass
+        class Answer(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000554
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sdp", Tag=1, Type=str),
+                    ])
+
+            webRTCSessionID: 'uint' = 0
+            sdp: 'str' = ""
+
+        @dataclass
+        class ICECandidate(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000554
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="ICECandidate", Tag=1, Type=str),
+                    ])
+
+            webRTCSessionID: 'uint' = 0
+            ICECandidate: 'str' = ""
+
+        @dataclass
+        class End(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000554
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="reason", Tag=1, Type=WebRTCTransportRequestor.Enums.WebRTCEndReasonEnum),
+                    ])
+
+            webRTCSessionID: 'uint' = 0
+            reason: 'WebRTCTransportRequestor.Enums.WebRTCEndReasonEnum' = 0
+
+    class Attributes:
+        @dataclass
+        class CurrentSessions(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000554
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[WebRTCTransportRequestor.Structs.WebRTCSessionStruct])
+
+            value: 'typing.List[WebRTCTransportRequestor.Structs.WebRTCSessionStruct]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000554
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000554
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class EventList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000554
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFA
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000554
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000554
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000554
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:

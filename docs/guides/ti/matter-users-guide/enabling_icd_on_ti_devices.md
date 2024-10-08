@@ -24,9 +24,6 @@ Trigger Support, set the following parameter to true:
 chip_enable_icd_lit = true
 ```
 
-TI examples have only been tested with the ICD Server configuration. To enable
-the client configuration, set `chip_enable_icd_client` to true.
-
 Persistent subscriptions allow devices to attempt resuming existing
 subscriptions following a device reset. To enable persistent subscriptions, set
 the following parameter to true:

@@ -114,7 +114,7 @@ void DeviceManager::RemoveSyncedDevice(NodeId nodeId)
                     ChipLogValueX64(device->GetNodeId()), device->GetEndpointId());
 }
 
-void DeviceManager::OpenDeviceCommissioningWindow(NodeId nodeId, uint32_t commissioningTimeoutSec, uint32_t iterations,
+void DeviceManager::OpenDeviceCommissioningWindow(NodeId nodeId, uint32_t iterations, uint16_t commissioningTimeoutSec,
                                                   uint16_t discriminator, const ByteSpan & salt, const ByteSpan & verifier)
 {
     ChipLogProgress(NotSpecified, "Opening commissioning window for Node ID: " ChipLogFormatX64, ChipLogValueX64(nodeId));
@@ -422,7 +422,7 @@ void DeviceManager::HandleReverseOpenCommissioningWindow(TLV::TLVReader & data)
     ChipLogProgress(NotSpecified, "  PAKEPasscodeVerifier size: %lu", value.PAKEPasscodeVerifier.size());
     ChipLogProgress(NotSpecified, "  salt size: %lu", value.salt.size());
 
-    OpenDeviceCommissioningWindow(mLocalBridgeNodeId, value.commissioningTimeout, value.iterations, value.discriminator,
+    OpenDeviceCommissioningWindow(mLocalBridgeNodeId, value.iterations, value.commissioningTimeout, value.discriminator,
                                   ByteSpan(value.salt.data(), value.salt.size()),
                                   ByteSpan(value.PAKEPasscodeVerifier.data(), value.PAKEPasscodeVerifier.size()));
 }

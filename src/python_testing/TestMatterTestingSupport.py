@@ -24,7 +24,7 @@ import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.tlv import uint
 from matter_testing_support import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main,
-                                    get_wait_seconds_from_set_time, type_matches, utc_time_in_matter_epoch)
+                                    get_wait_seconds_from_set_time, parse_matter_test_args, type_matches, utc_time_in_matter_epoch)
 from mobly import asserts, signals
 from pics_support import parse_pics, parse_pics_xml
 from taglist_and_topology_test_support import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
@@ -628,6 +628,24 @@ class TestMatterTestingSupport(MatterBaseTest):
         self.pics_assert('BINFO.S.A0013', False)
         self.pics_assert('BINFO.S.A0014', False)
         self.pics_assert('PICSDOESNOTEXIST', False)
+
+    def test_parse_matter_test_args(self):
+        args = [
+            # Verify that values are appended to a single argument
+            "--int-arg", "PIXIT.TEST.DEC:42",
+            "--int-arg", "PIXIT.TEST.HEX:0x1234",
+            # Verify that multiple values can be passed for a single argument
+            "--string-arg", "PIXIT.TEST.STR.MULTI.1:foo", "PIXIT.TEST.STR.MULTI.2:bar",
+            # Verify JSON parsing
+            "--json-arg", "PIXIT.TEST.JSON:{\"key\":\"value\"}",
+        ]
+
+        parsed = parse_matter_test_args(args)
+        asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.DEC"), 42)
+        asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.HEX"), 0x1234)
+        asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.STR.MULTI.1"), "foo")
+        asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.STR.MULTI.2"), "bar")
+        asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.JSON"), {"key": "value"})
 
 
 if __name__ == "__main__":
