@@ -213,7 +213,7 @@ def find_darwin_gcc_sysroot():
     ):
         if not line.startswith("Path: "):
             continue
-        path = line[line.find(": ") + 2 :]
+        path = line[line.find(": ") + 2:]
         if "/MacOSX.platform/" not in path:
             continue
         logging.info("Found %s" % path)
