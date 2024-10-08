@@ -280,6 +280,7 @@ static void LogStringAndReturnError(NSString * errorStr, MTRErrorCode errorCode,
 {
     auto * concreteController = self.concreteController;
     if (concreteController == nil) {
+        MTR_LOG_ERROR("Unable to determine session transport type for MTRBaseDevice created with an XPC controller");
         return MTRTransportTypeUndefined;
     }
     return [concreteController sessionTransportTypeForDevice:self];
@@ -294,6 +295,7 @@ static void LogStringAndReturnError(NSString * errorStr, MTRErrorCode errorCode,
     auto * concreteController = self.concreteController;
     if (concreteController == nil) {
         // Nothing we can do here.
+        MTR_LOG_ERROR("Unable invalidate CASE session for MTRBaseDevice created with an XPC controller");
         return;
     }
 
@@ -339,6 +341,7 @@ public:
     auto * concreteController = self.concreteController;
     if (concreteController == nil) {
         // No subscriptions (or really any MTRBaseDevice use) with XPC controllers.
+        MTR_LOG_ERROR("Unable to create subscription for MTRBaseDevice created with an XPC controller");
         dispatch_async(queue, ^{
             errorHandler([MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
         });
@@ -1653,6 +1656,7 @@ exit:
     auto * concreteController = self.concreteController;
     if (concreteController == nil) {
         // No subscriptions (or really any MTRBaseDevice use) with XPC controllers.
+        MTR_LOG_ERROR("Unable to create subscription for MTRBaseDevice created with an XPC controller");
         dispatch_async(queue, ^{
             reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
         });
@@ -1935,7 +1939,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
     auto * concreteController = self.concreteController;
     if (concreteController == nil) {
-        MTR_LOG_ERROR("Can't open a commissioning window via MTRBaseDevice against an XPC Controller");
+        MTR_LOG_ERROR("Can't open a commissioning window via MTRBaseDevice created with an XPC controller");
         dispatch_async(queue, ^{
             MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, CHIP_ERROR_INCORRECT_STATE);
             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
@@ -2230,7 +2234,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 {
     auto * concreteController = self.concreteController;
     if (concreteController == nil) {
-        MTR_LOG_ERROR("Can't download logs via MTRBaseDevice against an XPC Controller");
+        MTR_LOG_ERROR("Can't download logs via MTRBaseDevice created with an XPC controller");
         dispatch_async(queue, ^{
             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
         });
