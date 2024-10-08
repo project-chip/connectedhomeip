@@ -350,6 +350,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     NSDate * _Nullable _mostRecentReportTimeForDescription;
     // Copy of _lastSubscriptionFailureTime that is safe to use in description.
     NSDate * _Nullable _lastSubscriptionFailureTimeForDescription;
+    // Copy of _state that is safe to use in description.
+    MTRDeviceState _deviceStateForDescription;
+    // Copy of _deviceCachePrimed that is safe to use in description.
+    BOOL _deviceCachePrimedForDescription;
+    // Copy of _estimatedStartTime that is safe to use in description.
+    NSDate * _Nullable _estimatedStartTimeForDescription;
+    // Copy of _estimatedSubscriptionLatency that is safe to use in description.
+    NSNumber * _Nullable _estimatedSubscriptionLatencyForDescription;
 }
 
 // synthesize superclass property readwrite accessors
@@ -473,10 +481,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyKeyVendorID, _vid, properties);
     MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyKeyProductID, _pid, properties);
     MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyNetworkFeatures, _allNetworkFeatures, properties);
-    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceState, [NSNumber numberWithUnsignedInteger:_internalDeviceStateForDescription], properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceInternalState, [NSNumber numberWithUnsignedInteger:_internalDeviceStateForDescription], properties);
     MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionAttemptWait, [NSNumber numberWithUnsignedInt:_lastSubscriptionAttemptWaitForDescription], properties);
     MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyMostRecentReportTime, _mostRecentReportTimeForDescription, properties);
     MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionFailureTime, _lastSubscriptionFailureTimeForDescription, properties);
+
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceState, [NSNumber numberWithUnsignedInteger:_deviceStateForDescription], properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceCachePrimed, @(_deviceCachePrimedForDescription), properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyEstimatedStartTime, _estimatedStartTimeForDescription, properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyEstimatedSubscriptionLatency, _estimatedSubscriptionLatencyForDescription, properties);
 
     return properties;
 }
@@ -964,11 +977,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     os_unfair_lock_assert_owner(&self->_lock);
     MTRDeviceState lastState = _state;
     _state = state;
+    {
+        std::lock_guard lock(_descriptionLock);
+        _deviceStateForDescription = _state;
+    }
     if (lastState != state) {
         if (state != MTRDeviceStateReachable) {
             MTR_LOG("%@ reachability state change %lu => %lu, set estimated start time to nil", self, static_cast<unsigned long>(lastState),
                 static_cast<unsigned long>(state));
-            _estimatedStartTime = nil;
+            [self _updateEstimatedStartTime:nil];
             _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
         } else {
             MTR_LOG(
@@ -1025,6 +1042,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 }
 #endif
 
+- (void)_updateEstimatedSubscriptionLatency:(NSNumber *)estimatedSubscriptionLatency
+{
+    os_unfair_lock_assert_owner(&_lock);
+    _estimatedSubscriptionLatency = estimatedSubscriptionLatency;
+
+    std::lock_guard lock(_descriptionLock);
+    _estimatedSubscriptionLatencyForDescription = estimatedSubscriptionLatency;
+}
+
 // First Time Sync happens 2 minutes after reachability (this can be changed in the future)
 #define MTR_DEVICE_TIME_UPDATE_INITIAL_WAIT_TIME_SEC (60 * 2)
 - (void)_handleSubscriptionEstablished
@@ -1056,10 +1082,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         // way around.
         NSTimeInterval subscriptionLatency = -[initialSubscribeStart timeIntervalSinceNow];
         if (_estimatedSubscriptionLatency == nil) {
-            _estimatedSubscriptionLatency = @(subscriptionLatency);
+            [self _updateEstimatedSubscriptionLatency:@(subscriptionLatency)];
         } else {
             NSTimeInterval newSubscriptionLatencyEstimate = MTRDEVICE_SUBSCRIPTION_LATENCY_NEW_VALUE_WEIGHT * subscriptionLatency + (1 - MTRDEVICE_SUBSCRIPTION_LATENCY_NEW_VALUE_WEIGHT) * _estimatedSubscriptionLatency.doubleValue;
-            _estimatedSubscriptionLatency = @(newSubscriptionLatencyEstimate);
+            [self _updateEstimatedSubscriptionLatency:@(newSubscriptionLatencyEstimate)];
         }
         [self _storePersistedDeviceData];
     }
@@ -1733,6 +1759,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _resetStorageBehaviorState];
 }
 
+- (void)_updateDeviceCachePrimed:(BOOL)deviceCachePrimed
+{
+    os_unfair_lock_assert_owner(&_lock);
+    _deviceCachePrimed = deviceCachePrimed;
+
+    std::lock_guard lock(_descriptionLock);
+    _deviceCachePrimedForDescription = deviceCachePrimed;
+}
+
 - (void)_handleReportEnd
 {
     MTR_LOG("%@ handling report end", self);
@@ -1764,7 +1799,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (!_deviceCachePrimed) {
         // This is the end of the priming sequence of data reports, so we have
         // all the data for the device now.
-        _deviceCachePrimed = YES;
+        [self _updateDeviceCachePrimed:YES];
         [self _callDelegateDeviceCachePrimed];
     }
 
@@ -1954,6 +1989,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     return filteredEvents;
 }
 
+- (void)_updateEstimatedStartTime:(NSDate *)estimatedStartTime
+{
+    os_unfair_lock_assert_owner(&_lock);
+    _estimatedStartTime = estimatedStartTime;
+
+    std::lock_guard lock(_descriptionLock);
+    _estimatedStartTimeForDescription = _estimatedStartTime;
+}
+
 - (void)_handleEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
     std::lock_guard lock(_lock);
@@ -1999,11 +2043,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                 // If UpTime was received, make use of it as mark of system start time
                 MTR_LOG("%@ StartUp event: set estimated start time forward to %@", self,
                     _estimatedStartTimeFromGeneralDiagnosticsUpTime);
-                _estimatedStartTime = _estimatedStartTimeFromGeneralDiagnosticsUpTime;
+                [self _updateEstimatedStartTime:_estimatedStartTimeFromGeneralDiagnosticsUpTime];
             } else {
                 // If UpTime was not received, reset estimated start time in case of reboot
                 MTR_LOG("%@ StartUp event: set estimated start time to nil", self);
-                _estimatedStartTime = nil;
+                [self _updateEstimatedStartTime:nil];
             }
         }
 
@@ -2023,7 +2067,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             NSTimeInterval eventTimeValue = eventTimeValueNumber.doubleValue;
             NSDate * potentialSystemStartTime = [NSDate dateWithTimeIntervalSinceNow:-eventTimeValue];
             if (!_estimatedStartTime || ([potentialSystemStartTime compare:_estimatedStartTime] == NSOrderedAscending)) {
-                _estimatedStartTime = potentialSystemStartTime;
+                [self _updateEstimatedStartTime:potentialSystemStartTime];
             }
         }
 
@@ -3601,7 +3645,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     if (!_estimatedStartTime || ([potentialSystemStartTime compare:_estimatedStartTime] == NSOrderedAscending)) {
                         MTR_LOG("%@ General Diagnostics UpTime %.3lf: estimated start time %@ => %@", self, upTime,
                             oldSystemStartTime, potentialSystemStartTime);
-                        _estimatedStartTime = potentialSystemStartTime;
+                        [self _updateEstimatedStartTime:potentialSystemStartTime];
                     }
 
                     // Save estimate in the subscription resumption case, for when StartUp event uses it
@@ -3693,7 +3737,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     // We have some stored data.  Since we don't store data until the end of the
     // initial priming report, our device cache must be primed.
-    _deviceCachePrimed = YES;
+    [self _updateDeviceCachePrimed:YES];
 }
 
 - (void)_setLastInitialSubscribeLatency:(id)latency
@@ -3705,7 +3749,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         return;
     }
 
-    _estimatedSubscriptionLatency = latency;
+    [self _updateEstimatedSubscriptionLatency:latency];
 }
 
 - (void)setPersistedDeviceData:(NSDictionary<NSString *, id> *)data

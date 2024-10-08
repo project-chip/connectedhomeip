@@ -60,14 +60,23 @@ MTR_NEWLY_AVAILABLE
 // - (oneway void)deviceController:(NSUUID *)controller removeServerEndpoint:(MTRServerEndpoint *)endpoint;
 
 - (oneway void)deviceController:(NSUUID *)controller shutdownDeviceController:(NSUUID *)controller;
+
+// TODO: replace once the the reply version is tested and integrated
+//  (also, should this be placed under MTRXPCServerProtocol_MTRDevice?)
 - (oneway void)deviceController:(NSUUID *)controller registerNodeID:(NSNumber *)nodeID;
 - (oneway void)deviceController:(NSUUID *)controller unregisterNodeID:(NSNumber *)nodeID;
 
+// Register Node and get initial internal state
+- (oneway void)deviceController:(NSUUID *)controller registerNodeID:(NSNumber *)nodeID reply:(void (^)(NSDictionary * internalState))reply;
 @end
 
 MTR_NEWLY_AVAILABLE
 @protocol MTRXPCServerProtocol <NSObject, MTRXPCServerProtocol_MTRDevice, MTRXPCServerProtocol_MTRDeviceController>
+// TODO: remove once the the reply version is tested and integrated
 - (oneway void)deviceController:(NSUUID *)controller checkInWithContext:(NSDictionary *)context;
+
+// Check-in and get initial state
+- (oneway void)deviceController:(NSUUID *)controller checkInWithContext:(NSDictionary *)context reply:(void (^)(NSDictionary * controllerInfo))reply;
 @end
 
 NS_ASSUME_NONNULL_END
