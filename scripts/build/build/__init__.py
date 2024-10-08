@@ -4,9 +4,8 @@ import shutil
 from enum import Enum, auto
 from typing import Sequence
 
-from builders.builder import BuilderOptions
-
 from .targets import BUILD_TARGETS
+from builders.builder import BuilderOptions
 
 
 class BuildSteps(Enum):
