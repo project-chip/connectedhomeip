@@ -222,6 +222,7 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths : (NSArray<MTRAttributeR
 
     @try {
         [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+            MTR_LOG_ERROR("Invoke error: %@", error);
             completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
         }] deviceController:[[self deviceController] uniqueIdentifier]
                                  nodeID:[self nodeID]
