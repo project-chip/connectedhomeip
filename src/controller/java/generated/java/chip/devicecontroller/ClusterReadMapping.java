@@ -18247,6 +18247,120 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readZoneManagementInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readZoneManagementSupportedZoneSourcesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readZoneManagementSupportedZoneSourcesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ZoneManagementCluster) cluster).readSupportedZoneSourcesAttribute(
+              (ChipClusters.ZoneManagementCluster.SupportedZoneSourcesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedZoneManagementClusterSupportedZoneSourcesAttributeCallback(),
+          readZoneManagementSupportedZoneSourcesCommandParams
+        );
+        result.put("readSupportedZoneSourcesAttribute", readZoneManagementSupportedZoneSourcesAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readZoneManagementZonesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readZoneManagementZonesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ZoneManagementCluster) cluster).readZonesAttribute(
+              (ChipClusters.ZoneManagementCluster.ZonesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedZoneManagementClusterZonesAttributeCallback(),
+          readZoneManagementZonesCommandParams
+        );
+        result.put("readZonesAttribute", readZoneManagementZonesAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readZoneManagementTimeControlCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readZoneManagementTimeControlAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ZoneManagementCluster) cluster).readTimeControlAttribute(
+              (ChipClusters.ZoneManagementCluster.TimeControlAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedZoneManagementClusterTimeControlAttributeCallback(),
+          readZoneManagementTimeControlCommandParams
+        );
+        result.put("readTimeControlAttribute", readZoneManagementTimeControlAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readZoneManagementSensitivityCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readZoneManagementSensitivityAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ZoneManagementCluster) cluster).readSensitivityAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readZoneManagementSensitivityCommandParams
+        );
+        result.put("readSensitivityAttribute", readZoneManagementSensitivityAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readZoneManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readZoneManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ZoneManagementCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.ZoneManagementCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedZoneManagementClusterGeneratedCommandListAttributeCallback(),
+          readZoneManagementGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readZoneManagementGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readZoneManagementAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readZoneManagementAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ZoneManagementCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.ZoneManagementCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedZoneManagementClusterAcceptedCommandListAttributeCallback(),
+          readZoneManagementAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readZoneManagementAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readZoneManagementEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readZoneManagementEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ZoneManagementCluster) cluster).readEventListAttribute(
+              (ChipClusters.ZoneManagementCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedZoneManagementClusterEventListAttributeCallback(),
+          readZoneManagementEventListCommandParams
+        );
+        result.put("readEventListAttribute", readZoneManagementEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readZoneManagementAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readZoneManagementAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ZoneManagementCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.ZoneManagementCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedZoneManagementClusterAttributeListAttributeCallback(),
+          readZoneManagementAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readZoneManagementAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readZoneManagementFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readZoneManagementFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ZoneManagementCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readZoneManagementFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readZoneManagementFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readZoneManagementClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readZoneManagementClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ZoneManagementCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readZoneManagementClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readZoneManagementClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readWebRTCTransportProviderInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readWebRTCTransportProviderCurrentSessionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readWebRTCTransportProviderCurrentSessionsAttributeInteractionInfo = new InteractionInfo(
@@ -19962,6 +20076,7 @@ public class ClusterReadMapping {
             put("accountLogin", readAccountLoginInteractionInfo());
             put("contentControl", readContentControlInteractionInfo());
             put("contentAppObserver", readContentAppObserverInteractionInfo());
+            put("zoneManagement", readZoneManagementInteractionInfo());
             put("webRTCTransportProvider", readWebRTCTransportProviderInteractionInfo());
             put("webRTCTransportRequestor", readWebRTCTransportRequestorInteractionInfo());
             put("chime", readChimeInteractionInfo());

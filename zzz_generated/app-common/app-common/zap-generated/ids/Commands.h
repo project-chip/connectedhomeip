@@ -1803,6 +1803,36 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace ContentAppObserver
 
+namespace ZoneManagement {
+namespace Commands {
+
+namespace CreateTwoDCartesianZone {
+static constexpr CommandId Id = 0x00000000;
+} // namespace CreateTwoDCartesianZone
+
+namespace CreateTwoDCartesianZoneResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace CreateTwoDCartesianZoneResponse
+
+namespace UpdateTwoDCartesianZone {
+static constexpr CommandId Id = 0x00000002;
+} // namespace UpdateTwoDCartesianZone
+
+namespace GetTwoDCartesianZone {
+static constexpr CommandId Id = 0x00000003;
+} // namespace GetTwoDCartesianZone
+
+namespace GetTwoDCartesianZoneResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace GetTwoDCartesianZoneResponse
+
+namespace RemoveZone {
+static constexpr CommandId Id = 0x00000005;
+} // namespace RemoveZone
+
+} // namespace Commands
+} // namespace ZoneManagement
+
 namespace WebRTCTransportProvider {
 namespace Commands {
 

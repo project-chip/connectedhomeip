@@ -8768,6 +8768,201 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRZoneManagementClusterTwoDCartesianVertexStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _x = @(0);
+
+        _y = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRZoneManagementClusterTwoDCartesianVertexStruct alloc] init];
+
+    other.x = self.x;
+    other.y = self.y;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: x:%@; y:%@; >", NSStringFromClass([self class]), _x, _y];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRZoneManagementClusterTwoDCartesianZoneStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _name = @"";
+
+        _use = @(0);
+
+        _vertices = [NSArray array];
+
+        _color = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRZoneManagementClusterTwoDCartesianZoneStruct alloc] init];
+
+    other.name = self.name;
+    other.use = self.use;
+    other.vertices = self.vertices;
+    other.color = self.color;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; use:%@; vertices:%@; color:%@; >", NSStringFromClass([self class]), _name, _use, _vertices, _color];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRZoneManagementClusterZoneInformationStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _zoneID = @(0);
+
+        _zoneType = @(0);
+
+        _zoneSource = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRZoneManagementClusterZoneInformationStruct alloc] init];
+
+    other.zoneID = self.zoneID;
+    other.zoneType = self.zoneType;
+    other.zoneSource = self.zoneSource;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zoneType:%@; zoneSource:%@; >", NSStringFromClass([self class]), _zoneID, _zoneType, _zoneSource];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRZoneManagementClusterZoneTriggeringTimeControlStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _initialDuration = @(0);
+
+        _augmentationDuration = @(0);
+
+        _maxDuration = @(0);
+
+        _blindDuration = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRZoneManagementClusterZoneTriggeringTimeControlStruct alloc] init];
+
+    other.initialDuration = self.initialDuration;
+    other.augmentationDuration = self.augmentationDuration;
+    other.maxDuration = self.maxDuration;
+    other.blindDuration = self.blindDuration;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: initialDuration:%@; augmentationDuration:%@; maxDuration:%@; blindDuration:%@; >", NSStringFromClass([self class]), _initialDuration, _augmentationDuration, _maxDuration, _blindDuration];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRZoneManagementClusterZoneTriggeredEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _zones = [NSArray array];
+
+        _reason = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRZoneManagementClusterZoneTriggeredEvent alloc] init];
+
+    other.zones = self.zones;
+    other.reason = self.reason;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zones:%@; reason:%@; >", NSStringFromClass([self class]), _zones, _reason];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRZoneManagementClusterZoneStoppedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _zones = [NSArray array];
+
+        _reason = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRZoneManagementClusterZoneStoppedEvent alloc] init];
+
+    other.zones = self.zones;
+    other.reason = self.reason;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zones:%@; reason:%@; >", NSStringFromClass([self class]), _zones, _reason];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRWebRTCTransportProviderClusterICEServerStruct
 - (instancetype)init
 {

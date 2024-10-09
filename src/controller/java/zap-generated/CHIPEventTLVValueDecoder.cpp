@@ -8248,6 +8248,120 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::ZoneManagement::Id: {
+        using namespace app::Clusters::ZoneManagement;
+        switch (aPath.mEventId)
+        {
+        case Events::ZoneTriggered::Id: {
+            Events::ZoneTriggered::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_zones;
+            chip::JniReferences::GetInstance().CreateArrayList(value_zones);
+
+            auto iter_value_zones_0 = cppValue.zones.begin();
+            while (iter_value_zones_0.Next())
+            {
+                auto & entry_0 = iter_value_zones_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Integer";
+                std::string newElement_0CtorSignature = "(I)V";
+                jint jninewElement_0                  = static_cast<jint>(entry_0);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value_zones, newElement_0);
+            }
+
+            jobject value_reason;
+            std::string value_reasonClassName     = "java/lang/Integer";
+            std::string value_reasonCtorSignature = "(I)V";
+            jint jnivalue_reason                  = static_cast<jint>(cppValue.reason);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_reasonClassName.c_str(), value_reasonCtorSignature.c_str(), jnivalue_reason, value_reason);
+
+            jclass zoneTriggeredStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ZoneManagementClusterZoneTriggeredEvent", zoneTriggeredStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ZoneManagementClusterZoneTriggeredEvent");
+                return nullptr;
+            }
+
+            jmethodID zoneTriggeredStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, zoneTriggeredStructClass, "<init>", "(Ljava/util/ArrayList;Ljava/lang/Integer;)V", &zoneTriggeredStructCtor);
+            if (err != CHIP_NO_ERROR || zoneTriggeredStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$ZoneManagementClusterZoneTriggeredEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(zoneTriggeredStructClass, zoneTriggeredStructCtor, value_zones, value_reason);
+
+            return value;
+        }
+        case Events::ZoneStopped::Id: {
+            Events::ZoneStopped::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_zones;
+            chip::JniReferences::GetInstance().CreateArrayList(value_zones);
+
+            auto iter_value_zones_0 = cppValue.zones.begin();
+            while (iter_value_zones_0.Next())
+            {
+                auto & entry_0 = iter_value_zones_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Integer";
+                std::string newElement_0CtorSignature = "(I)V";
+                jint jninewElement_0                  = static_cast<jint>(entry_0);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value_zones, newElement_0);
+            }
+
+            jobject value_reason;
+            std::string value_reasonClassName     = "java/lang/Integer";
+            std::string value_reasonCtorSignature = "(I)V";
+            jint jnivalue_reason                  = static_cast<jint>(cppValue.reason);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_reasonClassName.c_str(), value_reasonCtorSignature.c_str(), jnivalue_reason, value_reason);
+
+            jclass zoneStoppedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ZoneManagementClusterZoneStoppedEvent", zoneStoppedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ZoneManagementClusterZoneStoppedEvent");
+                return nullptr;
+            }
+
+            jmethodID zoneStoppedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, zoneStoppedStructClass, "<init>", "(Ljava/util/ArrayList;Ljava/lang/Integer;)V", &zoneStoppedStructCtor);
+            if (err != CHIP_NO_ERROR || zoneStoppedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$ZoneManagementClusterZoneStoppedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(zoneStoppedStructClass, zoneStoppedStructCtor, value_zones, value_reason);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::WebRTCTransportProvider::Id: {
         using namespace app::Clusters::WebRTCTransportProvider;
         switch (aPath.mEventId)

@@ -19554,6 +19554,194 @@ using chip::System::Clock::Timeout;
 
 @end
 
+@implementation MTRClusterZoneManagement
+
+- (void)createTwoDCartesianZoneWithParams:(MTRZoneManagementClusterCreateTwoDCartesianZoneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRZoneManagementClusterCreateTwoDCartesianZoneResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRZoneManagementClusterCreateTwoDCartesianZoneParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ZoneManagement::Commands::CreateTwoDCartesianZone::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRZoneManagementClusterCreateTwoDCartesianZoneResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)updateTwoDCartesianZoneWithParams:(MTRZoneManagementClusterUpdateTwoDCartesianZoneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRZoneManagementClusterUpdateTwoDCartesianZoneParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ZoneManagement::Commands::UpdateTwoDCartesianZone::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)getTwoDCartesianZoneWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRZoneManagementClusterGetTwoDCartesianZoneResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    [self getTwoDCartesianZoneWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)getTwoDCartesianZoneWithParams:(MTRZoneManagementClusterGetTwoDCartesianZoneParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRZoneManagementClusterGetTwoDCartesianZoneResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRZoneManagementClusterGetTwoDCartesianZoneParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ZoneManagement::Commands::GetTwoDCartesianZone::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRZoneManagementClusterGetTwoDCartesianZoneResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)removeZoneWithParams:(MTRZoneManagementClusterRemoveZoneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRZoneManagementClusterRemoveZoneParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ZoneManagement::Commands::RemoveZone::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedZoneSourcesWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeSupportedZoneSourcesID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeZonesWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeZonesID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeTimeControlWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeTimeControlID) params:params];
+}
+
+- (void)writeAttributeTimeControlWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeTimeControlWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeTimeControlWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeTimeControlID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSensitivityWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityID) params:params];
+}
+
+- (void)writeAttributeSensitivityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeSensitivityWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeSensitivityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeEventListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeClusterRevisionID) params:params];
+}
+
+@end
+
 @implementation MTRClusterWebRTCTransportProvider
 
 - (void)solicitOfferWithParams:(MTRWebRTCTransportProviderClusterSolicitOfferParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRWebRTCTransportProviderClusterSolicitOfferResponseParams * _Nullable data, NSError * _Nullable error))completion

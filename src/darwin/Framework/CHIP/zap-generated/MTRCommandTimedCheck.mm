@@ -1124,6 +1124,15 @@ static BOOL CommandNeedsTimedInvokeInContentAppObserverCluster(AttributeId aAttr
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInZoneManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ZoneManagement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInWebRTCTransportProviderCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WebRTCTransportProvider;
@@ -1538,6 +1547,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ContentAppObserver::Id: {
         return CommandNeedsTimedInvokeInContentAppObserverCluster(commandID);
+    }
+    case Clusters::ZoneManagement::Id: {
+        return CommandNeedsTimedInvokeInZoneManagementCluster(commandID);
     }
     case Clusters::WebRTCTransportProvider::Id: {
         return CommandNeedsTimedInvokeInWebRTCTransportProviderCluster(commandID);
