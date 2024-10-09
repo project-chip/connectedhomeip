@@ -30,7 +30,6 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 import random
 from time import sleep
@@ -40,7 +39,6 @@ from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
-from chip.native import PyChipError
 from chip.tlv import TLVReader
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery import mdns_discovery
@@ -48,7 +46,6 @@ from mobly import asserts
 
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
-
 
 class TC_CADMIN_1_3_4(MatterBaseTest):
     async def CommissionAttempt(
@@ -319,7 +316,7 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
 
         self.step("3a")
         obcCmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
-        obc = await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
+        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
 
         self.step("3b")
         services = await self.get_txt_record()
