@@ -303,7 +303,7 @@ TEST_F(TestEcosystemInformationCluster, AddLocationInfoInvalidArguments)
 {
     const FabricIndex kFabricIndexTooLow  = 0;
     const FabricIndex kFabricIndexTooHigh = kMaxValidFabricIndex + 1;
-    const std::string kEmptyLocationIdStr = "";
+    const std::string kEmptyLocationIdStr;
     const std::string kValidLocationIdStr = "SomeLocationString";
     const std::string kInvalidLocationIdTooLongStr(65, 'x');
 
