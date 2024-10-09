@@ -51,6 +51,8 @@ from chip.testing.apps import AppServerSubprocess
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
+_DEVICE_TYPE_AGGREGATOR = 0x000E
+
 
 class TC_MCORE_FS_1_1(MatterBaseTest):
 
@@ -124,8 +126,34 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_1(self):
-        # TODO this value should either be determined or passed in from command line
-        dut_commissioning_control_endpoint = 1
+        dut_commissioning_control_endpoint = 0
+
+        # Get the list of endpoints on the DUT_FSA_BRIDGE before adding the TH_SERVER_NO_UID.
+        dut_fsa_bridge_endpoints = set(await self.read_single_attribute_check_success(
+            cluster=Clusters.Descriptor,
+            attribute=Clusters.Descriptor.Attributes.PartsList,
+            node_id=self.dut_node_id,
+            endpoint=0,
+        ))
+
+        # Iterate through the endpoints on the DUT_FSA_BRIDGE
+        for endpoint in dut_fsa_bridge_endpoints:
+            # Read the DeviceTypeList attribute for the current endpoint
+            device_type_list = await self.read_single_attribute_check_success(
+                cluster=Clusters.Descriptor,
+                attribute=Clusters.Descriptor.Attributes.DeviceTypeList,
+                node_id=self.dut_node_id,
+                endpoint=endpoint
+            )
+
+            # Check if any of the device types is an AGGREGATOR
+            if any(device_type.deviceType == _DEVICE_TYPE_AGGREGATOR for device_type in device_type_list):
+                dut_commissioning_control_endpoint = endpoint
+                logging.info(f"Aggregator endpoint found: {dut_commissioning_control_endpoint}")
+                break
+
+        asserts.assert_not_equal(dut_commissioning_control_endpoint, 0, "Invalid aggregator endpoint. Cannot proceed with test.")
+
         self.step(1)
         self.step(2)
         self.step(3)
