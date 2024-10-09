@@ -308,6 +308,13 @@ source_set("efr32-common") {
     public_deps += [ ":test-event-trigger" ]
   }
 
+  if (sl_enable_si70xx_sensor) {
+    sources += [
+      "${silabs_common_plat_dir}/Si70xxSensor.cpp",
+      "${silabs_common_plat_dir}/Si70xxSensor.h",
+    ]
+  }
+
   if (app_data_model != "") {
     public_deps += [ app_data_model ]
   }
