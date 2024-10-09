@@ -78,6 +78,15 @@ CHIP_ERROR SensorManager::Init()
 
 void SensorManager::SensorTimerEventHandler(void * arg)
 {
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_Timer;
+    event.Handler = TemperatureUpdateEventHandler;
+
+    AppTask::GetAppTask().PostEvent(&event);
+}
+
+void SensorManager::TemperatureUpdateEventHandler(AppEvent * aEvent)
+{
     int16_t temperature            = 0;
     static int16_t lastTemperature = 0;
 
@@ -119,7 +128,6 @@ void SensorManager::SensorTimerEventHandler(void * arg)
         PlatformMgr().LockChipStack();
         // The SensorMagager shouldn't be aware of the Endpoint ID TODO Fix this.
         // TODO Per Spec we should also apply the Offset stored in the same cluster before saving the temp
-
         app::Clusters::Thermostat::Attributes::LocalTemperature::Set(kThermostatEndpoint, temperature);
         PlatformMgr().UnlockChipStack();
     }
