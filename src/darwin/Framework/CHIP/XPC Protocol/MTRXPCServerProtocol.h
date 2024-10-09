@@ -18,6 +18,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationNodeIDsKey MTR_NEWLY_AVAILABLE;
+    MTR_EXTERN NSString * const MTRDeviceControllerRegistrationNodeIDKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerContextKey MTR_NEWLY_AVAILABLE;
+
+
 MTR_NEWLY_AVAILABLE
 @protocol MTRXPCServerProtocol_MTRDevice <NSObject>
 
@@ -42,6 +47,7 @@ MTR_NEWLY_AVAILABLE
 MTR_NEWLY_AVAILABLE
 @protocol MTRXPCServerProtocol_MTRDeviceController <NSObject>
 
+@optional
 - (oneway void)deviceController:(NSUUID *)controller getIsRunningWithReply:(void (^)(BOOL response))reply;
 - (oneway void)deviceController:(NSUUID *)controller getUniqueIdentifierWithReply:(void (^)(NSUUID *))reply;
 - (oneway void)deviceController:(NSUUID *)controller controllerNodeIDWithReply:(void (^)(NSNumber * nodeID))reply;
@@ -66,7 +72,9 @@ MTR_NEWLY_AVAILABLE
 
 MTR_NEWLY_AVAILABLE
 @protocol MTRXPCServerProtocol <NSObject, MTRXPCServerProtocol_MTRDevice, MTRXPCServerProtocol_MTRDeviceController>
+@optional
 - (oneway void)deviceController:(NSUUID *)controller checkInWithContext:(NSDictionary *)context;
+- (oneway void)deviceController:(NSUUID *)controller updateControllerConfiguration:(NSDictionary *)controllerState;
 @end
 
 NS_ASSUME_NONNULL_END
