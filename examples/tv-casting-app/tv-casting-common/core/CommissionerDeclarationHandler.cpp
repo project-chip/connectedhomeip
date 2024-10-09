@@ -85,8 +85,11 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
                     "%" CHIP_ERROR_FORMAT,
                     err.Format());
             }
-        } else {
-            ChipLogError(AppServer, "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() targetCastingPlayer is nullptr");
+        }
+        else
+        {
+            ChipLogError(AppServer,
+                         "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() targetCastingPlayer is nullptr");
         }
     }
 
