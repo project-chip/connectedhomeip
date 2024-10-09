@@ -207,11 +207,9 @@ class TidyState:
 
 
 def find_darwin_gcc_sysroot():
-    for line in (
-        subprocess.check_output("xcodebuild -sdk -version".split())
-        .decode("utf8")
-        .split("\n")
-    ):
+    for line in subprocess.check_output(
+        "xcodebuild -sdk -version".split(), text=True
+    ).splitlines():
         if not line.startswith("Path: "):
             continue
         path = line[line.find(": ") + 2:]
