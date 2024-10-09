@@ -48,7 +48,14 @@ void chip::NXP::App::ButtonApp::HandleShortPress()
 
 void chip::NXP::App::ButtonApp::HandleLongPress()
 {
-    chip::DeviceLayer::PlatformMgrImpl().CleanReset();
+    // Execute "clean" reset
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(
+        [](intptr_t arg) {
+            chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+            chip::DeviceLayer::PlatformMgr().Shutdown();
+            chip::DeviceLayer::PlatformMgrImpl().Reset();
+        },
+        (intptr_t) nullptr);
 }
 
 void chip::NXP::App::ButtonApp::HandleDoubleClick()
