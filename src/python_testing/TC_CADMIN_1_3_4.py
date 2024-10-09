@@ -49,6 +49,7 @@ from mobly import asserts
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
 
+
 class TC_CADMIN_1_3_4(MatterBaseTest):
     async def CommissionAttempt(
             self, setupPinCode: int, thnum: int, th: str, fail: bool):
