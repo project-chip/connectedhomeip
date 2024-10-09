@@ -24,6 +24,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/config.h>
+#include <app/util/ember-io-storage.h>
 #include <app/util/ember-strings.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/generic-callbacks.h>
@@ -33,7 +34,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <app/util/ember-io-storage.h>
 
 using chip::Protocols::InteractionModel::Status;
 
