@@ -166,8 +166,9 @@ def check_no_duplicates(obj: Any) -> None:
         raise ValueError(f"Value {str(obj)} contains duplicate values")
 
 
-def is_test_vendor(id) -> bool:
-    return 0xFFF1_0000 <= id <= 0xFFF4_FFFF
+def is_test_vendor(id: int) -> bool:
+    vendor_id = (id >> 16) & 0xFFFF
+    return 0xFFF1 <= vendor_id <= 0xFFF4
 
 
 class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
@@ -476,12 +477,12 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                 for bad in bad_attrs:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=bad)
                     self.record_error(self.get_test_name(
-                    ), location=location, problem=f'Attribute with bad prefix {hex(bad)[:6]} in cluster {cluster_id}' + (' (Test Vendor)' if is_test_vendor(bad) else ''), spec_location='Manufacturer Extensible Identifier (MEI)')
+                    ), location=location, problem=f'Attribute with bad prefix 0x{bad:04x} in cluster 0x{cluster_id:08x}' + (' (Test Vendor)' if is_test_vendor(bad) else ''), spec_location='Manufacturer Extensible Identifier (MEI)')
                     success = False
                 for bad in bad_cmds:
                     location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=bad)
                     self.record_error(self.get_test_name(
-                    ), location=location, problem=f'Command with bad prefix {hex(bad)[:6]} in cluster {cluster_id}' + (' (Test Vendor)' if is_test_vendor(bad) else ''), spec_location='Manufacturer Extensible Identifier(MEI)')
+                    ), location=location, problem=f'Command with bad prefix 0x{bad:04x} in cluster 0x{cluster_id:08x}' + (' (Test Vendor)' if is_test_vendor(bad) else ''), spec_location='Manufacturer Extensible Identifier(MEI)')
                     success = False
 
         self.print_step(7, "Validate that none of the MEI global attribute IDs contain values outside of the allowed suffix range")
@@ -527,7 +528,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             for bad in bad_clusters_ids:
                 location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad)
                 self.record_error(self.get_test_name(), location=location,
-                                  problem=f'Bad cluster id prefix {hex(bad)[:6]}' + (' (Test Vendor)' if is_test_vendor(bad) else ''), spec_location='Manufacturer Extensible Identifier (MEI)')
+                                  problem=f'Bad cluster id prefix 0x{bad:04x}' + (' (Test Vendor)' if is_test_vendor(bad) else ''), spec_location='Manufacturer Extensible Identifier (MEI)')
                 success = False
 
         self.print_step(9, "Validate that all clusters in the standard range have a known cluster ID")
