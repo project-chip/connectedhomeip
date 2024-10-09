@@ -6187,6 +6187,128 @@ public static class ContentControlClusterRemainingScreenTimeExpiredEvent {
     return output.toString();
   }
 }
+public static class ZoneManagementClusterZoneTriggeredEvent {
+  public ArrayList<Integer> zones;
+  public Integer reason;
+  private static final long ZONES_ID = 0L;
+  private static final long REASON_ID = 1L;
+
+  public ZoneManagementClusterZoneTriggeredEvent(
+    ArrayList<Integer> zones,
+    Integer reason
+  ) {
+    this.zones = zones;
+    this.reason = reason;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ZONES_ID, ArrayType.generateArrayType(zones, (elementzones) -> new UIntType(elementzones))));
+    values.add(new StructElement(REASON_ID, new UIntType(reason)));
+
+    return new StructType(values);
+  }
+
+  public static ZoneManagementClusterZoneTriggeredEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ArrayList<Integer> zones = null;
+    Integer reason = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ZONES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          zones = castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == REASON_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          reason = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ZoneManagementClusterZoneTriggeredEvent(
+      zones,
+      reason
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ZoneManagementClusterZoneTriggeredEvent {\n");
+    output.append("\tzones: ");
+    output.append(zones);
+    output.append("\n");
+    output.append("\treason: ");
+    output.append(reason);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ZoneManagementClusterZoneStoppedEvent {
+  public ArrayList<Integer> zones;
+  public Integer reason;
+  private static final long ZONES_ID = 0L;
+  private static final long REASON_ID = 1L;
+
+  public ZoneManagementClusterZoneStoppedEvent(
+    ArrayList<Integer> zones,
+    Integer reason
+  ) {
+    this.zones = zones;
+    this.reason = reason;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ZONES_ID, ArrayType.generateArrayType(zones, (elementzones) -> new UIntType(elementzones))));
+    values.add(new StructElement(REASON_ID, new UIntType(reason)));
+
+    return new StructType(values);
+  }
+
+  public static ZoneManagementClusterZoneStoppedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ArrayList<Integer> zones = null;
+    Integer reason = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ZONES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          zones = castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == REASON_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          reason = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ZoneManagementClusterZoneStoppedEvent(
+      zones,
+      reason
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ZoneManagementClusterZoneStoppedEvent {\n");
+    output.append("\tzones: ");
+    output.append(zones);
+    output.append("\n");
+    output.append("\treason: ");
+    output.append(reason);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class CommissionerControlClusterCommissioningRequestResultEvent {
   public Long requestID;
   public Long clientNodeID;
