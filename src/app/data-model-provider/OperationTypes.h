@@ -19,6 +19,7 @@
 #include <access/SubjectDescriptor.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 
 #include <cstdint>
@@ -55,6 +56,15 @@ struct OperationRequest
     ///
     /// NOTE: once kInternal flag is removed, this will become non-optional
     std::optional<chip::Access::SubjectDescriptor> subjectDescriptor;
+
+    /// Accessing fabric index is the subjectDescriptor fabric index (if any).
+    /// This is a readability convenience function.
+    ///
+    /// Returns kUndefinedFabricIndex if no subject descriptor is available
+    FabricIndex GetAccessingFabricIndex() const
+    {
+        return subjectDescriptor.has_value() ? subjectDescriptor->fabricIndex : kUndefinedFabricIndex;
+    }
 };
 
 enum class ReadFlags : uint32_t
