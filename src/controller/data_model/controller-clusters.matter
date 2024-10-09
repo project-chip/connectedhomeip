@@ -9416,6 +9416,355 @@ provisional cluster ContentAppObserver = 1296 {
   command ContentAppMessage(ContentAppMessageRequest): ContentAppMessageResponse = 0;
 }
 
+/** The Camera AV Stream Management cluster is used to allow clients to manage, control, and configure various audio, video, and snapshot streams on a camera. */
+cluster CameraAvStreamManagement = 1361 {
+  revision 1;
+
+  enum AudioCodecEnum : enum8 {
+    kOPUS = 0;
+    kAACLC = 1;
+  }
+
+  enum ImageCodecEnum : enum8 {
+    kJPEG = 0;
+  }
+
+  enum StreamTypeEnum : enum8 {
+    kInternal = 0;
+    kRecording = 1;
+    kAnalysis = 2;
+    kLiveView = 3;
+  }
+
+  enum TriStateAutoEnum : enum8 {
+    kOff = 0;
+    kOn = 1;
+    kAuto = 2;
+  }
+
+  enum TwoWayTalkSupportTypeEnum : enum8 {
+    kNotSupported = 0;
+    kHalfDuplex = 1;
+    kFullDuplex = 2;
+  }
+
+  enum VideoCodecEnum : enum8 {
+    kH264 = 0;
+    kHEVC = 1;
+    kVVC = 2;
+    kAV1 = 3;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPrivacy = 0x1;
+    kSensorControl = 0x2;
+    kAudio = 0x4;
+    kImageControl = 0x8;
+    kVideo = 0x10;
+    kSnapshot = 0x20;
+    kLocalStorage = 0x40;
+  }
+
+  struct VideoResolutionStruct {
+    int16u width = 0;
+    int16u height = 1;
+  }
+
+  struct VideoStreamStruct {
+    int16u videoStreamID = 0;
+    StreamTypeEnum streamType = 1;
+    VideoCodecEnum videoCodec = 2;
+    int16u minFrameRate = 3;
+    int16u maxFrameRate = 4;
+    VideoResolutionStruct minResolution = 5;
+    VideoResolutionStruct maxResolution = 6;
+    int16u minBitRate = 7;
+    int16u maxBitRate = 8;
+    int16u minFragmentLen = 9;
+    int16u maxFragmentLen = 10;
+    int8u referenceCount = 11;
+  }
+
+  struct SnapshotStreamStruct {
+    int16u snapshotStreamID = 0;
+    ImageCodecEnum imageCodec = 1;
+    int16u frameRate = 2;
+    int32u bitRate = 3;
+    VideoResolutionStruct minResolution = 4;
+    VideoResolutionStruct maxResolution = 5;
+    int8u quality = 6;
+    int8u referenceCount = 7;
+  }
+
+  struct SnapshotParamsStruct {
+    VideoResolutionStruct resolution = 0;
+    int16u maxFrameRate = 1;
+    ImageCodecEnum imageCodec = 2;
+  }
+
+  struct RateDistortionTradeOffPointsStruct {
+    VideoCodecEnum codec = 0;
+    VideoResolutionStruct resolution = 1;
+    int32u minBitRate = 2;
+  }
+
+  struct AudioCapabilitiesStruct {
+    int8u maxNumberOfChannels = 0;
+    AudioCodecEnum supportedCodecs[] = 1;
+    int32u supportedSampleRates[] = 2;
+    int32u supportedBitDepths[] = 3;
+  }
+
+  struct AudioStreamStruct {
+    int16u audioStreamID = 0;
+    StreamTypeEnum streamType = 1;
+    AudioCodecEnum audioCodec = 2;
+    int8u channelCount = 3;
+    int32u sampleRate = 4;
+    int32u bitRate = 5;
+    int8u bitDepth = 6;
+    int8u referenceCount = 7;
+  }
+
+  struct PerStreamStruct {
+    int16u streamID = 0;
+    boolean enabled = 1;
+  }
+
+  struct VideoSensorParamsStruct {
+    int16u sensorWidth = 0;
+    int16u sensorHeight = 1;
+    boolean HDRCapable = 2;
+    int16u maxFPS = 3;
+    int16u maxHDRFPS = 4;
+  }
+
+  struct ViewportStruct {
+    int16u x1 = 0;
+    int16u y1 = 1;
+    int16u x2 = 2;
+    int16u y2 = 3;
+  }
+
+  info event VideoStreamChanged = 0 {
+    int16u videoStreamID = 0;
+    optional StreamTypeEnum streamType = 1;
+    optional VideoCodecEnum videoCodec = 2;
+    optional int16u minFrameRate = 3;
+    optional int16u maxFrameRate = 4;
+    optional VideoResolutionStruct minResolution = 5;
+    optional VideoResolutionStruct maxResolution = 6;
+    optional int16u minBitRate = 7;
+    optional int16u maxBitRate = 8;
+    optional int16u minFragmentLen = 9;
+    optional int16u maxFragmentLen = 10;
+  }
+
+  info event AudioStreamChanged = 1 {
+    int16u audioStreamID = 0;
+    optional StreamTypeEnum streamType = 1;
+    optional AudioCodecEnum audioCodec = 2;
+    optional int8u channelCount = 3;
+    optional int32u sampleRate = 4;
+    optional int32u bitRate = 5;
+    optional int8u bitDepth = 6;
+  }
+
+  info event SnapshotStreamChanged = 2 {
+    int16u snapshotStreamID = 0;
+    optional ImageCodecEnum imageCodec = 1;
+    optional int16u frameRate = 2;
+    optional int32u bitRate = 3;
+    optional VideoResolutionStruct minResolution = 4;
+    optional VideoResolutionStruct maxResolution = 5;
+    optional int8u quality = 6;
+  }
+
+  readonly attribute access(read: administer) optional int8u maxConcurrentVideoEncoders = 0;
+  readonly attribute access(read: administer) optional int32u maxEncodedPixelRate = 1;
+  readonly attribute access(read: administer) optional VideoSensorParamsStruct videoSensorParams = 2;
+  readonly attribute access(read: administer) optional boolean nightVisionCapable = 3;
+  readonly attribute access(read: administer) optional VideoResolutionStruct minViewport = 4;
+  readonly attribute access(read: administer) optional RateDistortionTradeOffPointsStruct rateDistortionTradeOffPoints[] = 5;
+  readonly attribute access(read: administer) optional int32u maxPreRollBufferSize = 6;
+  readonly attribute access(read: administer) optional AudioCapabilitiesStruct microphoneCapabilities = 7;
+  readonly attribute access(read: administer) optional nullable AudioCapabilitiesStruct speakerCapabilities = 8;
+  readonly attribute access(read: administer) optional TwoWayTalkSupportTypeEnum twoWayTalkSupport = 9;
+  readonly attribute access(read: administer) optional SnapshotParamsStruct supportedSnapshotParams[] = 10;
+  readonly attribute access(read: administer) optional boolean HDRCapable = 11;
+  readonly attribute access(read: administer) int32u maxNetworkBandwidth = 12;
+  readonly attribute access(read: administer) optional int16u currentFrameRate = 13;
+  attribute access(read: administer, write: administer) optional boolean HDRMode = 14;
+  readonly attribute access(read: administer) optional VideoCodecEnum currentVideoCodecs[] = 15;
+  readonly attribute access(read: administer) optional SnapshotParamsStruct currentSnapshotConfig = 16;
+  readonly attribute access(read: administer) fabric_idx fabricsUsingCamera[] = 17;
+  readonly attribute access(read: administer) optional VideoStreamStruct allocatedVideoStreams[] = 18;
+  readonly attribute access(read: administer) optional AudioStreamStruct allocatedAudioStreams[] = 19;
+  readonly attribute access(read: administer) optional SnapshotStreamStruct allocatedSnapshotStreams[] = 20;
+  attribute access(read: administer, write: administer) optional StreamTypeEnum rankedVideoStreamPrioritiesList[] = 21;
+  attribute access(read: administer, write: administer) optional boolean softRecordingPrivacyModeSetting = 22;
+  attribute access(read: administer, write: administer) optional boolean softLivestreamPrivacyModeSetting = 23;
+  readonly attribute access(read: administer) optional boolean hardPrivacyMode = 24;
+  attribute access(read: administer, write: administer) optional TriStateAutoEnum nightVision = 25;
+  attribute access(read: administer, write: administer) optional TriStateAutoEnum nightVisionIllum = 26;
+  attribute access(read: administer, write: administer) optional boolean awb = 27;
+  attribute access(read: administer, write: administer) optional boolean shutterSpeed = 28;
+  attribute access(read: administer, write: administer) optional boolean iso = 29;
+  readonly attribute access(read: administer) optional ViewportStruct viewport = 30;
+  attribute access(read: administer, write: administer) optional boolean speakerEnabled = 31;
+  attribute access(read: administer, write: administer) optional int8u speakerVolumeLevel = 32;
+  attribute access(read: administer, write: administer) optional int8u speakerMaxLevel = 33;
+  attribute access(read: administer, write: administer) optional int8u speakerMinLevel = 34;
+  attribute access(read: administer, write: administer) optional boolean micStatus = 35;
+  attribute access(read: administer, write: administer) optional int8u micVolumeLevel = 36;
+  attribute access(read: administer, write: administer) optional int8u micMaxLevel = 37;
+  attribute access(read: administer, write: administer) optional int8u micMinLevel = 38;
+  attribute access(read: administer, write: administer) optional boolean micAGCEnabled = 39;
+  readonly attribute access(read: administer) optional int16u imageRotation = 40;
+  readonly attribute access(read: administer) optional boolean imageFlipHorizontal = 41;
+  readonly attribute access(read: administer) optional boolean imageFlipVertical = 42;
+  attribute access(read: administer, write: administer) optional boolean localVideoRecordingEnabled = 43;
+  attribute access(read: administer, write: administer) optional boolean localSnapshotRecordingEnabled = 44;
+  attribute access(read: administer, write: administer) optional boolean statusLight = 45;
+  attribute access(read: administer, write: administer) optional ThreeLevelAutoEnum statusLightBrightness = 46;
+  attribute access(read: administer, write: administer) optional TriStateAutoEnum depthSensorStatus = 47;
+  readonly attribute access(read: administer) optional PerStreamStruct watermarkEnabled[] = 48;
+  readonly attribute access(read: administer) optional PerStreamStruct OSDEnabled[] = 49;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AudioStreamAllocateRequest {
+    StreamTypeEnum streamType = 0;
+    AudioCodecEnum audioCodec = 1;
+    int8u channelCount = 2;
+    int32u sampleRate = 3;
+    int32u bitRate = 4;
+    int8u bitDepth = 5;
+  }
+
+  response struct AudioStreamAllocateResponse = 1 {
+    int16u audioStreamID = 0;
+  }
+
+  request struct AudioStreamDeallocateRequest {
+    int16u audioStreamID = 0;
+  }
+
+  request struct VideoStreamAllocateRequest {
+    StreamTypeEnum streamType = 0;
+    VideoCodecEnum videoCodec = 1;
+    int16u minFrameRate = 2;
+    int16u maxFrameRate = 3;
+    VideoResolutionStruct minResolution = 4;
+    VideoResolutionStruct maxResolution = 5;
+    int32u minBitRate = 6;
+    int32u maxBitRate = 7;
+    int16u minFragmentLen = 8;
+    int16u maxFragmentLen = 9;
+  }
+
+  response struct VideoStreamAllocateResponse = 4 {
+    int16u videoStreamID = 0;
+  }
+
+  request struct VideoStreamModifyRequest {
+    int16u videoStreamID = 0;
+    VideoResolutionStruct resolution = 1;
+  }
+
+  request struct VideoStreamDeallocateRequest {
+    int16u videoStreamID = 0;
+  }
+
+  request struct SnapshotStreamAllocateRequest {
+    ImageCodecEnum imageCodec = 0;
+    int16u frameRate = 1;
+    int32u bitRate = 2;
+    VideoResolutionStruct minResolution = 3;
+    VideoResolutionStruct maxResolution = 4;
+    int8u quality = 5;
+  }
+
+  response struct SnapshotStreamAllocateResponse = 8 {
+    int16u snapshotStreamID = 0;
+  }
+
+  request struct SnapshotStreamDeallocateRequest {
+    int16u snapshotStreamID = 0;
+  }
+
+  request struct CaptureSnapshotRequest {
+    int16u snapshotStreamID = 0;
+    VideoResolutionStruct requestedResolution = 1;
+  }
+
+  response struct CaptureSnapshotResponse = 12 {
+    octet_string data = 0;
+    ImageCodecEnum imageCodec = 1;
+    VideoResolutionStruct resolution = 2;
+  }
+
+  request struct SetViewportRequest {
+    ViewportStruct viewport = 0;
+  }
+
+  request struct SetImageRotationRequest {
+    int16u angle = 0;
+  }
+
+  request struct SetImageFlipHorizontalRequest {
+    boolean enabled = 0;
+  }
+
+  request struct SetImageFlipVerticalRequest {
+    boolean enabled = 0;
+  }
+
+  request struct SetWatermarkRequest {
+    int16u videoStreamID = 0;
+    boolean enabled = 1;
+  }
+
+  request struct SetOSDRequest {
+    int16u videoStreamID = 0;
+    boolean enabled = 1;
+  }
+
+  /** This command SHALL allocate an audio stream on the camera and return an allocated audio stream identifier. */
+  command access(invoke: administer) AudioStreamAllocate(AudioStreamAllocateRequest): AudioStreamAllocateResponse = 0;
+  /** This command SHALL deallocate an audio stream on the camera, corresponding to the given audio stream identifier. */
+  command access(invoke: administer) AudioStreamDeallocate(AudioStreamDeallocateRequest): DefaultSuccess = 2;
+  /** This command SHALL allocate a video stream on the camera and return an allocated video stream identifier. */
+  command access(invoke: administer) VideoStreamAllocate(VideoStreamAllocateRequest): VideoStreamAllocateResponse = 3;
+  /** This command SHALL be used to modify the resolution of a stream specified by the VideoStreamID. */
+  command access(invoke: administer) VideoStreamModify(VideoStreamModifyRequest): DefaultSuccess = 5;
+  /** This command SHALL deallocate a video stream on the camera, corresponding to the given video stream identifier. */
+  command access(invoke: administer) VideoStreamDeallocate(VideoStreamDeallocateRequest): DefaultSuccess = 6;
+  /** This command SHALL allocate a snapshot stream on the device and return an allocated snapshot stream identifier. */
+  command access(invoke: administer) SnapshotStreamAllocate(SnapshotStreamAllocateRequest): SnapshotStreamAllocateResponse = 7;
+  /** This command SHALL deallocate an snapshot stream on the camera, corresponding to the given snapshot stream identifier. */
+  command access(invoke: administer) SnapshotStreamDeallocate(SnapshotStreamDeallocateRequest): DefaultSuccess = 9;
+  command access(invoke: administer) SetStreamPriority(): DefaultSuccess = 10;
+  /** This command SHALL return a Snapshot from the camera. */
+  command access(invoke: administer) CaptureSnapshot(CaptureSnapshotRequest): DefaultSuccess = 11;
+  /** This command SHALL set the viewport in all video streams. */
+  command SetViewport(SetViewportRequest): DefaultSuccess = 13;
+  /** The data fields for this command SHALL be as follows: */
+  command SetImageRotation(SetImageRotationRequest): DefaultSuccess = 14;
+  /** The data fields for this command SHALL be as follows: */
+  command SetImageFlipHorizontal(SetImageFlipHorizontalRequest): DefaultSuccess = 15;
+  /** The data fields for this command SHALL be as follows: */
+  command SetImageFlipVertical(SetImageFlipVerticalRequest): DefaultSuccess = 16;
+  /** This command controls if the manufacturer watermark logo is enabled for a given video stream. */
+  command SetWatermark(SetWatermarkRequest): DefaultSuccess = 17;
+  /** This command controls if the On Screen Display (OSD) of text such as date, time, timezone, and/or device name, is enabled for a given video stream. */
+  command SetOSD(SetOSDRequest): DefaultSuccess = 18;
+}
+
 /** The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC. */
 provisional cluster WebRTCTransportProvider = 1363 {
   revision 1;

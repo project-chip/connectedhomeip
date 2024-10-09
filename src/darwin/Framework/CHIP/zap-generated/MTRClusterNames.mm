@@ -369,6 +369,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeContentAppObserverID:
         result = @"ContentAppObserver";
         break;
+    case MTRClusterIDTypeCameraAVStreamManagementID:
+        result = @"CameraAVStreamManagement";
+        break;
     case MTRClusterIDTypeWebRTCTransportProviderID:
         result = @"WebRTCTransportProvider";
         break;
@@ -8149,6 +8152,241 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeCameraAVStreamManagementID:
+
+        switch (attributeID) {
+
+            // Cluster CameraAVStreamManagement attributes
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxConcurrentVideoEncodersID:
+            result = @"MaxConcurrentVideoEncoders";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxEncodedPixelRateID:
+            result = @"MaxEncodedPixelRate";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeVideoSensorParamsID:
+            result = @"VideoSensorParams";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeNightVisionCapableID:
+            result = @"NightVisionCapable";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMinViewportID:
+            result = @"MinViewport";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeRateDistortionTradeOffPointsID:
+            result = @"RateDistortionTradeOffPoints";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxPreRollBufferSizeID:
+            result = @"MaxPreRollBufferSize";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMicrophoneCapabilitiesID:
+            result = @"MicrophoneCapabilities";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSpeakerCapabilitiesID:
+            result = @"SpeakerCapabilities";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeTwoWayTalkSupportID:
+            result = @"TwoWayTalkSupport";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSupportedSnapshotParamsID:
+            result = @"SupportedSnapshotParams";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeHDRCapableID:
+            result = @"HDRCapable";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxNetworkBandwidthID:
+            result = @"MaxNetworkBandwidth";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeCurrentFrameRateID:
+            result = @"CurrentFrameRate";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeHDRModeID:
+            result = @"HDRMode";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeCurrentVideoCodecsID:
+            result = @"CurrentVideoCodecs";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeCurrentSnapshotConfigID:
+            result = @"CurrentSnapshotConfig";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeFabricsUsingCameraID:
+            result = @"FabricsUsingCamera";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedVideoStreamsID:
+            result = @"AllocatedVideoStreams";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedAudioStreamsID:
+            result = @"AllocatedAudioStreams";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedSnapshotStreamsID:
+            result = @"AllocatedSnapshotStreams";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeRankedVideoStreamPrioritiesListID:
+            result = @"RankedVideoStreamPrioritiesList";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSoftRecordingPrivacyModeSettingID:
+            result = @"SoftRecordingPrivacyModeSetting";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSoftLivestreamPrivacyModeSettingID:
+            result = @"SoftLivestreamPrivacyModeSetting";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeHardPrivacyModeID:
+            result = @"HardPrivacyMode";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeNightVisionID:
+            result = @"NightVision";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeNightVisionIllumID:
+            result = @"NightVisionIllum";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAWBID:
+            result = @"AWB";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeShutterSpeedID:
+            result = @"ShutterSpeed";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeISOID:
+            result = @"ISO";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeViewportID:
+            result = @"Viewport";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSpeakerEnabledID:
+            result = @"SpeakerEnabled";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSpeakerVolumeLevelID:
+            result = @"SpeakerVolumeLevel";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSpeakerMaxLevelID:
+            result = @"SpeakerMaxLevel";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSpeakerMinLevelID:
+            result = @"SpeakerMinLevel";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMicStatusID:
+            result = @"MicStatus";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMicVolumeLevelID:
+            result = @"MicVolumeLevel";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMicMaxLevelID:
+            result = @"MicMaxLevel";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMicMinLevelID:
+            result = @"MicMinLevel";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMicAGCEnabledID:
+            result = @"MicAGCEnabled";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeImageRotationID:
+            result = @"ImageRotation";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeImageFlipHorizontalID:
+            result = @"ImageFlipHorizontal";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeImageFlipVerticalID:
+            result = @"ImageFlipVertical";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeLocalVideoRecordingEnabledID:
+            result = @"LocalVideoRecordingEnabled";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeLocalSnapshotRecordingEnabledID:
+            result = @"LocalSnapshotRecordingEnabled";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeStatusLightID:
+            result = @"StatusLight";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeStatusLightBrightnessID:
+            result = @"StatusLightBrightness";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeDepthSensorStatusID:
+            result = @"DepthSensorStatus";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeWatermarkEnabledID:
+            result = @"WatermarkEnabled";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeOSDEnabledID:
+            result = @"OSDEnabled";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWebRTCTransportProviderID:
 
         switch (attributeID) {
@@ -11002,6 +11240,76 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeCameraAVStreamManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandAudioStreamAllocateID:
+            result = @"AudioStreamAllocate";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandAudioStreamDeallocateID:
+            result = @"AudioStreamDeallocate";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandVideoStreamAllocateID:
+            result = @"VideoStreamAllocate";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandVideoStreamModifyID:
+            result = @"VideoStreamModify";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandVideoStreamDeallocateID:
+            result = @"VideoStreamDeallocate";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamAllocateID:
+            result = @"SnapshotStreamAllocate";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamDeallocateID:
+            result = @"SnapshotStreamDeallocate";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetStreamPriorityID:
+            result = @"SetStreamPriority";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandCaptureSnapshotID:
+            result = @"CaptureSnapshot";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetViewportID:
+            result = @"SetViewport";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetImageRotationID:
+            result = @"SetImageRotation";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetImageFlipHorizontalID:
+            result = @"SetImageFlipHorizontal";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetImageFlipVerticalID:
+            result = @"SetImageFlipVertical";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetWatermarkID:
+            result = @"SetWatermark";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetOSDID:
+            result = @"SetOSD";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWebRTCTransportProviderID:
 
         switch (commandID) {
@@ -12662,6 +12970,32 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
 
         case MTRCommandIDTypeClusterContentAppObserverCommandContentAppMessageResponseID:
             result = @"ContentAppMessageResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeCameraAVStreamManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandAudioStreamAllocateResponseID:
+            result = @"AudioStreamAllocateResponse";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandVideoStreamAllocateResponseID:
+            result = @"VideoStreamAllocateResponse";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamAllocateResponseID:
+            result = @"SnapshotStreamAllocateResponse";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandCaptureSnapshotResponseID:
+            result = @"CaptureSnapshotResponse";
             break;
 
         default:
@@ -14452,6 +14786,29 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeContentAppObserverID:
 
         switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeCameraAVStreamManagementID:
+
+        switch (eventID) {
+
+            // Cluster CameraAVStreamManagement events
+        case MTREventIDTypeClusterCameraAVStreamManagementEventVideoStreamChangedID:
+            result = @"VideoStreamChanged";
+            break;
+
+        case MTREventIDTypeClusterCameraAVStreamManagementEventAudioStreamChangedID:
+            result = @"AudioStreamChanged";
+            break;
+
+        case MTREventIDTypeClusterCameraAVStreamManagementEventSnapshotStreamChangedID:
+            result = @"SnapshotStreamChanged";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
