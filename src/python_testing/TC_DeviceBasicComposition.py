@@ -107,15 +107,14 @@ from chip import ChipUtility
 from chip.clusters.Attribute import ValueDecodeFailure
 from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
 from chip.interaction_model import InteractionModelError, Status
-from chip.tlv import uint
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
-                                         TestStep, async_test_body, default_matter_test_main)
+from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
+                                         async_test_body, default_matter_test_main)
 from chip.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok,
-                                                    get_direct_children_of_root, parts_list_cycles,
-                                                    separate_endpoint_types)
+                                                    get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
+from chip.tlv import uint
 from mobly import asserts
 
 
