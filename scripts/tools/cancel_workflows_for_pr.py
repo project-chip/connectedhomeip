@@ -65,20 +65,20 @@ class Canceller:
 )
 @click.option("--pull-request", type=int, help="Pull request number to consider")
 @click.option("--commit-sha", help="Commit to look at when cancelling pull requests")
-@click.option("--token", help="Github token to use")
+@click.option("--gh-api-token", help="Github token to use")
 @click.option("--token-file", help="Read github token from the given file")
 @click.option("--dry-run", default=False, is_flag=True, help="Actually cancel or not")
-def main(log_level, pull_request, commit_sha, token, token_file, dry_run):
+def main(log_level, pull_request, commit_sha, gh_api_token, token_file, dry_run):
     coloredlogs.install(
         level=__LOG_LEVELS__[log_level], fmt="%(asctime)s %(levelname)-7s %(message)s"
     )
 
-    if token:
-        gh_token = token
+    if gh_api_token:
+        gh_token = gh_api_token
     elif token_file:
         gh_token = open(token_file, "rt").read().strip()
     else:
-        raise Exception("Require a --token or --token-file to access github")
+        raise Exception("Require a --gh-api-token or --token-file to access github")
 
     Canceller(gh_token).cancel_all_runs(pull_request, commit_sha, dry_run)
 

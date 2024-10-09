@@ -52,4 +52,4 @@ jobs:
                   scripts/tools/cancel_workflows_for_pr.py       \
                     --pull-request ${{ inputs.pull_request_id }} \
                     --commit-sha "${{ inputs.commit_sha }}"      \
-                    --token "${{ secrets.GITHUB_TOKEN }}"
+                    --gh-api-token "${{ secrets.GITHUB_TOKEN }}"
