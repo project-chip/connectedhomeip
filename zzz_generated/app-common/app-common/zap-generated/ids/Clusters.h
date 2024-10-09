@@ -376,6 +376,9 @@ static constexpr ClusterId Id = 0x0000050F;
 namespace ContentAppObserver {
 static constexpr ClusterId Id = 0x00000510;
 } // namespace ContentAppObserver
+namespace CameraAvStreamManagement {
+static constexpr ClusterId Id = 0x00000551;
+} // namespace CameraAvStreamManagement
 namespace WebRTCTransportProvider {
 static constexpr ClusterId Id = 0x00000553;
 } // namespace WebRTCTransportProvider

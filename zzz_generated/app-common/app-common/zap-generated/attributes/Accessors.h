@@ -5641,6 +5641,241 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Attributes
 } // namespace ContentAppObserver
 
+namespace CameraAvStreamManagement {
+namespace Attributes {
+
+namespace MaxConcurrentVideoEncoders {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace MaxConcurrentVideoEncoders
+
+namespace MaxEncodedPixelRate {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // int32u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace MaxEncodedPixelRate
+
+namespace NightVisionCapable {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace NightVisionCapable
+
+namespace MaxPreRollBufferSize {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // int32u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace MaxPreRollBufferSize
+
+namespace TwoWayTalkSupport {
+Protocols::InteractionModel::Status
+Get(EndpointId endpoint,
+    chip::app::Clusters::CameraAvStreamManagement::TwoWayTalkSupportTypeEnum * value); // TwoWayTalkSupportTypeEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::app::Clusters::CameraAvStreamManagement::TwoWayTalkSupportTypeEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::app::Clusters::CameraAvStreamManagement::TwoWayTalkSupportTypeEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace TwoWayTalkSupport
+
+namespace HDRCapable {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace HDRCapable
+
+namespace MaxNetworkBandwidth {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // int32u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace MaxNetworkBandwidth
+
+namespace CurrentFrameRate {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace CurrentFrameRate
+
+namespace HDRMode {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace HDRMode
+
+namespace SoftRecordingPrivacyModeSetting {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace SoftRecordingPrivacyModeSetting
+
+namespace SoftLivestreamPrivacyModeSetting {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace SoftLivestreamPrivacyModeSetting
+
+namespace HardPrivacyMode {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace HardPrivacyMode
+
+namespace NightVision {
+Protocols::InteractionModel::Status
+Get(EndpointId endpoint, chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum * value); // TriStateAutoEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace NightVision
+
+namespace NightVisionIllum {
+Protocols::InteractionModel::Status
+Get(EndpointId endpoint, chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum * value); // TriStateAutoEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace NightVisionIllum
+
+namespace Awb {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace Awb
+
+namespace ShutterSpeed {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace ShutterSpeed
+
+namespace Iso {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace Iso
+
+namespace SpeakerEnabled {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace SpeakerEnabled
+
+namespace SpeakerVolumeLevel {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace SpeakerVolumeLevel
+
+namespace SpeakerMaxLevel {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace SpeakerMaxLevel
+
+namespace SpeakerMinLevel {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace SpeakerMinLevel
+
+namespace MicStatus {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace MicStatus
+
+namespace MicVolumeLevel {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace MicVolumeLevel
+
+namespace MicMaxLevel {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace MicMaxLevel
+
+namespace MicMinLevel {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace MicMinLevel
+
+namespace MicAGCEnabled {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace MicAGCEnabled
+
+namespace ImageRotation {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ImageRotation
+
+namespace ImageFlipHorizontal {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace ImageFlipHorizontal
+
+namespace ImageFlipVertical {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace ImageFlipVertical
+
+namespace LocalVideoRecordingEnabled {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace LocalVideoRecordingEnabled
+
+namespace LocalSnapshotRecordingEnabled {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace LocalSnapshotRecordingEnabled
+
+namespace StatusLight {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace StatusLight
+
+namespace StatusLightBrightness {
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::app::Clusters::Globals::ThreeLevelAutoEnum * value); // ThreeLevelAutoEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Globals::ThreeLevelAutoEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Globals::ThreeLevelAutoEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace StatusLightBrightness
+
+namespace DepthSensorStatus {
+Protocols::InteractionModel::Status
+Get(EndpointId endpoint, chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum * value); // TriStateAutoEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace DepthSensorStatus
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace CameraAvStreamManagement
+
 namespace WebRTCTransportProvider {
 namespace Attributes {
 

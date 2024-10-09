@@ -152,6 +152,7 @@
 | AccountLogin                                                        | 0x050E |
 | ContentControl                                                      | 0x050F |
 | ContentAppObserver                                                  | 0x0510 |
+| CameraAvStreamManagement                                            | 0x0551 |
 | WebRTCTransportProvider                                             | 0x0553 |
 | WebRTCTransportRequestor                                            | 0x0554 |
 | Chime                                                               | 0x0556 |
@@ -13650,6 +13651,695 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster CameraAvStreamManagement                                    | 0x0551 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * AudioStreamAllocate                                               |   0x00 |
+| * AudioStreamDeallocate                                             |   0x02 |
+| * VideoStreamAllocate                                               |   0x03 |
+| * VideoStreamModify                                                 |   0x05 |
+| * VideoStreamDeallocate                                             |   0x06 |
+| * SnapshotStreamAllocate                                            |   0x07 |
+| * SnapshotStreamDeallocate                                          |   0x09 |
+| * SetStreamPriority                                                 |   0x0A |
+| * CaptureSnapshot                                                   |   0x0B |
+| * SetViewport                                                       |   0x0D |
+| * SetImageRotation                                                  |   0x0E |
+| * SetImageFlipHorizontal                                            |   0x0F |
+| * SetImageFlipVertical                                              |   0x10 |
+| * SetWatermark                                                      |   0x11 |
+| * SetOSD                                                            |   0x12 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MaxConcurrentVideoEncoders                                        | 0x0000 |
+| * MaxEncodedPixelRate                                               | 0x0001 |
+| * VideoSensorParams                                                 | 0x0002 |
+| * NightVisionCapable                                                | 0x0003 |
+| * MinViewport                                                       | 0x0004 |
+| * RateDistortionTradeOffPoints                                      | 0x0005 |
+| * MaxPreRollBufferSize                                              | 0x0006 |
+| * MicrophoneCapabilities                                            | 0x0007 |
+| * SpeakerCapabilities                                               | 0x0008 |
+| * TwoWayTalkSupport                                                 | 0x0009 |
+| * SupportedSnapshotParams                                           | 0x000A |
+| * HDRCapable                                                        | 0x000B |
+| * MaxNetworkBandwidth                                               | 0x000C |
+| * CurrentFrameRate                                                  | 0x000D |
+| * HDRMode                                                           | 0x000E |
+| * CurrentVideoCodecs                                                | 0x000F |
+| * CurrentSnapshotConfig                                             | 0x0010 |
+| * FabricsUsingCamera                                                | 0x0011 |
+| * AllocatedVideoStreams                                             | 0x0012 |
+| * AllocatedAudioStreams                                             | 0x0013 |
+| * AllocatedSnapshotStreams                                          | 0x0014 |
+| * RankedVideoStreamPrioritiesList                                   | 0x0015 |
+| * SoftRecordingPrivacyModeSetting                                   | 0x0016 |
+| * SoftLivestreamPrivacyModeSetting                                  | 0x0017 |
+| * HardPrivacyMode                                                   | 0x0018 |
+| * NightVision                                                       | 0x0019 |
+| * NightVisionIllum                                                  | 0x001A |
+| * Awb                                                               | 0x001B |
+| * ShutterSpeed                                                      | 0x001C |
+| * Iso                                                               | 0x001D |
+| * Viewport                                                          | 0x001E |
+| * SpeakerEnabled                                                    | 0x001F |
+| * SpeakerVolumeLevel                                                | 0x0020 |
+| * SpeakerMaxLevel                                                   | 0x0021 |
+| * SpeakerMinLevel                                                   | 0x0022 |
+| * MicStatus                                                         | 0x0023 |
+| * MicVolumeLevel                                                    | 0x0024 |
+| * MicMaxLevel                                                       | 0x0025 |
+| * MicMinLevel                                                       | 0x0026 |
+| * MicAGCEnabled                                                     | 0x0027 |
+| * ImageRotation                                                     | 0x0028 |
+| * ImageFlipHorizontal                                               | 0x0029 |
+| * ImageFlipVertical                                                 | 0x002A |
+| * LocalVideoRecordingEnabled                                        | 0x002B |
+| * LocalSnapshotRecordingEnabled                                     | 0x002C |
+| * StatusLight                                                       | 0x002D |
+| * StatusLightBrightness                                             | 0x002E |
+| * DepthSensorStatus                                                 | 0x002F |
+| * WatermarkEnabled                                                  | 0x0030 |
+| * OSDEnabled                                                        | 0x0031 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+| * VideoStreamChanged                                                | 0x0000 |
+| * AudioStreamChanged                                                | 0x0001 |
+| * SnapshotStreamChanged                                             | 0x0002 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command AudioStreamAllocate
+ */
+class CameraAvStreamManagementAudioStreamAllocate : public ClusterCommand
+{
+public:
+    CameraAvStreamManagementAudioStreamAllocate(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("audio-stream-allocate", credsIssuerConfig)
+    {
+        AddArgument("StreamType", 0, UINT8_MAX, &mRequest.streamType);
+        AddArgument("AudioCodec", 0, UINT8_MAX, &mRequest.audioCodec);
+        AddArgument("ChannelCount", 0, UINT8_MAX, &mRequest.channelCount);
+        AddArgument("SampleRate", 0, UINT32_MAX, &mRequest.sampleRate);
+        AddArgument("BitRate", 0, UINT32_MAX, &mRequest.bitRate);
+        AddArgument("BitDepth", 0, UINT8_MAX, &mRequest.bitDepth);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamAllocate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamAllocate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamAllocate::Type mRequest;
+};
+
+/*
+ * Command AudioStreamDeallocate
+ */
+class CameraAvStreamManagementAudioStreamDeallocate : public ClusterCommand
+{
+public:
+    CameraAvStreamManagementAudioStreamDeallocate(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("audio-stream-deallocate", credsIssuerConfig)
+    {
+        AddArgument("AudioStreamID", 0, UINT16_MAX, &mRequest.audioStreamID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamDeallocate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamDeallocate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamDeallocate::Type mRequest;
+};
+
+/*
+ * Command VideoStreamAllocate
+ */
+class CameraAvStreamManagementVideoStreamAllocate : public ClusterCommand
+{
+public:
+    CameraAvStreamManagementVideoStreamAllocate(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("video-stream-allocate", credsIssuerConfig), mComplex_MinResolution(&mRequest.minResolution),
+        mComplex_MaxResolution(&mRequest.maxResolution)
+    {
+        AddArgument("StreamType", 0, UINT8_MAX, &mRequest.streamType);
+        AddArgument("VideoCodec", 0, UINT8_MAX, &mRequest.videoCodec);
+        AddArgument("MinFrameRate", 0, UINT16_MAX, &mRequest.minFrameRate);
+        AddArgument("MaxFrameRate", 0, UINT16_MAX, &mRequest.maxFrameRate);
+        AddArgument("MinResolution", &mComplex_MinResolution);
+        AddArgument("MaxResolution", &mComplex_MaxResolution);
+        AddArgument("MinBitRate", 0, UINT32_MAX, &mRequest.minBitRate);
+        AddArgument("MaxBitRate", 0, UINT32_MAX, &mRequest.maxBitRate);
+        AddArgument("MinFragmentLen", 0, UINT16_MAX, &mRequest.minFragmentLen);
+        AddArgument("MaxFragmentLen", 0, UINT16_MAX, &mRequest.maxFragmentLen);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamAllocate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamAllocate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamAllocate::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type>
+        mComplex_MinResolution;
+    TypedComplexArgument<chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type>
+        mComplex_MaxResolution;
+};
+
+/*
+ * Command VideoStreamModify
+ */
+class CameraAvStreamManagementVideoStreamModify : public ClusterCommand
+{
+public:
+    CameraAvStreamManagementVideoStreamModify(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("video-stream-modify", credsIssuerConfig), mComplex_Resolution(&mRequest.resolution)
+    {
+        AddArgument("VideoStreamID", 0, UINT16_MAX, &mRequest.videoStreamID);
+        AddArgument("Resolution", &mComplex_Resolution);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamModify::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamModify::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamModify::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type> mComplex_Resolution;
+};
+
+/*
+ * Command VideoStreamDeallocate
+ */
+class CameraAvStreamManagementVideoStreamDeallocate : public ClusterCommand
+{
+public:
+    CameraAvStreamManagementVideoStreamDeallocate(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("video-stream-deallocate", credsIssuerConfig)
+    {
+        AddArgument("VideoStreamID", 0, UINT16_MAX, &mRequest.videoStreamID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamDeallocate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamDeallocate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamDeallocate::Type mRequest;
+};
+
+/*
+ * Command SnapshotStreamAllocate
+ */
+class CameraAvStreamManagementSnapshotStreamAllocate : public ClusterCommand
+{
+public:
+    CameraAvStreamManagementSnapshotStreamAllocate(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("snapshot-stream-allocate", credsIssuerConfig), mComplex_MinResolution(&mRequest.minResolution),
+        mComplex_MaxResolution(&mRequest.maxResolution)
+    {
+        AddArgument("ImageCodec", 0, UINT8_MAX, &mRequest.imageCodec);
+        AddArgument("FrameRate", 0, UINT16_MAX, &mRequest.frameRate);
+        AddArgument("BitRate", 0, UINT32_MAX, &mRequest.bitRate);
+        AddArgument("MinResolution", &mComplex_MinResolution);
+        AddArgument("MaxResolution", &mComplex_MaxResolution);
+        AddArgument("Quality", 0, UINT8_MAX, &mRequest.quality);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocate::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type>
+        mComplex_MinResolution;
+    TypedComplexArgument<chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type>
+        mComplex_MaxResolution;
+};
+
+/*
+ * Command SnapshotStreamDeallocate
+ */
+class CameraAvStreamManagementSnapshotStreamDeallocate : public ClusterCommand
+{
+public:
+    CameraAvStreamManagementSnapshotStreamDeallocate(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("snapshot-stream-deallocate", credsIssuerConfig)
+    {
+        AddArgument("SnapshotStreamID", 0, UINT16_MAX, &mRequest.snapshotStreamID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamDeallocate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamDeallocate::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamDeallocate::Type mRequest;
+};
+
+/*
+ * Command SetStreamPriority
+ */
+class CameraAvStreamManagementSetStreamPriority : public ClusterCommand
+{
+public:
+    CameraAvStreamManagementSetStreamPriority(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-stream-priority", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SetStreamPriority::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SetStreamPriority::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CameraAvStreamManagement::Commands::SetStreamPriority::Type mRequest;
+};
+
+/*
+ * Command CaptureSnapshot
+ */
+class CameraAvStreamManagementCaptureSnapshot : public ClusterCommand
+{
+public:
+    CameraAvStreamManagementCaptureSnapshot(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("capture-snapshot", credsIssuerConfig), mComplex_RequestedResolution(&mRequest.requestedResolution)
+    {
+        AddArgument("SnapshotStreamID", 0, UINT16_MAX, &mRequest.snapshotStreamID);
+        AddArgument("RequestedResolution", &mComplex_RequestedResolution);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type>
+        mComplex_RequestedResolution;
+};
+
+/*
+ * Command SetViewport
+ */
+class CameraAvStreamManagementSetViewport : public ClusterCommand
+{
+public:
+    CameraAvStreamManagementSetViewport(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-viewport", credsIssuerConfig), mComplex_Viewport(&mRequest.viewport)
+    {
+        AddArgument("Viewport", &mComplex_Viewport);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SetViewport::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SetViewport::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CameraAvStreamManagement::Commands::SetViewport::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::CameraAvStreamManagement::Structs::ViewportStruct::Type> mComplex_Viewport;
+};
+
+/*
+ * Command SetImageRotation
+ */
+class CameraAvStreamManagementSetImageRotation : public ClusterCommand
+{
+public:
+    CameraAvStreamManagementSetImageRotation(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-image-rotation", credsIssuerConfig)
+    {
+        AddArgument("Angle", 0, UINT16_MAX, &mRequest.angle);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageRotation::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageRotation::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageRotation::Type mRequest;
+};
+
+/*
+ * Command SetImageFlipHorizontal
+ */
+class CameraAvStreamManagementSetImageFlipHorizontal : public ClusterCommand
+{
+public:
+    CameraAvStreamManagementSetImageFlipHorizontal(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-image-flip-horizontal", credsIssuerConfig)
+    {
+        AddArgument("Enabled", 0, 1, &mRequest.enabled);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipHorizontal::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipHorizontal::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipHorizontal::Type mRequest;
+};
+
+/*
+ * Command SetImageFlipVertical
+ */
+class CameraAvStreamManagementSetImageFlipVertical : public ClusterCommand
+{
+public:
+    CameraAvStreamManagementSetImageFlipVertical(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-image-flip-vertical", credsIssuerConfig)
+    {
+        AddArgument("Enabled", 0, 1, &mRequest.enabled);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipVertical::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipVertical::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipVertical::Type mRequest;
+};
+
+/*
+ * Command SetWatermark
+ */
+class CameraAvStreamManagementSetWatermark : public ClusterCommand
+{
+public:
+    CameraAvStreamManagementSetWatermark(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-watermark", credsIssuerConfig)
+    {
+        AddArgument("VideoStreamID", 0, UINT16_MAX, &mRequest.videoStreamID);
+        AddArgument("Enabled", 0, 1, &mRequest.enabled);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SetWatermark::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SetWatermark::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CameraAvStreamManagement::Commands::SetWatermark::Type mRequest;
+};
+
+/*
+ * Command SetOSD
+ */
+class CameraAvStreamManagementSetOSD : public ClusterCommand
+{
+public:
+    CameraAvStreamManagementSetOSD(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-osd", credsIssuerConfig)
+    {
+        AddArgument("VideoStreamID", 0, UINT16_MAX, &mRequest.videoStreamID);
+        AddArgument("Enabled", 0, 1, &mRequest.enabled);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SetOSD::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SetOSD::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CameraAvStreamManagement::Commands::SetOSD::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster WebRTCTransportProvider                                     | 0x0553 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -26643,6 +27333,320 @@ void registerClusterContentAppObserver(Commands & commands, CredentialIssuerComm
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::CameraAvStreamManagement;
+
+    const char * clusterName = "CameraAvStreamManagement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                               //
+        make_unique<CameraAvStreamManagementAudioStreamAllocate>(credsIssuerConfig),      //
+        make_unique<CameraAvStreamManagementAudioStreamDeallocate>(credsIssuerConfig),    //
+        make_unique<CameraAvStreamManagementVideoStreamAllocate>(credsIssuerConfig),      //
+        make_unique<CameraAvStreamManagementVideoStreamModify>(credsIssuerConfig),        //
+        make_unique<CameraAvStreamManagementVideoStreamDeallocate>(credsIssuerConfig),    //
+        make_unique<CameraAvStreamManagementSnapshotStreamAllocate>(credsIssuerConfig),   //
+        make_unique<CameraAvStreamManagementSnapshotStreamDeallocate>(credsIssuerConfig), //
+        make_unique<CameraAvStreamManagementSetStreamPriority>(credsIssuerConfig),        //
+        make_unique<CameraAvStreamManagementCaptureSnapshot>(credsIssuerConfig),          //
+        make_unique<CameraAvStreamManagementSetViewport>(credsIssuerConfig),              //
+        make_unique<CameraAvStreamManagementSetImageRotation>(credsIssuerConfig),         //
+        make_unique<CameraAvStreamManagementSetImageFlipHorizontal>(credsIssuerConfig),   //
+        make_unique<CameraAvStreamManagementSetImageFlipVertical>(credsIssuerConfig),     //
+        make_unique<CameraAvStreamManagementSetWatermark>(credsIssuerConfig),             //
+        make_unique<CameraAvStreamManagementSetOSD>(credsIssuerConfig),                   //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "max-concurrent-video-encoders", Attributes::MaxConcurrentVideoEncoders::Id,
+                                   credsIssuerConfig),                                                                    //
+        make_unique<ReadAttribute>(Id, "max-encoded-pixel-rate", Attributes::MaxEncodedPixelRate::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "video-sensor-params", Attributes::VideoSensorParams::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "night-vision-capable", Attributes::NightVisionCapable::Id, credsIssuerConfig),    //
+        make_unique<ReadAttribute>(Id, "min-viewport", Attributes::MinViewport::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "rate-distortion-trade-off-points", Attributes::RateDistortionTradeOffPoints::Id,
+                                   credsIssuerConfig),                                                                           //
+        make_unique<ReadAttribute>(Id, "max-pre-roll-buffer-size", Attributes::MaxPreRollBufferSize::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "microphone-capabilities", Attributes::MicrophoneCapabilities::Id, credsIssuerConfig),    //
+        make_unique<ReadAttribute>(Id, "speaker-capabilities", Attributes::SpeakerCapabilities::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "two-way-talk-support", Attributes::TwoWayTalkSupport::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "supported-snapshot-params", Attributes::SupportedSnapshotParams::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "hdrcapable", Attributes::HDRCapable::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "max-network-bandwidth", Attributes::MaxNetworkBandwidth::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "current-frame-rate", Attributes::CurrentFrameRate::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "hdrmode", Attributes::HDRMode::Id, credsIssuerConfig),                                   //
+        make_unique<ReadAttribute>(Id, "current-video-codecs", Attributes::CurrentVideoCodecs::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "current-snapshot-config", Attributes::CurrentSnapshotConfig::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "fabrics-using-camera", Attributes::FabricsUsingCamera::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "allocated-video-streams", Attributes::AllocatedVideoStreams::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "allocated-audio-streams", Attributes::AllocatedAudioStreams::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "allocated-snapshot-streams", Attributes::AllocatedSnapshotStreams::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "ranked-video-stream-priorities-list", Attributes::RankedVideoStreamPrioritiesList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "soft-recording-privacy-mode-setting", Attributes::SoftRecordingPrivacyModeSetting::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "soft-livestream-privacy-mode-setting", Attributes::SoftLivestreamPrivacyModeSetting::Id,
+                                   credsIssuerConfig),                                                                   //
+        make_unique<ReadAttribute>(Id, "hard-privacy-mode", Attributes::HardPrivacyMode::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "night-vision", Attributes::NightVision::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "night-vision-illum", Attributes::NightVisionIllum::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "awb", Attributes::Awb::Id, credsIssuerConfig),                                   //
+        make_unique<ReadAttribute>(Id, "shutter-speed", Attributes::ShutterSpeed::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "iso", Attributes::Iso::Id, credsIssuerConfig),                                   //
+        make_unique<ReadAttribute>(Id, "viewport", Attributes::Viewport::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "speaker-enabled", Attributes::SpeakerEnabled::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "speaker-volume-level", Attributes::SpeakerVolumeLevel::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "speaker-max-level", Attributes::SpeakerMaxLevel::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "speaker-min-level", Attributes::SpeakerMinLevel::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "mic-status", Attributes::MicStatus::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "mic-volume-level", Attributes::MicVolumeLevel::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "mic-max-level", Attributes::MicMaxLevel::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "mic-min-level", Attributes::MicMinLevel::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "mic-agcenabled", Attributes::MicAGCEnabled::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "image-rotation", Attributes::ImageRotation::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "image-flip-horizontal", Attributes::ImageFlipHorizontal::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "image-flip-vertical", Attributes::ImageFlipVertical::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "local-video-recording-enabled", Attributes::LocalVideoRecordingEnabled::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "local-snapshot-recording-enabled", Attributes::LocalSnapshotRecordingEnabled::Id,
+                                   credsIssuerConfig),                                                                       //
+        make_unique<ReadAttribute>(Id, "status-light", Attributes::StatusLight::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "status-light-brightness", Attributes::StatusLightBrightness::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "depth-sensor-status", Attributes::DepthSensorStatus::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "watermark-enabled", Attributes::WatermarkEnabled::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "osdenabled", Attributes::OSDEnabled::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                //
+        make_unique<WriteAttribute<uint8_t>>(Id, "max-concurrent-video-encoders", 0, UINT8_MAX,
+                                             Attributes::MaxConcurrentVideoEncoders::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "max-encoded-pixel-rate", 0, UINT32_MAX, Attributes::MaxEncodedPixelRate::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::CameraAvStreamManagement::Structs::VideoSensorParamsStruct::Type>>(
+            Id, "video-sensor-params", Attributes::VideoSensorParams::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "night-vision-capable", 0, 1, Attributes::NightVisionCapable::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type>>(
+            Id, "min-viewport", Attributes::MinViewport::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::CameraAvStreamManagement::Structs::RateDistortionTradeOffPointsStruct::Type>>>(
+            Id, "rate-distortion-trade-off-points", Attributes::RateDistortionTradeOffPoints::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "max-pre-roll-buffer-size", 0, UINT32_MAX, Attributes::MaxPreRollBufferSize::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::CameraAvStreamManagement::Structs::AudioCapabilitiesStruct::Type>>(
+            Id, "microphone-capabilities", Attributes::MicrophoneCapabilities::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::Nullable<chip::app::Clusters::CameraAvStreamManagement::Structs::AudioCapabilitiesStruct::Type>>>(
+            Id, "speaker-capabilities", Attributes::SpeakerCapabilities::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CameraAvStreamManagement::TwoWayTalkSupportTypeEnum>>(
+            Id, "two-way-talk-support", 0, UINT8_MAX, Attributes::TwoWayTalkSupport::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type>>>(
+            Id, "supported-snapshot-params", Attributes::SupportedSnapshotParams::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "hdrcapable", 0, 1, Attributes::HDRCapable::Id, WriteCommandType::kForceWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "max-network-bandwidth", 0, UINT32_MAX, Attributes::MaxNetworkBandwidth::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "current-frame-rate", 0, UINT16_MAX, Attributes::CurrentFrameRate::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "hdrmode", 0, 1, Attributes::HDRMode::Id, WriteCommandType::kWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::VideoCodecEnum>>>(
+            Id, "current-video-codecs", Attributes::CurrentVideoCodecs::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type>>(
+            Id, "current-snapshot-config", Attributes::CurrentSnapshotConfig::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::FabricIndex>>>(
+            Id, "fabrics-using-camera", Attributes::FabricsUsingCamera::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type>>>(
+            Id, "allocated-video-streams", Attributes::AllocatedVideoStreams::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::Structs::AudioStreamStruct::Type>>>(
+            Id, "allocated-audio-streams", Attributes::AllocatedAudioStreams::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotStreamStruct::Type>>>(
+            Id, "allocated-snapshot-streams", Attributes::AllocatedSnapshotStreams::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::StreamTypeEnum>>>(
+            Id, "ranked-video-stream-priorities-list", Attributes::RankedVideoStreamPrioritiesList::Id, WriteCommandType::kWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "soft-recording-privacy-mode-setting", 0, 1,
+                                          Attributes::SoftRecordingPrivacyModeSetting::Id, WriteCommandType::kWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "soft-livestream-privacy-mode-setting", 0, 1,
+                                          Attributes::SoftLivestreamPrivacyModeSetting::Id, WriteCommandType::kWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "hard-privacy-mode", 0, 1, Attributes::HardPrivacyMode::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum>>(
+            Id, "night-vision", 0, UINT8_MAX, Attributes::NightVision::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum>>(
+            Id, "night-vision-illum", 0, UINT8_MAX, Attributes::NightVisionIllum::Id, WriteCommandType::kWrite,
+            credsIssuerConfig),                                                                                               //
+        make_unique<WriteAttribute<bool>>(Id, "awb", 0, 1, Attributes::Awb::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "shutter-speed", 0, 1, Attributes::ShutterSpeed::Id, WriteCommandType::kWrite,
+                                          credsIssuerConfig),                                                                 //
+        make_unique<WriteAttribute<bool>>(Id, "iso", 0, 1, Attributes::Iso::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::CameraAvStreamManagement::Structs::ViewportStruct::Type>>(
+            Id, "viewport", Attributes::Viewport::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "speaker-enabled", 0, 1, Attributes::SpeakerEnabled::Id, WriteCommandType::kWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "speaker-volume-level", 0, UINT8_MAX, Attributes::SpeakerVolumeLevel::Id,
+                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "speaker-max-level", 0, UINT8_MAX, Attributes::SpeakerMaxLevel::Id,
+                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "speaker-min-level", 0, UINT8_MAX, Attributes::SpeakerMinLevel::Id,
+                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "mic-status", 0, 1, Attributes::MicStatus::Id, WriteCommandType::kWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "mic-volume-level", 0, UINT8_MAX, Attributes::MicVolumeLevel::Id,
+                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "mic-max-level", 0, UINT8_MAX, Attributes::MicMaxLevel::Id,
+                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "mic-min-level", 0, UINT8_MAX, Attributes::MicMinLevel::Id,
+                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "mic-agcenabled", 0, 1, Attributes::MicAGCEnabled::Id, WriteCommandType::kWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "image-rotation", 0, UINT16_MAX, Attributes::ImageRotation::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "image-flip-horizontal", 0, 1, Attributes::ImageFlipHorizontal::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "image-flip-vertical", 0, 1, Attributes::ImageFlipVertical::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "local-video-recording-enabled", 0, 1, Attributes::LocalVideoRecordingEnabled::Id,
+                                          WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "local-snapshot-recording-enabled", 0, 1,
+                                          Attributes::LocalSnapshotRecordingEnabled::Id, WriteCommandType::kWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "status-light", 0, 1, Attributes::StatusLight::Id, WriteCommandType::kWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Globals::ThreeLevelAutoEnum>>(
+            Id, "status-light-brightness", 0, UINT8_MAX, Attributes::StatusLightBrightness::Id, WriteCommandType::kWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum>>(
+            Id, "depth-sensor-status", 0, UINT8_MAX, Attributes::DepthSensorStatus::Id, WriteCommandType::kWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::Structs::PerStreamStruct::Type>>>(
+            Id, "watermark-enabled", Attributes::WatermarkEnabled::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::Structs::PerStreamStruct::Type>>>(
+            Id, "osdenabled", Attributes::OSDEnabled::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                  //
+        make_unique<SubscribeAttribute>(Id, "max-concurrent-video-encoders", Attributes::MaxConcurrentVideoEncoders::Id,
+                                        credsIssuerConfig),                                                                    //
+        make_unique<SubscribeAttribute>(Id, "max-encoded-pixel-rate", Attributes::MaxEncodedPixelRate::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "video-sensor-params", Attributes::VideoSensorParams::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "night-vision-capable", Attributes::NightVisionCapable::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "min-viewport", Attributes::MinViewport::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "rate-distortion-trade-off-points", Attributes::RateDistortionTradeOffPoints::Id,
+                                        credsIssuerConfig),                                                                       //
+        make_unique<SubscribeAttribute>(Id, "max-pre-roll-buffer-size", Attributes::MaxPreRollBufferSize::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "microphone-capabilities", Attributes::MicrophoneCapabilities::Id,
+                                        credsIssuerConfig),                                                                  //
+        make_unique<SubscribeAttribute>(Id, "speaker-capabilities", Attributes::SpeakerCapabilities::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "two-way-talk-support", Attributes::TwoWayTalkSupport::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "supported-snapshot-params", Attributes::SupportedSnapshotParams::Id,
+                                        credsIssuerConfig),                                                                       //
+        make_unique<SubscribeAttribute>(Id, "hdrcapable", Attributes::HDRCapable::Id, credsIssuerConfig),                         //
+        make_unique<SubscribeAttribute>(Id, "max-network-bandwidth", Attributes::MaxNetworkBandwidth::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "current-frame-rate", Attributes::CurrentFrameRate::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "hdrmode", Attributes::HDRMode::Id, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, "current-video-codecs", Attributes::CurrentVideoCodecs::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "current-snapshot-config", Attributes::CurrentSnapshotConfig::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "fabrics-using-camera", Attributes::FabricsUsingCamera::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "allocated-video-streams", Attributes::AllocatedVideoStreams::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "allocated-audio-streams", Attributes::AllocatedAudioStreams::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "allocated-snapshot-streams", Attributes::AllocatedSnapshotStreams::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "ranked-video-stream-priorities-list", Attributes::RankedVideoStreamPrioritiesList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "soft-recording-privacy-mode-setting", Attributes::SoftRecordingPrivacyModeSetting::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "soft-livestream-privacy-mode-setting",
+                                        Attributes::SoftLivestreamPrivacyModeSetting::Id, credsIssuerConfig),                 //
+        make_unique<SubscribeAttribute>(Id, "hard-privacy-mode", Attributes::HardPrivacyMode::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "night-vision", Attributes::NightVision::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "night-vision-illum", Attributes::NightVisionIllum::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "awb", Attributes::Awb::Id, credsIssuerConfig),                                   //
+        make_unique<SubscribeAttribute>(Id, "shutter-speed", Attributes::ShutterSpeed::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "iso", Attributes::Iso::Id, credsIssuerConfig),                                   //
+        make_unique<SubscribeAttribute>(Id, "viewport", Attributes::Viewport::Id, credsIssuerConfig),                         //
+        make_unique<SubscribeAttribute>(Id, "speaker-enabled", Attributes::SpeakerEnabled::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "speaker-volume-level", Attributes::SpeakerVolumeLevel::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "speaker-max-level", Attributes::SpeakerMaxLevel::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "speaker-min-level", Attributes::SpeakerMinLevel::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "mic-status", Attributes::MicStatus::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "mic-volume-level", Attributes::MicVolumeLevel::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "mic-max-level", Attributes::MicMaxLevel::Id, credsIssuerConfig),                 //
+        make_unique<SubscribeAttribute>(Id, "mic-min-level", Attributes::MicMinLevel::Id, credsIssuerConfig),                 //
+        make_unique<SubscribeAttribute>(Id, "mic-agcenabled", Attributes::MicAGCEnabled::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "image-rotation", Attributes::ImageRotation::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "image-flip-horizontal", Attributes::ImageFlipHorizontal::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "image-flip-vertical", Attributes::ImageFlipVertical::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "local-video-recording-enabled", Attributes::LocalVideoRecordingEnabled::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "local-snapshot-recording-enabled", Attributes::LocalSnapshotRecordingEnabled::Id,
+                                        credsIssuerConfig),                                                                       //
+        make_unique<SubscribeAttribute>(Id, "status-light", Attributes::StatusLight::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "status-light-brightness", Attributes::StatusLightBrightness::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "depth-sensor-status", Attributes::DepthSensorStatus::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "watermark-enabled", Attributes::WatermarkEnabled::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "osdenabled", Attributes::OSDEnabled::Id, credsIssuerConfig),                         //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                    //
+        make_unique<ReadEvent>(Id, "video-stream-changed", Events::VideoStreamChanged::Id, credsIssuerConfig),            //
+        make_unique<ReadEvent>(Id, "audio-stream-changed", Events::AudioStreamChanged::Id, credsIssuerConfig),            //
+        make_unique<ReadEvent>(Id, "snapshot-stream-changed", Events::SnapshotStreamChanged::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                               //
+        make_unique<SubscribeEvent>(Id, "video-stream-changed", Events::VideoStreamChanged::Id, credsIssuerConfig),       //
+        make_unique<SubscribeEvent>(Id, "audio-stream-changed", Events::AudioStreamChanged::Id, credsIssuerConfig),       //
+        make_unique<SubscribeEvent>(Id, "snapshot-stream-changed", Events::SnapshotStreamChanged::Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterWebRTCTransportProvider(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::WebRTCTransportProvider;
@@ -27692,6 +28696,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterAccountLogin(commands, credsIssuerConfig);
     registerClusterContentControl(commands, credsIssuerConfig);
     registerClusterContentAppObserver(commands, credsIssuerConfig);
+    registerClusterCameraAvStreamManagement(commands, credsIssuerConfig);
     registerClusterWebRTCTransportProvider(commands, credsIssuerConfig);
     registerClusterWebRTCTransportRequestor(commands, credsIssuerConfig);
     registerClusterChime(commands, credsIssuerConfig);

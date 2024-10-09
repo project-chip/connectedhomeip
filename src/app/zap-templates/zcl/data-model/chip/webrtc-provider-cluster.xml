@@ -23,15 +23,6 @@ Git: 0.9-fall2024-234-gf4d359001
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
   <domain name="General"/>
 
-  <enum name="StreamTypeEnum" type="enum8">
-    <cluster code="0x0553"/>
-    <cluster code="0x0554"/>
-    <item name="Internal" value="0x00"/>
-    <item name="Recording" value="0x01"/>
-    <item name="Analysis" value="0x02"/>
-    <item name="LiveView" value="0x03"/>
-  </enum>
-
   <bitmap name="WebRTCMetadataOptions" type="bitmap8">
     <cluster code="0x0553"/>
     <cluster code="0x0554"/>

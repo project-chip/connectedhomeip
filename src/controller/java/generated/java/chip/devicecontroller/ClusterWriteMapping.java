@@ -3472,6 +3472,492 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("contentControl", writeContentControlInteractionInfo);
     Map<String, InteractionInfo> writeContentAppObserverInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("contentAppObserver", writeContentAppObserverInteractionInfo);
+    Map<String, InteractionInfo> writeCameraAvStreamManagementInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementHDRModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementHDRModeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeCameraAvStreamManagementHDRModeCommandParams.put(
+        "value",
+        cameraAvStreamManagementHDRModeCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementHDRModeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeHDRModeAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementHDRModeCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeHDRModeAttribute", writeCameraAvStreamManagementHDRModeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementSoftRecordingPrivacyModeSettingCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementsoftRecordingPrivacyModeSettingCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeCameraAvStreamManagementSoftRecordingPrivacyModeSettingCommandParams.put(
+        "value",
+        cameraAvStreamManagementsoftRecordingPrivacyModeSettingCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementSoftRecordingPrivacyModeSettingAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeSoftRecordingPrivacyModeSettingAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementSoftRecordingPrivacyModeSettingCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeSoftRecordingPrivacyModeSettingAttribute", writeCameraAvStreamManagementSoftRecordingPrivacyModeSettingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementSoftLivestreamPrivacyModeSettingCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementsoftLivestreamPrivacyModeSettingCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeCameraAvStreamManagementSoftLivestreamPrivacyModeSettingCommandParams.put(
+        "value",
+        cameraAvStreamManagementsoftLivestreamPrivacyModeSettingCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementSoftLivestreamPrivacyModeSettingAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeSoftLivestreamPrivacyModeSettingAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementSoftLivestreamPrivacyModeSettingCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeSoftLivestreamPrivacyModeSettingAttribute", writeCameraAvStreamManagementSoftLivestreamPrivacyModeSettingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementNightVisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementnightVisionCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeCameraAvStreamManagementNightVisionCommandParams.put(
+        "value",
+        cameraAvStreamManagementnightVisionCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementNightVisionAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeNightVisionAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementNightVisionCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeNightVisionAttribute", writeCameraAvStreamManagementNightVisionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementNightVisionIllumCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementnightVisionIllumCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeCameraAvStreamManagementNightVisionIllumCommandParams.put(
+        "value",
+        cameraAvStreamManagementnightVisionIllumCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementNightVisionIllumAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeNightVisionIllumAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementNightVisionIllumCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeNightVisionIllumAttribute", writeCameraAvStreamManagementNightVisionIllumAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementAwbCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementawbCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeCameraAvStreamManagementAwbCommandParams.put(
+        "value",
+        cameraAvStreamManagementawbCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementAwbAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeAwbAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementAwbCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeAwbAttribute", writeCameraAvStreamManagementAwbAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementShutterSpeedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementshutterSpeedCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeCameraAvStreamManagementShutterSpeedCommandParams.put(
+        "value",
+        cameraAvStreamManagementshutterSpeedCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementShutterSpeedAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeShutterSpeedAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementShutterSpeedCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeShutterSpeedAttribute", writeCameraAvStreamManagementShutterSpeedAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementIsoCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementisoCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeCameraAvStreamManagementIsoCommandParams.put(
+        "value",
+        cameraAvStreamManagementisoCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementIsoAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeIsoAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementIsoCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeIsoAttribute", writeCameraAvStreamManagementIsoAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementSpeakerEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementspeakerEnabledCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeCameraAvStreamManagementSpeakerEnabledCommandParams.put(
+        "value",
+        cameraAvStreamManagementspeakerEnabledCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementSpeakerEnabledAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeSpeakerEnabledAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementSpeakerEnabledCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeSpeakerEnabledAttribute", writeCameraAvStreamManagementSpeakerEnabledAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementSpeakerVolumeLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementspeakerVolumeLevelCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeCameraAvStreamManagementSpeakerVolumeLevelCommandParams.put(
+        "value",
+        cameraAvStreamManagementspeakerVolumeLevelCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementSpeakerVolumeLevelAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeSpeakerVolumeLevelAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementSpeakerVolumeLevelCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeSpeakerVolumeLevelAttribute", writeCameraAvStreamManagementSpeakerVolumeLevelAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementSpeakerMaxLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementspeakerMaxLevelCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeCameraAvStreamManagementSpeakerMaxLevelCommandParams.put(
+        "value",
+        cameraAvStreamManagementspeakerMaxLevelCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementSpeakerMaxLevelAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeSpeakerMaxLevelAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementSpeakerMaxLevelCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeSpeakerMaxLevelAttribute", writeCameraAvStreamManagementSpeakerMaxLevelAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementSpeakerMinLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementspeakerMinLevelCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeCameraAvStreamManagementSpeakerMinLevelCommandParams.put(
+        "value",
+        cameraAvStreamManagementspeakerMinLevelCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementSpeakerMinLevelAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeSpeakerMinLevelAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementSpeakerMinLevelCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeSpeakerMinLevelAttribute", writeCameraAvStreamManagementSpeakerMinLevelAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementMicStatusCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementmicStatusCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeCameraAvStreamManagementMicStatusCommandParams.put(
+        "value",
+        cameraAvStreamManagementmicStatusCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementMicStatusAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeMicStatusAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementMicStatusCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeMicStatusAttribute", writeCameraAvStreamManagementMicStatusAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementMicVolumeLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementmicVolumeLevelCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeCameraAvStreamManagementMicVolumeLevelCommandParams.put(
+        "value",
+        cameraAvStreamManagementmicVolumeLevelCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementMicVolumeLevelAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeMicVolumeLevelAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementMicVolumeLevelCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeMicVolumeLevelAttribute", writeCameraAvStreamManagementMicVolumeLevelAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementMicMaxLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementmicMaxLevelCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeCameraAvStreamManagementMicMaxLevelCommandParams.put(
+        "value",
+        cameraAvStreamManagementmicMaxLevelCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementMicMaxLevelAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeMicMaxLevelAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementMicMaxLevelCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeMicMaxLevelAttribute", writeCameraAvStreamManagementMicMaxLevelAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementMicMinLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementmicMinLevelCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeCameraAvStreamManagementMicMinLevelCommandParams.put(
+        "value",
+        cameraAvStreamManagementmicMinLevelCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementMicMinLevelAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeMicMinLevelAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementMicMinLevelCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeMicMinLevelAttribute", writeCameraAvStreamManagementMicMinLevelAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementMicAGCEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementmicAGCEnabledCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeCameraAvStreamManagementMicAGCEnabledCommandParams.put(
+        "value",
+        cameraAvStreamManagementmicAGCEnabledCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementMicAGCEnabledAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeMicAGCEnabledAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementMicAGCEnabledCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeMicAGCEnabledAttribute", writeCameraAvStreamManagementMicAGCEnabledAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementLocalVideoRecordingEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementlocalVideoRecordingEnabledCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeCameraAvStreamManagementLocalVideoRecordingEnabledCommandParams.put(
+        "value",
+        cameraAvStreamManagementlocalVideoRecordingEnabledCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementLocalVideoRecordingEnabledAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeLocalVideoRecordingEnabledAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementLocalVideoRecordingEnabledCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeLocalVideoRecordingEnabledAttribute", writeCameraAvStreamManagementLocalVideoRecordingEnabledAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementLocalSnapshotRecordingEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementlocalSnapshotRecordingEnabledCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeCameraAvStreamManagementLocalSnapshotRecordingEnabledCommandParams.put(
+        "value",
+        cameraAvStreamManagementlocalSnapshotRecordingEnabledCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementLocalSnapshotRecordingEnabledAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeLocalSnapshotRecordingEnabledAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementLocalSnapshotRecordingEnabledCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeLocalSnapshotRecordingEnabledAttribute", writeCameraAvStreamManagementLocalSnapshotRecordingEnabledAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementStatusLightCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementstatusLightCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeCameraAvStreamManagementStatusLightCommandParams.put(
+        "value",
+        cameraAvStreamManagementstatusLightCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementStatusLightAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeStatusLightAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementStatusLightCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeStatusLightAttribute", writeCameraAvStreamManagementStatusLightAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementStatusLightBrightnessCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementstatusLightBrightnessCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeCameraAvStreamManagementStatusLightBrightnessCommandParams.put(
+        "value",
+        cameraAvStreamManagementstatusLightBrightnessCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementStatusLightBrightnessAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeStatusLightBrightnessAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementStatusLightBrightnessCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeStatusLightBrightnessAttribute", writeCameraAvStreamManagementStatusLightBrightnessAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementDepthSensorStatusCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementdepthSensorStatusCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeCameraAvStreamManagementDepthSensorStatusCommandParams.put(
+        "value",
+        cameraAvStreamManagementdepthSensorStatusCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementDepthSensorStatusAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeDepthSensorStatusAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementDepthSensorStatusCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeDepthSensorStatusAttribute", writeCameraAvStreamManagementDepthSensorStatusAttributeInteractionInfo);
+    writeAttributeMap.put("cameraAvStreamManagement", writeCameraAvStreamManagementInteractionInfo);
     Map<String, InteractionInfo> writeWebRTCTransportProviderInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("webRTCTransportProvider", writeWebRTCTransportProviderInteractionInfo);
     Map<String, InteractionInfo> writeWebRTCTransportRequestorInteractionInfo = new LinkedHashMap<>();

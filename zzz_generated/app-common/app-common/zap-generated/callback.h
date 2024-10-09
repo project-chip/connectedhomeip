@@ -621,6 +621,11 @@ void emberAfContentAppObserverClusterInitCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfCameraAvStreamManagementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfWebRTCTransportProviderClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -5183,6 +5188,44 @@ chip::Protocols::InteractionModel::Status MatterContentAppObserverClusterServerP
 void emberAfContentAppObserverClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Camera AV Stream Management Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfCameraAvStreamManagementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterCameraAvStreamManagementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfCameraAvStreamManagementClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterCameraAvStreamManagementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterCameraAvStreamManagementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfCameraAvStreamManagementClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // WebRTC Transport Provider Cluster
 //
 
@@ -6687,6 +6730,96 @@ bool emberAfContentControlClusterSetScheduledContentRatingThresholdCallback(
 bool emberAfContentAppObserverClusterContentAppMessageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessage::DecodableType & commandData);
+/**
+ * @brief Camera AV Stream Management Cluster AudioStreamAllocate Command callback (from client)
+ */
+bool emberAfCameraAvStreamManagementClusterAudioStreamAllocateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamAllocate::DecodableType & commandData);
+/**
+ * @brief Camera AV Stream Management Cluster AudioStreamDeallocate Command callback (from client)
+ */
+bool emberAfCameraAvStreamManagementClusterAudioStreamDeallocateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamDeallocate::DecodableType & commandData);
+/**
+ * @brief Camera AV Stream Management Cluster VideoStreamAllocate Command callback (from client)
+ */
+bool emberAfCameraAvStreamManagementClusterVideoStreamAllocateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamAllocate::DecodableType & commandData);
+/**
+ * @brief Camera AV Stream Management Cluster VideoStreamModify Command callback (from client)
+ */
+bool emberAfCameraAvStreamManagementClusterVideoStreamModifyCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamModify::DecodableType & commandData);
+/**
+ * @brief Camera AV Stream Management Cluster VideoStreamDeallocate Command callback (from client)
+ */
+bool emberAfCameraAvStreamManagementClusterVideoStreamDeallocateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamDeallocate::DecodableType & commandData);
+/**
+ * @brief Camera AV Stream Management Cluster SnapshotStreamAllocate Command callback (from client)
+ */
+bool emberAfCameraAvStreamManagementClusterSnapshotStreamAllocateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocate::DecodableType & commandData);
+/**
+ * @brief Camera AV Stream Management Cluster SnapshotStreamDeallocate Command callback (from client)
+ */
+bool emberAfCameraAvStreamManagementClusterSnapshotStreamDeallocateCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamDeallocate::DecodableType & commandData);
+/**
+ * @brief Camera AV Stream Management Cluster SetStreamPriority Command callback (from client)
+ */
+bool emberAfCameraAvStreamManagementClusterSetStreamPriorityCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetStreamPriority::DecodableType & commandData);
+/**
+ * @brief Camera AV Stream Management Cluster CaptureSnapshot Command callback (from client)
+ */
+bool emberAfCameraAvStreamManagementClusterCaptureSnapshotCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::DecodableType & commandData);
+/**
+ * @brief Camera AV Stream Management Cluster SetViewport Command callback (from client)
+ */
+bool emberAfCameraAvStreamManagementClusterSetViewportCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetViewport::DecodableType & commandData);
+/**
+ * @brief Camera AV Stream Management Cluster SetImageRotation Command callback (from client)
+ */
+bool emberAfCameraAvStreamManagementClusterSetImageRotationCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageRotation::DecodableType & commandData);
+/**
+ * @brief Camera AV Stream Management Cluster SetImageFlipHorizontal Command callback (from client)
+ */
+bool emberAfCameraAvStreamManagementClusterSetImageFlipHorizontalCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipHorizontal::DecodableType & commandData);
+/**
+ * @brief Camera AV Stream Management Cluster SetImageFlipVertical Command callback (from client)
+ */
+bool emberAfCameraAvStreamManagementClusterSetImageFlipVerticalCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipVertical::DecodableType & commandData);
+/**
+ * @brief Camera AV Stream Management Cluster SetWatermark Command callback (from client)
+ */
+bool emberAfCameraAvStreamManagementClusterSetWatermarkCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetWatermark::DecodableType & commandData);
+/**
+ * @brief Camera AV Stream Management Cluster SetOSD Command callback (from client)
+ */
+bool emberAfCameraAvStreamManagementClusterSetOSDCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetOSD::DecodableType & commandData);
 /**
  * @brief WebRTC Transport Provider Cluster SolicitOffer Command callback (from client)
  */
