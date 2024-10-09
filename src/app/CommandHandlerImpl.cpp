@@ -395,7 +395,6 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
 
         request.path                 = concretePath;
         request.subjectDescriptor    = GetSubjectDescriptor();
-        request.accessingFabricIndex = GetAccessingFabricIndex();
         request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
 
         Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
@@ -518,7 +517,6 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
 
             request.path                 = concretePath;
             request.subjectDescriptor    = GetSubjectDescriptor();
-            request.accessingFabricIndex = GetAccessingFabricIndex();
             request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
 
             Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);

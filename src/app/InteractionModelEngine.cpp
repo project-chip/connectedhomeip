@@ -1763,7 +1763,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
 
         // Fabric-scoped commands are not allowed before a specific accessing fabric is available.
         // This is mostly just during a PASE session before AddNOC.
-        if (aRequest.accessingFabricIndex == kUndefinedFabricIndex)
+        if (aRequest.GetAccessingFabricIndex() == kUndefinedFabricIndex)
         {
             return Status::UnsupportedAccess;
         }
