@@ -156,6 +156,7 @@ __all__ = [
     "AccountLogin",
     "ContentControl",
     "ContentAppObserver",
+    "ZoneManagement",
     "WebRTCTransportProvider",
     "WebRTCTransportRequestor",
     "Chime",
@@ -46535,6 +46536,462 @@ class ContentAppObserver(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = 0
+
+
+@dataclass
+class ZoneManagement(Cluster):
+    id: typing.ClassVar[int] = 0x00000550
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="supportedZoneSources", Tag=0x00000000, Type=typing.List[ZoneManagement.Enums.ZoneSourceEnum]),
+                ClusterObjectFieldDescriptor(Label="zones", Tag=0x00000001, Type=typing.Optional[typing.List[ZoneManagement.Structs.ZoneInformationStruct]]),
+                ClusterObjectFieldDescriptor(Label="timeControl", Tag=0x00000002, Type=typing.List[ZoneManagement.Structs.ZoneTriggeringTimeControlStruct]),
+                ClusterObjectFieldDescriptor(Label="sensitivity", Tag=0x00000003, Type=uint),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    supportedZoneSources: 'typing.List[ZoneManagement.Enums.ZoneSourceEnum]' = None
+    zones: 'typing.Optional[typing.List[ZoneManagement.Structs.ZoneInformationStruct]]' = None
+    timeControl: 'typing.List[ZoneManagement.Structs.ZoneTriggeringTimeControlStruct]' = None
+    sensitivity: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = None
+    acceptedCommandList: 'typing.List[uint]' = None
+    eventList: 'typing.List[uint]' = None
+    attributeList: 'typing.List[uint]' = None
+    featureMap: 'uint' = None
+    clusterRevision: 'uint' = None
+
+    class Enums:
+        class StatusCodeEnum(MatterIntEnum):
+            kZoneNotFound = 0x02
+            kZoneInUse = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 0
+
+        class ZoneEventStoppedReasonEnum(MatterIntEnum):
+            kActionStopped = 0x00
+            kTimeout = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
+        class ZoneEventTriggeredReasonEnum(MatterIntEnum):
+            kMotion = 0x00
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 1
+
+        class ZoneSourceEnum(MatterIntEnum):
+            kMfg = 0x00
+            kUser = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
+        class ZoneTypeEnum(MatterIntEnum):
+            kTwoDCARTZone = 0x00
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 1
+
+        class ZoneUseEnum(MatterIntEnum):
+            kMotion = 0x00
+            kPrivacy = 0x01
+            kFocus = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kTwoDimensionalCartesianZone = 0x1
+
+    class Structs:
+        @dataclass
+        class TwoDCartesianVertexStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="x", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="y", Tag=1, Type=uint),
+                    ])
+
+            x: 'uint' = 0
+            y: 'uint' = 0
+
+        @dataclass
+        class TwoDCartesianZoneStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="use", Tag=1, Type=ZoneManagement.Enums.ZoneUseEnum),
+                        ClusterObjectFieldDescriptor(Label="vertices", Tag=2, Type=typing.List[ZoneManagement.Structs.TwoDCartesianVertexStruct]),
+                        ClusterObjectFieldDescriptor(Label="color", Tag=3, Type=typing.Optional[str]),
+                    ])
+
+            name: 'str' = ""
+            use: 'ZoneManagement.Enums.ZoneUseEnum' = 0
+            vertices: 'typing.List[ZoneManagement.Structs.TwoDCartesianVertexStruct]' = field(default_factory=lambda: [])
+            color: 'typing.Optional[str]' = None
+
+        @dataclass
+        class ZoneInformationStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zoneID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="zoneType", Tag=1, Type=ZoneManagement.Enums.ZoneTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="zoneSource", Tag=2, Type=ZoneManagement.Enums.ZoneSourceEnum),
+                    ])
+
+            zoneID: 'uint' = 0
+            zoneType: 'ZoneManagement.Enums.ZoneTypeEnum' = 0
+            zoneSource: 'ZoneManagement.Enums.ZoneSourceEnum' = 0
+
+        @dataclass
+        class ZoneTriggeringTimeControlStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="initialDuration", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="augmentationDuration", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="maxDuration", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="blindDuration", Tag=3, Type=uint),
+                    ])
+
+            initialDuration: 'uint' = 0
+            augmentationDuration: 'uint' = 0
+            maxDuration: 'uint' = 0
+            blindDuration: 'uint' = 0
+
+    class Commands:
+        @dataclass
+        class CreateTwoDCartesianZone(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000550
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'CreateTwoDCartesianZoneResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zone", Tag=0, Type=ZoneManagement.Structs.TwoDCartesianZoneStruct),
+                    ])
+
+            zone: 'ZoneManagement.Structs.TwoDCartesianZoneStruct' = field(default_factory=lambda: ZoneManagement.Structs.TwoDCartesianZoneStruct())
+
+        @dataclass
+        class CreateTwoDCartesianZoneResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000550
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zoneID", Tag=0, Type=uint),
+                    ])
+
+            zoneID: 'uint' = 0
+
+        @dataclass
+        class UpdateTwoDCartesianZone(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000550
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zoneID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="zone", Tag=1, Type=ZoneManagement.Structs.TwoDCartesianZoneStruct),
+                    ])
+
+            zoneID: 'uint' = 0
+            zone: 'ZoneManagement.Structs.TwoDCartesianZoneStruct' = field(default_factory=lambda: ZoneManagement.Structs.TwoDCartesianZoneStruct())
+
+        @dataclass
+        class GetTwoDCartesianZone(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000550
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'GetTwoDCartesianZoneResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zoneID", Tag=0, Type=typing.Union[None, Nullable, uint]),
+                    ])
+
+            zoneID: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class GetTwoDCartesianZoneResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000550
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zones", Tag=0, Type=typing.List[ZoneManagement.Structs.TwoDCartesianZoneStruct]),
+                    ])
+
+            zones: 'typing.List[ZoneManagement.Structs.TwoDCartesianZoneStruct]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class RemoveZone(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000550
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zoneID", Tag=0, Type=uint),
+                    ])
+
+            zoneID: 'uint' = 0
+
+    class Attributes:
+        @dataclass
+        class SupportedZoneSources(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[ZoneManagement.Enums.ZoneSourceEnum])
+
+            value: 'typing.List[ZoneManagement.Enums.ZoneSourceEnum]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class Zones(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[ZoneManagement.Structs.ZoneInformationStruct]])
+
+            value: 'typing.Optional[typing.List[ZoneManagement.Structs.ZoneInformationStruct]]' = None
+
+        @dataclass
+        class TimeControl(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[ZoneManagement.Structs.ZoneTriggeringTimeControlStruct])
+
+            value: 'typing.List[ZoneManagement.Structs.ZoneTriggeringTimeControlStruct]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class Sensitivity(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class EventList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFA
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+    class Events:
+        @dataclass
+        class ZoneTriggered(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zones", Tag=0, Type=typing.List[uint]),
+                        ClusterObjectFieldDescriptor(Label="reason", Tag=1, Type=ZoneManagement.Enums.ZoneEventTriggeredReasonEnum),
+                    ])
+
+            zones: 'typing.List[uint]' = field(default_factory=lambda: [])
+            reason: 'ZoneManagement.Enums.ZoneEventTriggeredReasonEnum' = 0
+
+        @dataclass
+        class ZoneStopped(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zones", Tag=0, Type=typing.List[uint]),
+                        ClusterObjectFieldDescriptor(Label="reason", Tag=1, Type=ZoneManagement.Enums.ZoneEventStoppedReasonEnum),
+                    ])
+
+            zones: 'typing.List[uint]' = field(default_factory=lambda: [])
+            reason: 'ZoneManagement.Enums.ZoneEventStoppedReasonEnum' = 0
 
 
 @dataclass
