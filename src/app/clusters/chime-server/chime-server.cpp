@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2024 Project CHIP Authors
@@ -26,18 +25,15 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/InteractionModelEngine.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/util.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::DataModel;
-using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::Chime::Attributes;
 using chip::Protocols::InteractionModel::Status;
+using ChimeSoundStructType = Structs::ChimeSoundStruct::Type;
 
 namespace chip {
 namespace app {
@@ -45,22 +41,59 @@ namespace Clusters {
 
 ChimeServer::ChimeServer(EndpointId endpointId, ChimeDelegate & delegate) :
     AttributeAccessInterface(MakeOptional(endpointId), Chime::Id), CommandHandlerInterface(MakeOptional(endpointId), Chime::Id),
-    mDelegate(delegate)
+    mDelegate(delegate), mActiveChimeID(0), mEnabled(true)
 {
     mDelegate.SetChimeServer(this);
 }
 
 ChimeServer::~ChimeServer()
 {
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+    // null out the ref to us on the delegate
+    mDelegate.SetChimeServer(nullptr);
+
+    // unregister
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 CHIP_ERROR ChimeServer::Init()
 {
+    LoadPersistentAttributes();
+
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
+}
+
+void ChimeServer::LoadPersistentAttributes()
+{
+    // Load Active Chime ID
+    uint8_t storedActiveChimeID;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(GetEndpointId(), Chime::Id, ActiveChimeID::Id), storedActiveChimeID);
+    if (err == CHIP_NO_ERROR)
+    {
+        mActiveChimeID = storedActiveChimeID;
+    }
+    else
+    {
+        // otherwise defaults
+        ChipLogDetail(Zcl, "Chime: Unable to load the ActiveChimeID attribute from the KVS. Defaulting to %u", mActiveChimeID);
+    }
+
+    // Load Enabled
+    bool storedEnabled;
+    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(GetEndpointId(), Chime::Id, Enabled::Id),
+                                                                 storedEnabled);
+    if (err == CHIP_NO_ERROR)
+    {
+        mEnabled = storedEnabled;
+    }
+    else
+    {
+        // otherwise take the default
+        ChipLogDetail(Zcl, "Chime: Unable to load the Enabled attribute from the KVS. Defaulting to %u", mEnabled);
+    }
 }
 
 // AttributeAccessInterface
@@ -70,56 +103,100 @@ CHIP_ERROR ChimeServer::Read(const ConcreteReadAttributePath & aPath, AttributeV
 
     switch (aPath.mAttributeId)
     {
-    case InstalledChimeSounds::Id:
-        return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-            uint8_t index  = 0;
-            CHIP_ERROR err = CHIP_NO_ERROR;
-
-            // runs through all the Chime sounds available one by one
-            do
-            {
-                Chime::Structs::ChimeSoundStruct::Type chimeSound;
-                if ((err = this->mDelegate.GetChimeSoundByIndex(index, chimeSound)) == CHIP_NO_ERROR)
-                {
-                    ReturnErrorOnFailure(encoder.Encode(chimeSound));
-                    index++;
-                }
-            } while (err == CHIP_NO_ERROR);
-
-            if (err == CHIP_ERROR_NOT_FOUND)
-            {
-                return CHIP_NO_ERROR;
-            }
-            return err;
-        });
-
     case ActiveChimeID::Id:
-        return aEncoder.Encode(mDelegate.GetActiveChimeId());
-
+        ReturnErrorOnFailure(aEncoder.Encode(mActiveChimeID));
+        break;
     case Enabled::Id:
-        return aEncoder.Encode(mDelegate.GetEnabled());
+        ReturnErrorOnFailure(aEncoder.Encode(mEnabled));
+        break;
+    case InstalledChimeSounds::Id:
+        ChimeServer * cs = this;
+        CHIP_ERROR err = aEncoder.EncodeList([cs](const auto & encoder) -> CHIP_ERROR
+        {
+            return cs->EncodeSupportedChimeSounds(encoder);
+        });
+        return err;
     }
 
     return CHIP_NO_ERROR;
 }
 
+uint8_t ChimeServer::GetActiveChimeID() const
+{
+    return mActiveChimeID;
+}
+
+bool ChimeServer::GetEnabled() const
+{
+    return mEnabled;
+}
+
+// helper method to get the Chime Sounds one by one and encode into a list
+CHIP_ERROR ChimeServer::EncodeSupportedChimeSounds(const AttributeValueEncoder::ListEncodeHelper & encoder)
+{
+
+    for (uint8_t i = 0; true; i++)
+    {
+        ChimeSoundStructType chimeSound;
+
+        // Get the chime sound
+        // We pass in a MutableCharSpan to avoid any ownership issues - Delegate needs to use
+        // CopyCharSpanToMutableCharSpan to copy data in
+        char buffer[kMaxChimeSoundNameSize];
+        MutableCharSpan name(buffer);
+        auto err = mDelegate.GetChimeSoundByIndex(i, chimeSound.chimeID, name);
+
+        // return if we've run off the end of the Chime Sound List on the delegate
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        ReturnErrorOnFailure(err);
+
+        // set the name on the struct
+        chimeSound.name = name;
+
+        // and now encode the struct
+        ReturnErrorOnFailure(encoder.Encode(chimeSound));
+    }
+    return CHIP_NO_ERROR;
+}
+
+// helper method to check if the chimeID param is supported by the delegate
+bool ChimeServer::IsSupportedChimeID(uint8_t chimeID)
+{
+    uint8_t supportedChimeID;
+    for (uint8_t i = 0; mDelegate.GetChimeIDByIndex(i, supportedChimeID) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; i++)
+    {
+        if (supportedChimeID == chimeID)
+        {
+            return true;
+        }
+    }
+
+    ChipLogDetail(Zcl, "Cannot find a supported ChimeID with value %u", chimeID);
+    return false;
+}
+
 CHIP_ERROR ChimeServer::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     VerifyOrDie(aPath.mClusterId == Chime::Id);
+    Status status;
 
     switch (aPath.mAttributeId)
     {
     case ActiveChimeID::Id: {
         uint8_t newValue;
         ReturnErrorOnFailure(aDecoder.Decode(newValue));
-        ReturnErrorOnFailure(mDelegate.SetActiveChimeId(newValue));
-        return CHIP_NO_ERROR;
+        status = SetActiveChimeID(newValue);
+        return StatusIB(status).ToChipError();
     }
     case Enabled::Id: {
         bool newValue;
         ReturnErrorOnFailure(aDecoder.Decode(newValue));
-        ReturnErrorOnFailure(mDelegate.SetEnabled(newValue));
-        return CHIP_NO_ERROR;
+        status = SetEnabled(newValue);
+        return StatusIB(status).ToChipError();
     }
 
     default:
@@ -128,28 +205,47 @@ CHIP_ERROR ChimeServer::Write(const ConcreteDataAttributePath & aPath, Attribute
     }
 }
 
-CHIP_ERROR ChimeServer::SetActiveChimeId(uint8_t soundId)
+Status ChimeServer::SetActiveChimeID(uint8_t chimeID)
 {
-    uint8_t currentSoundId = mDelegate.GetActiveChimeId();
-    bool activeIdChanged   = !(currentSoundId == soundId);
+    if (!IsSupportedChimeID(chimeID))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
 
-    VerifyOrReturnError(activeIdChanged, CHIP_NO_ERROR);
-    VerifyOrDie(mDelegate.SetActiveChimeId(soundId) == CHIP_NO_ERROR);
-    MatterReportingAttributeChangeCallback(GetEndpointId(), Chime::Id, ActiveChimeID::Id);
+    bool activeIDChanged = !(mActiveChimeID == chimeID);
+    if (activeIDChanged)
+    {
+        mActiveChimeID = chimeID;
 
-    return CHIP_NO_ERROR;
+        // Write new value to persistent storage.
+        auto endpointId = GetEndpointId();
+        ConcreteAttributePath path = ConcreteAttributePath(endpointId, Chime::Id, ActiveChimeID::Id);
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mActiveChimeID);
+
+        // and mark as dirty
+        MatterReportingAttributeChangeCallback(path);
+    }
+    return Protocols::InteractionModel::Status::Success;
 }
 
-CHIP_ERROR ChimeServer::SetEnabled(bool enabled)
+Status ChimeServer::SetEnabled(bool Enabled)
 {
-    bool currentlyEnabled = mDelegate.GetEnabled();
-    bool enableChanged    = !(currentlyEnabled == enabled);
+    bool enableChanged = !(mEnabled == Enabled);
 
-    VerifyOrReturnError(enableChanged, CHIP_NO_ERROR);
-    VerifyOrDie(mDelegate.SetEnabled(enabled) == CHIP_NO_ERROR);
-    MatterReportingAttributeChangeCallback(GetEndpointId(), Chime::Id, Enabled::Id);
+    if (enableChanged)
+    {
+        mEnabled = Enabled;
 
-    return CHIP_NO_ERROR;
+        // Write new value to persistent storage.
+        auto endpointId = GetEndpointId();
+        ConcreteAttributePath path = ConcreteAttributePath(endpointId, Chime::Id, Enabled::Id);
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mEnabled);
+
+        // and mark as dirty
+        MatterReportingAttributeChangeCallback(path);
+    }
+
+    return Protocols::InteractionModel::Status::Success;
 }
 
 void ChimeServer::InvokeCommand(HandlerContext & ctx)

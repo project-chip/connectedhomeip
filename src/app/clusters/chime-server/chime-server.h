@@ -22,10 +22,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/InteractionModelEngine.h>
-#include <app/MessageDef/StatusIB.h>
 #include <app/reporting/reporting.h>
-#include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -38,26 +35,86 @@ class ChimeDelegate;
 class ChimeServer : private AttributeAccessInterface, private CommandHandlerInterface
 {
 public:
+    /**
+     * Creates a chime server instance. The Init() function needs to be called for this instance to be registered and
+     * called by the interaction model at the appropriate times.
+     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param aDelegate A reference to the delegate to be used by this server.
+     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+     */
     ChimeServer(EndpointId endpointId, ChimeDelegate & delegate);
     ~ChimeServer();
 
+    /**
+     * Initialise the chime server instance.
+     * @return Returns an error  if the CommandHandler or AttributeHandler registration fails.
+     */
     CHIP_ERROR Init();
+
+    // Attribute Setters
+    /**
+     * Sets the ActiveChimeID attribute. Note, this also handles writing the new value into non-volatile storage.
+     * @param chimeSoundID The value to which the ActiveChimeID  is to be set.
+     * @return Returns a ConstraintError if the chimeSoundID value is not valid. Returns Success otherwise.
+     */
+    Protocols::InteractionModel::Status SetActiveChimeID(uint8_t chimeSoundID);
+
+    /**
+     * Sets the Enabled attribute. Note, this also handles writing the new value into non-volatile storage.
+     * @param Enabled The value to which the Enabled  is to be set.
+     */
+    Protocols::InteractionModel::Status SetEnabled(bool Enabled);
+
+    // Attribute Getters
+    /**
+     * @return The Current ActiveChimeID.
+     */
+    uint8_t GetActiveChimeID() const;
+
+    /**
+     * @return The Enabled attribute..
+     */
+    bool GetEnabled() const;
+
+    /**
+     * @return The endpoint ID.
+     */
+    EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
+
+    // Cluster constants from the spec
+    static constexpr uint8_t kMaxChimeSoundNameSize = 48;
+
+    // List Change Reporting
+    /**
+     * Reports that the contents of the InstalledChimeSounds attribute have changed.
+     * The device SHALL call this method whenever it changes the list of installed chime sounds.
+     */
+    void ReportInstalledChimeSoundsChange();
 
 private:
     ChimeDelegate & mDelegate;
 
-    EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
+    // Attribute local storage
+    uint8_t mActiveChimeID;
+    bool mEnabled;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-    CHIP_ERROR SetActiveChimeId(uint8_t chimeSoundId);
-    CHIP_ERROR SetEnabled(bool enabled);
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
-
     void HandlePlayChimeSound(HandlerContext & ctx, const Chime::Commands::PlayChimeSound::DecodableType & req);
+
+    // Helpers
+    // Loads all the persistent attributes from the KVS.
+    void LoadPersistentAttributes();
+
+    // Checks if the chimeID is supported by the delegate
+    bool IsSupportedChimeID(uint8_t chimeID);
+
+    // Encodes all Installed Chime Sounds
+    CHIP_ERROR EncodeSupportedChimeSounds(const AttributeValueEncoder::ListEncodeHelper & encoder);
 };
 
 /** @brief
@@ -70,23 +127,33 @@ public:
 
     virtual ~ChimeDelegate() = default;
 
-    // Get Attribute Methods
+    /**
+     * Get the installed  chime sounds.
+     * @param index The index of the chime sound to be returned. It is assumed that chime sounds are indexable from 0 and with no
+     * gaps.
+     * @param chimeID a reference to the uint8_t variable that is to contain the ChimeID value.
+     * @param name  A reference to the mutable char span which will be mutated to receive the chime sound name on success. Use
+     * CopyCharSpanToMutableCharSpan to copy into the MutableCharSpan.
+     * @return Returns a CHIP_NO_ERROR if there was no error and the chime sound details were returned successfully,
+     * CHIP_ERROR_NOT_FOUND if the index in beyond the list of available chime sounds.
+     *
+     * Note: This is used by the SDK to populate the InstalledChimeSounds attribute. If the contents of this list change,
+     * the device SHALL call the Instance's ReportInstalledChimeSoundsChange method to report that this attribute has changed.
+     */
+    virtual CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name) = 0;
 
     /**
-     *   Get the chime sounds.
-     *   @param index The index of the chime sound to be returned. It is assumed that chime sounds are indexable from 0 and with no
+     * Get the installed  chime sound IDs
+     * @param index The index of the chime ID to be returned. It is assumed that chime sounds are indexable from 0 and with no
      * gaps.
-     *   @param chimeSound A reference to receive the chime sound struct on success.
-     *   @return Returns a CHIP_NO_ERROR if there was no error and the chime sound was returned successfully,
-     *   CHIP_ERROR_NOT_FOUND if the index in beyond the list of available chime sounds.
+     * @param chimeID a reference to the uint8_t variable that is to contain the ChimeID value.
+     * @return Returns a CHIP_NO_ERROR if there was no error and the ChimeID was returned successfully,
+     * CHIP_ERROR_NOT_FOUND if the index in beyond the list of available chime sounds.
+     *
+     * Note: This is used by the SDK to help populate the InstalledChimeSounds attribute. If the contents of this list change,
+     * the device SHALL call the Instance's ReportInstalledChimeSoundsChange method to report that this attribute has changed.
      */
-    virtual CHIP_ERROR GetChimeSoundByIndex(uint8_t index, Chime::Structs::ChimeSoundStruct::Type & chimeSound) = 0;
-    virtual uint8_t GetActiveChimeId()                                                                          = 0;
-    virtual bool GetEnabled()                                                                                   = 0;
-
-    // Set Attribute Methods
-    virtual CHIP_ERROR SetActiveChimeId(uint8_t chimeSoundId) = 0;
-    virtual CHIP_ERROR SetEnabled(bool enabled)               = 0;
+    virtual CHIP_ERROR GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID) = 0;
 
     // Commands
     /**
@@ -96,14 +163,13 @@ public:
      */
     virtual Protocols::InteractionModel::Status playChimeSound() = 0;
 
-private:
+protected:
     friend class ChimeServer;
 
     ChimeServer * mChimeServer = nullptr;
 
+    // sets the Chime Server pointer
     void SetChimeServer(ChimeServer * chimeServer) { mChimeServer = chimeServer; }
-
-protected:
     ChimeServer * GetChimeServer() const { return mChimeServer; }
 };
 
