@@ -22,6 +22,7 @@
  *          for Silabs platforms using the Silicon Labs SDK.
  */
 /* this file behaves like a config.h, comes first */
+#include <cmsis_os2.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -304,7 +305,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     // When called from an RPC, the following reset occurs before the RPC can respond,
     // which breaks tests (because it looks like the RPC hasn't successfully completed).
     // Block the task for 500 ms before the reset occurs to allow RPC response to be sent
-    vTaskDelay(pdMS_TO_TICKS(500));
+    osDelay(pdMS_TO_TICKS(500));
 
     NVIC_SystemReset();
 }

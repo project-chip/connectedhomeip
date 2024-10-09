@@ -12724,6 +12724,325 @@ public static class ContentControlClusterRatingNameStruct {
     return output.toString();
   }
 }
+public static class ZoneManagementClusterTwoDCartesianVertexStruct {
+  public Integer x;
+  public Integer y;
+  private static final long X_ID = 0L;
+  private static final long Y_ID = 1L;
+
+  public ZoneManagementClusterTwoDCartesianVertexStruct(
+    Integer x,
+    Integer y
+  ) {
+    this.x = x;
+    this.y = y;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(X_ID, new UIntType(x)));
+    values.add(new StructElement(Y_ID, new UIntType(y)));
+
+    return new StructType(values);
+  }
+
+  public static ZoneManagementClusterTwoDCartesianVertexStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer x = null;
+    Integer y = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == X_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          x = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == Y_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          y = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ZoneManagementClusterTwoDCartesianVertexStruct(
+      x,
+      y
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ZoneManagementClusterTwoDCartesianVertexStruct {\n");
+    output.append("\tx: ");
+    output.append(x);
+    output.append("\n");
+    output.append("\ty: ");
+    output.append(y);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ZoneManagementClusterTwoDCartesianZoneStruct {
+  public String name;
+  public Integer use;
+  public ArrayList<ChipStructs.ZoneManagementClusterTwoDCartesianVertexStruct> vertices;
+  public Optional<String> color;
+  private static final long NAME_ID = 0L;
+  private static final long USE_ID = 1L;
+  private static final long VERTICES_ID = 2L;
+  private static final long COLOR_ID = 3L;
+
+  public ZoneManagementClusterTwoDCartesianZoneStruct(
+    String name,
+    Integer use,
+    ArrayList<ChipStructs.ZoneManagementClusterTwoDCartesianVertexStruct> vertices,
+    Optional<String> color
+  ) {
+    this.name = name;
+    this.use = use;
+    this.vertices = vertices;
+    this.color = color;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(NAME_ID, new StringType(name)));
+    values.add(new StructElement(USE_ID, new UIntType(use)));
+    values.add(new StructElement(VERTICES_ID, ArrayType.generateArrayType(vertices, (elementvertices) -> elementvertices.encodeTlv())));
+    values.add(new StructElement(COLOR_ID, color.<BaseTLVType>map((nonOptionalcolor) -> new StringType(nonOptionalcolor)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ZoneManagementClusterTwoDCartesianZoneStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String name = null;
+    Integer use = null;
+    ArrayList<ChipStructs.ZoneManagementClusterTwoDCartesianVertexStruct> vertices = null;
+    Optional<String> color = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          name = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == USE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          use = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == VERTICES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          vertices = castingValue.map((elementcastingValue) -> ChipStructs.ZoneManagementClusterTwoDCartesianVertexStruct.decodeTlv(elementcastingValue));
+        }
+      } else if (element.contextTagNum() == COLOR_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          color = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new ZoneManagementClusterTwoDCartesianZoneStruct(
+      name,
+      use,
+      vertices,
+      color
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ZoneManagementClusterTwoDCartesianZoneStruct {\n");
+    output.append("\tname: ");
+    output.append(name);
+    output.append("\n");
+    output.append("\tuse: ");
+    output.append(use);
+    output.append("\n");
+    output.append("\tvertices: ");
+    output.append(vertices);
+    output.append("\n");
+    output.append("\tcolor: ");
+    output.append(color);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ZoneManagementClusterZoneInformationStruct {
+  public Integer zoneID;
+  public Integer zoneType;
+  public Integer zoneSource;
+  private static final long ZONE_ID_ID = 0L;
+  private static final long ZONE_TYPE_ID = 1L;
+  private static final long ZONE_SOURCE_ID = 2L;
+
+  public ZoneManagementClusterZoneInformationStruct(
+    Integer zoneID,
+    Integer zoneType,
+    Integer zoneSource
+  ) {
+    this.zoneID = zoneID;
+    this.zoneType = zoneType;
+    this.zoneSource = zoneSource;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ZONE_ID_ID, new UIntType(zoneID)));
+    values.add(new StructElement(ZONE_TYPE_ID, new UIntType(zoneType)));
+    values.add(new StructElement(ZONE_SOURCE_ID, new UIntType(zoneSource)));
+
+    return new StructType(values);
+  }
+
+  public static ZoneManagementClusterZoneInformationStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer zoneID = null;
+    Integer zoneType = null;
+    Integer zoneSource = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ZONE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          zoneID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ZONE_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          zoneType = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ZONE_SOURCE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          zoneSource = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ZoneManagementClusterZoneInformationStruct(
+      zoneID,
+      zoneType,
+      zoneSource
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ZoneManagementClusterZoneInformationStruct {\n");
+    output.append("\tzoneID: ");
+    output.append(zoneID);
+    output.append("\n");
+    output.append("\tzoneType: ");
+    output.append(zoneType);
+    output.append("\n");
+    output.append("\tzoneSource: ");
+    output.append(zoneSource);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ZoneManagementClusterZoneTriggeringTimeControlStruct {
+  public Integer initialDuration;
+  public Integer augmentationDuration;
+  public Long maxDuration;
+  public Integer blindDuration;
+  private static final long INITIAL_DURATION_ID = 0L;
+  private static final long AUGMENTATION_DURATION_ID = 1L;
+  private static final long MAX_DURATION_ID = 2L;
+  private static final long BLIND_DURATION_ID = 3L;
+
+  public ZoneManagementClusterZoneTriggeringTimeControlStruct(
+    Integer initialDuration,
+    Integer augmentationDuration,
+    Long maxDuration,
+    Integer blindDuration
+  ) {
+    this.initialDuration = initialDuration;
+    this.augmentationDuration = augmentationDuration;
+    this.maxDuration = maxDuration;
+    this.blindDuration = blindDuration;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(INITIAL_DURATION_ID, new UIntType(initialDuration)));
+    values.add(new StructElement(AUGMENTATION_DURATION_ID, new UIntType(augmentationDuration)));
+    values.add(new StructElement(MAX_DURATION_ID, new UIntType(maxDuration)));
+    values.add(new StructElement(BLIND_DURATION_ID, new UIntType(blindDuration)));
+
+    return new StructType(values);
+  }
+
+  public static ZoneManagementClusterZoneTriggeringTimeControlStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer initialDuration = null;
+    Integer augmentationDuration = null;
+    Long maxDuration = null;
+    Integer blindDuration = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == INITIAL_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          initialDuration = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == AUGMENTATION_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          augmentationDuration = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MAX_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          maxDuration = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == BLIND_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          blindDuration = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ZoneManagementClusterZoneTriggeringTimeControlStruct(
+      initialDuration,
+      augmentationDuration,
+      maxDuration,
+      blindDuration
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ZoneManagementClusterZoneTriggeringTimeControlStruct {\n");
+    output.append("\tinitialDuration: ");
+    output.append(initialDuration);
+    output.append("\n");
+    output.append("\taugmentationDuration: ");
+    output.append(augmentationDuration);
+    output.append("\n");
+    output.append("\tmaxDuration: ");
+    output.append(maxDuration);
+    output.append("\n");
+    output.append("\tblindDuration: ");
+    output.append(blindDuration);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class WebRTCTransportProviderClusterICEServerStruct {
   public ArrayList<String> urls;
   public Optional<String> username;
