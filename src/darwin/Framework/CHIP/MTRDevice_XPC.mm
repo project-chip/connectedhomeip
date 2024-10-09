@@ -283,17 +283,17 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
                 completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
             });
         }] deviceController:[[self deviceController] uniqueIdentifier]
-                     nodeID:[self nodeID]
-          downloadLogOfType:type
-                    timeout:timeout
-                 completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
-            dispatch_async(queue, ^{
-                completion(url, error);
-                if (url) {
-                    [[NSFileManager defaultManager] removeItemAtPath:url.path error:nil];
-                }
-            });
-        }];
+                       nodeID:[self nodeID]
+            downloadLogOfType:type
+                      timeout:timeout
+                   completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+                       dispatch_async(queue, ^{
+                           completion(url, error);
+                           if (url) {
+                               [[NSFileManager defaultManager] removeItemAtPath:url.path error:nil];
+                           }
+                       });
+                   }];
     } @catch (NSException * exception) {
         MTR_LOG_ERROR("Exception sending XPC messsage: %@", exception);
         dispatch_async(queue, ^{
