@@ -32,7 +32,7 @@ menu "CHIP Core"
             default 8
             help
                 The maximum number of simultaneously active CHIP exchange contexts.
-
+                                           
                 An exchange context object is used to track the state of an ongoing CHIP message
                 exchange (conversation) with a peer, e.g. a cloud service, a mobile application, or
                 another device.
@@ -409,13 +409,6 @@ menu "CHIP Device Layer"
             default n
             help
                 Enables or Disables ICD server
-
-        config ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
-            bool "Enforce SIT Slow Polling Max value to 15 seconds"
-            depends on ENABLE_ICD_SERVER
-            default n
-            help
-                Set to true to enforce SIT Slow Polling Max value to 15seconds
 
         config ICD_REPORT_ON_ACTIVE_MODE
             bool "Emit a report on entering active mode"

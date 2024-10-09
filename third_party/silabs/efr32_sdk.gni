@@ -415,6 +415,17 @@ template("efr32_sdk") {
       _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
     }
 
+    if (sl_enable_si70xx_sensor) {
+      _include_dirs += [
+        "${efr32_sdk_root}/platform/driver/i2cspm/inc",
+        "${efr32_sdk_root}/app/bluetooth/common/sensor_rht",
+        "${efr32_sdk_root}/app/bluetooth/common/sensor_rht/config",
+        "${efr32_sdk_root}/hardware/driver/si70xx/inc",
+        "${efr32_sdk_root}/app/bluetooth/common/sensor_select",
+        "${efr32_sdk_root}/platform/common/config",
+      ]
+    }
+
     # Note that we're setting the mbedTLS and PSA configuration files through a
     # define. This means the build system by default does not pick up changes in
     # the content of these, only when changing the filename itself.
@@ -670,6 +681,12 @@ template("efr32_sdk") {
 
     if (sl_use_subscription_syncing) {
       defines += [ "CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED=1" ]
+    }
+
+    if (sl_enable_si70xx_sensor) {
+      defines += [ "SL_MATTER_USE_SI70XX_SENSOR=1" ]
+    } else {
+      defines += [ "SL_MATTER_USE_SI70XX_SENSOR=0" ]
     }
 
     cflags = []
@@ -1065,6 +1082,16 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_sysrtc.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
+      ]
+    }
+
+    if (sl_enable_si70xx_sensor) {
+      sources += [
+        "${efr32_sdk_root}/hardware/driver/si70xx/src/sl_si70xx.c",
+        "${efr32_sdk_root}/platform/common/src/sl_status.c",
+        "${efr32_sdk_root}/platform/driver/i2cspm/src/sl_i2cspm.c",
+        "${efr32_sdk_root}/platform/emlib/src/em_i2c.c",
+        "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_i2cspm_init.c",
       ]
     }
 

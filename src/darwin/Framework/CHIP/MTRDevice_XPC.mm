@@ -49,7 +49,6 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
-#import "MTROperationalCredentialsDelegate.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "MTRServerEndpoint_Internal.h"
@@ -251,7 +250,8 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
 
     @try {
         [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-            MTR_LOG_ERROR("Error: %@", error);
+            MTR_LOG_ERROR("Invoke error: %@", error);
+            completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
         }] deviceController:[[self deviceController] uniqueIdentifier]
                                  nodeID:[self nodeID]
             invokeCommandWithEndpointID:endpointID
@@ -264,7 +264,8 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
             serverSideProcessingTimeout:serverSideProcessingTimeout
                              completion:completion];
     } @catch (NSException * exception) {
-        MTR_LOG_ERROR("Exception sending XPC messsage: %@", exception);
+        MTR_LOG_ERROR("Exception sending XPC message: %@", exception);
+        completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
     }
 }
 

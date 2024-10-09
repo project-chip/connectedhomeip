@@ -120,6 +120,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/resource-monitoring-cluster.x
 load "../src/app/zap-templates/zcl/data-model/chip/sample-mei-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/electrical-energy-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/electrical-power-measurement-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/zone-management-cluster.xml";
 
 all endpoints {
     // These attributes follow a different code path and do not have to be
