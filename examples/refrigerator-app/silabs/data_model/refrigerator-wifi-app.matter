@@ -1663,7 +1663,6 @@ endpoint 2 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    callback attribute tagList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -1694,7 +1693,6 @@ endpoint 3 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    callback attribute tagList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
