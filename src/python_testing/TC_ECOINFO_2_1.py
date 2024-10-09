@@ -46,7 +46,7 @@ import tempfile
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
-from chip.testing.apps import AppServerSubprocess
+from matter_testing_support.apps import AppServerSubprocess
 from chip.tlv import uint
 from matter_testing_support.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
