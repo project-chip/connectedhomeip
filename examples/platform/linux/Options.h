@@ -87,10 +87,12 @@ struct LinuxDeviceOptions
     int32_t subscriptionCapacity                   = CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
     int32_t subscriptionResumptionRetryIntervalSec = -1;
 #endif
+
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     chip::Optional<std::vector<chip::Access::AccessRestrictionProvider::Entry>> commissioningArlEntries;
     chip::Optional<std::vector<chip::Access::AccessRestrictionProvider::Entry>> arlEntries;
 #endif
+
     chip::Optional<std::string> vendorName;
     chip::Optional<std::string> productName;
     chip::Optional<std::string> hardwareVersionString;
