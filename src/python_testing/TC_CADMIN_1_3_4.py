@@ -155,7 +155,8 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
                      "DUT_CE opens its Commissioning window to allow a new commissioning"),
             TestStep(13, "TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 12",
                      "Since DUT_CE was already commissioned by TH_CR1 in step 1, AddNOC fails with NOCResponse with StatusCode field set to FabricConflict (9)"),
-            TestStep(14, "", "")
+            TestStep(14, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx", 
+                     "TH_CR1 removes TH_CR2 fabric using th2_idx")
         ]
 
     @async_test_body
