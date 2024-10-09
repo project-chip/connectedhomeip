@@ -375,7 +375,7 @@ jobs:
                   scripts/build_python_device.sh --chip_detail_logging true
 
     build_darwin:
-        name: Build on Darwin (clang, python_lib, simulated)
+        name: Build on Darwin (clang, simulated)
         runs-on: macos-13
         if: github.actor != 'restyled-io[bot]'
 
@@ -402,27 +402,20 @@ jobs:
                   CHIP_ROOT_PATH=examples/placeholder/linux
                   CHIP_ROOT_PATH="$CHIP_ROOT_PATH" BUILD_TYPE="$BUILD_TYPE" scripts/build/gn_gen.sh --args="$GN_ARGS"
                   scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
-            - name: Setup Build, Run Build and Run Tests
+            - name: Setup Build, Run Build and Run Tests (asan + target_os=all)
               # We can't enable leak checking here in LSAN_OPTIONS, because on
               # Darwin that's only supported with a new enough clang, and we're
               # not building with the pigweed clang here.
+              env:
+                  BUILD_TYPE: default
               run: |
-                  for BUILD_TYPE in default python_lib; do
-                      case $BUILD_TYPE in
-                          # We want to build various standalone example apps
-                          # (similar to what examples-linux-standalone.yaml
-                          # does), so use target_os="all" to get those picked
-                          # up as part of the "unified" build.  But then to
-                          # save CI resources we want to exclude the
-                          # "host clang" build, which uses the pigweed
-                          # clang.
-                          "default") GN_ARGS='target_os="all" is_asan=true enable_host_clang_build=false';;
-                      esac
-                      BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS chip_data_model_check_die_on_failure=true" --export-compile-commands
-                      scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
-                      BUILD_TYPE=$BUILD_TYPE scripts/tests/gn_tests.sh
-                  done
-            - name: Ensure codegen is done for sanitize
+                  # We want to build various standalone example apps similar to what examples-linux-standalone.yaml
+                  # does), so use target_os="all" to get those picked up as part of the "unified" build.  But then
+                  # to save CI resources we want to exclude the "host clang" build, which uses the pigweed clang.
+                  scripts/build/gn_gen.sh --args='target_os="all" is_asan=true enable_host_clang_build=false chip_data_model_check_die_on_failure=true' --export-compile-commands
+                  scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
+                  scripts/tests/gn_tests.sh
+            - name: Ensure codegen is done for default
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/default"
             - name: Clang-tidy validation

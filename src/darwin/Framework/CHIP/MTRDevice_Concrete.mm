@@ -757,7 +757,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }
         if ([self _deviceUsesThread]) {
             MTR_LOG(" => %@ - device is a thread device, scheduling in pool", self);
+            mtr_weakify(self);
             [self _scheduleSubscriptionPoolWork:^{
+                mtr_strongify(self);
                 [self->_deviceController asyncDispatchToMatterQueue:^{
                     std::lock_guard lock(self->_lock);
                     [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and scheduled subscription is happening", reason]];
@@ -1165,10 +1167,19 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         return;
     }
 
+    mtr_weakify(self);
     dispatch_block_t workBlockToQueue = ^{
+        mtr_strongify(self);
+        if (nil == self) {
+            // This block may be delayed by a specified number of nanoseconds, potentially running after the device is deallocated.
+            // If so, MTRAsyncWorkItem::initWithQueue will assert on a nil queue, which will cause a crash.
+            return;
+        }
+
         // In the case where a resubscription triggering event happened and already established, running the work block should result in a no-op
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
+            mtr_strongify(self);
             MTR_LOG("%@ - work item is ready to attempt pooled subscription", self);
             os_unfair_lock_lock(&self->_lock);
 #ifdef DEBUG
@@ -1246,7 +1257,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // Use the existing _triggerResubscribeWithReason mechanism, which does the right checks when
     // this block is run -- if other triggering events had happened, this would become a no-op.
+    mtr_weakify(self);
     auto resubscriptionBlock = ^{
+        mtr_strongify(self);
         [self->_deviceController asyncDispatchToMatterQueue:^{
             [self _triggerResubscribeWithReason:@"ResubscriptionNeeded timer fired" nodeLikelyReachable:NO];
         } errorHandler:^(NSError * _Nonnull error) {
@@ -1357,7 +1370,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // Call _reattemptSubscriptionNowIfNeededWithReason when timer fires - if subscription is
     // in a better state at that time this will be a no-op.
+    mtr_weakify(self);
     auto resubscriptionBlock = ^{
+        mtr_strongify(self);
         [self->_deviceController asyncDispatchToMatterQueue:^{
             std::lock_guard lock(self->_lock);
             [self _reattemptSubscriptionNowIfNeededWithReason:@"got subscription reset"];
@@ -2395,8 +2410,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            NSNumber * _Nullable retryDelay) {
                            if (error != nil) {
                                MTR_LOG_ERROR("%@ getSessionForNode error %@", self, error);
-                               [self _handleSubscriptionError:error];
-                               [self _handleSubscriptionReset:retryDelay];
+                               [self->_deviceController asyncDispatchToMatterQueue:^{
+                                   [self _handleSubscriptionError:error];
+                                   [self _handleSubscriptionReset:retryDelay];
+                               } errorHandler:nil];
                                return;
                            }
 
