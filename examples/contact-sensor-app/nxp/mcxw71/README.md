@@ -3,15 +3,15 @@
 For generic information related to contact sensor application, please see the
 [common README](../README.md).
 
-- [Matter `MCXW71` Contact Sensor Example Application](#matter-mcxw71-contact-sensor-example-application)
-  - [Introduction](#introduction)
-  - [Device UI](#device-ui)
-  - [Building](#building)
-  - [Flashing](#flashing)
-    - [Flashing the `NBU` image](#flashing-the-nbu-image)
-    - [Flashing the host image](#flashing-the-host-image)
-  - [Debugging](#debugging)
-  - [OTA](#ota)
+-   [Matter `MCXW71` Contact Sensor Example Application](#matter-mcxw71-contact-sensor-example-application)
+    -   [Introduction](#introduction)
+    -   [Device UI](#device-ui)
+    -   [Building](#building)
+    -   [Flashing](#flashing)
+        -   [Flashing the `NBU` image](#flashing-the-nbu-image)
+        -   [Flashing the host image](#flashing-the-host-image)
+    -   [Debugging](#debugging)
+    -   [OTA](#ota)
 
 ## Introduction
 

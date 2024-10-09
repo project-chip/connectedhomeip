@@ -3,18 +3,18 @@
 For generic information related to on/off light application, please see the
 [common README](../README.md).
 
-- [Matter K32W1 Lighting Example Application](#matter-k32w1-lighting-example-application)
-  - [Introduction](#introduction)
-  - [Device UI](#device-ui)
-  - [Building](#building)
-    - [`SMU2` Memory](#smu2-memory)
-    - [LED PWM](#led-pwm)
-  - [Flashing](#flashing)
-    - [Flashing the `NBU` image](#flashing-the-nbu-image)
-    - [Flashing the host image](#flashing-the-host-image)
-  - [Debugging](#debugging)
-  - [Running RPC console](#running-rpc-console)
-  - [OTA](#ota)
+-   [Matter K32W1 Lighting Example Application](#matter-k32w1-lighting-example-application)
+    -   [Introduction](#introduction)
+    -   [Device UI](#device-ui)
+    -   [Building](#building)
+        -   [`SMU2` Memory](#smu2-memory)
+        -   [LED PWM](#led-pwm)
+    -   [Flashing](#flashing)
+        -   [Flashing the `NBU` image](#flashing-the-nbu-image)
+        -   [Flashing the host image](#flashing-the-host-image)
+    -   [Debugging](#debugging)
+    -   [Running RPC console](#running-rpc-console)
+    -   [OTA](#ota)
 
 ## Introduction
 

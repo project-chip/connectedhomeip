@@ -3,16 +3,16 @@
 For generic information related to door lock application, please see the
 [common README](../README.md).
 
-- [Matter K32W1 Door Lock Example Application](#matter-k32w1-door-lock-example-application)
-  - [Introduction](#introduction)
-  - [Device UI](#device-ui)
-  - [Building](#building)
-  - [Flashing](#flashing)
-    - [Flashing the `NBU` image](#flashing-the-nbu-image)
-    - [Flashing the host image](#flashing-the-host-image)
-  - [Debugging](#debugging)
-  - [OTA](#ota)
-  - [Multiple BLE connections](#multiple-ble-connections)
+-   [Matter K32W1 Door Lock Example Application](#matter-k32w1-door-lock-example-application)
+    -   [Introduction](#introduction)
+    -   [Device UI](#device-ui)
+    -   [Building](#building)
+    -   [Flashing](#flashing)
+        -   [Flashing the `NBU` image](#flashing-the-nbu-image)
+        -   [Flashing the host image](#flashing-the-host-image)
+    -   [Debugging](#debugging)
+    -   [OTA](#ota)
+    -   [Multiple BLE connections](#multiple-ble-connections)
 
 ## Introduction
 
