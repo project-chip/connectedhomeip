@@ -524,7 +524,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
         jlong stayActiveMsec = chip::JniReferences::GetInstance().LongToPrimitive(jStayActiveMsec);
         if (!chip::CanCastTo<uint32_t>(stayActiveMsec))
         {
-            ChipLogError(Controller, "Failed to process stayActiveMsec in %s.", __func__);
+            ChipLogError(Controller, "Failed to process stayActiveMsec in %s since this is not a valid 32-bit integer.", __func__);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         params.SetICDStayActiveDurationMsec(static_cast<uint32_t>(stayActiveMsec));
