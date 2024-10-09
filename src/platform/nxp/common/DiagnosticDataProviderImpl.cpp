@@ -68,7 +68,7 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
     size_t freeHeapSize;
-    freeHeapSize    = GetFreeHeapSize();
+    freeHeapSize = GetFreeHeapSize();
 
     currentHeapFree = static_cast<uint64_t>(freeHeapSize);
     return CHIP_NO_ERROR;
@@ -90,7 +90,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
 {
     size_t highWatermarkHeapSize;
 
-    highWatermarkHeapSize    = HEAP_SIZE - GetMinimumEverFreeHeapSize();
+    highWatermarkHeapSize = HEAP_SIZE - GetMinimumEverFreeHeapSize();
 
     currentHeapHighWatermark = static_cast<uint64_t>(highWatermarkHeapSize);
     return CHIP_NO_ERROR;
