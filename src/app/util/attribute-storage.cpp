@@ -33,6 +33,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <app/util/ember-io-storage.h>
 
 using chip::Protocols::InteractionModel::Status;
 
@@ -291,6 +292,27 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
         }
     }
 
+    for (uint8_t i = 0; ep && (i < ep->clusterCount); i++) {
+        if (!ep->cluster) {
+            continue;
+        }
+
+        const EmberAfCluster * cluster = &(ep->cluster[i]);
+        if (!cluster->attributes) {
+            continue;
+        }
+
+        for (uint16_t j = 0; j < cluster->attributeCount; j++) {
+            const EmberAfAttributeMetadata * attr = &(cluster->attributes[j]);
+            if (emberAfAttributeSize(attr) > gEmberAttributeIOBufferSpan.size()) {
+                ChipLogError(
+                    DataManagement,
+                    "Attribute %u (id=" ChipLogFormatMEI ") of Cluster %u (id=" ChipLogFormatMEI ") too large",
+                    j, ChipLogValueMEI(attr->attributeId), i, ChipLogValueMEI(cluster->clusterId));
+                return CHIP_ERROR_NO_MEMORY;
+            }
+        }
+    }
     emAfEndpoints[index].endpoint       = id;
     emAfEndpoints[index].deviceTypeList = deviceTypeList;
     emAfEndpoints[index].endpointType   = ep;
@@ -639,10 +661,18 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                                 // Is the attribute externally stored?
                                 if (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE)
                                 {
-                                    return (write ? emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                                          am, buffer)
-                                                  : emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                                         am, buffer, emberAfAttributeSize(am)));
+                                    if (write) {
+                                        return emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                                     am, buffer);
+                                    }
+
+                                    if (readLength < emberAfAttributeSize(am)) {
+                                        // Prevent a potential buffer overflow
+                                        return Status::ResourceExhausted;
+                                    }
+
+                                    return emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                                am, buffer, emberAfAttributeSize(am));
                                 }
 
                                 // Internal storage is only supported for fixed endpoints
