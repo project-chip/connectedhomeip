@@ -31,7 +31,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --tests test_TC_IDM_10_2
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 

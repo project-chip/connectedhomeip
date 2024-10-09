@@ -28,7 +28,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
 #       --bool-arg simulate_occupancy:true
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 #  There are CI issues to be followed up for the test cases below that implements manually controlling sensor device for

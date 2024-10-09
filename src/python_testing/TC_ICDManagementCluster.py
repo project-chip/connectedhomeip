@@ -34,7 +34,7 @@
 #       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 

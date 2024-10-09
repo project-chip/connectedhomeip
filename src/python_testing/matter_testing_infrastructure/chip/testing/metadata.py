@@ -149,7 +149,7 @@ class MetadataReader:
                 app_args=attr.get("app-args"),
                 app_ready_pattern=attr.get("app-ready-pattern"),
                 script_args=attr.get("script-args"),
-                factory_reset=attr.get("factoryreset", False),
+                factory_reset=attr.get("factory-reset", False),
                 quiet=attr.get("quiet", True),
             ))
 

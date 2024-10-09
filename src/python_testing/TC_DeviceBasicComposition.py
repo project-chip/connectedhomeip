@@ -29,19 +29,19 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 #   run2:
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: --storage-path admin_storage.json --manual-code 10054912339
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 #   run3:
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 #   run4:
 #     app: ${CHIP_LOCK_APP}
@@ -50,7 +50,7 @@
 #       --storage-path admin_storage.json
 #       --discriminator 1234
 #       --passcode 20202021
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 #   run5:
 #     app: ${CHIP_LOCK_APP}
@@ -59,7 +59,7 @@
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
 #       --commissioning-method on-network
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 #   run6:
 #     app: ${CHIP_LOCK_APP}
@@ -68,7 +68,7 @@
 #       --storage-path admin_storage.json
 #       --qr-code MT:-24J0Q1212-10648G00
 #       --commissioning-method on-network
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 #   run7:
 #     app: ${CHIP_LOCK_APP}
@@ -78,13 +78,13 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --commissioning-method on-network
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 #   run8:
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: --storage-path admin_storage.json
-#     factoryreset: false
+#     factory-reset: false
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 

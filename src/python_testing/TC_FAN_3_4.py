@@ -30,7 +30,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
@@ -41,7 +41,7 @@ from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
-#import time
+# import time
 
 
 logger = logging.getLogger(__name__)
