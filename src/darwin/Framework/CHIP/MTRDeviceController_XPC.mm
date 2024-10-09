@@ -61,7 +61,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration:(NS
     for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
         NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
         MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
-        
+
         [nodeIDs addObject: nodeDictionary];
     }
     MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDsKey, nodeIDs, registrationInfo)
