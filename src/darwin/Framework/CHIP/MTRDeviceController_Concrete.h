@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTRAccessGrant.h>
+#import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
 #import <Matter/MTRDeviceControllerFactory.h>
@@ -148,6 +149,43 @@ NS_ASSUME_NONNULL_BEGIN
  * Only called on the Matter queue.
  */
 - (nullable NSNumber *)neededReadPrivilegeForClusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID;
+
+/**
+ * Try to asynchronously dispatch the given block on the Matter queue.  If the
+ * controller is not running either at call time or when the block would be
+ * about to run, the provided error handler will be called with an error.  Note
+ * that this means the error handler might be called on an arbitrary queue, and
+ * might be called before this function returns or after it returns.
+ *
+ * The DeviceCommissioner pointer passed to the callback should only be used
+ * synchronously during the callback invocation.
+ *
+ * If the error handler is nil, failure to run the block will be silent.
+ */
+- (void)asyncGetCommissionerOnMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
+                             errorHandler:(nullable MTRDeviceErrorHandler)errorHandler;
+
+/**
+ * Returns the transport used by the current session with the given device,
+ * or `MTRTransportTypeUndefined` if no session is currently active.
+ */
+- (MTRTransportType)sessionTransportTypeForDevice:(MTRBaseDevice *)device;
+
+/**
+ * Invalidate the CASE session for the given node ID.  This is a temporary thing
+ * just to support MTRBaseDevice's invalidateCASESession.  Must not be called on
+ * the Matter event queue.
+ */
+- (void)invalidateCASESessionForNode:(NSNumber *)nodeID;
+
+/**
+ * Download log of the desired type from the device.
+ */
+- (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
+                             type:(MTRDiagnosticLogType)type
+                          timeout:(NSTimeInterval)timeout
+                            queue:(dispatch_queue_t)queue
+                       completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
 
 @end
 
