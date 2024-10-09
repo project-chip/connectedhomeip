@@ -706,7 +706,6 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
     }
 #endif
-<<<<<<< HEAD
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     case kDeviceOption_WiFi_PAF: {
         LinuxDeviceOptions::GetInstance().mWiFiPAF        = true;
@@ -714,8 +713,6 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
     }
 #endif
-=======
->>>>>>> b19ffdfdca4e1cbaddbd0c737676d54b86a7c37a
     case kDeviceOption_VendorName:
         LinuxDeviceOptions::GetInstance().vendorName.SetValue(std::string{ aValue });
         break;
