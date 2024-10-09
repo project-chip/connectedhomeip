@@ -1,32 +1,4 @@
-import logging
-import time
-import http.server
-import ssl
-import threading
-import cryptography
-import tempfile
-import os.path
-import datetime
-from functools import partial
-import shutil
-# What's the stands of the Matter project on depending on requests ?
-# TODO Actually do we really need requests once we have matter cameras in place?
-import requests
-import subprocess
-import json
-import socket
-import sys
-
 import push_av_server
-
-import requests.adapters
-from zeroconf import ServiceInfo, Zeroconf
-from urllib.parse import urlparse
-
-from cryptography import x509
-from cryptography.x509.oid import NameOID
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import rsa
 
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects

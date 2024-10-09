@@ -1,13 +1,9 @@
-# TODO Move this one src/tools/ instead of having it here
 import logging
 import ssl
 from typing import Optional, Union
 import tempfile
 import os.path
 import datetime
-
-# What's the stands of the Matter project on depending on requests ?
-# TODO Actually do we really need requests once we have matter cameras in place?
 import argparse
 import pathlib
 from pathlib import Path
@@ -99,6 +95,7 @@ class WorkingDirectory:
         return p
 
     def print_tree(self):
+        # TODO Convert this helper to build a HTML representation for use in the UI
 
         def tree(dir_path: pathlib.Path, prefix: str = ""):
             """A recursive generator, given a directory Path object
