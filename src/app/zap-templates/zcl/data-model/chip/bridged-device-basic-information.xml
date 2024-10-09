@@ -95,7 +95,7 @@ limitations under the License.
         <attribute side="server" code="18" define="UNIQUE_ID"                 type="char_string"               length="32"                              optional="false">UniqueID</attribute>
         <attribute side="server" code="20" define="PRODUCT_APPEARANCE"        type="ProductAppearanceStruct"                                            optional="true">ProductAppearance</attribute>
 
-        <command source="client" code="0x80" name="KeepActive" optional="true" apiMaturity="provisional">
+        <command source="client" code="0x80" name="KeepActive" optional="true">
           <description> The server SHALL attempt to keep the devices specified active for StayActiveDuration milliseconds when they are next active.</description>
           <arg id="0" name="StayActiveDuration" type="int32u"/>
           <arg id="1" name="TimeoutMs" type="int32u" min="30000" max="3600000"/>
