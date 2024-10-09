@@ -455,10 +455,11 @@ exit:
 
 void pychip_ReadClient_ShutdownSubscription(ReadClient * apReadClient)
 {
+    // If an error occurs, the life cycle of apReadClient has ended.
     VerifyOrReturn(apReadClient != nullptr);
-    VerifyOrReturn(apReadClient->IsSubscriptionType());
 
     Optional<SubscriptionId> subscriptionId = apReadClient->GetSubscriptionId();
+    // If it is ReadType, this step will not be executed
     VerifyOrDie(subscriptionId.HasValue());
 
     FabricIndex fabricIndex = apReadClient->GetFabricIndex();
