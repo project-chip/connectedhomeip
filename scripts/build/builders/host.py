@@ -570,7 +570,14 @@ class HostBuilder(GnBuilder):
 
     def PreBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
-            self._Execute(['ninja', '-C', self.output_dir, 'default'], title="Build-only")
+            cmd = ['ninja', '-C', self.output_dir]
+
+            if self.ninja_jobs is not None:
+                cmd.append('-j' + str(self.ninja_jobs))
+
+            cmd.append('default')
+
+            self._Execute(cmd, title="Build-only")
             self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
                            '--exclude', os.path.join(self.chip_dir, '**/tests/*'),
                            '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),

@@ -91,6 +91,7 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     VerifyOrReturnError(apExchangeMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(reportScheduler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+    mState                          = State::kInitializing;
     mpExchangeMgr                   = apExchangeMgr;
     mpFabricTable                   = apFabricTable;
     mpCASESessionMgr                = apCASESessionMgr;
@@ -113,11 +114,14 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     ChipLogError(InteractionModel, "WARNING └────────────────────────────────────────────────────");
 #endif
 
+    mState = State::kInitialized;
     return CHIP_NO_ERROR;
 }
 
 void InteractionModelEngine::Shutdown()
 {
+    VerifyOrReturn(State::kUninitialized != mState);
+
     mpExchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(ResumeSubscriptionsTimerCallback, this);
 
     // TODO: individual object clears the entire command handler interface registry.
@@ -189,6 +193,8 @@ void InteractionModelEngine::Shutdown()
     //
     // mpFabricTable    = nullptr;
     // mpExchangeMgr    = nullptr;
+
+    mState = State::kUninitialized;
 }
 
 uint32_t InteractionModelEngine::GetNumActiveReadHandlers() const

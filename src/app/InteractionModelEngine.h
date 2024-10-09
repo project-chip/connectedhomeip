@@ -718,6 +718,14 @@ private:
     DataModel::Provider * mDataModelProvider      = nullptr;
     Messaging::ExchangeContext * mCurrentExchange = nullptr;
 
+    enum class State : uint8_t
+    {
+        kUninitialized, // The object has not been initialized.
+        kInitializing,  // Initial setup is in progress (e.g. setting up mpExchangeMgr).
+        kInitialized    // The object has been fully initialized and is ready for use.
+    };
+    State mState = State::kUninitialized;
+
     // Changes the current exchange context of a InteractionModelEngine to a given context
     class CurrentExchangeValueScope
     {
