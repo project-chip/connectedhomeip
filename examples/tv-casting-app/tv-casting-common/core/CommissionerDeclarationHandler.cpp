@@ -42,12 +42,6 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
     const chip::Transport::PeerAddress & source, chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)
 {
     ChipLogProgress(AppServer, "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage()");
-    CastingPlayer * targetCastingPlayer = CastingPlayer::GetTargetCastingPlayer();
-    if (targetCastingPlayer == nullptr)
-    {
-        ChipLogError(AppServer,
-                     "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() targetCastingPlayer is nullptr");
-    }
 
     // During UDC with CastingPlayer/Commissioner-Generated Passcode, the Commissioner responds with a CommissionerDeclaration
     // message with CommissionerPasscode set to true. The CommissionerPasscode flag indicates that a Passcode is now displayed for
@@ -78,6 +72,7 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
         // CastingPlayer/Commissioner user and the Casting Client/Commissionee user are not necessarily the same user. For example,
         // in an enviroment with multiple CastingPlayer/Commissioner TVs, one user 1 might be controlling the Client/Commissionee
         // and user 2 might be controlling the CastingPlayer/Commissioner TV.
+        CastingPlayer * targetCastingPlayer = CastingPlayer::GetTargetCastingPlayer();
         // Avoid crashing if we recieve this CommissionerDeclaration message when targetCastingPlayer is nullptr.
         if (targetCastingPlayer != nullptr)
         {
@@ -90,6 +85,8 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
                     "%" CHIP_ERROR_FORMAT,
                     err.Format());
             }
+        } else {
+            ChipLogError(AppServer, "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() targetCastingPlayer is nullptr");
         }
     }
 
