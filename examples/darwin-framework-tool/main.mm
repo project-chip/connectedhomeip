@@ -18,6 +18,7 @@
 
 #import <Matter/Matter.h>
 
+#import "debug/LeakChecker.h"
 #import "logging/logging.h"
 
 #include "commands/bdx/Commands.h"
@@ -35,6 +36,7 @@
 
 int main(int argc, const char * argv[])
 {
+    int exitCode = EXIT_SUCCESS;
     @autoreleasepool {
         dft::logging::Setup();
 
@@ -49,6 +51,7 @@ int main(int argc, const char * argv[])
         registerCommandsStorage(commands);
         registerCommandsConfiguration(commands);
         registerClusters(commands);
-        return commands.Run(argc, (char **) argv);
+        exitCode = commands.Run(argc, (char **) argv);
     }
+    return ConditionalLeaksCheck(exitCode);
 }

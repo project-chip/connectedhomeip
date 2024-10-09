@@ -373,6 +373,8 @@
 		B4E262172AA0CF2000DBA5BC /* RemoteDataModelLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = B4E262132AA0C7A300DBA5BC /* RemoteDataModelLogger.h */; };
 		B4E2621B2AA0D02000DBA5BC /* SleepCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4E262192AA0D01D00DBA5BC /* SleepCommand.mm */; };
 		B4E2621E2AA0D02D00DBA5BC /* WaitForCommissioneeCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4E2621C2AA0D02A00DBA5BC /* WaitForCommissioneeCommand.mm */; };
+		B4F773CA2CB54B61008C6B23 /* LeakChecker.h in Headers */ = {isa = PBXBuildFile; fileRef = B4F773C72CB54B61008C6B23 /* LeakChecker.h */; };
+		B4F773CB2CB54B61008C6B23 /* LeakChecker.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4F773C82CB54B61008C6B23 /* LeakChecker.mm */; };
 		B4FCD56A2B5EDBD300832859 /* MTRDiagnosticLogsType.h in Headers */ = {isa = PBXBuildFile; fileRef = B4FCD5692B5EDBD300832859 /* MTRDiagnosticLogsType.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B4FCD5702B603A6300832859 /* Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = B4FCD56D2B603A6300832859 /* Commands.h */; };
 		B4FCD5712B603A6300832859 /* DownloadLogCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = B4FCD56E2B603A6300832859 /* DownloadLogCommand.h */; };
@@ -818,6 +820,8 @@
 		B4E262132AA0C7A300DBA5BC /* RemoteDataModelLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RemoteDataModelLogger.h; sourceTree = "<group>"; };
 		B4E262192AA0D01D00DBA5BC /* SleepCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SleepCommand.mm; sourceTree = "<group>"; };
 		B4E2621C2AA0D02A00DBA5BC /* WaitForCommissioneeCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WaitForCommissioneeCommand.mm; sourceTree = "<group>"; };
+		B4F773C72CB54B61008C6B23 /* LeakChecker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LeakChecker.h; sourceTree = "<group>"; };
+		B4F773C82CB54B61008C6B23 /* LeakChecker.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = LeakChecker.mm; sourceTree = "<group>"; };
 		B4FCD5692B5EDBD300832859 /* MTRDiagnosticLogsType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDiagnosticLogsType.h; sourceTree = "<group>"; };
 		B4FCD56D2B603A6300832859 /* Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
 		B4FCD56E2B603A6300832859 /* DownloadLogCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadLogCommand.h; sourceTree = "<group>"; };
@@ -874,6 +878,7 @@
 		037C3CA82991A44B00B7EEE2 /* darwin-framework-tool */ = {
 			isa = PBXGroup;
 			children = (
+				B4F773C92CB54B61008C6B23 /* debug */,
 				039145E02993102B00257B3E /* main.mm */,
 				03F430A52994100000166449 /* controller */,
 				039547092992DB02006D42A8 /* editline */,
@@ -1543,6 +1548,15 @@
 			path = delay;
 			sourceTree = "<group>";
 		};
+		B4F773C92CB54B61008C6B23 /* debug */ = {
+			isa = PBXGroup;
+			children = (
+				B4F773C72CB54B61008C6B23 /* LeakChecker.h */,
+				B4F773C82CB54B61008C6B23 /* LeakChecker.mm */,
+			);
+			path = debug;
+			sourceTree = "<group>";
+		};
 		B4FCD56C2B603A6300832859 /* bdx */ = {
 			isa = PBXGroup;
 			children = (
@@ -1594,6 +1608,7 @@
 				037C3DAF2991BD4F00B7EEE2 /* DeviceControllerDelegateBridge.h in Headers */,
 				B4FCD5712B603A6300832859 /* DownloadLogCommand.h in Headers */,
 				037C3DC32991BD5100B7EEE2 /* Commands.h in Headers */,
+				B4F773CA2CB54B61008C6B23 /* LeakChecker.h in Headers */,
 				037C3DB82991BD5000B7EEE2 /* ClusterCommandBridge.h in Headers */,
 				037C3DC82991BD5100B7EEE2 /* CHIPToolKeypair.h in Headers */,
 				037C3DB52991BD5000B7EEE2 /* WriteAttributeCommandBridge.h in Headers */,
@@ -1900,6 +1915,7 @@
 				03F430A82994112B00166449 /* editline.c in Sources */,
 				03F430AA2994113500166449 /* sysunix.c in Sources */,
 				B45373BF2A9FEA9100807602 /* adopt.c in Sources */,
+				B4F773CB2CB54B61008C6B23 /* LeakChecker.mm in Sources */,
 				B45373D12A9FEB0C00807602 /* alloc.c in Sources */,
 				B45373DD2A9FEB5300807602 /* base64-decode.c in Sources */,
 				B45373D22A9FEB0C00807602 /* buflist.c in Sources */,

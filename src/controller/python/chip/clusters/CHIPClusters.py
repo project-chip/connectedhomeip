@@ -1855,6 +1855,12 @@ class ChipClusters:
                 "type": "bool",
                 "reportable": True,
             },
+            0x00000009: {
+                "attributeName": "TCUpdateDeadline",
+                "attributeId": 0x00000009,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -13129,6 +13135,90 @@ class ChipClusters:
             },
         },
     }
+    _WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER_INFO = {
+        "clusterName": "WebRTCTransportRequestor",
+        "clusterId": 0x00000554,
+        "commands": {
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "Offer",
+                "args": {
+                    "webRTCSessionID": "int",
+                    "sdp": "str",
+                    "ICEServers": "ICEServerStruct",
+                    "ICETransportPolicy": "str",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "Answer",
+                "args": {
+                    "webRTCSessionID": "int",
+                    "sdp": "str",
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "ICECandidate",
+                "args": {
+                    "webRTCSessionID": "int",
+                    "ICECandidate": "str",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "End",
+                "args": {
+                    "webRTCSessionID": "int",
+                    "reason": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "CurrentSessions",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _CHIME_CLUSTER_INFO = {
         "clusterName": "Chime",
         "clusterId": 0x00000556,
@@ -14448,6 +14538,7 @@ class ChipClusters:
         0x0000050F: _CONTENT_CONTROL_CLUSTER_INFO,
         0x00000510: _CONTENT_APP_OBSERVER_CLUSTER_INFO,
         0x00000553: _WEB_RTC_TRANSPORT_PROVIDER_CLUSTER_INFO,
+        0x00000554: _WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER_INFO,
         0x00000556: _CHIME_CLUSTER_INFO,
         0x00000750: _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
         0x00000751: _COMMISSIONER_CONTROL_CLUSTER_INFO,
@@ -14575,6 +14666,7 @@ class ChipClusters:
         "ContentControl": _CONTENT_CONTROL_CLUSTER_INFO,
         "ContentAppObserver": _CONTENT_APP_OBSERVER_CLUSTER_INFO,
         "WebRTCTransportProvider": _WEB_RTC_TRANSPORT_PROVIDER_CLUSTER_INFO,
+        "WebRTCTransportRequestor": _WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER_INFO,
         "Chime": _CHIME_CLUSTER_INFO,
         "EcosystemInformation": _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
         "CommissionerControl": _COMMISSIONER_CONTROL_CLUSTER_INFO,

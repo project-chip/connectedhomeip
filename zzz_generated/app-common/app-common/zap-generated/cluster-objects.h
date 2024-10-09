@@ -6533,6 +6533,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TCAcknowledgementsRequired
+namespace TCUpdateDeadline {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TCUpdateDeadline::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TCUpdateDeadline
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -6589,6 +6601,7 @@ struct TypeInfo
         Attributes::TCMinRequiredVersion::TypeInfo::DecodableType TCMinRequiredVersion                 = static_cast<uint16_t>(0);
         Attributes::TCAcknowledgements::TypeInfo::DecodableType TCAcknowledgements                     = static_cast<uint16_t>(0);
         Attributes::TCAcknowledgementsRequired::TypeInfo::DecodableType TCAcknowledgementsRequired     = static_cast<bool>(0);
+        Attributes::TCUpdateDeadline::TypeInfo::DecodableType TCUpdateDeadline                         = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -41670,6 +41683,259 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace WebRTCTransportProvider
+namespace WebRTCTransportRequestor {
+namespace Structs {
+namespace ICEServerStruct     = Clusters::detail::Structs::ICEServerStruct;
+namespace WebRTCSessionStruct = Clusters::detail::Structs::WebRTCSessionStruct;
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Offer {
+struct Type;
+struct DecodableType;
+} // namespace Offer
+
+namespace Answer {
+struct Type;
+struct DecodableType;
+} // namespace Answer
+
+namespace ICECandidate {
+struct Type;
+struct DecodableType;
+} // namespace ICECandidate
+
+namespace End {
+struct Type;
+struct DecodableType;
+} // namespace End
+
+} // namespace Commands
+
+namespace Commands {
+namespace Offer {
+enum class Fields : uint8_t
+{
+    kWebRTCSessionID    = 0,
+    kSdp                = 1,
+    kICEServers         = 2,
+    kICETransportPolicy = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::Offer::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
+
+    uint16_t webRTCSessionID = static_cast<uint16_t>(0);
+    chip::CharSpan sdp;
+    Optional<DataModel::List<const Structs::ICEServerStruct::Type>> ICEServers;
+    Optional<chip::CharSpan> ICETransportPolicy;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::Offer::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
+
+    uint16_t webRTCSessionID = static_cast<uint16_t>(0);
+    chip::CharSpan sdp;
+    Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;
+    Optional<chip::CharSpan> ICETransportPolicy;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Offer
+namespace Answer {
+enum class Fields : uint8_t
+{
+    kWebRTCSessionID = 0,
+    kSdp             = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::Answer::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
+
+    uint16_t webRTCSessionID = static_cast<uint16_t>(0);
+    chip::CharSpan sdp;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::Answer::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
+
+    uint16_t webRTCSessionID = static_cast<uint16_t>(0);
+    chip::CharSpan sdp;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Answer
+namespace ICECandidate {
+enum class Fields : uint8_t
+{
+    kWebRTCSessionID = 0,
+    kICECandidate    = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ICECandidate::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
+
+    uint16_t webRTCSessionID = static_cast<uint16_t>(0);
+    chip::CharSpan ICECandidate;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ICECandidate::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
+
+    uint16_t webRTCSessionID = static_cast<uint16_t>(0);
+    chip::CharSpan ICECandidate;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ICECandidate
+namespace End {
+enum class Fields : uint8_t
+{
+    kWebRTCSessionID = 0,
+    kReason          = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::End::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
+
+    uint16_t webRTCSessionID   = static_cast<uint16_t>(0);
+    WebRTCEndReasonEnum reason = static_cast<WebRTCEndReasonEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::End::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
+
+    uint16_t webRTCSessionID   = static_cast<uint16_t>(0);
+    WebRTCEndReasonEnum reason = static_cast<WebRTCEndReasonEnum>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace End
+} // namespace Commands
+
+namespace Attributes {
+
+namespace CurrentSessions {
+struct TypeInfo
+{
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::WebRTCTransportRequestor::Structs::WebRTCSessionStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::WebRTCTransportRequestor::Structs::WebRTCSessionStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::WebRTCTransportRequestor::Structs::WebRTCSessionStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentSessions::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentSessions
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::CurrentSessions::TypeInfo::DecodableType currentSessions;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace WebRTCTransportRequestor
 namespace Chime {
 namespace Structs {
 namespace ChimeSoundStruct {
