@@ -42,7 +42,7 @@
 
 NSString * const MTRDeviceControllerRegistrationControllerContextKey = @"MTRDeviceControllerRegistrationControllerContext";
 NSString * const MTRDeviceControllerRegistrationNodeIDsKey = @"MTRDeviceControllerRegistrationNodeIDs";
-    NSString * const MTRDeviceControllerRegistrationNodeIDKey = @"MTRDeviceControllerRegistrationNodeID";
+NSString * const MTRDeviceControllerRegistrationNodeIDKey = @"MTRDeviceControllerRegistrationNodeID";
 
 // #define MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 
@@ -50,9 +50,12 @@ NSString * const MTRDeviceControllerRegistrationNodeIDsKey = @"MTRDeviceControll
 
 #pragma mark - Node ID Management
 
-MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration:(NSDictionary *)controllerState, updateControllerConfiguration:(NSDictionary *)controllerState)
+MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
+                                               : (NSDictionary *) controllerState, updateControllerConfiguration
+                                               : (NSDictionary *) controllerState)
 
-- (void)_updateRegistrationInfo {
+- (void)_updateRegistrationInfo
+{
     NSMutableDictionary * registrationInfo = [NSMutableDictionary dictionary];
 
     NSMutableDictionary * controllerContext = [NSMutableDictionary dictionary];
@@ -62,12 +65,12 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration:(NS
         NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
         MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
 
-        [nodeIDs addObject: nodeDictionary];
+        [nodeIDs addObject:nodeDictionary];
     }
     MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDsKey, nodeIDs, registrationInfo)
     MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationControllerContextKey, controllerContext, registrationInfo)
 
-    [self updateControllerConfiguration: registrationInfo];
+    [self updateControllerConfiguration:registrationInfo];
 }
 
 - (void)_registerNodeID:(NSNumber *)nodeID
@@ -87,7 +90,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration:(NS
 
 - (void)removeDevice:(MTRDevice *)device
 {
-    [super removeDevice: device];
+    [super removeDevice:device];
     [self _updateRegistrationInfo];
 }
 

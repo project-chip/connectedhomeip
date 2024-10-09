@@ -19,9 +19,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationNodeIDsKey MTR_NEWLY_AVAILABLE;
-    MTR_EXTERN NSString * const MTRDeviceControllerRegistrationNodeIDKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationNodeIDKey MTR_NEWLY_AVAILABLE;
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerContextKey MTR_NEWLY_AVAILABLE;
-
 
 MTR_NEWLY_AVAILABLE
 @protocol MTRXPCServerProtocol_MTRDevice <NSObject>
