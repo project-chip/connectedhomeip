@@ -52,9 +52,9 @@ import tempfile
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support.apps import IcdAppServerSubprocess
-from matter_testing_support.matter_testing import (MatterBaseTest, SimpleEventCallback, TestStep, async_test_body,
-                                                   default_matter_test_main)
+from chip.testing.apps import IcdAppServerSubprocess
+from chip.testing.matter_testing import (MatterBaseTest, SimpleEventCallback, TestStep, async_test_body,
+                                         default_matter_test_main)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)

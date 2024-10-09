@@ -18,7 +18,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/python.gni")
 
-pw_python_package("matter_testing_support") {
+pw_python_package("chip-testing") {
   setup = [
     "setup.py",
     "setup.cfg",
@@ -28,22 +28,22 @@ pw_python_package("matter_testing_support") {
   inputs = [ "env_test.yaml" ]
 
   sources = [
-    "matter_testing_support/__init__.py",
-    "matter_testing_support/apps.py",
-    "matter_testing_support/basic_composition.py",
-    "matter_testing_support/choice_conformance.py",
-    "matter_testing_support/conformance.py",
-    "matter_testing_support/global_attribute_ids.py",
-    "matter_testing_support/matter_testing.py",
-    "matter_testing_support/metadata.py",
-    "matter_testing_support/pics.py",
-    "matter_testing_support/spec_parsing.py",
-    "matter_testing_support/taglist_and_topology_test.py",
-    "matter_testing_support/tasks.py",
+    "chip/testing/__init__.py",
+    "chip/testing/apps.py",
+    "chip/testing/basic_composition.py",
+    "chip/testing/choice_conformance.py",
+    "chip/testing/conformance.py",
+    "chip/testing/global_attribute_ids.py",
+    "chip/testing/matter_testing.py",
+    "chip/testing/metadata.py",
+    "chip/testing/pics.py",
+    "chip/testing/spec_parsing.py",
+    "chip/testing/taglist_and_topology_test.py",
+    "chip/testing/tasks.py",
   ]
 
   tests = [
-    "matter_testing_support/test_metadata.py",
-    "matter_testing_support/test_tasks.py",
+    "chip/testing/test_metadata.py",
+    "chip/testing/test_tasks.py",
   ]
 }

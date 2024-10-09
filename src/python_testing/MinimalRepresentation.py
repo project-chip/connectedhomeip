@@ -18,9 +18,9 @@
 from dataclasses import dataclass, field
 
 from chip.tlv import uint
-from matter_testing_support.conformance import ConformanceDecision
-from matter_testing_support.global_attribute_ids import GlobalAttributeIds
-from matter_testing_support.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.conformance import ConformanceDecision
+from chip.testing.global_attribute_ids import GlobalAttributeIds
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from TC_DeviceConformance import DeviceConformanceTests
 
 

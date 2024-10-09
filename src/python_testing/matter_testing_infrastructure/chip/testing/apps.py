@@ -16,7 +16,7 @@ import os
 import signal
 import tempfile
 
-from matter_testing_support.tasks import Subprocess
+from chip.testing.tasks import Subprocess
 
 
 class AppServerSubprocess(Subprocess):

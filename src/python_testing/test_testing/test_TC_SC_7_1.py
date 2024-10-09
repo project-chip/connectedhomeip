@@ -21,7 +21,7 @@ from random import randbytes
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
-from matter_testing_support.matter_testing import MatterTestConfig
+from chip.testing.matter_testing import MatterTestConfig
 from MockTestRunner import MockTestRunner
 
 

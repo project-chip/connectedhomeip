@@ -20,9 +20,9 @@ import chip.clusters as Clusters
 from chip.clusters import Attribute
 from chip.tlv import uint
 from jinja2 import Template
-from matter_testing_support.conformance import conformance_allowed
-from matter_testing_support.matter_testing import MatterBaseTest, default_matter_test_main
-from matter_testing_support.spec_parsing import build_xml_clusters, build_xml_device_types, parse_single_device_type
+from chip.testing.conformance import conformance_allowed
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing.spec_parsing import build_xml_clusters, build_xml_device_types, parse_single_device_type
 from mobly import asserts
 from TC_DeviceConformance import DeviceConformanceTests
 

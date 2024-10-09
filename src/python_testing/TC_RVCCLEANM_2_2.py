@@ -39,7 +39,7 @@
 import enum
 
 import chip.clusters as Clusters
-from matter_testing_support.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 

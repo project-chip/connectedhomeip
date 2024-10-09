@@ -47,8 +47,8 @@ from chip.clusters.ClusterObjects import ALL_ACCEPTED_COMMANDS, ALL_ATTRIBUTES, 
 from chip.clusters.Objects import AccessControl
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support.basic_composition import arls_populated
-from matter_testing_support.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.basic_composition import arls_populated
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 

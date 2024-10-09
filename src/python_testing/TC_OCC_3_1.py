@@ -43,8 +43,8 @@ from typing import Any, Optional
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from matter_testing_support.matter_testing import (ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep,
-                                                   async_test_body, await_sequence_of_reports, default_matter_test_main)
+from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep,
+                                         async_test_body, await_sequence_of_reports, default_matter_test_main)
 from mobly import asserts
 
 
