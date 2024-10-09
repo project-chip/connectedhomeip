@@ -27,7 +27,7 @@ on:
 
 jobs:
     cancel_workflow:
-        name: Report on pull requests
+        name: Cancel CI on pull request
 
         runs-on: ubuntu-latest
 
