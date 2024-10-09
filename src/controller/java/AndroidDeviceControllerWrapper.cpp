@@ -519,9 +519,15 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
                                                         "()Ljava/lang/Long;", &getICDStayActiveDurationMsecMethod);
     ReturnErrorOnFailure(err);
     jobject jStayActiveMsec = env->CallObjectMethod(icdRegistrationInfo, getICDStayActiveDurationMsecMethod);
-    if (jStayActiveMsec != 0)
+    if (jStayActiveMsec != nullptr)
     {
-        params.SetICDStayActiveDurationMsec(chip::JniReferences::GetInstance().IntegerToPrimitive(jStayActiveMsec));
+        jlong stayActiveMsec = chip::JniReferences::GetInstance().LongToPrimitive(jStayActiveMsec);
+        if (!chip::CanCastTo<uint32_t>(stayActiveMsec))
+        {
+            ChipLogError(Controller, "Failed to process stayActiveMsec in %s.", __func__);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        params.SetICDStayActiveDurationMsec(static_cast<uint32_t>(stayActiveMsec));
     }
 
     jmethodID getCheckInNodeIdMethod;
