@@ -99,7 +99,9 @@ void PlatformManagerImpl::Reset()
 #endif
     // Restart the system.
     NVIC_SystemReset();
-    while (1) {}
+    while (1)
+    {
+    }
 }
 
 void PlatformManagerImpl::ScheduleResetInIdle(void)
