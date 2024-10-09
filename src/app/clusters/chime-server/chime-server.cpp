@@ -111,10 +111,8 @@ CHIP_ERROR ChimeServer::Read(const ConcreteReadAttributePath & aPath, AttributeV
         break;
     case InstalledChimeSounds::Id:
         ChimeServer * cs = this;
-        CHIP_ERROR err = aEncoder.EncodeList([cs](const auto & encoder) -> CHIP_ERROR
-        {
-            return cs->EncodeSupportedChimeSounds(encoder);
-        });
+        CHIP_ERROR err =
+            aEncoder.EncodeList([cs](const auto & encoder) -> CHIP_ERROR { return cs->EncodeSupportedChimeSounds(encoder); });
         return err;
     }
 
@@ -218,7 +216,7 @@ Status ChimeServer::SetActiveChimeID(uint8_t chimeID)
         mActiveChimeID = chimeID;
 
         // Write new value to persistent storage.
-        auto endpointId = GetEndpointId();
+        auto endpointId            = GetEndpointId();
         ConcreteAttributePath path = ConcreteAttributePath(endpointId, Chime::Id, ActiveChimeID::Id);
         GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mActiveChimeID);
 
@@ -237,7 +235,7 @@ Status ChimeServer::SetEnabled(bool Enabled)
         mEnabled = Enabled;
 
         // Write new value to persistent storage.
-        auto endpointId = GetEndpointId();
+        auto endpointId            = GetEndpointId();
         ConcreteAttributePath path = ConcreteAttributePath(endpointId, Chime::Id, Enabled::Id);
         GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mEnabled);
 
