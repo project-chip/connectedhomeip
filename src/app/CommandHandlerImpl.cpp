@@ -524,7 +524,7 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
             Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
             if (preCheckStatus != Status::Success)
             {
-                // Command failed for a specific path, keep trying the rest of the commands still
+                // Command failed for a specific path, but keep trying the rest of the paths.
                 continue;
             }
         }
