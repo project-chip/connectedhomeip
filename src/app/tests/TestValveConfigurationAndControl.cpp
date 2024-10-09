@@ -1388,11 +1388,14 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestAttributeUpdates)
     EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
     EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
     EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-    // We should see the currentLevel and currentState marked as dirty, and the targets should not be
+
+    // We should see the CurrentLevel and CurrentState marked as dirty because they are changed.
+    // TargetState and TargetLevel should ALSO be marked as dirty because the target state should transition through
+    // from target back to NULL per the spec (effect of receipt for open command).
     EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentLevel::Id));
     EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentState::Id));
-    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetLevel::Id));
-    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetState::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetLevel::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetState::Id));
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
 
@@ -1413,12 +1416,16 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestAttributeUpdates)
     EXPECT_EQ(valElapsedSNullable.ValueOr(0), openDuration.Value());
     EXPECT_EQ(logic.GetCurrentLevel(valPercentNullable), CHIP_NO_ERROR);
     EXPECT_EQ(valPercentNullable.ValueOr(0), requestedLevel);
-    // We should see the following attributes marked as dirty: currentLevel, remainingDuration, openDuration
-    // The targetLevel and targetState should be null, and thus we should see no update.
+    // We should see the following attributes marked as dirty since they are different at the end
+    // of the command: currentLevel, remainingDuration, openDuration
+    // The TargetLevel and TargetState should be NULL at the end of the open call, but will still be
+    // marked dirty per the spec since they are set to the target values and and back to NULL.
+    // Similarly, TargetState is also set to transitioning during the call then back to open and should
+    // therefore be marked as dirty.
     EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentLevel::Id));
-    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentState::Id));
-    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetLevel::Id));
-    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetState::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentState::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetLevel::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetState::Id));
     EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
     EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
 
@@ -1509,8 +1516,10 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestAttributeUpdates)
     EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::make_optional(requestedLevel)), CHIP_NO_ERROR);
     EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
     EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+    // Current level should remain unchanged and therefore won't be marked as dirty, but the current state is unconditionally
+    // set to transitioning and then back to open per the spec and therefore should be marked as dirty.
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentLevel::Id));
-    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentState::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentState::Id));
 
     // TODO: Clarify, should we get a report if we use open to set the remaining duration down? I think so.
     // TODO: Add such tests here. I don't think the underlying layer handles that properly right now.
@@ -1524,7 +1533,9 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestAttributeUpdates)
     EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
     EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
     EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentLevel::Id));
-    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentState::Id));
+    // Current state will also be marked dirty since every open call sets the current state to transitioning
+    // unconditionally even if it is then set back to the original value.
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentState::Id));
 
     context.ClearDirtyList();
 
