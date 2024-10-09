@@ -21,13 +21,22 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: examples/fabric-admin/scripts/fabric-sync-app.py
-# test-runner-run/run1/app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
-# test-runner-run/run1/factoryreset: true
-# test-runner-run/run1/script-args: --PICS src/app/tests/suites/certification/ci-pics-values --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_server_app_path:${ALL_CLUSTERS_APP} --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-# test-runner-run/run1/script-start-delay: 5
-# test-runner-run/run1/quiet: true
+# test-runner-runs:
+#   run1:
+#     app: examples/fabric-admin/scripts/fabric-sync-app.py
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-ready-pattern: "Successfully opened pairing window on the device"
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factoryreset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -38,29 +47,9 @@ import time
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.testing.tasks import Subprocess
+from chip.testing.apps import AppServerSubprocess
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-
-
-class AppServer(Subprocess):
-    """Wrapper class for starting an application server in a subprocess."""
-
-    # Prefix for log messages from the application server.
-    PREFIX = "[SERVER]"
-
-    def __init__(self, app: str, storage_dir: str, discriminator: int, passcode: int, port: int = 5540):
-        storage_kvs_dir = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")[1]
-        # Start the server application with dedicated KVS storage.
-        super().__init__(app, "--KVS", storage_kvs_dir,
-                         '--secured-device-port', str(port),
-                         "--discriminator", str(discriminator),
-                         "--passcode", str(passcode),
-                         prefix=self.PREFIX)
-
-    def start(self):
-        # Start process and block until it prints the expected output.
-        super().start(expected_output="Server initialization complete")
 
 
 class TC_MCORE_FS_1_1(MatterBaseTest):
@@ -86,14 +75,16 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         self.th_server_discriminator = random.randint(0, 4095)
         self.th_server_passcode = 20202021
 
-        # Start the TH_SERVER_NO_UID app.
-        self.th_server = AppServer(
+        # Start the TH_SERVER app.
+        self.th_server = AppServerSubprocess(
             th_server_app,
             storage_dir=self.storage.name,
             port=self.th_server_port,
             discriminator=self.th_server_discriminator,
             passcode=self.th_server_passcode)
-        self.th_server.start()
+        self.th_server.start(
+            expected_output="Server initialization complete",
+            timeout=30)
 
         logging.info("Commissioning from separate fabric")
         # Create a second controller on a new fabric to communicate to the server
@@ -133,7 +124,6 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_1(self):
-        self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         # TODO this value should either be determined or passed in from command line
         dut_commissioning_control_endpoint = 0
         self.step(1)
@@ -152,7 +142,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
             requestID=good_request_id, vendorID=th_fsa_server_vid, productID=th_fsa_server_pid, label="Test Ecosystem")
         await self.send_single_cmd(cmd, endpoint=dut_commissioning_control_endpoint)
 
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input("Approve Commissioning approval request on DUT using manufacturer specified mechanism")
 
         if not events:
@@ -181,12 +171,12 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         await self.send_single_cmd(cmd, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, timedRequestTimeoutMs=5000)
 
         self.step("3c")
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             time.sleep(30)
 
         th_fsa_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
         # TODO: this should be mocked too.
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             asserts.assert_equal(len(th_fsa_server_fabrics) + 1, len(th_fsa_server_fabrics_new),
                                  "Unexpected number of fabrics on TH_SERVER")
 

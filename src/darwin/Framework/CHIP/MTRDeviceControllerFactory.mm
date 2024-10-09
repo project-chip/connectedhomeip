@@ -73,8 +73,12 @@ using namespace chip::Tracing::DarwinFramework;
 static bool sExitHandlerRegistered = false;
 static void ShutdownOnExit()
 {
-    MTR_LOG("ShutdownOnExit invoked on exit");
-    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+    // Depending on the structure of the software, this code might execute *after* the main autorelease pool has exited.
+    // Therefore, it needs to be enclosed in its own autorelease pool.
+    @autoreleasepool {
+        MTR_LOG("ShutdownOnExit invoked on exit");
+        [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+    }
 }
 
 @interface MTRDeviceControllerFactoryParams ()
@@ -1132,7 +1136,7 @@ MTR_DIRECT_MEMBERS
         if (compressedFabricId != nil && compressedFabricId.unsignedLongLongValue == operationalID.GetCompressedFabricId()) {
             ChipLogProgress(Controller, "Notifying controller at fabric index %u about new operational node 0x" ChipLogFormatX64,
                 controller.fabricIndex, ChipLogValueX64(operationalID.GetNodeId()));
-            [controller operationalInstanceAdded:operationalID.GetNodeId()];
+            [controller operationalInstanceAdded:@(operationalID.GetNodeId())];
         }
 
         // Keep going: more than one controller might match a given compressed

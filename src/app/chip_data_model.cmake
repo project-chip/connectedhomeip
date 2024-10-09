@@ -70,10 +70,15 @@ endfunction()
 #
 function(chip_configure_data_model APP_TARGET)
     set(SCOPE PRIVATE)
-    cmake_parse_arguments(ARG "" "SCOPE;ZAP_FILE;IDL" "EXTERNAL_CLUSTERS" ${ARGN})
+    set(ADD_EMBER_INTERFACE_FILES TRUE)
+    cmake_parse_arguments(ARG "SKIP_EMBER_INTERFACE" "SCOPE;ZAP_FILE;IDL" "EXTERNAL_CLUSTERS" ${ARGN})
 
     if(ARG_SCOPE)
         set(SCOPE ${ARG_SCOPE})
+    endif()
+
+    if(ARG_SKIP_EMBER_INTERFACE)
+        set(ADD_EMBER_INTERFACE_FILES FALSE)
     endif()
 
     # CMAKE data model auto-includes the server side implementation
@@ -159,7 +164,6 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/util/attribute-table.cpp
         ${CHIP_APP_BASE_DIR}/util/binding-table.cpp
         ${CHIP_APP_BASE_DIR}/util/DataModelHandler.cpp
-        ${CHIP_APP_BASE_DIR}/util/ember-compatibility-functions.cpp
         ${CHIP_APP_BASE_DIR}/util/ember-global-attribute-access-interface.cpp
         ${CHIP_APP_BASE_DIR}/util/ember-io-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/generic-callback-stubs.cpp
@@ -169,4 +173,10 @@ function(chip_configure_data_model APP_TARGET)
         ${APP_GEN_FILES}
         ${APP_TEMPLATES_GEN_FILES}
     )
+
+    if(ADD_EMBER_INTERFACE_FILES)
+        target_sources(${APP_TARGET} ${SCOPE}
+           ${CHIP_APP_BASE_DIR}/util/ember-compatibility-functions.cpp
+        )
+    endif()
 endfunction()

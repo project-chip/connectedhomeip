@@ -19,6 +19,7 @@
         "CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "CHANNEL_CLUSTER": [],
+        "CHIME_CLUSTER": [],
         "CLIENT_MONITORING_CLUSTER": [],
         "COLOR_CONTROL_CLUSTER": [],
         "COMMISSIONER_CONTROL_CLUSTER": [],
@@ -130,6 +131,8 @@
         "LAUNDRY_DRYER_CONTROLS_CLUSTER": [],
         "WATER_HEATER_MANAGEMENT_CLUSTER": [],
         "WATER_HEATER_MODE_CLUSTER": [],
+        "WEB_RTC_PROVIDER_CLUSTER": [],
+        "WEBRTC_REQUESTOR_CLUSTER": [],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": [],
         "WINDOW_COVERING_CLUSTER": []
     },
@@ -165,6 +168,7 @@
             "concentration-measurement-server"
         ],
         "CHANNEL_CLUSTER": ["channel-server"],
+        "CHIME_CLUSTER": [],
         "COLOR_CONTROL_CLUSTER": ["color-control-server"],
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],
@@ -308,6 +312,8 @@
         "WAKE_ON_LAN_CLUSTER": ["wake-on-lan-server"],
         "LAUNDRY_WASHER_CONTROLS_CLUSTER": ["laundry-washer-controls-server"],
         "LAUNDRY_DRYER_CONTROLS_CLUSTER": ["laundry-dryer-controls-server"],
+        "WEB_RTC_PROVIDER_CLUSTER": [],
+        "WEBRTC_REQUESTOR_CLUSTER": [],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
         "WIFI_NETWORK_MANAGEMENT_CLUSTER": ["wifi-network-management-server"],
         "WINDOW_COVERING_CLUSTER": ["window-covering-server"],

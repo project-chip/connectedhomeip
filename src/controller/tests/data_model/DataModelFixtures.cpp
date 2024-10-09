@@ -17,14 +17,19 @@
  */
 
 #include "DataModelFixtures.h"
-#include "app/data-model-provider/ActionReturnStatus.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/codegen-data-model-provider/Instance.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/logging/TextOnlyLogging.h>
+#include <optional>
 
 using namespace chip;
 using namespace chip::app;
@@ -235,11 +240,6 @@ bool IsClusterDataVersionEqual(const app::ConcreteClusterPath & aConcreteCluster
 bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 {
     return false;
-}
-
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
-{
-    return true;
 }
 
 Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
@@ -485,7 +485,7 @@ Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCom
     // Mock cluster catalog, only support commands on one cluster on one endpoint.
     using Protocols::InteractionModel::Status;
 
-    if (aCommandPath.mEndpointId != kTestEndpointId)
+    if (aCommandPath.mEndpointId != DataModelTests::kTestEndpointId)
     {
         return Status::UnsupportedEndpoint;
     }
@@ -665,7 +665,8 @@ ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest &
 std::optional<ActionReturnStatus> CustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                                                           CommandHandler * handler)
 {
-    return std::make_optional<ActionReturnStatus>(CHIP_ERROR_NOT_IMPLEMENTED);
+    DispatchSingleClusterCommand(request.path, input_arguments, handler);
+    return std::nullopt; // handler status is set by the dispatch
 }
 
 EndpointId CustomDataModel::FirstEndpoint()
@@ -676,6 +677,17 @@ EndpointId CustomDataModel::FirstEndpoint()
 EndpointId CustomDataModel::NextEndpoint(EndpointId before)
 {
     return CodegenDataModelProviderInstance()->NextEndpoint(before);
+}
+
+std::optional<DataModel::DeviceTypeEntry> CustomDataModel::FirstDeviceType(EndpointId endpoint)
+{
+    return std::nullopt;
+}
+
+std::optional<DataModel::DeviceTypeEntry> CustomDataModel::NextDeviceType(EndpointId endpoint,
+                                                                          const DataModel::DeviceTypeEntry & previous)
+{
+    return std::nullopt;
 }
 
 ClusterEntry CustomDataModel::FirstCluster(EndpointId endpoint)

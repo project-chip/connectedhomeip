@@ -50,12 +50,19 @@ Python tests located in src/python_testing
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factoryreset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 class TC_MYTEST_1_1(MatterBaseTest):
@@ -587,7 +594,7 @@ Next build the python wheels and create / activate a venv (called `pyenv` here,
 but any name may be used)
 
 ```
-./scripts/build_python.sh -i pyenv
+./scripts/build_python.sh -i out/python_env
 source pyenv/bin/activate
 ```
 
@@ -628,7 +635,10 @@ example DUT on the host and includes factory reset support
 -   Don’t forget to set the PICS file to the ci-pics-values
 -   If there are steps in your test that will fail on CI (e.g. test vendor
     checks), gate them on the PICS_SDK_CI_ONLY
-    -   `is_ci = self.check_pics('PICS_SDK_CI_ONLY')`
+    -   ```python
+        if not self.is_pics_sdk_ci_only:
+            ...  # Step that will fail on CI
+        ```
 
 The CI test runner uses a structured environment setup that can be declared
 using structured comments at the top of the test file. To use this structured
@@ -666,10 +676,10 @@ for that run, e.g.:
 # test-runner-runs:
 #   run1:
 #     app: ${TYPE_OF_APP}
-#     factoryreset: <true|false>
-#     quiet: <true|false>
 #     app-args: <app_arguments>
 #     script-args: <script_arguments>
+#     factoryreset: <true|false>
+#     quiet: <true|false>
 # === END CI TEST ARGUMENTS ===
 ```
 
@@ -698,18 +708,17 @@ for that run, e.g.:
     -   Example:
         `--discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json`
 
+-   `app-ready-pattern`: Regular expression pattern to match against the output
+    of the application to determine when the application is ready. If this
+    parameter is specified, the test runner will not run the test script until
+    the pattern is found.
+
+    -   Example: `"Manual pairing code: \\[\\d+\\]"`
+
 -   `script-args`: Specifies the arguments to be passed to the test script.
 
     -   Example:
         `--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto`
-
--   `script-start-delay`: Specifies the number of seconds to wait before
-    starting the test script. This parameter can be used to allow the
-    application to initialize itself properly before the test script will try to
-    commission it (e.g. in case if the application needs to be commissioned to
-    some other controller first). By default, the delay is 0 seconds.
-
-    -   Example: `10`
 
 This structured format ensures that all necessary configurations are clearly
 defined and easily understood, allowing for consistent and reliable test

@@ -17,10 +17,19 @@
 
 #import <Foundation/Foundation.h>
 
-#import <Matter/Matter.h>
+#import <Matter/MTRAccessGrant.h>
+#import <Matter/MTRDefines.h>
+#import <Matter/MTRDeviceController.h>
+#import <Matter/MTRDeviceControllerFactory.h>
+#import <Matter/MTRDeviceControllerStorageDelegate.h>
+#import <Matter/MTRDeviceStorageBehaviorConfiguration.h>
+#import <Matter/MTROTAProviderDelegate.h>
 
 #import "MTRDeviceConnectionBridge.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+
+#include <credentials/FabricTable.h>
+#include <lib/core/DataModelTypes.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -116,6 +125,29 @@ NS_ASSUME_NONNULL_BEGIN
  * makes use of the subscription pool.
  */
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
+
+/**
+ * Notify the controller that a new operational instance with the given node id
+ * and a compressed fabric id that matches this controller has been observed.
+ */
+- (void)operationalInstanceAdded:(NSNumber *)nodeID;
+
+/**
+ * Get the access grants that apply for the given cluster path.
+ */
+- (NSArray<MTRAccessGrant *> *)accessGrantsForClusterPath:(MTRClusterPath *)clusterPath;
+
+/**
+ * Get the privilege level needed to read the given attribute.  There's no
+ * endpoint provided because the expectation is that this information is the
+ * same for all cluster instances.
+ *
+ * Returns nil if we have no such attribute defined on any endpoint, otherwise
+ * one of MTRAccessControlEntry* constants wrapped in NSNumber.
+ *
+ * Only called on the Matter queue.
+ */
+- (nullable NSNumber *)neededReadPrivilegeForClusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID;
 
 @end
 

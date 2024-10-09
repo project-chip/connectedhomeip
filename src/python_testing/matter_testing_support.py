@@ -38,6 +38,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from functools import partial
+from itertools import chain
 from typing import Any, Iterable, List, Optional, Tuple
 
 from chip.tlv import float32, uint
@@ -584,9 +585,9 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         # TODO: Do we really need the expression as a string? We can evaluate this in code very easily
         logging.info(f'\t\t**** Skipping: {name}')
 
-    def step_start(self, name: str):
-        # The way I'm calling this, the name is already includes the step number, but it seems like it might be good to separate these
-        logging.info(f'\t\t***** Test Step {name}')
+    def step_start(self, name: str, endpoint: int | None = None):
+        # TODO: The way I'm calling this, the name already includes the step number, but it seems like it might be good to separate these
+        logging.info(f'\t\t***** Test Step {name} started with endpoint {endpoint} ')
 
     def step_success(self, logger, logs, duration: int, request):
         pass
@@ -915,6 +916,7 @@ def hex_from_bytes(b: bytes) -> str:
 class TestStep:
     test_plan_number: typing.Union[int, str]
     description: str
+    endpoint: int | None = None
     expectation: str = ""
     is_commissioning: bool = False
 
@@ -1008,7 +1010,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Use the following environment variables:
 
-         - LINUX_DUT_IP 
+         - LINUX_DUT_IP
             * if not provided, the Matter app is assumed to run on the same machine as the test,
               such as during CI, and the commands are sent to it using a local named pipe
             * if provided, the commands for writing to the named pipe are forwarded to the DUT
@@ -1128,9 +1130,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         super().teardown_class()
 
     def check_pics(self, pics_key: str) -> bool:
-        picsd = self.matter_test_config.pics
-        pics_key = pics_key.strip()
-        return pics_key in picsd and picsd[pics_key]
+        return self.matter_test_config.pics.get(pics_key.strip(), False)
+
+    @property
+    def is_pics_sdk_ci_only(self) -> bool:
+        return self.check_pics('PICS_SDK_CI_ONLY')
 
     async def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int) -> CustomCommissioningParameters:
         rnd_discriminator = random.randint(0, 4095)
@@ -1280,8 +1284,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         test_event_enabled = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=full_attr)
         asserts.assert_equal(test_event_enabled, True, "TestEventTriggersEnabled is False")
 
-    def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
-        logging.info(f'***** Test Step {stepnum} : {title}')
+    def print_step(self, stepnum: typing.Union[int, str], title: str, endpoint: int | None = None) -> None:
+        endpoint_info = f" with endpoint {endpoint}" if endpoint is not None else ""
+        logging.info(f'***** Test Step {stepnum} : {title}{endpoint_info}')
 
     def record_error(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.ERROR, problem, spec_location))
@@ -1451,7 +1456,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         for step in remaining:
             self.skip_step(step.test_plan_number)
 
-    def step(self, step: typing.Union[int, str]):
+    def step(self, step: typing.Union[int, str], endpoint: Optional[int] = None):
         test_name = self.current_test_info.name
         steps = self.get_test_steps(test_name)
 
@@ -1459,6 +1464,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if len(steps) <= self.current_step_index or steps[self.current_step_index].test_plan_number != step:
             asserts.fail(f'Unexpected test step: {step} - steps not called in order, or step does not exist')
 
+        current_step = steps[self.current_step_index]
         if self.runner_hook:
             # If we've reached the next step with no assertion and the step wasn't skipped, it passed
             if not self.step_skipped and self.current_step_index != 0:
@@ -1466,14 +1472,18 @@ class MatterBaseTest(base_test.BaseTestClass):
                 step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
                 self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
+            current_step.endpoint = endpoint
+
             # TODO: it seems like the step start should take a number and a name
-            name = f'{step} : {steps[self.current_step_index].description}'
-            self.runner_hook.step_start(name=name)
+            name = f'{step} : {current_step.description}'
+
+            self.print_step(step, current_step.description, endpoint)
+            self.runner_hook.step_start(name=name, endpoint=current_step.endpoint)
         else:
-            self.print_step(step, steps[self.current_step_index].description)
+            self.print_step(step, current_step.description)
 
         self.step_start_time = datetime.now(tz=timezone.utc)
-        self.current_step_index = self.current_step_index + 1
+        self.current_step_index += 1
         self.step_skipped = False
 
     def get_setup_payload_info(self) -> List[SetupPayloadInfo]:
@@ -1833,7 +1843,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     all_global_args = []
     argsets = [item for item in (args.int_arg, args.float_arg, args.string_arg, args.json_arg,
                                  args.hex_arg, args.bool_arg) if item is not None]
-    for argset in argsets:
+    for argset in chain.from_iterable(argsets):
         all_global_args.extend(argset)
 
     config.global_test_params = {}
@@ -1945,17 +1955,17 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                               help='Path to chip-tool credentials file root')
 
     args_group = parser.add_argument_group(title="Config arguments", description="Test configuration global arguments set")
-    args_group.add_argument('--int-arg', nargs='*', type=int_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--int-arg', nargs='*', action='append', type=int_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an integer as hex or decimal (e.g. -2 or 0xFFFF_1234)")
-    args_group.add_argument('--bool-arg', nargs='*', type=bool_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--bool-arg', nargs='*', action='append', type=bool_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an boolean value (e.g. true/false or 0/1)")
-    args_group.add_argument('--float-arg', nargs='*', type=float_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--float-arg', nargs='*', action='append', type=float_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for a floating point value (e.g. -2.1 or 6.022e23)")
-    args_group.add_argument('--string-arg', nargs='*', type=str_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--string-arg', nargs='*', action='append', type=str_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for a string value")
-    args_group.add_argument('--json-arg', nargs='*', type=json_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--json-arg', nargs='*', action='append', type=json_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for JSON stored as a list or dict")
-    args_group.add_argument('--hex-arg', nargs='*', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--hex-arg', nargs='*', action='append', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an octet string in hex (e.g. 0011cafe or 00:11:CA:FE)")
 
     if not argv:
