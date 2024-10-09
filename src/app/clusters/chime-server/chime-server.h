@@ -161,7 +161,7 @@ public:
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
-    virtual Protocols::InteractionModel::Status playChimeSound() = 0;
+    virtual Protocols::InteractionModel::Status PlayChimeSound() = 0;
 
 protected:
     friend class ChimeServer;

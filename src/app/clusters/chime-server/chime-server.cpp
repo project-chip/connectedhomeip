@@ -265,7 +265,7 @@ void ChimeServer::HandlePlayChimeSound(HandlerContext & ctx, const Commands::Pla
     ChipLogDetail(Zcl, "Chime: PlayChimeSound");
 
     // call the delegate to play the chime
-    Status status = mDelegate.playChimeSound();
+    Status status = mDelegate.PlayChimeSound();
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
