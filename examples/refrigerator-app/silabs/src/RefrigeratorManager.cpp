@@ -45,8 +45,6 @@ EndpointId kRefEndpointId           = 1;
 EndpointId kColdCabinetEndpointId   = 2;
 EndpointId kFreezeCabinetEndpointId = 3;
 
-
-
 RefrigeratorManager RefrigeratorManager::sRefrigeratorMgr;
 
 namespace {
@@ -133,7 +131,7 @@ void RefrigeratorManager::RefAlaramAttributeChangeHandler(EndpointId endpointId,
         RefAlarmAttr::State::Set(endpointId, mState);
     }
     break;
-    
+
     default: {
         ChipLogError(AppServer, "Unhandled Refrigerator Alarm attribute %ld", attributeId);
         return;
