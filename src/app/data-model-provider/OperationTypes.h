@@ -61,7 +61,8 @@ struct OperationRequest
     /// This is a readability convenience function.
     ///
     /// Returns kUndefinedFabricIndex if no subject descriptor is available
-    FabricIndex GetAccessingFabricIndex() const {
+    FabricIndex GetAccessingFabricIndex() const
+    {
         return subjectDescriptor.has_value() ? subjectDescriptor->fabricIndex : kUndefinedFabricIndex;
     }
 };

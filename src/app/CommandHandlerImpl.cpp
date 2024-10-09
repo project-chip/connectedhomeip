@@ -393,8 +393,8 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     {
         DataModel::InvokeRequest request;
 
-        request.path                 = concretePath;
-        request.subjectDescriptor    = GetSubjectDescriptor();
+        request.path              = concretePath;
+        request.subjectDescriptor = GetSubjectDescriptor();
         request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
 
         Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
@@ -515,8 +515,8 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
         {
             DataModel::InvokeRequest request;
 
-            request.path                 = concretePath;
-            request.subjectDescriptor    = GetSubjectDescriptor();
+            request.path              = concretePath;
+            request.subjectDescriptor = GetSubjectDescriptor();
             request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
 
             Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
