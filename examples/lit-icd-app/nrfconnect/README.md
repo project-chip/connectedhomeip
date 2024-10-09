@@ -167,6 +167,11 @@ duration of the effect.
 of the device. Releasing the button within the 3-second window cancels the
 factory reset procedure.
 
+**Button 2** Represents the Dynamic SIT LIT Support feature from the
+Intermittently Connected Devices Management cluster. Pressing it requests
+putting the ICD device in the SIT mode. Pressing the button again withdraws the
+previous request.
+
 **Button 3** Represents the User Active Mode Trigger feature from the
 Intermittently Connected Devices Management cluster. Pressing it puts the ICD
 device in the active mode and makes it responsive.

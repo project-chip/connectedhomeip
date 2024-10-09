@@ -58,12 +58,28 @@ public:
     /**
      * @return Pointer to the Attribute registered in this cluster, corresponding to attributeId
      */
-    void * GetAttribute(const chip::AttributeId attributeId) { return mAttributes[attributeId]; }
+    void * GetAttribute(const chip::AttributeId attributeId)
+    {
+        if (mAttributes.empty())
+        {
+            ChipLogError(AppServer, "BaseCluster::GetAttribute() mAttributes is empty");
+            return nullptr;
+        }
+        return mAttributes[attributeId];
+    }
 
     /**
      * @return Pointer to the Command registered in this cluster, corresponding to commandId
      */
-    void * GetCommand(const chip::CommandId commandId) { return mCommands[commandId]; }
+    void * GetCommand(const chip::CommandId commandId)
+    {
+        if (mCommands.empty())
+        {
+            ChipLogError(AppServer, "BaseCluster::GetCommand() mCommands is empty");
+            return nullptr;
+        }
+        return mCommands[commandId];
+    }
 
 protected:
     /**

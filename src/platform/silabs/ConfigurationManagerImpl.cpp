@@ -121,7 +121,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
         matterBootCause = BootReasonType::kPowerOnReboot;
     }
     else if (rebootCause & EMU_RSTCAUSE_AVDDBOD || rebootCause & EMU_RSTCAUSE_DVDDBOD || rebootCause & EMU_RSTCAUSE_DECBOD ||
-             rebootCause & EMU_RSTCAUSE_VREGIN || rebootCause & EMU_RSTCAUSE_IOVDD0BOD || rebootCause & EMU_RSTCAUSE_DVDDLEBOD)
+             rebootCause & EMU_RSTCAUSE_IOVDD0BOD || rebootCause & EMU_RSTCAUSE_DVDDLEBOD)
     {
         matterBootCause = BootReasonType::kBrownOutReset;
     }

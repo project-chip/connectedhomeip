@@ -86,6 +86,7 @@ namespace app {
  */
 class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
+                               private DataModel::ActionContext,
                                public CommandResponseSender::Callback,
                                public CommandHandlerImpl::Callback,
                                public ReadHandler::ManagementCallback,
@@ -402,7 +403,10 @@ public:
     }
 #endif
 
-    DataModel::Provider * GetDataModelProvider() const;
+    // Temporarily NOT const because the data model provider will be auto-set
+    // to codegen on first usage. This behaviour will be changed once each
+    // application must explicitly set the data model provider.
+    DataModel::Provider * GetDataModelProvider();
 
     // MUST NOT be used while the interaction model engine is running as interaction
     // model functionality (e.g. active reads/writes/subscriptions) rely on data model
@@ -412,6 +416,9 @@ public:
     DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
 
 private:
+    /* DataModel::ActionContext implementation */
+    Messaging::ExchangeContext * CurrentExchange() override { return mCurrentExchange; }
+
     friend class reporting::Engine;
     friend class TestCommandInteraction;
     friend class TestInteractionModelEngine;
@@ -463,9 +470,8 @@ private:
      *
      * aRequestedEventPathCount will be updated to reflect the number of event paths in the request.
      */
-    static CHIP_ERROR ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                      EventPathIBs::Parser & aEventPathListParser, bool & aHasValidEventPath,
-                                      size_t & aRequestedEventPathCount);
+    CHIP_ERROR ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor, EventPathIBs::Parser & aEventPathListParser,
+                               bool & aHasValidEventPath, size_t & aRequestedEventPathCount);
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
@@ -501,6 +507,7 @@ private:
 
     void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
+
     Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
 
     bool HasActiveRead();
@@ -605,6 +612,11 @@ private:
     void ShutdownMatchingSubscriptions(const Optional<FabricIndex> & aFabricIndex = NullOptional,
                                        const Optional<NodeId> & aPeerNodeId       = NullOptional);
 
+    /**
+     * Check if the given attribute path is a valid path in the data model provider.
+     */
+    bool IsExistentAttributePath(const ConcreteAttributePath & path);
+
     static void ResumeSubscriptionsTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 
     template <typename T, size_t N>
@@ -698,7 +710,31 @@ private:
 
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
 
-    DataModel::Provider * mDataModelProvider = nullptr;
+    DataModel::Provider * mDataModelProvider      = nullptr;
+    Messaging::ExchangeContext * mCurrentExchange = nullptr;
+
+    enum class State : uint8_t
+    {
+        kUninitialized, // The object has not been initialized.
+        kInitializing,  // Initial setup is in progress (e.g. setting up mpExchangeMgr).
+        kInitialized    // The object has been fully initialized and is ready for use.
+    };
+    State mState = State::kUninitialized;
+
+    // Changes the current exchange context of a InteractionModelEngine to a given context
+    class CurrentExchangeValueScope
+    {
+    public:
+        CurrentExchangeValueScope(InteractionModelEngine & engine, Messaging::ExchangeContext * context) : mEngine(engine)
+        {
+            mEngine.mCurrentExchange = context;
+        }
+
+        ~CurrentExchangeValueScope() { mEngine.mCurrentExchange = nullptr; }
+
+    private:
+        InteractionModelEngine & mEngine;
+    };
 };
 
 } // namespace app

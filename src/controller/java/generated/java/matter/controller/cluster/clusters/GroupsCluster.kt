@@ -99,8 +99,8 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_GROUP_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+    val TAG_GROUP_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_ID_REQ), groupID)
 
     val TAG_GROUP_NAME_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_GROUP_NAME_REQ), groupName)
@@ -121,7 +121,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
     val TAG_STATUS: Int = 0
     var status_decoded: UByte? = null
 
-    val TAG_GROUP_I_D: Int = 1
+    val TAG_GROUP_ID: Int = 1
     var groupID_decoded: UShort? = null
 
     while (!tlvReader.isEndOfContainer()) {
@@ -131,7 +131,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
         status_decoded = tlvReader.getUByte(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
       } else {
         tlvReader.skipElement()
@@ -157,8 +157,8 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_GROUP_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+    val TAG_GROUP_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_ID_REQ), groupID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -176,7 +176,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
     val TAG_STATUS: Int = 0
     var status_decoded: UByte? = null
 
-    val TAG_GROUP_I_D: Int = 1
+    val TAG_GROUP_ID: Int = 1
     var groupID_decoded: UShort? = null
 
     val TAG_GROUP_NAME: Int = 2
@@ -189,7 +189,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
         status_decoded = tlvReader.getUByte(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
       }
 
@@ -302,8 +302,8 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_GROUP_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+    val TAG_GROUP_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_ID_REQ), groupID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -321,7 +321,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
     val TAG_STATUS: Int = 0
     var status_decoded: UByte? = null
 
-    val TAG_GROUP_I_D: Int = 1
+    val TAG_GROUP_ID: Int = 1
     var groupID_decoded: UShort? = null
 
     while (!tlvReader.isEndOfContainer()) {
@@ -331,7 +331,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
         status_decoded = tlvReader.getUByte(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
       } else {
         tlvReader.skipElement()
@@ -379,8 +379,8 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_GROUP_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+    val TAG_GROUP_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_ID_REQ), groupID)
 
     val TAG_GROUP_NAME_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_GROUP_NAME_REQ), groupName)

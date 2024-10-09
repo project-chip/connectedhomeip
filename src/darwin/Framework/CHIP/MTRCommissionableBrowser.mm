@@ -268,9 +268,14 @@ public:
         // If there is nothing else to resolve for the given instance name, just remove it
         // too and informs the delegate that it is gone.
         if ([interfaces count] == 0) {
-            dispatch_async(mDispatchQueue, ^{
-                [mDelegate controller:mController didRemoveCommissionableDevice:result];
-            });
+            // If result.instanceName is nil, that means we never notified our
+            // delegate about this result (because we did not get that far in
+            // resolving it), so don't bother notifying about the removal either.
+            if (result.instanceName != nil) {
+                dispatch_async(mDispatchQueue, ^{
+                    [mDelegate controller:mController didRemoveCommissionableDevice:result];
+                });
+            }
 
             mDiscoveredResults[key] = nil;
         }
@@ -325,7 +330,7 @@ public:
         MATTER_LOG_METRIC(kMetricBLEDevicesRemoved, ++mBLEDevicesRemoved);
 
         dispatch_async(mDispatchQueue, ^{
-            [mDelegate controller:mController didFindCommissionableDevice:result];
+            [mDelegate controller:mController didRemoveCommissionableDevice:result];
         });
     }
 

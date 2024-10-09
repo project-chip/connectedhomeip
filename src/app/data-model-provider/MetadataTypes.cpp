@@ -30,6 +30,19 @@ const ClusterEntry ClusterEntry::kInvalid{
     .info = ClusterInfo(0 /* version */), // version of invalid cluster entry does not matter
 };
 
+// A default implementation if just first/next exist
+bool ProviderMetadataTree::EndpointExists(EndpointId endpoint)
+{
+    for (EndpointId id = FirstEndpoint(); id != kInvalidEndpointId; id = NextEndpoint(id))
+    {
+        if (id == endpoint)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 } // namespace DataModel
 } // namespace app
 } // namespace chip

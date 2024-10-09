@@ -42,6 +42,7 @@
 #include <queue.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+#include <static-supported-modes-manager.h>
 
 #include "init_Matter.h"
 #include "lega_rtos_api.h"
@@ -60,6 +61,7 @@ QueueHandle_t sAppEventQueue;
 constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
+app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointMain /* Endpoint Id */,
                                       &(NetworkCommissioning::ASRWiFiDriver::GetInstance()));
@@ -120,6 +122,7 @@ CHIP_ERROR AppTask::Init()
 
     sLightLED.Init(LIGHT_LED);
 
+    app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
     return CHIP_NO_ERROR;
 }
 

@@ -32,17 +32,17 @@ class EnergyEvseClusterEVConnectedEvent(val sessionID: ULong) {
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_SESSION_I_D), sessionID)
+      put(ContextSpecificTag(TAG_SESSION_ID), sessionID)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_SESSION_I_D = 0
+    private const val TAG_SESSION_ID = 0
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterEVConnectedEvent {
       tlvReader.enterStructure(tlvTag)
-      val sessionID = tlvReader.getULong(ContextSpecificTag(TAG_SESSION_I_D))
+      val sessionID = tlvReader.getULong(ContextSpecificTag(TAG_SESSION_ID))
 
       tlvReader.exitContainer()
 

@@ -47,7 +47,7 @@ limitations under the License.
   <cluster>
     <name>Occupancy Sensing</name>
     <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for configuring occupancy sensing, and reporting occupancy status.</description>
+    <description>The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status.</description>
     <code>0x0406</code>
     <define>OCCUPANCY_SENSING_CLUSTER</define>
 
@@ -147,5 +147,10 @@ limitations under the License.
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
+
+    <event side="server" code="0x00" priority="info" name="OccupancyChanged" optional="true">
+      <description>If this event is supported, it SHALL be generated when the Occupancy attribute changes.</description>
+      <field id="0" name="Occupancy" type="OccupancyBitmap"/>
+    </event>
   </cluster>
 </configurator>

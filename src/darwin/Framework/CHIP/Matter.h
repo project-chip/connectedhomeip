@@ -69,4 +69,7 @@
 #import <Matter/MTRStructsObjc.h>
 #import <Matter/MTRThreadOperationalDataset.h>
 
+#import <Matter/MTRXPCClientProtocol.h>
+#import <Matter/MTRXPCServerProtocol.h>
+
 #undef MTR_INCLUDED_FROM_UMBRELLA_HEADER

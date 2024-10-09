@@ -1420,18 +1420,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBarrierControlClusterBarrierControlGoToPercentParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRBarrierControlClusterBarrierControlStopParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
 @interface MTRServiceAreaClusterSelectAreasParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -2044,6 +2032,114 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRZoneManagementClusterCreateTwoDCartesianZoneParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRZoneManagementClusterCreateTwoDCartesianZoneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ZoneManagement::Commands::CreateTwoDCartesianZoneResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRZoneManagementClusterUpdateTwoDCartesianZoneParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRZoneManagementClusterGetTwoDCartesianZoneParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRZoneManagementClusterGetTwoDCartesianZoneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZoneResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRZoneManagementClusterRemoveZoneParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRWebRTCTransportProviderClusterSolicitOfferParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRWebRTCTransportProviderClusterSolicitOfferResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::WebRTCTransportProvider::Commands::SolicitOfferResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRWebRTCTransportProviderClusterProvideOfferParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRWebRTCTransportProviderClusterProvideOfferResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOfferResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRWebRTCTransportProviderClusterProvideAnswerParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRWebRTCTransportProviderClusterProvideICECandidateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRWebRTCTransportProviderClusterEndSessionParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRWebRTCTransportRequestorClusterOfferParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRWebRTCTransportRequestorClusterAnswerParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRWebRTCTransportRequestorClusterICECandidateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRWebRTCTransportRequestorClusterEndParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRChimeClusterPlayChimeSoundParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRCommissionerControlClusterRequestCommissioningApprovalParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -2059,30 +2155,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRCommissionerControlClusterReverseOpenCommissioningWindowParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CommissionerControl::Commands::ReverseOpenCommissioningWindow::DecodableType &)decodableStruct;
-
-@end
-
-@interface MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType &)decodableStruct;
-
-@end
-
-@interface MTRElectricalMeasurementClusterGetProfileInfoCommandParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType &)decodableStruct;
-
-@end
-
-@interface MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 

@@ -16,7 +16,6 @@ details.
     -   [Building](#building)
     -   [Commandline arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
-    -   [Running RPC Console](#running-rpc-console)
     -   [Device Tracing](#device-tracing)
     -   [Python Test Cases](#python-test-cases)
         -   [Running the test cases:](#running-the-test-cases)
@@ -74,6 +73,19 @@ details.
     `hciconfig` command, for example, `--ble-device 1` means using `hci1`
     interface. Default: `0`.
 
+-   `--application <evse | water-heater>`
+
+    Emulate either an EVSE or Water Heater example.
+
+-   `--featureSet <feature map for Device Energy Management e.g. 0x7a>`
+
+    Sets the run-time FeatureMap value for the Device Energy Management cluster.
+    This allows the DEM cluster to support `PFR` or `SFR` so that the full range
+    of TC_DEM_2.x test cases can be exercised with this application.
+
+    See the test-runner headers in the respective test script in
+    src/python_testing/TC_DEM_2.x.py which have recommended values to use.
+
 ## Running the Complete Example on Raspberry Pi 4
 
 > If you want to test Echo protocol, please enable Echo handler
@@ -124,20 +136,6 @@ details.
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.
 
-## Running RPC Console
-
--   As part of building the example with RPCs enabled the chip_rpc python
-    interactive console is installed into your venv. The python wheel files are
-    also created in the output folder: out/debug/chip_rpc_console_wheels. To
-    install the wheel files without rebuilding:
-    `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
-
--   To use the chip-rpc console after it has been installed run:
-    `chip-console -s localhost:33000 -o /<YourFolder>/pw_log.out`
-
--   Then you can Get and Set the Energy Management using the RPCs:
-    `rpcs.chip.rpc.EnergyManagement.Get()`
-
 ## Device Tracing
 
 Device tracing is available to analyze the device performance. To turn on
@@ -185,7 +183,7 @@ app you need to add `chip_enable_energy_evse_trigger=true` to the gn args.
 Once the application is built you also need to tell it at runtime what the
 chosen enable key is using the `--enable-key` command line option.
 
-          $ ./chip-energy-management-app --enable-key 000102030405060708090a0b0c0d0e0f
+          $ ./chip-energy-management-app --enable-key 000102030405060708090a0b0c0d0e0f --application evse
 
 ### Running the test cases:
 
@@ -194,7 +192,7 @@ From the top-level of the connectedhomeip repo type:
 Start the chip-energy-management-app:
 
 ```bash
-rm -f evse.bin; out/debug/chip-energy-management-app --enable-key 000102030405060708090a0b0c0d0e0f --KVS evse.bin --featureSet $featureSet
+rm -f evse.bin; out/debug/chip-energy-management-app --enable-key 000102030405060708090a0b0c0d0e0f --KVS evse.bin --featureSet $featureSet --application evse
 ```
 
 where the \$featureSet depends on the test being run:
@@ -262,7 +260,7 @@ data (e.g. fabric info).
 -   Step 1: Launch the example app
 
 ```bash
-    $ ./chip-energy-management-app --enable-key 000102030405060708090a0b0c0d0e0f
+    $ ./chip-energy-management-app --enable-key 000102030405060708090a0b0c0d0e0f --application evse
 ```
 
 -   Step 2: Launch CHIP-REPL

@@ -195,6 +195,14 @@ MTRDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrent
 
 MTRDeviceController * CHIPCommandBridge::GetCommissioner(const char * identity) { return mControllers[identity]; }
 
+MTRBaseDevice * CHIPCommandBridge::BaseDeviceWithNodeId(chip::NodeId nodeId)
+{
+    MTRDeviceController * controller = CurrentCommissioner();
+    VerifyOrReturnValue(controller != nil, nil);
+    return [controller deviceBeingCommissionedWithNodeID:@(nodeId) error:nullptr]
+        ?: [MTRBaseDevice deviceWithNodeID:@(nodeId) controller:controller];
+}
+
 void CHIPCommandBridge::StopCommissioners()
 {
     for (auto & pair : mControllers) {

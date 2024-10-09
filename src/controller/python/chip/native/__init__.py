@@ -69,7 +69,7 @@ class ErrorSDKPart(enum.IntEnum):
 class PyChipError(ctypes.Structure):
     ''' The ChipError for Python library.
 
-    We are using the following struct for passing the infomations of CHIP_ERROR between C++ and Python:
+    We are using the following struct for passing the information of CHIP_ERROR between C++ and Python:
 
     ```c
     struct PyChipError
@@ -87,6 +87,10 @@ class PyChipError(ctypes.Structure):
             exception = self.to_exception()
             if exception is not None:  # Ensure exception is not None to avoid mypy error and only raise valid exceptions
                 raise exception
+
+    @classmethod
+    def from_code(cls, code):
+        return cls(code=code, line=0, file=ctypes.c_void_p())
 
     @property
     def is_success(self) -> bool:

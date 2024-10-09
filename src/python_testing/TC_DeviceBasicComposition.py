@@ -19,13 +19,82 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --manual-code 10054912339 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: --storage-path admin_storage.json --manual-code 10054912339
+#     factory-reset: true
+#     quiet: true
+#   run3:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00
+#     factory-reset: true
+#     quiet: true
+#   run4:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --discriminator 1234
+#       --passcode 20202021
+#     factory-reset: true
+#     quiet: true
+#   run5:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --commissioning-method on-network
+#     factory-reset: true
+#     quiet: true
+#   run6:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --qr-code MT:-24J0Q1212-10648G00
+#       --commissioning-method on-network
+#     factory-reset: true
+#     quiet: true
+#   run7:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --discriminator 1234
+#       --passcode 20202021
+#       --commissioning-method on-network
+#     factory-reset: true
+#     quiet: true
+#   run8:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: --storage-path admin_storage.json
+#     factory-reset: false
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
+
+# Run 1: runs through all tests
+# Run 2: tests PASE connection using manual code (12.1 only)
+# Run 3: tests PASE connection using QR code (12.1 only)
+# Run 4: tests PASE connection using discriminator and passcode (12.1 only)
+# Run 5: Tests CASE connection using manual code (12.1 only)
+# Run 6: Tests CASE connection using QR code (12.1 only)
+# Run 7: Tests CASE connection using manual discriminator and passcode (12.1 only)
 
 import logging
 from dataclasses import dataclass
@@ -405,8 +474,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         self.print_step(
             6, "Validate that none of the global attribute IDs contain values with prefixes outside of the allowed standard or MEI prefix range")
-        is_ci = self.check_pics('PICS_SDK_CI_ONLY')
-        if is_ci:
+        if self.is_pics_sdk_ci_only:
             # test vendor prefixes are allowed in the CI because we use them internally in examples
             bad_prefix_min = 0xFFF5_0000
         else:
@@ -775,7 +843,18 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         software_version = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SoftwareVersion]
         filename = f'device_dump_0x{vid:04X}_0x{pid:04X}_{software_version}.json'
         dump_device_composition_path = self.user_params.get("dump_device_composition_path", filename)
-        self.dump_wildcard(dump_device_composition_path)
+        json_str, txt_str = self.dump_wildcard(dump_device_composition_path)
+
+        # Structured dump so we can pull these back out of the logs
+        def log_structured_data(start_tag: str, dump_string):
+            lines = dump_string.splitlines()
+            logging.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
+            for line in lines:
+                logging.info(f'{start_tag}{line}')
+            logging.info(f'{start_tag}END ====')
+
+        log_structured_data('==== json: ', json_str)
+        log_structured_data('==== txt: ', txt_str)
 
 
 if __name__ == "__main__":

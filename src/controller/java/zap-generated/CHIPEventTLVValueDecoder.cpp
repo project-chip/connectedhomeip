@@ -67,28 +67,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::OnOffSwitchConfiguration::Id: {
-        using namespace app::Clusters::OnOffSwitchConfiguration;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
     case app::Clusters::LevelControl::Id: {
         using namespace app::Clusters::LevelControl;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::BinaryInputBasic::Id: {
-        using namespace app::Clusters::BinaryInputBasic;
         switch (aPath.mEventId)
         {
         default:
@@ -500,46 +480,6 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             return value;
         }
-        case Events::AccessRestrictionEntryChanged::Id: {
-            Events::AccessRestrictionEntryChanged::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value_fabricIndex;
-            std::string value_fabricIndexClassName     = "java/lang/Integer";
-            std::string value_fabricIndexCtorSignature = "(I)V";
-            jint jnivalue_fabricIndex                  = static_cast<jint>(cppValue.fabricIndex);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_fabricIndexClassName.c_str(),
-                                                                       value_fabricIndexCtorSignature.c_str(), jnivalue_fabricIndex,
-                                                                       value_fabricIndex);
-
-            jclass accessRestrictionEntryChangedStructClass;
-            err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$AccessControlClusterAccessRestrictionEntryChangedEvent",
-                accessRestrictionEntryChangedStructClass);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$AccessControlClusterAccessRestrictionEntryChangedEvent");
-                return nullptr;
-            }
-
-            jmethodID accessRestrictionEntryChangedStructCtor;
-            err = chip::JniReferences::GetInstance().FindMethod(env, accessRestrictionEntryChangedStructClass, "<init>",
-                                                                "(Ljava/lang/Integer;)V", &accessRestrictionEntryChangedStructCtor);
-            if (err != CHIP_NO_ERROR || accessRestrictionEntryChangedStructCtor == nullptr)
-            {
-                ChipLogError(Zcl,
-                             "Could not find ChipEventStructs$AccessControlClusterAccessRestrictionEntryChangedEvent constructor");
-                return nullptr;
-            }
-
-            jobject value = env->NewObject(accessRestrictionEntryChangedStructClass, accessRestrictionEntryChangedStructCtor,
-                                           value_fabricIndex);
-
-            return value;
-        }
         case Events::FabricRestrictionReviewUpdate::Id: {
             Events::FabricRestrictionReviewUpdate::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
@@ -555,25 +495,29 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_tokenClassName.c_str(), value_tokenCtorSignature.c_str(), jnivalue_token, value_token);
 
             jobject value_instruction;
-            if (cppValue.instruction.IsNull())
+            if (!cppValue.instruction.HasValue())
             {
-                value_instruction = nullptr;
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_instruction);
             }
             else
             {
-                LogErrorOnFailure(
-                    chip::JniReferences::GetInstance().CharToStringUTF(cppValue.instruction.Value(), value_instruction));
+                jobject value_instructionInsideOptional;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.instruction.Value(),
+                                                                                     value_instructionInsideOptional));
+                chip::JniReferences::GetInstance().CreateOptional(value_instructionInsideOptional, value_instruction);
             }
 
-            jobject value_redirectURL;
-            if (cppValue.redirectURL.IsNull())
+            jobject value_ARLRequestFlowUrl;
+            if (!cppValue.ARLRequestFlowUrl.HasValue())
             {
-                value_redirectURL = nullptr;
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_ARLRequestFlowUrl);
             }
             else
             {
-                LogErrorOnFailure(
-                    chip::JniReferences::GetInstance().CharToStringUTF(cppValue.redirectURL.Value(), value_redirectURL));
+                jobject value_ARLRequestFlowUrlInsideOptional;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.ARLRequestFlowUrl.Value(),
+                                                                                     value_ARLRequestFlowUrlInsideOptional));
+                chip::JniReferences::GetInstance().CreateOptional(value_ARLRequestFlowUrlInsideOptional, value_ARLRequestFlowUrl);
             }
 
             jobject value_fabricIndex;
@@ -597,7 +541,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             jmethodID fabricRestrictionReviewUpdateStructCtor;
             err = chip::JniReferences::GetInstance().FindMethod(
                 env, fabricRestrictionReviewUpdateStructClass, "<init>",
-                "(Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;)V",
+                "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/Integer;)V",
                 &fabricRestrictionReviewUpdateStructCtor);
             if (err != CHIP_NO_ERROR || fabricRestrictionReviewUpdateStructCtor == nullptr)
             {
@@ -607,7 +551,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jobject value = env->NewObject(fabricRestrictionReviewUpdateStructClass, fabricRestrictionReviewUpdateStructCtor,
-                                           value_token, value_instruction, value_redirectURL, value_fabricIndex);
+                                           value_token, value_instruction, value_ARLRequestFlowUrl, value_fabricIndex);
 
             return value;
         }
@@ -7023,16 +6967,6 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::BarrierControl::Id: {
-        using namespace app::Clusters::BarrierControl;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
     case app::Clusters::ServiceArea::Id: {
         using namespace app::Clusters::ServiceArea;
         switch (aPath.mEventId)
@@ -7688,6 +7622,43 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         using namespace app::Clusters::OccupancySensing;
         switch (aPath.mEventId)
         {
+        case Events::OccupancyChanged::Id: {
+            Events::OccupancyChanged::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_occupancy;
+            std::string value_occupancyClassName     = "java/lang/Integer";
+            std::string value_occupancyCtorSignature = "(I)V";
+            jint jnivalue_occupancy                  = static_cast<jint>(cppValue.occupancy.Raw());
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_occupancyClassName.c_str(), value_occupancyCtorSignature.c_str(), jnivalue_occupancy, value_occupancy);
+
+            jclass occupancyChangedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$OccupancySensingClusterOccupancyChangedEvent",
+                occupancyChangedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$OccupancySensingClusterOccupancyChangedEvent");
+                return nullptr;
+            }
+
+            jmethodID occupancyChangedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, occupancyChangedStructClass, "<init>",
+                                                                "(Ljava/lang/Integer;)V", &occupancyChangedStructCtor);
+            if (err != CHIP_NO_ERROR || occupancyChangedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$OccupancySensingClusterOccupancyChangedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(occupancyChangedStructClass, occupancyChangedStructCtor, value_occupancy);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
@@ -8277,6 +8248,150 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::ZoneManagement::Id: {
+        using namespace app::Clusters::ZoneManagement;
+        switch (aPath.mEventId)
+        {
+        case Events::ZoneTriggered::Id: {
+            Events::ZoneTriggered::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_zones;
+            chip::JniReferences::GetInstance().CreateArrayList(value_zones);
+
+            auto iter_value_zones_0 = cppValue.zones.begin();
+            while (iter_value_zones_0.Next())
+            {
+                auto & entry_0 = iter_value_zones_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Integer";
+                std::string newElement_0CtorSignature = "(I)V";
+                jint jninewElement_0                  = static_cast<jint>(entry_0);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value_zones, newElement_0);
+            }
+
+            jobject value_reason;
+            std::string value_reasonClassName     = "java/lang/Integer";
+            std::string value_reasonCtorSignature = "(I)V";
+            jint jnivalue_reason                  = static_cast<jint>(cppValue.reason);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_reasonClassName.c_str(), value_reasonCtorSignature.c_str(), jnivalue_reason, value_reason);
+
+            jclass zoneTriggeredStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ZoneManagementClusterZoneTriggeredEvent", zoneTriggeredStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ZoneManagementClusterZoneTriggeredEvent");
+                return nullptr;
+            }
+
+            jmethodID zoneTriggeredStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, zoneTriggeredStructClass, "<init>", "(Ljava/util/ArrayList;Ljava/lang/Integer;)V", &zoneTriggeredStructCtor);
+            if (err != CHIP_NO_ERROR || zoneTriggeredStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$ZoneManagementClusterZoneTriggeredEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(zoneTriggeredStructClass, zoneTriggeredStructCtor, value_zones, value_reason);
+
+            return value;
+        }
+        case Events::ZoneStopped::Id: {
+            Events::ZoneStopped::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_zones;
+            chip::JniReferences::GetInstance().CreateArrayList(value_zones);
+
+            auto iter_value_zones_0 = cppValue.zones.begin();
+            while (iter_value_zones_0.Next())
+            {
+                auto & entry_0 = iter_value_zones_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Integer";
+                std::string newElement_0CtorSignature = "(I)V";
+                jint jninewElement_0                  = static_cast<jint>(entry_0);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value_zones, newElement_0);
+            }
+
+            jobject value_reason;
+            std::string value_reasonClassName     = "java/lang/Integer";
+            std::string value_reasonCtorSignature = "(I)V";
+            jint jnivalue_reason                  = static_cast<jint>(cppValue.reason);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_reasonClassName.c_str(), value_reasonCtorSignature.c_str(), jnivalue_reason, value_reason);
+
+            jclass zoneStoppedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ZoneManagementClusterZoneStoppedEvent", zoneStoppedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ZoneManagementClusterZoneStoppedEvent");
+                return nullptr;
+            }
+
+            jmethodID zoneStoppedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, zoneStoppedStructClass, "<init>", "(Ljava/util/ArrayList;Ljava/lang/Integer;)V", &zoneStoppedStructCtor);
+            if (err != CHIP_NO_ERROR || zoneStoppedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$ZoneManagementClusterZoneStoppedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(zoneStoppedStructClass, zoneStoppedStructCtor, value_zones, value_reason);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::WebRTCTransportProvider::Id: {
+        using namespace app::Clusters::WebRTCTransportProvider;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::WebRTCTransportRequestor::Id: {
+        using namespace app::Clusters::WebRTCTransportRequestor;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::Chime::Id: {
+        using namespace app::Clusters::Chime;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::EcosystemInformation::Id: {
         using namespace app::Clusters::EcosystemInformation;
         switch (aPath.mEventId)
@@ -8298,20 +8413,20 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
-            jobject value_requestId;
-            std::string value_requestIdClassName     = "java/lang/Long";
-            std::string value_requestIdCtorSignature = "(J)V";
-            jlong jnivalue_requestId                 = static_cast<jlong>(cppValue.requestId);
+            jobject value_requestID;
+            std::string value_requestIDClassName     = "java/lang/Long";
+            std::string value_requestIDCtorSignature = "(J)V";
+            jlong jnivalue_requestID                 = static_cast<jlong>(cppValue.requestID);
             chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                value_requestIdClassName.c_str(), value_requestIdCtorSignature.c_str(), jnivalue_requestId, value_requestId);
+                value_requestIDClassName.c_str(), value_requestIDCtorSignature.c_str(), jnivalue_requestID, value_requestID);
 
-            jobject value_clientNodeId;
-            std::string value_clientNodeIdClassName     = "java/lang/Long";
-            std::string value_clientNodeIdCtorSignature = "(J)V";
-            jlong jnivalue_clientNodeId                 = static_cast<jlong>(cppValue.clientNodeId);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_clientNodeIdClassName.c_str(),
-                                                                        value_clientNodeIdCtorSignature.c_str(),
-                                                                        jnivalue_clientNodeId, value_clientNodeId);
+            jobject value_clientNodeID;
+            std::string value_clientNodeIDClassName     = "java/lang/Long";
+            std::string value_clientNodeIDCtorSignature = "(J)V";
+            jlong jnivalue_clientNodeID                 = static_cast<jlong>(cppValue.clientNodeID);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_clientNodeIDClassName.c_str(),
+                                                                        value_clientNodeIDCtorSignature.c_str(),
+                                                                        jnivalue_clientNodeID, value_clientNodeID);
 
             jobject value_statusCode;
             std::string value_statusCodeClassName     = "java/lang/Integer";
@@ -8351,20 +8466,10 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jobject value = env->NewObject(commissioningRequestResultStructClass, commissioningRequestResultStructCtor,
-                                           value_requestId, value_clientNodeId, value_statusCode, value_fabricIndex);
+                                           value_requestID, value_clientNodeID, value_statusCode, value_fabricIndex);
 
             return value;
         }
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
-    case app::Clusters::ElectricalMeasurement::Id: {
-        using namespace app::Clusters::ElectricalMeasurement;
-        switch (aPath.mEventId)
-        {
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;

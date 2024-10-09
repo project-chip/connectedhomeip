@@ -59,6 +59,13 @@ commissioning information:
 python3 PICSGenerator.py --pics-template <pathToPicsTemplateFolder> --pics-output <outputPath> --commissioning-method ble-thread --discriminator <DESCRIMINATOR> --passcode <PASSCODE> --thread-dataset-hex <DATASET_AS_HEX>
 ```
 
+or in case the device is e.g. an example running on a Linux/macOS system, use
+the on-network commissioning:
+
+```
+python3 PICSGenerator.py --pics-template <pathToPicsTemplateFolder> --pics-output <outputPath> --commissioning-method on-network --discriminator <DESCRIMINATOR> --passcode <PASSCODE>
+```
+
 In case the device uses a development PAA, the following parameter should be
 added.
 
@@ -77,4 +84,21 @@ If a device has already been commissioned, the tool can be executed like this:
 
 ```
 python3 PICSGenerator.py --pics-template <pathToPicsTemplateFolder> --pics-output <outputPath>
+```
+
+# Updates for future releases
+
+Given each new release adds PICS files, to ensure the tool is able to map the
+cluster names to the PICS XML files, the XMLPICSValidator script can be used to
+validate the mapping and will inform in case a cluster can not be mapped to a
+PICS XML file.
+
+The purpose of this script is mainly to make the update of this tool to future
+versions of Matter easier and is not intended as a script for generating the
+PICS.
+
+To run the XMLPICSValidator, the following command can be used:
+
+```
+python3 XMLPICSValidator.py --pics-template <pathToPicsTemplateFolder>
 ```

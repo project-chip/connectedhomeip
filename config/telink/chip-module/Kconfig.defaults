@@ -180,7 +180,8 @@ config PWM
 endif
 
 # Board non-retention config
-if BOARD_TLSR9118BDK40D || BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D
+if  BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1 || \
+    BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D
 config PWM
     default y
 endif
@@ -191,6 +192,10 @@ config DYNAMIC_INTERRUPTS
 
 config CHIP_OTA_REQUESTOR
     default y
+
+config MCUBOOT_SIGNATURE_KEY_FILE
+	default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D
+	depends on BOOTLOADER_MCUBOOT
 
 # In current config/zephyr/Kconfig
 # next deprecated values are selected
@@ -219,12 +224,7 @@ config NVS_LOOKUP_CACHE_SIZE
 config SETTINGS_NVS_SECTOR_SIZE_MULT
     default 1
 
-# Set sector counter of NVS
-config SETTINGS_NVS_SECTOR_COUNT
-    default 12
-
 # Enable OpenThread
-
 config NET_L2_OPENTHREAD
     default y if !WIFI
 
@@ -297,16 +297,13 @@ config NET_CONFIG_INIT_TIMEOUT
 
 config CHIP_WIFI
 	bool "Enable Telink Wi-Fi support"
-	default y if BOARD_TLSR9118BDK40D
+	default y if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
 	select WIFI_W91
 	select WIFI
 	select NET_STATISTICS
 	select NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
 	select NET_IPV6_NBR_CACHE
 	select NET_STATISTICS_USER_API
-#	select NET_IPV4 # TODO: remove IPv4 when IPv6 will be ready (see CHIP_IPV4)
-#	select NET_CONFIG_NEED_IPV4
-#	select NET_DHCPV4
 
 if CHIP_WIFI
 

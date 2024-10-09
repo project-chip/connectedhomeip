@@ -532,33 +532,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRAccessControlClusterAccessRestrictionEntryChangedEvent
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _fabricIndex = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRAccessControlClusterAccessRestrictionEntryChangedEvent alloc] init];
-
-    other.fabricIndex = self.fabricIndex;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fabricIndex:%@; >", NSStringFromClass([self class]), _fabricIndex];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRAccessControlClusterFabricRestrictionReviewUpdateEvent
 - (instancetype)init
 {
@@ -568,7 +541,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _instruction = nil;
 
-        _redirectURL = nil;
+        _arlRequestFlowUrl = nil;
 
         _fabricIndex = @(0);
     }
@@ -581,7 +554,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.token = self.token;
     other.instruction = self.instruction;
-    other.redirectURL = self.redirectURL;
+    other.arlRequestFlowUrl = self.arlRequestFlowUrl;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -589,7 +562,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: token:%@; instruction:%@; redirectURL:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _token, _instruction, _redirectURL, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: token:%@; instruction:%@; arlRequestFlowUrl:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _token, _instruction, _arlRequestFlowUrl, _fabricIndex];
     return descriptionString;
 }
 
@@ -6739,7 +6712,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _landmarkTag = @(0);
 
-        _positionTag = nil;
+        _relativePositionTag = nil;
     }
     return self;
 }
@@ -6749,14 +6722,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRServiceAreaClusterLandmarkInfoStruct alloc] init];
 
     other.landmarkTag = self.landmarkTag;
-    other.positionTag = self.positionTag;
+    other.relativePositionTag = self.relativePositionTag;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: landmarkTag:%@; positionTag:%@; >", NSStringFromClass([self class]), _landmarkTag, _positionTag];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: landmarkTag:%@; relativePositionTag:%@; >", NSStringFromClass([self class]), _landmarkTag, _relativePositionTag];
     return descriptionString;
 }
 
@@ -6801,7 +6774,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _mapID = nil;
 
-        _areaDesc = [MTRServiceAreaClusterAreaInfoStruct new];
+        _areaInfo = [MTRServiceAreaClusterAreaInfoStruct new];
     }
     return self;
 }
@@ -6812,14 +6785,14 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.areaID = self.areaID;
     other.mapID = self.mapID;
-    other.areaDesc = self.areaDesc;
+    other.areaInfo = self.areaInfo;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: areaID:%@; mapID:%@; areaDesc:%@; >", NSStringFromClass([self class]), _areaID, _mapID, _areaDesc];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: areaID:%@; mapID:%@; areaInfo:%@; >", NSStringFromClass([self class]), _areaID, _mapID, _areaInfo];
     return descriptionString;
 }
 
@@ -7541,6 +7514,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: holdTimeMin:%@; holdTimeMax:%@; holdTimeDefault:%@; >", NSStringFromClass([self class]), _holdTimeMin, _holdTimeMax, _holdTimeDefault];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTROccupancySensingClusterOccupancyChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _occupancy = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROccupancySensingClusterOccupancyChangedEvent alloc] init];
+
+    other.occupancy = self.occupancy;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: occupancy:%@; >", NSStringFromClass([self class]), _occupancy];
     return descriptionString;
 }
 
@@ -8768,6 +8768,393 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRZoneManagementClusterTwoDCartesianVertexStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _x = @(0);
+
+        _y = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRZoneManagementClusterTwoDCartesianVertexStruct alloc] init];
+
+    other.x = self.x;
+    other.y = self.y;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: x:%@; y:%@; >", NSStringFromClass([self class]), _x, _y];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRZoneManagementClusterTwoDCartesianZoneStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _name = @"";
+
+        _use = @(0);
+
+        _vertices = [NSArray array];
+
+        _color = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRZoneManagementClusterTwoDCartesianZoneStruct alloc] init];
+
+    other.name = self.name;
+    other.use = self.use;
+    other.vertices = self.vertices;
+    other.color = self.color;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; use:%@; vertices:%@; color:%@; >", NSStringFromClass([self class]), _name, _use, _vertices, _color];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRZoneManagementClusterZoneInformationStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _zoneID = @(0);
+
+        _zoneType = @(0);
+
+        _zoneSource = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRZoneManagementClusterZoneInformationStruct alloc] init];
+
+    other.zoneID = self.zoneID;
+    other.zoneType = self.zoneType;
+    other.zoneSource = self.zoneSource;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zoneType:%@; zoneSource:%@; >", NSStringFromClass([self class]), _zoneID, _zoneType, _zoneSource];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRZoneManagementClusterZoneTriggeringTimeControlStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _initialDuration = @(0);
+
+        _augmentationDuration = @(0);
+
+        _maxDuration = @(0);
+
+        _blindDuration = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRZoneManagementClusterZoneTriggeringTimeControlStruct alloc] init];
+
+    other.initialDuration = self.initialDuration;
+    other.augmentationDuration = self.augmentationDuration;
+    other.maxDuration = self.maxDuration;
+    other.blindDuration = self.blindDuration;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: initialDuration:%@; augmentationDuration:%@; maxDuration:%@; blindDuration:%@; >", NSStringFromClass([self class]), _initialDuration, _augmentationDuration, _maxDuration, _blindDuration];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRZoneManagementClusterZoneTriggeredEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _zones = [NSArray array];
+
+        _reason = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRZoneManagementClusterZoneTriggeredEvent alloc] init];
+
+    other.zones = self.zones;
+    other.reason = self.reason;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zones:%@; reason:%@; >", NSStringFromClass([self class]), _zones, _reason];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRZoneManagementClusterZoneStoppedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _zones = [NSArray array];
+
+        _reason = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRZoneManagementClusterZoneStoppedEvent alloc] init];
+
+    other.zones = self.zones;
+    other.reason = self.reason;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zones:%@; reason:%@; >", NSStringFromClass([self class]), _zones, _reason];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWebRTCTransportProviderClusterICEServerStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _urls = [NSArray array];
+
+        _username = nil;
+
+        _credential = nil;
+
+        _caid = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWebRTCTransportProviderClusterICEServerStruct alloc] init];
+
+    other.urls = self.urls;
+    other.username = self.username;
+    other.credential = self.credential;
+    other.caid = self.caid;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: urls:%@; username:%@; credential:%@; caid:%@; >", NSStringFromClass([self class]), _urls, _username, _credential, _caid];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWebRTCTransportProviderClusterWebRTCSessionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _id = @(0);
+
+        _peerNodeID = @(0);
+
+        _peerFabricIndex = @(0);
+
+        _streamType = @(0);
+
+        _videoStreamID = nil;
+
+        _audioStreamID = nil;
+
+        _metadataOptions = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWebRTCTransportProviderClusterWebRTCSessionStruct alloc] init];
+
+    other.id = self.id;
+    other.peerNodeID = self.peerNodeID;
+    other.peerFabricIndex = self.peerFabricIndex;
+    other.streamType = self.streamType;
+    other.videoStreamID = self.videoStreamID;
+    other.audioStreamID = self.audioStreamID;
+    other.metadataOptions = self.metadataOptions;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerFabricIndex:%@; streamType:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerFabricIndex, _streamType, _videoStreamID, _audioStreamID, _metadataOptions];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWebRTCTransportRequestorClusterICEServerStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _urls = [NSArray array];
+
+        _username = nil;
+
+        _credential = nil;
+
+        _caid = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWebRTCTransportRequestorClusterICEServerStruct alloc] init];
+
+    other.urls = self.urls;
+    other.username = self.username;
+    other.credential = self.credential;
+    other.caid = self.caid;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: urls:%@; username:%@; credential:%@; caid:%@; >", NSStringFromClass([self class]), _urls, _username, _credential, _caid];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWebRTCTransportRequestorClusterWebRTCSessionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _id = @(0);
+
+        _peerNodeID = @(0);
+
+        _peerFabricIndex = @(0);
+
+        _streamType = @(0);
+
+        _videoStreamID = nil;
+
+        _audioStreamID = nil;
+
+        _metadataOptions = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWebRTCTransportRequestorClusterWebRTCSessionStruct alloc] init];
+
+    other.id = self.id;
+    other.peerNodeID = self.peerNodeID;
+    other.peerFabricIndex = self.peerFabricIndex;
+    other.streamType = self.streamType;
+    other.videoStreamID = self.videoStreamID;
+    other.audioStreamID = self.audioStreamID;
+    other.metadataOptions = self.metadataOptions;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerFabricIndex:%@; streamType:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerFabricIndex, _streamType, _videoStreamID, _audioStreamID, _metadataOptions];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRChimeClusterChimeSoundStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _chimeID = @(0);
+
+        _name = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRChimeClusterChimeSoundStruct alloc] init];
+
+    other.chimeID = self.chimeID;
+    other.name = self.name;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chimeID:%@; name:%@; >", NSStringFromClass([self class]), _chimeID, _name];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTREcosystemInformationClusterDeviceTypeStruct
 - (instancetype)init
 {
@@ -8887,9 +9274,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _requestId = @(0);
+        _requestID = @(0);
 
-        _clientNodeId = @(0);
+        _clientNodeID = @(0);
 
         _statusCode = @(0);
 
@@ -8902,8 +9289,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRCommissionerControlClusterCommissioningRequestResultEvent alloc] init];
 
-    other.requestId = self.requestId;
-    other.clientNodeId = self.clientNodeId;
+    other.requestID = self.requestID;
+    other.clientNodeID = self.clientNodeID;
     other.statusCode = self.statusCode;
     other.fabricIndex = self.fabricIndex;
 
@@ -8912,7 +9299,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestId:%@; clientNodeId:%@; statusCode:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _requestId, _clientNodeId, _statusCode, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestID:%@; clientNodeID:%@; statusCode:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _requestID, _clientNodeID, _statusCode, _fabricIndex];
     return descriptionString;
 }
 

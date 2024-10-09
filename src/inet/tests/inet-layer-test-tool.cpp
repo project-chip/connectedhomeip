@@ -88,11 +88,14 @@ static const uint32_t kExpectedTxSizeDefault = kExpectedRxSizeDefault;
 
 static const uint32_t kOptFlagsDefault = (kOptFlagUseIPv6 | kOptFlagUseUDPIP);
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 static TCPEndPoint * sTCPIPEndPoint       = nullptr; // Used for connect/send/receive
 static TCPEndPoint * sTCPIPListenEndPoint = nullptr; // Used for accept/listen
-static UDPEndPoint * sUDPIPEndPoint       = nullptr;
+static const uint16_t kTCPPort            = kUDPPort;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
-static const uint16_t kTCPPort = kUDPPort;
+static UDPEndPoint * sUDPIPEndPoint = nullptr;
+
 // clang-format off
 static TestState         sTestState             =
 {
@@ -184,6 +187,7 @@ static OptionSet *       sToolOptionSets[] =
 namespace chip {
 namespace Inet {
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 class TCPTest
 {
 public:
@@ -193,6 +197,7 @@ public:
         return endPoint->mState == TCPEndPoint::State::kConnected || endPoint->mState == TCPEndPoint::State::kReceiveShutdown;
     }
 };
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 } // namespace Inet
 } // namespace chip
@@ -502,6 +507,7 @@ static bool HandleDataReceived(const PacketBufferHandle & aBuffer, bool aCheckBu
 
 // TCP Endpoint Callbacks
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 void HandleTCPConnectionComplete(TCPEndPoint * aEndPoint, CHIP_ERROR aError)
 {
     CHIP_ERROR lStatus;
@@ -636,6 +642,7 @@ static void HandleTCPConnectionReceived(TCPEndPoint * aListenEndPoint, TCPEndPoi
 
     sTCPIPEndPoint = aConnectEndPoint;
 }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 // UDP Endpoint Callbacks
 
@@ -673,11 +680,13 @@ static bool IsTransportReadyForSend()
         return (sUDPIPEndPoint != nullptr);
     }
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if ((gOptFlags & kOptFlagUseTCPIP) == kOptFlagUseTCPIP)
     {
         return (sTCPIPEndPoint != nullptr) && (sTCPIPEndPoint->PendingSendLength() == 0) &&
             TCPTest::StateIsConnectedOrReceiveShutdown(sTCPIPEndPoint);
     }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     return false;
 }
@@ -686,6 +695,7 @@ static CHIP_ERROR PrepareTransportForSend()
 {
     CHIP_ERROR lStatus = CHIP_NO_ERROR;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gOptFlags & kOptFlagUseTCPIP)
     {
         if (sTCPIPEndPoint == nullptr)
@@ -702,6 +712,7 @@ static CHIP_ERROR PrepareTransportForSend()
             INET_FAIL_ERROR(lStatus, "TCPEndPoint::Connect failed");
         }
     }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     return (lStatus);
 }
@@ -722,6 +733,7 @@ static CHIP_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
 
         ReturnErrorOnFailure(sUDPIPEndPoint->SendTo(aAddress, kUDPPort, std::move(lBuffer)));
     }
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     else if ((gOptFlags & kOptFlagUseTCPIP) == kOptFlagUseTCPIP)
     {
         const uint32_t lFirstValue = sTestState.mStats.mTransmit.mActual;
@@ -737,6 +749,7 @@ static CHIP_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
 
         ReturnErrorOnFailure(sTCPIPEndPoint->Send(std::move(lBuffer)));
     }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     return CHIP_NO_ERROR;
 }
@@ -838,6 +851,7 @@ static void StartTest()
             lStatus = sUDPIPEndPoint->Listen(HandleUDPMessageReceived, HandleUDPReceiveError);
             INET_FAIL_ERROR(lStatus, "UDPEndPoint::Listen failed");
         }
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
         else if (gOptFlags & kOptFlagUseTCPIP)
         {
             const uint16_t lConnectionBacklogMax = 1;
@@ -855,6 +869,7 @@ static void StartTest()
             lStatus = sTCPIPListenEndPoint->Listen(lConnectionBacklogMax);
             INET_FAIL_ERROR(lStatus, "TCPEndPoint::Listen failed");
         }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     }
 
     if (Common::IsReceiver())
@@ -870,6 +885,7 @@ static void CleanupTest()
 
     // Release the resources associated with the allocated end points.
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (sTCPIPEndPoint != nullptr)
     {
         sTCPIPEndPoint->Close();
@@ -881,6 +897,7 @@ static void CleanupTest()
         sTCPIPListenEndPoint->Shutdown();
         sTCPIPListenEndPoint->Free();
     }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     if (sUDPIPEndPoint != nullptr)
     {

@@ -24,7 +24,14 @@
 
 #pragma once
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <stdint.h>
+
+#if (SL_MATTER_GN_BUILD == 0)
+#if defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && (CHIP_CONFIG_ENABLE_ICD_SERVER == 1)
+#include "sl_matter_icd_config.h"
+#endif // defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && (CHIP_CONFIG_ENABLE_ICD_SERVER == 1)
+#endif // SL_MATTER_GN_BUILD
 
 // ==================== General Platform Adaptations ====================
 
@@ -45,7 +52,8 @@
 #if CHIP_HAVE_CONFIG_H
 #include <crypto/CryptoBuildConfig.h>
 #endif
-#if (CHIP_CRYPTO_PLATFORM == 1)
+
+#if (CHIP_CRYPTO_PLATFORM == 1) && !defined(SL_MBEDTLS_USE_TINYCRYPT)
 #include "psa/crypto.h"
 
 #if !defined(CHIP_CONFIG_SHA256_CONTEXT_SIZE)
@@ -56,7 +64,7 @@
 #define CHIP_CONFIG_SHA256_CONTEXT_ALIGN psa_hash_operation_t
 #endif
 
-#endif // CHIP_CRYPTO_PLATFORM
+#endif // (CHIP_CRYPTO_PLATFORM == 1) && !defined(SL_MBEDTLS_USE_TINYCRYPT)
 
 // ==================== General Configuration Overrides ====================
 
@@ -92,7 +100,7 @@
 #define CHIP_CONFIG_MAX_FABRICS 5 // 4 fabrics + 1 for rotation slack
 #endif
 
-#ifdef SL_ICD_ENABLED
+#if defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #ifndef CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
 #define CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC SL_IDLE_MODE_DURATION_S
@@ -110,7 +118,16 @@
 #define CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC
 #endif // CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
 
-#endif // SL_ICD_ENABLED
+#endif // defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
+
+/**
+ * @brief CHIP_SHELL_MAX_LINE_SIZE
+ *
+ * @brief Platform maximum line for the Matter Shell
+ */
+#ifndef CHIP_SHELL_MAX_LINE_SIZE
+#define CHIP_SHELL_MAX_LINE_SIZE 256
+#endif // CHIP_SHELL_MAX_LINE_SIZE
 
 // ==================== FreeRTOS Configuration Overrides ====================
 #ifndef CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
@@ -120,3 +137,7 @@
 #ifndef CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE
 #define CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE 1
 #endif
+
+#ifndef CHIP_SHELL_MAX_TOKENS
+#define CHIP_SHELL_MAX_TOKENS 40
+#endif // CHIP_SHELL_MAX_TOKENS

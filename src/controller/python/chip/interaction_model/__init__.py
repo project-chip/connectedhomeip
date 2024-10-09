@@ -73,6 +73,7 @@ class Status(enum.IntEnum):
     Reserved99 = 0x99
     Reserved9a = 0x9a
     Busy = 0x9c
+    AccessRestricted = 0x9d
     Deprecatedc0 = 0xc0
     Deprecatedc1 = 0xc1
     Deprecatedc2 = 0xc2

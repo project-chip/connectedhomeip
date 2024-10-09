@@ -23,6 +23,7 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRCertificates.h>
 #import <Matter/MTRDefines.h>
+#import <Matter/MTRDeviceController.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -31,7 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MTROTAProviderDelegate;
 @protocol MTRKeypair;
 
-@class MTRDeviceController;
 @class MTRDeviceControllerStartupParams;
 @class MTRFabricInfo;
 

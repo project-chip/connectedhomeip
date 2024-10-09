@@ -22,6 +22,7 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/util/endpoint-config-api.h>
 #include <platform/Tizen/NetworkCommissioningDriver.h>
+#include <static-supported-modes-manager.h>
 
 #include <TizenServiceAppMain.h>
 #include <binding-handler.h>
@@ -36,6 +37,7 @@ constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 NetworkCommissioning::TizenEthernetDriver sEthernetDriver;
+Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sEthernetDriver);
 } // namespace
 
@@ -45,6 +47,7 @@ void ApplicationInit()
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
     sEthernetNetworkCommissioningInstance.Init();
+    Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 }
 
 void ApplicationShutdown(){};

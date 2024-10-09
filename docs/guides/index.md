@@ -19,7 +19,3 @@ and features.
 
 -   [Access Control](./access-control-guide.md)
 -   [Matter IDL tooling and validation](./matter_idl_tooling.md)
-
-## Troubleshooting Guides
-
--   [Avahi - Troubleshooting](./troubleshooting_avahi.md)

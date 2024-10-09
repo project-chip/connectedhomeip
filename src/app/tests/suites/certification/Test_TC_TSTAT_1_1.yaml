@@ -575,7 +575,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [72, 74, 78, 80, 82]
+              contains: [72, 74, 78, 80]
 
     - label: "Step 5: TH reads EventList attribute from the DUT."
       PICS: PICS_EVENT_LIST_ENABLED
@@ -606,17 +606,7 @@ tests:
               contains: [1, 2, 3]
 
     - label:
-          "Step 6c: TH reads the optional (GetRelayStatusLog) command in
-          AcceptedCommandList"
-      PICS: TSTAT.S.C04.Rsp
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          constraints:
-              type: list
-              contains: [4]
-    - label:
-          "Step 6d: TH reads Feature dependent(TSTAT.S.F08(PRES)) commands in
+          "Step 6c: TH reads Feature dependent(TSTAT.S.F08(PRES)) commands in
           AcceptedCommandList"
       PICS: TSTAT.S.F08
       command: "readAttribute"
@@ -624,20 +614,10 @@ tests:
       response:
           constraints:
               type: list
-              contains: [254]
+              contains: [6, 254]
 
     - label:
-          "Step 7a: TH reads from the DUT the GeneratedCommandList attribute."
-      PICS: " !TSTAT.S.C04.Rsp && !TSTAT.S.C02.Rsp "
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          value: [0xFD] # AtomicResponse
-          constraints:
-              type: list
-
-    - label:
-          "Step 7b: TH reads Feature dependent(TSTAT.S.F03(SCH)) commands in
+          "Step 7a: TH reads Feature dependent(TSTAT.S.F03(SCH)) commands in
           GeneratedCommandList"
       PICS: TSTAT.S.F03
       command: "readAttribute"
@@ -648,12 +628,12 @@ tests:
               contains: [0]
 
     - label:
-          "Step 7c: TH reads optional command (GetRelayStatusLogResponse) in
-          GeneratedCommandList"
-      PICS: TSTAT.S.C04.Rsp
+          "Step 7b: TH reads Feature dependent(TSTAT.S.F08(PRES)) commands in
+          the GeneratedCommandList attribute."
+      PICS: TSTAT.S.F08 & TSTAT.S.Cfe.Rsp
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
+          value: [0xFD] # AtomicResponse
           constraints:
               type: list
-              contains: [1]

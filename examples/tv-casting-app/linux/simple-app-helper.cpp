@@ -267,7 +267,7 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
     // For a connection failure, called back with an error and nullptr.
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
-        ChipLogProgress(
+        ChipLogError(
             AppServer,
             "simple-app-helper.cpp::ConnectionHandler(): Failed to connect to CastingPlayer (ID: %s) with err %" CHIP_ERROR_FORMAT,
             targetCastingPlayer->GetId(), err.Format()));
@@ -450,6 +450,9 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
 
         targetCastingPlayer->VerifyOrEstablishConnection(connectionCallbacks, matter::casting::core::kCommissioningWindowTimeoutSec,
                                                          idOptions);
+        ChipLogProgress(AppServer, "CommandHandler() request, VerifyOrEstablishConnection() called, calling StopDiscovery()");
+        // Stop discovery since we have discovered, and are now connecting to the desired CastingPlayer.
+        matter::casting::core::CastingPlayerDiscovery::GetInstance()->StopDiscovery();
         return CHIP_NO_ERROR;
     }
     if (strcmp(argv[0], "setcommissionerpasscode") == 0)

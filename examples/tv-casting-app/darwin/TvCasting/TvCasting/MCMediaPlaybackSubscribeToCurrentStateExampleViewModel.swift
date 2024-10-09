@@ -47,7 +47,7 @@ class MCMediaPlaybackSubscribeToCurrentStateExampleViewModel: ObservableObject {
         // validate that the selected endpoint supports the MediaPlayback cluster
         if(!endpoint.hasCluster(MCEndpointClusterTypeMediaPlayback))
         {
-            self.Log.error("No MediaPlayback cluster supporting endpoint found")
+            self.Log.error("MCMediaPlaybackSubscribeToCurrentStateExampleViewModel.subscribe() No MediaPlayback cluster supporting endpoint found")
             DispatchQueue.main.async
             {
                 self.status = "No MediaPlayback cluster supporting endpoint found"

@@ -14,13 +14,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/data-model-provider/ActionReturnStatus.h"
-#include "lib/support/StringBuilder.h"
 #include <app/reporting/Read-Checked.h>
 
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/reporting/Read-DataModel.h>
 #include <app/reporting/Read-Ember.h>
 #include <app/util/MatterCallbacks.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/StringBuilder.h>
 
 namespace chip {
 namespace app {
@@ -96,7 +97,7 @@ ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const Ac
         // Make unit tests strict; otherwise allow it with potentially odd mismatch errors
         // (in which case logs will be odd, however we also expect Checked versions to only
         // run for a short period until we switch over to either ember or DM completely).
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if CHIP_CONFIG_DATA_MODEL_CHECK_DIE_ON_FAILURE
         chipDie();
 #endif
     }
@@ -119,7 +120,7 @@ ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const Ac
     {
         ChipLogError(Test, "Different written length: %" PRIu32 " (Ember) vs %" PRIu32 " (DataModel)", lengthWrittenEmber,
                      reportBuilder.GetWriter()->GetLengthWritten());
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if CHIP_CONFIG_DATA_MODEL_CHECK_DIE_ON_FAILURE
         chipDie();
 #endif
     }
@@ -138,7 +139,7 @@ ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const Ac
                 ChipLogError(Test, "Different partial data");
                 // NOTE: die on unit tests only, since partial data size may differ across
                 //       time-dependent data (very rarely because fast code, but still possible)
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if CHIP_CONFIG_DATA_MODEL_CHECK_DIE_ON_FAILURE
                 chipDie();
 #endif
             }
@@ -147,7 +148,7 @@ ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const Ac
                 ChipLogError(Test, "Different partial data");
                 // NOTE: die on unit tests only, since partial data size may differ across
                 //       time-dependent data (very rarely because fast code, but still possible)
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if CHIP_CONFIG_DATA_MODEL_CHECK_DIE_ON_FAILURE
                 chipDie();
 #endif
             }
@@ -158,6 +159,23 @@ ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const Ac
                                                           DataModelCallbacks::OperationOrder::Post, path);
 
     return statusDm;
+}
+
+bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion)
+{
+    bool emberResult = EmberImpl::IsClusterDataVersionEqualTo(dataModel, path, dataVersion);
+    bool dmResult    = DataModelImpl::IsClusterDataVersionEqualTo(dataModel, path, dataVersion);
+
+    if (emberResult != dmResult)
+    {
+        ChipLogError(Test, "Different data model check result between ember (%s) and data model provider(%s)",
+                     emberResult ? "TRUE" : "FALSE", dmResult ? "TRUE" : "FALSE");
+#if CHIP_CONFIG_DATA_MODEL_CHECK_DIE_ON_FAILURE
+        chipDie();
+#endif
+    }
+
+    return dmResult;
 }
 
 } // namespace CheckedImpl

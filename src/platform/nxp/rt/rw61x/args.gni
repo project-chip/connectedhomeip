@@ -34,20 +34,13 @@ chip_ble_project_config_include = "<CHIPProjectConfig.h>"
 
 chip_build_tests = false
 
-#This enables the EventList global attribute
-enable_eventlist_attribute = true
-
 declare_args() {
   spinel_interface_rpmsg = true
 
   # if rw610_mbedtls_port_els_pkc is set to false software mbedtls is used instead
   rw610_mbedtls_port_els_pkc = true
 
-  # Enable DAC private key secure usage, chip_with_factory_data must be set to 1
-  chip_enable_secure_dac_private_key_storage = 0
-
-  # Generate DAC private key blob for factory data, chip_enable_secure_dac_private_key_storage must be set to 1
-  chip_convert_dac_private_key = 0
+  chip_enable_secondary_nwk_if = false
 }
 
 # TODO : Enable the OTA Requestor by default.
@@ -59,6 +52,10 @@ declare_args() {
   # TODO : set no_mcuboot to false by default when enabling ota requestor by default
   no_mcuboot = true
 }
+
+# By default nxp_nvm_component is set to "littlefs" in nxp_sdk.gni,
+# here we override it to set it to "nvs" for RW61x platform
+nxp_nvm_component = "nvs"
 
 mbedtls_target = "${nxp_sdk_build_root}:nxp_mbedtls"
 

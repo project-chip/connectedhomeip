@@ -36,7 +36,9 @@
 #include "spidrv.h"
 #include "task.h"
 
+#ifdef SL_BOARD_NAME
 #include "sl_board_control.h"
+#endif // SL_BOARD_NAME
 
 #include "sl_device_init_clocks.h"
 #include "sl_device_init_hfxo.h"

@@ -19,12 +19,20 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${LIT_ICD_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${LIT_ICD_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -96,7 +104,8 @@ class TC_ICDM_2_1(MatterBaseTest):
 
     def steps_TC_ICDM_2_1(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep("1a", "Commissioning, already done", is_commissioning=True),
+            TestStep("1b", "CTH reads from the DUT the FeatureMap attribute."),
             TestStep(2, "TH reads from the DUT the ActiveModeThreshold attribute."),
             TestStep(3, "TH reads from the DUT the ActiveModeDuration attribute."),
             TestStep(4, "TH reads from the DUT the IdleModeDuration attribute."),
@@ -131,8 +140,9 @@ class TC_ICDM_2_1(MatterBaseTest):
         attributes = cluster.Attributes
 
         # Commissioning
-        self.step(1)
+        self.step("1a")
         # Read feature map
+        self.step("1b")
         featureMap = await self._read_icdm_attribute_expect_success(
             attributes.FeatureMap)
 

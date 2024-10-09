@@ -296,12 +296,6 @@ CHIP_ERROR Storage::Commit()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Storage::GetBaseAddress(uint32_t & value)
-{
-    value = (uint32_t) Flash::sReadOnlyPage;
-    return CHIP_NO_ERROR;
-}
-
 //
 // DeviceInstanceInfoProvider
 //
@@ -674,6 +668,18 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
 //
 // Other
 //
+
+CHIP_ERROR Storage::SetCredentialsBaseAddress(uint32_t addr)
+{
+    Flash::sReadOnlyPage = (uint8_t *) addr;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Storage::GetCredentialsBaseAddress(uint32_t & addr)
+{
+    addr = (uint32_t) Flash::sReadOnlyPage;
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR Storage::SetProvisionVersion(const char * value, size_t size)
 {

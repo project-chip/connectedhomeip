@@ -502,8 +502,16 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kEvictPreviousCaseSessions:
         return CommissioningStage::kFindOperationalForStayActive;
     case CommissioningStage::kPrimaryOperationalNetworkFailed:
-        return CommissioningStage::kDisablePrimaryNetworkInterface;
-    case CommissioningStage::kDisablePrimaryNetworkInterface:
+        if (mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId)
+        {
+            return CommissioningStage::kRemoveWiFiNetworkConfig;
+        }
+        else
+        {
+            return CommissioningStage::kRemoveThreadNetworkConfig;
+        }
+    case CommissioningStage::kRemoveWiFiNetworkConfig:
+    case CommissioningStage::kRemoveThreadNetworkConfig:
         return GetNextCommissioningStageNetworkSetup(currentStage, lastErr);
     case CommissioningStage::kFindOperationalForStayActive:
         return CommissioningStage::kICDSendStayActive;
@@ -567,7 +575,8 @@ EndpointId AutoCommissioner::GetEndpoint(const CommissioningStage & stage) const
     case CommissioningStage::kThreadNetworkSetup:
     case CommissioningStage::kThreadNetworkEnable:
         return mDeviceCommissioningInfo.network.thread.endpoint;
-    case CommissioningStage::kDisablePrimaryNetworkInterface:
+    case CommissioningStage::kRemoveWiFiNetworkConfig:
+    case CommissioningStage::kRemoveThreadNetworkConfig:
         return kRootEndpointId;
     default:
         return kRootEndpointId;

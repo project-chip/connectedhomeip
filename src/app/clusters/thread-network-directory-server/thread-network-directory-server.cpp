@@ -182,9 +182,9 @@ void ThreadNetworkDirectoryServer::HandleAddNetworkRequest(HandlerContext & ctx,
 {
     OperationalDataset dataset;
     ByteSpan extendedPanIdSpan;
+    uint64_t activeTimestamp;
     union
     {
-        uint64_t activeTimestamp;
         uint16_t channel;
         uint8_t masterKey[kSizeMasterKey];
         uint8_t meshLocalPrefix[kSizeMeshLocalPrefix];
@@ -203,7 +203,7 @@ void ThreadNetworkDirectoryServer::HandleAddNetworkRequest(HandlerContext & ctx,
     // TODO: An immutable OperationalDatasetView on top of a ByteSpan (without copying) would be useful here.
     SuccessOrExitAction(err = dataset.Init(req.operationalDataset), context = "OperationalDataset");
     SuccessOrExitAction(err = dataset.GetExtendedPanIdAsByteSpan(extendedPanIdSpan), context = "ExtendedPanID");
-    SuccessOrExitAction(err = dataset.GetActiveTimestamp(unused.activeTimestamp), context = "ActiveTimestamp");
+    SuccessOrExitAction(err = dataset.GetActiveTimestamp(activeTimestamp), context = "ActiveTimestamp");
     SuccessOrExitAction(err = dataset.GetChannel(unused.channel), context = "Channel");
     SuccessOrExitAction(err = dataset.GetChannelMask(unusedSpan), context = "ChannelMask");
     SuccessOrExitAction(err = dataset.GetMasterKey(unused.masterKey), context = "NetworkKey");
@@ -214,6 +214,27 @@ void ThreadNetworkDirectoryServer::HandleAddNetworkRequest(HandlerContext & ctx,
     SuccessOrExitAction(err = dataset.GetSecurityPolicy(unused.securityPolicy), context = "SecurityContext");
 
     status = IMStatus::Failure;
+
+    // "If the received dataset has an Active Timestamp that is less than or equal to that of the existing entry,
+    // then the update SHALL be rejected with a status of INVALID_IN_STATE."
+    {
+        uint8_t datasetBuffer[kSizeOperationalDataset];
+        MutableByteSpan datasetSpan(datasetBuffer);
+        err = mStorage.GetNetworkDataset(ExtendedPanId(extendedPanIdSpan), datasetSpan);
+        if (err != CHIP_ERROR_NOT_FOUND)
+        {
+            SuccessOrExit(err);
+            SuccessOrExit(err = dataset.Init(datasetSpan));
+            uint64_t existingActiveTimestamp;
+            SuccessOrExit(err = dataset.GetActiveTimestamp(existingActiveTimestamp));
+            if (activeTimestamp <= existingActiveTimestamp)
+            {
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, IMStatus::InvalidInState, "ActiveTimestamp");
+                return;
+            }
+        }
+    }
+
     SuccessOrExit(err = mStorage.AddOrUpdateNetwork(ExtendedPanId(extendedPanIdSpan), req.operationalDataset));
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, IMStatus::Success);
@@ -265,6 +286,12 @@ void ThreadNetworkDirectoryServer::HandleOperationalDatasetRequest(
     HandlerContext & ctx, const ThreadNetworkDirectory::Commands::GetOperationalDataset::DecodableType & req)
 {
     CHIP_ERROR err;
+
+    if (ctx.mCommandHandler.GetSubjectDescriptor().authMode != Access::AuthMode::kCase)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, IMStatus::UnsupportedAccess);
+        return;
+    }
 
     if (req.extendedPanID.size() != ExtendedPanId::size())
     {
