@@ -65,12 +65,12 @@ from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
-from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.pics import read_pics_from_file
 from chip.tracing import TracingContext
+from global_attribute_ids import GlobalAttributeIds
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
+from pics_support import read_pics_from_file
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
@@ -2278,7 +2278,7 @@ def default_matter_test_main():
     In this case, only one test class in a test script is allowed.
     To make your test script executable, add the following to your file:
     .. code-block:: python
-      from chip.testing.matter_testing.py import default_matter_test_main
+      from matter_testing_support.py import default_matter_test_main
       ...
       if __name__ == '__main__':
         default_matter_test_main.main()
