@@ -21,7 +21,7 @@ dependencies:
     #   - Insights compilation fails seemingly after
     #     https://github.com/espressif/esp-insights/pull/47
     #   - Switching version to 1.0.2 does not seem to work (it says version not found)
-    #     wile 1.0.1 pulls in a esp_insights_cbor_encoder.c that uses SHA_SIZE which is
+    #     while 1.0.1 pulls in a esp_insights_cbor_encoder.c that uses SHA_SIZE which is
     #     undefined (unclear why c and header differ)
     # espressif/esp_insights:
     #     version: "1.0.1"
