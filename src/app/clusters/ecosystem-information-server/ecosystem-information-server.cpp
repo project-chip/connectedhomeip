@@ -219,7 +219,7 @@ std::unique_ptr<EcosystemLocationStruct> EcosystemLocationStruct::Builder::Build
     static_assert(kLocationDescriptorNameMaxSize <= std::numeric_limits<uint16_t>::max());
     VerifyOrReturnValue(
         mLocationDescriptor.mLocationName.size() <= kLocationDescriptorNameMaxSize, nullptr,
-        ChipLogError(Zcl, "Must Location Name must be less than %u bytes", static_cast<uint16_t>(kLocationDescriptorNameMaxSize)));
+        ChipLogError(Zcl, "Location Name must be less than %u bytes", static_cast<uint16_t>(kLocationDescriptorNameMaxSize)));
 
     // std::make_unique does not have access to private constructor we workaround with using new
     std::unique_ptr<EcosystemLocationStruct> ret{ new EcosystemLocationStruct(std::move(mLocationDescriptor),
