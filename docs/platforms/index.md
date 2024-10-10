@@ -22,7 +22,6 @@ ti/index
 
 -   [Android](./android/)
 -   [ASR](./asr/)
--   [Darwin](./darwin/)
 -   [ESP32](./esp32/)
 -   [Infineon](./infineon/)
 -   [MbedOS](./mbedos/)
