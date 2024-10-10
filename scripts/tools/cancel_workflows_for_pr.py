@@ -18,11 +18,11 @@
 import datetime
 import logging
 import re
-from dateutil.tz import tzlocal
 from typing import Optional, Set
 
 import click
 import coloredlogs
+from dateutil.tz import tzlocal
 from github import Github
 from github.Commit import Commit
 from github.PullRequest import PullRequest
