@@ -47,6 +47,7 @@ from mobly import asserts
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
 
+
 class TC_CADMIN_1_3_4(MatterBaseTest):
     async def CommissionAttempt(
             self, setupPinCode: int, thnum: int, th: str, fail: bool):
@@ -59,7 +60,7 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
                     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
             except ChipStackError as e:
                 asserts.assert_equal(e.err,  0x0000007E,
-                                 "Expected to return Trying to add NOC for fabric that already exists")                
+                                     "Expected to return Trying to add NOC for fabric that already exists")
 
         elif not fail:
             await th.CommissionOnNetwork(
@@ -69,7 +70,7 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
     async def get_fabrics(self, th: ChipDeviceCtrl) -> int:
         OC_cluster = Clusters.OperationalCredentials
         if th == self.th2:
-            th2_fabric_info = await th.ReadAttribute(nodeid=self.dut_node_id, fabricFiltered=True, attributes=[(0,OC_cluster.Attributes.Fabrics)])
+            th2_fabric_info = await th.ReadAttribute(nodeid=self.dut_node_id, fabricFiltered=True, attributes=[(0, OC_cluster.Attributes.Fabrics)])
             th2_fabric_data = list(th2_fabric_info.values())[0]
             th2_fabric_data = list(th2_fabric_data.values())[0]
             fabric_info = vars(list(th2_fabric_data.values())[1][0])
@@ -107,9 +108,9 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
                 asserts.assert_true(False, 'Failed to verify')
 
     async def write_nl_attr(self, th: ChipDeviceCtrl, attr_val: object):
-            result = await th.WriteAttribute(nodeid=self.dut_node_id, attributes=[(0, attr_val)])
-            asserts.assert_equal(result[0].Status, Status.Success, f"{th} node label write failed")
-                    
+        result = await th.WriteAttribute(nodeid=self.dut_node_id, attributes=[(0, attr_val)])
+        asserts.assert_equal(result[0].Status, Status.Success, f"{th} node label write failed")
+
     async def read_nl_attr(self, th: ChipDeviceCtrl, attr_val: object):
         try:
             await th.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, attr_val)])
@@ -153,7 +154,7 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
                      "DUT_CE opens its Commissioning window to allow a new commissioning"),
             TestStep(13, "TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 12",
                      "Since DUT_CE was already commissioned by TH_CR1 in step 1, AddNOC fails with NOCResponse with StatusCode field set to FabricConflict (9)"),
-            TestStep(14, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx", 
+            TestStep(14, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx",
                      "TH_CR1 removes TH_CR2 fabric using th2_idx")
         ]
 
@@ -242,13 +243,13 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
 
         self.step(11)
         # TH_CR2 reads the window status to verify the DUT_CE window is closed
-        #TODO: Issue noticed when initially attempting to check window status, issue is detailed here: https://github.com/project-chip/connectedhomeip/issues/35983
-        # Workaround in place until above issue resolved 
+        # TODO: Issue noticed when initially attempting to check window status, issue is detailed here: https://github.com/project-chip/connectedhomeip/issues/35983
+        # Workaround in place until above issue resolved
         try:
             window_status = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AdministratorCommissioning.Attributes.WindowStatus)])
         except:
             window_status = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AdministratorCommissioning.Attributes.WindowStatus)])
-        
+
         window_status = window_status[0]
         outer_key = list(window_status.keys())[0]
         inner_key = list(window_status[outer_key].keys())[1]
@@ -270,11 +271,11 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
             [2024-10-08 11:57:43.144365][TEST][STDOUT][MatterTest] 10-08 11:57:42.777 INFO Add NOC failed with error src/controller/CHIPDeviceController.cpp:1712: CHIP Error 0x0000007E: Trying to add a NOC for a fabric that already exists
         """
 
-        self.step(14) 
+        self.step(14)
         # TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx
         th2_idx = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
-        outer_key = list(th2_idx.keys())[0]  
-        inner_key = list(th2_idx[outer_key].keys())[0] 
+        outer_key = list(th2_idx.keys())[0]
+        inner_key = list(th2_idx[outer_key].keys())[0]
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
@@ -297,7 +298,7 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
                      "Verify that the RootPublicKey matches the root public key for TH_CR1 and the NodeID matches the node ID used when TH_CR1 commissioned the device."),
             TestStep(6, "TH_CR2 reads the Fabrics attribute from the Node Operational Credentials cluster using a fabric-filtered read",
                      "Verify that the RootPublicKey matches the root public key for TH_CR2 and the NodeID matches the node ID used when TH_CR2 commissioned the device."),
-            TestStep(7, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx", 
+            TestStep(7, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx",
                      "TH_CR1 removes TH_CR2 fabric using th2_idx")
         ]
 
@@ -336,8 +337,8 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
         self.th2 = th2_fabric_admin.NewController(nodeId=2)
         setupPayloadInfo = self.get_setup_payload_info()
         await self.th2.CommissionOnNetwork(
-                    nodeId=self.dut_node_id, setupPinCode=setupPayloadInfo[0].passcode,
-                    filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=setupPayloadInfo[0].filter_value)
+            nodeId=self.dut_node_id, setupPinCode=setupPayloadInfo[0].passcode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=setupPayloadInfo[0].filter_value)
 
         self.step(5)
         # TH_CR1 reads the Fabrics attribute from the Node Operational Credentials cluster using a fabric-filtered read
@@ -367,15 +368,16 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
             asserts.fail("DUT node ID from fabric does not match DUT node ID for TH2 during commissioning")
 
         await self.th2.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
-        
-        self.step(7) 
+
+        self.step(7)
         # TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx
         th2_idx = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
-        outer_key = list(th2_idx.keys())[0]  
-        inner_key = list(th2_idx[outer_key].keys())[0] 
+        outer_key = list(th2_idx.keys())[0]
+        inner_key = list(th2_idx[outer_key].keys())[0]
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
