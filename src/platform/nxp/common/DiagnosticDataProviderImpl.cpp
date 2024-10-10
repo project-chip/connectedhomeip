@@ -42,6 +42,17 @@ extern "C" {
 }
 #endif
 
+#if NXP_USE_MML
+#include "fsl_component_mem_manager.h"
+#define GetFreeHeapSize MEM_GetFreeHeapSize
+#define HEAP_SIZE MinimalHeapSize_c
+#define GetMinimumEverFreeHeapSize MEM_GetFreeHeapSizeLowWaterMark
+#else
+#define GetFreeHeapSize xPortGetFreeHeapSize
+#define HEAP_SIZE configTOTAL_HEAP_SIZE
+#define GetMinimumEverFreeHeapSize xPortGetMinimumEverFreeHeapSize
+#endif // NXP_USE_MML
+
 // Not implement into the SDK
 // extern "C" void xPortResetHeapMinimumEverFreeHeapSize(void);
 
@@ -57,8 +68,8 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
     size_t freeHeapSize;
+    freeHeapSize = GetFreeHeapSize();
 
-    freeHeapSize    = xPortGetFreeHeapSize();
     currentHeapFree = static_cast<uint64_t>(freeHeapSize);
     return CHIP_NO_ERROR;
 }
@@ -68,8 +79,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
     size_t freeHeapSize;
     size_t usedHeapSize;
 
-    freeHeapSize = xPortGetFreeHeapSize();
-    usedHeapSize = configTOTAL_HEAP_SIZE - freeHeapSize;
+    freeHeapSize = GetFreeHeapSize();
+    usedHeapSize = HEAP_SIZE - freeHeapSize;
 
     currentHeapUsed = static_cast<uint64_t>(usedHeapSize);
     return CHIP_NO_ERROR;
@@ -79,7 +90,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
 {
     size_t highWatermarkHeapSize;
 
-    highWatermarkHeapSize    = configTOTAL_HEAP_SIZE - xPortGetMinimumEverFreeHeapSize();
+    highWatermarkHeapSize = HEAP_SIZE - GetMinimumEverFreeHeapSize();
+
     currentHeapHighWatermark = static_cast<uint64_t>(highWatermarkHeapSize);
     return CHIP_NO_ERROR;
 }
@@ -89,12 +101,16 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
     // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
     // value of the CurrentHeapUsed.
 
+#if NXP_USE_MML
+    MEM_ResetFreeHeapSizeLowWaterMark();
+
+    return CHIP_NO_ERROR;
+#else
     // Not implement into the SDK
     // xPortResetHeapMinimumEverFreeHeapSize();
 
-    // return CHIP_NO_ERROR;
-
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
