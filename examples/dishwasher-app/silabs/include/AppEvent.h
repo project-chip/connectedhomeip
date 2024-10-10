@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,10 +19,37 @@
 
 #pragma once
 
-#include "sl_status.h"
-#include <stdint.h>
+struct AppEvent;
+typedef void (*EventHandler)(AppEvent *);
 
-namespace TemperatureSensor {
-sl_status_t Init();
-sl_status_t GetTemp(uint32_t * relativeHumidity, int16_t * temperature);
-}; // namespace TemperatureSensor
+struct AppEvent
+{
+    enum AppEventTypes
+    {
+        kEventType_Button = 0,
+        kEventType_Timer,
+        kEventType_Dishwasher,
+        kEventType_Install,
+    };
+
+    uint16_t Type;
+
+    union
+    {
+        struct
+        {
+            uint8_t Action;
+        } ButtonEvent;
+        struct
+        {
+            void * Context;
+        } TimerEvent;
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+        } DishwasherEvent;
+    };
+
+    EventHandler Handler;
+};

@@ -34,7 +34,7 @@
 #       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
@@ -49,10 +49,10 @@ import time
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing.apps import AppServerSubprocess
 from matter_testing_support import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
                                     run_if_endpoint_matches)
 from mobly import asserts
-from TC_MCORE_FS_1_1 import AppServer
 
 
 class TC_CCTRL_2_2(MatterBaseTest):
@@ -79,13 +79,15 @@ class TC_CCTRL_2_2(MatterBaseTest):
         self.th_server_passcode = 20202021
 
         # Start the TH_SERVER app.
-        self.th_server = AppServer(
+        self.th_server = AppServerSubprocess(
             th_server_app,
             storage_dir=self.storage.name,
             port=self.th_server_port,
             discriminator=self.th_server_discriminator,
             passcode=self.th_server_passcode)
-        self.th_server.start()
+        self.th_server.start(
+            expected_output="Server initialization complete",
+            timeout=30)
 
         logging.info("Commissioning from separate fabric")
 
@@ -192,7 +194,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         self.step(9)
         cmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         # If no exception is raised, this is success
-        await self.send_single_cmd(cmd, timedRequestTimeoutMs=5000)
+        await self.send_single_cmd(cmd, endpoint=0, timedRequestTimeoutMs=5000)
 
         self.step(10)
         if not events:

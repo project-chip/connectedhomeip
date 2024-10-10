@@ -53,6 +53,8 @@ class GenericConfigurationManagerImpl;
 template <class>
 class GenericPlatformManagerImpl;
 template <class>
+class GenericPlatformManagerImpl_CMSISOS;
+template <class>
 class GenericPlatformManagerImpl_FreeRTOS;
 template <class>
 class GenericPlatformManagerImpl_POSIX;
@@ -260,6 +262,8 @@ private:
     friend class Internal::BLEManagerImpl;
     template <class>
     friend class Internal::GenericPlatformManagerImpl;
+    template <class>
+    friend class Internal::GenericPlatformManagerImpl_CMSISOS;
     template <class>
     friend class Internal::GenericPlatformManagerImpl_FreeRTOS;
     template <class>

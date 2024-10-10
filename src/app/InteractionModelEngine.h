@@ -49,6 +49,7 @@
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/Engine.h>
@@ -508,7 +509,7 @@ private:
     void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
 
-    Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
+    Protocols::InteractionModel::Status ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request) override;
 
     bool HasActiveRead();
 
@@ -612,6 +613,10 @@ private:
     void ShutdownMatchingSubscriptions(const Optional<FabricIndex> & aFabricIndex = NullOptional,
                                        const Optional<NodeId> & aPeerNodeId       = NullOptional);
 
+    Status CheckCommandExistence(const ConcreteCommandPath & aCommandPath);
+    Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest);
+    Status CheckCommandFlags(const DataModel::InvokeRequest & aRequest);
+
     /**
      * Check if the given attribute path is a valid path in the data model provider.
      */
@@ -712,6 +717,14 @@ private:
 
     DataModel::Provider * mDataModelProvider      = nullptr;
     Messaging::ExchangeContext * mCurrentExchange = nullptr;
+
+    enum class State : uint8_t
+    {
+        kUninitialized, // The object has not been initialized.
+        kInitializing,  // Initial setup is in progress (e.g. setting up mpExchangeMgr).
+        kInitialized    // The object has been fully initialized and is ready for use.
+    };
+    State mState = State::kUninitialized;
 
     // Changes the current exchange context of a InteractionModelEngine to a given context
     class CurrentExchangeValueScope

@@ -19,54 +19,73 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1 run2 run3 run4 run5 run6 run7 run8
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --manual-code 10054912339 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#
-# test-runner-run/run2/app: ${CHIP_LOCK_APP}
-# test-runner-run/run2/factoryreset: True
-# test-runner-run/run2/quiet: True
-# test-runner-run/run2/app-args: --discriminator 1234 --KVS kvs1
-# test-runner-run/run2/script-args: --storage-path admin_storage.json --manual-code 10054912339
-#
-# test-runner-run/run3/app: ${CHIP_LOCK_APP}
-# test-runner-run/run3/factoryreset: True
-# test-runner-run/run3/quiet: True
-# test-runner-run/run3/app-args: --discriminator 1234 --KVS kvs1
-# test-runner-run/run3/script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00
-#
-# test-runner-run/run4/app: ${CHIP_LOCK_APP}
-# test-runner-run/run4/factoryreset: True
-# test-runner-run/run4/quiet: True
-# test-runner-run/run4/app-args: --discriminator 1234 --KVS kvs1
-# test-runner-run/run4/script-args: --storage-path admin_storage.json --discriminator 1234 --passcode 20202021
-#
-# test-runner-run/run5/app: ${CHIP_LOCK_APP}
-# test-runner-run/run5/factoryreset: True
-# test-runner-run/run5/quiet: True
-# test-runner-run/run5/app-args: --discriminator 1234 --KVS kvs1
-# test-runner-run/run5/script-args: --storage-path admin_storage.json --manual-code 10054912339 --commissioning-method on-network
-#
-# test-runner-run/run6/app: ${CHIP_LOCK_APP}
-# test-runner-run/run6/factoryreset: True
-# test-runner-run/run6/quiet: True
-# test-runner-run/run6/app-args: --discriminator 1234 --KVS kvs1
-# test-runner-run/run6/script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00 --commissioning-method on-network
-#
-# test-runner-run/run7/app: ${CHIP_LOCK_APP}
-# test-runner-run/run7/factoryreset: True
-# test-runner-run/run7/quiet: True
-# test-runner-run/run7/app-args: --discriminator 1234 --KVS kvs1
-# test-runner-run/run7/script-args: --storage-path admin_storage.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network
-#
-# test-runner-run/run8/app: ${CHIP_LOCK_APP}
-# test-runner-run/run8/factoryreset: False
-# test-runner-run/run8/quiet: True
-# test-runner-run/run8/app-args: --discriminator 1234 --KVS kvs1
-# test-runner-run/run8/script-args: --storage-path admin_storage.json
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: --storage-path admin_storage.json --manual-code 10054912339
+#     factory-reset: true
+#     quiet: true
+#   run3:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00
+#     factory-reset: true
+#     quiet: true
+#   run4:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --discriminator 1234
+#       --passcode 20202021
+#     factory-reset: true
+#     quiet: true
+#   run5:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --commissioning-method on-network
+#     factory-reset: true
+#     quiet: true
+#   run6:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --qr-code MT:-24J0Q1212-10648G00
+#       --commissioning-method on-network
+#     factory-reset: true
+#     quiet: true
+#   run7:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --discriminator 1234
+#       --passcode 20202021
+#       --commissioning-method on-network
+#     factory-reset: true
+#     quiet: true
+#   run8:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: --storage-path admin_storage.json
+#     factory-reset: false
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 # Run 1: runs through all tests
