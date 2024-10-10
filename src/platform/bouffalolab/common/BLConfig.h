@@ -77,6 +77,11 @@ public:
 
     static constexpr char kBLKey_factoryResetFlag[] = ("__factory_reset_pending");
 
+    static constexpr char kConfigKey_VendorName[]            = ("vendor-name");
+    static constexpr char kConfigKey_ProductName[]           = ("product-name");
+    static constexpr char kConfigKey_HardwareVersionString[] = ("hardware-version-string");
+    static constexpr char kConfigKey_SoftwareVersionString[] = ("software-version-string");
+
     static void Init(void);
 
     // Config value accessors.

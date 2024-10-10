@@ -38,18 +38,42 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetProductId(uint16_t
 template <class ConfigClass>
 CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetVendorName(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
-    return CHIP_NO_ERROR;
+    ChipError err        = CHIP_NO_ERROR;
+    size_t vendorNameLen = 0; // without counting null-terminator
+
+    err = mGenericConfigManager.ReadConfigValueStr(ConfigClass::kConfigKey_VendorName, buf, bufSize, vendorNameLen);
+
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME, sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME));
+        err = CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+
+    return err;
 }
 
 template <class ConfigClass>
 CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetProductName(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
 
-    return CHIP_NO_ERROR;
+    ChipError err         = CHIP_NO_ERROR;
+    size_t productNameLen = 0; // without counting null-terminator
+
+    err = mGenericConfigManager.ReadConfigValueStr(ConfigClass::kConfigKey_ProductName, buf, bufSize, productNameLen);
+
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME, sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME));
+        err = CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+
+    return err;
 }
 
 template <class ConfigClass>
@@ -96,19 +120,15 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetSerialNumber(char 
 
     err = mGenericConfigManager.ReadConfigValueStr(ConfigClass::kConfigKey_SerialNum, buf, bufSize, serialNumLen);
 
-#ifdef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
-    if (CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER[0] != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         ReturnErrorCodeIf(sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER));
-        serialNumLen = sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) - 1;
-        err          = CHIP_NO_ERROR;
-    }
-#endif // CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
-    ReturnErrorOnFailure(err);
 
-    ReturnErrorCodeIf(serialNumLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(buf[serialNumLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+        err = CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     return err;
 }
@@ -176,9 +196,24 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetHardwareVersion(ui
 template <class ConfigClass>
 CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetHardwareVersionString(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
-    return CHIP_NO_ERROR;
+
+    ChipError err                   = CHIP_NO_ERROR;
+    size_t hardwareVersionStringLen = 0; // without counting null-terminator
+
+    err = mGenericConfigManager.ReadConfigValueStr(ConfigClass::kConfigKey_HardwareVersionString, buf, bufSize,
+                                                   hardwareVersionStringLen);
+
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING,
+               sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING));
+        err = CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+
+    return err;
 }
 
 template <class ConfigClass>

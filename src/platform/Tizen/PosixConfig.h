@@ -75,6 +75,11 @@ public:
     static const Key kConfigKey_VendorId;
     static const Key kConfigKey_ProductId;
 
+    static const Key kConfigKey_VendorName;
+    static const Key kConfigKey_ProductName;
+    static const Key kConfigKey_HardwareVersionString;
+    static const Key kConfigKey_SoftwareVersionString;
+
     static const Key kCounterKey_TotalOperationalHours;
     static const Key kCounterKey_BootReason;
 

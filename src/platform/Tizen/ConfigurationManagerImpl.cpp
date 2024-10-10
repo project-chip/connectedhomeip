@@ -26,6 +26,7 @@
 #include "ConfigurationManagerImpl.h"
 
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/Tizen/PosixConfig.h>
@@ -59,9 +60,21 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(error);
     }
 
+    if (!Internal::PosixConfig::ConfigValueExists(Internal::PosixConfig::kConfigKey_VendorName))
+    {
+        error = StoreVendorName(chip::CharSpan::fromCharString(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME));
+        SuccessOrExit(error);
+    }
+
     if (!Internal::PosixConfig::ConfigValueExists(Internal::PosixConfig::kConfigKey_ProductId))
     {
         error = StoreProductId(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+        SuccessOrExit(error);
+    }
+
+    if (!Internal::PosixConfig::ConfigValueExists(Internal::PosixConfig::kConfigKey_ProductName))
+    {
+        error = StoreProductName(chip::CharSpan::fromCharString(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME));
         SuccessOrExit(error);
     }
 

@@ -72,6 +72,11 @@ public:
     static const Key kCounterKey_RebootCount;
     static const Key kCounterKey_BootReason;
 
+    static const Key kConfigKey_VendorName;
+    static const Key kConfigKey_ProductName;
+    static const Key kConfigKey_HardwareVersionString;
+    static const Key kConfigKey_SoftwareVersionString;
+
 #if !CHIP_DISABLE_PLATFORM_KVS
     static CHIP_ERROR Init(void);
 
