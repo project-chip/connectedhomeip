@@ -27,6 +27,7 @@ limitations under the License.
       <description>LabelList</description>
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
+      <mandatoryConform/>
     </attribute>
   </cluster>
 </configurator>
