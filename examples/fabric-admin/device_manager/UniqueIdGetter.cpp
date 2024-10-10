@@ -131,7 +131,7 @@ void UniqueIdGetter::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr,
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Failed to issue subscription to AdministratorCommissioning data");
+        ChipLogError(NotSpecified, "Failed to read unique ID from the bridged device.");
         OnDone(nullptr);
         return;
     }
@@ -140,7 +140,7 @@ void UniqueIdGetter::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr,
 void UniqueIdGetter::OnDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     VerifyOrDie(mCurrentlyGettingUid);
-    ChipLogError(NotSpecified, "DeviceSubscription failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+    ChipLogError(NotSpecified, "UniqueIdGetter failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
 
     OnDone(nullptr);
 }
