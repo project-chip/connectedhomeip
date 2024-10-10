@@ -139,7 +139,7 @@ CHIP_ERROR PASESession::GeneratePASEVerifier(Spake2pVerifier & verifier, uint32_
 
     if (useRandomPIN)
     {
-        SetupPayload::generateRandomSetupPin(setupPINCode);
+        ReturnErrorOnFailure(SetupPayload::generateRandomSetupPin(setupPINCode));
     }
 
     return verifier.Generate(pbkdf2IterCount, salt, setupPINCode);
