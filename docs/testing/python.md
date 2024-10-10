@@ -25,7 +25,7 @@ Python tests located in src/python_testing
         section should include various parameters and their respective values,
         which will guide the test runner on how to execute the tests.
 -   All test classes inherit from `MatterBaseTest` in
-    [matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/chip/testing/matter_testing.py)
+    [matter_testing_support.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_support.py)
     -   Support for commissioning using the python controller
     -   Default controller (`self.default_controller`) of type `ChipDeviceCtrl`
     -   `MatterBaseTest` inherits from the Mobly BaseTestClass
@@ -38,7 +38,7 @@ Python tests located in src/python_testing
         decorated with the @async_test_body decorator
 -   Use `ChipDeviceCtrl` to interact with the DUT
     -   Controller API is in `ChipDeviceCtrl.py` (see API doc in file)
-    -   Some support methods in `matter_testing.py`
+    -   Some support methods in `matter_testing_support.py`
 -   Use Mobly assertions for failing tests
 -   `self.step()` along with a `steps_*` method to mark test plan steps for cert
     tests
@@ -379,7 +379,7 @@ pai = await dev_ctrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Comm
 ## Mobly helpers
 
 The test system is based on Mobly, and the
-[matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/chip/testing/matter_testing.py)
+[matter_testing_support.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_support.py)
 class provides some helpers for Mobly integration.
 
 -   `default_matter_test_main`
@@ -561,11 +561,11 @@ these steps to set this up:
 
 ## Other support utilities
 
--   `basic_composition`
+-   `basic_composition_support`
     -   wildcard read, whole device analysis
 -   `CommissioningFlowBlocks`
     -   various commissioning support for core tests
--   `spec_parsing`
+-   `spec_parsing_support`
     -   parsing data model XML into python readable format
 
 # Running tests locally
