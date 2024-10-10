@@ -210,8 +210,8 @@ CHIP_ERROR SetupPayload::removeSerialNumber()
 
 CHIP_ERROR SetupPayload::generateRandomSetupPin(uint32_t & setupPINCode)
 {
-    uint8_t retries    = 0;
-    uint8_t maxRetries = 255;
+    uint8_t retries          = 0;
+    const uint8_t maxRetries = 255;
 
     do
     {
@@ -220,7 +220,8 @@ CHIP_ERROR SetupPayload::generateRandomSetupPin(uint32_t & setupPINCode)
         // Passcodes shall be restricted to the values 00000001 to 99999998 in decimal, see 5.1.1.6
         setupPINCode = (setupPINCode % kSetupPINCodeMaximumValue) + 1;
 
-        // To make sure that the Generated Setup Pin code is not one of the invalid passcodes/pin codes
+        // To make sure that the Generated Setup Pin code is not one of the invalid passcodes/pin codes defined in the
+        // specification.
         if (IsValidSetupPIN(setupPINCode))
         {
             return CHIP_NO_ERROR;
