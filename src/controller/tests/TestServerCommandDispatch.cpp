@@ -215,7 +215,8 @@ TEST_F(TestServerCommandDispatch, TestNoHandler)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-static const int kDescriptorAttributeArraySize = 254;
+// Use 8 so that we don't exceed the size of ATTRIBUTE_LARGEST defined by ZAP
+static const int kDescriptorAttributeArraySize = 8;
 
 // Declare Descriptor cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(descriptorAttrs)
