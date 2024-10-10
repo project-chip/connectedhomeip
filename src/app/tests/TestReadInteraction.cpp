@@ -1517,6 +1517,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestSupMaxInt
 
         EXPECT_EQ(minInterval, kMinInterval);
         EXPECT_EQ(maxInterval, idleModeDuration);
+        EXPECT_EQ(kMaxIntervalCeiling, readHandler.GetSubscriberRequestedMaxInterval());
     }
     engine->Shutdown();
 
@@ -1584,6 +1585,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestInfMaxInt
 
         EXPECT_EQ(minInterval, kMinInterval);
         EXPECT_EQ(maxInterval, idleModeDuration);
+        EXPECT_EQ(kMaxIntervalCeiling, readHandler.GetSubscriberRequestedMaxInterval());
     }
     engine->Shutdown();
 
@@ -1651,6 +1653,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestSupMinInt
 
         EXPECT_EQ(minInterval, kMinInterval);
         EXPECT_EQ(maxInterval, (2 * idleModeDuration));
+        EXPECT_EQ(kMaxIntervalCeiling, readHandler.GetSubscriberRequestedMaxInterval());
     }
     engine->Shutdown();
 
@@ -1716,6 +1719,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestMaxMinInt
 
         EXPECT_EQ(minInterval, kMinInterval);
         EXPECT_EQ(maxInterval, kMaxIntervalCeiling);
+        EXPECT_EQ(kMaxIntervalCeiling, readHandler.GetSubscriberRequestedMaxInterval());
     }
     engine->Shutdown();
 
@@ -1781,6 +1785,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestInvalidId
 
         EXPECT_EQ(minInterval, kMinInterval);
         EXPECT_EQ(maxInterval, kMaxIntervalCeiling);
+        EXPECT_EQ(kMaxIntervalCeiling, readHandler.GetSubscriberRequestedMaxInterval());
     }
     engine->Shutdown();
 
@@ -1959,6 +1964,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeRoundtrip)
         uint16_t minInterval;
         uint16_t maxInterval;
         delegate.mpReadHandler->GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(readPrepareParams.mMaxIntervalCeilingSeconds, delegate.mpReadHandler->GetSubscriberRequestedMaxInterval());
 
         // Test empty report
         // Advance monotonic timestamp for min interval to elapse
@@ -2028,6 +2034,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeEarlyReport)
         uint16_t minInterval;
         uint16_t maxInterval;
         delegate.mpReadHandler->GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(readPrepareParams.mMaxIntervalCeilingSeconds, delegate.mpReadHandler->GetSubscriberRequestedMaxInterval());
 
         EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 1u);
 
@@ -2760,6 +2767,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeInvalidAttributePathRoundt
         uint16_t minInterval;
         uint16_t maxInterval;
         delegate.mpReadHandler->GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(readPrepareParams.mMaxIntervalCeilingSeconds, delegate.mpReadHandler->GetSubscriberRequestedMaxInterval());
 
         // Advance monotonic timestamp for min interval to elapse
         gMockClock.AdvanceMonotonic(System::Clock::Seconds16(maxInterval));
