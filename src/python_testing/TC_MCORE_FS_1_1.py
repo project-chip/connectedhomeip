@@ -198,6 +198,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
                                                                                    iterations=resp.iterations, salt=resp.salt)
         await self.send_single_cmd(cmd, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, timedRequestTimeoutMs=5000)
 
+        # TODO(#35229)
         self.step("3c")
         if not self.is_pics_sdk_ci_only:
             time.sleep(30)
