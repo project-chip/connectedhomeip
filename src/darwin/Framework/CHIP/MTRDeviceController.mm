@@ -313,7 +313,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (void)shutdown
 {
-    // Subclass hook; nothing to do.
+    [self _clearDeviceControllerDelegates];
 }
 
 - (nullable NSNumber *)controllerNodeID
@@ -668,6 +668,14 @@ using namespace chip::Tracing::DarwinFramework;
         } else {
             MTR_LOG("%@ removeDeviceControllerDelegate: delegate %p not found in %lu", self, delegate, static_cast<unsigned long>(_delegates.count));
         }
+    }
+}
+
+- (void)_clearDeviceControllerDelegates
+{
+    @synchronized(self) {
+        _strongDelegateForSetDelegateAPI = nil;
+        [_delegates removeAllObjects];
     }
 }
 
