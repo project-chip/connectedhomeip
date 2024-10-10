@@ -15,10 +15,10 @@
 # limitations under the License.
 #
 
+import datetime
 import logging
 import re
 from typing import Optional, Set
-import datetime
 
 import click
 import coloredlogs
