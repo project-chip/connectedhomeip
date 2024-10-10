@@ -44,7 +44,7 @@ constexpr DeviceTypeData knownDeviceTypes[] = {
     { 0x00000014, DeviceTypeClass::Utility, "Matter OTA Provider" },
     { 0x00000015, DeviceTypeClass::Simple, "Matter Contact Sensor" },
     { 0x00000016, DeviceTypeClass::Node, "Matter Root Node" },
-    { 0x00000019, DeviceTypeClass::Utility, "Matter Secondary Network Interface Device Type" },
+    { 0x00000019, DeviceTypeClass::Utility, "Matter Secondary Network Interface" },
     { 0x00000022, DeviceTypeClass::Simple, "Matter Speaker" },
     { 0x00000023, DeviceTypeClass::Simple, "Matter Casting Video Player" },
     { 0x00000024, DeviceTypeClass::Simple, "Matter Content App" },
