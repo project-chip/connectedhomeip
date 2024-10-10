@@ -43,13 +43,13 @@ class Canceller:
         self.dry_run = dry_run
 
     def check_all_pending_prs(self, max_age, required_runs):
+        cutoff = datetime.datetime.now() - max_age
         for pr in self.repo.get_pulls(state="open", sort="updated", direction="desc"):
             pr_create = (
                 pr.updated_at.replace(tzinfo=None)
                 if pr.updated_at
                 else datetime.datetime.now()
             )
-            cutoff = datetime.datetime.now() - max_age
 
             if pr_create < cutoff:
                 logging.warning(
