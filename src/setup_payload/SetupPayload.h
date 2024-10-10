@@ -259,6 +259,8 @@ public:
      **/
     static bool IsVendorTag(uint8_t tag) { return !IsCommonTag(tag); }
 
+    static CHIP_ERROR generateRandomSetupPin(uint32_t & setupPINCode);
+
 private:
     std::map<uint8_t, OptionalQRCodeInfo> optionalVendorData;
     std::map<uint8_t, OptionalQRCodeInfoExtension> optionalExtensionData;
