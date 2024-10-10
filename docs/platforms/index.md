@@ -22,6 +22,7 @@ ti/index
 
 -   [Android](./android/)
 -   [ASR](./asr/)
+-   [Bouffalo Lab](./bouffalolab)
 -   [ESP32](./esp32/)
 -   [Infineon](./infineon/)
 -   [MbedOS](./mbedos/)
