@@ -193,23 +193,17 @@ void DeviceManager::UnpairLocalFabricBridge()
 
 void DeviceManager::SubscribeRemoteFabricBridge()
 {
-    // Listen to the state changes of the remote fabric bridge.
-    StringBuilder<kMaxCommandSize> commandBuilder;
+    ChipLogProgress(NotSpecified, "Start subscription to the remote bridge.")
 
-    // Prepare and push the descriptor subscribe command
-    commandBuilder.Add("descriptor subscribe parts-list ");
-    commandBuilder.AddFormat("%d %d %lu %d", kSubscribeMinInterval, kSubscribeMaxInterval, mRemoteBridgeNodeId,
-                             kAggragatorEndpointId);
-    PushCommand(commandBuilder.c_str());
+        CHIP_ERROR error = mBridgeSubscriber.StartSubscription(PairingManager::Instance().CurrentCommissioner(),
+                                                               mRemoteBridgeNodeId, kAggregatorEndpointId);
 
-    // Clear the builder for the next command
-    commandBuilder.Reset();
-
-    // Prepare and push the commissioner control subscribe command
-    commandBuilder.Add("commissionercontrol subscribe-event commissioning-request-result ");
-    commandBuilder.AddFormat("%d %d %lu %d --is-urgent true --keepSubscriptions true", kSubscribeMinInterval, kSubscribeMaxInterval,
-                             mRemoteBridgeNodeId, kAggregatorEndpointId);
-    PushCommand(commandBuilder.c_str());
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to subscribe to the remote bridge (NodeId: %" PRIu64 "). Error: %" CHIP_ERROR_FORMAT,
+                     mRemoteBridgeNodeId, error.Format());
+        return;
+    }
 }
 
 void DeviceManager::ReadSupportedDeviceCategories()
