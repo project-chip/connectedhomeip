@@ -42,14 +42,14 @@ class Canceller:
         self.repo = self.api.get_repo(REPOSITORY)
         self.dry_run = dry_run
 
-    def check_all_pending_prs(self, max_pr_age_days, required_runs):
+    def check_all_pending_prs(self, max_age, required_runs):
         for pr in self.repo.get_pulls(state="open", sort="updated", direction="desc"):
             pr_create = (
                 pr.updated_at.replace(tzinfo=None)
                 if pr.updated_at
                 else datetime.datetime.now()
             )
-            cutoff = datetime.datetime.now() - datetime.timedelta(days=max_pr_age_days)
+            cutoff = datetime.datetime.now() - max_age
 
             if pr_create < cutoff:
                 logging.warning(
@@ -139,10 +139,21 @@ class Canceller:
 @click.option("--token-file", help="Read github token from the given file")
 @click.option("--dry-run", default=False, is_flag=True, help="Actually cancel or not")
 @click.option(
-    "--max-pr-age-days", default=5, type=int, help="How many days to look at PRs"
+    "--max-pr-age-days", default=0, type=int, help="How many days to look at PRs"
+)
+@click.option(
+    "--max-pr-age-minutes", default=0, type=int, help="How many minutes to look at PRs"
 )
 @click.option("--require", multiple=True, default=[], help="Name of required runs")
-def main(log_level, gh_api_token, token_file, dry_run, max_pr_age_days, require):
+def main(
+    log_level,
+    gh_api_token,
+    token_file,
+    dry_run,
+    max_pr_age_days,
+    max_pr_age_minutes,
+    require,
+):
     coloredlogs.install(
         level=__LOG_LEVELS__[log_level], fmt="%(asctime)s %(levelname)-7s %(message)s"
     )
@@ -154,7 +165,13 @@ def main(log_level, gh_api_token, token_file, dry_run, max_pr_age_days, require)
     else:
         raise Exception("Require a --gh-api-token or --token-file to access github")
 
-    Canceller(gh_token, dry_run).check_all_pending_prs(max_pr_age_days, require)
+    max_age = datetime.timedelta(days=max_pr_age_days, minutes=max_pr_age_minutes)
+    if max_age == datetime.timedelta():
+        raise Exception(
+            "Please specifiy a max age of minutes or days (--max-pr-age-days or --max-pr-age-minutes)"
+        )
+
+    Canceller(gh_token, dry_run).check_all_pending_prs(max_age, require)
 
 
 if __name__ == "__main__":
