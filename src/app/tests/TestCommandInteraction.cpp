@@ -25,7 +25,6 @@
 #include <cinttypes>
 #include <optional>
 
-#include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/AppConfig.h>
@@ -38,6 +37,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/Optional.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
@@ -372,9 +372,21 @@ public:
     {
         DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
     }
-    Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath)
+
+    Protocols::InteractionModel::Status ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request) override
     {
-        return ServerClusterCommandExists(aCommandPath);
+        using Protocols::InteractionModel::Status;
+
+        Status status = ServerClusterCommandExists(request.path);
+        if (status != Status::Success)
+        {
+            return status;
+        }
+
+        // NOTE: IM does more validation here, however for now we do minimal options
+        //       to pass the test.
+
+        return Status::Success;
     }
 
     void ResetCounter() { onFinalCalledTimes = 0; }
