@@ -44,9 +44,11 @@ class TC_OPCREDS_3_4(MatterBaseTest):
                 TestStep(1, "TH1 fully commissions the DUT"),
                 TestStep(2, "TH1 reads the NOCs attribute from the Node Operational Credentials cluster using a fabric-filtered read"),
                 TestStep(3, "TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster"),
-                TestStep(4, "TH1 sends the UpdateNOC command to the Node Operational Credentials cluster with the following fields: NOCValue and ICACValue"),
+                TestStep(
+                    4, "TH1 sends the UpdateNOC command to the Node Operational Credentials cluster with the following fields: NOCValue and ICACValue"),
                 TestStep(5, "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds field set to 900"),
-                TestStep(6, "TH1 sends the UpdateNOC command to the Node Operational Credentials cluster with the following fields: NOCValue and ICACValue"),
+                TestStep(
+                    6, "TH1 sends the UpdateNOC command to the Node Operational Credentials cluster with the following fields: NOCValue and ICACValue"),
                 TestStep(7, "TH1 Sends CSRRequest command with the IsForUpdateNOC field set to false"),
                 TestStep(8, "TH1 generates a new NOC chain with ICAC with the following properties"),
                 TestStep(9, "TH1 sends the UpdateNOC command to the Node Operational Credentials cluster"),
@@ -238,6 +240,7 @@ class TC_OPCREDS_3_4(MatterBaseTest):
             asserts.fail("Unexpected error sending UpdateNOC command")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.UnsupportedAccess, "Failure status returned from UpdateNOC")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
