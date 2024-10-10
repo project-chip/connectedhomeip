@@ -292,13 +292,8 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
         }
     }
 
-    for (uint8_t i = 0; ep && (i < ep->clusterCount); i++)
+    for (uint8_t i = 0; i < ep->clusterCount; i++)
     {
-        if (!ep->cluster)
-        {
-            continue;
-        }
-
         const EmberAfCluster * cluster = &(ep->cluster[i]);
         if (!cluster->attributes)
         {
@@ -308,11 +303,14 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
         for (uint16_t j = 0; j < cluster->attributeCount; j++)
         {
             const EmberAfAttributeMetadata * attr = &(cluster->attributes[j]);
-            if (emberAfAttributeSize(attr) > chip::app::Compatibility::Internal::gEmberAttributeIOBufferSpan.size())
+            uint16_t attrSize                     = emberAfAttributeSize(attr);
+            size_t bufferSize                     = Compatibility::Internal::gEmberAttributeIOBufferSpan.size();
+            if (attrSize > bufferSize)
             {
-                ChipLogError(DataManagement,
-                             "Attribute %u (id=" ChipLogFormatMEI ") of Cluster %u (id=" ChipLogFormatMEI ") too large", j,
-                             ChipLogValueMEI(attr->attributeId), i, ChipLogValueMEI(cluster->clusterId));
+                ChipLogError(
+                    DataManagement,
+                    "Attribute size %u exceeds max size %lu, (attrId=" ChipLogFormatMEI ", clusterId=" ChipLogFormatMEI ")",
+                    attrSize, (unsigned long) bufferSize, ChipLogValueMEI(attr->attributeId), ChipLogValueMEI(cluster->clusterId));
                 return CHIP_ERROR_NO_MEMORY;
             }
         }
