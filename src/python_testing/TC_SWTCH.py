@@ -90,10 +90,10 @@ import chip.clusters as Clusters
 import test_plan_support
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult
+from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
+                                         TestStep, await_sequence_of_reports, default_matter_test_main, has_feature,
+                                         run_if_endpoint_matches)
 from chip.tlv import uint
-from matter_testing_support import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
-                                    TestStep, await_sequence_of_reports, default_matter_test_main, has_feature,
-                                    run_if_endpoint_matches)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -281,7 +281,8 @@ class TC_SwitchTests(MatterBaseTest):
         elapsed = 0.0
         time_remaining = timeout_sec
 
-        logging.info(f"Waiting {timeout_sec:.1f} seconds for no more events for cluster {expected_cluster} on endpoint {endpoint_id}")
+        logging.info(f"Waiting {timeout_sec: .1f} seconds for no more events for cluster {
+                     expected_cluster} on endpoint {endpoint_id}")
         while time_remaining > 0:
             try:
                 item: EventReadResult = event_queue.get(block=True, timeout=time_remaining)
