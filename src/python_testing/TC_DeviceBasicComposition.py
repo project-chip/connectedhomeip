@@ -120,6 +120,11 @@ from taglist_and_topology_test_support import (create_device_type_list_for_root,
                                                separate_endpoint_types)
 
 
+def get_vendor_id(mei: int) -> int:
+    """Get the vendor ID portion (MEI prefix) of an overall MEI."""
+    return (mei >> 16) & 0xffff
+
+
 def check_int_in_range(min_value: int, max_value: int, allow_null: bool = False) -> Callable:
     """Returns a checker for whether `obj` is an int that fits in a range."""
     def int_in_range_checker(obj: Any):
@@ -490,15 +495,17 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                 cmd_prefixes = [a & 0xFFFF_0000 for a in cmd_values]
                 bad_attrs = [a for a in attr_prefixes if a >= bad_prefix_min]
                 bad_cmds = [a for a in cmd_prefixes if a >= bad_prefix_min]
-                for bad in bad_attrs:
-                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=bad)
+                for bad_attrib_id in bad_attrs:
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=bad_attrib_id)
+                    vendor_id = get_vendor_id(bad_attrib_id)
                     self.record_error(self.get_test_name(
-                    ), location=location, problem=f'Attribute with bad prefix 0x{bad:04x} in cluster 0x{cluster_id:08x}' + (' (Test Vendor)' if attribute_id_type(bad) == AttributeIdType.kTest else ''), spec_location='Manufacturer Extensible Identifier (MEI)')
+                    ), location=location, problem=f'Attribute 0x{bad_attrib_id:08x} with bad prefix 0x{vendor_id:04x} in cluster 0x{cluster_id:08x}' + (' (Test Vendor)' if attribute_id_type(bad_attrib_id) == AttributeIdType.kTest else ''), spec_location='Manufacturer Extensible Identifier (MEI)')
                     success = False
-                for bad in bad_cmds:
-                    location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=bad)
+                for bad_cmd_id in bad_cmds:
+                    location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=bad_cmd_id)
+                    vendor_id = get_vendor_id(bad_cmd_id)
                     self.record_error(self.get_test_name(
-                    ), location=location, problem=f'Command with bad prefix 0x{bad:04x} in cluster 0x{cluster_id:08x}', spec_location='Manufacturer Extensible Identifier (MEI)')
+                    ), location=location, problem=f'Command 0x{bad_cmd_id:08x} with bad prefix 0x{vendor_id:04x} in cluster 0x{cluster_id:08x}', spec_location='Manufacturer Extensible Identifier (MEI)')
                     success = False
 
         self.print_step(7, "Validate that none of the MEI global attribute IDs contain values outside of the allowed suffix range")
@@ -541,10 +548,11 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             cluster_prefixes = [a & 0xFFFF_0000 for a in endpoint.keys()]
             bad_clusters_ids = [a for a in cluster_prefixes if a >= bad_prefix_min]
-            for bad in bad_clusters_ids:
-                location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad)
+            for bad_cluster_id in bad_clusters_ids:
+                location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad_cluster_id)
+                vendor_id = get_vendor_id(bad_cluster_id)
                 self.record_error(self.get_test_name(), location=location,
-                                  problem=f'Bad cluster id prefix 0x{bad:04x}' + (' (Test Vendor)' if cluster_id_type(bad) == ClusterIdType.kTest else ''), spec_location='Manufacturer Extensible Identifier (MEI)')
+                                  problem=f'Cluster 0x{bad_cluster_id:08x} with bad prefix 0x{vendor_id:04x}' + (' (Test Vendor)' if cluster_id_type(bad_cluster_id) == ClusterIdType.kTest else ''), spec_location='Manufacturer Extensible Identifier (MEI)')
                 success = False
 
         self.print_step(9, "Validate that all clusters in the standard range have a known cluster ID")
