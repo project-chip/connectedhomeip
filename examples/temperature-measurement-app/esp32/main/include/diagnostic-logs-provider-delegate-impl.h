@@ -19,11 +19,21 @@
 #pragma once
 
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
+
+#if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+#include <src/tracing/esp32_diagnostic_trace/DiagnosticStorageManager.h>
+#endif
+
 #include <map>
 
 #if defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
 #include <esp_core_dump.h>
 #endif // defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
+
+#if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+#define RETRIEVAL_BUFFER_SIZE CONFIG_END_USER_BUFFER_SIZE
+using namespace chip::Tracing::Diagnostics;
+#endif
 
 namespace chip {
 namespace app {

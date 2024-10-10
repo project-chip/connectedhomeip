@@ -29,6 +29,11 @@ using namespace chip::app::Clusters::DiagnosticLogs;
 LogProvider LogProvider::sInstance;
 LogProvider::CrashLogContext LogProvider::sCrashLogContext;
 
+#if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    static uint8_t retrieveBuffer[RETRIEVAL_BUFFER_SIZE];
+    MutableByteSpan endUserSupportSpan(retrieveBuffer, sizeof(retrieveBuffer));
+#endif
+
 namespace {
 bool IsValidIntent(IntentEnum intent)
 {
@@ -75,7 +80,14 @@ size_t LogProvider::GetSizeForIntent(IntentEnum intent)
     switch (intent)
     {
     case IntentEnum::kEndUserSupport:
-        return static_cast<size_t>(endUserSupportLogEnd - endUserSupportLogStart);
+        {
+            #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+                return RETRIEVAL_BUFFER_SIZE;
+            #else
+                return static_cast<size_t>(endUserSupportLogEnd - endUserSupportLogStart);
+            #endif
+        }
+        break;
     case IntentEnum::kNetworkDiag:
         return static_cast<size_t>(networkDiagnosticLogEnd - networkDiagnosticLogStart);
     case IntentEnum::kCrashLogs:
@@ -107,11 +119,30 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
     switch (intent)
     {
     case IntentEnum::kEndUserSupport: {
-        context->EndUserSupport.span =
-            ByteSpan(&endUserSupportLogStart[0], static_cast<size_t>(endUserSupportLogEnd - endUserSupportLogStart));
+        #if CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+            DiagnosticStorageImpl & diagnosticStorage = DiagnosticStorageImpl::GetInstance();
+
+            if (diagnosticStorage.IsEmptyBuffer())
+            {
+                printf("Buffer is empty\n");
+                ChipLogError(DeviceLayer, "Empty Diagnostic buffer");
+                return CHIP_ERROR_NOT_FOUND;
+            }
+            // Retrieve data from the diagnostic storage
+            CHIP_ERROR err = diagnosticStorage.Retrieve(endUserSupportSpan);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Failed to retrieve data: %s", chip::ErrorStr(err));
+                return err;
+            }
+            // Now, assign the span to the EndUserSupport object or whatever is required
+            context->EndUserSupport.span = endUserSupportSpan;
+        #else
+            context->EndUserSupport.span =
+                ByteSpan(&endUserSupportLogStart[0], static_cast<size_t>(endUserSupportLogEnd - endUserSupportLogStart));
+        #endif
     }
     break;
-
     case IntentEnum::kNetworkDiag: {
         context->NetworkDiag.span =
             ByteSpan(&networkDiagnosticLogStart[0], static_cast<size_t>(networkDiagnosticLogEnd - networkDiagnosticLogStart));
