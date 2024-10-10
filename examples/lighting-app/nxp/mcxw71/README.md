@@ -109,7 +109,7 @@ this feature, compile the application with: `chip_config_dimmable_led=true`
 
 If the feature is enabled, the LED brightness can be controlled using
 `LevelControl` cluster
-[commands](../../../../docs/guides/chip_tool_guide.md#step-7-control-application-data-model-clusters).
+[commands](../../../../docs/development_controllers/chip-tool/chip_tool_guide.md#step-7-control-application-data-model-clusters).
 
 ## Flashing
 
@@ -267,4 +267,4 @@ To reboot the device, please run `rpcs.chip.rpc.Device.Reboot()`.
 ## OTA
 
 Please see
-[mcxw71 OTA guide](../../../../docs/guides/nxp/nxp_mcxw71_ota_guide.md).
+[mcxw71 OTA guide](../../../../docs/platforms/nxp/nxp_mcxw71_ota_guide.md).
