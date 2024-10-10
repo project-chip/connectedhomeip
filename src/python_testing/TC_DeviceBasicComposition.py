@@ -479,7 +479,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                 for bad in bad_cmds:
                     location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=bad)
                     self.record_error(self.get_test_name(
-                    ), location=location, problem=f'Command with bad prefix 0x{bad:04x} in cluster 0x{cluster_id:08x}', spec_location='Manufacturer Extensible Identifier(MEI)')
+                    ), location=location, problem=f'Command with bad prefix 0x{bad:04x} in cluster 0x{cluster_id:08x}', spec_location='Manufacturer Extensible Identifier (MEI)')
                     success = False
 
         self.print_step(7, "Validate that none of the MEI global attribute IDs contain values outside of the allowed suffix range")
