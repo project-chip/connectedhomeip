@@ -53,6 +53,11 @@ const K32WConfig::Key K32WConfig::kConfigKey_Spake2pIterationCount{ &K32WConfig:
 const K32WConfig::Key K32WConfig::kConfigKey_Spake2pSalt{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x0A };
 const K32WConfig::Key K32WConfig::kConfigKey_Spake2pVerifier{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x0B };
 
+const K32WConfig::Key K32WConfig::kConfigKey_VendorName{ &K32WConfig::sFactoryStorage, kKeyId_Config, 0x0C };
+const K32WConfig::Key K32WConfig::kConfigKey_ProductName{ &K32WConfig::sFactoryStorage, kKeyId_Config, 0x0D };
+const K32WConfig::Key K32WConfig::kConfigKey_HardwareVersionString{ &K32WConfig::sFactoryStorage, kKeyId_Config, 0x0E };
+const K32WConfig::Key K32WConfig::kConfigKey_SoftwareVersionString{ &K32WConfig::sFactoryStorage, kKeyId_Config, 0x0F };
+
 const K32WConfig::Key K32WConfig::kConfigKey_ServiceConfig{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x01 };
 const K32WConfig::Key K32WConfig::kConfigKey_PairedAccountId{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x02 };
 const K32WConfig::Key K32WConfig::kConfigKey_ServiceId{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x03 };
@@ -63,11 +68,6 @@ const K32WConfig::Key K32WConfig::kConfigKey_CountryCode{ &K32WConfig::sConfigSt
 const K32WConfig::Key K32WConfig::kConfigKey_UniqueId{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x0A };
 const K32WConfig::Key K32WConfig::kConfigKey_SoftwareVersion{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x0B };
 const K32WConfig::Key K32WConfig::kConfigKey_SoftwareUpdateCompleted{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x0C };
-
-const K32WConfig::Key K32WConfig::kConfigKey_VendorName{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x0D };
-const K32WConfig::Key K32WConfig::kConfigKey_ProductName{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x0E };
-const K32WConfig::Key K32WConfig::kConfigKey_HardwareVersionString{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x0F };
-const K32WConfig::Key K32WConfig::kConfigKey_SoftwareVersionString{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x10 };
 
 const K32WConfig::Key K32WConfig::kCounterKey_RebootCount{ &K32WConfig::sCounterStorage, kKeyId_Counter, 0x00 };
 const K32WConfig::Key K32WConfig::kCounterKey_UpTime{ &K32WConfig::sCounterStorage, kKeyId_Counter, 0x01 };
