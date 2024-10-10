@@ -215,7 +215,7 @@ EcosystemLocationStruct::Builder::SetLocationDescriptorLastEdit(uint64_t aLocati
 std::unique_ptr<EcosystemLocationStruct> EcosystemLocationStruct::Builder::Build()
 {
     VerifyOrReturnValue(!mIsAlreadyBuilt, nullptr, ChipLogError(Zcl, "Build() already called"));
-    VerifyOrReturnValue(!mLocationDescriptor.mLocationName.empty(), nullptr, ChipLogError(Zcl, "Must Provided Location Name"));
+    VerifyOrReturnValue(!mLocationDescriptor.mLocationName.empty(), nullptr, ChipLogError(Zcl, "Must Provide Location Name"));
     static_assert(kLocationDescriptorNameMaxSize <= std::numeric_limits<uint16_t>::max());
     VerifyOrReturnValue(
         mLocationDescriptor.mLocationName.size() <= kLocationDescriptorNameMaxSize, nullptr,
