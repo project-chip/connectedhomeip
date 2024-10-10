@@ -49,7 +49,7 @@
 
 #include <mutex>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-#include <transport/raw/WiFiPAF.h>
+#include <wifipaf/WiFiPAFLayer.h>
 #endif
 #endif
 
@@ -144,12 +144,13 @@ public:
     CHIP_ERROR _WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
                                OnConnectionErrorFunct onError);
     CHIP_ERROR _WiFiPAFCancelConnect();
+    CHIP_ERROR _WiFiPAFCancelIncompleteConnect();
     void OnDiscoveryResult(gboolean success, GVariant * obj);
+    void OnReplied(gboolean success, GVariant * obj);
     void OnNanReceive(GVariant * obj);
     void OnNanSubscribeTerminated(gint term_subscribe_id, gint reason);
     CHIP_ERROR _WiFiPAFSend(chip::System::PacketBufferHandle && msgBuf);
-    Transport::WiFiPAFBase * _GetWiFiPAF();
-    void _SetWiFiPAF(Transport::WiFiPAFBase * pWiFiPAF);
+    WiFiPAF::WiFiPAFLayer * _GetWiFiPAF();
 #endif
 
     void PostNetworkConnect();
@@ -235,8 +236,18 @@ private:
         uint32_t subscribe_id;
         uint32_t peer_publish_id;
         uint8_t peer_addr[6];
+        bool fsd;
+        bool fsd_gas;
         uint32_t ssi_len;
     };
+    struct wpa_dbus_reply_info
+    {
+        uint32_t publish_id;
+        uint32_t peer_subscribe_id;
+        uint8_t peer_addr[6];
+        uint32_t ssi_len;
+    };
+
     uint32_t mpresubscribe_id;
     struct wpa_dbus_discov_info mpaf_info;
     struct wpa_dbus_nanrx_info
@@ -250,7 +261,7 @@ private:
 
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
     OnConnectionErrorFunct mOnPafSubscribeError;
-    Transport::WiFiPAFBase * pmWiFiPAF;
+    WiFiPAF::WiFiPAFLayer * pmWiFiPAF;
     void * mAppState;
     CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
