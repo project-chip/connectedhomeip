@@ -74,10 +74,13 @@ public:
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
 
+        __auto_type * endpoint = @(endpointId);
+        __auto_type * cluster = @(mClusterId);
+        __auto_type * attribute = @(mAttributeId);
         [device
-            writeAttributeWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
-                               clusterID:[NSNumber numberWithUnsignedInteger:clusterId]
-                             attributeID:[NSNumber numberWithUnsignedInteger:attributeId]
+            writeAttributeWithEndpointID:endpoint
+                               clusterID:cluster
+                             attributeID:attribute
                                    value:value
                        timedWriteTimeout:mTimedInteractionTimeoutMs.HasValue()
                            ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()]
@@ -86,11 +89,13 @@ public:
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   if (error != nil) {
                                       LogNSError("Error writing attribute", error);
+                                      RemoteDataModelLogger::LogAttributeErrorAsJSON(endpoint, cluster, attribute, error);
                                   }
                                   if (values) {
                                       for (id item in values) {
                                           NSLog(@"Response Item: %@", [item description]);
                                       }
+                                      RemoteDataModelLogger::LogAttributeAsJSON(endpoint, cluster, attribute, values);
                                   }
                                   SetCommandExitStatus(error);
                               }];

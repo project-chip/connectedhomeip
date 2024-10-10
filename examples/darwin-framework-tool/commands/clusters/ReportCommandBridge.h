@@ -57,20 +57,26 @@ public:
         if (mFabricFiltered.HasValue()) {
             params.filterByFabric = mFabricFiltered.Value();
         }
+
+        __auto_type * endpoint = @(endpointId);
+        __auto_type * cluster = @(mClusterId);
+        __auto_type * attribute = @(mAttributeId);
         [device
-            readAttributesWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
-                               clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
-                             attributeID:[NSNumber numberWithUnsignedInteger:mAttributeId]
+            readAttributesWithEndpointID:endpoint
+                               clusterID:cluster
+                             attributeID:attribute
                                   params:params
                                    queue:callbackQueue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   if (error != nil) {
                                       LogNSError("Error reading attribute", error);
+                                      RemoteDataModelLogger::LogAttributeErrorAsJSON(endpoint, cluster, attribute, error);
                                   }
                                   if (values) {
                                       for (id item in values) {
                                           NSLog(@"Response Item: %@", [item description]);
                                       }
+                                      RemoteDataModelLogger::LogAttributeAsJSON(endpoint, cluster, attribute, values);
                                   }
                                   SetCommandExitStatus(error);
                               }];
@@ -137,16 +143,23 @@ public:
             params.resubscribeAutomatically = mAutoResubscribe.Value();
         }
 
-        [device subscribeToAttributesWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
-            clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
-            attributeID:[NSNumber numberWithUnsignedInteger:mAttributeId]
+        __auto_type * endpoint = @(endpointId);
+        __auto_type * cluster = @(mClusterId);
+        __auto_type * attribute = @(mAttributeId);
+        [device subscribeToAttributesWithEndpointID:endpoint
+            clusterID:cluster
+            attributeID:attribute
             params:params
             queue:callbackQueue
             reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                if (error != nil) {
+                    RemoteDataModelLogger::LogAttributeErrorAsJSON(endpoint, cluster, attribute, error);
+                }
                 if (values) {
                     for (id item in values) {
                         NSLog(@"Response Item: %@", [item description]);
                     }
+                    RemoteDataModelLogger::LogAttributeAsJSON(endpoint, cluster, attribute, values);
                 }
                 SetCommandExitStatus(error);
             }
