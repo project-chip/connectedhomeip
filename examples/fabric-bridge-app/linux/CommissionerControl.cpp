@@ -116,7 +116,7 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const
         mLabel.ClearValue();
     }
 
-    CHIP_ERROR err = CommissionerControlServer::Instance().GenerateCommissioningRequestResultEvent(result);
+    CHIP_ERROR err = CommissionerControlServer::Instance().GenerateCommissioningRequestResultEvent(kAggregatorEndpointId, result);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -241,7 +241,7 @@ CHIP_ERROR CommissionerControlInit()
 
     Protocols::InteractionModel::Status status =
         Clusters::CommissionerControl::CommissionerControlServer::Instance().SetSupportedDeviceCategoriesValue(
-            kRootEndpointId, supportedDeviceCategories);
+            Clusters::CommissionerControl::kAggregatorEndpointId, supportedDeviceCategories);
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
