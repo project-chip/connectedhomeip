@@ -42,6 +42,7 @@
 #include <mbedtls/x509_csr.h>
 
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/Global.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPArgParser.hpp>
@@ -63,7 +64,7 @@ typedef struct
     mbedtls_entropy_context mEntropy;
 } EntropyContext;
 
-static EntropyContext gsEntropyContext;
+static Global<EntropyContext> gsEntropyContext;
 
 static bool _isValidTagLength(size_t tag_length)
 {
@@ -384,15 +385,16 @@ exit:
 
 static EntropyContext * get_entropy_context()
 {
-    if (!gsEntropyContext.mInitialized)
+    EntropyContext & entropyContext = gsEntropyContext.get();
+    if (!entropyContext.mInitialized)
     {
-        mbedtls_entropy_init(&gsEntropyContext.mEntropy);
-        mbedtls_ctr_drbg_init(&gsEntropyContext.mDRBGCtxt);
+        mbedtls_entropy_init(&entropyContext.mEntropy);
+        mbedtls_ctr_drbg_init(&entropyContext.mDRBGCtxt);
 
-        gsEntropyContext.mInitialized = true;
+        entropyContext.mInitialized = true;
     }
 
-    return &gsEntropyContext;
+    return &entropyContext;
 }
 
 static mbedtls_ctr_drbg_context * get_drbg_context()

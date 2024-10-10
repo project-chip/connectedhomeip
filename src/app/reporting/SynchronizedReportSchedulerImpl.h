@@ -79,6 +79,7 @@ class SynchronizedReportSchedulerImpl : public ReportSchedulerImpl, public Timer
 public:
     void OnReadHandlerDestroyed(ReadHandler * aReadHandler) override;
 
+    SynchronizedReportSchedulerImpl() = default;
     SynchronizedReportSchedulerImpl(TimerDelegate * aTimerDelegate) : ReportSchedulerImpl(aTimerDelegate) {}
     ~SynchronizedReportSchedulerImpl() override { UnregisterAllHandlers(); }
 
