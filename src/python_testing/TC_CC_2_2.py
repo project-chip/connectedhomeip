@@ -88,8 +88,7 @@ class TC_CC_2_3(MatterBaseTest):
                     14, f'{THcommand} MoveHue with _MoveMode_ field set to Down, _Rate_ field set to 255 and remaining fields set to 0', verify_success()),
                 TestStep(
                     15, f'{THcommand} MoveSaturation with _MoveMode_ field set to Down, _Rate_ field set to 255 and remaining fields set to 0', verify_success()),
-                TestStep(16, f'{
-                         THcommand} MoveToHue with _Hue_ field set to 254, _TransitionTime_ field set to 100, _Direction_ field set to Shortest and remaining fields set to 0', verify_success()),
+                TestStep(16, f'{THcommand} MoveToHue with _Hue_ field set to 254, _TransitionTime_ field set to 100, _Direction_ field set to Shortest and remaining fields set to 0', verify_success()),
                 TestStep(17, store_values('reportedCurrentHueValuesList', 'CurrentHue')),
                 TestStep(18, verify_entry_count('reportedCurrentHueValuesList', 'CurrentHue'),
                          entry_count_verification('reportedCurrentHueValuesList')),
