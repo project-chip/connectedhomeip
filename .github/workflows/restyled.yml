@@ -35,9 +35,4 @@ jobs:
           labels: "restyled"
           reviewers: ${{ github.event.pull_request.user.login }}
           delete-branch: true
-      - name: Cancel workflow if failed
-        with:
-           github_token: ${{ github.token }}
-        if: failure()
-        uses: ./.github/actions/stop-ci-workflows
 

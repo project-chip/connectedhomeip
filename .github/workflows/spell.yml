@@ -35,8 +35,3 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
             - uses: rojopolis/spellcheck-github-actions@0.36.0
-            - name: Cancel workflow if failed
-              with:
-                github_token: ${{ secrets.JOB_CANCEL_PAT }}
-              if: failure()
-              uses: ./.github/actions/stop-ci-workflows

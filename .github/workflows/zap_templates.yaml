@@ -74,8 +74,3 @@ jobs:
                   # to tell at a glance what might be going on.  And throw in
                   # --exit-code to make this job fail if there is a difference.
                   git diff-index --exit-code HEAD --
-            - name: Cancel workflow if failed
-              with:
-                github_token: ${{ secrets.JOB_CANCEL_PAT }}
-              if: failure()
-              uses: ./.github/actions/stop-ci-workflows

@@ -18,10 +18,13 @@
 import logging
 import re
 from typing import Optional, Set
+import datetime
 
 import click
 import coloredlogs
 from github import Github
+from github.Commit import Commit
+from github.PullRequest import PullRequest
 
 __LOG_LEVELS__ = {
     "debug": logging.DEBUG,
@@ -34,67 +37,93 @@ REPOSITORY = "project-chip/connectedhomeip"
 
 
 class Canceller:
-    def __init__(self, token):
+    def __init__(self, token: str, dry_run: bool):
         self.api = Github(token)
         self.repo = self.api.get_repo(REPOSITORY)
+        self.dry_run = dry_run
 
-    def cancel_all_runs(
-        self,
-        pr_number: int,
-        commit_sha: str,
-        skip_workflow: Optional[str],
-        dry_run: bool,
-    ):
-        pr = self.repo.get_pull(pr_number)
-        logging.info("Examining PR '%s'", pr.title)
-        logging.info("Looking to cancel for commit '%s'", commit_sha)
-        if skip_workflow is not None:
-            logging.info("Will skip workflow named '%s'", skip_workflow)
+    def check_all_pending_prs(self, max_pr_age_days, required_runs):
+        for pr in self.repo.get_pulls(
+            state="open", sort="created_at", direction="desc"
+        ):
+            pr_create = pr.created_at.replace(tzinfo=None)
+            cutoff = datetime.datetime.now() - datetime.timedelta(days=max_pr_age_days)
 
-        stopped: Set[int] = set()
+            if pr_create < cutoff:
+                logging.warning(
+                    "PR is too old (since %s, cutoff at %s). Skipping the rest...",
+                    pr.created_at,
+                    cutoff,
+                )
+                break
+            self.check_pr(pr, required_runs)
+
+    def check_pr(self, pr: PullRequest, required_runs):
+        logging.info("Examining PR %d: %s", pr.number, pr.title)
+
+        last_commit: Optional[Commit] = None
 
         for commit in pr.get_commits():
-            if commit.sha != commit_sha:
-                logging.info("Skipping SHA '%s' as it was not selected", commit.sha)
+            logging.debug("  Found commit %s", commit.sha)
+            if pr.head.sha == commit.sha:
+                last_commit = commit
+                break
+
+        logging.info("Last commit is: %s", last_commit.sha)
+
+        in_progress_workflows: Set[int] = set()
+        failed_check_names: Set[str] = set()
+
+        # Gather all workflows along with failed workflow names
+        for check_suite in last_commit.get_check_suites():
+            if check_suite.conclusion == "success":
+                # Finished without errors. Nothing to do here
                 continue
+            for run in check_suite.get_check_runs():
+                if run.conclusion is not None and run.conclusion != "failure":
+                    logging.debug(
+                        "    Run %s is not interesting: (state %s, conclusion %s)",
+                        run.name,
+                        run.status,
+                        run.conclusion,
+                    )
+                    continue
 
-            for check_suite in commit.get_check_suites():
-                for run in check_suite.get_check_runs():
-                    if run.status not in {"in_progress", "queued"}:
-                        logging.info("Skip over run %s (%s)", run.name, run.status)
-                        continue
-                    # TODO: I am unclear how to really find the workflow id, however the
-                    #       HTML URL is like https://github.com/project-chip/connectedhomeip/actions/runs/11261874698/job/31316278705
-                    #       so need whatever is after run.
-                    m = re.match(r".*/actions/runs/([\d]+)/job/.*", run.html_url)
-                    if not m:
-                        logging.error(
-                            "Failed to extract workflow number from %s", run.html_url
-                        )
-                        continue
+                # TODO: I am unclear how to really find the workflow id, however the
+                #       HTML URL is like https://github.com/project-chip/connectedhomeip/actions/runs/11261874698/job/31316278705
+                #       so need whatever is after run.
+                m = re.match(r".*/actions/runs/([\d]+)/job/.*", run.html_url)
+                if not m:
+                    logging.error(
+                        "Failed to extract workflow number from %s", run.html_url
+                    )
+                    continue
 
-                    workflow_id = int(m.group(1))
+                workflow_id = int(m.group(1))
+                if run.conclusion is None:
+                    logging.info(
+                        "    Workflow %d (i.e. %s) still pending: %s",
+                        workflow_id,
+                        run.name,
+                        run.status,
+                    )
+                    in_progress_workflows.add(workflow_id)
+                elif run.conclusion == "failure":
                     workflow = self.repo.get_workflow_run(workflow_id)
+                    logging.warning("    Workflow %s Failed", workflow.name)
+                    failed_check_names.add(workflow.name)
 
-                    if workflow_id in stopped:
-                        logging.info(
-                            "Workflow %s (id %d) already stopped.",
-                            workflow.name,
-                            workflow_id,
-                        )
-                        continue
+        if not any([name in failed_check_names for name in required_runs]):
+            logging.info("No critical failures found")
+            return
 
-                    stopped.add(workflow_id)
-
-                    if workflow.name == skip_workflow:
-                        logging.info("Workflow %s marked as skip.", workflow.name)
-                        continue
-
-                    if dry_run:
-                        logging.warning("DRY RUN: Will not stop run %s", run.name)
-                    else:
-                        workflow.cancel()
-                        logging.warning("Stopping run %s", run.name)
+        for id in in_progress_workflows:
+            workflow = self.repo.get_workflow_run(id)
+            if self.dry_run:
+                logging.warning("DRY RUN: Will not stop %s", workflow.name)
+            else:
+                workflow.cancel()
+                logging.warning("Stopping workflow %s", workflow.name)
 
 
 @click.command()
@@ -104,23 +133,14 @@ class Canceller:
     type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
     help="Determines the verbosity of script output.",
 )
-@click.option("--pull-request", type=int, help="Pull request number to consider")
-@click.option("--commit-sha", help="Commit to look at when cancelling pull requests")
 @click.option("--gh-api-token", help="Github token to use")
 @click.option("--token-file", help="Read github token from the given file")
 @click.option("--dry-run", default=False, is_flag=True, help="Actually cancel or not")
 @click.option(
-    "--skip-workflow", default=None, help="Name of the workflow NOT to cancel"
+    "--max-pr-age-days", default=5, type=int, help="How many days to look at PRs"
 )
-def main(
-    log_level,
-    pull_request,
-    commit_sha,
-    gh_api_token,
-    token_file,
-    dry_run,
-    skip_workflow,
-):
+@click.option("--require", multiple=True, default=[], help="Name of required runs")
+def main(log_level, gh_api_token, token_file, dry_run, max_pr_age_days, require):
     coloredlogs.install(
         level=__LOG_LEVELS__[log_level], fmt="%(asctime)s %(levelname)-7s %(message)s"
     )
@@ -132,9 +152,7 @@ def main(
     else:
         raise Exception("Require a --gh-api-token or --token-file to access github")
 
-    Canceller(gh_token).cancel_all_runs(
-        pull_request, commit_sha, skip_workflow, dry_run
-    )
+    Canceller(gh_token, dry_run).check_all_pending_prs(max_pr_age_days, require)
 
 
 if __name__ == "__main__":

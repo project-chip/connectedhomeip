@@ -346,8 +346,3 @@ jobs:
                   # Ignore uses of `System::Clock::Literals`, because that's the only way to have things using _ms32 or whatnot
                   # in a header file.
                   git grep -I -n -e '^using namespace' --and --not -e 'System::Clock::Literals' -- './**/*.h' ':(exclude)src/platform/*/BLEManager*.h' ':(exclude)src/platform/openiotsdk/KVPsaPsStore.h' ':(exclude)./examples' ':(exclude)./third_party' && exit 1 || exit 0
-            - name: Cancel workflow if failed
-              with:
-                github_token: ${{ secrets.JOB_CANCEL_PAT }}
-              if: failure()
-              uses: ./.github/actions/stop-ci-workflows
