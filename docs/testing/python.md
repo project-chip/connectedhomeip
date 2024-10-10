@@ -61,7 +61,7 @@ Python tests located in src/python_testing
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
@@ -627,7 +627,9 @@ for the CI). These arguments can be passed as sets of key/value pairs using the
 `./scripts/tests/run_python_test.py` is a convenient script that starts an
 example DUT on the host and includes factory reset support
 
-`./scripts/tests/run_python_test.py --factoryreset --app <your_app> --app-args "whatever" --script <your_script> --script-args "whatever"`
+```shell
+./scripts/tests/run_python_test.py --factory-reset --app <your_app> --app-args "whatever" --script <your_script> --script-args "whatever"
+```
 
 # Running tests in CI
 
@@ -678,7 +680,7 @@ for that run, e.g.:
 #     app: ${TYPE_OF_APP}
 #     app-args: <app_arguments>
 #     script-args: <script_arguments>
-#     factoryreset: <true|false>
+#     factory-reset: <true|false>
 #     quiet: <true|false>
 # === END CI TEST ARGUMENTS ===
 ```
@@ -692,7 +694,7 @@ for that run, e.g.:
 
     -   Example: `${TYPE_OF_APP}`
 
--   `factoryreset`: Determines whether a factory reset should be performed
+-   `factory-reset`: Determines whether a factory reset should be performed
     before the test.
 
     -   Example: `true`

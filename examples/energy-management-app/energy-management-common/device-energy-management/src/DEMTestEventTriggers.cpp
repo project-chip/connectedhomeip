@@ -18,7 +18,6 @@
 
 #include <DEMDelegate.h>
 #include <DeviceEnergyManagementDelegateImpl.h>
-#include <EVSEManufacturerImpl.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 
 #include <EnergyTimeUtils.h>

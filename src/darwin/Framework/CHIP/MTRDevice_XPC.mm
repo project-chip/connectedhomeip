@@ -250,7 +250,8 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
 
     @try {
         [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-            MTR_LOG_ERROR("Error: %@", error);
+            MTR_LOG_ERROR("Invoke error: %@", error);
+            completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
         }] deviceController:[[self deviceController] uniqueIdentifier]
                                  nodeID:[self nodeID]
             invokeCommandWithEndpointID:endpointID
@@ -263,7 +264,41 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
             serverSideProcessingTimeout:serverSideProcessingTimeout
                              completion:completion];
     } @catch (NSException * exception) {
+        MTR_LOG_ERROR("Exception sending XPC message: %@", exception);
+        completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+    }
+}
+
+- (void)downloadLogOfType:(MTRDiagnosticLogType)type
+                  timeout:(NSTimeInterval)timeout
+                    queue:(dispatch_queue_t)queue
+               completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+{
+    NSXPCConnection * xpcConnection = [(MTRDeviceController_XPC *) [self deviceController] xpcConnection];
+
+    @try {
+        [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+            MTR_LOG_ERROR("Error: %@", error);
+            dispatch_async(queue, ^{
+                completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+            });
+        }] deviceController:[[self deviceController] uniqueIdentifier]
+                       nodeID:[self nodeID]
+            downloadLogOfType:type
+                      timeout:timeout
+                   completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+                       dispatch_async(queue, ^{
+                           completion(url, error);
+                           if (url) {
+                               [[NSFileManager defaultManager] removeItemAtPath:url.path error:nil];
+                           }
+                       });
+                   }];
+    } @catch (NSException * exception) {
         MTR_LOG_ERROR("Exception sending XPC messsage: %@", exception);
+        dispatch_async(queue, ^{
+            completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+        });
     }
 }
 

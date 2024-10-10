@@ -1170,6 +1170,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     mtr_weakify(self);
     dispatch_block_t workBlockToQueue = ^{
         mtr_strongify(self);
+        if (nil == self) {
+            // This block may be delayed by a specified number of nanoseconds, potentially running after the device is deallocated.
+            // If so, MTRAsyncWorkItem::initWithQueue will assert on a nil queue, which will cause a crash.
+            return;
+        }
+
         // In the case where a resubscription triggering event happened and already established, running the work block should result in a no-op
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
@@ -2404,8 +2410,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            NSNumber * _Nullable retryDelay) {
                            if (error != nil) {
                                MTR_LOG_ERROR("%@ getSessionForNode error %@", self, error);
-                               [self _handleSubscriptionError:error];
-                               [self _handleSubscriptionReset:retryDelay];
+                               [self->_deviceController asyncDispatchToMatterQueue:^{
+                                   [self _handleSubscriptionError:error];
+                                   [self _handleSubscriptionReset:retryDelay];
+                               } errorHandler:nil];
                                return;
                            }
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,16 +16,22 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Example project configuration file for CHIP.
- *
- *          This is a place to put application or project-specific overrides
- *          to the default configuration values for general CHIP features.
- *
- */
-
 #pragma once
 
-// include the CHIPProjectConfig from config/standalone
-#include <CHIPProjectConfig.h>
+class ElectricalSensorManager
+{
+    using OperationalStateEnum = chip::app::Clusters::OperationalState::OperationalStateEnum;
+
+public:
+    ~ElectricalSensorManager() { Shutdown(); }
+
+    static ElectricalSensorManager & Instance(void) { return sElectricalSensor; }
+
+    CHIP_ERROR Init();
+    void Shutdown();
+
+    void UpdateEPMAttributes(OperationalStateEnum state);
+
+private:
+    static ElectricalSensorManager sElectricalSensor;
+};

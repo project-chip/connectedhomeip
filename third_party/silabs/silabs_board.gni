@@ -53,6 +53,9 @@ declare_args() {
 
   # Self-provision enabled
   use_provision_channel = false
+
+  # Temperature Sensor support
+  sl_enable_si70xx_sensor = false
 }
 
 declare_args() {
@@ -74,6 +77,9 @@ if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
   wifi_soc = true
+
+  assert(!sl_enable_si70xx_sensor,
+         "${silabs_board} does not support the si90xx sensor!")
 
   # EFR32 MG24 series ----------
 } else if (silabs_board == "BRD4186A" || silabs_board == "BRD4187A") {
@@ -104,6 +110,9 @@ if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A") {
   show_qr_code = false
   disable_lcd = true
 
+  assert(!sl_enable_si70xx_sensor,
+         "${silabs_board} does not support the si90xx sensor!")
+
   # EFR32 MG24 Modules series ----------
 } else if (silabs_board == "BRD4316A") {
   silabs_family = "mgm24"
@@ -128,6 +137,9 @@ if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A") {
   use_external_flash = false
   show_qr_code = false
   disable_lcd = true
+
+  assert(!sl_enable_si70xx_sensor,
+         "${silabs_board} does not support the si90xx sensor!")
 } else if (silabs_board == "BRD2704A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240PB32VNA"
@@ -137,6 +149,9 @@ if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A") {
   use_external_flash = false
   show_qr_code = false
   disable_lcd = true
+
+  assert(!sl_enable_si70xx_sensor,
+         "${silabs_board} does not support the si90xx sensor!")
 } else if (silabs_board == "BRD4318A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240SD22VNA"

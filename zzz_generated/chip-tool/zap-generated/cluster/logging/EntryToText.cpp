@@ -259,6 +259,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ContentControl";
     case chip::app::Clusters::ContentAppObserver::Id:
         return "ContentAppObserver";
+    case chip::app::Clusters::ZoneManagement::Id:
+        return "ZoneManagement";
     case chip::app::Clusters::WebRTCTransportProvider::Id:
         return "WebRTCTransportProvider";
     case chip::app::Clusters::WebRTCTransportRequestor::Id:
@@ -4383,6 +4385,33 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ZoneManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ZoneManagement::Attributes::SupportedZoneSources::Id:
+            return "SupportedZoneSources";
+        case chip::app::Clusters::ZoneManagement::Attributes::Zones::Id:
+            return "Zones";
+        case chip::app::Clusters::ZoneManagement::Attributes::TimeControl::Id:
+            return "TimeControl";
+        case chip::app::Clusters::ZoneManagement::Attributes::Sensitivity::Id:
+            return "Sensitivity";
+        case chip::app::Clusters::ZoneManagement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ZoneManagement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ZoneManagement::Attributes::EventList::Id:
+            return "EventList";
+        case chip::app::Clusters::ZoneManagement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ZoneManagement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ZoneManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::WebRTCTransportProvider::Id: {
         switch (id)
         {
@@ -5776,6 +5805,21 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ZoneManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ZoneManagement::Commands::CreateTwoDCartesianZone::Id:
+            return "CreateTwoDCartesianZone";
+        case chip::app::Clusters::ZoneManagement::Commands::UpdateTwoDCartesianZone::Id:
+            return "UpdateTwoDCartesianZone";
+        case chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZone::Id:
+            return "GetTwoDCartesianZone";
+        case chip::app::Clusters::ZoneManagement::Commands::RemoveZone::Id:
+            return "RemoveZone";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::WebRTCTransportProvider::Id: {
         switch (id)
         {
@@ -6340,6 +6384,17 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ZoneManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ZoneManagement::Commands::CreateTwoDCartesianZoneResponse::Id:
+            return "CreateTwoDCartesianZoneResponse";
+        case chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZoneResponse::Id:
+            return "GetTwoDCartesianZoneResponse";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::WebRTCTransportProvider::Id: {
         switch (id)
         {
@@ -6541,6 +6596,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Matter Humidity Sensor";
     case 0x0000050C:
         return "Matter EVSE";
+    case 0x0000050D:
+        return "Matter Device Energy Management";
     case 0x00000510:
         return "Matter Electrical Sensor";
     case 0x00000840:

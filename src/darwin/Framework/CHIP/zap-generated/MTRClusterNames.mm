@@ -369,6 +369,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeContentAppObserverID:
         result = @"ContentAppObserver";
         break;
+    case MTRClusterIDTypeZoneManagementID:
+        result = @"ZoneManagement";
+        break;
     case MTRClusterIDTypeWebRTCTransportProviderID:
         result = @"WebRTCTransportProvider";
         break;
@@ -8149,6 +8152,57 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeZoneManagementID:
+
+        switch (attributeID) {
+
+            // Cluster ZoneManagement attributes
+        case MTRAttributeIDTypeClusterZoneManagementAttributeSupportedZoneSourcesID:
+            result = @"SupportedZoneSources";
+            break;
+
+        case MTRAttributeIDTypeClusterZoneManagementAttributeZonesID:
+            result = @"Zones";
+            break;
+
+        case MTRAttributeIDTypeClusterZoneManagementAttributeTimeControlID:
+            result = @"TimeControl";
+            break;
+
+        case MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityID:
+            result = @"Sensitivity";
+            break;
+
+        case MTRAttributeIDTypeClusterZoneManagementAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterZoneManagementAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterZoneManagementAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterZoneManagementAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterZoneManagementAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterZoneManagementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWebRTCTransportProviderID:
 
         switch (attributeID) {
@@ -11002,6 +11056,32 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeZoneManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterZoneManagementCommandCreateTwoDCartesianZoneID:
+            result = @"CreateTwoDCartesianZone";
+            break;
+
+        case MTRCommandIDTypeClusterZoneManagementCommandUpdateTwoDCartesianZoneID:
+            result = @"UpdateTwoDCartesianZone";
+            break;
+
+        case MTRCommandIDTypeClusterZoneManagementCommandGetTwoDCartesianZoneID:
+            result = @"GetTwoDCartesianZone";
+            break;
+
+        case MTRCommandIDTypeClusterZoneManagementCommandRemoveZoneID:
+            result = @"RemoveZone";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWebRTCTransportProviderID:
 
         switch (commandID) {
@@ -12662,6 +12742,24 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
 
         case MTRCommandIDTypeClusterContentAppObserverCommandContentAppMessageResponseID:
             result = @"ContentAppMessageResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeZoneManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterZoneManagementCommandCreateTwoDCartesianZoneResponseID:
+            result = @"CreateTwoDCartesianZoneResponse";
+            break;
+
+        case MTRCommandIDTypeClusterZoneManagementCommandGetTwoDCartesianZoneResponseID:
+            result = @"GetTwoDCartesianZoneResponse";
             break;
 
         default:
@@ -14452,6 +14550,25 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeContentAppObserverID:
 
         switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeZoneManagementID:
+
+        switch (eventID) {
+
+            // Cluster ZoneManagement events
+        case MTREventIDTypeClusterZoneManagementEventZoneTriggeredID:
+            result = @"ZoneTriggered";
+            break;
+
+        case MTREventIDTypeClusterZoneManagementEventZoneStoppedID:
+            result = @"ZoneStopped";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
