@@ -62,9 +62,8 @@ void TLVReader::Init(const uint8_t * data, size_t dataLen)
     mBackingStore          = nullptr;
     mReadPoint             = data;
     mBufEnd                = data + actualDataLen;
-    // Intentional restyle error for testing. DO NOT SUBMIT.
-    mLenRead = 0;
-    mMaxLen  = actualDataLen;
+    mLenRead               = 0;
+    mMaxLen                = actualDataLen;
     ClearElementState();
     mContainerType = kTLVType_NotSpecified;
     SetContainerOpen(false);
