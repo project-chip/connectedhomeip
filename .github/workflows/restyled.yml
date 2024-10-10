@@ -10,8 +10,6 @@ concurrency:
 jobs:
   restyled:
     runs-on: ubuntu-latest
-    permissions:
-      actions: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,4 +33,3 @@ jobs:
           labels: "restyled"
           reviewers: ${{ github.event.pull_request.user.login }}
           delete-branch: true
-
