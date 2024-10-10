@@ -669,7 +669,6 @@ def BuildTizenTarget():
     # apps
     target.AppendFixedTargets([
         TargetPart('all-clusters', app=TizenApp.ALL_CLUSTERS),
-        TargetPart('all-clusters-minimal', app=TizenApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('chip-tool', app=TizenApp.CHIP_TOOL),
         TargetPart('light', app=TizenApp.LIGHT),
         TargetPart('tests', app=TizenApp.TESTS),
