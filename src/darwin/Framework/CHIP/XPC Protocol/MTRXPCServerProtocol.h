@@ -39,9 +39,9 @@ MTR_NEWLY_AVAILABLE
 - (oneway void)downloadLogOfType:(MTRDiagnosticLogType)type nodeID:(NSNumber *)nodeID timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
 
 @optional
- /* Note: The consumer of the completion block should move the file that the url points to or open it for reading before the
-  * completion handler returns. Otherwise, the file will be deleted, and the data will be lost.
-  */
+/* Note: The consumer of the completion block should move the file that the url points to or open it for reading before the
+ * completion handler returns. Otherwise, the file will be deleted, and the data will be lost.
+ */
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID downloadLogOfType:(MTRDiagnosticLogType)type timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
 
 @end
