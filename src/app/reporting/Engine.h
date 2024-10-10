@@ -114,7 +114,11 @@ public:
         {
             // Just decrement, so our increment after we finish running it will
             // do the right thing.
-            --mCurReadHandlerIdx;
+
+            if(mCurReadHandlerIdx > 0)
+            {
+                --mCurReadHandlerIdx;
+            }
         }
         else
         {
