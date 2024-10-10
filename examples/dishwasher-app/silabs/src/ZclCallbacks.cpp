@@ -46,7 +46,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     if ((clusterId == OperationalState::Id) && (attributeId == OperationalState::Attributes::OperationalState::Id))
     {
         GetDishwasherManager()->UpdateOperationState(static_cast<OperationalState::OperationalStateEnum>(*value));
-        ElectricalSensorManager::Instance().UpdateEPMAllAttributes(static_cast<OperationalState::OperationalStateEnum>(*value));
+        ElectricalSensorManager::Instance().UpdateEPMAttributes(static_cast<OperationalState::OperationalStateEnum>(*value));
     }
     else if (clusterId == Identify::Id)
     {

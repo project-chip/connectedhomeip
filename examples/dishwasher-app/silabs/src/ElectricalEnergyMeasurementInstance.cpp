@@ -54,7 +54,7 @@ static const MeasurementAccuracyRangeStruct::Type kEnergyAccuracyRanges[] = {
 
 static const MeasurementAccuracyStruct::Type kAccuracy = {
     .measurementType  = MeasurementTypeEnum::kElectricalEnergy,
-    .measured         = true,
+    .measured         = false, // this should be made true in an implementation where a real metering device is used.
     .minMeasuredValue = 0,
     .maxMeasuredValue = 1'000'000'000'000'000, // 1 million Mwh
     .accuracyRanges = List<const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type>(kEnergyAccuracyRanges)

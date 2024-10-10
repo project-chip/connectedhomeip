@@ -30,7 +30,7 @@ public:
     CHIP_ERROR Init();
     void Shutdown();
 
-    void UpdateEPMAllAttributes(OperationalStateEnum state);
+    void UpdateEPMAttributes(OperationalStateEnum state);
 
 private:
     static ElectricalSensorManager sElectricalSensor;

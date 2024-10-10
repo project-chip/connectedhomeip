@@ -55,25 +55,15 @@ static std::unique_ptr<PowerTopologyInstance> gPTInstance;
 static const struct
 {
     PowerModeEnum PowerMode;
-    int64_t Voltage;         // mV
-    int64_t ActiveCurrent;   // mA
-    int64_t ReactiveCurrent; // mA
-    int64_t ApparentCurrent; // mA
-    int64_t ActivePower;     // mW
-    int64_t ReactivePower;   // mW
-    int64_t ApparentPower;   // mW
-    int64_t RMSVoltage;      // mV
-    int64_t RMSCurrent;      // mA
-    int64_t RMSPower;        // mW
-    int64_t Frequency;       // Hz
-    int64_t PowerFactor;     // Percent 100ths
-    int64_t NeutralCurrent;  // mA
+    int64_t Voltage;       // mV
+    int64_t ActiveCurrent; // mA
+    int64_t ActivePower;   // mW
+    int64_t Frequency;     // Hz
 } kAttributes[4] = {
-    { PowerModeEnum::kAc, 120'000, 0, 0, 0, 0, 0, 0, 120'000, 0, 0, 60, 98'00, 0 }, // kStopped
-    { PowerModeEnum::kAc, 120'000, 15'000, 17'000, 23'000, 1800'000, 2040'000, 3000'000, 120'000, 15'000, 1800'000, 60, 92'00,
-      15'000 },                                                                                                   // kRunning
-    { PowerModeEnum::kAc, 120'000, 125, 150, 190, 17'000, 18'000, 25'000, 120'000, 125, 17'000, 60, 95'00, 125 }, // kPaused
-    { PowerModeEnum::kUnknown, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }                                            // kError
+    { PowerModeEnum::kAc, 120'000, 0, 0, 60 },             // kStopped
+    { PowerModeEnum::kAc, 120'000, 15'000, 1800'000, 60 }, // kRunning
+    { PowerModeEnum::kAc, 120'000, 125, 17'000, 60 },      // kPaused
+    { PowerModeEnum::kUnknown, 0, 0, 0, 0 }                // kError
 };
 
 /*
@@ -105,24 +95,11 @@ CHIP_ERROR ElectricalSensorManager::Init()
     /* Turning on all optional features and attributes for test certification purposes */
     gEPMInstance = std::make_unique<ElectricalPowerMeasurementInstance>(
         EPMEndpointId, *gEPMDelegate,
-        BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(
-            ElectricalPowerMeasurement::Feature::kDirectCurrent, ElectricalPowerMeasurement::Feature::kAlternatingCurrent,
-            ElectricalPowerMeasurement::Feature::kPolyphasePower, ElectricalPowerMeasurement::Feature::kHarmonics,
-            ElectricalPowerMeasurement::Feature::kPowerQuality),
+        BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(ElectricalPowerMeasurement::Feature::kDirectCurrent,
+                                                               ElectricalPowerMeasurement::Feature::kAlternatingCurrent),
         BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRanges,
             ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeVoltage,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeActiveCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactiveCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactivePower,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentPower,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSVoltage,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSPower,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeFrequency,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributePowerFactor,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeNeutralCurrent));
+            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeActiveCurrent));
 
     VerifyOrReturnError(gEPMInstance, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "Failed to allocate memory for EPM Instance");
                         gEPMDelegate.reset());
@@ -134,7 +111,7 @@ CHIP_ERROR ElectricalSensorManager::Init()
 
     // Initialize EPM attributes
     OperationalStateEnum state = GetDishwasherManager()->GetOperationalState();
-    UpdateEPMAllAttributes(state);
+    UpdateEPMAttributes(state);
 
     // Initialize EEM (Electrical Energy Management)
     VerifyOrReturnError(!gEEMInstance, CHIP_ERROR_INCORRECT_STATE, ChipLogError(AppServer, "EEM Instance already exist"));
@@ -160,11 +137,8 @@ CHIP_ERROR ElectricalSensorManager::Init()
     VerifyOrReturnError(gPTDelegate, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "Failed to allocate memory for PT Delegate"));
 
     gPTInstance = std::make_unique<PowerTopologyInstance>(
-        PTEndpointId, *gPTDelegate,
-        BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kSetTopology, PowerTopology::Feature::kDynamicPowerFlow),
-        BitMask<PowerTopology::OptionalAttributes, uint32_t>(
-            PowerTopology::OptionalAttributes::kOptionalAttributeAvailableEndpoints,
-            PowerTopology::OptionalAttributes::kOptionalAttributeActiveEndpoints));
+        PTEndpointId, *gPTDelegate, BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology),
+        BitMask<PowerTopology::OptionalAttributes, uint32_t>());
 
     VerifyOrReturnError(gPTInstance, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "Failed to allocate memory for PT Instance");
                         gPTDelegate.reset());
@@ -218,7 +192,7 @@ void ElectricalSensorManager::Shutdown()
     }
 }
 
-void ElectricalSensorManager::UpdateEPMAllAttributes(OperationalStateEnum state)
+void ElectricalSensorManager::UpdateEPMAttributes(OperationalStateEnum state)
 {
     if (gEPMDelegate)
     {
@@ -236,16 +210,6 @@ void ElectricalSensorManager::UpdateEPMAllAttributes(OperationalStateEnum state)
         gEPMDelegate->SetPowerMode(kAttributes[updateState].PowerMode);
         gEPMDelegate->SetVoltage(MakeNullable(kAttributes[updateState].Voltage));
         gEPMDelegate->SetActiveCurrent(MakeNullable(kAttributes[updateState].ActiveCurrent));
-        gEPMDelegate->SetReactiveCurrent(MakeNullable(kAttributes[updateState].ReactiveCurrent));
-        gEPMDelegate->SetApparentCurrent(MakeNullable(kAttributes[updateState].ApparentCurrent));
         gEPMDelegate->SetActivePower(MakeNullable(kAttributes[updateState].ActivePower));
-        gEPMDelegate->SetReactivePower(MakeNullable(kAttributes[updateState].ReactivePower));
-        gEPMDelegate->SetApparentPower(MakeNullable(kAttributes[updateState].ApparentPower));
-        gEPMDelegate->SetRMSVoltage(MakeNullable(kAttributes[updateState].RMSVoltage));
-        gEPMDelegate->SetRMSCurrent(MakeNullable(kAttributes[updateState].RMSCurrent));
-        gEPMDelegate->SetRMSPower(MakeNullable(kAttributes[updateState].RMSPower));
-        gEPMDelegate->SetFrequency(MakeNullable(kAttributes[updateState].Frequency));
-        gEPMDelegate->SetPowerFactor(MakeNullable(kAttributes[updateState].PowerFactor));
-        gEPMDelegate->SetNeutralCurrent(MakeNullable(kAttributes[updateState].NeutralCurrent));
     }
 }

@@ -225,7 +225,7 @@ void AppTask::ActionInitiated(OperationalStateEnum action)
     else
     {
         GetDishwasherManager()->UpdateOperationState(action);
-        ElectricalSensorManager::Instance().UpdateEPMAllAttributes(action);
+        ElectricalSensorManager::Instance().UpdateEPMAttributes(action);
     }
 }
 
