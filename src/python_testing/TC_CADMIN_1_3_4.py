@@ -250,7 +250,7 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
             window_status = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AdministratorCommissioning.Attributes.WindowStatus)])
         except asyncio.CancelledError:
             window_status = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AdministratorCommissioning.Attributes.WindowStatus)])
- 
+
         window_status = window_status[0]
         outer_key = list(window_status.keys())[0]
         inner_key = list(window_status[outer_key].keys())[1]
@@ -378,6 +378,7 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
