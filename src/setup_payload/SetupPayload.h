@@ -265,7 +265,8 @@ public:
      * It also checks that the generated passcode is not equal to any invalid passcode values as defined in 5.1.7.1.
      *
      * @param[out] setupPINCode The generated random setup PIN code.
-     * @return Returns a CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
+     * @return Returns a CHIP_ERROR_INTERNAL if unable to generate a valid passcode within a reasonable number of attempts,
+     * CHIP_NO_ERROR otherwise
      **/
     static CHIP_ERROR generateRandomSetupPin(uint32_t & setupPINCode);
 

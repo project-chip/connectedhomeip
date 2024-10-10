@@ -211,16 +211,17 @@ CHIP_ERROR SetupPayload::removeSerialNumber()
 CHIP_ERROR SetupPayload::generateRandomSetupPin(uint32_t & setupPINCode)
 {
     uint8_t retries          = 0;
-    const uint8_t maxRetries = 255;
+    const uint8_t maxRetries = 10;
 
     do
     {
         ReturnErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&setupPINCode), sizeof(setupPINCode)));
 
         // Passcodes shall be restricted to the values 00000001 to 99999998 in decimal, see 5.1.1.6
+        // TODO: Consider revising this method to ensure uniform distribution of setup PIN codes
         setupPINCode = (setupPINCode % kSetupPINCodeMaximumValue) + 1;
 
-        // To make sure that the Generated Setup Pin code is not one of the invalid passcodes/pin codes defined in the
+        // Make sure that the Generated Setup Pin code is not one of the invalid passcodes/pin codes defined in the
         // specification.
         if (IsValidSetupPIN(setupPINCode))
         {
