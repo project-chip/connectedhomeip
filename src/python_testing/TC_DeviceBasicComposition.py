@@ -109,9 +109,7 @@ from chip.clusters.Attribute import ValueDecodeFailure
 from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
 from chip.interaction_model import InteractionModelError, Status
 from chip.tlv import uint
-from global_attribute_ids import (GlobalAttributeIds, AttributeIdType, ClusterIdType, attribute_id_type, cluster_id_type)
-
-
+from global_attribute_ids import AttributeIdType, ClusterIdType, GlobalAttributeIds, attribute_id_type, cluster_id_type
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
                                     async_test_body, default_matter_test_main)
 from mobly import asserts
