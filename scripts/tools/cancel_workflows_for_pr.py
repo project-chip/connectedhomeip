@@ -43,16 +43,14 @@ class Canceller:
         self.dry_run = dry_run
 
     def check_all_pending_prs(self, max_pr_age_days, required_runs):
-        for pr in self.repo.get_pulls(
-            state="open", sort="created_at", direction="desc"
-        ):
-            pr_create = pr.created_at.replace(tzinfo=None)
+        for pr in self.repo.get_pulls(state="open", sort="updated", direction="desc"):
+            pr_create = pr.updated_at.replace(tzinfo=None)
             cutoff = datetime.datetime.now() - datetime.timedelta(days=max_pr_age_days)
 
             if pr_create < cutoff:
                 logging.warning(
                     "PR is too old (since %s, cutoff at %s). Skipping the rest...",
-                    pr.created_at,
+                    pr_create,
                     cutoff,
                 )
                 break
