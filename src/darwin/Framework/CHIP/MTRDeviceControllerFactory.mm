@@ -70,12 +70,6 @@ using namespace chip;
 using namespace chip::Controller;
 using namespace chip::Tracing::DarwinFramework;
 
-static bool sExitHandlerRegistered = false;
-static void ShutdownOnExit()
-{
-    // Don't do anything here, period
-}
-
 @interface MTRDeviceControllerFactoryParams ()
 
 // Flag to keep track of whether our .storage is real consumer-provided storage
@@ -389,17 +383,6 @@ MTR_DIRECT_MEMBERS
             SuccessOrExit(err = _controllerFactory->Init(params));
         }
 
-        // This needs to happen after DeviceControllerFactory::Init,
-        // because that creates (lazily, by calling functions with
-        // static variables in them) some static-lifetime objects.
-        if (!sExitHandlerRegistered) {
-            if (atexit(ShutdownOnExit) != 0) {
-                char error[128];
-                strerror_r(errno, error, sizeof(error));
-                MTR_LOG_ERROR("Warning: Failed to register atexit handler: %s", error);
-            }
-            sExitHandlerRegistered = true;
-        }
         HeapObjectPoolExitHandling::IgnoreLeaksOnExit();
 
         // Make sure we don't leave a system state running while we have no

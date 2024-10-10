@@ -253,3 +253,8 @@
  */
 #define CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS 10
 #endif
+
+#ifndef NXP_USE_MML
+/* Do not use Memory Manager Light for dynamic memory allocation by default. */
+#define NXP_USE_MML 0
+#endif // NXP_USE_MML

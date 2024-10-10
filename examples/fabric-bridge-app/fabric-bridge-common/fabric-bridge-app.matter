@@ -2059,21 +2059,6 @@ endpoint 0 {
     handle command KeySetReadAllIndices;
     handle command KeySetReadAllIndicesResponse;
   }
-
-  server cluster CommissionerControl {
-    emits event CommissioningRequestResult;
-    ram      attribute supportedDeviceCategories default = 0;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-
-    handle command RequestCommissioningApproval;
-    handle command CommissionNode;
-    handle command ReverseOpenCommissioningWindow;
-  }
 }
 endpoint 1 {
   device type ma_aggregator = 14, version 1;
@@ -2102,6 +2087,21 @@ endpoint 1 {
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
+  }
+
+  server cluster CommissionerControl {
+    emits event CommissioningRequestResult;
+    ram      attribute supportedDeviceCategories default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command RequestCommissioningApproval;
+    handle command CommissionNode;
+    handle command ReverseOpenCommissioningWindow;
   }
 }
 

@@ -13,13 +13,16 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
 import("${chip_root}/config/standalone/args.gni")
+import("${chip_root}/src/platform/silabs/efr32/args.gni")
 
-chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
-chip_project_config_include = "<CHIPProjectAppConfig.h>"
-chip_system_project_config_include = "<SystemProjectConfig.h>"
+silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
-chip_project_config_include_dirs =
-    [ "${chip_root}/examples/all-clusters-minimal-app/tizen/include" ]
-chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
+app_data_model =
+    "${chip_root}/examples/dishwasher-app/silabs/data_model:silabs-dishwasher"
+chip_enable_ota_requestor = true
+chip_enable_openthread = true
+sl_enable_test_event_trigger = true
+
+openthread_external_platform =
+    "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"
