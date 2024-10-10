@@ -44,7 +44,11 @@ class Canceller:
 
     def check_all_pending_prs(self, max_pr_age_days, required_runs):
         for pr in self.repo.get_pulls(state="open", sort="updated", direction="desc"):
-            pr_create = pr.updated_at.replace(tzinfo=None)
+            pr_create = (
+                pr.updated_at.replace(tzinfo=None)
+                if pr.updated_at
+                else datetime.datetime.now()
+            )
             cutoff = datetime.datetime.now() - datetime.timedelta(days=max_pr_age_days)
 
             if pr_create < cutoff:
