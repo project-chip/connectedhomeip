@@ -10,6 +10,8 @@ concurrency:
 jobs:
   restyled:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,7 +37,7 @@ jobs:
           delete-branch: true
       - name: Cancel workflow if failed
         with:
-           github_token: ${{ secrets.JOB_CANCEL_PAT }}
+           github_token: ${{ github.token }}
         if: failure()
         uses: ./.github/actions/stop-ci-workflows
 
