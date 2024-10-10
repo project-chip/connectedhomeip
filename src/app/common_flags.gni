@@ -21,6 +21,29 @@ declare_args() {
   chip_enable_read_client = true
   chip_build_controller_dynamic_server = false
 
+  # Configures whether terms and conditions acknowledgements are required.
+  #
+  # When set to true, the application will enforce the requirement of
+  # terms and conditions acknowledgements during commissioning.
+  chip_config_tc_required = false
+
+  # Configures the required terms and conditions acknowledgements bitmask.
+  #
+  # This setting defines the required terms and conditions acknowledgements bitmask.
+  # The bit-field is 16 bits long, so the possible value range is [0, 65535).
+  # This setting can be used to require that terms and conditions are presented
+  # to the user during commissioning.
+  chip_config_tc_required_acknowledgements = 0
+
+  # Configures the latest known version of the terms and conditions.
+  #
+  # This setting defines the version number of the latest terms and conditions.
+  # It allows the application to iterate on revisions of the terms and conditions.
+  # A value of 0 indicates that no specific version is required. This setting can
+  # be used to enforce version-specific terms and conditions acknowledgements in
+  # the application.
+  chip_config_tc_required_acknowledgements_version = 0
+
   # Flag that controls whether the time-to-wait from BUSY responses is
   # communicated to OperationalSessionSetup API consumers.
   chip_enable_busy_handling_for_operational_session_setup = true

@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,23 @@ config("server_config") {
   if (chip_app_use_echo) {
     defines += [ "CHIP_APP_USE_ECHO" ]
   }
+}
+
+source_set("enhanced_setup_flow_interface") {
+  sources = [
+    "DefaultTermsAndConditionsProvider.h",
+    "TermsAndConditionsProvider.h",
+  ]
+
+  public_configs = [ "${chip_root}/src/app:enhanced_setup_flow_config" ]
+
+  public_deps = [ "${chip_root}/src/lib/core" ]
+}
+
+source_set("enhanced_setup_flow") {
+  sources = [ "DefaultTermsAndConditionsProvider.cpp" ]
+
+  deps = [ ":enhanced_setup_flow_interface" ]
 }
 
 static_library("server") {
@@ -52,6 +69,7 @@ static_library("server") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":enhanced_setup_flow_interface",
     "${chip_root}/src/app",
     "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/app/icd/server:icd-server-config",
@@ -78,5 +96,9 @@ static_library("server") {
       public_deps +=
           [ "${chip_root}/src/app/icd/server:default-check-in-back-off" ]
     }
+  }
+
+  if (chip_config_tc_required) {
+    public_deps += [ ":enhanced_setup_flow" ]
   }
 }
