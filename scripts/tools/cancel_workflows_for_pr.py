@@ -18,6 +18,7 @@
 import datetime
 import logging
 import re
+from dateutil.tz import tzlocal
 from typing import Optional, Set
 
 import click
@@ -43,24 +44,25 @@ class Canceller:
         self.dry_run = dry_run
 
     def check_all_pending_prs(self, max_age, required_runs):
-        cutoff = datetime.datetime.now() - max_age
+        cutoff = datetime.datetime.now(tzlocal()) - max_age
         logging.info("Searching PRs updated after %s", cutoff)
         for pr in self.repo.get_pulls(state="open", sort="updated", direction="desc"):
-            pr_create = (pr.updated_at if pr.updated_at else pr.created_at).replace(
-                tzinfo=None
-            )
+            pr_update = pr.updated_at if pr.updated_at else pr.created_at
+            pr_update = pr_update.astimezone(tzlocal())
 
-            if pr_create < cutoff:
+            if pr_update < cutoff:
                 logging.warning(
                     "PR is too old (since %s, cutoff at %s). Skipping the rest...",
-                    pr_create,
+                    pr_update,
                     cutoff,
                 )
                 break
+            logging.info(
+                "Examining PR %d updated at %s: %s", pr.number, pr_update, pr.title
+            )
             self.check_pr(pr, required_runs)
 
     def check_pr(self, pr: PullRequest, required_runs):
-        logging.info("Examining PR %d: %s", pr.number, pr.title)
 
         last_commit: Optional[Commit] = None
 
