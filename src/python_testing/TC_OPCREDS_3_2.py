@@ -36,9 +36,9 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from chip.tlv import TLVReader
 from chip.utils import CommissioningBuildingBlocks
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from test_plan_support import (commission_from_existing, commission_if_required, read_attribute, remove_fabric,
                                verify_commissioning_successful, verify_success)

@@ -23,7 +23,7 @@ import time
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import type_matches
+from chip.testing.matter_testing import type_matches
 from mobly import asserts
 
 

@@ -17,10 +17,10 @@
 
 from dataclasses import dataclass, field
 
+from chip.testing.conformance import ConformanceDecision
+from chip.testing.global_attribute_ids import GlobalAttributeIds
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from chip.tlv import uint
-from conformance_support import ConformanceDecision
-from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from TC_DeviceConformance import DeviceConformanceTests
 
 
