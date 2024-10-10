@@ -41,7 +41,7 @@
 import logging
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -139,7 +139,8 @@ class TC_SEAR_1_3(MatterBaseTest):
             await self.send_cmd_select_areas_expect_response(step=9, new_areas=valid_areas, expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kInvalidInMode)
 
         if self.check_pics("SEAR.S.M.VALID_STATE_FOR_SELECT_AREAS") and self.check_pics("SEAR.S.M.HAS_MANUAL_SELAREA_STATE_CONTROL"):
-            test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({valid_areas}) command"
+            test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({
+                valid_areas}) command"
             self.print_step("10", test_step)
             if self.is_ci:
                 self.write_to_app_pipe({"Name": "Reset"})
@@ -155,7 +156,8 @@ class TC_SEAR_1_3(MatterBaseTest):
             await self.send_cmd_select_areas_expect_response(step=13, new_areas=valid_areas, expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kSuccess)
 
         if self.check_pics("SEAR.S.M.VALID_STATE_FOR_SELECT_AREAS") and self.check_pics("SEAR.S.M.HAS_MANUAL_SELAREA_STATE_CONTROL") and self.check_pics("SEAR.S.M.SELECT_AREAS_WHILE_NON_IDLE"):
-            test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({valid_areas}) command, and put the device in a non-idle state"
+            test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({
+                valid_areas}) command, and put the device in a non-idle state"
             self.print_step("14", test_step)
             if self.is_ci:
                 self.write_to_app_pipe({"Name": "Reset"})
