@@ -343,6 +343,7 @@ public:
     void TestReadClient();
     void TestReadUnexpectedSubscriptionId();
     void TestReadHandler();
+    void TestReadHandlerSetMaxReportingInterval();
     void TestReadClientGenerateAttributePathList();
     void TestReadClientGenerateInvalidAttributePathList();
     void TestReadClientInvalidReport();
@@ -565,6 +566,115 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandler)
 
     engine->Shutdown();
 
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandlerSetMaxReportingInterval)
+{
+    System::PacketBufferTLVWriter writer;
+    System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    SubscribeRequestMessage::Builder subscribeRequestBuilder;
+
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
+
+    uint16_t kMinInterval            = 120;
+    uint16_t kIntervalInfMinInterval = kMinInterval - 1;
+    uint16_t kMaxIntervalCeiling     = 500;
+
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
+
+    {
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+
+        // Configure ReadHandler
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
+                                CodegenDataModelProviderInstance());
+
+        writer.Init(std::move(subscribeRequestbuf));
+        EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.KeepSubscriptions(true);
+        EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.MinIntervalFloorSeconds(kMinInterval);
+        EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.MaxIntervalCeilingSeconds(kMaxIntervalCeiling);
+        EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
+
+        AttributePathIBs::Builder & attributePathListBuilder = subscribeRequestBuilder.CreateAttributeRequests();
+        EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
+
+        AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
+        EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
+
+        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
+
+        attributePathListBuilder.EndOfAttributePathIBs();
+        EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
+
+        EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(&subscribeRequestbuf), CHIP_NO_ERROR);
+
+        EXPECT_EQ(readHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf)), CHIP_NO_ERROR);
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        // When an ICD build, the default behavior is to select the IdleModeDuration as MaxInterval
+        kMaxIntervalCeiling = readHandler.GetPublisherSelectedIntervalLimit();
+#endif
+        // Try to change the MaxInterval while ReadHandler is active
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(340), CHIP_ERROR_INCORRECT_STATE);
+
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(kMaxIntervalCeiling, maxInterval);
+        // Set ReadHandler to Idle to allow MaxInterval changes
+        readHandler.MoveToState(ReadHandler::HandlerState::Idle);
+
+        // TC1: MaxInterval < MinIntervalFloor
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(kIntervalInfMinInterval), CHIP_ERROR_INVALID_ARGUMENT);
+
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(kMaxIntervalCeiling, maxInterval);
+
+        // TC2: MaxInterval == MinIntervalFloor
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(kMinInterval), CHIP_NO_ERROR);
+
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(kMinInterval, maxInterval);
+
+        // TC3: Minterval < MaxInterval < max(GetPublisherSelectedIntervalLimit(), mSubscriberRequestedMaxInterval)
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(kMaxIntervalCeiling), CHIP_NO_ERROR);
+
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(kMaxIntervalCeiling, maxInterval);
+
+        // TC4: MaxInterval == Subscriber Requested Max Interval
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(readHandler.GetSubscriberRequestedMaxInterval()), CHIP_NO_ERROR);
+
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(readHandler.GetSubscriberRequestedMaxInterval(), maxInterval);
+
+        // TC4: MaxInterval == GetPublisherSelectedIntervalLimit()
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(readHandler.GetPublisherSelectedIntervalLimit()), CHIP_NO_ERROR);
+
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(readHandler.GetPublisherSelectedIntervalLimit(), maxInterval);
+
+        // TC5: MaxInterval >  max(GetPublisherSelectedIntervalLimit(), mSubscriberRequestedMaxInterval)
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(std::numeric_limits<uint16_t>::max()), CHIP_ERROR_INVALID_ARGUMENT);
+
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(readHandler.GetPublisherSelectedIntervalLimit(), maxInterval);
+    }
+
+    engine->Shutdown();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -1248,8 +1358,7 @@ TEST_F(TestReadInteraction, TestSetDirtyBetweenChunks)
         public:
             DirtyingMockDelegate(AttributePathParams (&aReadPaths)[2], int & aNumAttributeResponsesWhenSetDirty,
                                  int & aNumArrayItemsWhenSetDirty) :
-                mReadPaths(aReadPaths),
-                mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
+                mReadPaths(aReadPaths), mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
                 mNumArrayItemsWhenSetDirty(aNumArrayItemsWhenSetDirty)
             {}
 

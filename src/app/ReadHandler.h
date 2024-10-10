@@ -124,14 +124,14 @@ public:
         /*
          * Called after a subscription has been fully established.
          */
-        virtual void OnSubscriptionEstablished(ReadHandler & aReadHandler){};
+        virtual void OnSubscriptionEstablished(ReadHandler & aReadHandler) {};
 
         /*
          * Called right before a subscription is about to get terminated. This is only called on subscriptions that were terminated
          * after they had been fully established (and therefore had called OnSubscriptionEstablished).
          * OnSubscriptionEstablishment().
          */
-        virtual void OnSubscriptionTerminated(ReadHandler & aReadHandler){};
+        virtual void OnSubscriptionTerminated(ReadHandler & aReadHandler) {};
     };
 
     /*
@@ -273,7 +273,7 @@ public:
     {
         VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mMinIntervalFloorSeconds <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(aMaxInterval <= std::max(GetPublisherSelectedIntervalLimit(), mMaxInterval),
+        VerifyOrReturnError(aMaxInterval <= std::max(GetPublisherSelectedIntervalLimit(), mSubscriberRequestedMaxInterval),
                             CHIP_ERROR_INVALID_ARGUMENT);
         mMaxInterval = aMaxInterval;
         return CHIP_NO_ERROR;
