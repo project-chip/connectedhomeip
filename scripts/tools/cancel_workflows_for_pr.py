@@ -72,6 +72,10 @@ class Canceller:
                 last_commit = commit
                 break
 
+        if last_commit is None:
+            logging.error("Could not find any commit in the pull request.")
+            return
+
         logging.info("Last commit is: %s", last_commit.sha)
 
         in_progress_workflows: Set[int] = set()
