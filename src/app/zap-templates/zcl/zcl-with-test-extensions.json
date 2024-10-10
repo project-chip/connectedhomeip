@@ -132,6 +132,7 @@
         "water-heater-management-cluster.xml",
         "water-heater-mode-cluster.xml",
         "webrtc-provider-cluster.xml",
+        "webrtc-requestor-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "wifi-network-management-cluster.xml",
         "window-covering.xml",
@@ -139,7 +140,8 @@
         "sample-mei-cluster.xml",
         "types/door-lock.xml",
         "types/occupancy-sensing.xml",
-        "types/thermostat-user-interface-configuration.xml"
+        "types/thermostat-user-interface-configuration.xml",
+        "zone-management-cluster.xml"
     ],
     "manufacturersXml": "../../../../src/app/zap-templates/zcl/data-model/manufacturers.xml",
     "options": {

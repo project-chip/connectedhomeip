@@ -30,6 +30,7 @@ using namespace chip::app::Clusters;
 
 namespace {
 
+constexpr EndpointId kAggregatorEndpointId = 1;
 constexpr uint16_t kWindowTimeout          = 300;
 constexpr uint16_t kIteration              = 1000;
 constexpr uint16_t kSubscribeMinInterval   = 0;
@@ -114,7 +115,7 @@ void DeviceManager::RemoveSyncedDevice(NodeId nodeId)
                     ChipLogValueX64(device->GetNodeId()), device->GetEndpointId());
 }
 
-void DeviceManager::OpenDeviceCommissioningWindow(NodeId nodeId, uint32_t commissioningTimeoutSec, uint32_t iterations,
+void DeviceManager::OpenDeviceCommissioningWindow(NodeId nodeId, uint32_t iterations, uint16_t commissioningTimeoutSec,
                                                   uint16_t discriminator, const ByteSpan & salt, const ByteSpan & verifier)
 {
     ChipLogProgress(NotSpecified, "Opening commissioning window for Node ID: " ChipLogFormatX64, ChipLogValueX64(nodeId));
@@ -207,7 +208,7 @@ void DeviceManager::SubscribeRemoteFabricBridge()
     // Prepare and push the commissioner control subscribe command
     commandBuilder.Add("commissionercontrol subscribe-event commissioning-request-result ");
     commandBuilder.AddFormat("%d %d %lu %d --is-urgent true --keepSubscriptions true", kSubscribeMinInterval, kSubscribeMaxInterval,
-                             mRemoteBridgeNodeId, kRootEndpointId);
+                             mRemoteBridgeNodeId, kAggregatorEndpointId);
     PushCommand(commandBuilder.c_str());
 }
 
@@ -224,7 +225,7 @@ void DeviceManager::ReadSupportedDeviceCategories()
 
     commandBuilder.Add("commissionercontrol read supported-device-categories ");
     commandBuilder.AddFormat("%ld ", mRemoteBridgeNodeId);
-    commandBuilder.AddFormat("%d", kRootEndpointId);
+    commandBuilder.AddFormat("%d", kAggregatorEndpointId);
 
     PushCommand(commandBuilder.c_str());
 }
@@ -259,7 +260,7 @@ void DeviceManager::RequestCommissioningApproval()
 
     StringBuilder<kMaxCommandSize> commandBuilder;
     commandBuilder.Add("commissionercontrol request-commissioning-approval ");
-    commandBuilder.AddFormat("%lu %u %u %lu %d", requestId, vendorId, productId, mRemoteBridgeNodeId, kRootEndpointId);
+    commandBuilder.AddFormat("%lu %u %u %lu %d", requestId, vendorId, productId, mRemoteBridgeNodeId, kAggregatorEndpointId);
 
     mRequestId = requestId;
     PushCommand(commandBuilder.c_str());
@@ -398,7 +399,7 @@ void DeviceManager::SendCommissionNodeRequest(uint64_t requestId, uint16_t respo
 
     StringBuilder<kMaxCommandSize> commandBuilder;
     commandBuilder.Add("commissionercontrol commission-node ");
-    commandBuilder.AddFormat("%lu %u %lu %d", requestId, responseTimeoutSeconds, mRemoteBridgeNodeId, kRootEndpointId);
+    commandBuilder.AddFormat("%lu %u %lu %d", requestId, responseTimeoutSeconds, mRemoteBridgeNodeId, kAggregatorEndpointId);
 
     PushCommand(commandBuilder.c_str());
 }
@@ -422,7 +423,7 @@ void DeviceManager::HandleReverseOpenCommissioningWindow(TLV::TLVReader & data)
     ChipLogProgress(NotSpecified, "  PAKEPasscodeVerifier size: %lu", value.PAKEPasscodeVerifier.size());
     ChipLogProgress(NotSpecified, "  salt size: %lu", value.salt.size());
 
-    OpenDeviceCommissioningWindow(mLocalBridgeNodeId, value.commissioningTimeout, value.iterations, value.discriminator,
+    OpenDeviceCommissioningWindow(mLocalBridgeNodeId, value.iterations, value.commissioningTimeout, value.discriminator,
                                   ByteSpan(value.salt.data(), value.salt.size()),
                                   ByteSpan(value.PAKEPasscodeVerifier.data(), value.PAKEPasscodeVerifier.size()));
 }

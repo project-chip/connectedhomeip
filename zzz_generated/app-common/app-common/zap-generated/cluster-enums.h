@@ -5448,6 +5448,86 @@ enum class StatusEnum : uint8_t
 };
 } // namespace ContentAppObserver
 
+namespace ZoneManagement {
+
+// Enum for StatusCodeEnum
+enum class StatusCodeEnum : uint8_t
+{
+    kZoneNotFound = 0x02,
+    kZoneInUse    = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Enum for ZoneEventStoppedReasonEnum
+enum class ZoneEventStoppedReasonEnum : uint8_t
+{
+    kActionStopped = 0x00,
+    kTimeout       = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for ZoneEventTriggeredReasonEnum
+enum class ZoneEventTriggeredReasonEnum : uint8_t
+{
+    kMotion = 0x00,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 1,
+};
+
+// Enum for ZoneSourceEnum
+enum class ZoneSourceEnum : uint8_t
+{
+    kMfg  = 0x00,
+    kUser = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for ZoneTypeEnum
+enum class ZoneTypeEnum : uint8_t
+{
+    kTwoDCARTZone = 0x00,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 1,
+};
+
+// Enum for ZoneUseEnum
+enum class ZoneUseEnum : uint8_t
+{
+    kMotion  = 0x00,
+    kPrivacy = 0x01,
+    kFocus   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kTwoDimensionalCartesianZone = 0x1,
+};
+} // namespace ZoneManagement
+
 namespace WebRTCTransportProvider {
 
 using StreamTypeEnum = Clusters::detail::StreamTypeEnum;
@@ -5456,6 +5536,15 @@ using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
 
 using WebRTCMetadataOptions = Clusters::detail::WebRTCMetadataOptions;
 } // namespace WebRTCTransportProvider
+
+namespace WebRTCTransportRequestor {
+
+using StreamTypeEnum = Clusters::detail::StreamTypeEnum;
+
+using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
+
+using WebRTCMetadataOptions = Clusters::detail::WebRTCMetadataOptions;
+} // namespace WebRTCTransportRequestor
 
 namespace Chime {} // namespace Chime
 

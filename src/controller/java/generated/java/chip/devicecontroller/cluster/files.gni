@@ -162,6 +162,12 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WaterHeaterModeClusterModeTagStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WebRTCTransportProviderClusterICEServerStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WebRTCTransportProviderClusterWebRTCSessionStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WebRTCTransportRequestorClusterICEServerStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WebRTCTransportRequestorClusterWebRTCSessionStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ZoneManagementClusterTwoDCartesianVertexStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ZoneManagementClusterTwoDCartesianZoneStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ZoneManagementClusterZoneInformationStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ZoneManagementClusterZoneTriggeringTimeControlStruct.kt",
 ]
 
 eventstructs_sources = [
@@ -249,4 +255,6 @@ eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/WiFiNetworkDiagnosticsClusterAssociationFailureEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/WiFiNetworkDiagnosticsClusterConnectionStatusEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/WiFiNetworkDiagnosticsClusterDisconnectionEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/ZoneManagementClusterZoneStoppedEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/ZoneManagementClusterZoneTriggeredEvent.kt",
 ]

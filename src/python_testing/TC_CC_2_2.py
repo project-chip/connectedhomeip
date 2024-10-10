@@ -19,12 +19,21 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -32,8 +41,8 @@ import time
 
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
-from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
-                                    has_cluster, run_if_endpoint_matches)
+from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
+                                         has_cluster, run_if_endpoint_matches)
 from mobly import asserts
 from test_plan_support import commission_if_required, read_attribute, verify_success
 
@@ -79,7 +88,8 @@ class TC_CC_2_3(MatterBaseTest):
                     14, f'{THcommand} MoveHue with _MoveMode_ field set to Down, _Rate_ field set to 255 and remaining fields set to 0', verify_success()),
                 TestStep(
                     15, f'{THcommand} MoveSaturation with _MoveMode_ field set to Down, _Rate_ field set to 255 and remaining fields set to 0', verify_success()),
-                TestStep(16, f'{THcommand} MoveToHue with _Hue_ field set to 254, _TransitionTime_ field set to 100, _Direction_ field set to Shortest and remaining fields set to 0', verify_success()),
+                TestStep(16, f'{
+                         THcommand} MoveToHue with _Hue_ field set to 254, _TransitionTime_ field set to 100, _Direction_ field set to Shortest and remaining fields set to 0', verify_success()),
                 TestStep(17, store_values('reportedCurrentHueValuesList', 'CurrentHue')),
                 TestStep(18, verify_entry_count('reportedCurrentHueValuesList', 'CurrentHue'),
                          entry_count_verification('reportedCurrentHueValuesList')),

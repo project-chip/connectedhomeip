@@ -12,5 +12,6 @@ The following docs are a brief introduction to SDK development.
 ```
 
 -   [Running your first example](./first_example.md)
--   [SDK Basics](./SDKBasics.md)
--   [ZAP](./zap.md)
+-   [Changing examples](./changing_examples.md)
+-   [SDK Architecture Introduction](./SDKBasics.md)
+-   [ZAP Introduction](./zap.md)

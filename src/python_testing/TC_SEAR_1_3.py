@@ -20,18 +20,28 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${CHIP_RVC_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --json-arg PIXIT.SEAR.VALID_AREAS:'[7, 1234567]' --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${CHIP_RVC_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --endpoint 1
+#       --json-arg PIXIT.SEAR.VALID_AREAS:'[7, 1234567]'
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -129,7 +139,8 @@ class TC_SEAR_1_3(MatterBaseTest):
             await self.send_cmd_select_areas_expect_response(step=9, new_areas=valid_areas, expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kInvalidInMode)
 
         if self.check_pics("SEAR.S.M.VALID_STATE_FOR_SELECT_AREAS") and self.check_pics("SEAR.S.M.HAS_MANUAL_SELAREA_STATE_CONTROL"):
-            test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({valid_areas}) command"
+            test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({
+                valid_areas}) command"
             self.print_step("10", test_step)
             if self.is_ci:
                 self.write_to_app_pipe({"Name": "Reset"})
@@ -145,7 +156,8 @@ class TC_SEAR_1_3(MatterBaseTest):
             await self.send_cmd_select_areas_expect_response(step=13, new_areas=valid_areas, expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kSuccess)
 
         if self.check_pics("SEAR.S.M.VALID_STATE_FOR_SELECT_AREAS") and self.check_pics("SEAR.S.M.HAS_MANUAL_SELAREA_STATE_CONTROL") and self.check_pics("SEAR.S.M.SELECT_AREAS_WHILE_NON_IDLE"):
-            test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({valid_areas}) command, and put the device in a non-idle state"
+            test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({
+                valid_areas}) command, and put the device in a non-idle state"
             self.print_step("14", test_step)
             if self.is_ci:
                 self.write_to_app_pipe({"Name": "Reset"})

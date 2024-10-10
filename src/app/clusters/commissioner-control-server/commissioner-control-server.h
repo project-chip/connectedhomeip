@@ -120,7 +120,8 @@ public:
      * @brief
      *   Called after the server return SUCCESS to a correctly formatted RequestCommissioningApproval command.
      */
-    CHIP_ERROR GenerateCommissioningRequestResultEvent(const Events::CommissioningRequestResult::Type & result);
+    CHIP_ERROR GenerateCommissioningRequestResultEvent(EndpointId endpoint,
+                                                       const Events::CommissioningRequestResult::Type & result);
 
 private:
     CommissionerControlServer()  = default;

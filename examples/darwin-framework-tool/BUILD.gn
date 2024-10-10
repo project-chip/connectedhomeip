@@ -43,6 +43,9 @@ declare_args() {
 
   # Disable generating compiler database by default
   generate_compilation_database = false
+
+  # Enable automatic leak checks before the application exits
+  enable_leak_checking = false
 }
 
 sdk = "macosx"
@@ -219,6 +222,7 @@ executable("darwin-framework-tool") {
     "commands/provider/OTASoftwareUpdateInteractive.mm",
     "commands/storage/Commands.h",
     "commands/storage/StorageManagementCommand.mm",
+    "debug/LeakChecker.mm",
     "logging/logging.mm",
     "main.mm",
   ]
@@ -278,6 +282,10 @@ executable("darwin-framework-tool") {
 
   if (enable_provisional_features) {
     defines += [ "MTR_ENABLE_PROVISIONAL=1" ]
+  }
+
+  if (enable_leak_checking) {
+    defines += [ "DFT_ENABLE_LEAK_CHECKING=1" ]
   }
 
   public_configs = [ ":config" ]
