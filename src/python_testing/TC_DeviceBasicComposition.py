@@ -103,19 +103,19 @@ from typing import Any, Callable
 import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
-from basic_composition_support import BasicCompositionTests
 from chip import ChipUtility
 from chip.clusters.Attribute import ValueDecodeFailure
 from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing.basic_composition import BasicCompositionTests
+from chip.testing.global_attribute_ids import AttributeIdType, ClusterIdType, GlobalAttributeIds, attribute_id_type, cluster_id_type
+from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
+                                         async_test_body, default_matter_test_main)
+from chip.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
+                                                    find_tag_list_problems, find_tree_roots, flat_list_ok,
+                                                    get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
 from chip.tlv import uint
-from global_attribute_ids import AttributeIdType, ClusterIdType, GlobalAttributeIds, attribute_id_type, cluster_id_type
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
-                                    async_test_body, default_matter_test_main)
 from mobly import asserts
-from taglist_and_topology_test_support import (create_device_type_list_for_root, create_device_type_lists, find_tag_list_problems,
-                                               find_tree_roots, flat_list_ok, get_direct_children_of_root, parts_list_cycles,
-                                               separate_endpoint_types)
 
 
 def get_vendor_id(mei: int) -> int:
