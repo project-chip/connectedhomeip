@@ -438,4 +438,3 @@ const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpo
     // no known attributes even for OTA
     return nullptr;
 }
-
