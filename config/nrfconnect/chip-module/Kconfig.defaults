@@ -67,7 +67,10 @@ config COMMON_LIBC_MALLOC_ARENA_SIZE
     default -1
 
 config NVS_LOOKUP_CACHE_SIZE
-    default 512
+    default 512 if NVS
+
+config ZMS_LOOKUP_CACHE_SIZE
+    default 512 if ZMS
 
 # ==============================================================================
 # Zephyr networking configuration

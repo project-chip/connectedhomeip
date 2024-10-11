@@ -17,8 +17,12 @@
 rsource "../../zephyr/Kconfig"
 
 config CHIP
-	imply NVS_LOOKUP_CACHE
-	imply NVS_LOOKUP_CACHE_FOR_SETTINGS
+	imply NVS if !SOC_FLASH_NRF_RRAM
+	imply NVS_LOOKUP_CACHE if !SOC_FLASH_NRF_RRAM
+	imply NVS_LOOKUP_CACHE_FOR_SETTINGS if !SOC_FLASH_NRF_RRAM
+	imply ZMS if SOC_FLASH_NRF_RRAM
+	imply ZMS_LOOKUP_CACHE if SOC_FLASH_NRF_RRAM
+	imply ZMS_LOOKUP_CACHE_FOR_SETTINGS if SOC_FLASH_NRF_RRAM
 
 if CHIP
 
@@ -246,9 +250,9 @@ config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
 endif # CHIP_FACTORY_DATA_BUILD
 
 # See config/zephyr/Kconfig for full definition
-config CHIP_FACTORY_RESET_ERASE_NVS
-	bool
+config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	default y
+	depends on NVS || ZMS
 
 config CHIP_LOG_SIZE_OPTIMIZATION
 	bool "Disable some detailed logs to decrease flash usage"
