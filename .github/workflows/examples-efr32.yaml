@@ -90,8 +90,8 @@ jobs:
       - name: Prepare some bloat report from the previous builds
         run: |
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-             efr32 BRD4187C lighting-app \
-             out/efr32-brd4187c-light-rpc/matter-silabs-lighting-example.out \
+             efr32 BRD4187C lock-app \
+             out/efr32-brd4187c-lock-rpc/matter-silabs-lock-example.out \
              /tmp/bloat_reports/
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py  \
              efr32 BRD4187C window-app \
