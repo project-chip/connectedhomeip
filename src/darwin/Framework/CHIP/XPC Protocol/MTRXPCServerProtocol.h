@@ -18,6 +18,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationNodeIDsKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationNodeIDKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerContextKey MTR_NEWLY_AVAILABLE;
+
 MTR_NEWLY_AVAILABLE
 @protocol MTRXPCServerProtocol_MTRDevice <NSObject>
 
@@ -37,11 +41,19 @@ MTR_NEWLY_AVAILABLE
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode discriminator:(NSNumber *)discriminator duration:(NSNumber *)duration completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
 
 - (oneway void)downloadLogOfType:(MTRDiagnosticLogType)type nodeID:(NSNumber *)nodeID timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
+
+@optional
+/* Note: The consumer of the completion block should move the file that the url points to or open it for reading before the
+ * completion handler returns. Otherwise, the file will be deleted, and the data will be lost.
+ */
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID downloadLogOfType:(MTRDiagnosticLogType)type timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
+
 @end
 
 MTR_NEWLY_AVAILABLE
 @protocol MTRXPCServerProtocol_MTRDeviceController <NSObject>
 
+@optional
 - (oneway void)deviceController:(NSUUID *)controller getIsRunningWithReply:(void (^)(BOOL response))reply;
 - (oneway void)deviceController:(NSUUID *)controller getUniqueIdentifierWithReply:(void (^)(NSUUID *))reply;
 - (oneway void)deviceController:(NSUUID *)controller controllerNodeIDWithReply:(void (^)(NSNumber * nodeID))reply;
@@ -66,7 +78,9 @@ MTR_NEWLY_AVAILABLE
 
 MTR_NEWLY_AVAILABLE
 @protocol MTRXPCServerProtocol <NSObject, MTRXPCServerProtocol_MTRDevice, MTRXPCServerProtocol_MTRDeviceController>
+@optional
 - (oneway void)deviceController:(NSUUID *)controller checkInWithContext:(NSDictionary *)context;
+- (oneway void)deviceController:(NSUUID *)controller updateControllerConfiguration:(NSDictionary *)controllerState;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -41278,6 +41278,542 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace ContentAppObserver
+namespace ZoneManagement {
+namespace Structs {
+namespace TwoDCartesianVertexStruct {
+enum class Fields : uint8_t
+{
+    kX = 0,
+    kY = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t x = static_cast<uint16_t>(0);
+    uint16_t y = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TwoDCartesianVertexStruct
+namespace TwoDCartesianZoneStruct {
+enum class Fields : uint8_t
+{
+    kName     = 0,
+    kUse      = 1,
+    kVertices = 2,
+    kColor    = 3,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan name;
+    ZoneUseEnum use = static_cast<ZoneUseEnum>(0);
+    DataModel::List<const Structs::TwoDCartesianVertexStruct::Type> vertices;
+    Optional<chip::CharSpan> color;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    chip::CharSpan name;
+    ZoneUseEnum use = static_cast<ZoneUseEnum>(0);
+    DataModel::DecodableList<Structs::TwoDCartesianVertexStruct::DecodableType> vertices;
+    Optional<chip::CharSpan> color;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace TwoDCartesianZoneStruct
+namespace ZoneInformationStruct {
+enum class Fields : uint8_t
+{
+    kZoneID     = 0,
+    kZoneType   = 1,
+    kZoneSource = 2,
+};
+
+struct Type
+{
+public:
+    uint16_t zoneID           = static_cast<uint16_t>(0);
+    ZoneTypeEnum zoneType     = static_cast<ZoneTypeEnum>(0);
+    ZoneSourceEnum zoneSource = static_cast<ZoneSourceEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ZoneInformationStruct
+namespace ZoneTriggeringTimeControlStruct {
+enum class Fields : uint8_t
+{
+    kInitialDuration      = 0,
+    kAugmentationDuration = 1,
+    kMaxDuration          = 2,
+    kBlindDuration        = 3,
+};
+
+struct Type
+{
+public:
+    uint16_t initialDuration      = static_cast<uint16_t>(0);
+    uint16_t augmentationDuration = static_cast<uint16_t>(0);
+    uint32_t maxDuration          = static_cast<uint32_t>(0);
+    uint16_t blindDuration        = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ZoneTriggeringTimeControlStruct
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace CreateTwoDCartesianZone {
+struct Type;
+struct DecodableType;
+} // namespace CreateTwoDCartesianZone
+
+namespace CreateTwoDCartesianZoneResponse {
+struct Type;
+struct DecodableType;
+} // namespace CreateTwoDCartesianZoneResponse
+
+namespace UpdateTwoDCartesianZone {
+struct Type;
+struct DecodableType;
+} // namespace UpdateTwoDCartesianZone
+
+namespace GetTwoDCartesianZone {
+struct Type;
+struct DecodableType;
+} // namespace GetTwoDCartesianZone
+
+namespace GetTwoDCartesianZoneResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetTwoDCartesianZoneResponse
+
+namespace RemoveZone {
+struct Type;
+struct DecodableType;
+} // namespace RemoveZone
+
+} // namespace Commands
+
+namespace Commands {
+namespace CreateTwoDCartesianZone {
+enum class Fields : uint8_t
+{
+    kZone = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::CreateTwoDCartesianZone::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+
+    Structs::TwoDCartesianZoneStruct::Type zone;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::ZoneManagement::Commands::CreateTwoDCartesianZoneResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::CreateTwoDCartesianZone::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+
+    Structs::TwoDCartesianZoneStruct::DecodableType zone;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CreateTwoDCartesianZone
+namespace CreateTwoDCartesianZoneResponse {
+enum class Fields : uint8_t
+{
+    kZoneID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::CreateTwoDCartesianZoneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+
+    uint16_t zoneID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::CreateTwoDCartesianZoneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+
+    uint16_t zoneID = static_cast<uint16_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CreateTwoDCartesianZoneResponse
+namespace UpdateTwoDCartesianZone {
+enum class Fields : uint8_t
+{
+    kZoneID = 0,
+    kZone   = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::UpdateTwoDCartesianZone::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+
+    uint16_t zoneID = static_cast<uint16_t>(0);
+    Structs::TwoDCartesianZoneStruct::Type zone;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::UpdateTwoDCartesianZone::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+
+    uint16_t zoneID = static_cast<uint16_t>(0);
+    Structs::TwoDCartesianZoneStruct::DecodableType zone;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UpdateTwoDCartesianZone
+namespace GetTwoDCartesianZone {
+enum class Fields : uint8_t
+{
+    kZoneID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZone::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+
+    Optional<DataModel::Nullable<uint16_t>> zoneID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::ZoneManagement::Commands::GetTwoDCartesianZoneResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZone::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+
+    Optional<DataModel::Nullable<uint16_t>> zoneID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetTwoDCartesianZone
+namespace GetTwoDCartesianZoneResponse {
+enum class Fields : uint8_t
+{
+    kZones = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZoneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+
+    DataModel::List<const Structs::TwoDCartesianZoneStruct::Type> zones;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZoneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+
+    DataModel::DecodableList<Structs::TwoDCartesianZoneStruct::DecodableType> zones;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetTwoDCartesianZoneResponse
+namespace RemoveZone {
+enum class Fields : uint8_t
+{
+    kZoneID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RemoveZone::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+
+    uint16_t zoneID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RemoveZone::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+
+    uint16_t zoneID = static_cast<uint16_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveZone
+} // namespace Commands
+
+namespace Attributes {
+
+namespace SupportedZoneSources {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::ZoneManagement::ZoneSourceEnum>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::ZoneManagement::ZoneSourceEnum>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::ZoneManagement::ZoneSourceEnum> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedZoneSources::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedZoneSources
+namespace Zones {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::ZoneManagement::Structs::ZoneInformationStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::ZoneManagement::Structs::ZoneInformationStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ZoneManagement::Structs::ZoneInformationStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Zones::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Zones
+namespace TimeControl {
+struct TypeInfo
+{
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::ZoneManagement::Structs::ZoneTriggeringTimeControlStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ZoneManagement::Structs::ZoneTriggeringTimeControlStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ZoneManagement::Structs::ZoneTriggeringTimeControlStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TimeControl::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TimeControl
+namespace Sensitivity {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Sensitivity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Sensitivity
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::SupportedZoneSources::TypeInfo::DecodableType supportedZoneSources;
+        Attributes::Zones::TypeInfo::DecodableType zones;
+        Attributes::TimeControl::TypeInfo::DecodableType timeControl;
+        Attributes::Sensitivity::TypeInfo::DecodableType sensitivity = static_cast<uint8_t>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+namespace Events {
+namespace ZoneTriggered {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kZones  = 0,
+    kReason = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ZoneTriggered::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::List<const uint16_t> zones;
+    ZoneEventTriggeredReasonEnum reason = static_cast<ZoneEventTriggeredReasonEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ZoneTriggered::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+
+    DataModel::DecodableList<uint16_t> zones;
+    ZoneEventTriggeredReasonEnum reason = static_cast<ZoneEventTriggeredReasonEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ZoneTriggered
+namespace ZoneStopped {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kZones  = 0,
+    kReason = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ZoneStopped::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::List<const uint16_t> zones;
+    ZoneEventStoppedReasonEnum reason = static_cast<ZoneEventStoppedReasonEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ZoneStopped::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+
+    DataModel::DecodableList<uint16_t> zones;
+    ZoneEventStoppedReasonEnum reason = static_cast<ZoneEventStoppedReasonEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ZoneStopped
+} // namespace Events
+} // namespace ZoneManagement
 namespace WebRTCTransportProvider {
 namespace Structs {
 namespace ICEServerStruct     = Clusters::detail::Structs::ICEServerStruct;

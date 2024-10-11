@@ -177,7 +177,7 @@ limitations under the License.
         <typeName>Matter Aggregator</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x000e</deviceId>
-        <class>Dynamic Utility</class>
+        <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
@@ -190,9 +190,9 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-bridgeddevice</name>
+        <name>MA-bridgednode</name>
         <domain>CHIP</domain>
-        <typeName>Matter Bridged Device</typeName>
+        <typeName>Matter Bridged Node</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0013</deviceId>
         <class>Utility</class>
@@ -2683,6 +2683,19 @@ limitations under the License.
             <include cluster="Energy EVSE" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Energy EVSE Mode" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>Device Energy Management</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Device Energy Management</typeName>
+        <class>Simple</class>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x050D</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Device Energy Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Device Energy Management Mode" client="false" server="true" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
 </configurator>
