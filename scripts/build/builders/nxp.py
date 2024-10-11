@@ -213,13 +213,18 @@ class NxpBuilder(GnBuilder):
         self.enable_factory_data_build = enable_factory_data_build
         self.disable_pairing_autostart = disable_pairing_autostart
         self.board_variant = board_variant
-        self.log_level = log_level
+        if self.low_power:
+            if log_level != NxpLogLevel.NONE:
+                logging.warning("Switching log level to 'NONE' for low power build")
+            self.log_level = NxpLogLevel.NONE
+        else:
+            self.log_level = log_level
 
     def GnBuildArgs(self):
         args = []
 
         if self.low_power:
-            args.append("chip_with_low_power=1 chip_logging=false")
+            args.append("chip_with_low_power=1")
             if self.board == NxpBoard.K32W0:
                 args.append("chip_pw_tokenizer_logging=false chip_with_OM15082=0")
 
