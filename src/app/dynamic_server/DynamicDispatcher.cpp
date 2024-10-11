@@ -427,8 +427,7 @@ const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endp
     return nullptr;
 }
 
-const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpoint, ClusterId clusterId,
-                                                                AttributeId attributeId)
+const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
     return nullptr;
 }
