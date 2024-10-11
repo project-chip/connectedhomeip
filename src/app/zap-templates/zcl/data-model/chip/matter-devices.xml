@@ -177,7 +177,7 @@ limitations under the License.
         <typeName>Matter Aggregator</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x000e</deviceId>
-        <class>Dynamic Utility</class>
+        <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
@@ -190,9 +190,9 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-bridgeddevice</name>
+        <name>MA-bridgednode</name>
         <domain>CHIP</domain>
-        <typeName>Matter Bridged Device</typeName>
+        <typeName>Matter Bridged Node</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0013</deviceId>
         <class>Utility</class>
@@ -2612,7 +2612,7 @@ limitations under the License.
     <deviceType>
         <name>MA-secondary-network-interface</name>
         <domain>CHIP</domain>
-        <typeName>Matter Secondary Network Interface Device Type</typeName>
+        <typeName>Matter Secondary Network Interface</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0019</deviceId>
         <class>Utility</class>
