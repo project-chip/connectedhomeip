@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,14 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
+import("//build_overrides/build.gni")
 
-import("${chip_root}/config/standalone/args.gni")
+# The location of the build configuration file.
+buildconfig = "${build_root}/config/BUILDCONFIG.gn"
 
-chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
-chip_project_config_include = "<CHIPProjectAppConfig.h>"
-chip_system_project_config_include = "<SystemProjectConfig.h>"
+# CHIP uses angle bracket includes.
+check_system_includes = true
 
-chip_project_config_include_dirs =
-    [ "${chip_root}/examples/all-clusters-minimal-app/tizen/include" ]
-chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
+default_args = {
+  target_cpu = "arm"
+  target_os = "freertos"
+  chip_openthread_ftd = true
+
+  import("//openthread.gni")
+}

@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("${chip_root}/config/standalone/args.gni")
+import("${chip_root}/src/platform/silabs/efr32/args.gni")
 
-# The location of the build configuration file.
-buildconfig = "${build_root}/config/BUILDCONFIG.gn"
+silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
-# CHIP uses angle bracket includes.
-check_system_includes = true
+app_data_model = "${chip_root}/examples/refrigerator-app/silabs/data_model:silabs-refrigerator"
+chip_enable_ota_requestor = true
+chip_enable_openthread = true
 
-default_args = {
-  target_os = "tizen"
-
-  import("//args.gni")
-}
+openthread_external_platform =
+    "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"

@@ -43,8 +43,7 @@ from mobly import asserts
 
 
 def _trusted_root_test_step(dut_num: int) -> TestStep:
-    read_trusted_roots_over_pase = f'TH establishes a PASE session to DUT{
-        dut_num} using the provided setup code and reads the TrustedRootCertificates attribute from the operational credentials cluster over PASE'
+    read_trusted_roots_over_pase = f'TH establishes a PASE session to DUT{dut_num} using the provided setup code and reads the TrustedRootCertificates attribute from the operational credentials cluster over PASE'
     return TestStep(dut_num, read_trusted_roots_over_pase, "List should be empty as the DUT should be in factory reset ")
 
 
