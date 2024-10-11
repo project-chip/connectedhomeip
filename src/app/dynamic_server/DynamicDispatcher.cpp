@@ -34,6 +34,7 @@
 #include <app/util/att-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
+#include <cstddef>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
@@ -387,14 +388,14 @@ const EmberAfCluster * emberAfFindServerCluster(EndpointId endpoint, ClusterId c
 
 Protocols::InteractionModel::Status emberAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
 {
-    return Protocols::InteractionModel::Status::Failure;
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
 Protocols::InteractionModel::Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord,
                                                              const EmberAfAttributeMetadata ** metadata, uint8_t * buffer,
                                                              uint16_t readLength, bool write)
 {
-    return Protocols::InteractionModel::Status::Failure;
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
 void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
@@ -412,7 +413,7 @@ DataVersion * emberAfDataVersionStorage(const ConcreteClusterPath & aConcreteClu
 Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAttributePath & path,
                                                                const EmberAfWriteDataInput & input)
 {
-    return Protocols::InteractionModel::Status::Failure;
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
 Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsigned endpointIndex, CHIP_ERROR & err)
@@ -424,13 +425,17 @@ Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsigned en
 const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endpointType, ClusterId clusterId,
                                                 EmberAfClusterMask mask, uint8_t * index)
 {
+    if ((endpointType == &otaProviderEndpoint) && (clusterId == Clusters::OtaSoftwareUpdateProvider::Id))
+    {
+        return &otaProviderCluster;
+    }
+
     return nullptr;
 }
 
 const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
+    // no known attributes even for OTA
     return nullptr;
 }
 
-/// TODO:
-// vtable for chip::app::Compatibility::GlobalAttributeReader
