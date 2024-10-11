@@ -61,12 +61,12 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-k32w0-freertos-lighting \
-                      --target nxp-k32w0-freertos-lighting-factory \
-                      --target nxp-k32w0-freertos-lighting-rotating-id \
-                      --target nxp-k32w0-freertos-contact-sensor \
-                      --target nxp-k32w0-freertos-contact-sensor-low-power \
-                      --target nxp-k32w0-freertos-contact-sensor-low-power-factory \
+                      --target nxp-k32w0-freertos-log-progress-lighting \
+                      --target nxp-k32w0-freertos-log-progress-lighting-factory \
+                      --target nxp-k32w0-freertos-log-progress-lighting-rotating-id \
+                      --target nxp-k32w0-freertos-log-progress-contact-sensor \
+                      --target nxp-k32w0-freertos-log-progress-contact-sensor-low-power \
+                      --target nxp-k32w0-freertos-log-progress-contact-sensor-low-power-factory \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -74,13 +74,13 @@ jobs:
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp k32w0+release light \
-                    out/artifacts/nxp-k32w0-freertos-lighting/chip-k32w0x-light-example.elf \
+                    out/artifacts/nxp-k32w0-freertos-log-progress-lighting/chip-k32w0x-light-example.elf \
                     /tmp/bloat_reports/
             - name: Get contact sensor size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp k32w0+release contact \
-                    out/artifacts/nxp-k32w0-freertos-contact-sensor-low-power/chip-k32w0x-contact-example.elf \
+                    out/artifacts/nxp-k32w0-freertos-log-progress-contact-sensor-low-power/chip-k32w0x-contact-example.elf \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports

@@ -28,7 +28,7 @@ from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
-from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpOsUsed
+from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpLogLevel, NxpOsUsed
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.stm32 import stm32App, stm32Board, stm32Builder
@@ -556,6 +556,10 @@ def BuildNxpTarget():
     target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rw61x')
     target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x')
     target.AppendModifier(name="cmake", build_system=NxpBuildSystem.CMAKE).OnlyIfRe('rw61x')
+    target.AppendModifier(name="log-all", log_level=NxpLogLevel.ALL).ExceptIfRe('-log-(progress|error|none)')
+    target.AppendModifier(name="log-progress", log_level=NxpLogLevel.PROGRESS).ExceptIfRe('-log-(all|error|none)')
+    target.AppendModifier(name="log-error", log_level=NxpLogLevel.ERROR).ExceptIfRe('-log-(progress|all|none)')
+    target.AppendModifier(name="log-none", log_level=NxpLogLevel.NONE).ExceptIfRe('-log-(progress|error|all)')
 
     return target
 
