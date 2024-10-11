@@ -293,7 +293,7 @@ TEST_F(TestDefaultICDClientStorage, TestProcessCheckInPayload)
     EXPECT_EQ(checkInCounter, 1u);
 
     // Validate second check-in message with increased counter
-    counter ++;
+    counter++;
     EXPECT_EQ(chip::Protocols::SecureChannel::CheckinMessage::GenerateCheckinMessagePayload(
                   clientInfo.aes_key_handle, clientInfo.hmac_key_handle, counter, ByteSpan(), output),
               CHIP_NO_ERROR);

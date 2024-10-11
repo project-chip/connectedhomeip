@@ -477,7 +477,7 @@ CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
 
 CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
 {
-   VerifyOrReturnError(CheckFabricExistence(fabricIndex) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    VerifyOrReturnError(CheckFabricExistence(fabricIndex) == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
     size_t clientInfoSize = 0;
     std::vector<ICDClientInfo> clientInfoVector;
@@ -489,7 +489,8 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
     }
     ReturnErrorOnFailure(
         mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(fabricIndex).KeyName()));
-    ReturnErrorOnFailure(mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricIndex).KeyName()));
+    ReturnErrorOnFailure(
+        mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricIndex).KeyName()));
 
     for (auto fabric = mFabricList.begin(); fabric != mFabricList.end(); fabric++)
     {

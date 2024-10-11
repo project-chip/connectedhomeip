@@ -121,15 +121,9 @@ public:
                                      Protocols::SecureChannel::CounterType & counter) override;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    size_t GetFabricListSize()
-    {
-        return mFabricList.size();
-    }
+    size_t GetFabricListSize() { return mFabricList.size(); }
 
-    PersistentStorageDelegate * GetClientInfoStore()
-    {
-        return mpClientInfoStore;
-    }
+    PersistentStorageDelegate * GetClientInfoStore() { return mpClientInfoStore; }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 protected:
