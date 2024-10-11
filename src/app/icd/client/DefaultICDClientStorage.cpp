@@ -478,10 +478,7 @@ CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
 
 CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
 {
-    if (CheckFabricExistence(fabricIndex) != CHIP_NO_ERROR)
-    {
-        return CHIP_NO_ERROR;
-    }
+   VerifyOrRetunrError (CheckFabricExistence(fabricIndex) == CHIP_NO_ERROR, CHIP_NO_ERROR)
 
     size_t clientInfoSize = 0;
     std::vector<ICDClientInfo> clientInfoVector;
