@@ -108,7 +108,7 @@ from chip.clusters.Attribute import ValueDecodeFailure
 from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.global_attribute_ids import AttributeIdType, ClusterIdType, GlobalAttributeIds, attribute_id_type, cluster_id_type, command_id_type
+from chip.testing.global_attribute_ids import AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds, attribute_id_type, cluster_id_type, command_id_type
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
                                          async_test_body, default_matter_test_main)
 from chip.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
