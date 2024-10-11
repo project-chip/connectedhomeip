@@ -35,10 +35,11 @@ jobs:
                 python-version: '3.12'
             - name: Setup pip modules we use
               run: |
-                  pip install     \
-                      click       \
-                      coloredlogs \
-                      pygithub    \
+                  pip install         \
+                      click           \
+                      coloredlogs     \
+                      python-dateutil \
+                      pygithub        \
                       && echo "DONE installint python prerequisites"
             - name: Cancel runs
               run: |
