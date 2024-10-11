@@ -33,9 +33,6 @@ namespace {
 constexpr EndpointId kAggregatorEndpointId = 1;
 constexpr uint16_t kWindowTimeout          = 300;
 constexpr uint16_t kIteration              = 1000;
-constexpr uint16_t kSubscribeMinInterval   = 0;
-constexpr uint16_t kSubscribeMaxInterval   = 60;
-constexpr uint16_t kAggragatorEndpointId   = 1;
 constexpr uint16_t kMaxDiscriminatorLength = 4095;
 
 } // namespace
@@ -200,7 +197,7 @@ void DeviceManager::SubscribeRemoteFabricBridge()
 
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Failed to subscribe to the remote bridge (NodeId: %" PRIu64 "). Error: %" CHIP_ERROR_FORMAT,
+        ChipLogError(NotSpecified, "Failed to subscribe to the remote bridge (NodeId: %lu). Error: %" CHIP_ERROR_FORMAT,
                      mRemoteBridgeNodeId, error.Format());
         return;
     }
