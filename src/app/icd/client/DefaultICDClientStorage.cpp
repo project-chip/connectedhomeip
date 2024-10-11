@@ -354,7 +354,7 @@ CHIP_ERROR DefaultICDClientStorage::CheckFabricExistence(FabricIndex fabricIndex
 {
     for (auto & fabric_idx : mFabricList)
     {
-        VerifyOrReturnError(fabric_idx != fabricIndex, CHIP_NO_ERROR); 
+        VerifyOrReturnError(fabric_idx != fabricIndex, CHIP_NO_ERROR);
     }
     return CHIP_ERROR_INVALID_FABRIC_INDEX;
 }
@@ -491,13 +491,13 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
         mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(fabricIndex).KeyName()));
     ReturnErrorOnFailure(mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricIndex).KeyName()));
 
-    for (auto fabric = mFabricList.begin(); fabric != mFabricList.end(); fabric++) 
+    for (auto fabric = mFabricList.begin(); fabric != mFabricList.end(); fabric++)
     {
-        if (*fabric == fabricIndex) 
+        if (*fabric == fabricIndex)
         {
             fabric = mFabricList.erase(fabric);
             break;
-        } 
+        }
     }
 
     if (mFabricList.size() == 0)
