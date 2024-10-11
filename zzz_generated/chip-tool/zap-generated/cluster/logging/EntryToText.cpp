@@ -6493,7 +6493,7 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
     case 0x00000016:
         return "Matter Root Node";
     case 0x00000019:
-        return "Matter Secondary Network Interface Device Type";
+        return "Matter Secondary Network Interface";
     case 0x00000022:
         return "Matter Speaker";
     case 0x00000023:
