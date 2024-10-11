@@ -145,10 +145,10 @@ public:
                                OnConnectionErrorFunct onError);
     CHIP_ERROR _WiFiPAFCancelConnect();
     CHIP_ERROR _WiFiPAFCancelIncompleteConnect();
-    void OnDiscoveryResult(gboolean success, GVariant * obj);
-    void OnReplied(gboolean success, GVariant * obj);
+    void OnDiscoveryResult(GVariant * obj);
+    void OnReplied(GVariant * obj);
     void OnNanReceive(GVariant * obj);
-    void OnNanSubscribeTerminated(gint term_subscribe_id, gint reason);
+    void OnNanSubscribeTerminated(guint subscribe_id, gchar * reason);
     CHIP_ERROR _WiFiPAFSend(chip::System::PacketBufferHandle && msgBuf);
     WiFiPAF::WiFiPAFLayer * _GetWiFiPAF();
 #endif
@@ -238,6 +238,7 @@ private:
         uint8_t peer_addr[6];
         bool fsd;
         bool fsd_gas;
+        uint32_t srv_proto_type;
         uint32_t ssi_len;
     };
     struct wpa_dbus_reply_info
@@ -245,19 +246,22 @@ private:
         uint32_t publish_id;
         uint32_t peer_subscribe_id;
         uint8_t peer_addr[6];
+        uint32_t srv_proto_type;
         uint32_t ssi_len;
     };
 
     uint32_t mpresubscribe_id;
     struct wpa_dbus_discov_info mpaf_info;
-    struct wpa_dbus_nanrx_info
+    struct wpa_dbus_reply_info mpaf_reply_info;
+    struct wpa_dbus_nantxrx_info
     {
         uint32_t id;
         uint32_t peer_id;
         uint8_t peer_addr[6];
         uint32_t ssi_len;
     };
-    struct wpa_dbus_nanrx_info mpaf_nanrx_info;
+    struct wpa_dbus_nantxrx_info mpaf_rx_info;
+    struct wpa_dbus_nantxrx_info mpaf_tx_info;
 
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
     OnConnectionErrorFunct mOnPafSubscribeError;
@@ -265,6 +269,7 @@ private:
     void * mAppState;
     CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
+    CHIP_ERROR _WiFiPAFUpdatePublish();
     CHIP_ERROR _WiFiPAFCancelPublish();
 #endif
 
