@@ -444,10 +444,7 @@ CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
     size_t clientInfoSize = 0;
     std::vector<ICDClientInfo> clientInfoVector;
     ReturnErrorOnFailure(Load(peerNode.GetFabricIndex(), clientInfoVector, clientInfoSize));
-    if (clientInfoVector.size() == 0)
-    {
-        return CHIP_NO_ERROR;
-    }
+    VerifyOrReturnError(clientInfoVector.size() > 0, CHIP_NO_ERROR);
 
     for (auto it = clientInfoVector.begin(); it != clientInfoVector.end(); it++)
     {
