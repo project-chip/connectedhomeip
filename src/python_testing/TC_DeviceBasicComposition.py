@@ -103,19 +103,24 @@ from typing import Any, Callable
 import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
+from basic_composition_support import BasicCompositionTests
 from chip import ChipUtility
 from chip.clusters.Attribute import ValueDecodeFailure
 from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
-                                         async_test_body, default_matter_test_main)
-from chip.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
-                                                    find_tag_list_problems, find_tree_roots, flat_list_ok,
-                                                    get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
 from chip.tlv import uint
+from global_attribute_ids import AttributeIdType, ClusterIdType, GlobalAttributeIds, attribute_id_type, cluster_id_type
+from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
+                                    async_test_body, default_matter_test_main)
 from mobly import asserts
+from taglist_and_topology_test_support import (create_device_type_list_for_root, create_device_type_lists, find_tag_list_problems,
+                                               find_tree_roots, flat_list_ok, get_direct_children_of_root, parts_list_cycles,
+                                               separate_endpoint_types)
+
+
+def get_vendor_id(mei: int) -> int:
+    """Get the vendor ID portion (MEI prefix) of an overall MEI."""
+    return (mei >> 16) & 0xffff
 
 
 def check_int_in_range(min_value: int, max_value: int, allow_null: bool = False) -> Callable:
@@ -488,15 +493,17 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                 cmd_prefixes = [a & 0xFFFF_0000 for a in cmd_values]
                 bad_attrs = [a for a in attr_prefixes if a >= bad_prefix_min]
                 bad_cmds = [a for a in cmd_prefixes if a >= bad_prefix_min]
-                for bad in bad_attrs:
-                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=bad)
+                for bad_attrib_id in bad_attrs:
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=bad_attrib_id)
+                    vendor_id = get_vendor_id(bad_attrib_id)
                     self.record_error(self.get_test_name(
-                    ), location=location, problem=f'Attribute with bad prefix {attribute_id} in cluster {cluster_id}', spec_location='Manufacturer Extensible Identifier (MEI)')
+                    ), location=location, problem=f'Attribute 0x{bad_attrib_id:08x} with bad prefix 0x{vendor_id:04x} in cluster 0x{cluster_id:08x}' + (' (Test Vendor)' if attribute_id_type(bad_attrib_id) == AttributeIdType.kTest else ''), spec_location='Manufacturer Extensible Identifier (MEI)')
                     success = False
-                for bad in bad_cmds:
-                    location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=bad)
+                for bad_cmd_id in bad_cmds:
+                    location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=bad_cmd_id)
+                    vendor_id = get_vendor_id(bad_cmd_id)
                     self.record_error(self.get_test_name(
-                    ), location=location, problem=f'Command with bad prefix {attribute_id} in cluster {cluster_id}', spec_location='Manufacturer Extensible Identifier (MEI)')
+                    ), location=location, problem=f'Command 0x{bad_cmd_id:08x} with bad prefix 0x{vendor_id:04x} in cluster 0x{cluster_id:08x}', spec_location='Manufacturer Extensible Identifier (MEI)')
                     success = False
 
         self.print_step(7, "Validate that none of the MEI global attribute IDs contain values outside of the allowed suffix range")
@@ -511,14 +518,12 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                                                      attribute_id=manufacturer_value)
                     if suffix > attribute_standard_range_max and suffix < global_range_min:
                         self.record_error(self.get_test_name(), location=location,
-                                          problem=f"Manufacturer attribute in undefined range {
-                                              manufacturer_value} in cluster {cluster_id}",
+                                          problem=f"Manufacturer attribute in undefined range {manufacturer_value} in cluster {cluster_id}",
                                           spec_location=f"Cluster {cluster_id}")
                         success = False
                     elif suffix >= global_range_min:
                         self.record_error(self.get_test_name(), location=location,
-                                          problem=f"Manufacturer attribute in global range {
-                                              manufacturer_value} in cluster {cluster_id}",
+                                          problem=f"Manufacturer attribute in global range {manufacturer_value} in cluster {cluster_id}",
                                           spec_location=f"Cluster {cluster_id}")
                         success = False
 
@@ -541,10 +546,11 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             cluster_prefixes = [a & 0xFFFF_0000 for a in endpoint.keys()]
             bad_clusters_ids = [a for a in cluster_prefixes if a >= bad_prefix_min]
-            for bad in bad_clusters_ids:
-                location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad)
+            for bad_cluster_id in bad_clusters_ids:
+                location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad_cluster_id)
+                vendor_id = get_vendor_id(bad_cluster_id)
                 self.record_error(self.get_test_name(), location=location,
-                                  problem=f'Bad cluster id prefix {bad}', spec_location='Manufacturer Extensible Identifier (MEI)')
+                                  problem=f'Cluster 0x{bad_cluster_id:08x} with bad prefix 0x{vendor_id:04x}' + (' (Test Vendor)' if cluster_id_type(bad_cluster_id) == ClusterIdType.kTest else ''), spec_location='Manufacturer Extensible Identifier (MEI)')
                 success = False
 
         self.print_step(9, "Validate that all clusters in the standard range have a known cluster ID")
@@ -815,8 +821,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         for ep, problem in problems.items():
             location = AttributePathLocation(endpoint_id=ep, cluster_id=Clusters.Descriptor.id,
                                              attribute_id=Clusters.Descriptor.Attributes.TagList.attribute_id)
-            msg = f'problem on ep {ep}: missing feature = {problem.missing_feature}, missing attribute = {
-                problem.missing_attribute}, duplicates = {problem.duplicates}, same_tags = {problem.same_tag}'
+            msg = f'problem on ep {ep}: missing feature = {problem.missing_feature}, missing attribute = {problem.missing_attribute}, duplicates = {problem.duplicates}, same_tags = {problem.same_tag}'
             self.record_error(self.get_test_name(), location=location, problem=msg, spec_location="Descriptor TagList")
 
         self.print_step(2, "Identify all the direct children of the root node endpoint")

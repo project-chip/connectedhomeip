@@ -50,8 +50,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
-                                         run_if_endpoint_matches)
+from matter_testing_support import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
+                                    run_if_endpoint_matches)
 from mobly import asserts
 
 
@@ -194,7 +194,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         self.step(9)
         cmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         # If no exception is raised, this is success
-        await self.send_single_cmd(cmd, timedRequestTimeoutMs=5000)
+        await self.send_single_cmd(cmd, endpoint=0, timedRequestTimeoutMs=5000)
 
         self.step(10)
         if not events:

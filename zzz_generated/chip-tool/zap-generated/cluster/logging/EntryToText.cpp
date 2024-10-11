@@ -6485,7 +6485,7 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
     case 0x00000012:
         return "Matter OTA Requestor";
     case 0x00000013:
-        return "Matter Bridged Device";
+        return "Matter Bridged Node";
     case 0x00000014:
         return "Matter OTA Provider";
     case 0x00000015:
@@ -6493,7 +6493,7 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
     case 0x00000016:
         return "Matter Root Node";
     case 0x00000019:
-        return "Matter Secondary Network Interface Device Type";
+        return "Matter Secondary Network Interface";
     case 0x00000022:
         return "Matter Speaker";
     case 0x00000023:
@@ -6596,6 +6596,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Matter Humidity Sensor";
     case 0x0000050C:
         return "Matter EVSE";
+    case 0x0000050D:
+        return "Matter Device Energy Management";
     case 0x00000510:
         return "Matter Electrical Sensor";
     case 0x00000840:
