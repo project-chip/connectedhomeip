@@ -354,10 +354,7 @@ CHIP_ERROR DefaultICDClientStorage::CheckFabricExistence(FabricIndex fabricIndex
 {
     for (auto & fabric_idx : mFabricList)
     {
-        if (fabric_idx == fabricIndex) 
-        {
-            return CHIP_NO_ERROR;
-        } 
+        VerifyOrReturnError(fabric_idx != fabricIndex, CHIP_NO_ERROR); 
     }
     return CHIP_ERROR_INVALID_FABRIC_INDEX;
 }
