@@ -183,7 +183,7 @@ private:
     CHIP_ERROR LoadFabricList();
     CHIP_ERROR LoadCounter(FabricIndex fabricIndex, size_t & count, size_t & clientInfoSize);
 
-    bool CheckFabricExistence(FabricIndex fabricIndex);
+    bool FabricExists(FabricIndex fabricIndex);
 
     CHIP_ERROR IncreaseEntryCountForFabric(FabricIndex fabricIndex);
     CHIP_ERROR DecreaseEntryCountForFabric(FabricIndex fabricIndex);

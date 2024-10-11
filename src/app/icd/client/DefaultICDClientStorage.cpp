@@ -350,7 +350,7 @@ CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, cons
     return writer.EndContainer(arrayType);
 }
 
-bool DefaultICDClientStorage::CheckFabricExistence(FabricIndex fabricIndex)
+bool DefaultICDClientStorage::FabricExists(FabricIndex fabricIndex)
 {
     for (auto & fabric_idx : mFabricList)
     {
@@ -364,7 +364,7 @@ bool DefaultICDClientStorage::CheckFabricExistence(FabricIndex fabricIndex)
 
 CHIP_ERROR DefaultICDClientStorage::StoreEntry(const ICDClientInfo & clientInfo)
 {
-    VerifyOrReturnError(CheckFabricExistence(clientInfo.peer_node.GetFabricIndex()), CHIP_ERROR_INVALID_FABRIC_INDEX);
+    VerifyOrReturnError(FabricExists(clientInfo.peer_node.GetFabricIndex()), CHIP_ERROR_INVALID_FABRIC_INDEX);
     std::vector<ICDClientInfo> clientInfoVector;
     size_t clientInfoSize = MaxICDClientInfoSize();
     ReturnErrorOnFailure(Load(clientInfo.peer_node.GetFabricIndex(), clientInfoVector, clientInfoSize));
@@ -442,7 +442,7 @@ CHIP_ERROR DefaultICDClientStorage::UpdateEntryCountForFabric(FabricIndex fabric
 
 CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
 {
-    VerifyOrReturnError(CheckFabricExistence(peerNode.GetFabricIndex()), CHIP_NO_ERROR);
+    VerifyOrReturnError(FabricExists(peerNode.GetFabricIndex()), CHIP_NO_ERROR);
     size_t clientInfoSize = 0;
     std::vector<ICDClientInfo> clientInfoVector;
     ReturnErrorOnFailure(Load(peerNode.GetFabricIndex(), clientInfoVector, clientInfoSize));
@@ -480,7 +480,7 @@ CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
 
 CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
 {
-    VerifyOrReturnError(CheckFabricExistence(fabricIndex), CHIP_NO_ERROR);
+    VerifyOrReturnError(FabricExists(fabricIndex), CHIP_NO_ERROR);
 
     size_t clientInfoSize = 0;
     std::vector<ICDClientInfo> clientInfoVector;

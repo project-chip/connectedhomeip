@@ -290,7 +290,7 @@ TEST_F(TestDefaultICDClientStorage, TestProcessCheckInPayload)
     uint32_t checkInCounter = 0;
     ByteSpan payload{ buffer->Start(), buffer->DataLength() };
     EXPECT_EQ(manager.ProcessCheckInPayload(payload, decodeClientInfo, checkInCounter), CHIP_NO_ERROR);
-    EXPECT_EQ(checkInCounter, 1u);
+    EXPECT_EQ(checkInCounter, counter);
 
     // Validate second check-in message with increased counter
     counter++;
@@ -300,7 +300,7 @@ TEST_F(TestDefaultICDClientStorage, TestProcessCheckInPayload)
     buffer->SetDataLength(static_cast<uint16_t>(output.size()));
     ByteSpan payload1{ buffer->Start(), buffer->DataLength() };
     EXPECT_EQ(manager.ProcessCheckInPayload(payload1, decodeClientInfo, checkInCounter), CHIP_NO_ERROR);
-    EXPECT_EQ(checkInCounter, 2u);
+    EXPECT_EQ(checkInCounter, counter);
 
     // Use a key not available in the storage for encoding
     EXPECT_EQ(manager.SetKey(clientInfo, ByteSpan(kKeyBuffer2)), CHIP_NO_ERROR);
@@ -342,7 +342,7 @@ TEST_F(TestDefaultICDClientStorage, TestProcessCheckInPayloadWithRemovedKey)
     uint32_t checkInCounter = 0;
     ByteSpan payload{ buffer->Start(), buffer->DataLength() };
     EXPECT_EQ(manager.ProcessCheckInPayload(payload, decodeClientInfo, checkInCounter), CHIP_NO_ERROR);
-    EXPECT_EQ(checkInCounter, 1u);
+    EXPECT_EQ(checkInCounter, counter);
 
     // Use a removed key in the storage for encoding
     manager.RemoveKey(clientInfo), CHIP_NO_ERROR;
@@ -384,7 +384,7 @@ TEST_F(TestDefaultICDClientStorage, TestProcessCheckInPayloadWithEmptyIcdStorage
     uint32_t checkInCounter = 0;
     ByteSpan payload{ buffer->Start(), buffer->DataLength() };
     EXPECT_EQ(manager.ProcessCheckInPayload(payload, decodeClientInfo, checkInCounter), CHIP_NO_ERROR);
-    EXPECT_EQ(checkInCounter, 1u);
+    EXPECT_EQ(checkInCounter, counter);
     manager.DeleteAllEntries(fabricId);
 
     EXPECT_EQ(chip::Protocols::SecureChannel::CheckinMessage::GenerateCheckinMessagePayload(
