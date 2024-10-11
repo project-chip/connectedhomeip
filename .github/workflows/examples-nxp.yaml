@@ -65,8 +65,8 @@ jobs:
                       --target nxp-k32w0-freertos-lighting-log-progress-factory \
                       --target nxp-k32w0-freertos-lighting-log-progress-rotating-id \
                       --target nxp-k32w0-freertos-contact-sensor-log-progress \
-                      --target nxp-k32w0-freertos-contact-sensor-log-progress-low-power \
-                      --target nxp-k32w0-freertos-contact-sensor-log-progress-low-power-factory \
+                      --target nxp-k32w0-freertos-contact-sensor-low-power \
+                      --target nxp-k32w0-freertos-contact-sensor-low-power-factory \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -80,7 +80,7 @@ jobs:
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp k32w0+release contact \
-                    out/artifacts/nxp-k32w0-freertos-contact-sensor-log-progress-low-power/chip-k32w0x-contact-example.elf \
+                    out/artifacts/nxp-k32w0-freertos-contact-sensor-low-power/chip-k32w0x-contact-example.elf \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
