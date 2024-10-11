@@ -350,18 +350,21 @@ CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, cons
     return writer.EndContainer(arrayType);
 }
 
-CHIP_ERROR DefaultICDClientStorage::CheckFabricExistence(FabricIndex fabricIndex)
+bool DefaultICDClientStorage::CheckFabricExistence(FabricIndex fabricIndex)
 {
     for (auto & fabric_idx : mFabricList)
     {
-        VerifyOrReturnError(fabric_idx != fabricIndex, CHIP_NO_ERROR);
+        if (fabric_idx == fabricIndex)
+        {
+            return true;
+        }
     }
-    return CHIP_ERROR_INVALID_FABRIC_INDEX;
+    return false;
 }
 
 CHIP_ERROR DefaultICDClientStorage::StoreEntry(const ICDClientInfo & clientInfo)
 {
-    ReturnErrorOnFailure(CheckFabricExistence(clientInfo.peer_node.GetFabricIndex()));
+    VerifyOrReturnError(CheckFabricExistence(clientInfo.peer_node.GetFabricIndex()), CHIP_ERROR_INVALID_FABRIC_INDEX);
     std::vector<ICDClientInfo> clientInfoVector;
     size_t clientInfoSize = MaxICDClientInfoSize();
     ReturnErrorOnFailure(Load(clientInfo.peer_node.GetFabricIndex(), clientInfoVector, clientInfoSize));
@@ -439,7 +442,7 @@ CHIP_ERROR DefaultICDClientStorage::UpdateEntryCountForFabric(FabricIndex fabric
 
 CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
 {
-    VerifyOrReturnError(CheckFabricExistence(peerNode.GetFabricIndex()) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    VerifyOrReturnError(CheckFabricExistence(peerNode.GetFabricIndex()), CHIP_NO_ERROR);
     size_t clientInfoSize = 0;
     std::vector<ICDClientInfo> clientInfoVector;
     ReturnErrorOnFailure(Load(peerNode.GetFabricIndex(), clientInfoVector, clientInfoSize));
@@ -477,7 +480,7 @@ CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
 
 CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
 {
-    VerifyOrReturnError(CheckFabricExistence(fabricIndex) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    VerifyOrReturnError(CheckFabricExistence(fabricIndex), CHIP_NO_ERROR);
 
     size_t clientInfoSize = 0;
     std::vector<ICDClientInfo> clientInfoVector;
@@ -496,7 +499,7 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
     {
         if (*fabric == fabricIndex)
         {
-            fabric = mFabricList.erase(fabric);
+            mFabricList.erase(fabric);
             break;
         }
     }
