@@ -225,6 +225,10 @@ static_library("interaction-model") {
 
   deps = [ "${chip_root}/src/app:events" ]
 
+  # Temporary dependency: codegen data provider instance should be provided
+  # by the application
+  deps += [ "${chip_root}/src/app/codegen-data-model-provider:instance-header" ]
+
   public_deps = [
     ":app_config",
     ":command-handler-impl",
@@ -232,7 +236,6 @@ static_library("interaction-model") {
     ":paths",
     ":subscription-info-provider",
     "${chip_root}/src/app/MessageDef",
-    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/icd/server:manager",
