@@ -216,10 +216,7 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
 {
     size_t count = 0;
     ReturnErrorOnFailure(LoadCounter(fabricIndex, count, clientInfoSize));
-    if (count == 0)
-    {
-        return CHIP_NO_ERROR;
-    }
+     VerifyOrReturnError(count > 0, CHIP_NO_ERROR)
     size_t len = clientInfoSize * count + kArrayOverHead;
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
