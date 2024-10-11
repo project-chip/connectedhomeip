@@ -852,15 +852,8 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
     uint16_t freq_list_buf[0xff];
     uint16_t * pfreq_lst                          = freq_list_buf;
     enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
-    bool solicited                                = true;
-    bool unsolicited                              = true;
-    bool solicited_multicast                      = false;
     unsigned int ttl                              = CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT;
-    bool disable_events                           = false;
-    bool fsd                                      = true;
-    bool fsd_gas                                  = false;
     unsigned int freq                             = CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL;
-    unsigned int announcement_period              = false;
     unsigned int freq_list_len;
     unsigned int ssi_len = sizeof(struct PAFPublishSSI);
 
@@ -896,23 +889,86 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
         ChipLogProgress(DeviceLayer, "WiFi-PAF: ssi_array_variant is NULL ");
         return CHIP_ERROR_INTERNAL;
     }
+<<<<<<< HEAD
     ret = Encoding::BytesToUppercaseHexString((uint8_t *) &PafPublish_ssi, sizeof(PafPublish_ssi), &args[strlen(args)],
                                               MAX_PAF_PUBLISH_SSI_BUFLEN - strlen(args));
     VerifyOrReturnError(ret == CHIP_NO_ERROR, ret);
     ChipLogProgress(DeviceLayer, "WiFi-PAF: publish: [%s]", args);
     wpa_supplicant_1_interface_call_nanpublish_sync(mWpaSupplicant.iface, args, &publish_id, nullptr, &err.GetReceiver());
     ChipLogProgress(DeviceLayer, "WiFi-PAF: publish_id: %d ! ", publish_id);
+=======
 
-    g_signal_connect(mWpaSupplicant.iface, "nan-replied",
-                     G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, gboolean success, GVariant * obj,
-                                    ConnectivityManagerImpl * self) { return self->OnReplied(success, obj); }),
+    GVariantBuilder builder;
+    GVariant * args = nullptr;
+    g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
+    g_variant_builder_add(&builder, "{sv}", "srv_name", g_variant_new_string(srv_name));
+    g_variant_builder_add(&builder, "{sv}", "srv_proto_type", g_variant_new_byte(srv_proto_type));
+    g_variant_builder_add(&builder, "{sv}", "ttl", g_variant_new_uint16(ttl));
+    g_variant_builder_add(&builder, "{sv}", "freq", g_variant_new_uint16(freq));
+    g_variant_builder_add(&builder, "{sv}", "ssi", ssi_array_variant);
+    g_variant_builder_add(&builder, "{sv}", "freq_list", freq_array_variant);
+    args = g_variant_builder_end(&builder);
+    wpa_fi_w1_wpa_supplicant1_interface_call_nanpublish_sync(mWpaSupplicant.iface, args, &publish_id, nullptr, &err.GetReceiver());
+>>>>>>> f9ee1e37b5 (Change the dbus calling method by following the new defined api of wpa_supplicant)
+
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: publish_id: %d ! ", publish_id);
+    mpaf_info.peer_publish_id = publish_id;
+
+    g_signal_connect(mWpaSupplicant.iface, "nanreplied",
+                     G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
+                         return self->OnReplied(obj);
+                     }),
                      this);
 
+<<<<<<< HEAD
     g_signal_connect(mWpaSupplicant.iface, "nan-receive",
                      G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
+=======
+    g_signal_connect(mWpaSupplicant.iface, "nanreceive",
+                     G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
+>>>>>>> f9ee1e37b5 (Change the dbus calling method by following the new defined api of wpa_supplicant)
                          return self->OnNanReceive(obj);
                      }),
                      this);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFUpdatePublish()
+{
+    ChipLogProgress(Controller, "WiFi-PAF: Try to update publish the NAN-USD devices");
+    GAutoPtr<GError> err;
+    gint publish_id      = mpaf_info.peer_publish_id;
+    unsigned int ssi_len = sizeof(struct PAFPublishSSI);
+    struct PAFPublishSSI PafPublish_ssi;
+
+    PafPublish_ssi.DevOpCode = 0;
+    VerifyOrDie(DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(PafPublish_ssi.DevInfo) == CHIP_NO_ERROR);
+    if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(PafPublish_ssi.ProductId) != CHIP_NO_ERROR)
+    {
+        PafPublish_ssi.ProductId = 0;
+    }
+    if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(PafPublish_ssi.VendorId) != CHIP_NO_ERROR)
+    {
+        PafPublish_ssi.VendorId = 0;
+    }
+
+    GVariant * ssi_array_variant = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &PafPublish_ssi, ssi_len, sizeof(guint8));
+    if (ssi_array_variant == nullptr)
+    {
+        ChipLogProgress(DeviceLayer, "WiFi-PAF: ssi_array_variant is NULL ");
+        return CHIP_ERROR_INTERNAL;
+    }
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    GVariantBuilder builder;
+    GVariant * args = nullptr;
+    g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
+    g_variant_builder_add(&builder, "{sv}", "publish_id", g_variant_new_int32(publish_id));
+    g_variant_builder_add(&builder, "{sv}", "ssi_len", g_variant_new_uint16(ssi_len));
+    g_variant_builder_add(&builder, "{sv}", "ssi", ssi_array_variant);
+    args = g_variant_builder_end(&builder);
+    wpa_fi_w1_wpa_supplicant1_interface_call_nanupdate_publish_sync(mWpaSupplicant.iface, args, nullptr, &err.GetReceiver());
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: publish_id: [%d]", publish_id);
+
     return CHIP_NO_ERROR;
 }
 
@@ -1374,9 +1430,9 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
 /*
     NAN-USD Service Protocol Type: ref: Table 58 of Wi-Fi Aware Specificaiton
 */
-void ConnectivityManagerImpl::OnDiscoveryResult(gboolean success, GVariant * discov_info)
+void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
 {
-    ChipLogProgress(Controller, "WiFi-PAF: OnDiscoveryResult, %d", success);
+    ChipLogProgress(Controller, "WiFi-PAF: OnDiscoveryResult");
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     if (g_variant_n_children(discov_info) == 0)
@@ -1384,45 +1440,61 @@ void ConnectivityManagerImpl::OnDiscoveryResult(gboolean success, GVariant * dis
         return;
     }
 
-    if (success == true)
-    {
-        GAutoPtr<GVariant> dataValue(g_variant_lookup_value(discov_info, "discov_info", G_VARIANT_TYPE_BYTESTRING));
-        size_t bufferLen;
-        auto buffer = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
-        if (((struct wpa_dbus_discov_info *) buffer)->subscribe_id == mpaf_info.subscribe_id)
-        {
-            return;
-        }
-        memcpy(&mpaf_info, buffer, sizeof(struct wpa_dbus_discov_info));
-        ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe_id: %u", mpaf_info.subscribe_id);
-        ChipLogProgress(DeviceLayer, "WiFi-PAF: peer_publish_id: %u", mpaf_info.peer_publish_id);
-        ChipLogProgress(DeviceLayer, "WiFi-PAF: peer_addr: [%02x:%02x:%02x:%02x:%02x:%02x]", mpaf_info.peer_addr[0],
-                        mpaf_info.peer_addr[1], mpaf_info.peer_addr[2], mpaf_info.peer_addr[3], mpaf_info.peer_addr[4],
-                        mpaf_info.peer_addr[5]);
-        GetWiFiPAF()->SetWiFiPAFState(WiFiPAF::State::kConnected);
+    GAutoPtr<GVariant> dataValue;
+    GVariant * value;
 
-        // Read the ssi
-        GAutoPtr<GVariant> ssiValue(g_variant_lookup_value(discov_info, "ssi", G_VARIANT_TYPE_BYTESTRING));
-        size_t ssiBufLen;
-        g_variant_get_fixed_array(ssiValue.get(), &ssiBufLen, sizeof(uint8_t));
+    value = g_variant_lookup_value(discov_info, "subscribe_id", G_VARIANT_TYPE_UINT32);
+    dataValue.reset(value);
+    g_variant_get(dataValue.get(), "u", &mpaf_info.subscribe_id);
 
-        ChipDeviceEvent event;
-        event.Type = DeviceEventType::kCHIPoWiFiPAFConnected;
-        PlatformMgr().PostEventOrDie(&event);
-    }
-    else
-    {
-        GetWiFiPAF()->SetWiFiPAFState(WiFiPAF::State::kInitialized);
-        if (mOnPafSubscribeError != nullptr)
-        {
-            mOnPafSubscribeError(mAppState, CHIP_ERROR_TIMEOUT);
-        }
-    }
+    value = g_variant_lookup_value(discov_info, "publish_id", G_VARIANT_TYPE_UINT32);
+    dataValue.reset(value);
+    g_variant_get(dataValue.get(), "u", &mpaf_info.peer_publish_id);
+
+    char addr_str[20];
+    char * paddr;
+    value = g_variant_lookup_value(discov_info, "peer_addr", G_VARIANT_TYPE_STRING);
+    dataValue.reset(value);
+    g_variant_get(dataValue.get(), "s", &paddr);
+    strncpy(addr_str, paddr, sizeof(addr_str));
+    sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &mpaf_info.peer_addr[0], &mpaf_info.peer_addr[1],
+           &mpaf_info.peer_addr[2], &mpaf_info.peer_addr[3], &mpaf_info.peer_addr[4], &mpaf_info.peer_addr[5]);
+
+    value = g_variant_lookup_value(discov_info, "fsd", G_VARIANT_TYPE_BOOLEAN);
+    dataValue.reset(value);
+    g_variant_get(dataValue.get(), "b", &mpaf_info.fsd);
+
+    value = g_variant_lookup_value(discov_info, "fsd_gas", G_VARIANT_TYPE_BOOLEAN);
+    dataValue.reset(value);
+    g_variant_get(dataValue.get(), "b", &mpaf_info.fsd_gas);
+
+    value = g_variant_lookup_value(discov_info, "srv_proto_type", G_VARIANT_TYPE_UINT32);
+    dataValue.reset(value);
+    g_variant_get(dataValue.get(), "u", &mpaf_info.srv_proto_type);
+
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe_id: %u", mpaf_info.subscribe_id);
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: peer_publish_id: %u", mpaf_info.peer_publish_id);
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: peer_addr: [%02x:%02x:%02x:%02x:%02x:%02x]", mpaf_info.peer_addr[0],
+                    mpaf_info.peer_addr[1], mpaf_info.peer_addr[2], mpaf_info.peer_addr[3], mpaf_info.peer_addr[4],
+                    mpaf_info.peer_addr[5]);
+    GetWiFiPAF()->SetWiFiPAFState(WiFiPAF::State::kConnected);
+    mpaf_tx_info.id      = mpaf_info.subscribe_id;
+    mpaf_tx_info.peer_id = mpaf_info.peer_publish_id;
+    memcpy(mpaf_tx_info.peer_addr, mpaf_info.peer_addr, sizeof(mpaf_tx_info.peer_addr));
+
+    // Read the ssi
+    GAutoPtr<GVariant> ssiValue(g_variant_lookup_value(discov_info, "ssi", G_VARIANT_TYPE_BYTESTRING));
+    size_t ssiBufLen;
+    g_variant_get_fixed_array(ssiValue.get(), &ssiBufLen, sizeof(uint8_t));
+
+    ChipDeviceEvent event;
+    event.Type = DeviceEventType::kCHIPoWiFiPAFConnected;
+    PlatformMgr().PostEventOrDie(&event);
 }
 
-void ConnectivityManagerImpl::OnReplied(gboolean success, GVariant * reply_info)
+void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
 {
-    ChipLogProgress(Controller, "WiFi-PAF: OnReplied, %d", success);
+    ChipLogProgress(Controller, "WiFi-PAF: OnReplied");
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     if (g_variant_n_children(reply_info) == 0)
@@ -1430,29 +1502,39 @@ void ConnectivityManagerImpl::OnReplied(gboolean success, GVariant * reply_info)
         return;
     }
 
-    if (success == true)
-    {
-        GAutoPtr<GVariant> dataValue(g_variant_lookup_value(reply_info, "reply_info", G_VARIANT_TYPE_BYTESTRING));
-        size_t bufferLen;
-        auto buffer = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
-        struct wpa_dbus_reply_info * preply_info;
+    GAutoPtr<GVariant> dataValue;
+    GVariant * value;
 
-        preply_info = (struct wpa_dbus_reply_info *) buffer;
-        ChipLogProgress(DeviceLayer, "WiFi-PAF: publish_id: %u", preply_info->publish_id);
-        ChipLogProgress(DeviceLayer, "WiFi-PAF: peer_subscribe_id: %u", preply_info->peer_subscribe_id);
-        ChipLogProgress(DeviceLayer, "WiFi-PAF: peer_addr: [%02x:%02x:%02x:%02x:%02x:%02x]", preply_info->peer_addr[0],
-                        preply_info->peer_addr[1], preply_info->peer_addr[2], preply_info->peer_addr[3], preply_info->peer_addr[4],
-                        preply_info->peer_addr[5]);
-        ChipLogProgress(DeviceLayer, "WiFi-PAF: ssi_len: %u", preply_info->ssi_len);
-    }
-    else
-    {
-        GetWiFiPAF()->SetWiFiPAFState(WiFiPAF::State::kInitialized);
-        if (mOnPafSubscribeError != nullptr)
-        {
-            mOnPafSubscribeError(mAppState, CHIP_ERROR_TIMEOUT);
-        }
-    }
+    value = g_variant_lookup_value(reply_info, "publish_id", G_VARIANT_TYPE_UINT32);
+    dataValue.reset(value);
+    g_variant_get(dataValue.get(), "u", &mpaf_reply_info.publish_id);
+
+    value = g_variant_lookup_value(reply_info, "subscribe_id", G_VARIANT_TYPE_UINT32);
+    dataValue.reset(value);
+    g_variant_get(dataValue.get(), "u", &mpaf_reply_info.peer_subscribe_id);
+
+    char addr_str[20];
+    char * paddr;
+    value = g_variant_lookup_value(reply_info, "peer_addr", G_VARIANT_TYPE_STRING);
+    dataValue.reset(value);
+    g_variant_get(dataValue.get(), "s", &paddr);
+    strncpy(addr_str, paddr, sizeof(addr_str));
+    sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &mpaf_reply_info.peer_addr[0], &mpaf_reply_info.peer_addr[1],
+           &mpaf_reply_info.peer_addr[2], &mpaf_reply_info.peer_addr[3], &mpaf_reply_info.peer_addr[4],
+           &mpaf_reply_info.peer_addr[5]);
+
+    value = g_variant_lookup_value(reply_info, "srv_proto_type", G_VARIANT_TYPE_UINT32);
+    dataValue.reset(value);
+    g_variant_get(dataValue.get(), "u", &mpaf_reply_info.srv_proto_type);
+
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: publish_id: %u", mpaf_reply_info.publish_id);
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: peer_subscribe_id: %u", mpaf_reply_info.peer_subscribe_id);
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: peer_addr: [%02x:%02x:%02x:%02x:%02x:%02x]", mpaf_reply_info.peer_addr[0],
+                    mpaf_reply_info.peer_addr[1], mpaf_reply_info.peer_addr[2], mpaf_reply_info.peer_addr[3],
+                    mpaf_reply_info.peer_addr[4], mpaf_reply_info.peer_addr[5]);
+    mpaf_tx_info.id      = mpaf_reply_info.publish_id;
+    mpaf_tx_info.peer_id = mpaf_reply_info.peer_subscribe_id;
+    memcpy(mpaf_tx_info.peer_addr, mpaf_reply_info.peer_addr, sizeof(mpaf_tx_info.peer_addr));
 }
 
 void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
@@ -1462,22 +1544,32 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
         return;
     }
     // Read the rx_info
-    GAutoPtr<GVariant> dataValueInfo(g_variant_lookup_value(obj, "nanrx_info", G_VARIANT_TYPE_BYTESTRING));
-    size_t infoBufferLen;
-    auto infoBuffer = g_variant_get_fixed_array(dataValueInfo.get(), &infoBufferLen, sizeof(uint8_t));
+    GAutoPtr<GVariant> dataValue;
+    GVariant * value;
+    value = g_variant_lookup_value(obj, "id", G_VARIANT_TYPE_UINT32);
+    dataValue.reset(value);
+    g_variant_get(dataValue.get(), "u", &mpaf_rx_info.id);
 
-    memcpy(&mpaf_nanrx_info, infoBuffer, sizeof(struct wpa_dbus_nanrx_info));
-    mpaf_info.subscribe_id    = mpaf_nanrx_info.id;
-    mpaf_info.peer_publish_id = mpaf_nanrx_info.peer_id;
-    memcpy(mpaf_info.peer_addr, mpaf_nanrx_info.peer_addr, 6);
-    if (mpaf_nanrx_info.ssi_len == 0)
-    {
-        return;
-    }
+    value = g_variant_lookup_value(obj, "peer_id", G_VARIANT_TYPE_UINT32);
+    dataValue.reset(value);
+    g_variant_get(dataValue.get(), "u", &mpaf_rx_info.peer_id);
+
+    char addr_str[20];
+    char * paddr;
+    value = g_variant_lookup_value(obj, "peer_addr", G_VARIANT_TYPE_STRING);
+    dataValue.reset(value);
+    g_variant_get(dataValue.get(), "s", &paddr);
+    strncpy(addr_str, paddr, sizeof(addr_str));
+    sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &mpaf_rx_info.peer_addr[0], &mpaf_rx_info.peer_addr[1],
+           &mpaf_rx_info.peer_addr[2], &mpaf_rx_info.peer_addr[3], &mpaf_rx_info.peer_addr[4], &mpaf_rx_info.peer_addr[5]);
+
     // Read the rx_data
-    GAutoPtr<GVariant> dataValue(g_variant_lookup_value(obj, "ssi", G_VARIANT_TYPE_BYTESTRING));
     size_t bufferLen;
     System::PacketBufferHandle buf;
+
+    value = g_variant_lookup_value(obj, "ssi", G_VARIANT_TYPE_BYTESTRING);
+    dataValue.reset(value);
+
     auto rxbuf = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
     ChipLogProgress(DeviceLayer, "WiFi-PAF: wpa_supplicant: nan-rx: [len: %lu]", bufferLen);
     buf = System::PacketBufferHandle::NewWithData(rxbuf, bufferLen);
@@ -1489,14 +1581,14 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void ConnectivityManagerImpl::OnNanSubscribeTerminated(gint term_subscribe_id, gint reason)
+void ConnectivityManagerImpl::OnNanSubscribeTerminated(guint subscribe_id, gchar * reason)
 {
-    ChipLogProgress(Controller, "WiFi-PAF: Subscription terminated (%d, %d)", term_subscribe_id, reason);
-    if (mpresubscribe_id == (uint32_t) term_subscribe_id)
+    ChipLogProgress(Controller, "WiFi-PAF: Subscription terminated (%u, %s)", subscribe_id, reason);
+    if (mpresubscribe_id == (uint32_t) subscribe_id)
     {
         mpresubscribe_id = 0;
     }
-    if (mpaf_info.subscribe_id == (uint32_t) term_subscribe_id)
+    if (mpaf_info.subscribe_id == (uint32_t) subscribe_id)
     {
         mpaf_info.subscribe_id = 0;
     }
@@ -1535,11 +1627,29 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
         return CHIP_ERROR_INTERNAL;
     }
 
+<<<<<<< HEAD
     wpa_supplicant_1_interface_call_nansubscribe_sync(mWpaSupplicant.iface, args, &subscribe_id, nullptr, &err.GetReceiver());
+=======
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    GVariantBuilder builder;
+    GVariant * args = nullptr;
+    g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
+    g_variant_builder_add(&builder, "{sv}", "srv_name", g_variant_new_string(srv_name));
+    g_variant_builder_add(&builder, "{sv}", "srv_proto_type", g_variant_new_byte(srv_proto_type));
+    g_variant_builder_add(&builder, "{sv}", "active", g_variant_new_boolean(is_active));
+    g_variant_builder_add(&builder, "{sv}", "ttl", g_variant_new_uint16(ttl));
+    g_variant_builder_add(&builder, "{sv}", "freq", g_variant_new_uint16(freq));
+    g_variant_builder_add(&builder, "{sv}", "ssi", ssi_array_variant);
+    args = g_variant_builder_end(&builder);
+    wpa_fi_w1_wpa_supplicant1_interface_call_nansubscribe_sync(mWpaSupplicant.iface, args, &subscribe_id, nullptr,
+                                                               &err.GetReceiver());
+
+>>>>>>> f9ee1e37b5 (Change the dbus calling method by following the new defined api of wpa_supplicant)
     ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe_id: [%d]", subscribe_id);
     mpresubscribe_id        = subscribe_id;
     mOnPafSubscribeComplete = onSuccess;
     mOnPafSubscribeError    = onError;
+<<<<<<< HEAD
     g_signal_connect(mWpaSupplicant.iface, "nan-discoveryresult",
                      G_CALLBACK(+[](WpaSupplicant1Interface * proxy, gboolean success, GVariant * obj,
                                     ConnectivityManagerImpl * self) { return self->OnDiscoveryResult(success, obj); }),
@@ -1547,15 +1657,31 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
 
     g_signal_connect(mWpaSupplicant.iface, "nan-receive",
                      G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
+=======
+    g_signal_connect(mWpaSupplicant.iface, "nandiscovery-result",
+                     G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
+                         return self->OnDiscoveryResult(obj);
+                     }),
+                     this);
+
+    g_signal_connect(mWpaSupplicant.iface, "nanreceive",
+                     G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
+>>>>>>> f9ee1e37b5 (Change the dbus calling method by following the new defined api of wpa_supplicant)
                          return self->OnNanReceive(obj);
                      }),
                      this);
 
     g_signal_connect(
+<<<<<<< HEAD
         mWpaSupplicant.iface, "nan-subscribeterminated",
         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, gint term_subscribe_id, gint reason, ConnectivityManagerImpl * self) {
             return self->OnNanSubscribeTerminated(term_subscribe_id, reason);
         }),
+=======
+        mWpaSupplicant.iface, "nansubscribe-terminated",
+        G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, guint term_subscribe_id, gchar * reason,
+                       ConnectivityManagerImpl * self) { return self->OnNanSubscribeTerminated(term_subscribe_id, reason); }),
+>>>>>>> f9ee1e37b5 (Change the dbus calling method by following the new defined api of wpa_supplicant)
         this);
 
     return CHIP_NO_ERROR;
@@ -1599,13 +1725,12 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(System::PacketBufferHandle && m
         }
     }
 
-    // ================================================================================================================
     //  Send the packets
     GAutoPtr<GError> err;
     gchar peer_mac[18];
 
-    snprintf(peer_mac, sizeof(peer_mac), "%02x:%02x:%02x:%02x:%02x:%02x", mpaf_info.peer_addr[0], mpaf_info.peer_addr[1],
-             mpaf_info.peer_addr[2], mpaf_info.peer_addr[3], mpaf_info.peer_addr[4], mpaf_info.peer_addr[5]);
+    snprintf(peer_mac, sizeof(peer_mac), "%02x:%02x:%02x:%02x:%02x:%02x", mpaf_tx_info.peer_addr[0], mpaf_tx_info.peer_addr[1],
+             mpaf_tx_info.peer_addr[2], mpaf_tx_info.peer_addr[3], mpaf_tx_info.peer_addr[4], mpaf_tx_info.peer_addr[5]);
     GVariant * ssi_array_variant =
         g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, msgBuf->Start(), msgBuf->DataLength(), sizeof(guint8));
     if (ssi_array_variant == nullptr)
@@ -1614,11 +1739,25 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(System::PacketBufferHandle && m
         return CHIP_ERROR_INTERNAL;
     }
 
+<<<<<<< HEAD
     ret = chip::Encoding::BytesToUppercaseHexString(msgBuf->Start(), msgBuf->DataLength(), &args[strlen(args)],
                                                     MAX_PAF_TX_SSI_BUFLEN - strlen(args));
     VerifyOrReturnError(ret == CHIP_NO_ERROR, ret);
     ChipLogProgress(DeviceLayer, "WiFi-PAF: ssi: [%s]", args);
     wpa_supplicant_1_interface_call_nantransmit_sync(mWpaSupplicant.iface, args, nullptr, &err.GetReceiver());
+=======
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    GVariantBuilder builder;
+    GVariant * args = nullptr;
+    g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
+    g_variant_builder_add(&builder, "{sv}", "handle", g_variant_new_uint32(mpaf_tx_info.id));
+    g_variant_builder_add(&builder, "{sv}", "req_instance_id", g_variant_new_uint32(mpaf_tx_info.peer_id));
+    g_variant_builder_add(&builder, "{sv}", "peer_addr", g_variant_new_string(peer_mac));
+    g_variant_builder_add(&builder, "{sv}", "ssi", ssi_array_variant);
+    args = g_variant_builder_end(&builder);
+    wpa_fi_w1_wpa_supplicant1_interface_call_nantransmit_sync(mWpaSupplicant.iface, args, nullptr, &err.GetReceiver());
+
+>>>>>>> f9ee1e37b5 (Change the dbus calling method by following the new defined api of wpa_supplicant)
     ChipLogProgress(Controller, "WiFi-PAF: Outbound message (%lu) done", msgBuf->DataLength());
     return ret;
 }
