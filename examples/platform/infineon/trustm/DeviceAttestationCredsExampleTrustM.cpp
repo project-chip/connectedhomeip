@@ -32,7 +32,7 @@
 
 /* Device attestation key ids for Trust M */
 #define DEV_ATTESTATION_KEY_ID 0xE0F0
-#define DEV_ATTESTATION_CERT_ID 0xE0E3
+#define DEV_ATTESTATION_CERT_ID 0xE0E0
 #define PAI_CERT_ID 0xE0E8
 #define CERT_DECLARATION_ID 0xF1E0
 
