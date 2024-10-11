@@ -36,11 +36,11 @@ struct DeviceTypeData {
 constexpr DeviceTypeData knownDeviceTypes[] = {
     { 0x0000000A, DeviceTypeClass::Simple, "Matter Door Lock" },
     { 0x0000000B, DeviceTypeClass::Simple, "Matter Door Lock Controller" },
-    { 0x0000000E, DeviceTypeClass::Utility, "Matter Aggregator" },
+    { 0x0000000E, DeviceTypeClass::Simple, "Matter Aggregator" },
     { 0x0000000F, DeviceTypeClass::Simple, "Matter Generic Switch" },
     { 0x00000011, DeviceTypeClass::Utility, "Matter Power Source" },
     { 0x00000012, DeviceTypeClass::Utility, "Matter OTA Requestor" },
-    { 0x00000013, DeviceTypeClass::Utility, "Matter Bridged Device" },
+    { 0x00000013, DeviceTypeClass::Utility, "Matter Bridged Node" },
     { 0x00000014, DeviceTypeClass::Utility, "Matter OTA Provider" },
     { 0x00000015, DeviceTypeClass::Simple, "Matter Contact Sensor" },
     { 0x00000016, DeviceTypeClass::Node, "Matter Root Node" },

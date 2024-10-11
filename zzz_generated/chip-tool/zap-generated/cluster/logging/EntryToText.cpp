@@ -6430,7 +6430,7 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
     case 0x00000012:
         return "Matter OTA Requestor";
     case 0x00000013:
-        return "Matter Bridged Device";
+        return "Matter Bridged Node";
     case 0x00000014:
         return "Matter OTA Provider";
     case 0x00000015:
