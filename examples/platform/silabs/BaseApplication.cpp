@@ -82,6 +82,10 @@
 #include <performance_test_commands.h>
 #endif // PERFORMANCE_TEST_ENABLED
 
+#ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
+#include <app-common/zap-generated/callback.h>
+#endif
+
 /**********************************************************
  * Defines and Constants
  *********************************************************/
@@ -154,13 +158,9 @@ SilabsLCD slLCD;
 #ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 
-Identify gIdentify = {
-    chip::EndpointId{ 1 },
-    BaseApplication::OnIdentifyStart,
-    BaseApplication::OnIdentifyStop,
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    BaseApplication::OnTriggerIdentifyEffect,
-};
+ObjectPool<Identify, MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT> IdentifyPool;
+
+EndpointId latest_active_endpoint;
 
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
@@ -395,48 +395,55 @@ bool BaseApplication::ActivateStatusLedPatterns()
     bool isPatternSet = false;
 #if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)))
 #ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
-    if (gIdentify.mActive)
+    for (const auto & obj : IdentifyPool)
     {
-        // Identify in progress
-        // Do a steady blink on the status led
-        sStatusLED.Blink(250, 250);
-        isPatternSet = true;
-    }
-    else if (sIdentifyEffect != Clusters::Identify::EffectIdentifierEnum::kStopEffect)
-    {
-        // Identify trigger effect received. Do some on/off patterns on the status led
-        if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kBlink)
+        if (obj->mEndpoint == latest_active_endpoint)
         {
-            // Fast blink
-            sStatusLED.Blink(50, 50);
-        }
-        else if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kBreathe)
-        {
-            // Slow blink
-            sStatusLED.Blink(1000, 1000);
-        }
-        else if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kOkay)
-        {
-            // Pulse effect
-            sStatusLED.Blink(300, 700);
-        }
-        else if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kChannelChange)
-        {
-            // Alternate between Short and Long pulses effect
-            static uint64_t mLastChangeTimeMS = 0;
-            static bool alternatePattern      = false;
-            uint32_t onTimeMS                 = alternatePattern ? 50 : 700;
-            uint32_t offTimeMS                = alternatePattern ? 950 : 300;
-
-            uint64_t nowMS = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
-            if (nowMS >= mLastChangeTimeMS + 1000) // each pattern is done over a 1 second period
+            if (obj->mActive)
             {
-                mLastChangeTimeMS = nowMS;
-                alternatePattern  = !alternatePattern;
-                sStatusLED.Blink(onTimeMS, offTimeMS);
+                // Identify in progress
+                // Do a steady blink on the status led
+                sStatusLED.Blink(250, 250);
+                isPatternSet = true;
             }
+            else if (sIdentifyEffect != Clusters::Identify::EffectIdentifierEnum::kStopEffect)
+            {
+                // Identify trigger effect received. Do some on/off patterns on the status led
+                if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kBlink)
+                {
+                    // Fast blink
+                    sStatusLED.Blink(50, 50);
+                }
+                else if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kBreathe)
+                {
+                    // Slow blink
+                    sStatusLED.Blink(1000, 1000);
+                }
+                else if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kOkay)
+                {
+                    // Pulse effect
+                    sStatusLED.Blink(300, 700);
+                }
+                else if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kChannelChange)
+                {
+                    // Alternate between Short and Long pulses effect
+                    static uint64_t mLastChangeTimeMS = 0;
+                    static bool alternatePattern      = false;
+                    uint32_t onTimeMS                 = alternatePattern ? 50 : 700;
+                    uint32_t offTimeMS                = alternatePattern ? 950 : 300;
+
+                    uint64_t nowMS = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
+                    if (nowMS >= mLastChangeTimeMS + 1000) // each pattern is done over a 1 second period
+                    {
+                        mLastChangeTimeMS = nowMS;
+                        alternatePattern  = !alternatePattern;
+                        sStatusLED.Blink(onTimeMS, offTimeMS);
+                    }
+                }
+                isPatternSet = true;
+            }
+            break;
         }
-        isPatternSet = true;
     }
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
@@ -686,6 +693,7 @@ void BaseApplication::StopStatusLEDTimer()
 void BaseApplication::OnIdentifyStart(Identify * identify)
 {
     ChipLogProgress(Zcl, "onIdentifyStart");
+    latest_active_endpoint = identify->mEndpoint;
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     StartStatusLEDTimer();
@@ -695,6 +703,7 @@ void BaseApplication::OnIdentifyStart(Identify * identify)
 void BaseApplication::OnIdentifyStop(Identify * identify)
 {
     ChipLogProgress(Zcl, "onIdentifyStop");
+    latest_active_endpoint = identify->mEndpoint;
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     StopStatusLEDTimer();
@@ -713,7 +722,8 @@ void BaseApplication::OnTriggerIdentifyEffectCompleted(chip::System::Layer * sys
 
 void BaseApplication::OnTriggerIdentifyEffect(Identify * identify)
 {
-    sIdentifyEffect = identify->mCurrentEffectIdentifier;
+    sIdentifyEffect        = identify->mCurrentEffectIdentifier;
+    latest_active_endpoint = identify->mEndpoint;
 
     if (identify->mEffectVariant != Clusters::Identify::EffectVariantEnum::kDefault)
     {
@@ -1006,4 +1016,10 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
 bool BaseApplication::GetProvisionStatus()
 {
     return BaseApplication::sIsProvisioned;
+}
+void emberAfIdentifyClusterInitCallback(chip::EndpointId endpoint)
+{
+    latest_active_endpoint = endpoint;
+    IdentifyPool.CreateObject(endpoint, BaseApplication::OnIdentifyStart, BaseApplication::OnIdentifyStop,
+                              Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, BaseApplication::OnTriggerIdentifyEffect);
 }
