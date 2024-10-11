@@ -216,7 +216,7 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
 {
     size_t count = 0;
     ReturnErrorOnFailure(LoadCounter(fabricIndex, count, clientInfoSize));
-     VerifyOrReturnError(count > 0, CHIP_NO_ERROR)
+    VerifyOrReturnError(count > 0, CHIP_NO_ERROR);
     size_t len = clientInfoSize * count + kArrayOverHead;
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -439,8 +439,7 @@ CHIP_ERROR DefaultICDClientStorage::UpdateEntryCountForFabric(FabricIndex fabric
 
 CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
 {
-   VerifyOrReturnError(CheckFabricExistence(peerNode.GetFabricIndex()) == CHIP_NO_ERROR, CHIP_NO_ERROR);
-
+    VerifyOrReturnError(CheckFabricExistence(peerNode.GetFabricIndex()) == CHIP_NO_ERROR, CHIP_NO_ERROR);
     size_t clientInfoSize = 0;
     std::vector<ICDClientInfo> clientInfoVector;
     ReturnErrorOnFailure(Load(peerNode.GetFabricIndex(), clientInfoVector, clientInfoSize));
@@ -478,7 +477,7 @@ CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
 
 CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
 {
-   VerifyOrRetunrError (CheckFabricExistence(fabricIndex) == CHIP_NO_ERROR, CHIP_NO_ERROR)
+   VerifyOrReturnError(CheckFabricExistence(fabricIndex) == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
     size_t clientInfoSize = 0;
     std::vector<ICDClientInfo> clientInfoVector;
