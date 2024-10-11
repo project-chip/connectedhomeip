@@ -17,17 +17,16 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <Matter/Matter.h>
 
-NS_ASSUME_NONNULL_BEGIN
+@interface PreferencesStorage : NSObject <NSFastEnumeration>
 
-extern NSString * const kDarwinFrameworkToolCertificatesDomain;
+@property (nonatomic, strong) NSString * domain;
 
-@interface CHIPToolPersistentStorageDelegate : NSObject <MTRStorage>
-- (nullable NSData *)storageDataForKey:(NSString *)key;
-- (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key;
-- (BOOL)removeStorageDataForKey:(NSString *)key;
-- (BOOL)deleteAllStorage;
+- (instancetype)initWithDomain:(NSString *)domain;
+- (NSData *)objectForKeyedSubscript:(NSString *)key;
+- (void)setObject:(id)obj forKeyedSubscript:(NSString *)key;
+- (NSArray<NSString *> *)allKeys;
+- (bool)reset;
+- (void)print;
+
 @end
-
-NS_ASSUME_NONNULL_END
