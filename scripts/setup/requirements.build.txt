@@ -11,4 +11,3 @@ click
 # scripts/py_matter_idl/matter_idl
 jinja2
 lark
-stringcase

@@ -21,8 +21,6 @@
  *          Utilities for accessing persisted device configuration on
  *          platforms based on the  NXP SDK.
  */
-/* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "NXPConfig.h"
 
@@ -30,6 +28,7 @@
 #include "FunctionLib.h"
 #include "board.h"
 #include <lib/core/CHIPEncoding.h>
+#include <platform/CHIPDeviceError.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
 
 /* FS Writes in Idle task only - LittleFS only , already enabled by default on NVM */

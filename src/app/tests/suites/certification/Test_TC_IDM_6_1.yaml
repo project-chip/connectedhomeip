@@ -523,7 +523,6 @@ tests:
       verification: |
           ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
 
-
           On TH(chip-tool) verify that the DUT sends Report Data Message with EventReports
 
           [1655986008.400642][4813:4818] CHIP:DMG: }
@@ -609,7 +608,7 @@ tests:
           large event data. For every chunked data message received, DUT sends a
           status response."
       verification: |
-          Try to verify this step in  doorlock app, below mentioned  wildcard command to  read-event  from TH to DUT.
+          Try to verify this step in  doorlock app, below mentioned  wildcard command to  read-event  from TH to DUT.(Log may vary based on the reference app)
 
            ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
           The message flow  can expect as mentioned below

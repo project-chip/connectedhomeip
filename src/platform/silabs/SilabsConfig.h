@@ -35,9 +35,11 @@
 #endif
 
 // Delay before Key/Value is actually saved in NVM
-#define SILABS_KVS_SAVE_DELAY_SECONDS 5
+#ifndef SL_KVS_SAVE_DELAY_SECONDS
+#define SL_KVS_SAVE_DELAY_SECONDS 2
+#endif
 
-static_assert((KVS_MAX_ENTRIES <= 255), "Implementation supports up to 255 Kvs entries");
+static_assert((KVS_MAX_ENTRIES <= 511), "Implementation supports up to 511 Kvs entries");
 static_assert((KVS_MAX_ENTRIES >= 30), "Mininimal Kvs entries requirement is not met");
 
 namespace chip {
@@ -89,7 +91,8 @@ public:
     // Persistent counter values set at runtime. Retained during factory reset.
     static constexpr uint8_t kMatterCounter_KeyBase = 0x74;
     // Persistent config values set at runtime. Cleared during factory reset.
-    static constexpr uint8_t kMatterKvs_KeyBase = 0x75;
+    static constexpr uint8_t kMatterKvs_KeyBase       = 0x75;
+    static constexpr uint8_t kMatterKvs_ExtendedRange = 0x76;
 
     // Key definitions for well-known configuration values.
     // Factory config keys
@@ -167,7 +170,8 @@ public:
     // Matter KVS storage Keys
     static constexpr Key kConfigKey_KvsStringKeyMap = SilabsConfigKey(kMatterKvs_KeyBase, 0x00);
     static constexpr Key kConfigKey_KvsFirstKeySlot = SilabsConfigKey(kMatterKvs_KeyBase, 0x01);
-    static constexpr Key kConfigKey_KvsLastKeySlot  = SilabsConfigKey(kMatterKvs_KeyBase, KVS_MAX_ENTRIES);
+    static constexpr Key kConfigKey_KvsLastKeySlot =
+        SilabsConfigKey(kMatterKvs_KeyBase + (KVS_MAX_ENTRIES >> 8), KVS_MAX_ENTRIES & UINT8_MAX);
 
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_MatterFactory = SilabsConfigKey(kMatterFactory_KeyBase, 0x00);
@@ -180,7 +184,9 @@ public:
     static constexpr Key kMaxConfigKey_MatterCounter = SilabsConfigKey(kMatterCounter_KeyBase, 0x1F);
 
     static constexpr Key kMinConfigKey_MatterKvs = kConfigKey_KvsStringKeyMap;
-    static constexpr Key kMaxConfigKey_MatterKvs = kConfigKey_KvsLastKeySlot;
+    static constexpr Key kMaxConfigKey_MatterKvs = SilabsConfigKey(kMatterKvs_ExtendedRange, 0xFF);
+    static_assert(kConfigKey_KvsLastKeySlot <= kMaxConfigKey_MatterKvs,
+                  "Configured KVS_MAX_ENTRIES overflows the reserved KVS Key range");
 
     static CHIP_ERROR Init(void);
     static void DeInit(void);

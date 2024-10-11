@@ -18,6 +18,7 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
@@ -37,16 +38,16 @@ namespace DeviceEnergyManagement {
 
 CHIP_ERROR Instance::Init()
 {
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;
 }
 
 void Instance::Shutdown()
 {
-    InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
-    unregisterAttributeAccessOverride(this);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 bool Instance::HasFeature(Feature aFeature) const
@@ -581,7 +582,7 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
     if (!forecast.Value().slots[activeSlotNumber].slotIsPausable.Value())
     {
         ChipLogError(Zcl, "DEM: activeSlotNumber %d is NOT pausable.", activeSlotNumber);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 
@@ -606,6 +607,7 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "DEM: PauseRequest(%ld) FAILURE", static_cast<long unsigned int>(duration));
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
 }
@@ -622,7 +624,7 @@ void Instance::HandleResumeRequest(HandlerContext & ctx, const Commands::ResumeR
     if (ESAStateEnum::kPaused != mDelegate.GetESAState())
     {
         ChipLogError(Zcl, "DEM: ESAState not Paused.");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
         return;
     }
 
@@ -674,10 +676,10 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
         const Structs::SlotAdjustmentStruct::Type & slotAdjustment = iterator.GetValue();
 
         // Check for an invalid slotIndex
-        if (slotAdjustment.slotIndex > forecast.Value().slots.size())
+        if (slotAdjustment.slotIndex >= forecast.Value().slots.size())
         {
             ChipLogError(Zcl, "DEM: Bad slot index %d", slotAdjustment.slotIndex);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
             return;
         }
 
@@ -694,8 +696,8 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
         // NominalPower is only relevant if PFR is supported
         if (HasFeature(Feature::kPowerForecastReporting))
         {
-            if (!slot.minPowerAdjustment.HasValue() || !slot.maxPowerAdjustment.HasValue() ||
-                slotAdjustment.nominalPower.Value() < slot.minPowerAdjustment.Value() ||
+            if (!slotAdjustment.nominalPower.HasValue() || !slot.minPowerAdjustment.HasValue() ||
+                !slot.maxPowerAdjustment.HasValue() || slotAdjustment.nominalPower.Value() < slot.minPowerAdjustment.Value() ||
                 slotAdjustment.nominalPower.Value() > slot.maxPowerAdjustment.Value())
             {
                 ChipLogError(Zcl, "DEM: Bad nominalPower");
@@ -725,6 +727,7 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "DEM: ModifyForecastRequest FAILURE");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 }

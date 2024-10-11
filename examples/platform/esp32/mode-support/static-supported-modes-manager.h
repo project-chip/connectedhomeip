@@ -25,7 +25,7 @@ namespace app {
 namespace Clusters {
 namespace ModeSelect {
 
-class StaticSupportedModesManager : public chip::app::Clusters::ModeSelect::SupportedModesManager
+class StaticSupportedModesManager : public SupportedModesManager
 {
 private:
     using ModeOptionStructType = Structs::ModeOptionStruct::Type;
@@ -35,8 +35,6 @@ private:
     static ModeOptionsProvider * epModeOptionsProviderList;
 
     void FreeSupportedModes(EndpointId endpointId) const;
-
-    static const StaticSupportedModesManager instance;
 
 public:
     // InitEndpointArray should be called only once in the application. Memory allocated to the
@@ -68,11 +66,7 @@ public:
             FreeSupportedModes(i);
         }
     }
-
-    static inline const StaticSupportedModesManager & getStaticSupportedModesManagerInstance() { return instance; }
 };
-
-const SupportedModesManager * getSupportedModesManager();
 
 } // namespace ModeSelect
 } // namespace Clusters

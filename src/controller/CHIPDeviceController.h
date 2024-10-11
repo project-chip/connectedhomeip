@@ -243,9 +243,10 @@ public:
      * An error return from this function means that neither callback has been
      * called yet, and neither callback will be called in the future.
      */
-    CHIP_ERROR GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                                  TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload)
+    virtual CHIP_ERROR
+    GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
+                       Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                       TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
         mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection, onFailure,
@@ -467,7 +468,7 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
 {
 public:
     DeviceCommissioner();
-    ~DeviceCommissioner() override {}
+    ~DeviceCommissioner() override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**
@@ -846,6 +847,11 @@ private:
     static void OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err);
     RendezvousParameters mRendezvousParametersForDeviceDiscoveredOverBle;
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    static void OnWiFiPAFSubscribeComplete(void * appState);
+    static void OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err);
+    RendezvousParameters mRendezvousParametersForDeviceDiscoveredOverWiFiPAF;
+#endif
 
     static void OnBasicFailure(void * context, CHIP_ERROR err);
     static void OnBasicSuccess(void * context, const chip::app::DataModel::NullObjectType &);
@@ -973,8 +979,6 @@ private:
     static void
     OnICDManagementStayActiveResponse(void * context,
                                       const app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType & data);
-
-    static void OnInterfaceEnableWriteSuccessResponse(void * context);
 
     /**
      * @brief

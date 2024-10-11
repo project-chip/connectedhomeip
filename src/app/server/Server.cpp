@@ -19,8 +19,10 @@
 
 #include <access/examples/ExampleAccessControlDelegate.h>
 
+#include <app/AppConfig.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/EchoHandler.h>
 #include <app/util/DataModelHandler.h>
@@ -56,6 +58,10 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <transport/raw/WiFiPAF.h>
+#endif
+
 #if defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT) || defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
 #include <lib/support/PersistentStorageAudit.h>
 #endif // defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT) || defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
@@ -77,6 +83,33 @@ using chip::Transport::TcpListenParameters;
 
 namespace {
 
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
+{
+public:
+    bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
+    {
+        chip::app::DataModel::Provider * model = chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+
+        for (auto type = model->FirstDeviceType(endpoint); type.has_value(); type = model->NextDeviceType(endpoint, *type))
+        {
+            if (type->deviceTypeId == deviceType)
+            {
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+                VerifyOrDie(chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint));
+#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL
+                return true;
+            }
+        }
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+        VerifyOrDie(!chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint));
+#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL
+        return false;
+    }
+} sDeviceTypeResolver;
+#else // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+
+// Ember implementation of the device type resolver
 class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
 {
 public:
@@ -85,6 +118,7 @@ public:
         return chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
     }
 } sDeviceTypeResolver;
+#endif
 
 } // namespace
 
@@ -173,6 +207,13 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
     Access::SetAccessControl(mAccessControl);
 
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    if (initParams.accessRestrictionProvider != nullptr)
+    {
+        mAccessControl.SetAccessRestrictionProvider(initParams.accessRestrictionProvider);
+    }
+#endif
+
     mAclStorage = initParams.aclStorage;
     SuccessOrExit(err = mAclStorage->Init(*mDeviceStorage, mFabrics.begin(), mFabrics.end()));
 
@@ -214,6 +255,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                            TcpListenParameters(DeviceLayer::TCPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mOperationalServicePort)
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                               ,
+                           Transport::WiFiPAFListenParameters(DeviceLayer::ConnectivityMgr().GetWiFiPAF())
 #endif
     );
 
@@ -359,8 +404,16 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mICDManager.RegisterObserver(mReportScheduler);
     mICDManager.RegisterObserver(&app::DnssdServer::Instance());
 
-    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr,
-                     chip::app::InteractionModelEngine::GetInstance());
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    mICDManager.SetPersistentStorageDelegate(mDeviceStorage)
+        .SetFabricTable(&GetFabricTable())
+        .SetSymmetricKeyStore(mSessionKeystore)
+        .SetExchangeManager(&mExchangeMgr)
+        .SetSubscriptionsInfoProvider(chip::app::InteractionModelEngine::GetInstance())
+        .SetICDCheckInBackOffStrategy(initParams.icdCheckInBackOffStrategy);
+
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+    mICDManager.Init();
 
     // Register Test Event Trigger Handler
     if (mTestEventTriggerDelegate != nullptr)
@@ -769,5 +822,8 @@ app::SimpleSubscriptionResumptionStorage CommonCaseDeviceServerInitParams::sSubs
 #endif
 app::DefaultAclStorage CommonCaseDeviceServerInitParams::sAclStorage;
 Crypto::DefaultSessionKeystore CommonCaseDeviceServerInitParams::sSessionKeystore;
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+app::DefaultICDCheckInBackOffStrategy CommonCaseDeviceServerInitParams::sDefaultICDCheckInBackOffStrategy;
+#endif
 
 } // namespace chip

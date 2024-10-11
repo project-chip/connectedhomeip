@@ -28,6 +28,7 @@
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <app/MessageDef/SubscribeRequestMessage.h>
 #include <app/MessageDef/SubscribeResponseMessage.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/TLVUtilities.h>
 #include <messaging/ExchangeContext.h>
@@ -53,9 +54,9 @@ uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 }
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
-                         InteractionType aInteractionType, Observer * observer) :
-    mExchangeCtx(*this),
-    mManagementCallback(apCallback)
+                         InteractionType aInteractionType, Observer * observer, DataModel::Provider * apDataModel) :
+    mAttributePathExpandIterator(apDataModel, nullptr),
+    mExchangeCtx(*this), mManagementCallback(apCallback)
 {
     VerifyOrDie(apExchangeContext != nullptr);
 
@@ -79,8 +80,8 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
 }
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer) :
-    mExchangeCtx(*this), mManagementCallback(apCallback)
+ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer, DataModel::Provider * apDataModel) :
+    mAttributePathExpandIterator(apDataModel, nullptr), mExchangeCtx(*this), mManagementCallback(apCallback)
 {
     mInteractionType = InteractionType::Subscribe;
     mFlags.ClearAll();
@@ -509,8 +510,8 @@ CHIP_ERROR ReadHandler::ProcessAttributePaths(AttributePathIBs::Parser & aAttrib
     if (CHIP_END_OF_TLV == err)
     {
         mManagementCallback.GetInteractionModelEngine()->RemoveDuplicateConcreteAttributePath(mpAttributePathList);
-        mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
-        err                          = CHIP_NO_ERROR;
+        mAttributePathExpandIterator.ResetTo(mpAttributePathList);
+        err = CHIP_NO_ERROR;
     }
     return err;
 }
@@ -850,7 +851,7 @@ void ReadHandler::PersistSubscription()
 
 void ReadHandler::ResetPathIterator()
 {
-    mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
+    mAttributePathExpandIterator.ResetTo(mpAttributePathList);
     mAttributeEncoderState.Reset();
 }
 

@@ -1,8 +1,8 @@
-# Matter Linux Lighting Example
+# Matter Linux Dishwasher Example
 
 An example showing the use of Matter on the Linux. The document will describe
-how to build and run Matter Linux Lighting Example on Raspberry Pi. This doc is
-tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu
+how to build and run Matter Linux Dishwasher Example on Raspberry Pi. This doc
+is tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu
 for Raspberry Pi Desktop 20.10 (aarch64)**
 
 To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
@@ -12,7 +12,7 @@ details.
 
 <hr>
 
--   [Matter Linux Lighting Example](#matter-linux-lighting-example)
+-   [Matter Linux Dishwasher Example](#matter-linux-dishwasher-example)
     -   [Building](#building)
     -   [Commandline Arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
@@ -29,7 +29,7 @@ details.
 
 -   Build the example application:
 
-          $ cd ~/connectedhomeip/examples/lighting-app/linux
+          $ cd ~/connectedhomeip/examples/dishwasher-app/linux
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ gn gen out/debug
@@ -37,12 +37,12 @@ details.
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/lighting-app/linux
+          $ cd ~/connectedhomeip/examples/dishwasher-app/linux
           $ rm -rf out/
 
 -   Build the example with pigweed RPC
 
-          $ cd ~/connectedhomeip/examples/lighting-app/linux
+          $ cd ~/connectedhomeip/examples/dishwasher-app/linux
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
@@ -107,15 +107,29 @@ details.
                       RX bytes:8609495 acl:14 sco:0 events:217484 errors:0
                       TX bytes:92185 acl:20 sco:0 commands:5259 errors:0
 
-        -   Run Linux Lighting Example App
+        -   Run Linux Dishwasher Example App
 
-                  $ cd ~/connectedhomeip/examples/lighting-app/linux
-                  $ sudo out/debug/chip-lighting-app --ble-device [bluetooth device number]
+                  $ cd ~/connectedhomeip/examples/dishwasher-app/linux
+                  $ sudo out/debug/chip-dishwasher-app --ble-device [bluetooth device number]
                   # In this example, the device we want to use is hci1
-                  $ sudo out/debug/chip-lighting-app --ble-device 1
+                  $ sudo out/debug/chip-dishwasher-app --ble-device 1
 
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.
+
+## Control
+
+Control the operational mode:
+
+```
+    $ chip-tool operationalstate start <node_id> <endpoint>
+    $ chip-tool operationalstate stop <node_id> <endpoint>
+    $ chip-tool operationalstate pause <node_id> <endpoint>
+
+    $ chip-tool operationalstate start 1 1
+    $ chip-tool operationalstate stop 1 1
+    $ chip-tool operationalstate pause 1 1
+```
 
 ## Running RPC Console
 
@@ -129,9 +143,9 @@ details.
     `chip-console -s localhost:33000 -o /<YourFolder>/pw_log.out`
 
 -   Then you can Get and Set the light using the RPCs:
-    `rpcs.chip.rpc.Lighting.Get()`
+    `rpcs.chip.rpc.Dishwasher.Get()`
 
-    `rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))`
+    `rpcs.chip.rpc.Dishwasher.Set(on=True, level=128, color=protos.chip.rpc.DishwasherColor(hue=5, saturation=5))`
 
 ## Device Tracing
 

@@ -167,6 +167,8 @@ static bool IsMemoryOnlyGlobalKey(NSString * key)
     // We do not expect to see the "g/icdfl" key; that's only used by
     // DefaultICDClientStorage, which Matter.framework does not use.
 
+    // We do not expect to see the "g/tnd/*" Thread Network Directory keys.
+
     return false;
 }
 

@@ -46,8 +46,7 @@ public:
 #define VERIFY_ROUNDTRIP(err, status)                                                                                              \
     do                                                                                                                             \
     {                                                                                                                              \
-        StatusIB newStatus;                                                                                                        \
-        newStatus.InitFromChipError(err);                                                                                          \
+        StatusIB newStatus(err);                                                                                                   \
         EXPECT_EQ(newStatus.mStatus, status.mStatus);                                                                              \
         EXPECT_EQ(newStatus.mClusterStatus, status.mClusterStatus);                                                                \
     } while (0);
@@ -86,16 +85,14 @@ TEST_F(TestStatusIB, TestStatusIBToFromChipError)
     err            = status.ToChipError();
     EXPECT_NE(err, CHIP_NO_ERROR);
     {
-        StatusIB newStatus;
-        newStatus.InitFromChipError(err);
+        StatusIB newStatus(err);
         EXPECT_EQ(newStatus.mStatus, Status::Failure);
         EXPECT_EQ(newStatus.mClusterStatus, status.mClusterStatus);
     }
 
     err = CHIP_ERROR_NO_MEMORY;
     {
-        StatusIB newStatus;
-        newStatus.InitFromChipError(err);
+        StatusIB newStatus(err);
         EXPECT_EQ(newStatus.mStatus, Status::Failure);
         EXPECT_FALSE(newStatus.mClusterStatus.HasValue());
     }

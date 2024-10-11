@@ -1168,10 +1168,10 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
     return (conId != BLE_CONNECTION_UNINITIALIZED) ? static_cast<uint16_t>(conId->mtu) : 0;
 }
 
-bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
-                                             const Ble::ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                                   const Ble::ChipBleUUID * charId)
 {
-    int ret;
+    int ret = TIZEN_ERROR_INVALID_PARAMETER;
 
     ChipLogProgress(DeviceLayer, "SubscribeCharacteristic");
 
@@ -1190,16 +1190,15 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
         ChipLogError(DeviceLayer, "bt_gatt_client_set_characteristic_value_changed_cb() failed: %s", get_error_message(ret)));
 
     NotifySubscribeOpComplete(conId, true);
-    return true;
 
 exit:
-    return false;
+    return TizenToChipError(ret);
 }
 
-bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
-                                               const Ble::ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                                     const Ble::ChipBleUUID * charId)
 {
-    int ret;
+    int ret = TIZEN_ERROR_INVALID_PARAMETER;
 
     ChipLogProgress(DeviceLayer, "UnSubscribeCharacteristic");
 
@@ -1218,15 +1217,14 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
         ChipLogError(DeviceLayer, "bt_gatt_client_unset_characteristic_value_changed_cb() failed: %s", get_error_message(ret)));
 
     NotifySubscribeOpComplete(conId, false);
-    return true;
 
 exit:
-    return false;
+    return TizenToChipError(ret);
 }
 
-bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
+CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
-    int ret;
+    int ret = TIZEN_ERROR_INVALID_PARAMETER;
 
     ChipLogProgress(DeviceLayer, "Close BLE Connection");
 
@@ -1238,16 +1236,15 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_disconnect() failed: %s", get_error_message(ret)));
 
     RemoveConnectionData(conId->peerAddr);
-    return true;
 
 exit:
-    return false;
+    return TizenToChipError(ret);
 }
 
-bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                                    System::PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                          const Ble::ChipBleUUID * charId, System::PacketBufferHandle pBuf)
 {
-    int ret;
+    int ret = TIZEN_ERROR_INVALID_PARAMETER;
 
     conId = static_cast<BLEConnection *>(g_hash_table_lookup(mConnectionMap, conId->peerAddr));
     VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED, ChipLogError(DeviceLayer, "Failed to find connection info"));
@@ -1269,16 +1266,15 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::Chip
     VerifyOrExit(
         ret == BT_ERROR_NONE,
         ChipLogError(DeviceLayer, "bt_gatt_server_notify_characteristic_changed_value() failed: %s", get_error_message(ret)));
-    return true;
 
 exit:
-    return false;
+    return TizenToChipError(ret);
 }
 
-bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                                      System::PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                            const Ble::ChipBleUUID * charId, System::PacketBufferHandle pBuf)
 {
-    int ret;
+    int ret = TIZEN_ERROR_INVALID_PARAMETER;
 
     VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED, ChipLogError(DeviceLayer, "Invalid Connection"));
     VerifyOrExit(Ble::UUIDsMatch(svcId, &Ble::CHIP_BLE_SVC_ID),
@@ -1296,9 +1292,9 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
     ret = bt_gatt_client_write_value(conId->gattCharC1Handle, WriteCompletedCb, conId);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_gatt_client_write_value() failed: %s", get_error_message(ret)));
-    return true;
+
 exit:
-    return false;
+    return TizenToChipError(ret);
 }
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) {}

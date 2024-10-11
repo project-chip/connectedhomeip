@@ -57,8 +57,8 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct(
       put(ContextSpecificTag(TAG_ROUTER_ID), routerId)
       put(ContextSpecificTag(TAG_NEXT_HOP), nextHop)
       put(ContextSpecificTag(TAG_PATH_COST), pathCost)
-      put(ContextSpecificTag(TAG_L_Q_I_IN), LQIIn)
-      put(ContextSpecificTag(TAG_L_Q_I_OUT), LQIOut)
+      put(ContextSpecificTag(TAG_LQI_IN), LQIIn)
+      put(ContextSpecificTag(TAG_LQI_OUT), LQIOut)
       put(ContextSpecificTag(TAG_AGE), age)
       put(ContextSpecificTag(TAG_ALLOCATED), allocated)
       put(ContextSpecificTag(TAG_LINK_ESTABLISHED), linkEstablished)
@@ -72,8 +72,8 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct(
     private const val TAG_ROUTER_ID = 2
     private const val TAG_NEXT_HOP = 3
     private const val TAG_PATH_COST = 4
-    private const val TAG_L_Q_I_IN = 5
-    private const val TAG_L_Q_I_OUT = 6
+    private const val TAG_LQI_IN = 5
+    private const val TAG_LQI_OUT = 6
     private const val TAG_AGE = 7
     private const val TAG_ALLOCATED = 8
     private const val TAG_LINK_ESTABLISHED = 9
@@ -88,8 +88,8 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct(
       val routerId = tlvReader.getUInt(ContextSpecificTag(TAG_ROUTER_ID))
       val nextHop = tlvReader.getUInt(ContextSpecificTag(TAG_NEXT_HOP))
       val pathCost = tlvReader.getUInt(ContextSpecificTag(TAG_PATH_COST))
-      val LQIIn = tlvReader.getUInt(ContextSpecificTag(TAG_L_Q_I_IN))
-      val LQIOut = tlvReader.getUInt(ContextSpecificTag(TAG_L_Q_I_OUT))
+      val LQIIn = tlvReader.getUInt(ContextSpecificTag(TAG_LQI_IN))
+      val LQIOut = tlvReader.getUInt(ContextSpecificTag(TAG_LQI_OUT))
       val age = tlvReader.getUInt(ContextSpecificTag(TAG_AGE))
       val allocated = tlvReader.getBoolean(ContextSpecificTag(TAG_ALLOCATED))
       val linkEstablished = tlvReader.getBoolean(ContextSpecificTag(TAG_LINK_ESTABLISHED))

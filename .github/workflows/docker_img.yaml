@@ -101,8 +101,7 @@ jobs:
                     # ApplyLayer exit status 1 stdout:  stderr: write /opt/fsl-imx-xwayland/5.15-kirkstone/sysroots/armv8a-poky-linux/opt/ltp/testcases/bin/fanotify15: no space left on device
                     # - "-imx"
                     - "-java"
-                    - "-k32w"
-                    - "-mbed-os"
+                    - "-nxp"
                     - "-nrf-platform"
                     - "-telink"
                     - "-ti"

@@ -43,6 +43,7 @@ pw_python_package("matter_yamltests") {
     "matter_yamltests/pseudo_clusters/clusters/system_commands.py",
     "matter_yamltests/pseudo_clusters/pseudo_cluster.py",
     "matter_yamltests/pseudo_clusters/pseudo_clusters.py",
+    "matter_yamltests/py.typed",
     "matter_yamltests/runner.py",
     "matter_yamltests/websocket_runner.py",
     "matter_yamltests/yaml_loader.py",

@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 -->
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0016" name="Root Node" revision="2">
   <revisionHistory>
-    <revision revision="1" summary="Initial release of this document"/>
+    <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added Power Source to device type; Deprecated Power Source Configuration"/>
   </revisionHistory>
   <classification class="node" scope="node"/>

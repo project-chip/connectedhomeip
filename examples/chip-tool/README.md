@@ -253,12 +253,10 @@ Usage:
   +-------------------------------------------------------------------------------------+
   | Clusters:                                                                           |
   +-------------------------------------------------------------------------------------+
-  | * barriercontrol                                                                    |
   | * basic                                                                             |
   | * colorcontrol                                                                      |
   | * doorlock                                                                          |
   | * groups                                                                            |
-  | * iaszone                                                                           |
   | * identify                                                                          |
   | * levelcontrol                                                                      |
   | * onoff                                                                             |
@@ -344,12 +342,10 @@ chip-tool payload parse-additional-data-payload "#####"
 
 ## Command List
 
--   [barriercontrol](#barriercontrol)
 -   [basic](#basic)
 -   [colorcontrol](#colorcontrol)
 -   [doorlock](#doorlock)
 -   [groups](#groups)
--   [iaszone](#iaszone)
 -   [identify](#identify)
 -   [levelcontrol](#levelcontrol)
 -   [onoff](#onoff)
@@ -359,22 +355,6 @@ chip-tool payload parse-additional-data-payload "#####"
 -   [temperaturemeasurement](#temperaturemeasurement)
 
 ## Command Details
-
-### barriercontrol
-
-```bash
-Usage:
-  ./chip-tool barriercontrol command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * barrier-control-go-to-percent                                                     |
-  | * barrier-control-stop                                                              |
-  | * discover                                                                          |
-  | * read                                                                              |
-  +-------------------------------------------------------------------------------------+
-```
 
 ### basic
 
@@ -475,21 +455,6 @@ Usage:
   | * view-group                                                                        |
   | * discover                                                                          |
   | * read                                                                              |
-  +-------------------------------------------------------------------------------------+
-```
-
-### iaszone
-
-```bash
-Usage:
-  ./chip-tool iaszone command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * discover                                                                          |
-  | * read                                                                              |
-  | * write                                                                             |
   +-------------------------------------------------------------------------------------+
 ```
 

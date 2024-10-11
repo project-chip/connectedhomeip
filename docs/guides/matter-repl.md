@@ -244,8 +244,8 @@ Some tests provides the option to exclude them. For example, you can use
 It is recommended to use the test wrapper to run mobile-device-test.py, for
 example, you can run:
 
-```
-./scripts/tests/run_python_test.py --app chip-all-clusters-app --factoryreset
+```shell
+./scripts/tests/run_python_test.py --app chip-all-clusters-app --factory-reset
 ```
 
 It provides some extra options, for example:
@@ -254,7 +254,7 @@ It provides some extra options, for example:
 optional arguments:
   -h, --help                show this help message and exit
   --app APP                 Path to local application to use, omit to use external apps.
-  --factoryreset            Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests.
+  --factory-reset           Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests.
   --app-args APP_ARGS       The extra parameters passed to the device side app.
   --script SCRIPT           Path to the test script to use, omit to use the default test script (mobile-device-test.py).
   --script-args SCRIPT_ARGS Arguments for the REPL test script
@@ -263,8 +263,8 @@ optional arguments:
 You can pass your own flags for mobile-device-test.py by appending them to the
 command line with two dashes, for example:
 
-```
-./scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-no-ble-no-wifi-tsan-clang/chip-all-clusters-app --factoryreset --script-args "-t 90 --disable-test ClusterObjectTests.TestTimedRequestTimeout"
+```shell
+./scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-no-ble-no-wifi-tsan-clang/chip-all-clusters-app --factory-reset --script-args "-t 90 --disable-test ClusterObjectTests.TestTimedRequestTimeout"
 ```
 
 will pass `-t 90 --disable-test ClusterObjectTests.TestTimedRequestTimeout` to

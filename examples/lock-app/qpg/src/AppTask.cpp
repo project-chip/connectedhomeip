@@ -64,7 +64,8 @@ using namespace ::chip::DeviceLayer;
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 #define QPG_LOCK_ENDPOINT_ID (1)
-#define TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS (1 * 3600) // this value must be multiplication of 3600
+#define SECONDS_IN_HOUR (3600)                                              // we better keep this 3600
+#define TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS (1 * SECONDS_IN_HOUR) // increment every hour
 
 #define NMBR_OF_RESETS_BLE_ADVERTISING (3)
 
@@ -414,10 +415,18 @@ void AppTask::TotalHoursTimerHandler(chip::System::Layer * aLayer, void * aAppSt
     CHIP_ERROR err;
     uint32_t totalOperationalHours = 0;
 
-    if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
+    err = ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours);
+
+    if (err == CHIP_NO_ERROR)
     {
         ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
-                                                      (TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS / 3600));
+                                                      (TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS / SECONDS_IN_HOUR));
+    }
+    else if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        totalOperationalHours = 0; // set this explicitly to 0 for safety
+        ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
+                                                      (TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS / SECONDS_IN_HOUR));
     }
     else
     {

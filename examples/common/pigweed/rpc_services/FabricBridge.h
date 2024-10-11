@@ -43,6 +43,17 @@ public:
     {
         return pw::Status::Unimplemented();
     }
+
+    virtual pw::Status ActiveChanged(const chip_rpc_KeepActiveChanged & request, pw_protobuf_Empty & response)
+    {
+        return pw::Status::Unimplemented();
+    }
+
+    virtual pw::Status AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommissioningChanged & request,
+                                                          pw_protobuf_Empty & response)
+    {
+        return pw::Status::Unimplemented();
+    }
 };
 
 } // namespace rpc

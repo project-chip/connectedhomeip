@@ -115,8 +115,8 @@ class IcdManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_CHECK_IN_NODE_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_CHECK_IN_NODE_I_D_REQ), checkInNodeID)
+    val TAG_CHECK_IN_NODE_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_CHECK_IN_NODE_ID_REQ), checkInNodeID)
 
     val TAG_MONITORED_SUBJECT_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_MONITORED_SUBJECT_REQ), monitoredSubject)
@@ -145,13 +145,13 @@ class IcdManagementCluster(
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_I_C_D_COUNTER: Int = 0
+    val TAG_ICD_COUNTER: Int = 0
     var ICDCounter_decoded: UInt? = null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_I_C_D_COUNTER)) {
+      if (tag == ContextSpecificTag(TAG_ICD_COUNTER)) {
         ICDCounter_decoded = tlvReader.getUInt(tag)
       } else {
         tlvReader.skipElement()
@@ -177,8 +177,8 @@ class IcdManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_CHECK_IN_NODE_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_CHECK_IN_NODE_I_D_REQ), checkInNodeID)
+    val TAG_CHECK_IN_NODE_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_CHECK_IN_NODE_ID_REQ), checkInNodeID)
 
     val TAG_VERIFICATION_KEY_REQ: Int = 1
     verificationKey?.let {
@@ -1061,6 +1061,99 @@ class IcdManagementCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readMaximumCheckInBackOffAttribute(): UInt? {
+    val ATTRIBUTE_ID: UInt = 9u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Maximumcheckinbackoff attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UInt? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUInt(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
+  }
+
+  suspend fun subscribeMaximumCheckInBackOffAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<UIntSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 9u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UIntSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Maximumcheckinbackoff attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UInt? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUInt(AnonymousTag)
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(UIntSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UIntSubscriptionState.SubscriptionEstablished)
         }
       }
     }

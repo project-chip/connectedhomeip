@@ -1,0 +1,14 @@
+{{#unless (isInConfigList (concat ns "::" label) "EnumsNotUsedAsTypeInXML")}}
+static auto __attribute__((unused)) EnsureKnownEnumValue({{ns}}::{{asType label}} val)
+{
+    using EnumType = {{ns}}::{{asType label}};
+    switch (val) {
+    {{#zcl_enum_items}}
+    case EnumType::k{{asUpperCamelCase label}}:
+    {{/zcl_enum_items}}
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+{{/unless}}

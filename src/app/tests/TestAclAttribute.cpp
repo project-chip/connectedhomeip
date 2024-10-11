@@ -41,11 +41,27 @@
 #include <messaging/Flags.h>
 #include <protocols/interaction_model/Constants.h>
 
-#include <type_traits>
-
 namespace {
 using namespace chip;
 using namespace chip::Access;
+using namespace chip::Test;
+
+const MockNodeConfig & TestMockNodeConfig()
+{
+    using namespace chip::app;
+    using namespace chip::app::Clusters::Globals::Attributes;
+
+    // clang-format off
+    static const MockNodeConfig config({
+        MockEndpointConfig(kTestEndpointId, {
+            MockClusterConfig(kTestClusterId, {
+                ClusterRevision::Id, FeatureMap::Id, 1, 2
+            }),
+        }),
+    });
+    // clang-format on
+    return config;
+}
 
 class TestAccessControlDelegate : public AccessControl::Delegate
 {
@@ -118,7 +134,19 @@ public:
 
         Access::GetAccessControl().Finish();
         Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
     }
+
+    void TearDown() override
+    {
+        chip::Test::ResetMockNodeConfig();
+        AppContext::TearDown();
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+    }
+
+private:
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
 // Read Client sends a malformed subscribe request, interaction model engine fails to parse the request and generates a status

@@ -102,6 +102,10 @@ source_event = '''<?xml version="1.0"?>
 
 source_bitmap = '''<?xml version="1.0"?>
   <configurator>
+    <bitmap name="TestGlobalBitmap" type="bitmap8">
+      <field name="a" mask="0x1"/>
+    </bitmap>
+
     <bitmap name="TestBitmap" type="bitmap8">
       <cluster code="0x1234"/>
       <field name="a" mask="0x1"/>
@@ -126,6 +130,10 @@ source_bitmap = '''<?xml version="1.0"?>
 
 source_enum = '''<?xml version="1.0"?>
   <configurator>
+    <enum name="TestGlobalEnum" type="enum8">
+      <item name="a" value="0x00"/>
+    </enum>
+
     <enum name="TestEnum" type="enum8">
       <cluster code="0x1234"/>
       <item name="a" value="0x00"/>
@@ -150,6 +158,10 @@ source_enum = '''<?xml version="1.0"?>
 
 source_struct = '''<?xml version="1.0"?>
   <configurator>
+    <struct name="TestGlobalStruct">
+        <item name="a" type="boolean"/>
+    </struct>
+
     <struct name="TestStruct">
         <cluster code="0x1234"/>
         <item name="a" type="boolean"/>
@@ -311,9 +323,15 @@ class TestSpecDefinitions(unittest.TestCase):
         self.assertIsNone(definitions.get_bitmap_by_name(
             'WrongName', 'TestBitmap'))
         self.assertIsNone(definitions.get_bitmap_by_name(
+            'TestWrong', 'TestBitmap'))
+        self.assertIsNone(definitions.get_bitmap_by_name(
             'Test', 'TestWrongBitmap'))
         self.assertIsInstance(definitions.get_bitmap_by_name(
             'Test', 'TestBitmap'), Bitmap)
+        self.assertIsInstance(definitions.get_bitmap_by_name(
+            'Test', 'TestGlobalBitmap'), Bitmap)
+        self.assertIsInstance(definitions.get_bitmap_by_name(
+            'TestWrong', 'TestGlobalBitmap'), Bitmap)
         self.assertIsNone(definitions.get_bitmap_by_name('test', 'TestBitmap'))
         self.assertIsNone(definitions.get_bitmap_by_name('Test', 'testbitmap'))
 
@@ -323,9 +341,15 @@ class TestSpecDefinitions(unittest.TestCase):
         self.assertIsNone(definitions.get_enum_by_name(
             'WrongName', 'TestEnum'))
         self.assertIsNone(definitions.get_enum_by_name(
+            'TestWrong', 'TestEnum'))
+        self.assertIsNone(definitions.get_enum_by_name(
             'Test', 'TestWrongEnum'))
         self.assertIsInstance(
             definitions.get_enum_by_name('Test', 'TestEnum'), Enum)
+        self.assertIsInstance(
+            definitions.get_enum_by_name('Test', 'TestGlobalEnum'), Enum)
+        self.assertIsInstance(
+            definitions.get_enum_by_name('TestWrong', 'TestGlobalEnum'), Enum)
         self.assertIsNone(definitions.get_enum_by_name('test', 'TestEnum'))
         self.assertIsNone(definitions.get_enum_by_name('Test', 'testenum'))
 
@@ -335,9 +359,15 @@ class TestSpecDefinitions(unittest.TestCase):
         self.assertIsNone(definitions.get_struct_by_name(
             'WrongName', 'TestStruct'))
         self.assertIsNone(definitions.get_struct_by_name(
+            'TestWrong', 'TestStruct'))
+        self.assertIsNone(definitions.get_struct_by_name(
             'Test', 'TestWrongStruct'))
         self.assertIsInstance(definitions.get_struct_by_name(
             'Test', 'TestStruct'), Struct)
+        self.assertIsInstance(definitions.get_struct_by_name(
+            'Test', 'TestGlobalStruct'), Struct)
+        self.assertIsInstance(definitions.get_struct_by_name(
+            'TestWrong', 'TestGlobalStruct'), Struct)
         self.assertIsNone(definitions.get_struct_by_name('test', 'TestStruct'))
         self.assertIsNone(definitions.get_struct_by_name('Test', 'teststruct'))
 
@@ -365,16 +395,22 @@ class TestSpecDefinitions(unittest.TestCase):
             [ParseSource(source=io.StringIO(source_bitmap), name='source_bitmap')])
         self.assertIsInstance(definitions.get_type_by_name(
             'Test', 'TestBitmap'), Bitmap)
+        self.assertIsInstance(definitions.get_type_by_name(
+            'Test', 'TestGlobalBitmap'), Bitmap)
 
         definitions = SpecDefinitions(
             [ParseSource(source=io.StringIO(source_enum), name='source_enum')])
         self.assertIsInstance(
             definitions.get_type_by_name('Test', 'TestEnum'), Enum)
+        self.assertIsInstance(
+            definitions.get_type_by_name('Test', 'TestGlobalEnum'), Enum)
 
         definitions = SpecDefinitions(
             [ParseSource(source=io.StringIO(source_struct), name='source_struct')])
         self.assertIsInstance(definitions.get_type_by_name(
             'Test', 'TestStruct'), Struct)
+        self.assertIsInstance(definitions.get_type_by_name(
+            'Test', 'TestGlobalStruct'), Struct)
 
     def test_struct_is_fabric_scoped(self):
         definitions = SpecDefinitions(

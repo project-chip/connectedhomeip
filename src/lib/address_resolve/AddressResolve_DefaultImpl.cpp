@@ -47,13 +47,16 @@ void NodeLookupHandle::LookupResult(const ResolveResult & result)
     char addr_string[Transport::PeerAddress::kMaxToStringSize];
     result.address.ToString(addr_string);
 
+    const PeerId peerId = GetRequest().GetPeerId();
     if (success)
     {
-        ChipLogProgress(Discovery, "%s: new best score: %u", addr_string, to_underlying(score));
+        ChipLogProgress(Discovery, "%s: new best score: %u (for " ChipLogFormatPeerId ")", addr_string, to_underlying(score),
+                        ChipLogValuePeerId(peerId));
     }
     else
     {
-        ChipLogProgress(Discovery, "%s: score has not improved: %u", addr_string, to_underlying(score));
+        ChipLogProgress(Discovery, "%s: score has not improved: %u (for " ChipLogFormatPeerId ")", addr_string,
+                        to_underlying(score), ChipLogValuePeerId(peerId));
     }
 #endif
 }
@@ -245,6 +248,10 @@ CHIP_ERROR Resolver::Init(System::Layer * systemLayer)
 
 void Resolver::Shutdown()
 {
+    // mSystemLayer is set in ::Init, so if it's null that means the resolver
+    // has not been initialized or has already been shut down.
+    VerifyOrReturn(mSystemLayer != nullptr);
+
     while (mActiveLookups.begin() != mActiveLookups.end())
     {
         auto current = mActiveLookups.begin();

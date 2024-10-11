@@ -31,6 +31,7 @@
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <controller/ReadInteraction.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
@@ -47,12 +48,89 @@ using namespace chip::Test;
 
 namespace {
 
+const MockNodeConfig & TestMockNodeConfig()
+{
+    using namespace Clusters::Globals::Attributes;
+
+    // clang-format off
+    static const MockNodeConfig config({
+        MockEndpointConfig(kRootEndpointId, {
+            MockClusterConfig(Clusters::IcdManagement::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+                Clusters::IcdManagement::Attributes::OperatingMode::Id,
+            }),
+        }),
+        MockEndpointConfig(kTestEndpointId, {
+            MockClusterConfig(Clusters::UnitTesting::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+                Clusters::UnitTesting::Attributes::Boolean::Id,
+                Clusters::UnitTesting::Attributes::Int16u::Id,
+                Clusters::UnitTesting::Attributes::ListFabricScoped::Id,
+                Clusters::UnitTesting::Attributes::ListStructOctetString::Id,
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint1, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }, {
+                MockEventId(1), MockEventId(2),
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint2, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2),
+            }),
+            MockClusterConfig(MockClusterId(3), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint3, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3), MockAttributeId(4),
+            }),
+            MockClusterConfig(MockClusterId(3), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+            MockClusterConfig(MockClusterId(4), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+        }),
+    });
+    // clang-format on
+    return config;
+}
+
 class TestRead : public chip::Test::AppContext, public app::ReadHandler::ApplicationCallback
 {
 protected:
     static uint16_t mMaxInterval;
 
-    CHIP_ERROR OnSubscriptionRequested(app::ReadHandler & aReadHandler, Transport::SecureSession & aSecureSession)
+    // Performs setup for each individual test in the test suite
+    void SetUp() override
+    {
+        chip::Test::AppContext::SetUp();
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&CustomDataModel::Instance());
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+    }
+
+    // Performs teardown for each individual test in the test suite
+    void TearDown() override
+    {
+        chip::Test::ResetMockNodeConfig();
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+        chip::Test::AppContext::TearDown();
+    }
+
+    CHIP_ERROR OnSubscriptionRequested(app::ReadHandler & aReadHandler, Transport::SecureSession & aSecureSession) override
     {
         VerifyOrReturnError(!mEmitSubscriptionError, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -63,9 +141,9 @@ protected:
         return CHIP_NO_ERROR;
     }
 
-    void OnSubscriptionEstablished(app::ReadHandler & aReadHandler) { mNumActiveSubscriptions++; }
+    void OnSubscriptionEstablished(app::ReadHandler & aReadHandler) override { mNumActiveSubscriptions++; }
 
-    void OnSubscriptionTerminated(app::ReadHandler & aReadHandler) { mNumActiveSubscriptions--; }
+    void OnSubscriptionTerminated(app::ReadHandler & aReadHandler) override { mNumActiveSubscriptions--; }
 
     // Issue the given number of reads in parallel and wait for them all to
     // succeed.
@@ -83,9 +161,10 @@ protected:
     // max-interval to time out.
     static System::Clock::Timeout ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval);
 
-    bool mEmitSubscriptionError      = false;
-    int32_t mNumActiveSubscriptions  = 0;
-    bool mAlterSubscriptionIntervals = false;
+    bool mEmitSubscriptionError                   = false;
+    int32_t mNumActiveSubscriptions               = 0;
+    bool mAlterSubscriptionIntervals              = false;
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
 uint16_t TestRead::mMaxInterval = 66;
@@ -3177,6 +3256,7 @@ TEST_F(TestRead, TestSubscribeAttributeDeniedNotExistPath)
         app::AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mEndpointId             = kRootEndpointId; // this cluster does NOT exist on the root endpoint
         attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
         attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::ListStructOctetString::Id;
 

@@ -242,8 +242,8 @@ class DeviceEnergyManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_FORECAST_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_FORECAST_I_D_REQ), forecastID)
+    val TAG_FORECAST_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_FORECAST_ID_REQ), forecastID)
 
     val TAG_SLOT_ADJUSTMENTS_REQ: Int = 1
     tlvWriter.startArray(ContextSpecificTag(TAG_SLOT_ADJUSTMENTS_REQ))

@@ -66,6 +66,9 @@
 #include <ble/Ble.h>
 #include <transport/raw/BLE.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <transport/raw/WiFiPAF.h>
+#endif
 
 #include <errno.h>
 #include <inttypes.h>
@@ -400,6 +403,9 @@ void DeviceController::Shutdown()
         // assume that all sessions for our fabric belong to us here.
         mSystemState->CASESessionMgr()->ReleaseSessionsForFabric(mFabricIndex);
 
+        // Shut down any bdx transfers we're acting as the server for.
+        mSystemState->BDXTransferServer()->AbortTransfersForFabric(mFabricIndex);
+
         // TODO: The CASE session manager does not shut down existing CASE
         // sessions.  It just shuts down any ongoing CASE session establishment
         // we're in the middle of as initiator.  Maybe it should shut down
@@ -465,6 +471,13 @@ DeviceCommissioner::DeviceCommissioner() :
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
 {}
+
+DeviceCommissioner::~DeviceCommissioner()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    DeviceLayer::ConnectivityMgr().WiFiPAFCancelConnect();
+#endif
+}
 
 CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 {
@@ -730,6 +743,12 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         peerAddress = Transport::PeerAddress::UDP(params.GetPeerAddress().GetIPAddress(), params.GetPeerAddress().GetPort(),
                                                   params.GetPeerAddress().GetInterface());
     }
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    else if (params.GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF)
+    {
+        peerAddress = Transport::PeerAddress::WiFiPAF(remoteDeviceId);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
     current = FindCommissioneeDevice(peerAddress);
     if (current != nullptr)
@@ -805,6 +824,24 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         }
     }
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (params.GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF)
+    {
+        if (DeviceLayer::ConnectivityMgr().GetWiFiPAF()->GetWiFiPAFState() != Transport::WiFiPAFBase::State::kConnected)
+        {
+            ChipLogProgress(Controller, "WiFi-PAF: Subscribing the NAN-USD devices");
+            if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
+            {
+                ChipLogError(Controller, "Wi-Fi Management should have be started now.");
+                ExitNow(CHIP_ERROR_INTERNAL);
+            }
+            mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
+            DeviceLayer::ConnectivityMgr().WiFiPAFConnect(params.GetSetupDiscriminator().value(), (void *) this,
+                                                          OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
+            ExitNow(CHIP_NO_ERROR);
+        }
+    }
+#endif
     session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress(), params.GetMRPConfig());
     VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY);
 
@@ -871,6 +908,43 @@ void DeviceCommissioner::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ER
     }
 }
 #endif // CONFIG_NETWORK_LAYER_BLE
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+void DeviceCommissioner::OnWiFiPAFSubscribeComplete(void * appState)
+{
+    auto self   = (DeviceCommissioner *) appState;
+    auto device = self->mDeviceInPASEEstablishment;
+
+    if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
+    {
+        ChipLogProgress(Controller, "WiFi-PAF: Subscription Completed, dev_id = %lu", device->GetDeviceId());
+        auto remoteId = device->GetDeviceId();
+        auto params   = self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF;
+
+        self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = RendezvousParameters();
+        self->ReleaseCommissioneeDevice(device);
+        LogErrorOnFailure(self->EstablishPASEConnection(remoteId, params));
+    }
+}
+
+void DeviceCommissioner::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err)
+{
+    auto self   = (DeviceCommissioner *) appState;
+    auto device = self->mDeviceInPASEEstablishment;
+
+    if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
+    {
+        ChipLogError(Controller, "WiFi-PAF: Subscription Error, id = %lu, err = %" CHIP_ERROR_FORMAT, device->GetDeviceId(),
+                     err.Format());
+        self->ReleaseCommissioneeDevice(device);
+        self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = RendezvousParameters();
+        if (self->mPairingDelegate != nullptr)
+        {
+            self->mPairingDelegate->OnPairingComplete(err);
+        }
+    }
+}
+#endif
 
 CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningParameters & params)
 {
@@ -1802,12 +1876,6 @@ void DeviceCommissioner::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData 
 }
 
 void DeviceCommissioner::OnBasicSuccess(void * context, const chip::app::DataModel::NullObjectType &)
-{
-    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
-}
-
-void DeviceCommissioner::OnInterfaceEnableWriteSuccessResponse(void * context)
 {
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
@@ -3465,19 +3533,43 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kPrimaryOperationalNetworkFailed: {
-        // nothing to do. This stage indicates that the primary operational network failed and the network interface should be
-        // disabled later.
+        // nothing to do. This stage indicates that the primary operational network failed and the network config should be
+        // removed later.
         break;
     }
-    case CommissioningStage::kDisablePrimaryNetworkInterface: {
-        NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo::Type request = false;
-        CHIP_ERROR err = SendCommissioningWriteRequest(proxy, endpoint, NetworkCommissioning::Id,
-                                                       NetworkCommissioning::Attributes::InterfaceEnabled::Id, request,
-                                                       OnInterfaceEnableWriteSuccessResponse, OnBasicFailure);
+    case CommissioningStage::kRemoveWiFiNetworkConfig: {
+        NetworkCommissioning::Commands::RemoveNetwork::Type request;
+        request.networkID = params.GetWiFiCredentials().Value().ssid;
+        request.breadcrumb.Emplace(breadcrumb);
+        CHIP_ERROR err = SendCommissioningCommand(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
         if (err != CHIP_NO_ERROR)
         {
             // We won't get any async callbacks here, so just complete our stage.
-            ChipLogError(Controller, "Failed to send InterfaceEnabled write request: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(Controller, "Failed to send RemoveNetwork command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
+        break;
+    }
+    case CommissioningStage::kRemoveThreadNetworkConfig: {
+        ByteSpan extendedPanId;
+        chip::Thread::OperationalDataset operationalDataset;
+        if (!params.GetThreadOperationalDataset().HasValue() ||
+            operationalDataset.Init(params.GetThreadOperationalDataset().Value()) != CHIP_NO_ERROR ||
+            operationalDataset.GetExtendedPanIdAsByteSpan(extendedPanId) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Unable to get extended pan ID for thread operational dataset\n");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+        NetworkCommissioning::Commands::RemoveNetwork::Type request;
+        request.networkID = extendedPanId;
+        request.breadcrumb.Emplace(breadcrumb);
+        CHIP_ERROR err = SendCommissioningCommand(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send RemoveNetwork command: %" CHIP_ERROR_FORMAT, err.Format());
             CommissioningStageComplete(err);
             return;
         }

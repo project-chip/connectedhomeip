@@ -19,6 +19,42 @@ from .ClusterObjects import (Cluster, ClusterAttributeDescriptor, ClusterCommand
                              ClusterObjectDescriptor, ClusterObjectFieldDescriptor)
 from .Types import Nullable, NullValue
 
+
+__all__ = [
+    "Globals",
+{{#zcl_clusters}}
+    "{{asUpperCamelCase name}}",
+{{/zcl_clusters}}
+]
+
+
+class Globals:
+    class Enums:
+{{#zcl_enums}}
+{{#if has_no_clusters}}
+{{> enum_def cluster="Globals"}}
+
+{{/if}}
+{{/zcl_enums}}
+    class Bitmaps:
+{{#zcl_bitmaps}}
+{{#if has_no_clusters}}
+{{! Work around https://github.com/project-chip/zap/issues/1370 and manually filter out built-in bitmap types. }}
+{{#if_is_atomic label}}
+{{else}}
+{{> bitmap_def }}
+
+{{/if_is_atomic}}
+{{/if}}
+{{/zcl_bitmaps}}
+    class Structs:
+{{#zcl_structs}}
+{{#if has_no_clusters}}
+{{> struct_def cluster="Globals"}}
+
+{{/if}}
+{{/zcl_structs}}
+
 {{#zcl_clusters}}
 
 @dataclass
@@ -50,23 +86,7 @@ class {{asUpperCamelCase name}}(Cluster):
 {{#first}}
     class Enums:
 {{/first}}
-        class {{asType label}}(MatterIntEnum):
-{{#zcl_enum_items}}
-            k{{asUpperCamelCase label}} = {{asHex value 2}}
-{{/zcl_enum_items}}
-{{#unless (isInConfigList (concat (asUpperCamelCase ../name) "::" label) "EnumsNotUsedAsTypeInXML")}}
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = {{first_unused_enum_value mode="first_unused"}},
-{{else}}
-            # kUnknownEnumValue intentionally not defined. This enum never goes
-            # through DataModel::Decode, likely because it is a part of a derived
-            # cluster. As a result having kUnknownEnumValue in this enum is error
-            # prone, and was removed. See
-            # src/app/common/templates/config-data.yaml.
-{{/unless}}
+{{> enum_def cluster=(asUpperCamelCase ../name)}}
 
 {{#last}}
 {{/last}}
@@ -75,30 +95,14 @@ class {{asUpperCamelCase name}}(Cluster):
 {{#first}}
     class Bitmaps:
 {{/first}}
-        class {{asType label}}(IntFlag):
-{{#zcl_bitmap_items}}
-            k{{asUpperCamelCase label}} = {{asHex mask}}
-{{/zcl_bitmap_items}}
+{{> bitmap_def }}
 
 {{/zcl_bitmaps}}
 {{#zcl_structs}}
 {{#first}}
     class Structs:
 {{/first}}
-        @dataclass
-        class {{asUpperCamelCase name}}(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                    {{#zcl_struct_items}}
-                        ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{ fieldIdentifier }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}),
-                    {{/zcl_struct_items}}
-                    ])
-
-            {{#zcl_struct_items}}
-            {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
-            {{/zcl_struct_items}}
+{{> struct_def cluster=(asUpperCamelCase parent.name) }}
 
 {{/zcl_structs}}
 {{#zcl_commands}}

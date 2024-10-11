@@ -189,8 +189,6 @@ CHIP_ERROR CastingApp::Stop()
 
 CHIP_ERROR CastingApp::ShutdownAllSubscriptions()
 {
-    VerifyOrReturnError(mState == CASTING_APP_RUNNING, CHIP_ERROR_INCORRECT_STATE);
-
     chip::app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptions();
 
     return CHIP_NO_ERROR;

@@ -139,10 +139,7 @@ CHIP_ERROR PASESession::GeneratePASEVerifier(Spake2pVerifier & verifier, uint32_
 
     if (useRandomPIN)
     {
-        ReturnErrorOnFailure(DRBG_get_bytes(reinterpret_cast<uint8_t *>(&setupPINCode), sizeof(setupPINCode)));
-
-        // Passcodes shall be restricted to the values 00000001 to 99999998 in decimal, see 5.1.1.6
-        setupPINCode = (setupPINCode % kSetupPINCodeMaximumValue) + 1;
+        ReturnErrorOnFailure(SetupPayload::generateRandomSetupPin(setupPINCode));
     }
 
     return verifier.Generate(pbkdf2IterCount, salt, setupPINCode);
@@ -314,7 +311,12 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
 
     mNextExpectedMsg.SetValue(MsgType::PBKDFParamResponse);
 
-    ChipLogDetail(SecureChannel, "Sent PBKDF param request");
+#if CHIP_PROGRESS_LOGGING
+    const auto localMRPConfig = mLocalMRPConfig.Value();
+#endif // CHIP_PROGRESS_LOGGING
+    ChipLogProgress(SecureChannel, "Sent PBKDF param request [II:%" PRIu32 "ms AI:%" PRIu32 "ms AT:%ums)",
+                    localMRPConfig.mIdleRetransTimeout.count(), localMRPConfig.mActiveRetransTimeout.count(),
+                    localMRPConfig.mActiveThresholdTime.count());
 
     return CHIP_NO_ERROR;
 }

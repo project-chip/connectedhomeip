@@ -245,6 +245,32 @@ CHIP_ERROR ESP32FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8
     return GenericDeviceInstanceInfoProvider<ESP32Config>::GetManufacturingDate(year, month, day);
 }
 
+CHIP_ERROR ESP32FactoryDataProvider::GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish)
+{
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+    uint32_t productFinish = 0;
+
+    err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_ProductFinish, productFinish);
+    ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
+
+    *finish = static_cast<app::Clusters::BasicInformation::ProductFinishEnum>(productFinish);
+
+    return err;
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint32_t color = 0;
+
+    err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_ProductColor, color);
+    ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
+
+    *primaryColor = static_cast<app::Clusters::BasicInformation::ColorEnum>(color);
+
+    return err;
+}
+
 CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
 {
     return GenericDeviceInstanceInfoProvider<ESP32Config>::GetHardwareVersion(hardwareVersion);
@@ -252,7 +278,12 @@ CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersi
 
 CHIP_ERROR ESP32FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
 {
-    return GenericDeviceInstanceInfoProvider<ESP32Config>::GetPartNumber(buf, bufSize);
+    CHIP_ERROR err = ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_PartNumber, buf, bufSize, bufSize);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    return err;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 

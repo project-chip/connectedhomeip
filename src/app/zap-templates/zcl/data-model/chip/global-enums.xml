@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2024 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!--
+TODO: Make these structures global rather than defining them for each cluster.
+ This depends on the ability to define global structs via XML tags.
+ see: https://github.com/project-chip/connectedhomeip/issues/29818
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <enum name="AtomicRequestTypeEnum" type="enum8">
+    <item name="BeginWrite" value="0x00"/>
+    <item name="CommitWrite" value="0x01"/>
+    <item name="RollbackWrite" value="0x02"/>
+  </enum>
+
+  <enum name="ThreeLevelAutoEnum" type="enum8">
+    <item name="Low" value="0x00"/>
+    <item name="Medium" value="0x01"/>
+    <item name="High" value="0x02"/>
+    <item name="Automatic" value="0x03"/>
+  </enum>
+  <!--
+    These are test global items (no cluster attached) for testing only.
+    Their usage is defined for UnitTestCluster only.
+  -->
+  <enum name="TestGlobalEnum" type="enum8">
+    <item name="SomeValue" value="0x00"/>
+    <item name="SomeOtherValue" value="0x01"/>
+    <item name="FinalValue" value="0x02"/>
+  </enum>
+
+</configurator>

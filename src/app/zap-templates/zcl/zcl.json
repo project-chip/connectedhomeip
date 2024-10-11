@@ -3,12 +3,7 @@
     "category": "matter",
     "version": 1,
     "requiredFeatureLevel": 102,
-    "xmlRoot": [
-        ".",
-        "./data-model/chip/",
-        "./data-model/draft/",
-        "./data-model/silabs/"
-    ],
+    "xmlRoot": [".", "./data-model/chip/", "./data-model/silabs/"],
     "_comment": "Ensure access-control-definitions.xml is first in xmlFile array",
     "xmlFile": [
         "access-control-definitions.xml",
@@ -21,13 +16,13 @@
         "application-launcher-cluster.xml",
         "audio-output-cluster.xml",
         "ballast-configuration-cluster.xml",
-        "barrier-control-cluster.xml",
         "basic-information-cluster.xml",
         "binding-cluster.xml",
         "boolean-state-cluster.xml",
         "boolean-state-configuration-cluster.xml",
         "actions-cluster.xml",
         "bridged-device-basic-information.xml",
+        "chime-cluster.xml",
         "chip-ota.xml",
         "channel-cluster.xml",
         "clusters-extensions.xml",
@@ -46,8 +41,8 @@
         "microwave-oven-mode-cluster.xml",
         "door-lock-cluster.xml",
         "drlc-cluster.xml",
+        "ecosystem-information-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
-        "electrical-measurement-cluster.xml",
         "electrical-power-measurement-cluster.xml",
         "energy-evse-cluster.xml",
         "energy-evse-mode-cluster.xml",
@@ -60,13 +55,14 @@
         "general-commissioning-cluster.xml",
         "general-diagnostics-cluster.xml",
         "global-attributes.xml",
+        "global-bitmaps.xml",
+        "global-enums.xml",
         "global-structs.xml",
         "groups-cluster.xml",
         "group-key-mgmt-cluster.xml",
         "icd-management-cluster.xml",
         "identify-cluster.xml",
         "illuminance-measurement-cluster.xml",
-        "input-output-value-clusters.xml",
         "keypad-input-cluster.xml",
         "laundry-washer-mode-cluster.xml",
         "laundry-dryer-controls-cluster.xml",
@@ -83,7 +79,6 @@
         "network-commissioning-cluster.xml",
         "occupancy-sensing-cluster.xml",
         "onoff-cluster.xml",
-        "onoff-switch-configuration-cluster.xml",
         "operational-credentials-cluster.xml",
         "operational-state-cluster.xml",
         "operational-state-oven-cluster.xml",
@@ -130,6 +125,8 @@
         "washer-controls-cluster.xml",
         "water-heater-management-cluster.xml",
         "water-heater-mode-cluster.xml",
+        "webrtc-provider-cluster.xml",
+        "webrtc-requestor-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "wifi-network-management-cluster.xml",
         "window-covering.xml",
@@ -137,7 +134,8 @@
         "sample-mei-cluster.xml",
         "types/door-lock.xml",
         "types/occupancy-sensing.xml",
-        "types/thermostat-user-interface-configuration.xml"
+        "types/thermostat-user-interface-configuration.xml",
+        "zone-management-cluster.xml"
     ],
     "manufacturersXml": "../../../../src/app/zap-templates/zcl/data-model/manufacturers.xml",
     "options": {
@@ -207,6 +205,15 @@
             "SupportedModes",
             "CurrentMode",
             "FeatureMap"
+        ],
+        "Door Lock": [
+            "AliroReaderVerificationKey",
+            "AliroReaderGroupIdentifier",
+            "AliroReaderGroupSubIdentifier",
+            "AliroGroupResolvingKey",
+            "AliroBLEAdvertisingVersion",
+            "NumberOfAliroCredentialIssuerKeysSupported",
+            "NumberOfAliroEndpointKeysSupported"
         ],
         "Energy EVSE": [
             "State",
@@ -278,7 +285,7 @@
             "ICDCounter",
             "ClientsSupportedPerFabric"
         ],
-        "Occupancy Sensing": ["HoldTimeLimits"],
+        "Occupancy Sensing": ["HoldTimeLimits", "HoldTime", "FeatureMap"],
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",
@@ -295,7 +302,18 @@
             "struct_attr",
             "nullable_struct",
             "general_error_boolean",
-            "cluster_error_boolean"
+            "cluster_error_boolean",
+            "global_struct",
+            "nullable_global_struct"
+        ],
+        "Thread Border Router Management": [
+            "BorderRouterName",
+            "BorderAgentID",
+            "ThreadVersion",
+            "InterfaceEnabled",
+            "ActiveDatasetTimestamp",
+            "PendingDatasetTimestamp",
+            "FeatureMap"
         ],
         "Thread Network Diagnostics": [
             "Channel",
@@ -394,13 +412,7 @@
             "DSTOffsetListMaxSize"
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
-        "Dishwasher Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "StartUpMode",
-            "OnMode",
-            "FeatureMap"
-        ],
+        "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Control": [
             "CookTime",
@@ -414,18 +426,10 @@
             "WattRating",
             "FeatureMap"
         ],
-        "Laundry Washer Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "StartUpMode",
-            "OnMode",
-            "FeatureMap"
-        ],
+        "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
             "SupportedModes",
             "CurrentMode",
-            "StartUpMode",
-            "OnMode",
             "FeatureMap"
         ],
         "RVC Clean Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
@@ -607,7 +611,6 @@
             "FeatureMap"
         ],
         "Air Quality": ["AirQuality", "FeatureMap"],
-        "Thermostat": ["QueuedPreset"],
         "Electrical Energy Measurement": [
             "Accuracy",
             "CumulativeEnergyImported",
@@ -642,9 +645,26 @@
         "Power Topology": ["FeatureMap"],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"],
+        "Water Heater Management": [
+            "HeaterTypes",
+            "HeatDemand",
+            "TankVolume",
+            "EstimatedHeatRequired",
+            "TankPercentage",
+            "BoostState",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
         "Water Heater Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "Wi-Fi Network Management": ["SSID"]
+        "Wi-Fi Network Management": ["SSID", "PassphraseSurrogate"],
+        "Thread Network Directory": [
+            "PreferredExtendedPanID",
+            "ThreadNetworks",
+            "ThreadNetworkTableSize"
+        ],
+        "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"]
     },
+    "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],
     "fabricHandling": {

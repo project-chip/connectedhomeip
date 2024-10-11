@@ -24,6 +24,10 @@
 #include <rsi_data_types.h>
 #endif
 
+#if SL_MATTER_GN_BUILD == 0
+#include "sl_matter_wifi_config.h"
+#endif // SL_MATTER_GN_BUILD
+
 /******************************************************
  * *                      Macros
  * ******************************************************/
@@ -33,15 +37,6 @@
 // failure return value
 #define RSI_FAILURE -1
 #endif
-
-#define RSI_BLE_CONN_EVENT (0x01)
-#define RSI_BLE_DISCONN_EVENT (0x02)
-#define RSI_BLE_GATT_WRITE_EVENT (0x03)
-#define RSI_BLE_MTU_EVENT (0x04)
-#define RSI_BLE_GATT_INDICATION_CONFIRMATION (0x05)
-#define RSI_BLE_RESP_ATT_VALUE (0x06)
-#define RSI_BLE_EVENT_GATT_RD (0x08)
-#define RSI_BLE_ADDR_LENGTH 6
 
 #define RSI_SSID (0x0D)
 #define RSI_SECTYPE (0x0E)
@@ -58,7 +53,6 @@
 
 #define RSI_BLE_DEV_NAME "CCP_DEVICE"
 #define RSI_BLE_SET_RAND_ADDR "00:23:A7:12:34:56"
-#define RSI_BLE_EVENT_GATT_RD (0x08)
 #define RSI_BLE_ADDR_LENGTH 6
 
 #define CLEAR_WHITELIST (0x00)
@@ -107,7 +101,7 @@
 #else
 #define RSI_BLE_MAX_NBR_ATT_REC (80)
 
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
+#if (EXP_BOARD)
 #define RSI_BLE_MAX_NBR_PERIPHERALS (3)
 #else
 #define RSI_BLE_MAX_NBR_SLAVES (3)
