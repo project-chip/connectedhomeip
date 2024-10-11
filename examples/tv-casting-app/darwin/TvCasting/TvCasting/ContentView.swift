@@ -20,9 +20,13 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         NavigationView {
-            if ProcessInfo.processInfo.environment["CHIP_CASTING_SIMPLIFIED"] == "0"
+            if ProcessInfo.processInfo.environment["CHIP_CASTING_SIMPLIFIED"] == "1"
             {
-                StartFromCacheView()
+                MCDiscoveryExampleView()
+            }
+            else
+            {
+                CommissionerDiscoveryView()
             }
         }
     }

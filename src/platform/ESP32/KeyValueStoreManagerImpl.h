@@ -45,7 +45,7 @@ public:
     CHIP_ERROR EraseAll(void);
 
 private:
-    const char * kNamespace = "CHIP_KVS";
+    static inline const char kNamespace[] = "CHIP_KVS";
 
     // ===== Members for internal use by the following friends.
     friend KeyValueStoreManager & KeyValueStoreMgr();

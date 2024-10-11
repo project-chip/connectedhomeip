@@ -20,11 +20,11 @@ import os
 from typing import List, Optional, Set
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
+from matter_idl.generators.filters import upfirst
 from matter_idl.generators.type_definitions import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
                                                     ParseDataType, TypeLookupContext)
-from matter_idl.matter_idl_types import (Attribute, Cluster, ClusterSide, Command, DataType, Field, FieldQuality, Idl, Struct,
-                                         StructQuality, StructTag)
-from stringcase import capitalcase
+from matter_idl.matter_idl_types import (Attribute, Cluster, Command, DataType, Field, FieldQuality, Idl, Struct, StructQuality,
+                                         StructTag)
 
 
 @dataclasses.dataclass
@@ -114,7 +114,6 @@ _KNOWN_DECODABLE_TYPES = {
     'event_no': 'chip::EventNumber',
     'fabric_id': 'chip::FabricId',
     'fabric_idx': 'chip::FabricIndex',
-    'fabric_idx': 'chip::FabricIndex',
     'field_id': 'chip::FieldId',
     'group_id': 'chip::GroupId',
     'node_id': 'chip::NodeId',
@@ -126,8 +125,6 @@ _KNOWN_DECODABLE_TYPES = {
     # non-named enums
     'enum8': 'uint8_t',
     'enum16': 'uint16_t',
-    'enum32': 'uint32_t',
-    'enum64': 'uint64_t',
 }
 
 
@@ -202,7 +199,7 @@ def DelegatedCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
     if global_name:
         return 'Delegated{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
 
-    return 'Delegated{}Cluster{}AttributeCallback'.format(context.cluster.name, capitalcase(attr.definition.name))
+    return 'Delegated{}Cluster{}AttributeCallback'.format(context.cluster.name, upfirst(attr.definition.name))
 
 
 def ChipClustersCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
@@ -215,7 +212,7 @@ def ChipClustersCallbackName(attr: Attribute, context: TypeLookupContext) -> str
     if global_name:
         return 'ChipClusters.{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
 
-    return 'ChipClusters.{}Cluster.{}AttributeCallback'.format(context.cluster.name, capitalcase(attr.definition.name))
+    return 'ChipClusters.{}Cluster.{}AttributeCallback'.format(context.cluster.name, upfirst(attr.definition.name))
 
 
 def CallbackName(attr: Attribute, context: TypeLookupContext) -> str:
@@ -231,11 +228,11 @@ def CallbackName(attr: Attribute, context: TypeLookupContext) -> str:
     global_name = FieldToGlobalName(attr.definition, context)
 
     if global_name:
-        return 'CHIP{}AttributeCallback'.format(capitalcase(global_name))
+        return 'CHIP{}AttributeCallback'.format(upfirst(global_name))
 
     return 'CHIP{}{}AttributeCallback'.format(
-        capitalcase(context.cluster.name),
-        capitalcase(attr.definition.name)
+        upfirst(context.cluster.name),
+        upfirst(attr.definition.name)
     )
 
 
@@ -265,7 +262,7 @@ def JavaAttributeCallbackName(attr: Attribute, context: TypeLookupContext) -> st
     if global_name:
         return '{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
 
-    return '{}AttributeCallback'.format(capitalcase(attr.definition.name))
+    return '{}AttributeCallback'.format(upfirst(attr.definition.name))
 
 
 def IsFieldGlobalName(field: Field, context: TypeLookupContext) -> bool:
@@ -320,8 +317,6 @@ def _IsUsingGlobalCallback(field: Field, context: TypeLookupContext):
         "int64u",
         "enum8",
         "enum16",
-        "enum32",
-        "enum64",
         "bitmap8",
         "bitmap16",
         "bitmap32",
@@ -766,60 +761,6 @@ class JavaJNIGenerator(__JavaCodeGenerator):
         Renders .CPP files required for JNI support.
         """
 
-        large_targets = [
-            GenerateTarget(template="CHIPCallbackTypes.jinja",
-                           output_name="jni/CHIPCallbackTypes.h"),
-            GenerateTarget(template="CHIPReadCallbacks_h.jinja",
-                           output_name="jni/CHIPReadCallbacks.h"),
-            GenerateTarget(template="CHIPGlobalCallbacks_cpp.jinja",
-                           output_name="jni/CHIPGlobalCallbacks.cpp"),
-        ]
-
-        for target in large_targets:
-            self.internal_render_one_output(
-                template_path=target.template,
-                output_file_name=target.output_name,
-                vars={
-                    'idl': self.idl,
-                    'clientClusters': [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT],
-                    'globalTypes': _GLOBAL_TYPES,
-                }
-            )
-
-        cluster_targets = [
-            GenerateTarget(template="ChipClustersRead.jinja",
-                           output_name="jni/{cluster_name}Client-ReadImpl.cpp"),
-            GenerateTarget(template="ChipClustersCpp.jinja",
-                           output_name="jni/{cluster_name}Client-InvokeSubscribeImpl.cpp"),
-        ]
-
-        self.internal_render_one_output(
-            template_path="CHIPCallbackTypes.jinja",
-            output_file_name="jni/CHIPCallbackTypes.h",
-            vars={
-                'idl': self.idl,
-                'clientClusters': [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT],
-            }
-        )
-
-        # Every cluster has its own impl, to avoid
-        # very large compilations (running out of RAM)
-        for cluster in self.idl.clusters:
-            if cluster.side != ClusterSide.CLIENT:
-                continue
-
-            for target in cluster_targets:
-                self.internal_render_one_output(
-                    template_path=target.template,
-                    output_file_name=target.output_name.format(
-                        cluster_name=cluster.name),
-                    vars={
-                        'cluster': cluster,
-                        'typeLookup': TypeLookupContext(self.idl, cluster),
-                        'globalTypes': _GLOBAL_TYPES,
-                    }
-                )
-
 
 class JavaClassGenerator(__JavaCodeGenerator):
     """Generates .java files """
@@ -832,8 +773,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         Renders .java files required for java matter support
         """
 
-        clientClusters = [
-            c for c in self.idl.clusters if c.side == ClusterSide.CLIENT]
+        clientClusters = self.idl.clusters
 
         self.internal_render_one_output(
             template_path="ClusterReadMapping.jinja",
@@ -910,9 +850,6 @@ class JavaClassGenerator(__JavaCodeGenerator):
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:
-            if cluster.side != ClusterSide.CLIENT:
-                continue
-
             for struct in cluster.structs:
                 if struct.tag:
                     continue

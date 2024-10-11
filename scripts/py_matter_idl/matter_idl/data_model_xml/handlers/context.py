@@ -16,7 +16,7 @@ import logging
 import xml.sax.xmlreader
 from typing import List, Optional
 
-from matter_idl.matter_idl_types import Cluster, ClusterSide, Idl, ParseMetaData
+from matter_idl.matter_idl_types import Cluster, Idl, ParseMetaData
 
 
 class IdlPostProcessor:
@@ -90,8 +90,7 @@ class Context:
         """
         assert name not in self.abstract_base_clusters  # be unique
 
-        cluster = Cluster(side=ClusterSide.CLIENT, name=name,
-                          code=-1, parse_meta=parse_meta)
+        cluster = Cluster(name=name, code=-1, parse_meta=parse_meta)
         self.abstract_base_clusters[name] = cluster
 
         return cluster

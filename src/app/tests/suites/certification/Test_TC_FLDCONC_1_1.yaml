@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +33,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Read the global attribute: ClusterRevision"
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -40,8 +42,8 @@ tests:
               type: int16u
 
     - label:
-          "Step 3a: Read the global attribute: FeatureMap and check for either
-          bit 0 or 1 set"
+          "Step 3a: TH reads from the DUT the FeatureMap attribute. and check
+          for either bit 0 or 1 set"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -181,7 +183,7 @@ tests:
               type: bitmap32
               hasMasksClear: [0x20]
 
-    - label: "Step 4a: Read the global attribute: AttributeList"
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       command: "readAttribute"
       attribute: "AttributeList"
       PICS: PICS_EVENT_LIST_ENABLED
@@ -190,7 +192,7 @@ tests:
               type: list
               contains: [9, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "Step 4a: Read the global attribute: AttributeList"
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       command: "readAttribute"
       attribute: "AttributeList"
       PICS: "!PICS_EVENT_LIST_ENABLED"
@@ -199,7 +201,8 @@ tests:
               type: list
               contains: [9, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "Step 4b: Read the optional attribute Uncertainty in AttributeList"
+    - label:
+          "Step 4b: TH reads the optional attribute Uncertainty in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       PICS: FLDCONC.S.A0007 && FLDCONC.S.F00
@@ -220,7 +223,7 @@ tests:
               excludes: [7]
 
     - label:
-          "Step 4d: Read the optional, feature dependent attributes
+          "Step 4d: TH reads the optional, feature dependent attributes
           MeasuredValue, MinMeasuredValue, MaxMeasuredValue and Measurement Unit
           in AttributeList"
       command: "readAttribute"
@@ -244,7 +247,7 @@ tests:
               excludes: [0, 1, 2, 7, 8]
 
     - label:
-          "Step 4f: Read the optional, feature dependent attributes
+          "Step 4f: TH reads the optional, feature dependent attributes
           PeakMeasuredValue & PeakMeasuredValueWindow in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -266,7 +269,7 @@ tests:
               excludes: [3, 4]
 
     - label:
-          "Step 4h: Read the optional, feature dependent attributes
+          "Step 4h: TH reads the optional, feature dependent attributes
           AverageMeasuredValue AverageMeasuredValueWindow in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -289,8 +292,8 @@ tests:
               excludes: [5, 6]
 
     - label:
-          "Step 4j: Read the optional, feature dependent attribute LevelValue in
-          AttributeList"
+          "Step 4j: TH reads the optional, feature dependent attribute
+          LevelValue in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       PICS: FLDCONC.S.F01
@@ -310,7 +313,7 @@ tests:
               type: list
               excludes: [10]
 
-    - label: "Step 5: Read the global attribute: EventList"
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -319,7 +322,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 6: Read the global attribute: AcceptedCommandList"
+    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -327,7 +330,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 7: Read the global attribute: GeneratedCommandList"
+    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

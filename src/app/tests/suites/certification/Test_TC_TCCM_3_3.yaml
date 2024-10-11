@@ -19,7 +19,7 @@ name:
 PICS:
     - TCCM.S.A0002
     - TCCM.S.A0003
-    - TCCM.S.F00
+    - MOD.S.F00
     - OO.S.A4003
 
 config:
@@ -35,7 +35,9 @@ config:
         defaultValue: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -43,7 +45,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: TH reads the StartUpMode attribute from the DUT"
+    - label: "Step 2: TH reads from the DUT the SupportedModes attribute."
       PICS: TCCM.S.A0002
       command: "readAttribute"
       attribute: "StartUpMode"
@@ -69,7 +71,7 @@ tests:
                 - name: "Equals"
                   saveAs: IsExpectedValue
 
-    - label: "Step 3: TH reads the SupportedModes attribute from the DUT"
+    - label: "Step 3: TH reads from the DUT the SupportedModes attribute."
       runIf: IsExpectedValue
       PICS: TCCM.S.A0000
       command: "readAttribute"
@@ -90,7 +92,7 @@ tests:
       arguments:
           value: new_start_up_mode_th
 
-    - label: "Step 5: TH reads the OnMode attribute from the DUT"
+    - label: "Step 5: TH reads from the DUT the  OnMode attribute."
       PICS: TCCM.S.A0003 && TCCM.S.A0002
       command: "readAttribute"
       attribute: "OnMode"
@@ -137,8 +139,8 @@ tests:
       arguments:
           value: new_mode_th
 
-    - label: "Step 8: TH reads the OnMode attribute from the DUT"
-      PICS: TCCM.S.A0003 && TCCM.S.F00
+    - label: "Step 8: TH reads from the DUT the OnMode attribute."
+      PICS: TCCM.S.A0003 && MOD.S.F00
       command: "readAttribute"
       attribute: "OnMode"
       response:
@@ -177,7 +179,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 11: TH reads the StartUpMode attribute from the DUT"
+    - label: "Step 11: TH reads from the DUT the StartUpMode attribute."
       PICS: TCCM.S.A0002 && PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "StartUpMode"
@@ -185,7 +187,7 @@ tests:
           constraints:
               anyOf: [new_start_up_mode_th, startup_mode_dut]
 
-    - label: "Step 12: TH reads the CurrentMode attribute from the DUT"
+    - label: "Step 12: TH reads from the DUT the CurrentMode attribute."
       PICS: TCCM.S.A0001 && PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CurrentMode"

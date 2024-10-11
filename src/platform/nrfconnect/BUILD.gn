@@ -29,7 +29,6 @@ static_library("nrfconnect") {
     "../Zephyr/DiagnosticDataProviderImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.h",
     "../Zephyr/KeyValueStoreManagerImpl.cpp",
-    "../Zephyr/Logging.cpp",
     "../Zephyr/PlatformManagerImpl.cpp",
     "../Zephyr/SysHeapMalloc.h",
     "../Zephyr/SystemTimeSupport.cpp",
@@ -77,6 +76,13 @@ static_library("nrfconnect") {
     ]
   }
 
+  if (chip_enable_openthread || chip_enable_wifi) {
+    sources += [
+      "../Zephyr/InetUtils.cpp",
+      "../Zephyr/InetUtils.h",
+    ]
+  }
+
   if (chip_enable_openthread) {
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",
@@ -84,7 +90,7 @@ static_library("nrfconnect") {
       "ThreadStackManagerImpl.h",
     ]
 
-    if (chip_mdns == "platform") {
+    if (chip_mdns_platform) {
       sources += [
         "../OpenThread/DnssdImpl.cpp",
         "../OpenThread/OpenThreadDnssdImpl.cpp",
@@ -96,8 +102,6 @@ static_library("nrfconnect") {
 
   if (chip_enable_wifi) {
     sources += [
-      "../Zephyr/InetUtils.cpp",
-      "../Zephyr/InetUtils.h",
       "OTAImageProcessorImplWiFi.h",
       "wifi/ConnectivityManagerImplWiFi.cpp",
       "wifi/ConnectivityManagerImplWiFi.h",
@@ -127,4 +131,12 @@ static_library("nrfconnect") {
   }
 
   cflags = [ "-Wconversion" ]
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "../Zephyr/Logging.cpp" ]
 }

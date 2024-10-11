@@ -32,38 +32,20 @@ CHIP_ERROR CommissionableNodeController::DiscoverCommissioners(Dnssd::DiscoveryF
 {
     ReturnErrorOnFailure(SetUpNodeDiscovery());
 
-    if (mResolver == nullptr)
-    {
 #if CONFIG_DEVICE_LAYER
-        mDNSResolver.Shutdown(); // reset if already inited
-        ReturnErrorOnFailure(mDNSResolver.Init(DeviceLayer::UDPEndPointManager()));
+    mDNSResolver.Shutdown(); // reset if already inited
+    ReturnErrorOnFailure(mDNSResolver.Init(DeviceLayer::UDPEndPointManager()));
 #endif
-        mDNSResolver.SetCommissioningDelegate(this);
-        return mDNSResolver.DiscoverCommissioners(discoveryFilter);
-    }
-
-#if CONFIG_DEVICE_LAYER
-    ReturnErrorOnFailure(mResolver->Init(DeviceLayer::UDPEndPointManager()));
-#endif
-    return mResolver->DiscoverCommissioners(discoveryFilter);
-}
-
-CHIP_ERROR CommissionableNodeController::StopDiscovery()
-{
-    if (mResolver == nullptr)
-    {
-        return AbstractDnssdDiscoveryController::StopDiscovery();
-    }
-
-    return mResolver->StopDiscovery();
+    mDNSResolver.SetDiscoveryDelegate(this);
+    return mDNSResolver.DiscoverCommissioners(discoveryFilter);
 }
 
 CommissionableNodeController::~CommissionableNodeController()
 {
-    mDNSResolver.SetCommissioningDelegate(nullptr);
+    mDNSResolver.SetDiscoveryDelegate(nullptr);
 }
 
-const Dnssd::DiscoveredNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)
+const Dnssd::CommissionNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)
 {
     return GetDiscoveredNode(idx);
 }

@@ -1,0 +1,6 @@
+crc>=7.0.0
+jsonschema>=4.17.0
+pycryptodome>=3.20.0
+intelhex
+cbor
+cbor2

@@ -1,0 +1,16 @@
+/ {
+	keys {
+		compatible = "gpio-keys";
+		key_5: button_5 {
+			gpios = <&gpioe 0 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		};
+		key_6: button_6 {
+			gpios = <&gpioe 1 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		};
+	};
+};
+
+&gpioe {
+	interrupts = <38 1>;
+	status = "okay";
+};

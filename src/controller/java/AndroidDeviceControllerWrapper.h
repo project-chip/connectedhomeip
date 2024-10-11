@@ -17,6 +17,7 @@
  */
 #pragma once
 
+#include <controller/java/ControllerConfig.h>
 #include <lib/support/JniReferences.h>
 
 #include <memory>
@@ -24,6 +25,8 @@
 
 #include <jni.h>
 
+#include <app/icd/client/CheckInHandler.h>
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <controller/CHIPDeviceController.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
@@ -40,6 +43,7 @@
 #include <platform/android/CHIPP256KeypairBridge.h>
 #endif // JAVA_MATTER_CONTROLLER_TEST
 
+#include "AndroidCheckInDelegate.h"
 #include "AndroidOperationalCredentialsIssuer.h"
 #include "AttestationTrustStoreBridge.h"
 #include "DeviceAttestationDelegateBridge.h"
@@ -47,6 +51,10 @@
 #include "OTAProviderDelegateBridge.h"
 #endif
 
+constexpr uint8_t kUserActiveModeTriggerInstructionBufferLen =
+    128 + 1; // 128bytes is max UserActiveModeTriggerInstruction size and 1 byte is for escape sequence.
+
+constexpr uint8_t kCountryCodeBufferLen = 2;
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
  * to handle all controller-related processing.
@@ -60,7 +68,7 @@ public:
 
     chip::Controller::DeviceCommissioner * Controller() { return mController.get(); }
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
-    jobject JavaObjectRef() { return mJavaObjectRef; }
+    jobject JavaObjectRef() { return mJavaObjectRef.ObjectRef(); }
     jlong ToJNIHandle();
 
 #ifndef JAVA_MATTER_CONTROLLER_TEST
@@ -79,13 +87,19 @@ public:
     }
 #endif // JAVA_MATTER_CONTROLLER_TEST
 
-    void CallJavaMethod(const char * methodName, jint argument);
+    void CallJavaIntMethod(const char * methodName, jint argument);
+    void CallJavaLongMethod(const char * methodName, jlong argument);
     CHIP_ERROR InitializeOperationalCredentialsIssuer();
 
     /**
      * Convert network credentials from Java, and apply them to the commissioning parameters object.
      */
     CHIP_ERROR ApplyNetworkCredentials(chip::Controller::CommissioningParameters & params, jobject networkCredentials);
+
+    /**
+     * Convert ICD Registration Infomations from Java, and apply them to the commissioning parameters object.
+     */
+    CHIP_ERROR ApplyICDRegistrationInfo(chip::Controller::CommissioningParameters & params, jobject icdRegistrationInfo);
 
     /**
      * Update the CommissioningParameters used by the active device commissioner
@@ -103,6 +117,8 @@ public:
     void OnScanNetworksSuccess(
         const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse) override;
     void OnScanNetworksFailure(CHIP_ERROR error) override;
+    void OnICDRegistrationInfoRequired() override;
+    void OnICDRegistrationComplete(chip::ScopedNodeId icdNodeId, uint32_t icdCounter) override;
 
     // PersistentStorageDelegate implementation
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
@@ -113,10 +129,7 @@ public:
 
     chip::Credentials::PartialDACVerifier * GetPartialDACVerifier() { return &mPartialDACVerifier; }
 
-    const chip::Controller::CommissioningParameters & GetCommissioningParameters() const
-    {
-        return mAutoCommissioner.GetCommissioningParameters();
-    }
+    const chip::Controller::CommissioningParameters & GetCommissioningParameters() const { return mCommissioningParameter; }
 
     static AndroidDeviceControllerWrapper * FromJNIHandle(jlong handle)
     {
@@ -174,7 +187,8 @@ public:
                 jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
                 jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId,
                 uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread,
-                bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure);
+                bool skipCommissioningComplete, bool skipAttestationCertificateValidation, jstring countryCode,
+                bool enableServerInteractions, CHIP_ERROR * errInfoOnFailure);
 
     void Shutdown();
 
@@ -192,11 +206,17 @@ public:
     CHIP_ERROR UpdateDeviceAttestationDelegateBridge(jobject deviceAttestationDelegate, chip::Optional<uint16_t> expiryTimeoutSecs,
                                                      bool shouldWaitAfterDeviceAttestation);
 
-    CHIP_ERROR UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate);
+    CHIP_ERROR UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate, jobject cdTrustKeys);
 
     CHIP_ERROR StartOTAProvider(jobject otaProviderDelegate);
 
     CHIP_ERROR FinishOTAProvider();
+
+    CHIP_ERROR SetICDCheckInDelegate(jobject checkInDelegate);
+
+    void StartDnssd();
+
+    void StopDnssd();
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
@@ -210,8 +230,11 @@ private:
     // TODO: This may need to be injected as a SessionKeystore*
     chip::Crypto::RawKeySessionKeystore mSessionKeystore;
 
-    JavaVM * mJavaVM       = nullptr;
-    jobject mJavaObjectRef = nullptr;
+    chip::app::AndroidCheckInDelegate mCheckInDelegate;
+    chip::app::CheckInHandler mCheckInHandler;
+
+    JavaVM * mJavaVM = nullptr;
+    chip::JniGlobalReference mJavaObjectRef;
 #ifdef JAVA_MATTER_CONTROLLER_TEST
     ExampleOperationalCredentialsIssuerPtr mOpCredsIssuer;
     PersistentStorage mExampleStorage;
@@ -232,6 +255,8 @@ private:
     std::vector<uint8_t> mIcacCertificate;
     std::vector<uint8_t> mRcacCertificate;
 
+    char mCountryCode[kCountryCodeBufferLen];
+
     chip::Controller::AutoCommissioner mAutoCommissioner;
 
     chip::Credentials::PartialDACVerifier mPartialDACVerifier;
@@ -242,6 +267,16 @@ private:
 #if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     OTAProviderDelegateBridge * mOtaProviderBridge = nullptr;
 #endif
+    bool mDeviceIsICD = false;
+    uint8_t mICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
+    char mUserActiveModeTriggerInstructionBuffer[kUserActiveModeTriggerInstructionBufferLen];
+    chip::MutableCharSpan mUserActiveModeTriggerInstruction = chip::MutableCharSpan(mUserActiveModeTriggerInstructionBuffer);
+    chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerHint;
+
+    uint32_t mIdleModeDuration    = 0;
+    uint32_t mActiveModeDuration  = 0;
+    uint16_t mActiveModeThreshold = 0;
+    chip::Controller::CommissioningParameters mCommissioningParameter;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller,
 #ifdef JAVA_MATTER_CONTROLLER_TEST

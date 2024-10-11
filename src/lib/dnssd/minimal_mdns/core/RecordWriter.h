@@ -17,9 +17,10 @@
 #pragma once
 
 #include <lib/core/CHIPEncoding.h>
-#include <lib/core/Optional.h>
 #include <lib/dnssd/minimal_mdns/core/QName.h>
 #include <lib/support/BufferWriter.h>
+
+#include <optional>
 
 namespace mdns {
 namespace Minimal {
@@ -99,7 +100,7 @@ private:
     /// Find the offset at which this qname was previously seen (if any)
     /// works with QName and SerializedQNameIterator
     template <class T>
-    chip::Optional<uint16_t> FindPreviousName(const T & name) const
+    std::optional<uint16_t> FindPreviousName(const T & name) const
     {
         for (size_t i = 0; i < kMaxCachedReferences; i++)
         {
@@ -110,7 +111,7 @@ private:
             {
                 if (previous == name)
                 {
-                    return chip::MakeOptional(static_cast<uint16_t>(previous.OffsetInCurrentValidData()));
+                    return std::make_optional(static_cast<uint16_t>(previous.OffsetInCurrentValidData()));
                 }
 
                 if (!previous.Next())
@@ -120,7 +121,7 @@ private:
             }
         }
 
-        return chip::Optional<uint16_t>::Missing();
+        return std::nullopt;
     }
 
     /// Gets the iterator corresponding to the previous name

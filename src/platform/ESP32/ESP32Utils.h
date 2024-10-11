@@ -54,6 +54,7 @@ public:
 
     static constexpr char kDefaultWiFiStationNetifKey[] = "WIFI_STA_DEF";
     static constexpr char kDefaultWiFiAPNetifKey[]      = "WIFI_AP_DEF";
+    static constexpr char kDefaultEthernetNetifKey[]    = "ETH_DEF";
 };
 
 #define ReturnMappedErrorOnFailure(expr)                                                                                           \

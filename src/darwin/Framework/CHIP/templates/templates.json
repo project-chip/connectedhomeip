@@ -12,7 +12,7 @@
     ],
     "resources": {
         "availability-data": "availability.yaml",
-        "config-data": "../../../../app/common/templates/config-data.yaml"
+        "config-data": "config-data.yaml"
     },
     "override": "../../../../../src/app/zap-templates/common/override.js",
     "partials": [
@@ -45,8 +45,32 @@
             "path": "partials/struct_field_decl.zapt"
         },
         {
+            "name": "struct_interface_decl",
+            "path": "partials/struct_interface_decl.zapt"
+        },
+        {
+            "name": "struct_interface_impl",
+            "path": "partials/struct_interface_impl.zapt"
+        },
+        {
+            "name": "enum_decl",
+            "path": "partials/enum_decl.zapt"
+        },
+        {
             "name": "renamed_struct_field_impl",
             "path": "partials/renamed_struct_field_impl.zapt"
+        },
+        {
+            "name": "cluster_id_shims",
+            "path": "partials/cluster_id_shims.zapt"
+        },
+        {
+            "name": "attribute_id_shims",
+            "path": "partials/attribute_id_shims.zapt"
+        },
+        {
+            "name": "command_id_shims",
+            "path": "partials/command_id_shims.zapt"
         }
     ],
     "templates": [
@@ -119,6 +143,11 @@
             "path": "MTRClusterConstants.zapt",
             "name": "Constants for cluster IDs",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterConstants.h"
+        },
+        {
+            "path": "MTRClusterNames-src.zapt",
+            "name": "Objc Cluster Names API",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterNames.mm"
         },
         {
             "path": "MTRAttributeSpecifiedCheck-src.zapt",

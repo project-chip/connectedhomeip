@@ -145,7 +145,7 @@ class CHIPVirtualHome:
             self.assertTrue(self.wait_for_device_output(
                 device_id, "Thread Border Router started on AIL", 10))
             self.assertTrue(self.wait_for_device_output(
-                device_id, "CHIP:SVR: Server Listening...", 15))
+                device_id, "[SVR] Server Listening...", 15))
             # Clear default Thread network commissioning data
             self.logger.info("Resetting thread network on {}".format(
                 self.get_device_pretty_id(device_id)))
@@ -299,13 +299,13 @@ class CHIPVirtualHome:
         assert(Not)Equal
         python unittest style functions that raise exceptions when condition not met
         '''
-        if not (exp is True):
+        if exp is not True:
             if note:
                 self.logger.error(note)
             raise AssertionError
 
     def assertFalse(self, exp, note=None):
-        if not (exp is False):
+        if exp is not False:
             if note:
                 self.logger.error(note)
             raise AssertionError

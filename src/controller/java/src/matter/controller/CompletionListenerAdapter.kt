@@ -18,6 +18,7 @@
 package matter.controller
 
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ICDDeviceInfo
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -28,17 +29,17 @@ class CompletionListenerAdapter(val listener: MatterController.CompletionListene
 
   override fun onStatusUpdate(status: Int) = listener.onStatusUpdate(status)
 
-  override fun onPairingComplete(errorCode: Int) = listener.onPairingComplete(errorCode)
+  override fun onPairingComplete(errorCode: Long) = listener.onPairingComplete(errorCode.toUInt())
 
-  override fun onPairingDeleted(errorCode: Int) = listener.onPairingDeleted(errorCode)
+  override fun onPairingDeleted(errorCode: Long) = listener.onPairingDeleted(errorCode.toUInt())
 
   override fun onNotifyChipConnectionClosed() = listener.onNotifyChipConnectionClosed()
 
-  override fun onCommissioningComplete(nodeId: Long, errorCode: Int) =
-    listener.onCommissioningComplete(nodeId, errorCode)
+  override fun onCommissioningComplete(nodeId: Long, errorCode: Long) =
+    listener.onCommissioningComplete(nodeId, errorCode.toUInt())
 
-  override fun onCommissioningStatusUpdate(nodeId: Long, stage: String?, errorCode: Int) =
-    listener.onCommissioningStatusUpdate(nodeId, stage, errorCode)
+  override fun onCommissioningStatusUpdate(nodeId: Long, stage: String?, errorCode: Long) =
+    listener.onCommissioningStatusUpdate(nodeId, stage, errorCode.toUInt())
 
   override fun onReadCommissioningInfo(
     vendorId: Int,
@@ -48,6 +49,11 @@ class CompletionListenerAdapter(val listener: MatterController.CompletionListene
   ) = listener.onReadCommissioningInfo(vendorId, productId, wifiEndpointId, threadEndpointId)
 
   override fun onOpCSRGenerationComplete(csr: ByteArray) = listener.onOpCSRGenerationComplete(csr)
+
+  override fun onICDRegistrationInfoRequired() = listener.onICDRegistrationInfoRequired()
+
+  override fun onICDRegistrationComplete(errorCode: Long, icdDeviceInfo: ICDDeviceInfo) =
+    listener.onICDRegistrationComplete(errorCode.toUInt(), icdDeviceInfo)
 
   override fun onError(error: Throwable) = listener.onError(error)
 

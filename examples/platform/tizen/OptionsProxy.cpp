@@ -25,6 +25,8 @@
 #include <lib/core/CHIPConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <string>
+
 namespace {
 
 struct Option

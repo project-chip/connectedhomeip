@@ -19,6 +19,7 @@
 
 #include <controller/CommissioningWindowOpener.h>
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 namespace chip {
 namespace Controller {
@@ -44,7 +45,6 @@ public:
 
 private:
     AndroidCommissioningWindowOpener(DeviceController * controller, jobject javaCallbackObject);
-    ~AndroidCommissioningWindowOpener();
 
     static void OnOpenCommissioningWindowResponse(void * context, NodeId deviceId, CHIP_ERROR status, chip::SetupPayload payload);
     static void OnOpenBasicCommissioningWindowResponse(void * context, NodeId deviceId, CHIP_ERROR status);
@@ -52,7 +52,7 @@ private:
     chip::Callback::Callback<chip::Controller::OnOpenCommissioningWindow> mOnOpenCommissioningWindowCallback;
     chip::Callback::Callback<chip::Controller::OnOpenBasicCommissioningWindow> mOnOpenBasicCommissioningWindowCallback;
 
-    jobject mJavaCallback;
+    chip::JniGlobalReference mJavaCallback;
     jmethodID mOnSuccessMethod = nullptr;
     jmethodID mOnErrorMethod   = nullptr;
 };

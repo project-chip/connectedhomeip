@@ -39,6 +39,9 @@ def main():
 
         args = parser.parse_args()
 
+        command = ['git', '-C', zephyr_base, 'fetch']
+        subprocess.run(command, check=True)
+
         command = ['git', '-C', zephyr_base, 'reset', args.hash, '--hard']
         subprocess.run(command, check=True)
 

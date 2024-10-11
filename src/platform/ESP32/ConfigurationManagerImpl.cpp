@@ -29,6 +29,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/ESP32/ESP32Config.h>
+#include <platform/ESP32/ESP32Utils.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
@@ -44,21 +45,24 @@ namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
 
-namespace {
-
-enum
-{
-    kChipProduct_Connect = 0x0016
-};
-
-} // unnamed namespace
-
-// TODO: Define a Singleton instance of CHIP Group Key Store here (#1266)
-
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
     static ConfigurationManagerImpl sInstance;
     return sInstance;
+}
+
+uint32_t ConfigurationManagerImpl::mTotalOperationalHours = 0;
+
+void ConfigurationManagerImpl::TotalOperationalHoursTimerCallback(TimerHandle_t timer)
+{
+    mTotalOperationalHours++;
+
+    CHIP_ERROR err = ConfigurationMgrImpl().StoreTotalOperationalHours(mTotalOperationalHours);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to store total operational hours: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
@@ -169,17 +173,33 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
-    if (!ESP32Config::ConfigValueExists(ESP32Config::kCounterKey_TotalOperationalHours))
+    if (CHIP_NO_ERROR != GetTotalOperationalHours(mTotalOperationalHours))
     {
-        err = StoreTotalOperationalHours(0);
+        err = StoreTotalOperationalHours(mTotalOperationalHours);
         SuccessOrExit(err);
+    }
+
+    {
+        // Start a timer which reloads every one hour and bumps the total operational hours
+        TickType_t reloadPeriod   = (1000 * 60 * 60) / portTICK_PERIOD_MS;
+        TimerHandle_t timerHandle = xTimerCreate("tOpHrs", reloadPeriod, pdPASS, nullptr, TotalOperationalHoursTimerCallback);
+        if (timerHandle == nullptr)
+        {
+            err = CHIP_ERROR_NO_MEMORY;
+            ExitNow(ChipLogError(DeviceLayer, "total operational hours Timer creation failed"));
+        }
+
+        BaseType_t timerStartStatus = xTimerStart(timerHandle, 0);
+        if (timerStartStatus == pdFAIL)
+        {
+            err = CHIP_ERROR_INTERNAL;
+            ExitNow(ChipLogError(DeviceLayer, "total operational hours Timer start failed"));
+        }
     }
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<ESP32Config>::Init();
     SuccessOrExit(err);
-
-    // TODO: Initialize the global GroupKeyStore object here (#1266)
 
     err = CHIP_NO_ERROR;
 
@@ -232,7 +252,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
 
 CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
 {
-#if CONFIG_ENABLE_ESP32_LOCATIONCAPABILITY
+#ifdef CONFIG_ENABLE_ESP32_LOCATIONCAPABILITY
     uint32_t value = 0;
     CHIP_ERROR err = ReadConfigValue(ESP32Config::kConfigKey_LocationCapability, value);
 
@@ -246,7 +266,24 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
 #else
     location       = static_cast<uint8_t>(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
     return CHIP_NO_ERROR;
-#endif
+#endif // CONFIG_ENABLE_ESP32_LOCATIONCAPABILITY
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetDeviceTypeId(uint32_t & deviceType)
+{
+    uint32_t value = 0;
+    CHIP_ERROR err = ReadConfigValue(ESP32Config::kConfigKey_PrimaryDeviceType, value);
+
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        deviceType = CHIP_DEVICE_CONFIG_DEVICE_TYPE;
+    }
+    else
+    {
+        deviceType = value;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreCountryCode(const char * code, size_t codeLen)
@@ -255,7 +292,7 @@ CHIP_ERROR ConfigurationManagerImpl::StoreCountryCode(const char * code, size_t 
     VerifyOrReturnError((code != nullptr) && (codeLen == 2), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Setting country is only possible on WiFi supported SoCs
-#if CONFIG_ESP32_WIFI_ENABLED
+#ifdef CONFIG_ESP32_WIFI_ENABLED
     // Write CountryCode to esp_phy layer
     ReturnErrorOnFailure(MapConfigError(esp_phy_update_country_info(code)));
 #endif
@@ -311,7 +348,7 @@ CHIP_ERROR ConfigurationManagerImpl::MapConfigError(esp_err_t error)
     case ESP_OK:
         return CHIP_NO_ERROR;
     case ESP_ERR_WIFI_NOT_INIT:
-        return CHIP_ERROR_WELL_UNINITIALIZED;
+        return CHIP_ERROR_UNINITIALIZED;
     case ESP_ERR_INVALID_ARG:
     case ESP_ERR_WIFI_IF:
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -412,6 +449,22 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     CHIP_ERROR err;
+
+    // Unregistering the wifi and IP event handlers from the esp_default_event_loop()
+    err = ESP32Utils::MapError(esp_event_handler_unregister(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to unregister IP event handler");
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    err =
+        ESP32Utils::MapError(esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to unregister wifi event handler");
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 

@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2024 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <bitmap name="SupportedDeviceCategoryBitmap" type="bitmap32">
+    <cluster code="0x0751"/>
+    <field name="FabricSynchronization" mask="0x1"/>
+  </bitmap>
+
+  <cluster>
+    <domain>General</domain>
+    <name>Commissioner Control</name>
+    <code>0x0751</code>
+    <define>COMMISSIONER_CONTROL_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>Supports the ability for clients to request the commissioning of themselves or other nodes onto a fabric which the cluster server can commission onto.</description>
+
+    <!-- cluster revision -->
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
+    <attribute side="server" code="0x0000" define="SUPPORTED_DEVICE_CATEGORIES" type="SupportedDeviceCategoryBitmap" default="0" min="0x00000000" max="0x00000001">
+      <description>SupportedDeviceCategories</description>
+      <access op="read" privilege="manage"/>
+    </attribute>
+
+    <command source="client" code="0x00" name="RequestCommissioningApproval" optional="false">
+      <description>This command is sent by a client to request approval for a future CommissionNode call.</description>
+      <arg id="0" name="RequestID" type="int64u"/>
+      <arg id="1" name="VendorID" type="vendor_id"/>
+      <arg id="2" name="ProductID" type="int16u"/>
+      <arg id="3" name="Label" type="char_string" optional="true" length="64"/>
+      <access op="invoke" privilege="manage"/>
+    </command>
+
+    <command source="client" code="0x01" name="CommissionNode" response="ReverseOpenCommissioningWindow" optional="false">
+      <description>This command is sent by a client to request that the server begins commissioning a previously approved request.</description>
+      <arg id="0" name="RequestID" type="int64u"/>
+      <arg id="1" name="ResponseTimeoutSeconds" type="int16u" min="30" max="120" default="30"/>
+      <access op="invoke" privilege="manage"/>
+    </command>
+
+    <command source="server" code="0x02" name="ReverseOpenCommissioningWindow" optional="false" disableDefaultResponse="true">
+      <description>When received within the timeout specified by CommissionNode, the client SHALL open a commissioning window on to the node which the client called RequestCommissioningApproval to have commissioned.</description>
+      <arg id="0" name="CommissioningTimeout" type="int16u"/>
+      <arg id="1" name="PAKEPasscodeVerifier" type="octet_string"/>
+      <arg id="2" name="Discriminator" type="int16u" min="0" max="4095"/>
+      <arg id="3" name="Iterations" type="int32u" min="1000" max="100000"/>
+      <arg id="4" name="Salt" type="octet_string" length="32" minLength="16"/>
+    </command>
+
+    <event code="0x00" name="CommissioningRequestResult" priority="info" side="server" isFabricSensitive="true">
+      <description>This event SHALL be sent by the server following a RequestCommissioningApproval command which the server responded to with SUCCESS.</description>
+      <field id="0" name="RequestID" type="int64u"/>
+      <field id="1" name="ClientNodeID" type="node_id"/>
+      <field id="2" name="StatusCode" type="status"/>
+      <access op="read" privilege="manage"/>
+    </event>
+
+  </cluster>
+</configurator>

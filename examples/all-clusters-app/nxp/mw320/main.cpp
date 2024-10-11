@@ -41,6 +41,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <static-supported-modes-manager.h>
 #include <static-supported-temperature-levels.h>
 
 #include <app/InteractionModelEngine.h>
@@ -111,7 +112,7 @@ enum
 };
 static int Matter_Selection = MAX_SELECTION;
 #define RUN_RST_LT_DELAY 10
-static const char * TAG = "mw320";
+static const char TAG[] = "mw320";
 
 /*******************************************************************************
  * Variables
@@ -121,6 +122,7 @@ static struct wlan_network sta_network;
 static struct wlan_network uap_network;
 
 chip::app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+chip::app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 
 const int TASK_MAIN_PRIO         = OS_PRIO_3;
 const int TASK_MAIN_STACK_SIZE   = 800;
@@ -286,7 +288,7 @@ void GPIO_IRQHandler(void)
 #endif /* __cplusplus */
 
 /*
-EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
                                                    uint8_t * buffer, uint16_t maxReadLength, int32_t index)
 {
@@ -295,7 +297,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     if(clusterId == Clusters::Switch::Id) {
         *buffer = g_ButtonPress;
     }
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Protocols::InteractionModel::Status::Success;
 }
 */
 
@@ -1083,6 +1085,7 @@ static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
     // binding --
 
     chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    chip::app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 
     return;
 }
@@ -1152,12 +1155,10 @@ void task_test_main(void * param)
             PRINTF("--> update CurrentPosition [%d] \r\n", value);
             Clusters::Switch::Attributes::CurrentPosition::Set(1, value);
 #ifdef SUPPORT_MANUAL_CTRL
-#error                                                                                                                             \
-    "This code thinks it's setting the OnOff attribute, but it's actually setting the NumberOfPositions attribute!  And passing the wrong size for either case.  Figure out what it's trying to do."
-            // sync-up the Light attribute (for test event, OO.M.ManuallyControlled)
-            PRINTF("--> update [Clusters::Switch::Id]: OnOff::Id [%d] \r\n", value);
-            emAfWriteAttribute(1, Clusters::Switch::Id, Clusters::OnOff::Attributes::OnOff::Id, (uint8_t *) &value, sizeof(value),
-                               true, false);
+#error "Not implemented"
+            // TODO: previous code was trying to write a OnOff cluster attribute id to a switch attribute, generally
+            //       not working. Determine if this should maybe be
+            //       OnOff::Attributes::OnOff::Set(1, is_on) or similar
 #endif // SUPPORT_MANUAL_CTRL
 
             need2sync_sw_attr = false;
@@ -1618,20 +1619,21 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     return;
 }
 
-EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                          const EmberAfAttributeMetadata * attributeMetadata,
+                                                                          uint8_t * buffer)
 {
     PRINTF("====> %s() \r\n", __FUNCTION__);
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Protocols::InteractionModel::Status::Success;
 }
 
-EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                   uint16_t maxReadLength)
+Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                         const EmberAfAttributeMetadata * attributeMetadata,
+                                                                         uint8_t * buffer, uint16_t maxReadLength)
 {
     // Added for the pairing of TE9 to report the commission_info
     // default function (in callback-stub.cpp)
     //
     PRINTF("-> %s()\n\r", __FUNCTION__);
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Protocols::InteractionModel::Status::Success;
 }

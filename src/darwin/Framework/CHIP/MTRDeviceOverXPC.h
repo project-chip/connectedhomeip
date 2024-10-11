@@ -25,7 +25,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_HIDDEN
 @interface MTRDeviceOverXPC : MTRBaseDevice
 
 - (instancetype)init NS_UNAVAILABLE;

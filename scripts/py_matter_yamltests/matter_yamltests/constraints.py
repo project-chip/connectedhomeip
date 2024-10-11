@@ -15,6 +15,9 @@
 #    limitations under the License.
 #
 
+import ast
+import builtins
+import inspect
 import math
 import re
 import string
@@ -22,6 +25,12 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from .errors import TestStepError
+from .fixes import fix_typed_yaml_value
+
+
+def print_to_log(*objects, sep=' ', end=None):
+    # Try to fit in with the test logger output format
+    print('\n\t\t    ' + sep.join(str(arg) for arg in objects))
 
 
 class ConstraintParseError(Exception):
@@ -121,6 +130,11 @@ class ConstraintAnyOfError(ConstraintCheckError):
         super().__init__(context, 'anyOf', reason)
 
 
+class ConstraintPythonError(ConstraintCheckError):
+    def __init__(self, context, reason):
+        super().__init__(context, 'python', reason)
+
+
 class BaseConstraint(ABC):
     '''Constraint Interface'''
 
@@ -130,7 +144,7 @@ class BaseConstraint(ABC):
         self._is_null_allowed = is_null_allowed
         self._context = context
 
-    def validate(self, value, value_type_name):
+    def validate(self, value, value_type_name, runtime_variables):
         if value is None and self._is_null_allowed:
             return
 
@@ -194,6 +208,8 @@ class BaseConstraint(ABC):
             raise ConstraintNotValueError(self._context, reason)
         elif isinstance(self, _ConstraintAnyOf):
             raise ConstraintAnyOfError(self._context, reason)
+        elif isinstance(self, _ConstraintPython):
+            raise ConstraintPythonError(self._context, reason)
         else:
             # This should not happens.
             raise ConstraintParseError('Unknown constraint instance.')
@@ -204,7 +220,7 @@ class _ConstraintHasValue(BaseConstraint):
         super().__init__(context, types=[])
         self._has_value = has_value
 
-    def validate(self, value, value_type_name):
+    def validate(self, value, value_type_name, runtime_variables):
         # We are overriding the BaseConstraint of validate since has value is a special case where
         # we might not be expecting a value at all, but the basic null check in BaseConstraint
         # is not what we want.
@@ -801,14 +817,15 @@ class _ConstraintHasMaskClear(BaseConstraint):
 
 class _ConstraintNotValue(BaseConstraint):
     def __init__(self, context, not_value):
-        super().__init__(context, types=[], is_null_allowed=True)
+        # NOTE: do not use is_null_allowed=True here, because 'notValue: null' needs to work.
+        super().__init__(context, types=[])
         self._not_value = not_value
 
     def check_response(self, value, value_type_name) -> bool:
         return value != self._not_value
 
     def get_reason(self, value, value_type_name) -> str:
-        return f'The response value "{value}" should differs from the constraint.'
+        return f'The response value "{value}" should differ from the constraint.'
 
 
 class _ConstraintAnyOf(BaseConstraint):
@@ -821,6 +838,46 @@ class _ConstraintAnyOf(BaseConstraint):
 
     def get_reason(self, value, value_type_name) -> str:
         return f'The response value "{value}" is not a value from {self._any_of}.'
+
+
+class _ConstraintPython(BaseConstraint):
+    def __init__(self, context, source: str):
+        super().__init__(context, types=[], is_null_allowed=False)
+
+        # Parse the source as the body of a function
+        if '\n' not in source:  # treat single line code like a lambda
+            source = 'return (' + source + ')\n'
+        parsed = ast.parse(source)
+        module = ast.parse('def _func(value): pass')
+        module.body[0].body = parsed.body  # inject parsed body
+        self._ast = module
+
+    def validate(self, value, value_type_name, runtime_variables):
+        # Build a global scope that includes all runtime variables
+        scope = {name: fix_typed_yaml_value(value) for name, value in runtime_variables.items()}
+        scope['__builtins__'] = self.BUILTINS
+        # Execute the module AST and extract the defined function
+        exec(compile(self._ast, '<string>', 'exec'), scope)
+        func = scope['_func']
+        # Call the function to validate the value
+        try:
+            valid = func(value)
+        except Exception as ex:
+            self._raise_error(f'Python constraint {type(ex).__name__}: {ex}')
+        if type(valid) is not bool:
+            self._raise_error("Python constraint TypeError: must return a bool")
+        if not valid:
+            self._raise_error(f'The response value "{value}" is not valid')
+
+    def check_response(self, value, value_type_name) -> bool: pass  # unused
+    def get_reason(self, value, value_type_name) -> str: pass  # unused
+
+    # Explicitly list allowed functions / constants, avoid things like exec, eval, import. Classes are generally safe.
+    ALLOWED_BUILTINS = ['True', 'False', 'None', 'abs', 'all', 'any', 'ascii', 'bin', 'chr', 'divmod', 'enumerate', 'filter', 'format',
+                        'hex', 'isinstance', 'issubclass', 'iter', 'len', 'max', 'min', 'next', 'oct', 'ord', 'pow', 'repr', 'round', 'sorted', 'sum']
+    BUILTINS = (dict(inspect.getmembers(builtins, inspect.isclass)) |
+                {name: getattr(builtins, name) for name in ALLOWED_BUILTINS} |
+                {'print': print_to_log})
 
 
 def get_constraints(constraints: dict) -> List[BaseConstraint]:
@@ -878,6 +935,9 @@ def get_constraints(constraints: dict) -> List[BaseConstraint]:
         elif 'anyOf' == constraint:
             _constraints.append(_ConstraintAnyOf(
                 context, constraint_value))
+        elif 'python' == constraint:
+            _constraints.append(_ConstraintPython(
+                context, constraint_value))
         else:
             raise ConstraintParseError(f'Unknown constraint type:{constraint}')
 
@@ -903,9 +963,14 @@ def is_typed_constraint(constraint: str):
         'hasMasksClear': False,
         'notValue': True,
         'anyOf': True,
+        'python': False,
     }
 
     is_typed = constraints.get(constraint)
     if is_typed is None:
         raise ConstraintParseError(f'Unknown constraint type:{constraint}')
     return is_typed
+
+
+def is_variable_aware_constraint(constraint: str):
+    return constraint == 'python'

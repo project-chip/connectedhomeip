@@ -15,18 +15,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/core/TLVUpdater.h>
 
-/**
- *    @file
- *      This file implements an updating encoder for the CHIP TLV
- *      (Tag-Length-Value) encoding format.
- *
- */
+#include <stdint.h>
+#include <string.h>
 
-#include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPEncoding.h>
-#include <lib/core/TLV.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/TLVCommon.h>
+#include <lib/core/TLVReader.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVTypes.h>
+#include <lib/core/TLVWriter.h>
+#include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/logging/Constants.h>
+#include <lib/support/logging/TextOnlyLogging.h>
 
 namespace chip {
 namespace TLV {
@@ -98,6 +102,8 @@ CHIP_ERROR TLVUpdater::Init(TLVReader & aReader, uint32_t freeLen)
     mUpdaterReader.ImplicitProfileId = aReader.ImplicitProfileId;
     mUpdaterReader.AppData           = aReader.AppData;
 
+    // TODO(#30825): Need to ensure we use TLVWriter public API rather than touch the innards.
+
     // Initialize the internal writer object
     mUpdaterWriter.mBackingStore  = nullptr;
     mUpdaterWriter.mBufStart      = buf - readDataLen;
@@ -109,7 +115,8 @@ CHIP_ERROR TLVUpdater::Init(TLVReader & aReader, uint32_t freeLen)
     mUpdaterWriter.SetContainerOpen(false);
     mUpdaterWriter.SetCloseContainerReserved(false);
 
-    mUpdaterWriter.ImplicitProfileId = aReader.ImplicitProfileId;
+    mUpdaterWriter.ImplicitProfileId     = aReader.ImplicitProfileId;
+    mUpdaterWriter.mInitializationCookie = TLVWriter::kExpectedInitializationCookie;
 
     // Cache element start address for internal use
     mElementStartAddr = buf + freeLen;
@@ -142,6 +149,8 @@ CHIP_ERROR TLVUpdater::Next()
 
 CHIP_ERROR TLVUpdater::Move()
 {
+    VerifyOrReturnError(mUpdaterWriter.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     const uint8_t * elementEnd;
     uint32_t copyLen;
 
@@ -171,6 +180,8 @@ CHIP_ERROR TLVUpdater::Move()
 
 void TLVUpdater::MoveUntilEnd()
 {
+    VerifyOrDie(mUpdaterWriter.IsInitialized());
+
     const uint8_t * buffEnd = mUpdaterReader.GetReadPoint() + mUpdaterReader.GetRemainingLength();
 
     uint32_t copyLen = static_cast<uint32_t>(buffEnd - mElementStartAddr);
@@ -178,6 +189,7 @@ void TLVUpdater::MoveUntilEnd()
     // Move all elements till end to output TLV
     memmove(mUpdaterWriter.mWritePoint, mElementStartAddr, copyLen);
 
+    // TODO(#30825): Need to ensure public API is used rather than touching the innards.
     // Adjust the updater state
     mElementStartAddr += copyLen;
     mUpdaterWriter.mWritePoint += copyLen;
@@ -197,6 +209,8 @@ void TLVUpdater::MoveUntilEnd()
 
 CHIP_ERROR TLVUpdater::EnterContainer(TLVType & outerContainerType)
 {
+    VerifyOrReturnError(mUpdaterWriter.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     TLVType containerType;
 
     VerifyOrReturnError(TLVTypeIsContainer(static_cast<TLVType>(mUpdaterReader.mControlByte & kTLVTypeMask)),
@@ -232,6 +246,8 @@ CHIP_ERROR TLVUpdater::ExitContainer(TLVType outerContainerType)
  */
 void TLVUpdater::AdjustInternalWriterFreeSpace()
 {
+    VerifyOrDie(mUpdaterWriter.IsInitialized());
+
     const uint8_t * nextElementStart = mUpdaterReader.mReadPoint;
 
     if (nextElementStart != mElementStartAddr)

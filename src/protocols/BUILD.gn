@@ -38,27 +38,12 @@ static_library("protocols") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    ":im_status",
     ":type_definitions",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols/bdx",
+    "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/protocols/secure_channel",
-  ]
-}
-
-static_library("im_status") {
-  sources = [
-    "interaction_model/StatusCode.cpp",
-    "interaction_model/StatusCode.h",
-  ]
-
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
-    ":type_definitions",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
   ]
 }

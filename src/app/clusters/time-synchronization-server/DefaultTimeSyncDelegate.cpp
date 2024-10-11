@@ -24,17 +24,6 @@
 using chip::TimeSyncDataProvider;
 using namespace chip::app::Clusters::TimeSynchronization;
 
-void DefaultTimeSyncDelegate::TimeZoneListChanged(const Span<TimeSyncDataProvider::TimeZoneStore> timeZoneList)
-{
-    // placeholder implementation
-}
-
-bool DefaultTimeSyncDelegate::HandleUpdateDSTOffset(chip::CharSpan name)
-{
-    // placeholder implementation
-    return false;
-}
-
 bool DefaultTimeSyncDelegate::IsNTPAddressValid(chip::CharSpan ntp)
 {
     // placeholder implementation
@@ -44,8 +33,10 @@ bool DefaultTimeSyncDelegate::IsNTPAddressValid(chip::CharSpan ntp)
 
 bool DefaultTimeSyncDelegate::IsNTPAddressDomain(chip::CharSpan ntp)
 {
-    // placeholder implementation
-    return false;
+    // For now, assume anything that includes a . is a domain name.
+    // Delegates are free to evaluate this properly if they actually HAVE domain
+    // name resolution, rather than just implementing a dummy for testing.
+    return !IsNTPAddressValid(ntp) && (memchr(ntp.data(), '.', ntp.size()) != nullptr);
 }
 
 CHIP_ERROR DefaultTimeSyncDelegate::UpdateTimeFromPlatformSource(chip::Callback::Callback<OnTimeSyncCompletion> * callback)
@@ -63,11 +54,5 @@ CHIP_ERROR DefaultTimeSyncDelegate::UpdateTimeFromPlatformSource(chip::Callback:
         callback->mCall(callback->mContext, TimeSourceEnum::kMixedNTP, GranularityEnum::kMillisecondsGranularity);
         return CHIP_NO_ERROR;
     }
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR DefaultTimeSyncDelegate::UpdateTimeUsingNTPFallback(const CharSpan & fallbackNTP,
-                                                               chip::Callback::Callback<OnFallbackNTPCompletion> * callback)
-{
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

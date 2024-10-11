@@ -25,6 +25,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="3"/>
+
+    <features>
+      <feature bit="0" code="EXT" name="Extended" summary="Extended range and resolution">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="PRESSURE_MEASURED_VALUE" type="int16s" writable="false" reportable="true" optional="false" isNullable="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="PRESSURE_MIN_MEASURED_VALUE" type="int16s" writable="false" optional="false" isNullable="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="PRESSURE_MAX_MEASURED_VALUE" type="int16s" writable="false" optional="false" isNullable="true">MaxMeasuredValue</attribute>
@@ -36,8 +43,4 @@ limitations under the License.
     <attribute side="server" code="0x0014" define="PRESSURE_SCALE" type="int8s" writable="false" optional="true" default="0">Scale</attribute>
   </cluster>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0403"/>
-    <field name="Extended" mask="0x1"/>
-  </bitmap>
 </configurator>

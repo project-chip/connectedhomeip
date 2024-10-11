@@ -27,10 +27,24 @@
 
 #pragma once
 
-#include "TLVCommon.h"
+#include <cstdio>
+#include <stdint.h>
+#include <type_traits>
+#include <utility>
 
-#include "TLVBackingStore.h"
-#include "TLVReader.h"
+#include <lib/core/CHIPError.h>
+#include <lib/core/TLVReader.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVTypes.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/BitMask.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/EnforceFormat.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/Span.h>
+#include <lib/support/TypeTraits.h>
+#include <system/SystemConfig.h>
 
 /**
  * @namespace chip::TLV
@@ -61,6 +75,18 @@ class DLL_EXPORT TLVWriter
     friend class TLVUpdater;
 
 public:
+    TLVWriter();
+
+    // TODO(#30825): We do not cleanly handle copies for all backing stores, but we don't disallow copy...
+#if 0
+    // Disable copy (and move) semantics.
+    TLVWriter(const TLVWriter&) = delete;
+    TLVWriter& operator=(const TLVWriter&) = delete;
+#endif
+
+    // Initialization cookie that is set when properly initialized. Randomly-picked 16 bit value.
+    static constexpr uint16_t kExpectedInitializationCookie = 0x52b1;
+
     /**
      * Initializes a TLVWriter object to write into a single output buffer.
      *
@@ -115,6 +141,7 @@ public:
      * (See @p OpenContainer()).
      *
      * @retval #CHIP_NO_ERROR      If the encoding was finalized successfully.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -127,24 +154,25 @@ public:
      * Reserve some buffer for encoding future fields.
      *
      * @retval #CHIP_NO_ERROR        Successfully reserved required buffer size.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_NO_MEMORY The reserved buffer size cannot fits into the remaining buffer size.
+     * @retval #CHIP_ERROR_INCORRECT_STATE
+     *                               Uses TLVBackingStore and is in a state where it might allocate
+     *                               additional non-contigious memory, thus making it difficult/impossible
+     *                               to properly reserve space.
      */
-    CHIP_ERROR ReserveBuffer(uint32_t aBufferSize)
-    {
-        VerifyOrReturnError(mRemainingLen >= aBufferSize, CHIP_ERROR_NO_MEMORY);
-        mReservedSize += aBufferSize;
-        mRemainingLen -= aBufferSize;
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR ReserveBuffer(uint32_t aBufferSize);
 
     /**
      * Release previously reserved buffer.
      *
      * @retval #CHIP_NO_ERROR        Successfully released reserved buffer size.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_NO_MEMORY The released buffer is larger than previously reserved buffer size.
      */
     CHIP_ERROR UnreserveBuffer(uint32_t aBufferSize)
     {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mReservedSize >= aBufferSize, CHIP_ERROR_NO_MEMORY);
         mReservedSize -= aBufferSize;
         mRemainingLen += aBufferSize;
@@ -161,6 +189,7 @@ public:
      * @param[in]   v               The value to be encoded.
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -193,6 +222,7 @@ public:
      *                              are strongly encouraged to set this parameter to false.
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -251,6 +281,7 @@ public:
      * @param[in]   v               The value to be encoded.
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -341,6 +372,7 @@ public:
      * @param[in]   v               The value to be encoded.
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -374,6 +406,7 @@ public:
      * @param[in]   data            A ByteSpan object containing the bytes string to be encoded.
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -431,6 +464,7 @@ public:
      * @param[in]   v               The value to be encoded.
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -472,6 +506,7 @@ public:
      * @param[in]   len             The number of bytes to be encoded.
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -500,6 +535,7 @@ public:
      * @param[in]   buf             A pointer to the null-terminated UTF-8 string to be encoded.
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -529,6 +565,7 @@ public:
      * @param[in]   len             The length (in bytes) of the string to be encoded.
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -557,6 +594,7 @@ public:
      * @param[in]   str             A Span containing a pointer and a length of the string to be encoded.
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -680,6 +718,7 @@ public:
      *                              ContextTag() or CommonTag().
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -716,7 +755,7 @@ public:
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
      * @retval #CHIP_ERROR_INCORRECT_STATE
-     *                              If the supplied reader is not positioned on an element.
+     *                              If the supplied reader is not positioned on an element or if the writer is not initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -765,7 +804,7 @@ public:
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
      * @retval #CHIP_ERROR_INCORRECT_STATE
-     *                              If the supplied reader is not positioned on an element.
+     *                              If the supplied reader is not positioned on an element or if the writer is not initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -815,6 +854,7 @@ public:
      *                              writer.
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_WRONG_TLV_TYPE
      *                              If the value specified for containerType is incorrect.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
@@ -855,7 +895,7 @@ public:
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
      * @retval #CHIP_ERROR_INCORRECT_STATE
-     *                              If a corresponding StartContainer() call was not made.
+     *                              If a corresponding StartContainer() call was not made or if the TLVWriter is not initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -903,6 +943,7 @@ public:
      *                              associated with the supplied object is overwritten.
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_WRONG_TLV_TYPE
      *                              If the value specified for containerType is incorrect.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
@@ -940,7 +981,8 @@ public:
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
      * @retval #CHIP_ERROR_INCORRECT_STATE
-     *                              If the supplied container writer is not in the correct state.
+     *                              If the supplied container writer is not in the correct state or if the TLVWriter is not
+     * initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If another container writer has been opened on the supplied
      *                              container writer and not yet closed.
@@ -979,6 +1021,7 @@ public:
      * @param[in]   dataLen         The number of bytes in the @p data buffer.
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_WRONG_TLV_TYPE
      *                              If the value specified for containerType is incorrect.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
@@ -1018,7 +1061,8 @@ public:
      * @retval #CHIP_ERROR_INVALID_ARGUMENT
      *                              If the supplied reader uses a TLVBackingStore rather than a simple buffer.
      * @retval #CHIP_ERROR_INCORRECT_STATE
-     *                              If the supplied reader is not positioned on a container element.
+     *                              If the supplied reader is not positioned on a container element or if the TLVWriter was not
+     * initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -1070,7 +1114,8 @@ public:
      * @retval #CHIP_ERROR_INVALID_ARGUMENT
      *                              If the supplied reader uses a TLVBackingStore rather than a simple buffer.
      * @retval #CHIP_ERROR_INCORRECT_STATE
-     *                              If the supplied reader is not positioned on a container element.
+     *                              If the supplied reader is not positioned on a container element or of the TLVWriter was not
+     * initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -1117,6 +1162,7 @@ public:
      * @param[in] encodedContainerLen   The length in bytes of the pre-encoded container.
      *
      * @retval #CHIP_NO_ERROR          If the method succeeded.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                                  If a container writer has been opened on the current writer and not
      *                                  yet closed.
@@ -1165,6 +1211,12 @@ public:
      * @return the total remaining number of bytes.
      */
     uint32_t GetRemainingFreeLength() const { return mRemainingLen; }
+
+    /**
+     * @brief Returns true if this TLVWriter was properly initialized.
+     */
+    bool IsInitialized() const { return mInitializationCookie == kExpectedInitializationCookie; }
+
     /**
      * The profile id of tags that should be encoded in implicit form.
      *
@@ -1197,6 +1249,7 @@ protected:
     uint32_t mMaxLen;
     uint32_t mReservedSize;
     TLVType mContainerType;
+    uint16_t mInitializationCookie;
 
 private:
     bool mContainerOpen;

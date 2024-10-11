@@ -85,7 +85,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: TH_CR1 opens a commissioning window on DUT_CE"
+    - label:
+          "Step 2: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       PICS: CADMIN.S.C01.Rsp
@@ -115,8 +117,10 @@ tests:
 
     #As per issue https://github.com/CHIP-Specifications/chip-test-scripts/issues/495 adding --discover-once flag
     - label:
-          "Step 4.1: TH_CR2 starts a commissioning process with DUT_CE using
-          Invalid setup code"
+          "Step 4.1: Before the expiration of PIXIT.CADMIN.CwDuration set in
+          step 2, set up a TH_CR2 to start attempting to do PASE to DUT_CE and
+          failing 20 times. This can be done using a valid onboarding payload
+          with an incorrect setupcode"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -475,8 +479,9 @@ tests:
 
     # This step must match the verification step above where we checked `correctPayload`
     - label:
-          "Step 5a: TH_CR2 attempts to do PASE to DUT_CE using the correct
-          onboarding payload"
+          "Step 5a: Before the expiration of PIXIT.CADMIN.CwDuration set in step
+          2, TH_CR2 attempts to do PASE to DUT_CE using the correct onboarding
+          payload"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"

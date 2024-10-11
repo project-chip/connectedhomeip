@@ -20,8 +20,8 @@ assert(chip_build_tools)
 
 executable("chip-bridge-app") {
   sources = [
+    "${chip_root}/examples/bridge-app/bridge-common/include/CHIPProjectAppConfig.h",
     "${chip_root}/examples/bridge-app/linux/bridged-actions-stub.cpp",
-    "${chip_root}/examples/tv-app/tv-common/include/CHIPProjectAppConfig.h",
     "Device.cpp",
     "include/Device.h",
     "include/main.h",
@@ -42,5 +42,9 @@ executable("chip-bridge-app") {
 }
 
 group("linux") {
+  deps = [ ":chip-bridge-app" ]
+}
+
+group("default") {
   deps = [ ":chip-bridge-app" ]
 }

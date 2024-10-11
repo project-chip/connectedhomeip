@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Read PHYRate attribute constraints"
+    - label: "Step 2: TH reads PHYRate attribute constraints"
       PICS: DGETH.S.A0000
       command: "readAttribute"
       attribute: "PHYRate"
@@ -40,7 +40,7 @@ tests:
               type: enum8
               anyOf: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, null]
 
-    - label: "Step 3: Read FullDuplex attribute constraints"
+    - label: "Step 3: TH reads FullDuplex attribute constraints"
       PICS: DGETH.S.A0001
       command: "readAttribute"
       attribute: "FullDuplex"
@@ -49,7 +49,7 @@ tests:
               type: boolean
               anyOf: [0, 1, null]
 
-    - label: "Step 4a: Read PacketRxCount attribute constraints"
+    - label: "Step 4a: TH reads PacketRxCount attribute constraints"
       PICS: DGETH.S.A0002
       command: "readAttribute"
       attribute: "PacketRxCount"
@@ -101,7 +101,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 5a: Read PacketTxCount attribute constraints"
+    - label: "Step 5a: TH reads PacketTxCount attribute constraints"
       PICS: DGETH.S.A0003
       command: "readAttribute"
       attribute: "PacketTxCount"
@@ -113,7 +113,7 @@ tests:
 
     #Test-plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3413
     - label:
-          "Step 5b: Read PacketTxCount attribute constraints, Upon a node
+          "Step 5b: TH reads PacketTxCount attribute constraints, Upon a node
           reboot, the value will be reset to 0"
       verification: |
           Upon a node reboot, the value will be reset to 0.
@@ -128,8 +128,8 @@ tests:
                 value: "y"
 
     - label:
-          "Step 6: Read TxErrCount attribute constraints, Upon a node reboot,
-          the value will be reset to 0"
+          "Step 6: TH reads TxErrCount attribute constraints, Upon a node
+          reboot, the value will be reset to 0"
       PICS: DGETH.S.A0004
       command: "readAttribute"
       attribute: "TxErrCount"
@@ -139,8 +139,8 @@ tests:
               type: int64u
 
     - label:
-          "Step 7: Read CollisionCount attribute , Upon a node reboot, the value
-          will be reset to 0"
+          "Step 7: TH reads CollisionCount attribute , Upon a node reboot, the
+          value will be reset to 0"
       PICS: DGETH.S.A0005
       command: "readAttribute"
       attribute: "CollisionCount"
@@ -149,7 +149,7 @@ tests:
           constraints:
               type: int64u
 
-    - label: "Step 8: Read OverrunCount attribute constraints"
+    - label: "Step 8: TH reads OverrunCount attribute constraints"
       PICS: DGETH.S.A0006
       command: "readAttribute"
       attribute: "OverrunCount"
@@ -158,7 +158,7 @@ tests:
           constraints:
               type: int64u
 
-    - label: "Step 9: Read CarrierDetect attribute constraints"
+    - label: "Step 9: TH reads CarrierDetect attribute constraints"
       PICS: DGETH.S.A0007
       command: "readAttribute"
       attribute: "CarrierDetect"
@@ -167,7 +167,7 @@ tests:
               type: boolean
               anyOf: [0, 1, null]
 
-    - label: "Step 10: Read TimeSinceReset attribute constraints"
+    - label: "Step 10: TH reads TimeSinceReset attribute constraints"
       PICS: DGETH.S.A0008
       command: "readAttribute"
       attribute: "TimeSinceReset"

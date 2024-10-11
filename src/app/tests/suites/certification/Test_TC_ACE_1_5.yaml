@@ -36,7 +36,7 @@ config:
         defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved for TH1"
+    - label: "Step 1: TH1 commissions DUT using admin node ID N1"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -81,7 +81,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 2: Open Commissioning Window from alpha"
+    - label: "Step 2: TH1 opens the commissioning window on the DUT"
       cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
@@ -108,7 +108,7 @@ tests:
               - name: "ms"
                 value: waitAfterCommissioning
 
-    - label: "Step 3: Commission from TH2"
+    - label: "Step 3: TH2 commissions DUT using admin node ID N2"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -130,7 +130,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 4: TH2 reads the fabric index"
+    - label:
+          "Step 4: TH2 reads its fabric index from the Operational Credentials
+          cluster CurrentFabricIndex attribute"
       identity: "beta"
       PICS: PICS_SDK_CI_ONLY
       cluster: "Operational Credentials"
@@ -169,7 +171,14 @@ tests:
                 saveAs: commissionerNodeIdAlpha
 
     - label:
-          "Step 5: TH1 writes ACL giving view privilege for descriptor cluster"
+          "Step 5: TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute,value is list of AccessControlEntryStruct containing 2
+          elements 1.Struct : a)Fabric Index: 1 b)Privilege field: Administer
+          (5) c)AuthMode field: CASE (2) d)Subjects field: [N1] e)Targets
+          field:[{Cluster: AccessControl (0x001f), Endpoint: 0}] 2.struct :
+          a)Fabric Index: 1 b)Privilege field: View (1) c)AuthMode field: CASE
+          (2) d)Subjects field: null e)Targets field: [{Cluster: Descriptor
+          (0x001d), Endpoint: 0}]"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
@@ -202,7 +211,12 @@ tests:
               - name: "nodeId"
                 saveAs: commissionerNodeIdBeta
 
-    - label: "Step 6: TH2 writes ACL giving view privilge for basic cluster"
+    - label:
+          "Step 6: TH2 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute,value is list of AccessControlEntryStruct containing 2
+          elements 1.Struct : a)Fabric Index: th2FabricIndex b)Privilege field:
+          Administer (5) c)AuthMode field: CASE (2) d)Subjects field: [N2]
+          e)Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]"
       identity: beta
       PICS: PICS_SDK_CI_ONLY
       command: "writeAttribute"
@@ -249,21 +263,25 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 7: TH1 reads descriptor cluster - expect SUCCESS"
+    - label:
+          "Step 7: TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList
+          attribute"
       command: "readAttribute"
       cluster: "Descriptor"
       attribute: "DeviceTypeList"
 
     - label:
           "Step 8: TH1 reads DUT Endpoint 0 Basic Information cluster VendorID
-          attribute - expect UNSUPPORTED_ACCESS"
+          attribute"
       command: "readAttribute"
       cluster: "Basic Information"
       attribute: "VendorID"
       response:
           error: UNSUPPORTED_ACCESS
 
-    - label: "Step 9: TH2 reads descriptor cluster - expect UNSUPPORTED_ACCESS"
+    - label:
+          "Step 9: TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList
+          attribute"
       identity: "beta"
       PICS: PICS_SDK_CI_ONLY
       command: "readAttribute"
@@ -295,7 +313,7 @@ tests:
 
     - label:
           "Step 10: TH2 reads DUT Endpoint 0 Basic Information cluster VendorID
-          attribute - expect SUCCESS"
+          attribute"
       identity: "beta"
       PICS: PICS_SDK_CI_ONLY
       command: "readAttribute"
@@ -324,7 +342,12 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 11: TH1 resets ACL to default"
+    - label:
+          "Step 11: TH1 resets the ACLs to the default value bywriting DUT
+          Endpoint 0 AccessControl cluster ACL attribute,value is list of
+          AccessControlEntryStruct containing 1 elements 1.Struct : a)Fabric
+          Index: 1 b)Privilege field: Administer (5) c)AuthMode field: CASE (2)
+          d)Subjects field: [N1] e)Targets field: null"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
@@ -338,7 +361,9 @@ tests:
                   },
               ]
 
-    - label: "Step 12: TH1 sends RemoveFabric command for TH2"
+    - label:
+          "Step 12: TH1 removes the TH2 fabric by sending the RemoveFabric
+          command to the DUT with the FabricIndex set to th2FabricIndex"
       cluster: "Operational Credentials"
       PICS: PICS_SDK_CI_ONLY
       command: "RemoveFabric"
@@ -348,7 +373,9 @@ tests:
                 value: th2FabricIndex
 
     #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
-    - label: "Step 12: TH1 sends RemoveFabric command for TH2"
+    - label:
+          "Step 12: TH1 removes the TH2 fabric by sending the RemoveFabric
+          commandto the DUT with the FabricIndex set to th2FabricIndex"
       verification: |
           ./chip-tool operationalcredentials remove-fabric 2 1 0
 

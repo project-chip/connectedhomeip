@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -52,15 +54,23 @@ tests:
               minValue: 0
               maxValue: 1
 
-    - label: "Step 4: TH reads from the DUT the ChangeIndication attribute."
-      PICS: ACFREMON.S.A0002
+    - label: "Step 4a: TH reads from the DUT the ChangeIndication attribute."
+      PICS: ACFREMON.S.A0002 && !ACFREMON.S.F01
       command: "readAttribute"
       attribute: "ChangeIndication"
       response:
           constraints:
               type: enum8
-              minValue: 0
-              maxValue: 2
+              anyOf: [0, 2]
+
+    - label: "Step 4b: TH reads from the DUT the ChangeIndication attribute."
+      PICS: ACFREMON.S.F01 && ACFREMON.S.A0002
+      command: "readAttribute"
+      attribute: "ChangeIndication"
+      response:
+          value: 1
+          constraints:
+              type: enum8
 
     - label: "Step 5: TH reads from the DUT the InPlaceIndicator attribute"
       PICS: ACFREMON.S.A0003

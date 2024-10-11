@@ -17,7 +17,11 @@
 
 #pragma once
 
-#include <app/icd/ICDStateObserver.h>
+#include <app/icd/server/ICDServerConfig.h>
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/server/ICDManager.h> // nogncheck
+#endif
+#include <app/icd/server/ICDStateObserver.h>
 #include <app/server/CommissioningModeProvider.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
@@ -89,7 +93,10 @@ public:
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     template <class AdvertisingParams>
     void AddICDKeyToAdvertisement(AdvertisingParams & advParams);
+
+    void SetICDManager(ICDManager * manager) { mICDManager = manager; };
 #endif
+
     /// Start operational advertising
     CHIP_ERROR AdvertiseOperational();
 
@@ -120,11 +127,25 @@ public:
      */
     CHIP_ERROR SetEphemeralDiscriminator(Optional<uint16_t> discriminator);
 
-    // ICDStateObserver
-    // No action is needed by the DnssdServer on active or idle state entries
-    void OnEnterActiveMode() override{};
-    void OnTransitionToIdle() override{};
+    /**
+     * @brief When the ICD changes operating mode, the dnssd server needs to restart its DNS-SD advertising to update the TXT keys.
+     */
     void OnICDModeChange() override;
+
+    /**
+     * @brief dnssd server has no action to do on this ICD event. Do nothing.
+     */
+    void OnEnterActiveMode() override{};
+
+    /**
+     * @brief dnssd server has no action to do on this ICD event. Do nothing.
+     */
+    void OnTransitionToIdle() override{};
+
+    /**
+     * @brief dnssd server has no action to do on this ICD event. Do nothing.
+     */
+    void OnEnterIdleMode() override{};
 
 private:
     /// Overloaded utility method for commissioner and commissionable advertisement
@@ -140,6 +161,11 @@ private:
     /// Set MDNS commissionable node advertisement
     CHIP_ERROR AdvertiseCommissionableNode(chip::Dnssd::CommissioningMode mode);
 
+    // Our randomly-generated fallback "MAC address", in case we don't have a real one.
+    uint8_t mFallbackMAC[chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength] = { 0 };
+
+    void GetPrimaryOrFallbackMACAddress(chip::MutableByteSpan mac);
+
     //
     // Check if we have any valid operational credentials present in the fabric table and return true
     // if we do.
@@ -148,6 +174,10 @@ private:
 
     FabricTable * mFabricTable                             = nullptr;
     CommissioningModeProvider * mCommissioningModeProvider = nullptr;
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    ICDManager * mICDManager = nullptr;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     uint16_t mSecuredPort          = CHIP_PORT;
     uint16_t mUnsecuredPort        = CHIP_UDC_PORT;

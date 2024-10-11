@@ -18,6 +18,7 @@
 package matter.controller
 
 import java.time.Duration
+import java.util.Optional
 import matter.controller.model.AttributePath
 import matter.controller.model.CommandPath
 import matter.controller.model.EventPath
@@ -150,11 +151,40 @@ sealed class SubscriptionState {
  *
  * @param attributePath The attribute path information in the write request.
  * @param tlvPayload The ByteArray representation of the TLV payload.
+ * @param dataVersion The data version in the write request.
  */
 class WriteRequest(
   val attributePath: AttributePath,
   val tlvPayload: ByteArray,
-)
+  val dataVersion: UInt? = null
+) {
+  private fun getEndpointId(wildcardId: Long): Long {
+    return attributePath.endpointId?.toLong() ?: wildcardId
+  }
+
+  private fun getClusterId(wildcardId: Long): Long {
+    return attributePath.clusterId?.toLong() ?: wildcardId
+  }
+
+  private fun getAttributeId(wildcardId: Long): Long {
+    return attributePath.attributeId?.toLong() ?: wildcardId
+  }
+
+  // For JNI interface
+  private fun getJsonString(): String? = null
+
+  fun getTlvByteArray(): ByteArray {
+    return tlvPayload
+  }
+
+  fun hasDataVersion(): Boolean {
+    return dataVersion != null
+  }
+
+  fun getDataVersion(): Int {
+    return dataVersion?.toInt() ?: 0
+  }
+}
 
 /**
  * Information about a collection of write request elements.
@@ -189,8 +219,39 @@ sealed interface WriteResponse {
 class InvokeRequest(
   val commandPath: CommandPath,
   val tlvPayload: ByteArray,
-  val timedRequest: Duration?
-)
+  val timedRequest: Duration?,
+  val jsonString: String? = null
+) {
+  private fun getEndpointId(wildcardId: Long): Long {
+    return commandPath.endpointId?.toLong() ?: wildcardId
+  }
+
+  @Suppress("UNUSED_PARAMETER")
+  private fun getClusterId(wildcardId: Long): Long {
+    return commandPath.clusterId.toLong()
+  }
+
+  @Suppress("UNUSED_PARAMETER")
+  private fun getCommandId(wildcardId: Long): Long {
+    return commandPath.commandId.toLong()
+  }
+
+  fun getGroupId(): Optional<Int> {
+    return Optional.ofNullable(commandPath.groupId?.toInt())
+  }
+
+  fun isEndpointIdValid(): Boolean {
+    return commandPath.groupId == null
+  }
+
+  fun isGroupIdValid(): Boolean {
+    return commandPath.groupId != null
+  }
+
+  fun getTlvByteArray(): ByteArray {
+    return tlvPayload
+  }
+}
 
 /**
  * InvokeResponse will be received when a invoke response has been successful received and
@@ -198,4 +259,4 @@ class InvokeRequest(
  *
  * @param payload An invoke response that could contain tlv data or empty.
  */
-class InvokeResponse(val payload: ByteArray)
+class InvokeResponse(val payload: ByteArray, val path: CommandPath, val jsonString: String? = null)

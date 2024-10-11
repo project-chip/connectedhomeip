@@ -129,6 +129,9 @@ def build_darwin_framework(args):
     if args.enable_encoding_sentinel_enum_values:
         cflags += ["-DCHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES=1"]
 
+    if args.compdb:
+        cflags += ["-gen-cdb-fragment-path ", abs_path + '/compdb']
+
     command += ["OTHER_CFLAGS=" + ' '.join(cflags), "OTHER_LDFLAGS=" + ' '.join(ldflags)]
     command_result = run_command(command)
     print("Build Framework Result: {}".format(command_result))
@@ -172,6 +175,7 @@ if __name__ == "__main__":
     parser.add_argument('--ble', action=argparse.BooleanOptionalAction)
     parser.add_argument('--clang', action=argparse.BooleanOptionalAction)
     parser.add_argument('--enable-encoding-sentinel-enum-values', action=argparse.BooleanOptionalAction)
+    parser.add_argument('--compdb', action=argparse.BooleanOptionalAction)
 
     args = parser.parse_args()
     build_darwin_framework(args)

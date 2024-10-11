@@ -15,10 +15,16 @@
  *    limitations under the License.
  */
 
+// NOTE: This class was not intended to be part of the public Matter API;
+// internally this class has been replaced by MTRAsyncWorkQueue. This code
+// remains here simply to preserve API/ABI compatibility.
+
 #import <dispatch/dispatch.h>
 #import <os/lock.h>
 
 #import "MTRLogging_Internal.h"
+#import "MTRUnfairLock.h"
+
 #import <Matter/MTRAsyncCallbackWorkQueue.h>
 
 #pragma mark - Class extensions
@@ -68,14 +74,10 @@
 
 - (NSString *)description
 {
-    os_unfair_lock_lock(&_lock);
+    std::lock_guard lock(_lock);
 
-    auto * desc = [NSString
-        stringWithFormat:@"MTRAsyncCallbackWorkQueue context: %@ items count: %lu", self.context, (unsigned long) self.items.count];
-
-    os_unfair_lock_unlock(&_lock);
-
-    return desc;
+    return [NSString
+        stringWithFormat:@"MTRAsyncCallbackWorkQueue context: %@ items count: %lu", self.context, static_cast<unsigned long>(self.items.count)];
 }
 
 - (void)enqueueWorkItem:(MTRAsyncCallbackQueueWorkItem *)item
@@ -87,12 +89,11 @@
 
     [item markEnqueued];
 
-    os_unfair_lock_lock(&_lock);
+    std::lock_guard lock(_lock);
     item.workQueue = self;
     [self.items addObject:item];
 
     [self _callNextReadyWorkItem];
-    os_unfair_lock_unlock(&_lock);
 }
 
 - (void)invalidate
@@ -111,11 +112,10 @@
 // called after executing a work item
 - (void)_postProcessWorkItem:(MTRAsyncCallbackQueueWorkItem *)workItem retry:(BOOL)retry
 {
-    os_unfair_lock_lock(&_lock);
+    std::lock_guard lock(_lock);
     // sanity check if running
     if (!self.runningWorkItemCount) {
         // something is wrong with state - nothing is currently running
-        os_unfair_lock_unlock(&_lock);
         MTR_LOG_ERROR("MTRAsyncCallbackWorkQueue endWork: no work is running on work queue");
         return;
     }
@@ -125,7 +125,6 @@
     MTRAsyncCallbackQueueWorkItem * firstWorkItem = self.items.firstObject;
     if (firstWorkItem != workItem) {
         // something is wrong with this work item - should not be currently running
-        os_unfair_lock_unlock(&_lock);
         MTR_LOG_ERROR("MTRAsyncCallbackWorkQueue endWork: work item is not first on work queue");
         return;
     }
@@ -138,7 +137,6 @@
     // when "concurrency width" is implemented this will be decremented instead
     self.runningWorkItemCount = 0;
     [self _callNextReadyWorkItem];
-    os_unfair_lock_unlock(&_lock);
 }
 
 - (void)endWork:(MTRAsyncCallbackQueueWorkItem *)workItem
@@ -199,34 +197,30 @@
 
 - (void)invalidate
 {
-    os_unfair_lock_lock(&_lock);
+    std::lock_guard lock(_lock);
     [self _invalidate];
-    os_unfair_lock_unlock(&_lock);
 }
 
 - (void)markEnqueued
 {
-    os_unfair_lock_lock(&_lock);
+    std::lock_guard lock(_lock);
     _enqueued = YES;
-    os_unfair_lock_unlock(&_lock);
 }
 
 - (void)setReadyHandler:(MTRAsyncCallbackReadyHandler)readyHandler
 {
-    os_unfair_lock_lock(&_lock);
+    std::lock_guard lock(_lock);
     if (!_enqueued) {
         _readyHandler = readyHandler;
     }
-    os_unfair_lock_unlock(&_lock);
 }
 
 - (void)setCancelHandler:(dispatch_block_t)cancelHandler
 {
-    os_unfair_lock_lock(&_lock);
+    std::lock_guard lock(_lock);
     if (!_enqueued) {
         _cancelHandler = cancelHandler;
     }
-    os_unfair_lock_unlock(&_lock);
 }
 
 - (void)endWork

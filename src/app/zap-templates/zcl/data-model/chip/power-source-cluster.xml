@@ -24,6 +24,25 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node.</description>
+
+    <features>
+      <feature bit="0" code="WIRED" name="Wired" summary="A wired power source">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="BAT" name="Battery" summary="A battery power source">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="RECHG" name="Rechargeable" summary="A rechargeable battery power source">
+        <optionalConform>
+          <feature name="BAT"/>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="REPLC" name="Replaceable" summary="A replaceable battery power source">
+        <optionalConform>
+          <feature name="BAT"/>
+        </optionalConform>
+      </feature>
+    </features>
     
     <attribute side="server" code="0x0000" define="POWER_SOURCE_STATUS" type="PowerSourceStatusEnum" writable="false">Status</attribute>
     <attribute side="server" code="0x0001" define="POWER_SOURCE_ORDER" type="int8u" min="0x00" max="0xFF" writable="false">Order</attribute>
@@ -36,7 +55,7 @@ limitations under the License.
     <attribute side="server" code="0x0007" define="POWER_SOURCE_WIRED_NOMINAL_VOLTAGE" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredNominalVoltage</attribute>
     <attribute side="server" code="0x0008" define="POWER_SOURCE_WIRED_MAXIMUM_CURRENT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredMaximumCurrent</attribute>
     <attribute side="server" code="0x0009" define="POWER_SOURCE_WIRED_PRESENT" type="boolean" writable="false" optional="true">WiredPresent</attribute>
-    <attribute side="server" code="0x000A" define="POWER_SOURCE_ACTIVE_WIRED_FAULTS" type="ARRAY" entryType="WiredFaultEnum" length="8" writable="false" optional="true">ActiveWiredFaults</attribute>
+    <attribute side="server" code="0x000A" define="POWER_SOURCE_ACTIVE_WIRED_FAULTS" type="array" entryType="WiredFaultEnum" length="8" writable="false" optional="true">ActiveWiredFaults</attribute>
 
     <attribute side="server" code="0x000B" define="POWER_SOURCE_BAT_VOLTAGE" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">BatVoltage</attribute>
     <attribute side="server" code="0x000C" define="POWER_SOURCE_BAT_PERCENT_REMAINING" type="int8u" min="0x00" max="0xC8" writable="false" optional="true" isNullable="true">BatPercentRemaining</attribute>
@@ -45,7 +64,7 @@ limitations under the License.
     <attribute side="server" code="0x000F" define="POWER_SOURCE_BAT_REPLACEMENT_NEEDED" type="boolean" writable="false" optional="true">BatReplacementNeeded</attribute>
     <attribute side="server" code="0x0010" define="POWER_SOURCE_BAT_REPLACEABILITY" type="BatReplaceabilityEnum" writable="false" optional="true">BatReplaceability</attribute>
     <attribute side="server" code="0x0011" define="POWER_SOURCE_BAT_PRESENT" type="boolean" writable="false" optional="true">BatPresent</attribute>
-    <attribute side="server" code="0x0012" define="POWER_SOURCE_ACTIVE_BAT_FAULTS" type="ARRAY" entryType="BatFaultEnum" length="8" writable="false" optional="true">ActiveBatFaults</attribute>
+    <attribute side="server" code="0x0012" define="POWER_SOURCE_ACTIVE_BAT_FAULTS" type="array" entryType="BatFaultEnum" length="8" writable="false" optional="true">ActiveBatFaults</attribute>
     <attribute side="server" code="0x0013" define="POWER_SOURCE_BAT_REPLACEMENT_DESCRIPTION" type="char_string" length="60" writable="false" optional="true">BatReplacementDescription</attribute>
     <attribute side="server" code="0x0014" define="POWER_SOURCE_BAT_COMMON_DESIGNATION" type="BatCommonDesignationEnum" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatCommonDesignation</attribute>
     <attribute side="server" code="0x0015" define="POWER_SOURCE_BAT_ANSI_DESIGNATION" type="char_string" length="20" writable="false" optional="true">BatANSIDesignation</attribute>
@@ -57,8 +76,8 @@ limitations under the License.
     <attribute side="server" code="0x001B" define="POWER_SOURCE_BAT_TIME_TO_FULL_CHARGE" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">BatTimeToFullCharge</attribute>
     <attribute side="server" code="0x001C" define="POWER_SOURCE_BAT_FUNCTIONAL_WHILE_CHARGING" type="boolean" writable="false" optional="true">BatFunctionalWhileCharging</attribute>
     <attribute side="server" code="0x001D" define="POWER_SOURCE_BAT_CHARGING_CURRENT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">BatChargingCurrent</attribute>
-    <attribute side="server" code="0x001E" define="POWER_SOURCE_ACTIVE_BAT_CHARGE_FAULTS" type="ARRAY" entryType="BatChargeFaultEnum" length="16" writable="false" optional="true">ActiveBatChargeFaults</attribute>
-    <attribute side="server" code="0x001F" define="POWER_SOURCE_ENDPOINT_LIST" type="ARRAY" entryType="endpoint_no" writable="false">EndpointList</attribute>
+    <attribute side="server" code="0x001E" define="POWER_SOURCE_ACTIVE_BAT_CHARGE_FAULTS" type="array" entryType="BatChargeFaultEnum" length="16" writable="false" optional="true">ActiveBatChargeFaults</attribute>
+    <attribute side="server" code="0x001F" define="POWER_SOURCE_ENDPOINT_LIST" type="array" entryType="endpoint_no" writable="false">EndpointList</attribute>
 
     <event code="0x0000" name="WiredFaultChange" priority="info" side="server" optional="true">
       <description>The WiredFaultChange Event SHALL indicate a change in the set of wired faults currently detected by the Node on this wired power source.</description>
@@ -80,13 +99,6 @@ limitations under the License.
 
   </cluster>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x002F"/>
-    <field name="Wired" mask="0x1"/>
-    <field name="Battery" mask="0x2"/>
-    <field name="Rechargeable" mask="0x4"/>
-    <field name="Replaceable" mask="0x8"/>
-  </bitmap>
 
   <enum name="WiredFaultEnum" type="enum8">
     <cluster code="0x002F"/>

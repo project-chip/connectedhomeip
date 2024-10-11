@@ -93,14 +93,33 @@ struct SetupParams
 
     /**
      * Controls whether shutdown of the controller removes the corresponding
-     * entry from the fabric table.  For now the removal is just from the
-     * in-memory table, not from storage, which means that after controller
-     * shutdown the storage and the in-memory fabric table will be out of sync.
-     * This is acceptable for implementations that don't actually store any of
-     * the fabric table information, but if someone wants a true removal at some
-     * point another option will need to be added here.
+     * entry from the in-memory fabric table, but NOT from storage.
+     *
+     * Note that this means that after controller shutdown the storage and
+     * in-memory versions of the fabric table will be out of sync.
+     * For compatibility reasons this is the default behavior.
+     *
+     * @see deleteFromFabricTableOnShutdown
      */
     bool removeFromFabricTableOnShutdown = true;
+
+    /**
+     * Controls whether shutdown of the controller deletes the corresponding
+     * entry from the fabric table (both in-memory and storage).
+     *
+     * If both `removeFromFabricTableOnShutdown` and this setting are true,
+     * this setting will take precedence.
+     *
+     * @see removeFromFabricTableOnShutdown
+     */
+    bool deleteFromFabricTableOnShutdown = false;
+
+    /**
+     * Specifies whether to utilize the fabric table entry for the given FabricIndex
+     * for initialization. If provided and neither the operational key pair nor the NOC
+     * chain are provided, then attempt to locate a fabric corresponding to the given FabricIndex.
+     */
+    chip::Optional<FabricIndex> fabricIndex;
 
     Credentials::DeviceAttestationVerifier * deviceAttestationVerifier = nullptr;
     CommissioningDelegate * defaultCommissioner                        = nullptr;
@@ -120,11 +139,14 @@ struct FactoryInitParams
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager      = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager      = nullptr;
     FabricTable * fabricTable                                          = nullptr;
-    OperationalKeystore * operationalKeystore                          = nullptr;
+    Crypto::OperationalKeystore * operationalKeystore                  = nullptr;
     Credentials::OperationalCertificateStore * opCertStore             = nullptr;
     SessionResumptionStorage * sessionResumptionStorage                = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    Transport::WiFiPAFLayer * wifipaf_layer = nullptr;
 #endif
 
     //
@@ -153,7 +175,9 @@ public:
 
     // Shuts down matter and frees the system state.
     //
-    // Must not be called while any controllers are alive.
+    // Must not be called while any controllers are alive, or while any calls
+    // to RetainSystemState or EnsureAndRetainSystemState have not been balanced
+    // by a call to ReleaseSystemState.
     void Shutdown();
 
     CHIP_ERROR SetupController(SetupParams params, DeviceController & controller);
@@ -176,7 +200,8 @@ public:
     // all device controllers have ceased to exist. To avoid that, this method has been
     // created to permit retention of the underlying system state.
     //
-    // NB: The system state will still be freed in Shutdown() regardless of this call.
+    // Calls to this method must be balanced by calling ReleaseSystemState before Shutdown.
+    //
     void RetainSystemState();
 
     //
@@ -186,7 +211,13 @@ public:
     //
     // This should only be invoked if a matching call to RetainSystemState() was called prior.
     //
-    void ReleaseSystemState();
+    // Returns true if stack was shut down in response to this call, or false otherwise.
+    //
+    bool ReleaseSystemState();
+
+    // Like RetainSystemState(), but will re-initialize the system state first if necessary.
+    // Calls to this method must be balanced by calling ReleaseSystemState before Shutdown.
+    CHIP_ERROR EnsureAndRetainSystemState();
 
     //
     // Retrieve a read-only pointer to the system state object that contains pointers to key stack
@@ -251,7 +282,7 @@ private:
     DeviceControllerFactory() {}
     void PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params);
     CHIP_ERROR InitSystemState(FactoryInitParams params);
-    CHIP_ERROR InitSystemState();
+    CHIP_ERROR ReinitSystemStateIfNecessary();
     void ControllerInitialized(const DeviceController & controller);
 
     uint16_t mListenPort;

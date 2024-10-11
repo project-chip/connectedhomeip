@@ -52,10 +52,6 @@
 #ifndef __ARCH_CC_H__
 #define __ARCH_CC_H__
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #if CHIP_HAVE_CONFIG_H
 #include <lwip/lwip_buildconfig.h>
 #endif

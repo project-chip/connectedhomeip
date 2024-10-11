@@ -24,18 +24,20 @@
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Nullable.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace Scenes {
+namespace ScenesManagement {
 
 class ScenesServer : public CommandHandlerInterface, public AttributeAccessInterface
 {
 public:
     static constexpr size_t kScenesServerMaxEndpointCount =
-        EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+        MATTER_DM_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
     static_assert(kScenesServerMaxEndpointCount <= kEmberInvalidEndpointIndex, "Scenes endpoint count error");
     static constexpr uint8_t kScenesServerMaxFabricCount = CHIP_CONFIG_MAX_FABRICS;
 
@@ -114,8 +116,6 @@ private:
     void HandleStoreScene(HandlerContext & ctx, const Commands::StoreScene::DecodableType & req);
     void HandleRecallScene(HandlerContext & ctx, const Commands::RecallScene::DecodableType & req);
     void HandleGetSceneMembership(HandlerContext & ctx, const Commands::GetSceneMembership::DecodableType & req);
-    void HandleEnhancedAddScene(HandlerContext & ctx, const Commands::EnhancedAddScene::DecodableType & req);
-    void HandleEnhancedViewScene(HandlerContext & ctx, const Commands::EnhancedViewScene::DecodableType & req);
     void HandleCopyScene(HandlerContext & ctx, const Commands::CopyScene::DecodableType & req);
 
     // Group Data Provider
@@ -128,7 +128,7 @@ private:
     static ScenesServer mInstance;
 };
 
-} // namespace Scenes
+} // namespace ScenesManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip

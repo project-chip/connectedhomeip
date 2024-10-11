@@ -36,9 +36,9 @@ public:
                     "1 to use Enhanced Commissioning Method.\n  0 to use Basic Commissioning Method.");
         AddArgument("window-timeout", 0, UINT16_MAX, &mCommissioningWindowTimeout,
                     "Time, in seconds, before the commissioning window closes.");
-        AddArgument("iteration", chip::kSpake2p_Min_PBKDF_Iterations, chip::kSpake2p_Max_PBKDF_Iterations, &mIteration,
-                    "Number of PBKDF iterations to use to derive the verifier.  Ignored if 'option' is 0.");
-        AddArgument("discriminator", 0, 4096, &mDiscriminator, "Discriminator to use for advertising.  Ignored if 'option' is 0.");
+        AddArgument("iteration", chip::Crypto::kSpake2p_Min_PBKDF_Iterations, chip::Crypto::kSpake2p_Max_PBKDF_Iterations,
+                    &mIteration, "Number of PBKDF iterations to use to derive the verifier.  Ignored if 'option' is 0.");
+        AddArgument("discriminator", 0, 4095, &mDiscriminator, "Discriminator to use for advertising.  Ignored if 'option' is 0.");
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout, "Time, in seconds, before this command is considered to have timed out.");
     }
 

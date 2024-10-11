@@ -1208,27 +1208,27 @@ void GroupDataProviderImpl::GroupInfoIteratorImpl::Release()
 }
 
 GroupDataProvider::EndpointIterator * GroupDataProviderImpl::IterateEndpoints(chip::FabricIndex fabric_index,
-                                                                              Optional<GroupId> group_id)
+                                                                              std::optional<GroupId> group_id)
 {
     VerifyOrReturnError(IsInitialized(), nullptr);
     return mEndpointIterators.CreateObject(*this, fabric_index, group_id);
 }
 
 GroupDataProviderImpl::EndpointIteratorImpl::EndpointIteratorImpl(GroupDataProviderImpl & provider, chip::FabricIndex fabric_index,
-                                                                  Optional<GroupId> group_id) :
+                                                                  std::optional<GroupId> group_id) :
     mProvider(provider),
     mFabric(fabric_index)
 {
     FabricData fabric(fabric_index);
     VerifyOrReturn(CHIP_NO_ERROR == fabric.Load(provider.mStorage));
 
-    if (group_id.HasValue())
+    if (group_id.has_value())
     {
-        GroupData group(fabric_index, group_id.Value());
+        GroupData group(fabric_index, *group_id);
         VerifyOrReturn(CHIP_NO_ERROR == group.Load(provider.mStorage));
 
-        mGroup         = group_id.Value();
-        mFirstGroup    = group_id.Value();
+        mGroup         = *group_id;
+        mFirstGroup    = *group_id;
         mGroupCount    = 1;
         mEndpoint      = group.first_endpoint;
         mEndpointCount = group.endpoint_count;

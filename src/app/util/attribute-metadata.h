@@ -18,7 +18,6 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-
 #include <cstdint>
 
 /**
@@ -105,17 +104,6 @@ union EmberAfDefaultOrMinMaxAttributeValue
     const EmberAfAttributeMinMaxValue * ptrToMinMaxValue;
 };
 
-enum class EmberAfAttributeWritePermission
-{
-    DenyWrite            = 0,
-    AllowWriteNormal     = 1,
-    AllowWriteOfReadOnly = 2,
-    UnsupportedAttribute = 0x86, // Protocols::InteractionModel::Status::UnsupportedAttribute
-    InvalidValue         = 0x87, // Protocols::InteractionModel::Status::ConstraintError
-    ReadOnly             = 0x88, // Protocols::InteractionModel::Status::UnsupportedWrite
-    InvalidDataType      = 0x8d, // Protocols::InteractionModel::Status::InvalidDataType
-};
-
 // Attribute masks modify how attributes are used by the framework
 //
 // Attribute that has this mask is NOT read-only
@@ -170,6 +158,21 @@ struct EmberAfAttributeMetadata
     EmberAfAttributeMask mask;
 
     /**
+     * Check wether this attribute is a boolean based on its type according to the spec.
+     */
+    bool IsBoolean() const;
+
+    /**
+     * Check wether this attribute is signed based on its type according to the spec.
+     */
+    bool IsSignedIntegerAttribute() const;
+
+    /**
+     * Check whether this attribute has a define min and max.
+     */
+    bool HasMinMax() const { return mask & ATTRIBUTE_MASK_MIN_MAX; }
+
+    /**
      * Check whether this attribute is nullable.
      */
     bool IsNullable() const { return mask & ATTRIBUTE_MASK_NULLABLE; }
@@ -209,14 +212,3 @@ bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType);
 
 /** @brief Returns true if the given attribute type is a long string. */
 bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType);
-
-/*
- * @brief Function that determines the length of a zigbee Cluster Library string
- *   (where the first byte is assumed to be the length).
- */
-uint8_t emberAfStringLength(const uint8_t * buffer);
-/*
- * @brief Function that determines the length of a zigbee Cluster Library long string.
- *   (where the first two bytes are assumed to be the length).
- */
-uint16_t emberAfLongStringLength(const uint8_t * buffer);

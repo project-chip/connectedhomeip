@@ -21,7 +21,7 @@ if CHIP
 
 config CHIP_WIFI
 	bool "Enable nrfconnect Wi-Fi support"
-	default y if SHIELD_NRF7002EK || BOARD_NRF7002DK_NRF5340_CPUAPP || SHIELD_NRF7002EB
+	default y if SHIELD_NRF7002EK || BOARD_NRF7002DK_NRF5340_CPUAPP || SHIELD_NRF7002EB || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP
 	select WIFI_NRF700X
 	select WIFI
 	select WPA_SUPP
@@ -42,14 +42,12 @@ config CHIP_WIFI
 
 config CHIP_QSPI_NOR
 	bool "Enable QSPI NOR feature set"
+	imply NORDIC_QSPI_NOR
 	help
 	  Enables QSPI NOR flash with a set of options for configuring pages and
 	  buffer sizes.
 
 if CHIP_QSPI_NOR
-
-config NORDIC_QSPI_NOR
-	default y
 
 config NORDIC_QSPI_NOR_STACK_WRITE_BUFFER_SIZE
 	default 16
@@ -62,6 +60,7 @@ config CHIP_SPI_NOR
 	imply SPI_NOR
 	imply MULTITHREADING
 	imply PM_OVERRIDE_EXTERNAL_DRIVER_CHECK
+	imply MCUMGR_GRP_IMG_ALLOW_ERASE_PENDING
 	help
 	  Enables SPI NOR flash with a set of options for configuring pages and
 	  buffer sizes.
@@ -75,15 +74,20 @@ endif # CHIP_SPI_NOR
 
 config CHIP_MEMORY_PROFILING
 	bool "Enable features for tracking memory usage"
+	# Matter stack
 	select CHIP_STATISTICS
+	# Heap
 	select CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT if CHIP_MALLOC_SYS_HEAP
+	select SYS_HEAP_RUNTIME_STATS if CHIP_MALLOC_SYS_HEAP	
+	# Crypto
 	select MBEDTLS_MEMORY_DEBUG if !CHIP_CRYPTO_PSA
-	select SYS_HEAP_RUNTIME_STATS if CHIP_MALLOC_SYS_HEAP
-	select KERNEL_SHELL
+	# Network
 	select NET_STATISTICS
 	select NET_SHELL
 	select NET_BUF_POOL_USAGE
 	select OPENTHREAD_SHELL if !CHIP_WIFI
+	# Zephyr
+	select KERNEL_SHELL
 	help
 	  Enables features for tracking memory usage in Matter.
 
@@ -146,7 +150,7 @@ endif
 config CHIP_DFU_OVER_BT_SMP
 	bool "Enable DFU over Bluetooth LE SMP feature set"
 	imply CHIP_QSPI_NOR if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
-	imply CHIP_SPI_NOR if BOARD_NRF7002DK_NRF5340_CPUAPP
+	imply CHIP_SPI_NOR if BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP || BOARD_NRF54L15PDK_NRF54L15_CPUAPP
 	imply BOOTLOADER_MCUBOOT
 	select MCUMGR
 	select MCUMGR_TRANSPORT_BT
@@ -158,6 +162,7 @@ config CHIP_DFU_OVER_BT_SMP
 	# Enable custom SMP request to erase settings partition.
 	select MCUMGR_GRP_ZBASIC
 	select MCUMGR_GRP_ZBASIC_STORAGE_ERASE
+	select MCUMGR_TRANSPORT_BT_REASSEMBLY
 	help
 	  Enables Device Firmware Upgrade over Bluetooth LE with SMP and configures
 	  the set of options related to that feature.

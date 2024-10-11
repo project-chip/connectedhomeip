@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="door_lock_lock_state">Lock state</string>
+    <string name="door_lock_send_lock_alarm_event">Send Alarm</string>
+</resources>

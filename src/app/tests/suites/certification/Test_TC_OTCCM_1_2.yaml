@@ -1,0 +1,138 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 260.2.1. [TC-OTCCM-1.2] Cluster attributes with DUT as Server
+
+PICS:
+    - OTCCM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Oven Mode"
+    endpoint: 1
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the SupportedModes attribute."
+      PICS: OTCCM.S.A0000
+      verification: |
+          ./chip-tool ovenmode read supported-modes  1 1
+
+          - Verify that the DUT response contains a list of ModeOptionsStruct entries
+          -Verify that the list has at least 2 and at most 255 entries
+          - Verify that each ModeOptionsStruct entry has a unique Mode field value
+          - Verify that each ModeOptionsStruct entry has a unique Label field value
+          - Verify that each ModeOptionsStruct entry’s ModeTags field has:
+          at least one entry the values of the Value fields that are not larger than 16 bits
+          - for each Value field: Is the mode tag value a defined common tag value (Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a defined derived cluster tag value (Bake(0x4000), Convection(0x4001), Grill(0x4002), Roast(0x4003), Clean(0x4004), Convection Bake(0x4005), Convection Roast(0x4006), Warming(0x4007), Proofing(0x4008)) or in the MfgTags (0x8000 to 0xBFFF) range
+          - for at least one Value field: Is the mode tag value a defined common tag value (Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a derived cluster value (Normal, Defrost)
+          - if the Value field is in the MfgTags (0x8000 to 0xBFFF) range, the TagName field is a string with a length between 1 and 64
+          - Verify that at least one ModeOptionsStruct entry includes the Bake(0x4000) mode tag in the ModeTags field
+          - Save the Mode field values as supported_modes_dut, On the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+
+          [1705647707.587205][79487:79492] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0049 Attribute 0x0000_0000 DataVersion: 3240184500
+          [1705647707.587250][79487:79492] CHIP:TOO:   SupportedModes: 9 entries
+          [1705647707.587265][79487:79492] CHIP:TOO:     [1]: {
+          [1705647707.587268][79487:79492] CHIP:TOO:       Label: Bake
+          [1705647707.587275][79487:79492] CHIP:TOO:       Mode: 0
+          [1705647707.587282][79487:79492] CHIP:TOO:       ModeTags: 1 entries
+          [1705647707.587287][79487:79492] CHIP:TOO:         [1]: {
+          [1705647707.587290][79487:79492] CHIP:TOO:           Value: 16384
+          [1705647707.587294][79487:79492] CHIP:TOO:          }
+          [1705647707.587297][79487:79492] CHIP:TOO:      }
+          [1705647707.587303][79487:79492] CHIP:TOO:     [2]: {
+          [1705647707.587305][79487:79492] CHIP:TOO:       Label: Convection
+          [1705647707.587308][79487:79492] CHIP:TOO:       Mode: 1
+          [1705647707.587311][79487:79492] CHIP:TOO:       ModeTags: 1 entries
+          [1705647707.587316][79487:79492] CHIP:TOO:         [1]: {
+          [1705647707.587318][79487:79492] CHIP:TOO:           Value: 16385
+          [1705647707.587321][79487:79492] CHIP:TOO:          }
+          [1705647707.587324][79487:79492] CHIP:TOO:      }
+          [1705647707.587330][79487:79492] CHIP:TOO:     [3]: {
+          [1705647707.587333][79487:79492] CHIP:TOO:       Label: Grill
+          [1705647707.587335][79487:79492] CHIP:TOO:       Mode: 2
+          [1705647707.587338][79487:79492] CHIP:TOO:       ModeTags: 1 entries
+          [1705647707.587342][79487:79492] CHIP:TOO:         [1]: {
+          [1705647707.587345][79487:79492] CHIP:TOO:           Value: 16386
+          [1705647707.587348][79487:79492] CHIP:TOO:          }
+          [1705647707.587351][79487:79492] CHIP:TOO:      }
+          [1705647707.587356][79487:79492] CHIP:TOO:     [4]: {
+          [1705647707.587359][79487:79492] CHIP:TOO:       Label: Roast
+          [1705647707.587361][79487:79492] CHIP:TOO:       Mode: 3
+          [1705647707.587364][79487:79492] CHIP:TOO:       ModeTags: 1 entries
+          [1705647707.587369][79487:79492] CHIP:TOO:         [1]: {
+          [1705647707.587371][79487:79492] CHIP:TOO:           Value: 16387
+          [1705647707.587374][79487:79492] CHIP:TOO:          }
+          [1705647707.587376][79487:79492] CHIP:TOO:      }
+          [1705647707.587382][79487:79492] CHIP:TOO:     [5]: {
+          [1705647707.587384][79487:79492] CHIP:TOO:       Label: Clean
+          [1705647707.587387][79487:79492] CHIP:TOO:       Mode: 4
+          [1705647707.587390][79487:79492] CHIP:TOO:       ModeTags: 1 entries
+          [1705647707.587394][79487:79492] CHIP:TOO:         [1]: {
+          [1705647707.587397][79487:79492] CHIP:TOO:           Value: 16388
+          [1705647707.587400][79487:79492] CHIP:TOO:          }
+          [1705647707.587402][79487:79492] CHIP:TOO:      }
+          [1705647707.587408][79487:79492] CHIP:TOO:     [6]: {
+          [1705647707.587410][79487:79492] CHIP:TOO:       Label: Convection Bake
+          [1705647707.587413][79487:79492] CHIP:TOO:       Mode: 5
+          [1705647707.587416][79487:79492] CHIP:TOO:       ModeTags: 1 entries
+          [1705647707.587420][79487:79492] CHIP:TOO:         [1]: {
+          [1705647707.587423][79487:79492] CHIP:TOO:           Value: 16389
+          [1705647707.587425][79487:79492] CHIP:TOO:          }
+          [1705647707.587428][79487:79492] CHIP:TOO:      }
+          [1705647707.587434][79487:79492] CHIP:TOO:     [7]: {
+          [1705647707.587436][79487:79492] CHIP:TOO:       Label: Convection Roast
+          [1705647707.587439][79487:79492] CHIP:TOO:       Mode: 6
+          [1705647707.587442][79487:79492] CHIP:TOO:       ModeTags: 1 entries
+          [1705647707.587446][79487:79492] CHIP:TOO:         [1]: {
+          [1705647707.587449][79487:79492] CHIP:TOO:           Value: 16390
+          [1705647707.587451][79487:79492] CHIP:TOO:          }
+          [1705647707.587454][79487:79492] CHIP:TOO:      }
+          [1705647707.587460][79487:79492] CHIP:TOO:     [8]: {
+          [1705647707.587462][79487:79492] CHIP:TOO:       Label: Warming
+          [1705647707.587465][79487:79492] CHIP:TOO:       Mode: 7
+          [1705647707.587468][79487:79492] CHIP:TOO:       ModeTags: 1 entries
+          [1705647707.587472][79487:79492] CHIP:TOO:         [1]: {
+          [1705647707.587475][79487:79492] CHIP:TOO:           Value: 16391
+          [1705647707.587477][79487:79492] CHIP:TOO:          }
+          [1705647707.587480][79487:79492] CHIP:TOO:      }
+          [1705647707.587485][79487:79492] CHIP:TOO:     [9]: {
+          [1705647707.587488][79487:79492] CHIP:TOO:       Label: Proofing
+          [1705647707.587490][79487:79492] CHIP:TOO:       Mode: 8
+          [1705647707.587493][79487:79492] CHIP:TOO:       ModeTags: 1 entries
+          [1705647707.587497][79487:79492] CHIP:TOO:         [1]: {
+          [1705647707.587500][79487:79492] CHIP:TOO:           Value: 16392
+          [1705647707.587502][79487:79492] CHIP:TOO:          }
+          [1705647707.587505][79487:79492] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
+      PICS: OTCCM.S.A0001
+      verification: |
+          ./chip-tool ovenmode read current-mode  1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer value from supported_modes_dut, below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
+
+          [1705647748.316225][81944:81949] CHIP:DMG: }
+          [1705647748.316354][81944:81949] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0049 Attribute 0x0000_0001 DataVersion: 3240184500
+          [1705647748.316395][81944:81949] CHIP:TOO:   CurrentMode: 0
+      disabled: true

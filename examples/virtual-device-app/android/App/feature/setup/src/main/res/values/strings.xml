@@ -11,7 +11,6 @@
     <string name="setup_network_notification_message">Make sure your Mobile/Hub/Device App are connected to the same Wi-Fi network.</string>
     <string name="save">Save</string>
     <string name="toast_discriminator" translatable="false">Invalid input value</string>
-    <string name="cancel">Cancel</string>
     <string name="start">Start</string>
     <string name="setup_ssid_text" translatable="false">Wi-Fi : %1$s</string>
     <string name="setup_discriminator_text" translatable="false">%1$s : %2$s</string>

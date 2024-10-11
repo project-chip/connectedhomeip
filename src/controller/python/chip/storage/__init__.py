@@ -24,10 +24,12 @@ import ctypes
 import json
 import logging
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_char, c_char_p, c_uint16, c_void_p, py_object
-from typing import Dict
+from typing import IO, Dict, Optional
 
 import chip.exceptions
 import chip.native
+
+LOGGER = logging.getLogger(__name__)
 
 _SyncSetKeyValueCbFunct = CFUNCTYPE(
     None, py_object, c_char_p, POINTER(c_char),  c_uint16)
@@ -37,12 +39,12 @@ _SyncDeleteKeyValueCbFunct = CFUNCTYPE(None, py_object, c_char_p)
 
 
 @_SyncSetKeyValueCbFunct
-def _OnSyncSetKeyValueCb(storageObj, key: str, value, size):
+def _OnSyncSetKeyValueCb(storageObj, key: bytes, value, size):
     storageObj.SetSdkKey(key.decode("utf-8"), ctypes.string_at(value, size))
 
 
 @_SyncGetKeyValueCbFunct
-def _OnSyncGetKeyValueCb(storageObj, key: str, value, size, is_found):
+def _OnSyncGetKeyValueCb(storageObj, key: bytes, value, size, is_found):
     ''' This does not adhere to the API requirements of
     PersistentStorageDelegate::SyncGetKeyValue, but that is okay since
     the C++ storage binding layer is capable of adapting results from
@@ -91,11 +93,8 @@ class PersistentStorage:
 
         Object must be resident before the Matter stack starts up and last past its shutdown.
     '''
-    @classmethod
-    def logger(cls):
-        return logging.getLogger('PersistentStorage')
 
-    def __init__(self, path: str = None, jsonData: Dict = None):
+    def __init__(self, path: Optional[str] = None, jsonData: Optional[Dict] = None):
         ''' Initializes the object with either a path to a JSON file that contains the configuration OR
             a JSON dictionary that contains an in-memory representation of the configuration.
 
@@ -109,9 +108,9 @@ class PersistentStorage:
             raise ValueError("Can't provide both a valid path and jsonData")
 
         if (path is not None):
-            self.logger().warn(f"Initializing persistent storage from file: {path}")
+            LOGGER.info(f"Initializing persistent storage from file: {path}")
         else:
-            self.logger().warn("Initializing persistent storage from dict")
+            LOGGER.info("Initializing persistent storage from dict")
 
         self._handle = chip.native.GetLibraryHandle()
         self._isActive = True
@@ -119,30 +118,30 @@ class PersistentStorage:
 
         if (self._path):
             try:
-                self._file = open(path, 'r')
+                self._file: Optional[IO[str]] = open(path, 'r')
                 self._file.seek(0, 2)
                 size = self._file.tell()
                 self._file.seek(0)
 
                 if (size != 0):
-                    self.logger().warn(f"Loading configuration from {path}...")
+                    LOGGER.info(f"Loading configuration from {path}...")
                     self._jsonData = json.load(self._file)
                 else:
                     self._jsonData = {}
 
             except Exception as ex:
-                logging.error(ex)
-                logging.critical(f"Could not load configuration from {path} - resetting configuration...")
+                LOGGER.error(ex)
+                LOGGER.critical(f"Could not load configuration from {path} - resetting configuration...")
                 self._jsonData = {}
         else:
             self._jsonData = jsonData
 
         if ('sdk-config' not in self._jsonData):
-            logging.warn("No valid SDK configuration present - clearing out configuration")
+            LOGGER.warn("No valid SDK configuration present - clearing out configuration")
             self._jsonData['sdk-config'] = {}
 
         if ('repl-config' not in self._jsonData):
-            logging.warn("No valid REPL configuration present - clearing out configuration")
+            LOGGER.warn("No valid REPL configuration present - clearing out configuration")
             self._jsonData['repl-config'] = {}
 
         # Clear out the file so that calling 'Commit' will re-open the file at that time in write mode.
@@ -166,7 +165,6 @@ class PersistentStorage:
         ''' Commits the cached JSON configuration to file (if one was provided in the constructor).
             Otherwise, this is a no-op.
         '''
-        self.logger().info("Committing...")
 
         if (self._path is None):
             return
@@ -175,9 +173,8 @@ class PersistentStorage:
             try:
                 self._file = open(self._path, 'w')
             except Exception as ex:
-                logging.warn(
-                    f"Could not open {self._path} for writing configuration. Error:")
-                logging.warn(ex)
+                LOGGER.error(
+                    f"Could not open {self._path} for writing configuration. Error: {ex}")
                 return
 
         self._file.seek(0)
@@ -188,7 +185,7 @@ class PersistentStorage:
     def SetReplKey(self, key: str, value):
         ''' Set a REPL key to a specific value. Creates the key if one doesn't exist already.
         '''
-        self.logger().info(f"SetReplKey: {key} = {value}")
+        LOGGER.debug(f"SetReplKey: {key} = {value}")
 
         if (key is None or key == ''):
             raise ValueError("Invalid Key")
@@ -212,7 +209,7 @@ class PersistentStorage:
     def SetSdkKey(self, key: str, value: bytes):
         ''' Set an SDK key to a specific value. Creates the key if one doesn't exist already.
         '''
-        self.logger().info(f"SetSdkKey: {key} = {value}")
+        LOGGER.debug(f"SetSdkKey: {key} = {value}")
 
         if (key is None or key == ''):
             raise ValueError("Invalid Key")
@@ -236,7 +233,7 @@ class PersistentStorage:
     def DeleteSdkKey(self, key: str):
         ''' Deletes an SDK key if one exists.
         '''
-        self.logger().info(f"DeleteSdkKey: {key}")
+        LOGGER.debug(f"DeleteSdkKey: {key}")
 
         del (self._jsonData['sdk-config'][key])
         self.Commit()

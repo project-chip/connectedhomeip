@@ -35,26 +35,29 @@ namespace Internal {
 class BluezObjectList
 {
 public:
-    explicit BluezObjectList(GDBusObjectManager * manager) { Initialize(manager); }
+    BluezObjectList() = default;
+    explicit BluezObjectList(GDBusObjectManager * manager) { Init(manager); }
 
-    ~BluezObjectList() { g_list_free_full(mObjectList, g_object_unref); }
+    // This class is not trivially copyable
+    BluezObjectList(const BluezObjectList &)             = delete;
+    BluezObjectList & operator=(const BluezObjectList &) = delete;
+
+    ~BluezObjectList()
+    {
+        if (mObjectList != nullptr)
+            g_list_free_full(mObjectList, g_object_unref);
+    }
+
+    CHIP_ERROR Init(GDBusObjectManager * manager)
+    {
+        VerifyOrReturnError(manager != nullptr, CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(DeviceLayer, "Manager is NULL in %s", __func__));
+        mObjectList = g_dbus_object_manager_get_objects(manager);
+        return CHIP_NO_ERROR;
+    }
 
     BluezObjectIterator begin() const { return BluezObjectIterator(mObjectList); }
-    BluezObjectIterator end() const { return BluezObjectIterator(); }
-
-protected:
-    BluezObjectList() {}
-
-    void Initialize(GDBusObjectManager * manager)
-    {
-        if (manager == nullptr)
-        {
-            ChipLogError(DeviceLayer, "Manager is NULL in %s", __func__);
-            return;
-        }
-
-        mObjectList = g_dbus_object_manager_get_objects(manager);
-    }
+    static BluezObjectIterator end() { return BluezObjectIterator(); }
 
 private:
     GList * mObjectList = nullptr;

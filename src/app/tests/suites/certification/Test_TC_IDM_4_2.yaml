@@ -119,92 +119,46 @@ tests:
           sends a Subscribe Response Message to the CR1 to activate the
           subscription."
       verification: |
-          To ensure that CR1 and CR2 are on the same fabric and that CR1 grants access to CR2, Please send the below mentioned command, it will configure TH2 without access to a specific cluster, we send the ACL command, allowing access only to the Level Control cluster (cluster ID: 8); any attempts to subscribe to or use commands from other clusters will result in a status of 'INVALID_ACTION
+          Please run the following command on the TH to test the subscription feature and verify that the value of MaxIntervalCeiling is set correctly( set the value less than SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT)
 
-          accesscontrol write acl '[{"privilege":5, "authMode":2, "subjects":[112233], "targets":null, "fabricIndex": 1},{"privilege":3, "authMode":2, "subjects":[4], "targets":[{"cluster":8, "endpoint":null, "deviceType":null}]}]' 1 0
 
-          [1689933254.566655][48781:48783] CHIP:EM: Rxd Ack; Removing MessageCounter:156974239 from Retrans Table on exchange 6316i
-          [1689933254.566660][48781:48783] CHIP:DMG: WriteClient moving to [ResponseRe]
-          [1689933254.566671][48781:48783] CHIP:DMG: WriteResponseMessage =
-          [1689933254.566675][48781:48783] CHIP:DMG: {
-          [1689933254.566677][48781:48783] CHIP:DMG:         AttributeStatusIBs =
-          [1689933254.566682][48781:48783] CHIP:DMG:         [
-          [1689933254.566684][48781:48783] CHIP:DMG:                 AttributeStatusIB =
-          [1689933254.566688][48781:48783] CHIP:DMG:                 {
-          [1689933254.566691][48781:48783] CHIP:DMG:                         AttributePathIB =
-          [1689933254.566695][48781:48783] CHIP:DMG:                         {
-          [1689933254.566698][48781:48783] CHIP:DMG:                                 Endpoint = 0x0,
-          [1689933254.566702][48781:48783] CHIP:DMG:                                 Cluster = 0x1f,
-          [1689933254.566705][48781:48783] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1689933254.566708][48781:48783] CHIP:DMG:                         }
-          [1689933254.566713][48781:48783] CHIP:DMG:
-          [1689933254.566716][48781:48783] CHIP:DMG:                         StatusIB =
-          [1689933254.566720][48781:48783] CHIP:DMG:                         {
-          [1689933254.566723][48781:48783] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1689933254.566726][48781:48783] CHIP:DMG:                         },
-          [1689933254.566730][48781:48783] CHIP:DMG:
-          [1689933254.566732][48781:48783] CHIP:DMG:                 },
-          [1689933254.566739][48781:48783] CHIP:DMG:
-          [1689933254.566741][48781:48783] CHIP:DMG:                 AttributeStatusIB =
-          [1689933254.566744][48781:48783] CHIP:DMG:                 {
-          [1689933254.566747][48781:48783] CHIP:DMG:                         AttributePathIB =
-          [1689933254.566750][48781:48783] CHIP:DMG:                         {
-          [1689933254.566752][48781:48783] CHIP:DMG:                                 Endpoint = 0x0,
-          [1689933254.566756][48781:48783] CHIP:DMG:                                 Cluster = 0x1f,
-          [1689933254.566760][48781:48783] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1689933254.566763][48781:48783] CHIP:DMG:                                 ListIndex = Null,
-          [1689933254.566766][48781:48783] CHIP:DMG:                         }
-          [1689933254.566770][48781:48783] CHIP:DMG:
-          [1689933254.566773][48781:48783] CHIP:DMG:                         StatusIB =
-          [1689933254.566776][48781:48783] CHIP:DMG:                         {
-          [1689933254.566779][48781:48783] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1689933254.566782][48781:48783] CHIP:DMG:                         },
-          [1689933254.566786][48781:48783] CHIP:DMG:
-          [1689933254.566789][48781:48783] CHIP:DMG:                 },
-          [1689933254.566794][48781:48783] CHIP:DMG:
-          [1689933254.566797][48781:48783] CHIP:DMG:                 AttributeStatusIB =
-          [1689933254.566800][48781:48783] CHIP:DMG:                 {
-          [1689933254.566802][48781:48783] CHIP:DMG:                         AttributePathIB =
-          [1689933254.566805][48781:48783] CHIP:DMG:                         {
-          [1689933254.566808][48781:48783] CHIP:DMG:                                 Endpoint = 0x0,
-          [1689933254.566811][48781:48783] CHIP:DMG:                                 Cluster = 0x1f,
-          [1689933254.566815][48781:48783] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1689933254.566818][48781:48783] CHIP:DMG:                                 ListIndex = Null,
-          [1689933254.566821][48781:48783] CHIP:DMG:                         }
-          [1689933254.566825][48781:48783] CHIP:DMG:
-          [1689933254.566828][48781:48783] CHIP:DMG:                         StatusIB =
-          [1689933254.566831][48781:48783] CHIP:DMG:                         {
-          [1689933254.566834][48781:48783] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1689933254.566837][48781:48783] CHIP:DMG:                         },
-          [1689933254.566840][48781:48783] CHIP:DMG:
-          [1689933254.566843][48781:48783] CHIP:DMG:                 },
-          [1689933254.566847][48781:48783] CHIP:DMG:
-          [1689933254.566849][48781:48783] CHIP:DMG:         ],
-          [1689933254.566857][48781:48783] CHIP:DMG:
-          [1689933254.566859][48781:48783] CHIP:DMG:         InteractionModelRevision = 1
-          [1689933254.566862][48781:48783] CHIP:DMG: }
-          [1689933254.566897][48781:48783] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1689933254.566916][48781:48783] CHIP:EM: <<< [E:6316i S:13964 M:156974240 (Ack:46397313)] (S) Msg TX to 1:0000000000000001 [B15F] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1689933254.566922][48781:48783] CHIP:IN: (S) Sending msg 156974240 on secure session with LSID: 13964
+          basicinformation subscribe location 10 400 1 0 --keepSubscriptions true
 
-          If CR2 attempts to subscribe to an attribute on a cluster (ClusterID) for which it does not have access, the AttributePath used for the subscription would be in the form [[Attribute = AttributeName, Cluster = ClusterID, Endpoint = EndpointID]], but this action will be denied, and CR2 will not be able to access the attribute due to the restricted access.
+          On the CR1(chip-tool), verify a report data message is received and verify it contains the following data :
+          1. Verify Report Data Message Received:
+                Check if a report data message is received on the CR1 (target hardware).
 
-          below provided the  example command used to subscribe location attribute from basicinformation cluster from node id(4) that have access to the “levelcontrol” cluster
+          2. Verify Report Data Contents:
+                Confirm that the received report data message contains the data of the attribute/event that was previously requested.
 
-          basicinformation subscribe location 10 2400 1 0  --commissioner-nodeid  4
-          [1689933387.304826][48781:48783] CHIP:EM: Rxd Ack; Removing MessageCounter:42350588 from Retrans Table on exchange 6319i
-          [1689933387.304834][48781:48783] CHIP:DMG: StatusResponseMessage =
-          [1689933387.304838][48781:48783] CHIP:DMG: {
-          [1689933387.304841][48781:48783] CHIP:DMG:         Status = 0x80 (INVALID_ACTION),
-          [1689933387.304845][48781:48783] CHIP:DMG:         InteractionModelRevision = 1
-          [1689933387.304846][48781:48783] CHIP:DMG: }
-          [1689933387.304850][48781:48783] CHIP:IM: Received status response, status is 0x80 (INVALID_ACTION)
-          [1689933387.304864][48781:48783] CHIP:EM: <<< [E:6319i S:13965 M:42350589 (Ack:227168589)] (S) Msg TX to 2:0000000000000001 [B15F] --- Type 0001:01 (IM:StatusResponse)
-          [1689933387.304869][48781:48783] CHIP:IN: (S) Sending msg 42350589 on secure session with LSID: 13965
-          [1689933387.304882][48781:48783] CHIP:DMG: MoveToState ReadClient[0x7fd404019110]: Moving to [      Idle]
+          3. Verify Subscribe Response Fields:
+              Examine the Subscribe Response to ensure it includes the following fields:
+              SubscriptionId: Verify that it is of type uint32.
+              MaxInterval: Verify that it is of type uint32.
 
-          With the ACL command in step-2, we are overwriting the default privilege that chip-tool has an admin. After this step-3 you need to send below mentioned command to Grant access to all clusters again.
-          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode":2, "subjects":[112233,4], "targets":null}]' 1 0
+          4. Verify MaxInterval against SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT:
+              Compare the MaxInterval value received in the Subscribe Response to the value of SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT.
+                Verify that the MaxInterval value is less than or equal to SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT.
+
+          [1693221766.862968][22261:22263] CHIP:DMG: }
+          [1693221766.863028][22261:22263] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 1552486032
+          [1693221766.863045][22261:22263] CHIP:TOO:   Location: XX
+          [1693221766.863068][22261:22263] CHIP:DMG: MoveToState ReadClient[0x7f6070027b50]: Moving to [AwaitingSu]
+          [1693221766.863114][22261:22263] CHIP:EM: <<< [E:26389i S:13043 M:192043503 (Ack:11734615)] (S) Msg TX to 1:0000000000000001 [3DC0] --- Type 0001:01 (IM:StatusResponse)
+          [1693221766.863130][22261:22263] CHIP:IN: (S) Sending msg 192043503 on secure session with LSID: 13043
+          [1693221766.863196][22261:22263] CHIP:DL: HandlePlatformSpecificBLEEvent 32793
+          [1693221766.863207][22261:22263] CHIP:DL: HandlePlatformSpecificBLEEvent 32793
+          [1693221766.863559][22261:22263] CHIP:EM: >>> [E:26389i S:13043 M:11734616 (Ack:192043503)] (S) Msg RX from 1:0000000000000001 [3DC0] --- Type 0001:04 (IM:SubscribeResponse)
+          [1693221766.863569][22261:22263] CHIP:EM: Found matching exchange: 26389i, Delegate: 0x7f6070027b60
+          [1693221766.863584][22261:22263] CHIP:EM: Rxd Ack; Removing MessageCounter:192043503 from Retrans Table on exchange 26389i
+          [1693221766.863603][22261:22263] CHIP:DMG: SubscribeResponse is received
+          [1693221766.863620][22261:22263] CHIP:DMG: SubscribeResponseMessage =
+          [1693221766.863629][22261:22263] CHIP:DMG: {
+          [1693221766.863639][22261:22263] CHIP:DMG:         SubscriptionId = 0x83e461d9,
+          [1693221766.863651][22261:22263] CHIP:DMG:         MaxInterval = 0xa,
+          [1693221766.863661][22261:22263] CHIP:DMG:         InteractionModelRevision = 10
+          [1693221766.863667][22261:22263] CHIP:DMG: }
+          [1693221766.863677][22261:22263] CHIP:DMG: Subscription established with SubscriptionID = 0x83e461d9 MinInterval = 10s MaxInterval = 10s Peer = 01:0000000000000001
       disabled: true
 
     - label:

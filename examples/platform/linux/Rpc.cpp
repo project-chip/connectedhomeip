@@ -18,12 +18,25 @@
 
 #include "pw_rpc/server.h"
 #include "pw_rpc_system_server/rpc_server.h"
+#include "pw_rpc_system_server/socket.h"
 
+#include <platform/PlatformManager.h>
 #include <thread>
+
+#include "Rpc.h"
+#include <map>
+
+#if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+#include "pigweed/rpc_services/Actions.h"
+#endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
 
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 #include "pigweed/rpc_services/Attributes.h"
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
+
+#if defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
+#include "pigweed/rpc_services/BooleanState.h"
+#endif // defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
 
 #if defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
 #include "pigweed/rpc_services/Descriptor.h"
@@ -63,9 +76,17 @@ namespace chip {
 namespace rpc {
 namespace {
 
+#if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+Actions actions_service;
+#endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 Attributes attributes_service;
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
+
+#if defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
+BooleanState boolean_state_service;
+#endif // defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
 
 #if defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
 Descriptor descriptor_service;
@@ -85,9 +106,17 @@ pw::trace::TraceService trace_service(pw::trace::GetTokenizedTracer());
 
 void RegisterServices(pw::rpc::Server & server)
 {
+#if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+    server.RegisterService(actions_service);
+#endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
     server.RegisterService(attributes_service);
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
+
+#if defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
+    server.RegisterService(boolean_state_service);
+#endif // defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
 
 #if defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
     server.RegisterService(descriptor_service);
@@ -109,6 +138,13 @@ void RegisterServices(pw::rpc::Server & server)
 
 } // namespace
 
+#if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+void SubscribeActions(RpcActionsSubscribeCallback subscriber)
+{
+    actions_service.SubscribeActions(subscriber);
+}
+#endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+
 void RunRpcService()
 {
     pw::rpc::system_server::Init();
@@ -116,9 +152,10 @@ void RunRpcService()
     pw::rpc::system_server::Start();
 }
 
-int Init()
+int Init(uint16_t rpcServerPort)
 {
     int err = 0;
+    pw::rpc::system_server::set_socket_port(rpcServerPort);
     std::thread rpc_service(RunRpcService);
     rpc_service.detach();
     return err;

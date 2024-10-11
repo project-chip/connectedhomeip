@@ -37,11 +37,11 @@ namespace {
 
 char kInteractiveModeName[]                         = "";
 constexpr size_t kInteractiveModeArgumentsMaxLength = 32;
-constexpr const char * kOptionalArgumentPrefix      = "--";
-constexpr const char * kJsonClusterKey              = "cluster";
-constexpr const char * kJsonCommandKey              = "command";
-constexpr const char * kJsonCommandSpecifierKey     = "command_specifier";
-constexpr const char * kJsonArgumentsKey            = "arguments";
+constexpr char kOptionalArgumentPrefix[]            = "--";
+constexpr char kJsonClusterKey[]                    = "cluster";
+constexpr char kJsonCommandKey[]                    = "command";
+constexpr char kJsonCommandSpecifierKey[]           = "command_specifier";
+constexpr char kJsonArgumentsKey[]                  = "arguments";
 
 #if !CHIP_DISABLE_PLATFORM_KVS
 template <typename T>

@@ -37,6 +37,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 namespace chip {
 
@@ -161,6 +162,11 @@ static CHIP_ERROR generateBitSet(PayloadContents & payload, MutableByteSpan & bi
     size_t totalPayloadSizeInBits = kTotalPayloadDataSizeInBits + (tlvDataLengthInBytes * 8);
     VerifyOrReturnError(bits.size() * 8 >= totalPayloadSizeInBits, CHIP_ERROR_BUFFER_TOO_SMALL);
 
+    // isValidQRCodePayload() has already performed all relevant checks (including that we have a
+    // long discriminator and rendevouz information). But if AllowInvalidPayload is set these
+    // requirements might be violated; in that case simply encode 0 for the relevant fields.
+    // Encoding an invalid (or partially valid) payload is useful for clients that need to be able
+    // to serialize and deserialize partially populated or invalid payloads.
     ReturnErrorOnFailure(
         populateBits(bits.data(), offset, payload.version, kVersionFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(
@@ -169,10 +175,11 @@ static CHIP_ERROR generateBitSet(PayloadContents & payload, MutableByteSpan & bi
         populateBits(bits.data(), offset, payload.productID, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateBits(bits.data(), offset, static_cast<uint64_t>(payload.commissioningFlow),
                                       kCommissioningFlowFieldLengthInBits, kTotalPayloadDataSizeInBits));
-    VerifyOrReturnError(payload.rendezvousInformation.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.rendezvousInformation.Value().Raw(),
+    ReturnErrorOnFailure(populateBits(bits.data(), offset,
+                                      payload.rendezvousInformation.ValueOr(RendezvousInformationFlag::kNone).Raw(),
                                       kRendezvousInfoFieldLengthInBits, kTotalPayloadDataSizeInBits));
-    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.discriminator.GetLongValue(),
+    auto const & pd = payload.discriminator;
+    ReturnErrorOnFailure(populateBits(bits.data(), offset, (!pd.IsShortDiscriminator() ? pd.GetLongValue() : 0),
                                       kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(
         populateBits(bits.data(), offset, payload.setUpPINCode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits));

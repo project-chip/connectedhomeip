@@ -147,6 +147,19 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT
+ *
+ * The maximum value of time in milliseconds that the sleepy end device can use as an idle interval in the SIT mode.
+ * The Matter spec does not allow this value to exceed 15s (spec 9.16.1.5).
+ * For the SIT device, the usability of this value is arguable, as slow poll interval can be configured using
+ * CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL. This value can be used for the LIT device, to limit the slow poll interval used while
+ * temporarily working in the SIT mode.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT
+#define CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT System::Clock::Milliseconds32(15000)
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL
  *
  * The default amount of time in milliseconds that the sleepy end device will use as an active interval.
@@ -303,6 +316,19 @@
 #endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
 /**
+ * The device shall check every WIFI_START_CHECK_TIME_USEC whether Wi-Fi management
+ * has been fully initialized. If after WIFI_START_CHECK_ATTEMPTS Wi-Fi management
+ * still hasn't been initialized, the device configuration is reset, and device
+ * needs to be paired again.
+ */
+#ifndef WIFI_START_CHECK_TIME_USEC
+#define WIFI_START_CHECK_TIME_USEC 100000 // 100ms
+#endif
+#ifndef WIFI_START_CHECK_ATTEMPTS
+#define WIFI_START_CHECK_ATTEMPTS 5
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_USER_SELECTED_MODE_TIMEOUT_SEC
  *
  * The default amount of time (in whole seconds) that the device will remain in "user selected"
@@ -410,6 +436,15 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME
 #define CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME "wlan0"
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+ *
+ * Enable support for commissioning using Wi-Fi Public Action Frame as the transport.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#define CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF 0
 #endif
 
 // -------------------- WiFi AP Configuration --------------------
@@ -604,6 +639,59 @@
 #define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME 30000
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_EXT_ADVERTISING
+ *
+ * Optional configuration to enable Extended Announcement Duration up to 48h.
+ * Should be used together with extending CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS past 15 minutes.
+ * Disabled by default.
+ */
+
+#ifndef CHIP_DEVICE_CONFIG_EXT_ADVERTISING
+#define CHIP_DEVICE_CONFIG_EXT_ADVERTISING 0
+#endif
+
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS
+ *
+ * The amount of time in miliseconds after which BLE advertisement should be switched from the slow
+ * advertising to the extended advertising, counting from the moment of advertisement commencement.
+ *
+ *  Defaults to 900000 ms.
+ */
+#ifndef CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS
+#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS (15 * 60 * 1000)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN
+ *
+ * The minimum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in the extended advertising mode. The minimum interval shall not be smaller than the default value.
+ *
+ * Defaults to 2056 (1285 ms).
+ */
+#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN 2056
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX
+ *
+ * The maximum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in the extended advertising mode. The maximum interval should be greater.
+ *
+ * Defaults to 2056 (1285 ms).
+ */
+#ifndef CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX
+#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX 2056
+#endif
+
+static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX,
+              "Max Extended Advertising Interval cannot be larger to the Min Extended Advertising Interval");
+
+#endif
+
 // -------------------- Service Provisioning Configuration --------------------
 
 /**
@@ -647,8 +735,19 @@
  * Time in seconds that a factory new device will advertise commissionable node discovery.
  */
 #ifndef CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
+/**
+ * By default, the extended announcement, when enabled, starts its extended advertising 15 mins
+ * after the standard slow advertisement. Time at which the default discovery time would close the
+ * commissioning window and stop the BLE.
+ * Therefore, when CHIP_DEVICE_CONFIG_EXT_ADVERTISING is enabled bump the default Discovery timeout
+ * to the maximum allowed by the spec. 48h.
+ */
+#define CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS (60 * 60 * 48)
+#else
 #define CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS (15 * 60)
-#endif
+#endif // CHIP_DEVICE_CONFIG_EXT_ADVERTISING
+#endif // CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS
 
 /**
  * CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES
@@ -670,6 +769,19 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS
+ *
+ * The number of target apps that a client can include in a UDC message.
+ *
+ * Depends upon CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY set to 1
+ *
+ * For Video Players, this value should be set to 10
+ */
+#ifndef CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS
+#define CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS 3
 #endif
 
 /**
@@ -831,6 +943,20 @@
 #define CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION ""
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_PASSCODE
+ *
+ * Enable or disable commissioner passcode feature.
+ * With this feature enabled, the commissioner can generate a commissioning passcode
+ * and display it to the user so that the user can enter it into a commissionable
+ * node, such as a phone app, during user directed commissioning.
+ *
+ * For Video Players, this value will often be 1
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_PASSCODE
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_PASSCODE 0
+#endif
+
 // -------------------- Thread Configuration --------------------
 
 /**
@@ -861,6 +987,27 @@
 #define CHIP_DEVICE_CONFIG_THREAD_SSED 0
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER
+ *
+ * Enable Thread Border Router service.
+ * Users should ensure OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE is set accordingly within their thread stack
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER
+#define CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK
+ *
+ * Indicate if the matter device thread stack is implemented using the ot-br-posix dbus API
+ * Rather than the standard openthread stack api
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK
+#define CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK 0
+#endif
 /**
  * CHIP_DEVICE_CONFIG_THREAD_TASK_NAME
  *
@@ -974,6 +1121,15 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
+ *
+ * Enable starting provisioned Thread network automatically after device power-up.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART 1
 #endif
 
 // -------------------- Network Telemetry Configuration --------------------

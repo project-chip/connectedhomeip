@@ -44,13 +44,13 @@ KeyFormat DetectKeyFormat(const uint8_t * key, uint32_t keyLen)
 {
     static uint32_t p256SerializedKeypairLen = kP256_PublicKey_Length + kP256_PrivateKey_Length;
     static const uint8_t chipRawPrefix[]     = { 0x04 };
-    static const char * chipHexPrefix        = "04";
-    static const char * chipB64Prefix        = "B";
+    static const char chipHexPrefix[]        = "04";
+    static const char chipB64Prefix[]        = "B";
     static const uint8_t derRawPrefix[]      = { 0x30, 0x77, 0x02, 0x01, 0x01, 0x04 };
-    static const char * derHexPrefix         = "307702010104";
-    static const char * ecPEMMarker          = "-----BEGIN EC PRIVATE KEY-----";
-    static const char * pkcs8PEMMarker       = "-----BEGIN PRIVATE KEY-----";
-    static const char * ecPUBPEMMarker       = "-----BEGIN PUBLIC KEY-----";
+    static const char derHexPrefix[]         = "307702010104";
+    static const char ecPEMMarker[]          = "-----BEGIN EC PRIVATE KEY-----";
+    static const char pkcs8PEMMarker[]       = "-----BEGIN PRIVATE KEY-----";
+    static const char ecPUBPEMMarker[]       = "-----BEGIN PUBLIC KEY-----";
 
     VerifyOrReturnError(key != nullptr, kKeyFormat_Unknown);
 

@@ -45,7 +45,14 @@ CHIP_ERROR CYW30739Config::ReadConfigValue(Key key, T & val)
 
 CHIP_ERROR CYW30739Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    return ReadConfigValueBin(key, buf, bufSize, outLen);
+    const CHIP_ERROR err = ReadConfigValueBin(key, buf, bufSize, outLen);
+
+    if (outLen >= bufSize)
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+
+    buf[outLen] = '\0';
+
+    return err;
 }
 
 CHIP_ERROR CYW30739Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
@@ -75,6 +82,7 @@ CHIP_ERROR CYW30739Config::ReadConfigValueBin(Key key, void * buf, size_t bufSiz
 }
 
 template CHIP_ERROR CYW30739Config::ReadConfigValue(Key key, bool & val);
+template CHIP_ERROR CYW30739Config::ReadConfigValue(Key key, uint16_t & val);
 template CHIP_ERROR CYW30739Config::ReadConfigValue(Key key, uint32_t & val);
 template CHIP_ERROR CYW30739Config::ReadConfigValue(Key key, uint64_t & val);
 

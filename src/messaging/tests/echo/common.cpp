@@ -51,10 +51,6 @@ void InitializeChip()
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
-    // Initialize TCP.
-    err = chip::DeviceLayer::TCPEndPointManager()->Init(chip::DeviceLayer::SystemLayer());
-    SuccessOrExit(err);
-
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -68,6 +64,5 @@ void ShutdownChip()
     gMessageCounterManager.Shutdown();
     gExchangeManager.Shutdown();
     gSessionManager.Shutdown();
-    (void) chip::DeviceLayer::TCPEndPointManager()->Shutdown();
     chip::DeviceLayer::PlatformMgr().Shutdown();
 }

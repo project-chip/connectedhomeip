@@ -18,6 +18,7 @@
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
 
+#include <lib/support/FibonacciUtils.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -110,9 +111,9 @@ void MTRBaseSubscriptionCallback::OnDeallocatePaths(ReadPrepareParams && aReadPr
     }
 
     VerifyOrDie((aReadPrepareParams.mDataVersionFilterListSize == 0 && aReadPrepareParams.mpDataVersionFilterList == nullptr)
-        || (aReadPrepareParams.mDataVersionFilterListSize == 1 && aReadPrepareParams.mpDataVersionFilterList != nullptr));
+        || (aReadPrepareParams.mDataVersionFilterListSize > 0 && aReadPrepareParams.mpDataVersionFilterList != nullptr));
     if (aReadPrepareParams.mpDataVersionFilterList != nullptr) {
-        delete aReadPrepareParams.mpDataVersionFilterList;
+        delete[] aReadPrepareParams.mpDataVersionFilterList;
     }
 
     VerifyOrDie((aReadPrepareParams.mEventPathParamsListSize == 0 && aReadPrepareParams.mpEventPathParamsList == nullptr)
@@ -135,13 +136,18 @@ CHIP_ERROR MTRBaseSubscriptionCallback::OnResubscriptionNeeded(ReadClient * apRe
     CHIP_ERROR err = ClusterStateCache::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause);
     ReturnErrorOnFailure(err);
 
+    auto error = [MTRError errorForCHIPErrorCode:aTerminationCause];
+    auto delayMs = @(apReadClient->ComputeTimeTillNextSubscription());
+    CallResubscriptionScheduledHandler(error, delayMs);
+    return CHIP_NO_ERROR;
+}
+
+void MTRBaseSubscriptionCallback::CallResubscriptionScheduledHandler(NSError * error, NSNumber * resubscriptionDelay)
+{
     if (mResubscriptionCallback != nil) {
         auto callback = mResubscriptionCallback;
-        auto error = [MTRError errorForCHIPErrorCode:aTerminationCause];
-        auto delayMs = @(apReadClient->ComputeTimeTillNextSubscription());
-        callback(error, delayMs);
+        callback(error, resubscriptionDelay);
     }
-    return CHIP_NO_ERROR;
 }
 
 void MTRBaseSubscriptionCallback::OnUnsolicitedMessageFromPublisher(ReadClient *)
@@ -193,5 +199,29 @@ void MTRBaseSubscriptionCallback::ReportError(CHIP_ERROR aError, bool aCancelSub
         dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
             delete myself;
         });
+    }
+}
+
+void MTRBaseSubscriptionCallback::ClearCachedAttributeState(EndpointId aEndpoint)
+{
+    assertChipStackLockedByCurrentThread();
+    if (mClusterStateCache) {
+        mClusterStateCache->ClearAttributes(aEndpoint);
+    }
+}
+
+void MTRBaseSubscriptionCallback::ClearCachedAttributeState(const ConcreteClusterPath & aCluster)
+{
+    assertChipStackLockedByCurrentThread();
+    if (mClusterStateCache) {
+        mClusterStateCache->ClearAttributes(aCluster);
+    }
+}
+
+void MTRBaseSubscriptionCallback::ClearCachedAttributeState(const ConcreteAttributePath & aAttribute)
+{
+    assertChipStackLockedByCurrentThread();
+    if (mClusterStateCache) {
+        mClusterStateCache->ClearAttribute(aAttribute);
     }
 }

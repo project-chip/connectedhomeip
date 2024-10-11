@@ -19,20 +19,23 @@ declare_args() {
 
 SOURCES = [ 
   # BOARD APPLICATION SRC(in examples/platform/stm32/common/STM32WB5MM-DK/)
+  "${stm32_board_src}/Src/app_debug.c",
   "${stm32_board_src}/Src/entropy_hardware_poll.c",
-  "${stm32_board_src}/Src/flash_driver.c",
   "${stm32_board_src}/Src/flash_wb.c",
   "${stm32_board_src}/Src/freertos_port.c",
   "${stm32_board_src}/Src/hw_timerserver.c",
   "${stm32_board_src}/Src/hw_uart.c",
+  "${stm32_board_src}/Src/stm_ext_flash.c",
+  "${stm32_board_src}/Src/stm32_factorydata.c",
   "${stm32_board_src}/Src/stm32_lpm_if.c",
+  "${stm32_board_src}/Src/stm32wb5mm_dk_qspi.c",
   "${stm32_board_src}/Src/stm32wbxx_hal_msp.c",
   "${stm32_board_src}/Src/stm32wbxx_hal_timebase_tim.c",
   "${stm32_board_src}/Src/stm32wbxx_it.c",
   "${stm32_board_src}/Src/stm_logging.c",
   "${stm32_board_src}/Src/syscalls.c",
   "${stm32_board_src}/Src/system_stm32wbxx.c",
-  "${stm32_board_src}/Src/otp.c", 
+  "${stm32_board_src}/Src/otp.c",
   "${stm32_board_src}/STM32_WPAN/Target/hw_ipcc.c",
 
   "${chip_root}/examples/platform/stm32/config_files/STM32WB5/matter_config.h",
@@ -46,6 +49,7 @@ SOURCES = [
   #BSP COMPONENTS
   "${components_ssd1315}/ssd1315_reg.c",
   "${components_ssd1315}/ssd1315.c",
+  "${components_s25fl128s}/s25fl128s.c",
   
   # BOARD UTILITIES
   "${stm32_lpm_util}/stm32_lpm.c",

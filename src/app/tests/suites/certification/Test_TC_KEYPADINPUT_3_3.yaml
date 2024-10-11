@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 1a: Send Numbers1"
+    - label: "Step 1a: TH sends Numbers1"
       PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:
@@ -43,7 +43,7 @@ tests:
               - name: "Status"
                 value: 0
 
-    - label: "Step 1b: Send Numbers2"
+    - label: "Step 1b: TH sends Numbers2"
       PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:
@@ -55,7 +55,7 @@ tests:
               - name: "Status"
                 value: 0
 
-    - label: "Step 1c: Send Numbers3"
+    - label: "Step 1c: TH sends Numbers3"
       PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:
@@ -67,7 +67,7 @@ tests:
               - name: "Status"
                 value: 0
 
-    - label: "Step 1d: Send Numbers4"
+    - label: "Step 1d: TH sends Numbers4"
       PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:
@@ -79,7 +79,7 @@ tests:
               - name: "Status"
                 value: 0
 
-    - label: "Step 1e: Send Numbers5"
+    - label: "Step 1e: TH sends Numbers5"
       PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:
@@ -91,7 +91,7 @@ tests:
               - name: "Status"
                 value: 0
 
-    - label: "Step 1f: Send Numbers6"
+    - label: "Step 1f: TH sends Numbers6"
       PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:
@@ -103,7 +103,7 @@ tests:
               - name: "Status"
                 value: 0
 
-    - label: "Step 1g: Send Numbers7"
+    - label: "Step 1g: TH sends Numbers7"
       PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:
@@ -115,7 +115,7 @@ tests:
               - name: "Status"
                 value: 0
 
-    - label: "Step 1h: Send Numbers8"
+    - label: "Step 1h: TH sends Numbers8"
       PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:
@@ -127,7 +127,7 @@ tests:
               - name: "Status"
                 value: 0
 
-    - label: "Step 1i: Send Numbers9"
+    - label: "Step 1i: TH sends Numbers9"
       PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:

@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -32,8 +32,8 @@ tests:
                 value: nodeId
 
     - label:
-          "Step 2a: Writes a value of 0 to TemperatureDisplayMode attribute of
-          DUT"
+          "Step 2a: TH writes a value of 0 to TemperatureDisplayMode attribute
+          of DUT"
       PICS: TSUIC.S.A0000
       command: "writeAttribute"
       attribute: "TemperatureDisplayMode"
@@ -59,8 +59,8 @@ tests:
           value: 0
 
     - label:
-          "Step 2c: Writes a value of 1 to TemperatureDisplayMode attribute of
-          DUT"
+          "Step 2c: TH writes a value of 1 to TemperatureDisplayMode attribute
+          of DUT"
       PICS: TSUIC.S.A0000
       command: "writeAttribute"
       attribute: "TemperatureDisplayMode"
@@ -86,8 +86,8 @@ tests:
           value: 1
 
     - label:
-          "Step 2e: Writes a value of greater than 1 to TemperatureDisplayMode
-          attribute of DUT"
+          "Step 2e: TH writes a value of greater than 1 to
+          TemperatureDisplayMode attribute of DUT"
       PICS: TSUIC.S.A0000
       command: "writeAttribute"
       attribute: "TemperatureDisplayMode"
@@ -103,7 +103,7 @@ tests:
       response:
           value: 1
 
-    - label: "Step 3a: Writes a value of 0 to KeypadLockout attribute of DUT"
+    - label: "Step 3a: TH writes a value of 0 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "KeypadLockout"
@@ -128,7 +128,7 @@ tests:
       response:
           value: 0
 
-    - label: "Step 3c: Writes a value of 1 to KeypadLockout attribute of DUT"
+    - label: "Step 3c: TH writes a value of 1 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "KeypadLockout"
@@ -153,7 +153,7 @@ tests:
       response:
           value: 1
 
-    - label: "Step 3e: Writes a value of 2 to KeypadLockout attribute of DUT"
+    - label: "Step 3e: TH writes a value of 2 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "KeypadLockout"
@@ -178,7 +178,7 @@ tests:
       response:
           value: 2
 
-    - label: "Step 3g: Writes a value of 3 to KeypadLockout attribute of DUT"
+    - label: "Step 3g: TH writes a value of 3 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "KeypadLockout"
@@ -203,7 +203,7 @@ tests:
       response:
           value: 3
 
-    - label: "Step 3i: Writes a value of 4 to KeypadLockout attribute of DUT"
+    - label: "Step 3i: TH writes a value of 4 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "KeypadLockout"
@@ -228,7 +228,7 @@ tests:
       response:
           value: 4
 
-    - label: "Step 3k: Writes a value of 5 to KeypadLockout attribute of DUT"
+    - label: "Step 3k: TH writes a value of 5 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "KeypadLockout"
@@ -272,7 +272,7 @@ tests:
           value: 5
 
     - label:
-          "Step 4a: Writes a value of 0 to ScheduleProgrammingVisibility
+          "Step 4a: TH writes a value of 0 to ScheduleProgrammingVisibility
           attribute of DUT"
       PICS: TSUIC.S.A0002
       command: "writeAttribute"
@@ -302,7 +302,7 @@ tests:
           value: 0
 
     - label:
-          "Step 4c: Writes a value of 1 to ScheduleProgrammingVisibility
+          "Step 4c: TH writes a value of 1 to ScheduleProgrammingVisibility
           attribute of DUT"
       PICS: TSUIC.S.A0002
       command: "writeAttribute"
@@ -332,7 +332,7 @@ tests:
           value: 1
 
     - label:
-          "Step 4e: Writes a value of greater than 1 to
+          "Step 4e: TH writes a value of greater than 1 to
           ScheduleProgrammingVisibility attribute of DUT"
       PICS: TSUIC.S.A0002
       command: "writeAttribute"

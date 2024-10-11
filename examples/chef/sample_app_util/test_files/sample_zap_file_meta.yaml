@@ -15,7 +15,7 @@
                     FeatureMap/65532: '0'
             Descriptor/29:
                 attributes:
-                    FeatureMap/65532: '0'
+                    FeatureMap/65532: ''
             DiagnosticLogs/50:
                 attributes:
                     FeatureMap/65532: '0'
@@ -30,14 +30,11 @@
                     FeatureMap/65532: '6'
             GeneralDiagnostics/51:
                 attributes:
-                    FeatureMap/65532: '0'
+                    FeatureMap/65532: ''
             GroupKeyManagement/63:
                 attributes:
-                    FeatureMap/65532: '0'
+                    FeatureMap/65532: ''
             Groups/4:
-                attributes:
-                    FeatureMap/65532: '0'
-            LocalizationConfiguration/43:
                 attributes:
                     FeatureMap/65532: '0'
             OperationalCredentials/62:
@@ -48,16 +45,13 @@
                     FeatureMap/65532: '0'
             SoftwareDiagnostics/52:
                 attributes:
-                    FeatureMap/65532: '1'
+                    FeatureMap/65532: ''
             Switch/59:
                 attributes:
                     FeatureMap/65532: '0'
             ThreadNetworkDiagnostics/53:
                 attributes:
                     FeatureMap/65532: '15'
-            TimeFormatLocalization/44:
-                attributes:
-                    FeatureMap/65532: '0'
             UserLabel/65:
                 attributes:
                     FeatureMap/65532: '0'
@@ -72,7 +66,7 @@
                     FeatureMap/65532: '0'
             Descriptor/29:
                 attributes:
-                    FeatureMap/65532: '0'
+                    FeatureMap/65532: ''
             Groups/4:
                 attributes:
                     FeatureMap/65532: '0'

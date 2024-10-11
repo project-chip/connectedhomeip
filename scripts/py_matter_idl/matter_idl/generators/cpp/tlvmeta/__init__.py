@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from typing import Generator, List, Optional
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Cluster, ClusterSide, Field, Idl, StructTag
+from matter_idl.matter_idl_types import Cluster, Field, Idl, StructTag
 
 
 @dataclass
@@ -297,10 +297,9 @@ class TLVMetaDataGenerator(CodeGenerator):
             template_path="TLVMetaData_cpp.jinja",
             output_file_name=f"tlv/meta/{self.table_name}.cpp",
             vars={
-                'clusters': [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT],
+                'clusters': self.idl.clusters,
                 'table_name': self.table_name,
                 'sub_tables': tables,
-
             }
         )
 
@@ -308,7 +307,7 @@ class TLVMetaDataGenerator(CodeGenerator):
             template_path="TLVMetaData_h.jinja",
             output_file_name=f"tlv/meta/{self.table_name}.h",
             vars={
-                'clusters': [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT],
+                'clusters': self.idl.clusters,
                 'table_name': self.table_name,
                 'sub_tables': tables,
             }

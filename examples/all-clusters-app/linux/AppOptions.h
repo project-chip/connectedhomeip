@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,13 +22,20 @@
 
 #include <app/tests/suites/credentials/TestHarnessDACProvider.h>
 
+#include <string>
+
 class AppOptions
 {
 public:
     static chip::ArgParser::OptionSet * GetOptions();
     static chip::Credentials::DeviceAttestationCredentialsProvider * GetDACProvider();
+    static chip::Optional<std::string> GetEndUserSupportLogFilePath();
+    static chip::Optional<std::string> GetNetworkDiagnosticsLogFilePath();
+    static chip::Optional<std::string> GetCrashLogFilePath();
 
 private:
     static bool HandleOptions(const char * program, chip::ArgParser::OptionSet * options, int identifier, const char * name,
                               const char * value);
+
+    static bool IsEmptyString(const char * value);
 };

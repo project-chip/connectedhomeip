@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Read mandatory non-global attribute: StateValue"
+    - label: "Step 2: TH reads the StateValue attribute from the DUT"
       PICS: BOOL.S.A0000
       command: "readAttribute"
       attribute: "StateValue"

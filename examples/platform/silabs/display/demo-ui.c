@@ -23,9 +23,12 @@
 #include "dmd/dmd.h"
 #include "em_types.h"
 #include "glib.h"
-#if SL_WIFI && !SIWX_917
+#include "sl_component_catalog.h"
+#include "sl_memlcd.h"
+#include <app/icd/server/ICDServerConfig.h>
+#if SL_WIFI && !SLI_SI91X_MCU_INTERFACE
 #include "spi_multiplex.h"
-#endif // SL_WIFI && !SIWX_917
+#endif // SL_WIFI && !SLI_SI91X_MCU_INTERFACE
 #include <stdio.h>
 #include <string.h>
 
@@ -40,12 +43,8 @@
 #define PROT2_ID_X_POSITION 79
 
 // Matter Logo
-#define PROT2_BITMAP_WIDTH MATTER_LOGO_WIDTH
-#define PROT2_BITMAP_HEIGHT MATTER_LOGO_HEIGHT
 #define PROT2_X_POSITION 104
 #define PROT2_Y_POSITION (APP_Y_POSITION + (APP_Y_POSITION / 2))
-#define PROT2_BITMAP (matterLogoBitmap)
-#define PROT2_BITMAP_CONN (matterLogoBitmap)
 
 // Networking Protocol Logo
 #ifdef SL_WIFI
@@ -53,15 +52,16 @@
 #define PROT1_BITMAP_HEIGHT WIFI_BITMAP_HEIGHT
 #define PROT1_X_POSITION 8
 #define PROT1_Y_POSITION (APP_Y_POSITION + (APP_Y_POSITION / 2))
-#define PROT1_BITMAP (networkBitMap)
-#define PROT1_BITMAP_CONN (networkBitMap)
 #else
 #define PROT1_BITMAP_WIDTH THREAD_BITMAP_WIDTH
 #define PROT1_BITMAP_HEIGHT THREAD_BITMAP_HEIGHT
 #define PROT1_X_POSITION 8
+#ifdef SL_CATALOG_ZIGBEE_ZCL_FRAMEWORK_CORE_PRESENT
+#define ZIGBEE_POSITION_Y (APP_Y_POSITION + (APP_Y_POSITION / 2) + (ZIGBEE_BITMAP_HEIGHT / 2))
+#define PROT1_Y_POSITION (APP_Y_POSITION + (APP_Y_POSITION / 2) - (ZIGBEE_BITMAP_HEIGHT / 2))
+#else
 #define PROT1_Y_POSITION (APP_Y_POSITION + (APP_Y_POSITION / 2))
-#define PROT1_BITMAP (networkBitMap)
-#define PROT1_BITMAP_CONN (networkBitMap)
+#endif
 #endif
 
 /*******************************************************************************
@@ -79,6 +79,10 @@ static const uint8_t OffStateBitMap[] = { OFF_DEMO_BITMAP };
 static const uint8_t networkBitMap[] = { WIFI_BITMAP };
 #else
 static const uint8_t networkBitMap[] = { THREAD_BITMAP };
+#endif
+
+#ifdef SL_CATALOG_ZIGBEE_ZCL_FRAMEWORK_CORE_PRESENT
+static const uint8_t zigbeeBitMap[] = { ZIGBEE_BITMAP };
 #endif
 
 // Future usage
@@ -102,15 +106,33 @@ void demoUIInit(GLIB_Context_t * context)
 
 sl_status_t updateDisplay(void)
 {
+    sl_status_t status = SL_STATUS_OK;
+
+#if SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER
+    // In sleep, memlcd will not be retained so re-initialize MEMLCD interface after sleep wakeup
+    sl_memlcd_post_wakeup_init();
+#endif // SLI_SI91X_MCU_INTERFACE && SL_ICD_ENABLED && CHIP_CONFIG_ENABLE_ICD_SERVER
+
 #if SL_LCDCTRL_MUX
-    sl_wfx_host_pre_lcd_spi_transfer();
+    status = sl_wfx_host_pre_lcd_spi_transfer();
+    if (status != SL_STATUS_OK)
+        return status;
 #endif // SL_LCDCTRL_MUX
-    sl_status_t status = DMD_updateDisplay();
-#if SL_LCDCTRL_MUX
-    sl_wfx_host_post_lcd_spi_transfer();
-#endif // SL_LCDCTRL_MUX
+    status = DMD_updateDisplay();
     if (status != DMD_OK)
         return SL_STATUS_FAIL;
+#if SL_LCDCTRL_MUX
+    status = sl_wfx_host_post_lcd_spi_transfer();
+    if (status != SL_STATUS_OK)
+        return status;
+#endif // SL_LCDCTRL_MUX
+
+#if SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER
+    // MEMLCD is not a UULP component and not available in sleep so powering down before sleep and need to be re-initialized after
+    // sleep-wakeup
+    sl_memlcd_power_on(NULL, false);
+#endif // SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER
+
     return SL_STATUS_OK;
 }
 
@@ -131,14 +153,13 @@ void demoUIDisplayApp(bool on)
     updateDisplay();
 }
 
-void demoUIDisplayProtocol(demoUIProtocol protocol, bool isConnected)
+void demoUIDisplayProtocols()
 {
-    GLIB_drawBitmap(&glibContext, (protocol == DEMO_UI_PROTOCOL1 ? PROT1_X_POSITION : PROT2_X_POSITION),
-                    (protocol == DEMO_UI_PROTOCOL1 ? PROT1_Y_POSITION : PROT2_Y_POSITION),
-                    (protocol == DEMO_UI_PROTOCOL1 ? PROT1_BITMAP_WIDTH : PROT2_BITMAP_WIDTH),
-                    (protocol == DEMO_UI_PROTOCOL1 ? PROT1_BITMAP_HEIGHT : PROT2_BITMAP_HEIGHT),
-                    (protocol == DEMO_UI_PROTOCOL1 ? (isConnected ? PROT1_BITMAP_CONN : PROT1_BITMAP)
-                                                   : (isConnected ? PROT2_BITMAP_CONN : PROT2_BITMAP)));
+    GLIB_drawBitmap(&glibContext, PROT2_X_POSITION, PROT2_Y_POSITION, MATTER_LOGO_WIDTH, MATTER_LOGO_HEIGHT, matterLogoBitmap);
+    GLIB_drawBitmap(&glibContext, PROT1_X_POSITION, PROT1_Y_POSITION, PROT1_BITMAP_WIDTH, PROT1_BITMAP_HEIGHT, networkBitMap);
+#ifdef SL_CATALOG_ZIGBEE_ZCL_FRAMEWORK_CORE_PRESENT
+    GLIB_drawBitmap(&glibContext, PROT1_X_POSITION, ZIGBEE_POSITION_Y, ZIGBEE_BITMAP_WIDTH, ZIGBEE_BITMAP_HEIGHT, zigbeeBitMap);
+#endif
     updateDisplay();
 }
 
@@ -146,7 +167,5 @@ void demoUIClearMainScreen(uint8_t * name)
 {
     GLIB_clear(&glibContext);
     demoUIDisplayHeader((char *) name);
-    demoUIDisplayApp(false);
-    demoUIDisplayProtocol(DEMO_UI_PROTOCOL1, false);
-    demoUIDisplayProtocol(DEMO_UI_PROTOCOL2, false);
+    demoUIDisplayProtocols();
 }

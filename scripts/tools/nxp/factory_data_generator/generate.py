@@ -22,10 +22,15 @@ import logging
 import subprocess
 import sys
 
+from crc import Calculator, Crc16
 from custom import (CertDeclaration, DacCert, DacPKey, Discriminator, HardwareVersion, HardwareVersionStr, IterationCount,
-                    ManufacturingDate, PaiCert, PartNumber, ProductId, ProductLabel, ProductName, ProductURL, Salt, SerialNum,
-                    SetupPasscode, StrArgument, UniqueId, VendorId, VendorName, Verifier)
+                    ManufacturingDate, PaiCert, PartNumber, ProductFinish, ProductId, ProductLabel, ProductName,
+                    ProductPrimaryColor, ProductURL, Salt, SerialNum, SetupPasscode, StrArgument, UniqueId, VendorId, VendorName,
+                    Verifier)
 from default import InputArgument
+
+# Global variable for hash ID
+hash_id = "CE47BA5E"
 
 
 def set_logger():
@@ -70,7 +75,7 @@ class KlvGenerator:
         self.spake2p = Spake2p()
         if self.args.spake2p_verifier is None:
             self.spake2p.generate(self.args)
-        self.args.dac_key.generate_private_key(self.args.dac_key_password)
+        self.args.dac_key.generate_private_key(self.args.dac_key_password, self.args.dac_key_use_sss_blob)
 
     def _validate_args(self):
         if self.args.dac_key_password is None:
@@ -101,7 +106,7 @@ class KlvGenerator:
 
         return data
 
-    def to_bin(self, klv, out, aes128_key):
+    def to_bin(self, klv, out, aes_key):
         fullContent = bytearray()
         with open(out, "wb") as file:
             for entry in klv:
@@ -110,7 +115,7 @@ class KlvGenerator:
                 fullContent += entry[2]
             size = len(fullContent)
 
-            if (aes128_key is None):
+            if (aes_key is None):
                 # Calculate 4 bytes of hashing
                 hashing = hashlib.sha256(fullContent).hexdigest()
                 hashing = hashing[0:8]
@@ -123,16 +128,25 @@ class KlvGenerator:
                 fullContent = size.to_bytes(4, "little") + fullContent
 
                 # Add hash id
-                hashId = bytearray.fromhex("CE47BA5E")
+                hashId = bytearray.fromhex(hash_id)
                 hashId.reverse()
                 fullContent = hashId + fullContent
 
                 size = len(fullContent)
 
+                if (self.args.hw_params):
+                    calculator = Calculator(Crc16.XMODEM)
+                    crc_sum = calculator.checksum(fullContent)
+
+                    fullContent = bytearray(b"APP_FACT_DATA:  ") + size.to_bytes(4, 'little') + \
+                        fullContent + crc_sum.to_bytes(2, 'little')
+
+                    size = len(fullContent)
+
                 logging.info("Size of final generated binary is: {} bytes".format(size))
                 file.write(fullContent)
             else:
-                # In case a aes128_key is given the data will be encrypted
+                # In case a aes_key is given the data will be encrypted
                 # Always add a padding to be 16 bytes aligned
                 padding_len = size % 16
                 padding_len = 16 - padding_len
@@ -142,7 +156,7 @@ class KlvGenerator:
                 size = len(fullContent)
                 logging.info("(After padding) Size of generated binary is: {} bytes".format(size))
                 from Crypto.Cipher import AES
-                cipher = AES.new(bytes.fromhex(aes128_key), AES.MODE_ECB)
+                cipher = AES.new(bytes.fromhex(aes_key), AES.MODE_ECB)
                 fullContentCipher = cipher.encrypt(fullContent)
 
                 # Add 4 bytes of hashing to generated binary to check for integrity
@@ -155,9 +169,9 @@ class KlvGenerator:
                 fullContentCipher = size.to_bytes(4, "little") + fullContentCipher
 
                 # Add hash id
-                hashId = bytearray.fromhex("CE47BA5E")
+                hashId = bytearray.fromhex(hash_id)
                 hashId.reverse()
-                fullContentCipher = hashId.reverse() + fullContentCipher
+                fullContentCipher = hashId + fullContentCipher
 
                 size = len(fullContentCipher)
 
@@ -209,10 +223,14 @@ def main():
 
     optional.add_argument("--dac_key_password", type=str,
                           help="[path] Password to decode DAC Key if available")
+    optional.add_argument("--dac_key_use_sss_blob", action='store_true',
+                          help="[bool] If present, DAC private key area is populated by an encrypted blob")
     optional.add_argument("--spake2p_verifier", type=Verifier,
                           help="[base64 str] Already generated spake2p verifier")
     optional.add_argument("--aes128_key",
                           help="[hex] AES 128 bits key used to encrypt the whole dataset")
+    optional.add_argument("--aes256_key",
+                          help="[hex] AES 256 bits key used to encrypt the whole dataset")
     optional.add_argument("--date", type=ManufacturingDate,
                           help="[str] Manufacturing Date (YYYY-MM-DD)")
     optional.add_argument("--part_number", type=PartNumber,
@@ -225,12 +243,23 @@ def main():
                           help="[str] Serial Number")
     optional.add_argument("--unique_id", type=UniqueId,
                           help="[str] Unique identifier for the device")
+    optional.add_argument("--product_finish", type=ProductFinish, metavar=ProductFinish.VALUES,
+                          help="[str] Visible finish of the product")
+    optional.add_argument("--product_primary_color", type=ProductPrimaryColor, metavar=ProductPrimaryColor.VALUES,
+                          help="[str] Representative color of the visible parts of the product")
+    optional.add_argument("--hw_params", action='store_true',
+                          help="[bool] If present, store factory data in HWParameters APP section")
 
     args = parser.parse_args()
 
     klv = KlvGenerator(args)
     data = klv.generate()
-    klv.to_bin(data, args.out, args.aes128_key)
+    aes_key = None
+    if args.aes256_key:
+        aes_key = args.aes256_key
+    elif args.aes128_key:
+        aes_key = args.aes128_key
+    klv.to_bin(data, args.out, aes_key)
 
 
 if __name__ == "__main__":

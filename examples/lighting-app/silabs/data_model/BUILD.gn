@@ -22,7 +22,5 @@ chip_data_model("silabs-lighting") {
   } else {
     zap_file = "lighting-thread-app.zap"
   }
-
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
   is_server = true
 }

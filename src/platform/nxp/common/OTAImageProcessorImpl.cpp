@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2024 Project CHIP Authors
  *    Copyright 2023 NXP
  *    All rights reserved.
  *
@@ -21,6 +21,8 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 #include "OTAImageProcessorImpl.h"
+
+static constexpr uint16_t deltaRebootDelayMs = 200;
 
 namespace chip {
 
@@ -44,11 +46,6 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    if (mImageFile == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
-        return CHIP_ERROR_INTERNAL;
-    }
     DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
@@ -284,8 +281,10 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
      * This should be done with a delay so the device has enough time to send
      * the state-transition event when applying the update.
      */
-    ChipLogProgress(SoftwareUpdate, "Restarting device in 5 seconds ...");
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(5 * 1000), HandleRestart, nullptr);
+    ChipLogProgress(SoftwareUpdate, "Restarting device, will reboot in %d seconds ...", imageProcessor->mDelayBeforeRebootSec);
+    DeviceLayer::PlatformMgr().HandleServerShuttingDown();
+    DeviceLayer::SystemLayer().StartTimer(
+        System::Clock::Milliseconds32(imageProcessor->mDelayBeforeRebootSec * 1000 + deltaRebootDelayMs), HandleRestart, nullptr);
 
     /*
      * At next boot time, the bootloader will test + validate new image.
@@ -308,6 +307,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
     }
 
     OTA_CancelImage();
+    OTA_ServiceDeInit();
 
     imageProcessor->ReleaseBlock();
 }
@@ -352,6 +352,11 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 
     mBlock = MutableByteSpan();
     return CHIP_NO_ERROR;
+}
+
+void OTAImageProcessorImpl::SetRebootDelaySec(uint16_t rebootDelay)
+{
+    mDelayBeforeRebootSec = rebootDelay;
 }
 
 } // namespace chip

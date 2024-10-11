@@ -168,6 +168,12 @@ void TizenWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * cal
     }
 }
 
+uint32_t TizenWiFiDriver::GetSupportedWiFiBandsMask() const
+{
+    return static_cast<uint32_t>((1UL << chip::to_underlying(WiFiBandEnum::k2g4)) |
+                                 (1UL << chip::to_underlying(WiFiBandEnum::k5g)));
+}
+
 size_t TizenWiFiDriver::WiFiNetworkIterator::Count()
 {
     return driver->mStagingNetwork.ssidLen == 0 ? 0 : 1;

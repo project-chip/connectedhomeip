@@ -55,7 +55,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
     else if (clusterId == ColorControl::Id)
     {
-        EmberAfStatus status;
+        Protocols::InteractionModel::Status status;
         /* ignore several attributes that are currently not processed */
         if ((attributeId == ColorControl::Attributes::RemainingTime::Id) ||
             (attributeId == ColorControl::Attributes::EnhancedColorMode::Id) ||
@@ -120,13 +120,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             ChipLogProgress(Zcl, "New CT color: %u", ct.ctMireds);
             LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_CT, (uint8_t *) &ct.ctMireds);
         }
-    }
-    else if (clusterId == OnOffSwitchConfiguration::Id)
-    {
-        ChipLogProgress(Zcl, "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(attributeId), type, *value, size);
-
-        // WIP Apply attribute change to Light
     }
     else if (clusterId == Identify::Id)
     {

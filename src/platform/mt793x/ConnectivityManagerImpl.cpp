@@ -23,8 +23,6 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
 
-#include <app/server/Dnssd.h>
-
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
 #include <lwip/nd6.h>
@@ -51,7 +49,6 @@
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
-using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {

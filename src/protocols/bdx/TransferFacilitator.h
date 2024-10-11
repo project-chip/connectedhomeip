@@ -45,7 +45,12 @@ class TransferFacilitator : public Messaging::ExchangeDelegate, public Messaging
 {
 public:
     TransferFacilitator() : mExchangeCtx(nullptr), mSystemLayer(nullptr), mPollFreq(kDefaultPollFreq) {}
-    ~TransferFacilitator() override = default;
+    ~TransferFacilitator() override;
+
+    /**
+     * Calls reset on the TransferSession object and stops the poll timer.
+     */
+    void ResetTransfer();
 
 private:
     //// UnsolicitedMessageHandler Implementation ////
@@ -58,8 +63,6 @@ private:
     }
 
     // Inherited from ExchangeContext
-    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
-                                 chip::System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     /**
@@ -73,6 +76,10 @@ private:
     virtual void HandleTransferSessionOutput(TransferSession::OutputEvent & event) = 0;
 
 protected:
+    // Inherited from ExchangeContext
+    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
+                                 chip::System::PacketBufferHandle && payload) override;
+
     /**
      * The callback for when the poll timer expires. The poll timer regulates how often the TransferSession is polled.
      */
@@ -94,7 +101,6 @@ protected:
     System::Clock::Timeout mPollFreq;
     static constexpr System::Clock::Timeout kDefaultPollFreq    = System::Clock::Milliseconds32(500);
     static constexpr System::Clock::Timeout kImmediatePollDelay = System::Clock::Milliseconds32(1);
-    bool mStopPolling                                           = false;
 };
 
 /**
@@ -119,8 +125,6 @@ public:
     CHIP_ERROR PrepareForTransfer(System::Layer * layer, TransferRole role, BitFlags<TransferControlFlags> xferControlOpts,
                                   uint16_t maxBlockSize, System::Clock::Timeout timeout,
                                   System::Clock::Timeout pollFreq = TransferFacilitator::kDefaultPollFreq);
-
-    void ResetTransfer();
 };
 
 /**

@@ -13,11 +13,12 @@
 # limitations under the License.
 
 name:
-    Window Covering [TC-WNCV-3.5] DownOrClose Long-Run Verification with server
-    as DUT
+    Window Covering [TC-WNCV-3.5] DownOrClose command Long-Run Verification [DUT
+    as Server]
 
 PICS:
     - WNCV.S
+    - WNCV.S.F02 | WNCV.S.F04
 
 config:
     nodeId: 0x12344321
@@ -42,17 +43,13 @@ tests:
     ################ Position Init Phase #############
     ### Step 1x -> Initialize the Covering position before any testing
     ### MANDATORY Init Commands
-    - label:
-          "Step 1a: TH sends UpOrOpen command to preposition the DUT in the
-          opposite direction"
+    - label: "Step 1a: TH sends UpOrOpen command to DUT"
       command: "UpOrOpen"
       PICS: WNCV.S.C00.Rsp
 
     ### DUT adjusts to a non-closed position
     ### Testers should input the fastMotionDuration parameter that match their DUT behavior
-    - label:
-          "Step 1b: TH Waits for fastMotionDuration seconds movement(s) on the
-          device"
+    - label: "Step 1b: TH waits for 5-15 seconds movement(s) on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -69,9 +66,7 @@ tests:
 
     ### DUT move toward its fully-closed position
     ### Testers should input the fullMotionDuration parameter that match their DUT behavior
-    - label:
-          "Step 2b: TH Waits for fullMotionDuration seconds movement(s) on the
-          device"
+    - label: "Step 2b: TH waits for PIXIT.WNCV.FULLMOTION on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -79,7 +74,7 @@ tests:
               - name: "ms"
                 value: fullMotionDuration
 
-    - label: "Step 2c: TH reads OperationalStatus attribute from DUT"
+    - label: "Step 2c: TH checks OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
       PICS: WNCV.S.A000a

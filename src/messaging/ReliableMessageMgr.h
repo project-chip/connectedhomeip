@@ -27,6 +27,7 @@
 #include <stdint.h>
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/Pool.h>
 #include <messaging/ExchangeContext.h>
@@ -111,8 +112,8 @@ public:
      *
      *  @retval  The backoff time value, including jitter.
      */
-    static System::Clock::Timestamp GetBackoff(System::Clock::Timestamp baseInterval, uint8_t sendCount,
-                                               bool computeMaxPossible = false);
+    static System::Clock::Timeout GetBackoff(System::Clock::Timeout baseInterval, uint8_t sendCount,
+                                             bool computeMaxPossible = false);
 
     /**
      *  Start retranmisttion of cached encryped packet for current entry.
@@ -205,6 +206,21 @@ public:
     }
 #endif // CHIP_CONFIG_TEST
 
+    /**
+     * Set the value to add to the MRP backoff time we compute.  This is meant to
+     * account for high network latency on the sending side (us) that can't be
+     * known to the message recipient and hence is not captured in the MRP
+     * parameters the message recipient communicates to us.
+     *
+     * If set to NullOptional falls back to the compile-time
+     * CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST.
+     *
+     * This is a static, not a regular member, because API consumers may need to
+     * set this before actually bringing up the stack and having access to a
+     * ReliableMessageMgr.
+     */
+    static void SetAdditionalMRPBackoffTime(const Optional<System::Clock::Timeout> & additionalTime);
+
 private:
     /**
      * Calculates the next retransmission time for the entry
@@ -233,6 +249,8 @@ private:
     ObjectPool<RetransTableEntry, CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE> mRetransTable;
 
     SessionUpdateDelegate * mSessionUpdateDelegate = nullptr;
+
+    static System::Clock::Timeout sAdditionalMRPBackoffTime;
 };
 
 } // namespace Messaging

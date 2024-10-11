@@ -29,7 +29,7 @@
 
 #include <app-common/zap-generated/ids/Clusters.h>
 
-static const char * TAG = "lock-devicecallbacks";
+static const char TAG[] = "lock-devicecallbacks";
 
 using namespace ::chip;
 using namespace ::chip::Inet;

@@ -16,13 +16,14 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlfaultinjection.gni")
-import("//build_overrides/nlio.gni")
-import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
 
+import("$dir_pw_build/target_types.gni")
 import("${chip_root}/build/chip/chip_version.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
   # Set to true to run the PersistentStorageDelegate API compliance audit
@@ -68,6 +69,7 @@ source_set("logging_constants") {
 
 source_set("attributes") {
   sources = [
+    "Compiler.h",
     "DLLUtil.h",
     "EnforceFormat.h",
   ]
@@ -132,7 +134,10 @@ source_set("text_only_logging") {
 }
 
 source_set("verifymacros") {
-  sources = [ "CodeUtils.h" ]
+  sources = [
+    "CodeUtils.h",
+    "ObjectDump.h",
+  ]
 
   public_deps = [
     ":attributes",
@@ -147,13 +152,31 @@ source_set("verifymacros") {
 source_set("span") {
   sources = [ "Span.h" ]
 
-  public_deps = [ ":verifymacros" ]
+  public_deps = [
+    ":verifymacros",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("chip_version_header") {
   sources = get_target_outputs(":gen_chip_version")
 
   deps = [ ":gen_chip_version" ]
+}
+
+source_set("testing") {
+  sources = [
+    "TestGroupData.h",
+    "TestPersistentStorageDelegate.h",
+  ]
+}
+
+source_set("type-traits") {
+  sources = [ "TypeTraits.h" ]
+}
+
+source_set("static-support") {
+  sources = [ "static_support_smart_ptr.h" ]
 }
 
 static_library("support") {
@@ -173,37 +196,51 @@ static_library("support") {
     "BytesToHex.cpp",
     "BytesToHex.h",
     "CHIPArgParser.cpp",
+    "CHIPArgParser.hpp",
     "CHIPCounter.h",
     "CHIPMemString.h",
+    "CommonIterator.h",
+    "CommonPersistentData.h",
     "DLLUtil.h",
     "DefaultStorageKeyAllocator.h",
     "Defer.h",
     "FibonacciUtils.cpp",
     "FibonacciUtils.h",
+    "FileDescriptor.h",
     "FixedBufferAllocator.cpp",
     "FixedBufferAllocator.h",
+    "Fold.h",
+    "FunctionTraits.h",
     "IniEscaping.cpp",
     "IniEscaping.h",
+    "IntrusiveList.h",
     "Iterators.h",
+    "LambdaBridge.h",
     "LifetimePersistedCounter.h",
+    "LinkedList.h",
     "ObjectLifeCycle.h",
     "PersistedCounter.h",
+    "PersistentData.h",
     "PersistentStorageAudit.cpp",
     "PersistentStorageAudit.h",
     "PersistentStorageMacros.h",
     "Pool.cpp",
     "Pool.h",
+    "PoolWrapper.h",
     "PrivateHeap.cpp",
     "PrivateHeap.h",
     "ReferenceCountedHandle.h",
-    "SerializableIntegerSet.cpp",
-    "SerializableIntegerSet.h",
+    "SafePointerCast.h",
+    "SafeString.h",
+    "Scoped.h",
+    "ScopedBuffer.h",
     "SetupDiscriminator.h",
     "SortUtils.h",
     "StateMachine.h",
     "StringBuilder.cpp",
     "StringBuilder.h",
     "StringSplitter.h",
+    "TemporaryFileStream.h",
     "ThreadOperationalDataset.cpp",
     "ThreadOperationalDataset.h",
     "TimeUtils.cpp",
@@ -221,7 +258,7 @@ static_library("support") {
     "verhoeff/Verhoeff10.cpp",
   ]
 
-  if (current_os == "android" || matter_enable_java_compilation) {
+  if (chip_device_platform == "android" || matter_enable_java_compilation) {
     if (matter_enable_java_compilation) {
       include_dirs = java_matter_controller_dependent_paths
     }
@@ -247,14 +284,16 @@ static_library("support") {
     ":safeint",
     ":span",
     ":text_only_logging",
+    ":type-traits",
     ":verifymacros",
     ":verifymacros_no_logging",
     "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/lib/core:encoding",
     "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/core:types",
     "${chip_root}/src/platform:platform_config_header",
     "${chip_root}/src/system:system_config_header",
     "${nlassert_root}:nlassert",
-    "${nlio_root}:nlio",
   ]
 
   # These are needed because we include CHIPCore.h, which uses config
@@ -265,12 +304,10 @@ static_library("support") {
     "${chip_root}/src/inet:inet_config_header",
   ]
 
-  # Android has no 'platform' that provides logging
-  if (current_os == "android") {
-    public_deps += [ "${chip_root}/src/platform/logging:android" ]
-  }
-
-  if (current_os == "mac" || current_os == "ios") {
+  # Platforms that utilize CHIP_SYSTEM_CONFIG_PLATFORM_LOG need to
+  # be pulled in here as public_deps since they hook into logging at
+  # the macro level rather than just providing a LogV implementation.
+  if (chip_device_platform == "darwin") {
     public_deps += [ "${chip_root}/src/platform/Darwin:logging" ]
   }
 
@@ -297,23 +334,31 @@ static_library("support") {
   }
 }
 
-static_library("testing") {
-  output_name = "libSupportTesting"
+static_library("test_utils") {
+  output_name = "libTestUtils"
   output_dir = "${root_out_dir}/lib"
+  deps = [ "${chip_root}/src/platform" ]
 
   sources = [
-    "UnitTestExtendedAssertions.h",
-    "UnitTestRegistration.cpp",
-    "UnitTestRegistration.h",
     "UnitTestUtils.cpp",
     "UnitTestUtils.h",
   ]
+}
 
+pw_static_library("pw_tests_wrapper") {
+  if (chip_device_platform == "esp32") {
+    complete_static_lib = true
+  }
+  output_name = "libPWTestsWrapper"
+  output_dir = "${root_out_dir}/lib"
   public_deps = [
-    ":support",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/platform",
-    "${nlassert_root}:nlassert",
-    "${nlunit_test_root}:nlunit-test",
+    "$dir_pw_log:impl",
+    "$dir_pw_unit_test",
+    "$dir_pw_unit_test:logging",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+  ]
+  sources = [
+    "UnitTest.cpp",
+    "UnitTest.h",
   ]
 }

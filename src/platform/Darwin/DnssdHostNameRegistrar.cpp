@@ -37,18 +37,18 @@ namespace Dnssd {
 namespace {
 
 #if CHIP_PROGRESS_LOGGING
-constexpr const char * kPathStatusInvalid     = "Invalid";
-constexpr const char * kPathStatusUnsatisfied = "Unsatisfied";
-constexpr const char * kPathStatusSatisfied   = "Satisfied";
-constexpr const char * kPathStatusSatisfiable = "Satisfiable";
-constexpr const char * kPathStatusUnknown     = "Unknown";
+constexpr char kPathStatusInvalid[]     = "Invalid";
+constexpr char kPathStatusUnsatisfied[] = "Unsatisfied";
+constexpr char kPathStatusSatisfied[]   = "Satisfied";
+constexpr char kPathStatusSatisfiable[] = "Satisfiable";
+constexpr char kPathStatusUnknown[]     = "Unknown";
 
-constexpr const char * kInterfaceTypeCellular = "Cellular";
-constexpr const char * kInterfaceTypeWiFi     = "WiFi";
-constexpr const char * kInterfaceTypeWired    = "Wired";
-constexpr const char * kInterfaceTypeLoopback = "Loopback";
-constexpr const char * kInterfaceTypeOther    = "Other";
-constexpr const char * kInterfaceTypeUnknown  = "Unknown";
+constexpr char kInterfaceTypeCellular[] = "Cellular";
+constexpr char kInterfaceTypeWiFi[]     = "WiFi";
+constexpr char kInterfaceTypeWired[]    = "Wired";
+constexpr char kInterfaceTypeLoopback[] = "Loopback";
+constexpr char kInterfaceTypeOther[]    = "Other";
+constexpr char kInterfaceTypeUnknown[]  = "Unknown";
 
 const char * GetPathStatusString(nw_path_status_t status)
 {

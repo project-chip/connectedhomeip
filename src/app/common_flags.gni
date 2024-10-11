@@ -12,9 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+import("${chip_root}/config/recommended.gni")
+
 declare_args() {
   # Temporary flag for interaction model and echo protocols, set it to true to enable
   chip_app_use_echo = false
   chip_enable_read_client = true
   chip_build_controller_dynamic_server = false
+
+  # Flag that controls whether the time-to-wait from BUSY responses is
+  # communicated to OperationalSessionSetup API consumers.
+  chip_enable_busy_handling_for_operational_session_setup = true
+
+  # Data model interface usage:
+  #   - disabled: does not use data model interface at all
+  #   - check:    runs BOTH datamodel and non-data-model (if possible) functionality and compares results
+  #   - enabled:  runs only the data model interface (does not use the legacy code)
+  if (matter_enable_recommended && current_os == "linux") {
+    chip_use_data_model_interface = "check"
+  } else {
+    chip_use_data_model_interface = "disabled"
+  }
+
+  # Whether we call `chipDie` on DM `check` errors
+  #
+  # If/once the chip_use_data_model_interface flag is removed or does not support
+  # a `check` option, this should alwo be removed
+  chip_data_model_check_die_on_failure = false
 }

@@ -1,0 +1,91 @@
+/*
+ *    Copyright (c) 2023-2024 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http: //www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/ {
+	chosen {
+		zephyr,console = &flexcomm0;
+		zephyr,shell-uart = &flexcomm3;
+	};
+};
+
+&flexcomm0 {
+	compatible = "nxp,lpc-usart";
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&pinmux_flexcomm0_usart>;
+	pinctrl-names = "default";
+};
+
+&flexcomm3 {
+	compatible = "nxp,lpc-usart";
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&pinmux_flexcomm3_usart>;
+	pinctrl-names = "default";
+};
+
+&sram {
+	#address-cells = <1>;
+	#size-cells = <1>;
+
+	sram_data: memory@40000 {
+		compatible = "mmio-sram";
+		reg = <0x40000 DT_SIZE_K(1216)>;
+	};
+};
+
+/delete-node/ &boot_partition;
+/delete-node/ &slot0_partition;
+/delete-node/ &slot1_partition;
+/delete-node/ &fw_storage;
+/delete-node/ &storage_partition;
+
+&flexspi {
+	status = "okay";
+
+	mx25u51245g: mx25u51245g@0 {
+		status = "okay";
+
+		partitions {
+			boot_partition: partition@0 {
+				label = "mcuboot";
+				reg = <0x00000000 DT_SIZE_K(128)>;
+			};
+
+			slot0_partition: partition@20000 {
+				label = "image-0";
+				reg = <0x00020000 0x440000>;
+			};
+
+			slot1_partition: partition@460000 {
+				label = "image-1";
+				reg = <0x00460000 0x440000>;
+			};
+
+			storage_partition: partition@3FEF000 {
+				label = "storage";
+				reg = <0x03FEF000 DT_SIZE_K(64)>;
+			};
+
+			factory_partition: partition@3FFF000 {
+				label = "factory-data";
+				reg = <0x03FFF000 DT_SIZE_K(4)>;
+			};
+
+		};
+	};
+};

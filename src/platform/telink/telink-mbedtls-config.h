@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -36,9 +36,6 @@
 #define MBEDTLS_PKCS5_C
 #define MBEDTLS_X509_CREATE_C
 #define MBEDTLS_X509_CSR_WRITE_C
-
-#define MBEDTLS_AES_ALT
-#define MBEDTLS_ECP_ALT
 
 #undef MBEDTLS_ERROR_C
 

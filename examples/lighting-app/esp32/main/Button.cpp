@@ -30,7 +30,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <vector>
 
-static const char * TAG = "Button.cpp";
+static const char TAG[] = "Button.cpp";
 
 extern Button gButtons[BUTTON_NUMBER];
 

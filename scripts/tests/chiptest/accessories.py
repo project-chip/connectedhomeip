@@ -98,12 +98,12 @@ class AppsRegister:
             return accessory.factoryReset()
         return False
 
-    def waitForMessage(self, name, message):
+    def waitForMessage(self, name, message, timeoutInSeconds=10):
         accessory = self.__accessories[name]
         if accessory:
             # The message param comes directly from the sys.argv[2:] of WaitForMessage.py and should contain a list of strings that
             # comprise the entire message to wait for
-            return accessory.waitForMessage(' '.join(message))
+            return accessory.waitForMessage(' '.join(message), timeoutInSeconds)
         return False
 
     def createOtaImage(self, otaImageFilePath, rawImageFilePath, rawImageContent, vid='0xDEAD', pid='0xBEEF'):
@@ -126,6 +126,16 @@ class AppsRegister:
             raise Exception('Files %s and %s do not match' % (file1, file2))
         return True
 
+    def createFile(self, filePath, fileContent):
+        with open(filePath, 'w') as rawFile:
+            rawFile.write(fileContent)
+        return True
+
+    def deleteFile(self, filePath):
+        if os.path.exists(filePath):
+            os.remove(filePath)
+        return True
+
     def __startXMLRPCServer(self):
         self.server = SimpleXMLRPCServer((IP, PORT))
 
@@ -136,6 +146,8 @@ class AppsRegister:
         self.server.register_function(self.waitForMessage, 'waitForMessage')
         self.server.register_function(self.compareFiles, 'compareFiles')
         self.server.register_function(self.createOtaImage, 'createOtaImage')
+        self.server.register_function(self.createFile, 'createFile')
+        self.server.register_function(self.deleteFile, 'deleteFile')
 
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.start()

@@ -17,6 +17,7 @@
  */
 package matter.controller
 
+import chip.devicecontroller.ICDDeviceInfo
 import java.io.Closeable
 
 /** Controller interface for interacting with a CHIP device. */
@@ -30,16 +31,16 @@ interface MatterController : Closeable, InteractionClient {
     fun onStatusUpdate(status: Int)
 
     /** Notifies the completion of pairing. */
-    fun onPairingComplete(errorCode: Int)
+    fun onPairingComplete(errorCode: UInt)
 
     /** Notifies the deletion of a pairing session. */
-    fun onPairingDeleted(errorCode: Int)
+    fun onPairingDeleted(errorCode: UInt)
 
     /** Notifies that the CHIP connection has been closed. */
     fun onNotifyChipConnectionClosed()
 
     /** Notifies the completion of commissioning. */
-    fun onCommissioningComplete(nodeId: Long, errorCode: Int)
+    fun onCommissioningComplete(nodeId: Long, errorCode: UInt)
 
     /** Notifies the completion of reading commissioning information. */
     fun onReadCommissioningInfo(
@@ -50,13 +51,22 @@ interface MatterController : Closeable, InteractionClient {
     )
 
     /** Notifies the completion of each stage of commissioning. */
-    fun onCommissioningStatusUpdate(nodeId: Long, stage: String?, errorCode: Int)
+    fun onCommissioningStatusUpdate(nodeId: Long, stage: String?, errorCode: UInt)
 
     /** Notifies the listener of an error. */
     fun onError(error: Throwable)
 
     /** Notifies the Commissioner when the OpCSR for the Comissionee is generated. */
     fun onOpCSRGenerationComplete(csr: ByteArray)
+
+    /**
+     * Notifies when the ICD registration information (ICD symmetric key, check-in node ID and
+     * monitored subject) is required.
+     */
+    fun onICDRegistrationInfoRequired()
+
+    /** Notifies when the registration flow for the ICD completes. */
+    fun onICDRegistrationComplete(errorCode: UInt, icdDeviceInfo: ICDDeviceInfo)
   }
 
   /**

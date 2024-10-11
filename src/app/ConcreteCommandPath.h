@@ -33,6 +33,8 @@ struct ConcreteCommandPath : public ConcreteClusterPath
         ConcreteClusterPath(aEndpointId, aClusterId), mCommandId(aCommandId)
     {}
 
+    ConcreteCommandPath() : ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId), mCommandId(kInvalidCommandId) {}
+
     bool operator==(const ConcreteCommandPath & aOther) const
     {
         return ConcreteClusterPath::operator==(aOther) && (mCommandId == aOther.mCommandId);

@@ -48,9 +48,9 @@ public:
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
 
-    jobject mDiagnosticDataProviderManagerObject = nullptr;
-    jmethodID mGetRebootCountMethod              = nullptr;
-    jmethodID mGetNifMethod                      = nullptr;
+    JniGlobalReference mDiagnosticDataProviderManagerObject;
+    jmethodID mGetRebootCountMethod = nullptr;
+    jmethodID mGetNifMethod         = nullptr;
 };
 
 /**

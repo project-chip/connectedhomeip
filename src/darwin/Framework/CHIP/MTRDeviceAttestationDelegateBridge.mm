@@ -28,7 +28,7 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
     chip::Credentials::AttestationVerificationResult attestationResult)
 {
     dispatch_async(mQueue, ^{
-        MTR_LOG_DEFAULT("MTRDeviceAttestationDelegateBridge::OnDeviceAttestationFailed completed with result: %hu",
+        MTR_LOG("MTRDeviceAttestationDelegateBridge::OnDeviceAttestationFailed completed with result: %hu",
             chip::to_underlying(attestationResult));
 
         mResult = attestationResult;

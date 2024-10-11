@@ -24,6 +24,8 @@
 
 #include <websocket-server/WebSocketServer.h>
 
+#include <string>
+
 class Commands;
 
 class InteractiveCommand : public CHIPCommand
@@ -59,6 +61,10 @@ public:
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
+
+private:
+    char * GetCommand(char * command);
+    std::string GetHistoryFilePath() const;
 };
 
 class InteractiveServerCommand : public InteractiveCommand, public WebSocketServerDelegate, public RemoteDataModelLoggerDelegate

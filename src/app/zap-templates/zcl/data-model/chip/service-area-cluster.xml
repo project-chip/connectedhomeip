@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023-24 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  Data types
+  <struct name="LandmarkInfoStruct" apiMaturity="provisional">
+    <cluster code="0x0150"/>
+    <item name="LandmarkTag" type="LandmarkTag"                 optional="false" isNullable="false"/>
+    <item name="RelativePositionTag" type="RelativePositionTag" optional="false" isNullable="true"/>
+  </struct>
+
+  <struct name="AreaInfoStruct" apiMaturity="provisional">
+    <cluster code="0x0150"/>
+    <item name="LocationInfo" type="LocationDescriptorStruct" optional="false" isNullable="true"/>
+    <item name="LandmarkInfo" type="LandmarkInfoStruct"       optional="false" isNullable="true"/>
+  </struct>
+
+  <struct name="MapStruct">
+    <cluster code="0x0150"/>
+    <item name="MapID" type="int32u"                  optional="false"/>
+    <item name="Name"  type="char_string" length="64" optional="false"/>
+  </struct>
+
+  <struct name="AreaStruct">
+    <cluster code="0x0150"/>
+    <item name="AreaID"   type="int32u"         optional="false" isNullable="false"/>
+    <item name="MapID"    type="int32u"         optional="false" isNullable="true"/>
+    <item name="AreaInfo" type="AreaInfoStruct" optional="false" isNullable="false"/>
+  </struct>
+
+  <struct name="ProgressStruct">
+    <cluster code="0x0150"/>
+    <item name="AreaID"                 type="int32u"                 optional="false"/>
+    <item name="Status"                 type="OperationalStatusEnum"  optional="false"/>
+    <item name="TotalOperationalTime"   type="elapsed_s"              optional="true" isNullable="true"/>
+    <item name="EstimatedTime"          type="elapsed_s"              optional="true" isNullable="true"/>
+  </struct>
+
+  <enum name="OperationalStatusEnum" type="enum8">
+    <cluster code="0x0150"/>
+    <item value="0x00" name="Pending"/>
+    <item value="0x01" name="Operating"/>
+    <item value="0x02" name="Skipped"/>
+    <item value="0x03" name="Completed"/>
+  </enum>
+
+  <enum name="SelectAreasStatus" type="enum8">
+    <cluster code="0x0150"/>
+    <item value="0x00" name="Success"/>
+    <item value="0x01" name="UnsupportedArea"/>
+    <item value="0x02" name="InvalidInMode"/>
+    <item value="0x03" name="InvalidSet"/>
+  </enum>
+
+  <enum name="SkipAreaStatus" type="enum8">
+    <cluster code="0x0150"/>
+    <item value="0x00" name="Success"/>
+    <item value="0x01" name="InvalidAreaList"/>
+    <item value="0x02" name="InvalidInMode"/>
+    <item value="0x03" name="InvalidSkippedArea"/>
+  </enum>
+
+  <cluster apiMaturity="provisional">
+    <domain>General</domain>
+    <name>Service Area</name>
+    <description>The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced.</description>
+    <code>0x0150</code>
+    <define>SERVICE_AREA_CLUSTER</define>
+    <globalAttribute side="either" code="0xFFFD" value="1" />
+
+    <features>
+      <feature bit="0" code="SELRUN" name="SelectWhileRunning" summary="The device allows changing the selected areas while running">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="PROG" name="ProgressReporting" summary="The device implements the progress reporting feature">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="MAPS" name="Maps" summary="The device has map support">
+        <optionalConform/>
+      </feature>
+    </features>
+
+    <!-- Attributes -->
+    <attribute side="server" code="0x0000" define="SupportedAreas"      type="array"     entryType="AreaStruct"      writable="false" isNullable="false" optional="false">SupportedAreas</attribute>
+    <attribute side="server" code="0x0001" define="SupportedMaps"       type="array"     entryType="MapStruct"       writable="false" isNullable="false" optional="true" >SupportedMaps</attribute>
+    <attribute side="server" code="0x0002" define="SelectedAreas"       type="array"     entryType="int32u"          writable="false" isNullable="false" optional="false">SelectedAreas</attribute>
+    <attribute side="server" code="0x0003" define="CurrentArea"         type="int32u"                                writable="false" isNullable="true"  optional="true" >CurrentArea</attribute>
+    <attribute side="server" code="0x0004" define="EstimatedEndTime"    type="epoch_s"                               writable="false" isNullable="true"  optional="true" >EstimatedEndTime</attribute>
+    <attribute side="server" code="0x0005" define="Progress"            type="array"     entryType="ProgressStruct"  writable="false" isNullable="false" optional="true" >Progress</attribute>
+
+    <!-- Commands -->
+    <command source="client" code="0x00" name="SelectAreas" response="SelectAreasResponse" optional="false">
+      <description>
+        Command used to select a set of device areas, where the device is to operate.
+      </description>
+      <arg name="NewAreas" type="int32u" array="true"/>
+    </command>
+
+    <command source="server" code="0x01" name="SelectAreasResponse" disableDefaultResponse="true" optional="false">
+      <description>
+        This command is sent by the device on receipt of the SelectAreas command.
+      </description>
+      <arg name="Status"     type="SelectAreasStatus"/>
+      <arg name="StatusText" type="char_string" length="256"/>
+    </command>
+
+    <command source="client" code="0x02" name="SkipArea" response="SkipAreaResponse" optional="true">
+      <description>
+        This command is used to skip an area where the device operates.
+      </description>
+      <arg name="SkippedArea" type="int32u"/>
+    </command>
+
+    <command source="server" code="0x03" name="SkipAreaResponse" disableDefaultResponse="true" optional="true">
+      <description>
+        This command is sent by the device on receipt of the SkipArea command.
+      </description>
+      <arg name="Status"     type="SkipAreaStatus"/>
+      <arg name="StatusText" type="char_string" length="256"/>
+    </command>
+
+  </cluster>
+
+</configurator>

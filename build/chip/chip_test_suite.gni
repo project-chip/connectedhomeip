@@ -14,12 +14,19 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-import("${chip_root}/build/chip/chip_test.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${dir_pw_unit_test}/test.gni")
 
 assert(chip_build_tests)
+
+declare_args() {
+  # These may be overridden in args.gni to build platform-specific test binaries.
+  test_executable_output_name = ""
+  test_executable_output_name_suffix = ""
+  test_executable_ldflags = []
+}
 
 # Define CHIP unit tests
 #
@@ -33,36 +40,12 @@ assert(chip_build_tests)
 #   ]
 #
 #   test_sources = [
-#     "TestFoo.cpp",    # Files are parsed for `CHIP_REGISTER_TEST_SUITE(...)`
-#     "TestBar.cpp",    # and a driver is created automatically
-#   ]
-#
-#   public_deps = [
-#     "${chip_root}/src/lib/foo",         # add dependencies here
-#     "${nlunit_test_root}:nlunit-test",
-#   ]
-# }
-#
-#
-# Deprecated usage (writing own driver files):
-#
-# chip_test_suite("tests") {
-#   output_name = "libFooTests"
-#
-#   sources = [
-#     "TestDeclarations.h",
 #     "TestFoo.cpp",
 #     "TestBar.cpp",
 #   ]
 #
 #   public_deps = [
 #     "${chip_root}/src/lib/foo",         # add dependencies here
-#     "${nlunit_test_root}:nlunit-test",
-#   ]
-#
-#   tests = [
-#     "TestFoo",  # Assumes TestFooDriver.cpp exists
-#     "TestBar",  # Assumes TestBarDriver.cpp exists
 #   ]
 # }
 
@@ -70,23 +53,29 @@ assert(chip_build_tests)
 template("chip_test_suite") {
   _suite_name = target_name
 
-  # Ensures that the common library has sources containing both common
-  # and individual unit tests.
-  if (!defined(invoker.sources)) {
-    invoker.sources = []
+  exclude_variables = [ "tests" ]
+  if (chip_link_tests && chip_device_platform != "darwin") {
+    # Common library shouldn't have all the individual unit tests, only the common sources.
+    exclude_variables += [ "test_sources" ]
+    # NOTE: For `Build on Darwin (clang, python_lib, simulated)` the test_sources must be in common lib.
+  } else {
+    # Common library should have all the individual unit tests, in addition to the common sources.
+    if (!defined(invoker.sources)) {
+      invoker.sources = []
+    }
+    if (defined(invoker.test_sources)) {
+      invoker.sources += invoker.test_sources
+    }
   }
 
-  if (defined(invoker.test_sources)) {
-    invoker.sources += invoker.test_sources
-  }
-
+  # Target for the common library.  Contains all the common sources, and sometimes all the individual test sources.
   if (chip_build_test_static_libraries) {
     _target_type = "static_library"
   } else {
     _target_type = "source_set"
   }
   target(_target_type, "${_suite_name}.lib") {
-    forward_variables_from(invoker, "*", [ "tests" ])
+    forward_variables_from(invoker, "*", exclude_variables)
 
     output_dir = "${root_out_dir}/lib"
 
@@ -94,19 +83,32 @@ template("chip_test_suite") {
       public_deps = []
     }
 
-    if (current_os != "zephyr" && current_os != "mbed") {
+    deps = [ dir_pw_unit_test ]
+
+    if (current_os != "zephyr" && current_os != "mbed" &&
+        chip_device_platform != "efr32") {
       # Depend on stdio logging, and have it take precedence over the default platform backend
-      public_deps += [ "${chip_root}/src/platform/logging:force_stdio" ]
+      public_deps += [ "${chip_root}/src/platform/logging:stdio" ]
+    } else {
+      public_deps += [ "${chip_root}/src/platform/logging:default" ]
     }
   }
+
+  # Build a source_set or a flashable executable for each individual unit test source, which also includes the common files.
   if (chip_link_tests) {
     tests = []
 
     if (defined(invoker.test_sources)) {
       foreach(_test, invoker.test_sources) {
         _test_name = string_replace(_test, ".cpp", "")
+
+        _test_output_dir = "${root_out_dir}/tests"
+        if (defined(invoker.output_dir)) {
+          _test_output_dir = invoker.output_dir
+        }
 
         pw_test(_test_name) {
+          # Forward certain variables from the invoker.
           forward_variables_from(invoker,
                                  [
                                    "deps",
@@ -114,36 +116,30 @@ template("chip_test_suite") {
                                    "cflags",
                                    "configs",
                                  ])
+
+          # Link to the common lib for this suite so we get its `sources`.
           public_deps += [ ":${_suite_name}.lib" ]
+
+          # Set variables that the platform executable may need.
+          if (test_executable_output_name != "") {
+            output_name = test_executable_output_name + _test_name +
+                          test_executable_output_name_suffix
+          }
+          ldflags = test_executable_ldflags
+
+          # Add the individual test source file (e.g. "TestSomething.cpp").
           sources = [ _test ]
+
+          output_dir = _test_output_dir
         }
         tests += [ _test_name ]
       }
     }
 
-    if (defined(invoker.tests)) {
-      foreach(_test, invoker.tests) {
-        pw_test(_test) {
-          forward_variables_from(invoker,
-                                 [
-                                   "deps",
-                                   "public_deps",
-                                   "cflags",
-                                   "configs",
-                                 ])
-          public_deps += [ ":${_suite_name}.lib" ]
-          test_main = ""
-          sources = [
-            "${_test}.cpp",
-            "${_test}Driver.cpp",
-          ]
-        }
-        tests += [ _test ]
-      }
-    }
-
     group(_suite_name) {
       deps = []
+
+      # Add each individual unit test.
       foreach(_test, tests) {
         deps += [ ":${_test}" ]
       }
@@ -152,103 +148,8 @@ template("chip_test_suite") {
     if (chip_pw_run_tests) {
       group("${_suite_name}_run") {
         deps = []
-        foreach(_test, tests) {
-          deps += [ ":${_test}.run" ]
-        }
-      }
-    }
-  } else {
-    group(_suite_name) {
-      deps = [ ":${_suite_name}.lib" ]
-    }
-  }
-}
 
-# TODO: remove this once transition away from nlunit-test is completed
-template("chip_test_suite_using_nltest") {
-  _suite_name = target_name
-
-  # Ensures that the common library has sources containing both common
-  # and individual unit tests.
-  if (!defined(invoker.sources)) {
-    invoker.sources = []
-  }
-
-  if (defined(invoker.test_sources)) {
-    invoker.sources += invoker.test_sources
-  }
-
-  if (chip_build_test_static_libraries) {
-    _target_type = "static_library"
-  } else {
-    _target_type = "source_set"
-  }
-  target(_target_type, "${_suite_name}.lib") {
-    forward_variables_from(invoker, "*", [ "tests" ])
-
-    output_dir = "${root_out_dir}/lib"
-
-    if (!defined(invoker.public_deps)) {
-      public_deps = []
-    }
-
-    if (current_os != "zephyr" && current_os != "mbed") {
-      # Depend on stdio logging, and have it take precedence over the default platform backend
-      public_deps += [ "${chip_root}/src/platform/logging:force_stdio" ]
-    }
-  }
-  if (chip_link_tests) {
-    tests = []
-
-    if (defined(invoker.test_sources)) {
-      foreach(_test, invoker.test_sources) {
-        _test_name = string_replace(_test, ".cpp", "")
-
-        _driver_name = "${root_gen_dir}/${_test_name}.driver.cpp"
-
-        action("${_test_name}_generate_driver") {
-          script = "${chip_root}/scripts/gen_test_driver.py"
-
-          inputs = [ _test ]
-          outputs = [ _driver_name ]
-          args = [
-            "--input_file=" + rebase_path(_test, root_build_dir),
-            "--output_file=" + rebase_path(_driver_name, root_build_dir),
-          ]
-        }
-
-        chip_test(_test_name) {
-          sources = [ _driver_name ]
-          public_deps = [
-            ":${_suite_name}.lib",
-            ":${_test_name}_generate_driver",
-          ]
-        }
-        tests += [ _test_name ]
-      }
-    }
-
-    if (defined(invoker.tests)) {
-      foreach(_test, invoker.tests) {
-        chip_test(_test) {
-          sources = [ "${_test}Driver.cpp" ]
-
-          public_deps = [ ":${_suite_name}.lib" ]
-        }
-        tests += [ _test ]
-      }
-    }
-
-    group(_suite_name) {
-      deps = []
-      foreach(_test, tests) {
-        deps += [ ":${_test}" ]
-      }
-    }
-
-    if (chip_pw_run_tests) {
-      group("${_suite_name}_run") {
-        deps = []
+        # Add the .run targets created by pw_test.
         foreach(_test, tests) {
           deps += [ ":${_test}.run" ]
         }

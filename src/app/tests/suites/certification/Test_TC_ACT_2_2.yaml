@@ -500,10 +500,11 @@ tests:
 
     - label: "Step 4c: subscribe to StateChanged and ActionFailed events"
       verification: |
-          To subscribe StateChanged event follow below steps
+          To subscribe StateChanged and ActionFailed event follow below steps
 
           1) ./chip-tool interactive start
-          2) actions subscribe-event action-failed 2 30 1 0
+
+          2) actions subscribe-event action-failed 2 30 1 1
 
           Via the TH (chip-tool), Verify ActionFailed event subscription.
 
@@ -530,14 +531,28 @@ tests:
           [1659962630.456551][25381:25386] CHIP:DMG: }
           [1659962630.456563][25381:25386] CHIP:DMG: Subscription established with SubscriptionID = 0x78f0a04c MinInterval = 0s MaxInterval = 100s Peer = 01:0000000000000001
 
-          3) actions  instant-action  0x1001 1 1
+          3) actions subscribe-event state-changed 2 30 1 1
 
-          Via the TH (chip-tool), Verify the SUCCESS response for instant-action.
+          Via the TH (chip-tool), Verify StateChanged event subscription.
 
-          [1659955888.114483][23216:23221] CHIP:DMG:                                 StatusIB =
-          [1659955888.114499][23216:23221] CHIP:DMG:                                 {
-          [1659955888.114515][23216:23221] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1659955888.114529][23216:23221] CHIP:DMG:                                 },
+          [1696947597.397495][20187:20190] CHIP:DMG: ReportDataMessage =
+          [1696947597.397508][20187:20190] CHIP:DMG: {
+          [1696947597.397517][20187:20190] CHIP:DMG:         SubscriptionId = 0x78906430,
+          [1696947597.397529][20187:20190] CHIP:DMG:         InteractionModelRevision = 11
+          [1696947597.397539][20187:20190] CHIP:DMG: }
+          [1696947597.397561][20187:20190] CHIP:DMG: MoveToState ReadClient[0x7fe364020f30]: Moving to [AwaitingSu]
+          [1696947597.397646][20187:20190] CHIP:EM: <<< [E:22246i S:684 M:21569658 (Ack:244821317)] (S) Msg TX to 1:0000000000000001 [7884] [UDP:[fe80::ee12:c4a5:f800:bf4f%wlp0s20f3]:5540] --- Type 0001:01 (IM:StatusResponse)
+          [1696947597.398261][20187:20190] CHIP:EM: >>> [E:22246i S:684 M:244821318 (Ack:21569658)] (S) Msg RX from 1:0000000000000001 [7884] --- Type 0001:04 (IM:SubscribeResponse)
+          [1696947597.398292][20187:20190] CHIP:EM: Found matching exchange: 22246i, Delegate: 0x7fe364020f40
+          [1696947597.398314][20187:20190] CHIP:EM: Rxd Ack; Removing MessageCounter:21569658 from Retrans Table on exchange 22246i
+          [1696947597.398334][20187:20190] CHIP:DMG: SubscribeResponse is received
+          [1696947597.398356][20187:20190] CHIP:DMG: SubscribeResponseMessage =
+          [1696947597.398369][20187:20190] CHIP:DMG: {
+          [1696947597.398382][20187:20190] CHIP:DMG:         SubscriptionId = 0x78906430,
+          [1696947597.398394][20187:20190] CHIP:DMG:         MaxInterval = 0x1e,
+          [1696947597.398407][20187:20190] CHIP:DMG:         InteractionModelRevision = 11
+          [1696947597.398417][20187:20190] CHIP:DMG: }
+          [1696947597.398431][20187:20190] CHIP:DMG: Subscription established with SubscriptionID = 0x78906430 MinInterval = 2s MaxInterval = 30s Peer = 01:0000000000000001
       disabled: true
 
     - label:
@@ -546,9 +561,19 @@ tests:
           SupportedCommands in this ActionStruct) by sending the command with
           this particular ActionID and a random value for InvokeID"
       verification: |
-          Only InstantActions  command is supported
+          Only InstantAction command is supported in bridge-app. When testing with a real DUT, test for all the actions supported by the DUT (list from step 4b):
 
           ./chip-tool actions  instant-action  0x1001 1 1
+
+          Via the TH (chip-tool), Verify the SUCCESS response for instant-action.
+
+          [1659955888.114483][23216:23221] CHIP:DMG:                                 StatusIB =
+          [1659955888.114499][23216:23221] CHIP:DMG:                                 {
+          [1659955888.114515][23216:23221] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1659955888.114529][23216:23221] CHIP:DMG:                                 },
+
+
+          ./chip-tool actions  instant-action  0x1003 1 1
 
           Via the TH (chip-tool), Verify the SUCCESS response for instant-action.
 
@@ -562,5 +587,5 @@ tests:
           "Step 4e: repeat 4d for the other SupportedCommands of each
           ActionStruct"
       verification: |
-          Only InstantActions command is supported
+          Only InstantAction command is supported in bridge-app. When testing with a real DUT, test for all the actions supported by the DUT (list from step 4b)
       disabled: true

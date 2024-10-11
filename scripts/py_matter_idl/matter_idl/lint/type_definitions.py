@@ -16,7 +16,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import List, MutableMapping, Optional, Union
 
-from matter_idl.matter_idl_types import ClusterSide, Idl, ParseMetaData
+from matter_idl.matter_idl_types import Idl, ParseMetaData
 
 
 class MissingIdlError(Exception):
@@ -158,9 +158,7 @@ class ClusterValidationRule(ErrorAccumulatingRule):
         if not self._idl:
             raise MissingIdlError()
 
-        cluster_definition = [
-            c for c in self._idl.clusters if c.name == name and c.side == ClusterSide.SERVER
-        ]
+        cluster_definition = [c for c in self._idl.clusters if c.name == name]
         if not cluster_definition:
             self._AddLintError(
                 "Cluster definition for %s not found" % name, location)
@@ -242,9 +240,7 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
         if not self._idl:
             raise MissingIdlError()
 
-        cluster_definition = [
-            c for c in self._idl.clusters if c.name == name and c.side == ClusterSide.SERVER
-        ]
+        cluster_definition = [c for c in self._idl.clusters if c.name == name]
         if not cluster_definition:
             self._AddLintError(
                 "Cluster definition for %s not found" % name, location)
@@ -365,9 +361,6 @@ class RequiredCommandsRule(ErrorAccumulatingRule):
             raise MissingIdlError()
 
         for cluster in self._idl.clusters:
-            if cluster.side != ClusterSide.SERVER:
-                continue  # only validate server-side:
-
             if cluster.code not in self._mandatory_commands:
                 continue  # no known mandatory commands
 

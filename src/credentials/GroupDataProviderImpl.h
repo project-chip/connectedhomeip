@@ -68,7 +68,7 @@ public:
     CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, EndpointId endpoint_id) override;
     // Iterators
     GroupInfoIterator * IterateGroupInfo(FabricIndex fabric_index) override;
-    EndpointIterator * IterateEndpoints(FabricIndex fabric_index, Optional<GroupId> group_id = NullOptional) override;
+    EndpointIterator * IterateEndpoints(FabricIndex fabric_index, std::optional<GroupId> group_id = std::nullopt) override;
 
     //
     // Group-Key map
@@ -133,7 +133,7 @@ protected:
     class EndpointIteratorImpl : public EndpointIterator
     {
     public:
-        EndpointIteratorImpl(GroupDataProviderImpl & provider, FabricIndex fabric_index, Optional<GroupId> group_id);
+        EndpointIteratorImpl(GroupDataProviderImpl & provider, FabricIndex fabric_index, std::optional<GroupId> group_id);
         size_t Count() override;
         bool Next(GroupEndpoint & output) override;
         void Release() override;
@@ -156,16 +156,16 @@ protected:
     public:
         GroupKeyContext(GroupDataProviderImpl & provider) : mProvider(provider) {}
 
-        GroupKeyContext(GroupDataProviderImpl & provider, const Crypto::Aes128KeyByteArray & encryptionKey, uint16_t hash,
-                        const Crypto::Aes128KeyByteArray & privacyKey) :
+        GroupKeyContext(GroupDataProviderImpl & provider, const Crypto::Symmetric128BitsKeyByteArray & encryptionKey, uint16_t hash,
+                        const Crypto::Symmetric128BitsKeyByteArray & privacyKey) :
             mProvider(provider)
 
         {
             Initialize(encryptionKey, hash, privacyKey);
         }
 
-        void Initialize(const Crypto::Aes128KeyByteArray & encryptionKey, uint16_t hash,
-                        const Crypto::Aes128KeyByteArray & privacyKey)
+        void Initialize(const Crypto::Symmetric128BitsKeyByteArray & encryptionKey, uint16_t hash,
+                        const Crypto::Symmetric128BitsKeyByteArray & privacyKey)
         {
             ReleaseKeys();
             mKeyHash = hash;

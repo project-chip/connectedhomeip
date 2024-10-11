@@ -116,7 +116,8 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 
 /**
  * Like the public invokeCommandWithEndpointID but allows passing through a
- * serverSideProcessingTimeout.
+ * serverSideProcessingTimeout and controlling whether we log the call (so we
+ * can not log when the call is not actually originating with MTRBaseDevice).
  */
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
@@ -124,6 +125,7 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                        commandFields:(id)commandFields
                   timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
          serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                             logCall:(BOOL)logCall
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion;
 
@@ -185,6 +187,27 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                                     queue:(dispatch_queue_t)queue
                                completion:(void (^)(id _Nullable value, NSError * _Nullable error))completion;
 
+/**
+ * Same as the public -readAttributePaths:eventPaths:params:queue:completion: except also include the data version in the data-value dictionary in the response dictionary, if the includeDataVersion argument is set to YES.
+ */
+- (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                    params:(MTRReadParams * _Nullable)params
+        includeDataVersion:(BOOL)includeDataVersion
+                     queue:(dispatch_queue_t)queue
+                completion:(MTRDeviceResponseHandler)completion;
+
+/**
+ * Same as the public version, except for logging.  For use from MTRDevice only.
+ */
+- (void)_writeAttributeWithEndpointID:(NSNumber *)endpointID
+                            clusterID:(NSNumber *)clusterID
+                          attributeID:(NSNumber *)attributeID
+                                value:(id)value
+                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                                queue:(dispatch_queue_t)queue
+                           completion:(MTRDeviceResponseHandler)completion;
+
 @end
 
 @interface MTRClusterPath ()
@@ -228,6 +251,12 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 
 // Exported utility function
 // Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler
-NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data);
+NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data, NSNumber * _Nullable dataVersion = nil);
+
+// Convert a data-value dictionary as described in MTRDeviceResponseHandler into
+// TLV Data with an anonymous tag.  This method assumes the encoding of the
+// value fits in a single UDP MTU; for lists this method might need to be used
+// on each list item separately.
+NSData * _Nullable MTREncodeTLVFromDataValueDictionary(NSDictionary<NSString *, id> * value, NSError * __autoreleasing * error);
 
 NS_ASSUME_NONNULL_END

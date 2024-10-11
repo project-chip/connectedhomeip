@@ -22,12 +22,16 @@
 
 #include <editline.h>
 
-constexpr const char * kInteractiveModePrompt          = ">>> ";
-constexpr const char * kInteractiveModeHistoryFilePath = "/tmp/chip_tool_history";
-constexpr const char * kInteractiveModeStopCommand     = "quit()";
-constexpr const char * kCategoryError                  = "Error";
-constexpr const char * kCategoryProgress               = "Info";
-constexpr const char * kCategoryDetail                 = "Debug";
+#include <string>
+#include <vector>
+
+constexpr char kInteractiveModePrompt[]          = ">>> ";
+constexpr char kInteractiveModeHistoryFileName[] = "chip_tool_history";
+constexpr char kInteractiveModeStopCommand[]     = "quit()";
+constexpr char kCategoryError[]                  = "Error";
+constexpr char kCategoryProgress[]               = "Info";
+constexpr char kCategoryDetail[]                 = "Debug";
+constexpr char kCategoryAutomation[]             = "Automation";
 
 namespace {
 
@@ -146,6 +150,9 @@ struct InteractiveServerResult
         case chip::Logging::kLogCategory_Detail:
             messageType = kCategoryDetail;
             break;
+        case chip::Logging::kLogCategory_Automation:
+            messageType = kCategoryAutomation;
+            return;
         default:
             // This should not happen.
             chipDie();
@@ -257,7 +264,9 @@ void ENFORCE_FORMAT(3, 0) InteractiveServerLoggingCallback(const char * module, 
     gInteractiveServerResult.MaybeAddLog(module, category, base64Message);
 }
 
-char * GetCommand(char * command)
+} // namespace
+
+char * InteractiveStartCommand::GetCommand(char * command)
 {
     if (command != nullptr)
     {
@@ -271,12 +280,32 @@ char * GetCommand(char * command)
     if (command != nullptr && *command)
     {
         add_history(command);
-        write_history(kInteractiveModeHistoryFilePath);
+        write_history(GetHistoryFilePath().c_str());
     }
 
     return command;
 }
-} // namespace
+
+std::string InteractiveStartCommand::GetHistoryFilePath() const
+{
+    std::string storageDir;
+    if (GetStorageDirectory().HasValue())
+    {
+        storageDir = GetStorageDirectory().Value();
+    }
+    else
+    {
+        // Match what GetFilename in ExamplePersistentStorage.cpp does.
+        const char * dir = getenv("TMPDIR");
+        if (dir == nullptr)
+        {
+            dir = "/tmp";
+        }
+        storageDir = dir;
+    }
+
+    return storageDir + "/" + kInteractiveModeHistoryFileName;
+}
 
 CHIP_ERROR InteractiveServerCommand::RunCommand()
 {
@@ -329,7 +358,7 @@ CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
 
 CHIP_ERROR InteractiveStartCommand::RunCommand()
 {
-    read_history(kInteractiveModeHistoryFilePath);
+    read_history(GetHistoryFilePath().c_str());
 
     // Logs needs to be redirected in order to refresh the screen appropriately when something
     // is dumped to stdout while the user is typing a command.

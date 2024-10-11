@@ -25,3 +25,12 @@ gcc_toolchain("standalone") {
     import("${chip_root}/config/standalone/args.gni")
   }
 }
+
+gcc_toolchain("lit_icd") {
+  toolchain_args = {
+    current_os = host_os
+    current_cpu = host_cpu
+    is_clang = false
+    import("${chip_root}/examples/lit-icd-app/linux/args.gni")
+  }
+}

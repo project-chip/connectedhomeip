@@ -17,9 +17,7 @@
 
 #include "ConnectivityUtils.h"
 
-#include <platform/Tizen/ConnectivityUtils.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
+#include <errno.h>
 #include <ifaddrs.h>
 #include <linux/ethtool.h>
 #include <linux/sockios.h>
@@ -33,52 +31,170 @@
 
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/Tizen/ConnectivityUtils.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 using namespace ::chip::app::Clusters::EthernetNetworkDiagnostics;
 
-namespace chip {
-namespace DeviceLayer {
-namespace Internal {
+namespace {
 
-uint16_t ConnectivityUtils::MapChannelToFrequency(const uint16_t inBand, const uint8_t inChannel)
+constexpr uint16_t Map2400MHz(const uint8_t inChannel)
 {
-    uint16_t frequency = 0;
-
-    if (inBand == kWiFi_BAND_2_4_GHZ)
-    {
-        frequency = Map2400MHz(inChannel);
-    }
-    else if (inBand == kWiFi_BAND_5_0_GHZ)
-    {
-        frequency = Map5000MHz(inChannel);
-    }
-
-    return frequency;
+    if (inChannel >= 1 && inChannel <= 13)
+        return static_cast<uint16_t>(2412 + ((inChannel - 1) * 5));
+    if (inChannel == 14)
+        return 2484;
+    return 0;
 }
 
-uint8_t ConnectivityUtils::MapFrequencyToChannel(const uint16_t frequency)
+constexpr uint8_t MapFrequencyToChannel(const uint16_t frequency)
 {
     if (frequency < 2412)
         return 0;
-
     if (frequency < 2484)
         return static_cast<uint8_t>((frequency - 2407) / 5);
-
     if (frequency == 2484)
         return 14;
-
     return static_cast<uint8_t>(frequency / 5 - 1000);
 }
 
-InterfaceTypeEnum ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
+constexpr uint16_t Map5000MHz(const uint8_t inChannel)
+{
+    switch (inChannel)
+    {
+    case 183:
+        return 4915;
+    case 184:
+        return 4920;
+    case 185:
+        return 4925;
+    case 187:
+        return 4935;
+    case 188:
+        return 4940;
+    case 189:
+        return 4945;
+    case 192:
+        return 4960;
+    case 196:
+        return 4980;
+    case 7:
+        return 5035;
+    case 8:
+        return 5040;
+    case 9:
+        return 5045;
+    case 11:
+        return 5055;
+    case 12:
+        return 5060;
+    case 16:
+        return 5080;
+    case 34:
+        return 5170;
+    case 36:
+        return 5180;
+    case 38:
+        return 5190;
+    case 40:
+        return 5200;
+    case 42:
+        return 5210;
+    case 44:
+        return 5220;
+    case 46:
+        return 5230;
+    case 48:
+        return 5240;
+    case 52:
+        return 5260;
+    case 56:
+        return 5280;
+    case 60:
+        return 5300;
+    case 64:
+        return 5320;
+    case 100:
+        return 5500;
+    case 104:
+        return 5520;
+    case 108:
+        return 5540;
+    case 112:
+        return 5560;
+    case 116:
+        return 5580;
+    case 120:
+        return 5600;
+    case 124:
+        return 5620;
+    case 128:
+        return 5640;
+    case 132:
+        return 5660;
+    case 136:
+        return 5680;
+    case 140:
+        return 5700;
+    case 149:
+        return 5745;
+    case 153:
+        return 5765;
+    case 157:
+        return 5785;
+    case 161:
+        return 5805;
+    case 165:
+        return 5825;
+    default:
+        return 0;
+    }
+}
+
+constexpr double ConvertFrequencyToFloat(const iw_freq * in)
+{
+    double result = (double) in->m;
+    for (int i = 0; i < in->e; i++)
+        result *= 10;
+    return result;
+}
+
+CHIP_ERROR GetWiFiParameter(int sock,            /* Socket to the kernel */
+                            const char * ifname, /* Device name */
+                            int request,         /* WE ID */
+                            struct iwreq * pwrq) /* Fixed part of the request */
+{
+    chip::Platform::CopyString(pwrq->ifr_name, ifname);
+    if (ioctl(sock, request, pwrq) == -1)
+        return CHIP_ERROR_POSIX(errno);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GetWiFiStats(int sock, const char * ifname, struct iw_statistics * stats)
+{
+    struct iwreq wrq   = {};
+    wrq.u.data.pointer = (caddr_t) stats;
+    wrq.u.data.length  = sizeof(*stats);
+    wrq.u.data.flags   = 1; /* Clear updated flag */
+    return GetWiFiParameter(sock, ifname, SIOCGIWSTATS, &wrq);
+}
+
+} // namespace
+
+namespace chip {
+namespace DeviceLayer {
+namespace Internal {
+namespace ConnectivityUtils {
+
+InterfaceTypeEnum GetInterfaceConnectionType(const char * ifname)
 {
     InterfaceTypeEnum ret = InterfaceTypeEnum::kUnspecified;
     int sock              = -1;
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
-        ChipLogError(DeviceLayer, "Failed to open socket");
+        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
         return ret;
     }
 
@@ -107,48 +223,39 @@ InterfaceTypeEnum ConnectivityUtils::GetInterfaceConnectionType(const char * ifn
     return ret;
 }
 
-CHIP_ERROR ConnectivityUtils::GetInterfaceHardwareAddrs(const char * ifname, uint8_t * buf, size_t bufSize)
+CHIP_ERROR GetInterfaceHardwareAddrs(const char * ifname, uint8_t * buf, size_t bufSize)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
-    int skfd;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (ifname[0] == '\0')
-    {
-        ChipLogError(DeviceLayer, "Invalid argument for interface name");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
-        return CHIP_ERROR_OPEN_FAILED;
-    }
+    int sock = socket(AF_INET, SOCK_DGRAM, 0);
+    VerifyOrReturnError(sock != -1, CHIP_ERROR_POSIX(errno),
+                        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
 
     struct ifreq req;
     Platform::CopyString(req.ifr_name, ifname);
-    if (ioctl(skfd, SIOCGIFHWADDR, &req) != -1)
-    {
-        // Copy 48-bit IEEE MAC Address
-        VerifyOrReturnError(bufSize >= 6, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(ioctl(sock, SIOCGIFHWADDR, &req) != -1, err = CHIP_ERROR_POSIX(errno);
+                 ChipLogError(DeviceLayer, "Failed to get hardware address: %s", strerror(errno)));
 
-        memset(buf, 0, bufSize);
-        memcpy(buf, req.ifr_ifru.ifru_hwaddr.sa_data, 6);
-        err = CHIP_NO_ERROR;
-    }
+    // Copy 48-bit IEEE MAC Address
+    VerifyOrExit(bufSize >= 6, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    close(skfd);
+    memset(buf, 0, bufSize);
+    memcpy(buf, req.ifr_ifru.ifru_hwaddr.sa_data, 6);
+
+exit:
+    close(sock);
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp)
+CHIP_ERROR GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp)
 {
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
     if (getifaddrs(&ifaddr) == -1)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-        return err;
+        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
+        return CHIP_ERROR_POSIX(errno);
     }
 
     uint8_t index = 0;
@@ -182,15 +289,15 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceIPv4Addrs(const char * ifname, uint8_t
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetInterfaceIPv6Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp)
+CHIP_ERROR GetInterfaceIPv6Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp)
 {
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
     if (getifaddrs(&ifaddr) == -1)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-        return err;
+        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
+        return CHIP_ERROR_POSIX(errno);
     }
 
     uint8_t index = 0;
@@ -224,15 +331,15 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceIPv6Addrs(const char * ifname, uint8_t
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetWiFiInterfaceName(char * ifname, size_t bufSize)
+CHIP_ERROR GetWiFiInterfaceName(char * ifname, size_t bufSize)
 {
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
     if (getifaddrs(&ifaddr) == -1)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-        return err;
+        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
+        return CHIP_ERROR_POSIX(errno);
     }
 
     struct ifaddrs * ifa = nullptr;
@@ -250,60 +357,51 @@ CHIP_ERROR ConnectivityUtils::GetWiFiInterfaceName(char * ifname, size_t bufSize
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber)
+CHIP_ERROR GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
+    CHIP_ERROR err;
     struct iwreq wrq;
-    int skfd;
+    double freq;
 
-    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
-        return CHIP_ERROR_OPEN_FAILED;
-    }
+    int sock = socket(AF_INET, SOCK_DGRAM, 0);
+    VerifyOrReturnError(sock != -1, CHIP_ERROR_POSIX(errno),
+                        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
 
-    if ((err = GetWiFiParameter(skfd, ifname, SIOCGIWFREQ, &wrq)) == CHIP_NO_ERROR)
-    {
-        double freq = ConvertFrequenceToFloat(&(wrq.u.freq));
-        VerifyOrReturnError((freq / 1000000) <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-        channelNumber = MapFrequencyToChannel(static_cast<uint16_t>(freq / 1000000));
+    err = GetWiFiParameter(sock, ifname, SIOCGIWFREQ, &wrq);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(DeviceLayer, "Failed to get channel/frequency: %" CHIP_ERROR_FORMAT, err.Format()));
 
-        err = CHIP_NO_ERROR;
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "Failed to get channel/frequency (Hz).")
-    }
+    freq = ConvertFrequencyToFloat(&(wrq.u.freq));
+    VerifyOrExit((freq / 1000000) <= UINT16_MAX, err = CHIP_ERROR_INVALID_INTEGER_VALUE);
+    channelNumber = MapFrequencyToChannel(static_cast<uint16_t>(freq / 1000000));
 
-    close(skfd);
+exit:
+    close(sock);
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetWiFiRssi(const char * ifname, int8_t & rssi)
+CHIP_ERROR GetWiFiRssi(const char * ifname, int8_t & rssi)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
+    CHIP_ERROR err;
     struct iw_statistics stats;
-    int skfd;
 
-    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
-        return CHIP_ERROR_OPEN_FAILED;
-    }
+    int sock = socket(AF_INET, SOCK_DGRAM, 0);
+    VerifyOrReturnError(sock != -1, CHIP_ERROR_POSIX(errno),
+                        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
 
-    if ((err = GetWiFiStats(skfd, ifname, &stats)) == CHIP_NO_ERROR)
+    err = GetWiFiStats(sock, ifname, &stats);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to get Wi-Fi stats: %" CHIP_ERROR_FORMAT, err.Format()));
+
     {
         struct iw_quality * qual = &stats.qual;
-
         if (qual->updated & IW_QUAL_RCPI)
         {
             /* RCPI = int{(Power in dBm +110)*2} for 0dbm > Power > -110dBm */
             if (!(qual->updated & IW_QUAL_LEVEL_INVALID))
             {
                 double rcpilevel = (qual->level / 2.0) - 110.0;
-                VerifyOrReturnError(rcpilevel <= INT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+                VerifyOrExit(rcpilevel <= INT8_MAX, err = CHIP_ERROR_INVALID_INTEGER_VALUE);
                 rssi = static_cast<int8_t>(rcpilevel);
-                err  = CHIP_NO_ERROR;
             }
         }
         else
@@ -317,88 +415,74 @@ CHIP_ERROR ConnectivityUtils::GetWiFiRssi(const char * ifname, int8_t & rssi)
                     if (qual->level >= 64)
                         dblevel -= 0x100;
 
-                    VerifyOrReturnError(dblevel <= INT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+                    VerifyOrExit(dblevel <= INT8_MAX, err = CHIP_ERROR_INVALID_INTEGER_VALUE);
                     rssi = static_cast<int8_t>(dblevel);
-                    err  = CHIP_NO_ERROR;
                 }
             }
             else
             {
                 if (!(qual->updated & IW_QUAL_LEVEL_INVALID))
                 {
-                    VerifyOrReturnError(qual->level <= INT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+                    VerifyOrExit(qual->level <= INT8_MAX, err = CHIP_ERROR_INVALID_INTEGER_VALUE);
                     rssi = static_cast<int8_t>(qual->level);
-                    err  = CHIP_NO_ERROR;
                 }
             }
         }
     }
-    else
-    {
-        ChipLogError(DeviceLayer, "Failed to get /proc/net/wireless stats.")
-    }
 
-    close(skfd);
+exit:
+    close(sock);
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCount)
+CHIP_ERROR GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCount)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
+    CHIP_ERROR err;
     struct iw_statistics stats;
-    int skfd;
 
-    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
-        return CHIP_ERROR_OPEN_FAILED;
-    }
+    int sock = socket(AF_INET, SOCK_DGRAM, 0);
+    VerifyOrReturnError(sock != -1, CHIP_ERROR_POSIX(errno),
+                        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
 
-    if (GetWiFiStats(skfd, ifname, &stats) == CHIP_NO_ERROR)
-    {
-        beaconLostCount = stats.miss.beacon;
-        err             = CHIP_NO_ERROR;
-    }
+    err = GetWiFiStats(sock, ifname, &stats);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to get Wi-Fi stats: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    close(skfd);
+    beaconLostCount = stats.miss.beacon;
+
+exit:
+    close(sock);
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate)
+CHIP_ERROR GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
+    CHIP_ERROR err;
     struct iwreq wrq;
-    int skfd;
 
-    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
-        return CHIP_ERROR_OPEN_FAILED;
-    }
+    int sock = socket(AF_INET, SOCK_DGRAM, 0);
+    VerifyOrReturnError(sock != -1, CHIP_ERROR_POSIX(errno),
+                        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
 
-    if ((err = GetWiFiParameter(skfd, ifname, SIOCGIWRATE, &wrq)) == CHIP_NO_ERROR)
-    {
-        currentMaxRate = wrq.u.bitrate.value;
-        err            = CHIP_NO_ERROR;
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "Failed to get channel/frequency (Hz).")
-    }
+    err = GetWiFiParameter(sock, ifname, SIOCGIWRATE, &wrq);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(DeviceLayer, "Failed to get channel/frequency: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    close(skfd);
+    currentMaxRate = wrq.u.bitrate.value;
+
+exit:
+    close(sock);
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
+CHIP_ERROR GetEthInterfaceName(char * ifname, size_t bufSize)
 {
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
     if (getifaddrs(&ifaddr) == -1)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-        return err;
+        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
+        return CHIP_ERROR_POSIX(errno);
     }
 
     struct ifaddrs * ifa = nullptr;
@@ -416,11 +500,9 @@ CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetEthPHYRate(const char * ifname, PHYRateEnum & pHYRate)
+CHIP_ERROR GetEthPHYRate(const char * ifname, PHYRateEnum & pHYRate)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    int skfd;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
     uint32_t speed          = 0;
     struct ethtool_cmd ecmd = {};
     ecmd.cmd                = ETHTOOL_GSET;
@@ -429,18 +511,12 @@ CHIP_ERROR ConnectivityUtils::GetEthPHYRate(const char * ifname, PHYRateEnum & p
     ifr.ifr_data = reinterpret_cast<char *>(&ecmd);
     Platform::CopyString(ifr.ifr_name, ifname);
 
-    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
-        return CHIP_ERROR_OPEN_FAILED;
-    }
+    int sock = socket(AF_INET, SOCK_DGRAM, 0);
+    VerifyOrReturnError(sock != -1, CHIP_ERROR_POSIX(errno),
+                        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
 
-    if (ioctl(skfd, SIOCETHTOOL, &ifr) == -1)
-    {
-        ChipLogError(DeviceLayer, "Cannot get device settings");
-        close(skfd);
-        return CHIP_ERROR_READ_FAILED;
-    }
+    VerifyOrExit(ioctl(sock, SIOCETHTOOL, &ifr) != -1, err = CHIP_ERROR_POSIX(errno);
+                 ChipLogError(DeviceLayer, "Cannot get device settings: %s", strerror(errno)));
 
     speed = (ecmd.speed_hi << 16) | ecmd.speed;
     switch (speed)
@@ -481,16 +557,14 @@ CHIP_ERROR ConnectivityUtils::GetEthPHYRate(const char * ifname, PHYRateEnum & p
         break;
     };
 
-    close(skfd);
-
+exit:
+    close(sock);
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetEthFullDuplex(const char * ifname, bool & fullDuplex)
+CHIP_ERROR GetEthFullDuplex(const char * ifname, bool & fullDuplex)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
-
-    int skfd;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
     struct ethtool_cmd ecmd = {};
     ecmd.cmd                = ETHTOOL_GSET;
     struct ifreq ifr        = {};
@@ -498,216 +572,21 @@ CHIP_ERROR ConnectivityUtils::GetEthFullDuplex(const char * ifname, bool & fullD
     ifr.ifr_data = reinterpret_cast<char *>(&ecmd);
     Platform::CopyString(ifr.ifr_name, ifname);
 
-    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
-        return CHIP_ERROR_OPEN_FAILED;
-    }
+    int sock = socket(AF_INET, SOCK_DGRAM, 0);
+    VerifyOrReturnError(sock != -1, CHIP_ERROR_POSIX(errno),
+                        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
 
-    if (ioctl(skfd, SIOCETHTOOL, &ifr) == -1)
-    {
-        ChipLogError(DeviceLayer, "Cannot get device settings");
-        err = CHIP_ERROR_READ_FAILED;
-    }
-    else
-    {
-        fullDuplex = ecmd.duplex == DUPLEX_FULL;
-        err        = CHIP_NO_ERROR;
-    }
+    VerifyOrExit(ioctl(sock, SIOCETHTOOL, &ifr) != -1, err = CHIP_ERROR_POSIX(errno);
+                 ChipLogError(DeviceLayer, "Cannot get device settings: %s", strerror(errno)));
 
-    close(skfd);
+    fullDuplex = ecmd.duplex == DUPLEX_FULL;
 
+exit:
+    close(sock);
     return err;
 }
 
-uint16_t ConnectivityUtils::Map2400MHz(const uint8_t inChannel)
-{
-    uint16_t frequency = 0;
-
-    if (inChannel >= 1 && inChannel <= 13)
-    {
-        frequency = static_cast<uint16_t>(2412 + ((inChannel - 1) * 5));
-    }
-    else if (inChannel == 14)
-    {
-        frequency = 2484;
-    }
-
-    return frequency;
-}
-
-uint16_t ConnectivityUtils::Map5000MHz(const uint8_t inChannel)
-{
-    uint16_t frequency = 0;
-
-    switch (inChannel)
-    {
-    case 183:
-        frequency = 4915;
-        break;
-    case 184:
-        frequency = 4920;
-        break;
-    case 185:
-        frequency = 4925;
-        break;
-    case 187:
-        frequency = 4935;
-        break;
-    case 188:
-        frequency = 4940;
-        break;
-    case 189:
-        frequency = 4945;
-        break;
-    case 192:
-        frequency = 4960;
-        break;
-    case 196:
-        frequency = 4980;
-        break;
-    case 7:
-        frequency = 5035;
-        break;
-    case 8:
-        frequency = 5040;
-        break;
-    case 9:
-        frequency = 5045;
-        break;
-    case 11:
-        frequency = 5055;
-        break;
-    case 12:
-        frequency = 5060;
-        break;
-    case 16:
-        frequency = 5080;
-        break;
-    case 34:
-        frequency = 5170;
-        break;
-    case 36:
-        frequency = 5180;
-        break;
-    case 38:
-        frequency = 5190;
-        break;
-    case 40:
-        frequency = 5200;
-        break;
-    case 42:
-        frequency = 5210;
-        break;
-    case 44:
-        frequency = 5220;
-        break;
-    case 46:
-        frequency = 5230;
-        break;
-    case 48:
-        frequency = 5240;
-        break;
-    case 52:
-        frequency = 5260;
-        break;
-    case 56:
-        frequency = 5280;
-        break;
-    case 60:
-        frequency = 5300;
-        break;
-    case 64:
-        frequency = 5320;
-        break;
-    case 100:
-        frequency = 5500;
-        break;
-    case 104:
-        frequency = 5520;
-        break;
-    case 108:
-        frequency = 5540;
-        break;
-    case 112:
-        frequency = 5560;
-        break;
-    case 116:
-        frequency = 5580;
-        break;
-    case 120:
-        frequency = 5600;
-        break;
-    case 124:
-        frequency = 5620;
-        break;
-    case 128:
-        frequency = 5640;
-        break;
-    case 132:
-        frequency = 5660;
-        break;
-    case 136:
-        frequency = 5680;
-        break;
-    case 140:
-        frequency = 5700;
-        break;
-    case 149:
-        frequency = 5745;
-        break;
-    case 153:
-        frequency = 5765;
-        break;
-    case 157:
-        frequency = 5785;
-        break;
-    case 161:
-        frequency = 5805;
-        break;
-    case 165:
-        frequency = 5825;
-        break;
-    }
-
-    return frequency;
-}
-
-double ConnectivityUtils::ConvertFrequenceToFloat(const iw_freq * in)
-{
-    double result = (double) in->m;
-
-    for (int i = 0; i < in->e; i++)
-        result *= 10;
-
-    return result;
-}
-
-CHIP_ERROR ConnectivityUtils::GetWiFiParameter(int skfd,            /* Socket to the kernel */
-                                               const char * ifname, /* Device name */
-                                               int request,         /* WE ID */
-                                               struct iwreq * pwrq) /* Fixed part of the request */
-{
-    Platform::CopyString(pwrq->ifr_name, ifname);
-
-    if (ioctl(skfd, request, pwrq) < 0)
-        return CHIP_ERROR_BAD_REQUEST;
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityUtils::GetWiFiStats(int skfd, const char * ifname, struct iw_statistics * stats)
-{
-    struct iwreq wrq;
-
-    wrq.u.data.pointer = (caddr_t) stats;
-    wrq.u.data.length  = sizeof(struct iw_statistics);
-    wrq.u.data.flags   = 1; /*Clear updated flag */
-    Platform::CopyString(wrq.ifr_name, ifname);
-
-    return GetWiFiParameter(skfd, ifname, SIOCGIWSTATS, &wrq);
-}
-
+} // namespace ConnectivityUtils
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

@@ -389,18 +389,19 @@ tests:
           [1684167429.421129][29723:29723] CHIP:IN:   Joined multicast group on interface wlp0s20f3
 
           Verify the DSIZ flag is set to Group On TH(Reference app) log:
-          (Here in below log the value recived is 0X04 = 0100 (decimal) - Here the bit 2 is enabled then DSIZ flag is set to group)
-
-          [1686317564.742205][7679:7679] CHIP:DMG: Header Flags =
-          [1686317564.742207][7679:7679] CHIP:DMG: {
-          [1686317564.742212][7679:7679] CHIP:DMG:     Message (0x04) =
-          [1686317564.742214][7679:7679] CHIP:DMG:     {
-          [1686317564.742217][7679:7679] CHIP:DMG:         SourceNodeId = C831420E9B16886B
-          [1686317564.742219][7679:7679] CHIP:DMG:     }
-          [1686317564.742224][7679:7679] CHIP:DMG:     Exchange (0x03) =
-          [1686317564.742226][7679:7679] CHIP:DMG:     {
-          [1686317564.742228][7679:7679] CHIP:DMG:         Initiator = true
-          [1686317564.742231][7679:7679] CHIP:DMG:         AckMsg = 48718950
-          [1686317564.742233][7679:7679] CHIP:DMG:     }
-          [1686317564.742237][7679:7679] CHIP:DMG: }
+          (Here in below log the value received is 0X06 = 0110 (binary) - Here the S Flag (1 bit, position 2) is enabled as SourceNodeID is present and DISZ has a value 2(10) as the Destination Node ID field is present as a 16-bit Group
+          [1700720496.175477][40754:40754] CHIP:DMG: Header Flags =
+          [1700720496.175481][40754:40754] CHIP:DMG: {
+          [1700720496.175485][40754:40754] CHIP:DMG:     Security (0x01) =
+          [1700720496.175489][40754:40754] CHIP:DMG:     {
+          [1700720496.175492][40754:40754] CHIP:DMG:     }
+          [1700720496.175497][40754:40754] CHIP:DMG:     Message (0x06) =
+          [1700720496.175500][40754:40754] CHIP:DMG:     {
+          [1700720496.175505][40754:40754] CHIP:DMG:         SourceNodeId = 000000000001B669
+          [1700720496.175508][40754:40754] CHIP:DMG:         DestinationGroupIdPresent = 0x0103
+          [1700720496.175512][40754:40754] CHIP:DMG:     }
+          [1700720496.175519][40754:40754] CHIP:DMG:     Exchange (0x01) =
+          [1700720496.175523][40754:40754] CHIP:DMG:     {
+          [1700720496.175525][40754:40754] CHIP:DMG:         Initiator = true
+          [1700720496.175529][40754:40754] CHIP:DMG:     }
       disabled: true

@@ -17,10 +17,10 @@
  */
 
 #include "AccountLoginManager.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
-#include <app/util/af.h>
+#include <app/util/config.h>
 
-using namespace std;
 using namespace chip::app::Clusters::AccountLogin;
 
 AccountLoginManager::AccountLoginManager(const char * setupPin)
@@ -28,10 +28,11 @@ AccountLoginManager::AccountLoginManager(const char * setupPin)
     CopyString(mSetupPin, sizeof(mSetupPin), setupPin);
 }
 
-bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, const CharSpan & setupPin)
+bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, const CharSpan & setupPin,
+                                      const chip::Optional<chip::NodeId> & nodeId)
 {
-    string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
-    string setupPinString(setupPin.data(), setupPin.size());
+    std::string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
+    std::string setupPinString(setupPin.data(), setupPin.size());
     ChipLogProgress(Zcl, "temporary account id: %s", tempAccountIdentifierString.c_str());
     ChipLogProgress(Zcl, "setup pin %s", setupPinString.c_str());
 
@@ -45,7 +46,7 @@ bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, co
     return false;
 }
 
-bool AccountLoginManager::HandleLogout()
+bool AccountLoginManager::HandleLogout(const chip::Optional<chip::NodeId> & nodeId)
 {
     // TODO: Insert your code here to send logout request
     ChipLogProgress(Zcl, "AccountLoginManager::HandleLogout success");
@@ -55,11 +56,28 @@ bool AccountLoginManager::HandleLogout()
 void AccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupPINResponse> & helper,
                                             const CharSpan & tempAccountIdentifier)
 {
-    string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
+    std::string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
 
     GetSetupPINResponse response;
     ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.c_str(), mSetupPin);
 
     response.setupPIN = CharSpan::fromCharString(mSetupPin);
     helper.Success(response);
+}
+
+uint16_t AccountLoginManager::GetClusterRevision(chip::EndpointId endpoint)
+{
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return kClusterRevision;
+    }
+
+    uint16_t clusterRevision = 0;
+    bool success =
+        (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == chip::Protocols::InteractionModel::Status::Success);
+    if (!success)
+    {
+        ChipLogError(Zcl, "AccountLoginManager::GetClusterRevision error reading cluster revision");
+    }
+    return clusterRevision;
 }

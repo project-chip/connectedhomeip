@@ -19,6 +19,8 @@
 #include "rvc-device.h"
 #include <AppMain.h>
 
+#include <string>
+
 #define RVC_ENDPOINT 1
 
 using namespace chip;
@@ -26,7 +28,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
-constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_rvc_fifo_";
+constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_rvc_fifo_";
 NamedPipeCommands sChipNamedPipeCommands;
 RvcAppCommandDelegate sRvcAppCommandDelegate;
 } // namespace

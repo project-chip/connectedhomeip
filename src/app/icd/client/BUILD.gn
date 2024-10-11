@@ -1,0 +1,55 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+# ICD sources and configurations
+source_set("manager") {
+  sources = [
+    "DefaultICDClientStorage.cpp",
+    "DefaultICDClientStorage.h",
+    "ICDClientInfo.h",
+    "ICDClientStorage.h",
+  ]
+
+  deps = [ "${chip_root}/src/lib/core" ]
+  public_deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols",
+  ]
+}
+
+# ICD Handler source-set is broken out of the main source-set to enable unit tests
+# All sources and configurations used by the CheckInHandler need to go in this source-set
+source_set("handler") {
+  sources = [
+    "CheckInDelegate.h",
+    "CheckInHandler.cpp",
+    "CheckInHandler.h",
+    "DefaultCheckInDelegate.cpp",
+    "DefaultCheckInDelegate.h",
+    "RefreshKeySender.cpp",
+    "RefreshKeySender.h",
+  ]
+  public_deps = [
+    ":manager",
+    "${chip_root}/src/app",
+    "${chip_root}/src/controller",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols",
+  ]
+}

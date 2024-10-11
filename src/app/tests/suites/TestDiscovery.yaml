@@ -17,6 +17,9 @@ name: Test Discovery
 config:
     nodeId: 0x12344321
     endpoint: 0
+    # These defaults correspond to the behavior of all-clusters-app, and
+    # different values should be passed on the command line when testing
+    # against any other server.
     discriminator:
         type: int16u
         defaultValue: 3840
@@ -31,7 +34,7 @@ config:
         defaultValue: 32769
     deviceType:
         type: int16u
-        defaultValue: 65535
+        defaultValue: 0x0101
 
 tests:
     - label: "Stop target device"
@@ -203,7 +206,7 @@ tests:
               - name: "productId"
                 value: productId
 
-    - label: "Optional TXT key for MRP Sleepy Idle Interval (SII)"
+    - label: "Optional TXT key for MRP Session Idle Interval (SII)"
       PICS: MCORE.SC.SII_COMM_DISCOVERY_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -214,7 +217,7 @@ tests:
                     minValue: 0
                     maxValue: 3600000
 
-    - label: "Optional TXT key for MRP Sleepy Active Interval (SAI)"
+    - label: "Optional TXT key for MRP Session Active Interval (SAI)"
       PICS: MCORE.SC.SAI_COMM_DISCOVERY_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"

@@ -1,0 +1,76 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.8.8. [TC-MEDIAPLAYBACK-6.9] Audio Track Verification
+
+PICS:
+    - MEDIAPLAYBACK.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Media Playback"
+    endpoint: 3
+
+    AudioTrack_ID_Value:
+        type: CHAR_STRING
+        defaultValue: activeAudioTrackId_1
+    AudioOutputIndex_Value:
+        type: int16u
+        defaultValue: 1
+
+tests:
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 1: TH reads the ActiveAudioTrack attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0007
+      command: "readAttribute"
+      attribute: "ActiveAudioTrack"
+      response:
+          saveAs: ActiveAudioTrackValue
+
+    - label: "Step 2: TH reads the AvailableAudioTracks attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0008
+      command: "readAttribute"
+      attribute: "AvailableAudioTracks"
+      response:
+          saveAs: AvailableAudioTracksValue
+          constraints:
+              type: list
+              minLength: 2
+
+    - label:
+          "Step 3: TH sends a ActivateAudioTrack command to DUT specifying the
+          ID value from step 2"
+      PICS: MEDIAPLAYBACK.S.C09.Rsp
+      command: "ActivateAudioTrack"
+      arguments:
+          values:
+              - name: "AudioOutputIndex"
+                value: AudioOutputIndex_Value
+              - name: "TrackID"
+                value: AudioTrack_ID_Value
+
+    - label: "Step 4: TH reads the ActiveAudioTrack attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0007
+      command: "readAttribute"
+      attribute: "ActiveAudioTrack"
+      response:
+          value: { ID: AudioTrack_ID_Value }

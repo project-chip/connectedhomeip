@@ -27,7 +27,6 @@ limitations under the License.
     <type id="0x10" description="Boolean"                  name="boolean"           size="1"  discrete="true" />
     <type id="0x18" description="8-bit bitmap"             name="bitmap8"           size="1"  discrete="true" />
     <type id="0x19" description="16-bit bitmap"            name="bitmap16"          size="2"  discrete="true" />
-    <type id="0x1A" description="24-bit bitmap"            name="bitmap24"          size="3"  discrete="true" />
     <type id="0x1B" description="32-bit bitmap"            name="bitmap32"          size="4"  discrete="true" />
     <type id="0x1F" description="64-bit bitmap"            name="bitmap64"          size="8"  discrete="true" />
     <type id="0x20" description="Unsigned 8-bit integer"   name="int8u"             size="1"  analog="true"   />
@@ -38,14 +37,14 @@ limitations under the License.
     <type id="0x25" description="Unsigned 48-bit integer"  name="int48u"            size="6"  analog="true"   />
     <type id="0x26" description="Unsigned 56-bit integer"  name="int56u"            size="7"  analog="true"   />
     <type id="0x27" description="Unsigned 64-bit integer"  name="int64u"            size="8"  analog="true"   />
-    <type id="0x28" description="Signed 8-bit integer"     name="int8s"             size="1"  analog="true"   />
-    <type id="0x29" description="Signed 16-bit integer"    name="int16s"            size="2"  analog="true"   />
-    <type id="0x2A" description="Signed 24-bit integer"    name="int24s"            size="3"  analog="true"   />
-    <type id="0x2B" description="Signed 32-bit integer"    name="int32s"            size="4"  analog="true"   />
-    <type id="0x2C" description="Signed 40-bit integer"    name="int40s"            size="5"  analog="true"   />
-    <type id="0x2D" description="Signed 48-bit integer"    name="int48s"            size="6"  analog="true"   />
-    <type id="0x2E" description="Signed 56-bit integer"    name="int56s"            size="7"  analog="true"   />
-    <type id="0x2F" description="Signed 64-bit integer"    name="int64s"            size="8"  analog="true"   />
+    <type id="0x28" description="Signed 8-bit integer"     name="int8s"             size="1"  analog="true"  signed="true" />
+    <type id="0x29" description="Signed 16-bit integer"    name="int16s"            size="2"  analog="true"  signed="true"  />
+    <type id="0x2A" description="Signed 24-bit integer"    name="int24s"            size="3"  analog="true"  signed="true"  />
+    <type id="0x2B" description="Signed 32-bit integer"    name="int32s"            size="4"  analog="true"  signed="true"  />
+    <type id="0x2C" description="Signed 40-bit integer"    name="int40s"            size="5"  analog="true"  signed="true"  />
+    <type id="0x2D" description="Signed 48-bit integer"    name="int48s"            size="6"  analog="true"  signed="true"  />
+    <type id="0x2E" description="Signed 56-bit integer"    name="int56s"            size="7"  analog="true"  signed="true"  />
+    <type id="0x2F" description="Signed 64-bit integer"    name="int64s"            size="8"  analog="true"  signed="true"  />
     <type id="0x39" description="Single precision"         name="single"            size="4"  analog="true"   />
     <type id="0x3A" description="Double precision"         name="double"            size="8"  analog="true"   />
     <type id="0x41" description="Octet String"             name="octet_string"                composite="true"/>
@@ -55,6 +54,11 @@ limitations under the License.
     <!-- Derived Data Types -->
     <type id="0x42" description="Character String"         name="char_string"                 composite="true"/>
     <type id="0x44" description="Long Character String"    name="long_char_string"            composite="true"/>
+
+    <type id="0xD9" description="Power milliwatts"         name="power_mw"          size="8"  analog="true"     signed="true"/>
+    <type id="0xDA" description="Amperage milliamps"       name="amperage_ma"       size="8"  analog="true"     signed="true"/>
+    <type id="0xDB" description="Voltage millivolts"       name="voltage_mv"        size="8"  analog="true"     signed="true"/>
+    <type id="0xDC" description="Energy milliwatt-hours"   name="energy_mwh"        size="8"  analog="true"     signed="true"/>
 
     <type id="0xE6" description="Percentage units 1%"      name="percent"           size="1"  analog="true"   />
     <type id="0xE7" description="Percentage units 0.01%"   name="percent100ths"     size="2"  analog="true"   />
@@ -102,6 +106,7 @@ limitations under the License.
     <type id="0xF5" description="IPv6 Prefix"              name="ipv6pre"                     composite="true"/>
     <type id="0xF6" description="Hardware Address"         name="hwadr"                       composite="true"/>
 
+    <!-- TODO: Spec marks these as "compositte" yet they are set "discrete" here -->
     <type id="0xC9" description="Semantic Tag"             name="semtag"            size="4"  discrete="true" />
     <type id="0xCA" description="Namespace"                name="namespace"         size="1"  discrete="true" />
     <type id="0xCB" description="Tag"                      name="tag"               size="1"  discrete="true" />

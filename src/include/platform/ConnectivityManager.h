@@ -24,7 +24,7 @@
 #pragma once
 #include <memory>
 
-#include <app/AttributeAccessInterface.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -34,6 +34,9 @@
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <inet/TCPEndPoint.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <transport/raw/WiFiPAF.h>
 #endif
 
 namespace chip {
@@ -48,6 +51,8 @@ namespace DeviceLayer {
 namespace Internal {
 template <class>
 class GenericPlatformManagerImpl;
+template <class>
+class GenericPlatformManagerImpl_CMSISOS;
 template <class>
 class GenericPlatformManagerImpl_FreeRTOS;
 template <class>
@@ -101,14 +106,6 @@ public:
         kWiFiAPMode_OnDemand_NoStationProvision = 5,
     };
 
-    enum ThreadMode
-    {
-        kThreadMode_NotSupported          = 0,
-        kThreadMode_ApplicationControlled = 1,
-        kThreadMode_Disabled              = 2,
-        kThreadMode_Enabled               = 3,
-    };
-
     enum WiFiStationState
     {
         kWiFiStationState_NotConnected,
@@ -146,8 +143,9 @@ public:
 
     enum BLEAdvertisingMode
     {
-        kFastAdvertising = 0,
-        kSlowAdvertising = 1,
+        kFastAdvertising     = 0,
+        kSlowAdvertising     = 1,
+        kExtendedAdvertising = 2,
     };
 
     enum class SEDIntervalMode
@@ -178,6 +176,19 @@ public:
     bool IsWiFiStationProvisioned();
     void ClearWiFiStationProvision();
     CHIP_ERROR GetAndLogWiFiStatsCounters();
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    struct WiFiPAFAdvertiseParam;
+
+    CHIP_ERROR SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam & args);
+    typedef void (*OnConnectionCompleteFunct)(void * appState);
+    typedef void (*OnConnectionErrorFunct)(void * appState, CHIP_ERROR err);
+    CHIP_ERROR WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
+                              OnConnectionErrorFunct onError);
+    CHIP_ERROR WiFiPAFCancelConnect();
+    CHIP_ERROR WiFiPAFSend(System::PacketBufferHandle && msgBuf);
+    Transport::WiFiPAFBase * GetWiFiPAF();
+    void SetWiFiPAF(Transport::WiFiPAFBase * pmWiFiPAF);
+#endif
 
     // WiFi AP methods
     WiFiAPMode GetWiFiAPMode();
@@ -189,19 +200,16 @@ public:
     void MaintainOnDemandWiFiAP();
     System::Clock::Timeout GetWiFiAPIdleTimeout();
     void SetWiFiAPIdleTimeout(System::Clock::Timeout val);
+    CHIP_ERROR DisconnectNetwork();
 
     // Thread Methods
-    ThreadMode GetThreadMode();
-    CHIP_ERROR SetThreadMode(ThreadMode val);
     bool IsThreadEnabled();
-    bool IsThreadApplicationControlled();
     ThreadDeviceType GetThreadDeviceType();
     CHIP_ERROR SetThreadDeviceType(ThreadDeviceType deviceType);
     bool IsThreadAttached();
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
     void ResetThreadNetworkDiagnosticsCounts();
-    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
     CHIP_ERROR SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 
@@ -243,6 +251,8 @@ private:
     template <class>
     friend class Internal::GenericPlatformManagerImpl;
     template <class>
+    friend class Internal::GenericPlatformManagerImpl_CMSISOS;
+    template <class>
     friend class Internal::GenericPlatformManagerImpl_FreeRTOS;
     template <class>
     friend class Internal::GenericPlatformManagerImpl_POSIX;
@@ -277,6 +287,16 @@ struct ConnectivityManager::SEDIntervalsConfig
      * Only meaningful when the device is acting as a sleepy end node. */
     System::Clock::Milliseconds32 IdleIntervalMS;
 };
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+struct ConnectivityManager::WiFiPAFAdvertiseParam
+{
+    /* To enable/disable WiFiPAF Commissioning */
+    bool enable;
+    /* The optional commands */
+    const char * ExtCmds;
+};
+#endif
 
 /**
  * Returns a reference to the public interface of the ConnectivityManager singleton object.
@@ -417,24 +437,32 @@ inline CHIP_ERROR ConnectivityManager::GetAndLogWiFiStatsCounters()
     return static_cast<ImplClass *>(this)->_GetAndLogWiFiStatsCounters();
 }
 
-inline ConnectivityManager::ThreadMode ConnectivityManager::GetThreadMode()
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+inline CHIP_ERROR ConnectivityManager::SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam & args)
 {
-    return static_cast<ImplClass *>(this)->_GetThreadMode();
+    return static_cast<ImplClass *>(this)->_SetWiFiPAFAdvertisingEnabled(args);
 }
 
-inline CHIP_ERROR ConnectivityManager::SetThreadMode(ThreadMode val)
+inline CHIP_ERROR ConnectivityManager::WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState,
+                                                      OnConnectionCompleteFunct onSuccess, OnConnectionErrorFunct onError)
 {
-    return static_cast<ImplClass *>(this)->_SetThreadMode(val);
+    return static_cast<ImplClass *>(this)->_WiFiPAFConnect(connDiscriminator, appState, onSuccess, onError);
 }
+
+inline CHIP_ERROR ConnectivityManager::WiFiPAFCancelConnect()
+{
+    return static_cast<ImplClass *>(this)->_WiFiPAFCancelConnect();
+}
+
+inline CHIP_ERROR ConnectivityManager::WiFiPAFSend(chip::System::PacketBufferHandle && msgBuf)
+{
+    return static_cast<ImplClass *>(this)->_WiFiPAFSend(std::move(msgBuf));
+}
+#endif
 
 inline bool ConnectivityManager::IsThreadEnabled()
 {
     return static_cast<ImplClass *>(this)->_IsThreadEnabled();
-}
-
-inline bool ConnectivityManager::IsThreadApplicationControlled()
-{
-    return static_cast<ImplClass *>(this)->_IsThreadApplicationControlled();
 }
 
 inline ConnectivityManager::ThreadDeviceType ConnectivityManager::GetThreadDeviceType()
@@ -476,24 +504,17 @@ inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()
     static_cast<ImplClass *>(this)->_ResetThreadNetworkDiagnosticsCounts();
 }
 
-/*
- * @brief Get runtime value from the thread network based on the given attribute ID.
- *        The info is encoded via the AttributeValueEncoder.
- *
- * @param attributeId Id of the attribute for the requested info.
- * @param aEncoder Encoder to encode the attribute value.
- *
- * @return CHIP_NO_ERROR = Succes.
- *         CHIP_ERROR_NOT_IMPLEMENTED = Runtime value for this attribute to yet available to send as reply
- *                                      Use standard read.
- *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE = Is not a Runtime readable attribute. Use standard read
- *         All other errors should be treated as a read error and reported as such.
- */
-inline CHIP_ERROR ConnectivityManager::WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                                  app::AttributeValueEncoder & encoder)
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+inline Transport::WiFiPAFBase * ConnectivityManager::GetWiFiPAF()
 {
-    return static_cast<ImplClass *>(this)->_WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
+    return static_cast<ImplClass *>(this)->_GetWiFiPAF();
 }
+
+inline void ConnectivityManager::SetWiFiPAF(Transport::WiFiPAFBase * pWiFiPAF)
+{
+    return static_cast<ImplClass *>(this)->_SetWiFiPAF(pWiFiPAF);
+}
+#endif
 
 inline Ble::BleLayer * ConnectivityManager::GetBleLayer()
 {
@@ -603,6 +624,11 @@ inline void ConnectivityManager::OnWiFiScanDone()
 inline void ConnectivityManager::OnWiFiStationProvisionChange()
 {
     static_cast<ImplClass *>(this)->_OnWiFiStationProvisionChange();
+}
+
+inline CHIP_ERROR ConnectivityManager::DisconnectNetwork()
+{
+    return static_cast<ImplClass *>(this)->_DisconnectNetwork();
 }
 
 } // namespace DeviceLayer

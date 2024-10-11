@@ -157,6 +157,7 @@ silabs_executable("light_switch_app") {
     ]
 
     deps += [
+      "$dir_pw_hdlc:default_addresses",
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_stream:sys_io_stream",
       "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
@@ -165,6 +166,7 @@ silabs_executable("light_switch_app") {
       "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
+      "${chip_root}/src/platform/logging:default",
     ]
 
     if (wifi_soc) {

@@ -53,7 +53,7 @@ chip::System::LayerSockets & SystemLayerSockets()
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 namespace Internal {
-const char * const TAG = "CHIP[DL]";
+extern const char TAG[] = "CHIP[DL]";
 } // namespace Internal
 
 } // namespace DeviceLayer

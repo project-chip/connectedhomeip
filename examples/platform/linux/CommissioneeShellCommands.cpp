@@ -37,7 +37,8 @@ namespace chip {
 namespace Shell {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-static CHIP_ERROR SendUDC(bool printHeader, chip::Transport::PeerAddress commissioner)
+static CHIP_ERROR SendUDC(bool printHeader, chip::Transport::PeerAddress commissioner,
+                          Protocols::UserDirectedCommissioning::IdentificationDeclaration id)
 {
     streamer_t * sout = streamer_get();
 
@@ -46,7 +47,7 @@ static CHIP_ERROR SendUDC(bool printHeader, chip::Transport::PeerAddress commiss
         streamer_printf(sout, "SendUDC:        ");
     }
 
-    Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner);
+    Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner, id);
 
     streamer_printf(sout, "done\r\n");
 
@@ -60,6 +61,13 @@ static CHIP_ERROR PrintAllCommands()
     streamer_printf(sout, "  help                       Usage: commissionee <subcommand>\r\n");
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     streamer_printf(sout, "  sendudc <address> <port>   Send UDC message to address. Usage: commissionee sendudc ::1 5543\r\n");
+    streamer_printf(sout, "  udccancel <address> <port> Send UDC cancel message to address. Usage: cast udccancel ::1 5543\r\n");
+    streamer_printf(sout,
+                    "  udccommissionerpasscode <address> <port> [CommissionerPasscodeReady] [PairingHint] [PairingInst] Send UDC "
+                    "commissioner passcode message to address. Usage: udccommissionerpasscode ::1 5543 t 5 HelloWorld\r\n");
+    streamer_printf(sout,
+                    "  testudc <address> <port> [NoPasscode] [CdUponPasscodeDialog] [vid] [PairingHint] [PairingInst] Send UDC "
+                    "message to address. Usage: cast testudc ::1 5543 t t 5 HelloWorld\r\n");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     // TODO: Figure out whether setdiscoverytimeout is a reasonable thing to do
     // at all, and if so what semantics it should have.  Presumably it should
@@ -93,11 +101,92 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     if (strcmp(argv[0], "sendudc") == 0)
     {
+        Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
+
         char * eptr;
         chip::Inet::IPAddress commissioner;
         chip::Inet::IPAddress::FromString(argv[1], commissioner);
         uint16_t port = (uint16_t) strtol(argv[2], &eptr, 10);
-        return SendUDC(true, chip::Transport::PeerAddress::UDP(commissioner, port));
+
+        return SendUDC(true, chip::Transport::PeerAddress::UDP(commissioner, port), id);
+    }
+    if (strcmp(argv[0], "udccancel") == 0)
+    {
+        char * eptr;
+        chip::Inet::IPAddress commissioner;
+        chip::Inet::IPAddress::FromString(argv[1], commissioner);
+        uint16_t port = (uint16_t) strtol(argv[2], &eptr, 10);
+
+        Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
+        id.SetCancelPasscode(true);
+        return Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(commissioner, port),
+                                                                          id);
+    }
+    if (strcmp(argv[0], "udccommissionerpasscode") == 0)
+    {
+        char * eptr;
+        chip::Inet::IPAddress commissioner;
+        chip::Inet::IPAddress::FromString(argv[1], commissioner);
+        uint16_t port = (uint16_t) strtol(argv[2], &eptr, 10);
+
+        // udccommissionerpasscode <address> <port> [CommissionerPasscodeReady] [PairingHint] [PairingInst]
+        // ex. udccommissionerpasscode <address> <port> t 5 'hello world'
+
+        Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
+        id.SetCommissionerPasscode(true);
+        if (argc > 3)
+        {
+            id.SetCommissionerPasscodeReady(strcmp(argv[3], "t") == 0);
+        }
+        if (argc > 4)
+        {
+            uint16_t hint = (uint16_t) strtol(argv[4], &eptr, 10);
+            id.SetPairingHint(hint);
+        }
+        if (argc > 5)
+        {
+            id.SetPairingInst(argv[5]);
+        }
+        return Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(commissioner, port),
+                                                                          id);
+    }
+    if (strcmp(argv[0], "testudc") == 0)
+    {
+        char * eptr;
+        chip::Inet::IPAddress commissioner;
+        chip::Inet::IPAddress::FromString(argv[1], commissioner);
+        uint16_t port = (uint16_t) strtol(argv[2], &eptr, 10);
+
+        // sendudc <address> <port> [NoPasscode] [CdUponPasscodeDialog] [vid] [PairingHint] [PairingInst]
+        // ex. sendudc <address> <port> t t 111 5 'hello world'
+
+        Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
+        if (argc > 3)
+        {
+            id.SetNoPasscode(strcmp(argv[3], "t") == 0);
+        }
+        if (argc > 4)
+        {
+            id.SetCdUponPasscodeDialog(strcmp(argv[4], "t") == 0);
+        }
+        if (argc > 5)
+        {
+            uint16_t vid = (uint16_t) strtol(argv[5], &eptr, 10);
+            Protocols::UserDirectedCommissioning::TargetAppInfo info;
+            info.vendorId = vid;
+            id.AddTargetAppInfo(info);
+        }
+        if (argc > 6)
+        {
+            uint16_t hint = (uint16_t) strtol(argv[6], &eptr, 10);
+            id.SetPairingHint(hint);
+        }
+        if (argc > 7)
+        {
+            id.SetPairingInst(argv[7]);
+        }
+        return Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(commissioner, port),
+                                                                          id);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     // TODO: Figure out whether setdiscoverytimeout is a reasonable thing to do

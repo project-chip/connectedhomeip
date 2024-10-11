@@ -33,20 +33,20 @@ class BitMask : public BitFlags<FlagsEnum, StorageType>
 public:
     using IntegerType = typename BitFlags<FlagsEnum, StorageType>::IntegerType;
 
-    BitMask() : BitFlags<FlagsEnum, StorageType>() {}
-    BitMask(const BitFlags<FlagsEnum, StorageType> & other) : BitFlags<FlagsEnum, StorageType>(other) {}
-    BitMask(BitFlags<FlagsEnum, StorageType> && other) : BitFlags<FlagsEnum, StorageType>(std::move(other)) {}
+    constexpr BitMask() : BitFlags<FlagsEnum, StorageType>() {}
+    constexpr BitMask(const BitFlags<FlagsEnum, StorageType> & other) : BitFlags<FlagsEnum, StorageType>(other) {}
+    constexpr BitMask(BitFlags<FlagsEnum, StorageType> && other) : BitFlags<FlagsEnum, StorageType>(std::move(other)) {}
     BitMask(const BitMask &) = default;
 
     explicit BitMask(FlagsEnum value) : BitFlags<FlagsEnum, StorageType>(value) {}
     explicit BitMask(IntegerType value) : BitFlags<FlagsEnum, StorageType>(value) {}
 
     template <typename... Args>
-    BitMask(FlagsEnum flag, Args &&... args) : BitFlags<FlagsEnum, StorageType>(flag, std::forward<Args>(args)...)
+    constexpr BitMask(FlagsEnum flag, Args &&... args) : BitFlags<FlagsEnum, StorageType>(flag, std::forward<Args>(args)...)
     {}
 
     template <typename... Args>
-    BitMask(IntegerType value, Args &&... args) : BitFlags<FlagsEnum, StorageType>(value, std::forward<Args>(args)...)
+    constexpr BitMask(IntegerType value, Args &&... args) : BitFlags<FlagsEnum, StorageType>(value, std::forward<Args>(args)...)
     {}
 
     BitMask & operator=(const BitMask &) = default;
@@ -87,7 +87,7 @@ public:
         IntegerType updated = static_cast<IntegerType>(BitFlags<FlagsEnum, StorageType>::Raw() & ~bitMask);
 
         // Set the right bits
-        updated |= static_cast<IntegerType>(bitMask & (value << shift));
+        updated = static_cast<IntegerType>(updated | (bitMask & (value << shift)));
 
         BitFlags<FlagsEnum, StorageType>::SetRaw(updated);
 

@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class RvcOperationalStateClusterOperationCompletionEvent(
   val completionErrorCode: UInt,
   val totalOperationalTime: Optional<ULong>?,
-  val pausedTime: Optional<ULong>?
+  val pausedTime: Optional<ULong>?,
 ) {
   override fun toString(): String = buildString {
     append("RvcOperationalStateClusterOperationCompletionEvent {\n")
@@ -67,7 +67,7 @@ class RvcOperationalStateClusterOperationCompletionEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): RvcOperationalStateClusterOperationCompletionEvent {
       tlvReader.enterStructure(tlvTag)
       val completionErrorCode = tlvReader.getUInt(ContextSpecificTag(TAG_COMPLETION_ERROR_CODE))
@@ -99,7 +99,7 @@ class RvcOperationalStateClusterOperationCompletionEvent(
       return RvcOperationalStateClusterOperationCompletionEvent(
         completionErrorCode,
         totalOperationalTime,
-        pausedTime
+        pausedTime,
       )
     }
   }

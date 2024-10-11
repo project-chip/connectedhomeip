@@ -23,13 +23,13 @@
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ESP32SecureCertDACProvider.h>
 
-#if CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+#ifdef CONFIG_USE_ESP32_ECDSA_PERIPHERAL
 #include <platform/ESP32/ESP32CHIPCryptoPAL.h>
 #endif // CONFIG_USE_ESP32_ECDSA_PERIPHERAL
 
 #define TAG "dac_provider"
 
-#if CONFIG_SEC_CERT_DAC_PROVIDER
+#ifdef CONFIG_SEC_CERT_DAC_PROVIDER
 
 namespace chip {
 namespace DeviceLayer {
@@ -55,11 +55,15 @@ CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P
 
 CHIP_ERROR ESP32SecureCertDACProvider ::GetCertificationDeclaration(MutableByteSpan & outBuffer)
 {
+#ifdef CONFIG_ENABLE_SET_CERT_DECLARATION_API
+    return CopySpanToMutableSpan(mCD, outBuffer);
+#else
     size_t certSize;
     ReturnErrorOnFailure(
         ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_CertDeclaration, outBuffer.data(), outBuffer.size(), certSize));
     outBuffer.reduce_size(certSize);
     return CHIP_NO_ERROR;
+#endif // CONFIG_ENABLE_SET_CERT_DECLARATION_API
 }
 
 CHIP_ERROR ESP32SecureCertDACProvider ::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
@@ -79,8 +83,8 @@ CHIP_ERROR ESP32SecureCertDACProvider ::GetDeviceAttestationCert(MutableByteSpan
     {
         ESP_FAULT_ASSERT(err == ESP_OK && dac_cert != NULL && dac_len != 0);
         VerifyOrReturnError(dac_len <= kMaxDERCertLength, CHIP_ERROR_UNSUPPORTED_CERT_FORMAT,
-                            esp_secure_cert_free_ca_cert(dac_cert));
-        VerifyOrReturnError(dac_len <= outBuffer.size(), CHIP_ERROR_BUFFER_TOO_SMALL, esp_secure_cert_free_ca_cert(dac_cert));
+                            esp_secure_cert_free_device_cert(dac_cert));
+        VerifyOrReturnError(dac_len <= outBuffer.size(), CHIP_ERROR_BUFFER_TOO_SMALL, esp_secure_cert_free_device_cert(dac_cert));
         memcpy(outBuffer.data(), dac_cert, outBuffer.size());
         outBuffer.reduce_size(dac_len);
         esp_secure_cert_free_device_cert(dac_cert);
@@ -135,7 +139,7 @@ CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteS
     // This flow is for devices supporting ECDSA peripheral
     if (keyType == ESP_SECURE_CERT_ECDSA_PERIPHERAL_KEY)
     {
-#if CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+#ifdef CONFIG_USE_ESP32_ECDSA_PERIPHERAL
         Crypto::ESP32P256Keypair keypair;
         uint8_t efuseBlockId;
 
@@ -159,7 +163,7 @@ CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteS
     }
     else // This flow is for devices which do not support ECDSA peripheral
     {
-#if !CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+#ifndef CONFIG_USE_ESP32_ECDSA_PERIPHERAL
         Crypto::P256Keypair keypair;
         char * sc_keypair       = NULL;
         uint32_t sc_keypair_len = 0;

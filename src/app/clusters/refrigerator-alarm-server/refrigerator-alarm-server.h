@@ -23,28 +23,31 @@
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 class RefrigeratorAlarmServer
 {
 public:
     static RefrigeratorAlarmServer & Instance();
 
-    EmberAfStatus GetMaskValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * mask);
-    EmberAfStatus GetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * state);
-    EmberAfStatus GetSupportedValue(chip::EndpointId endpoint,
-                                    chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * suppported);
+    chip::Protocols::InteractionModel::Status GetMaskValue(chip::EndpointId endpoint,
+                                                           chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * mask);
+    chip::Protocols::InteractionModel::Status
+    GetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * state);
+    chip::Protocols::InteractionModel::Status
+    GetSupportedValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * suppported);
 
     // A change in mask value will result in a corresponding change in state.
-    EmberAfStatus SetMaskValue(chip::EndpointId endpoint,
-                               const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> mask);
+    chip::Protocols::InteractionModel::Status
+    SetMaskValue(chip::EndpointId endpoint, const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> mask);
 
     // When State changes we are generating Notify event.
-    EmberAfStatus SetStateValue(chip::EndpointId endpoint,
-                                chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> newState);
+    chip::Protocols::InteractionModel::Status
+    SetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> newState);
 
     // A change in supported value will result in a corresponding change in mask and state.
-    EmberAfStatus SetSupportedValue(chip::EndpointId endpoint,
-                                    const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> supported);
+    chip::Protocols::InteractionModel::Status
+    SetSupportedValue(chip::EndpointId endpoint, const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> supported);
 
 private:
     static RefrigeratorAlarmServer instance;

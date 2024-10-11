@@ -1,0 +1,186 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("//build_overrides/editline.gni")
+import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/examples/fabric-admin/fabric-admin.gni")
+import("${chip_root}/src/lib/core/core.gni")
+
+assert(chip_build_tools)
+
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+}
+
+config("config") {
+  include_dirs = [
+    ".",
+    "${chip_root}/examples/common",
+    "${chip_root}/examples/platform/linux",
+    "${chip_root}/zzz_generated/app-common/app-common",
+    "${chip_root}/zzz_generated/chip-tool",
+    "${chip_root}/src/lib",
+  ]
+
+  defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}" ]
+
+  # Note: CONFIG_USE_LOCAL_STORAGE is tested for via #ifdef, not #if.
+  if (config_use_local_storage) {
+    defines += [ "CONFIG_USE_LOCAL_STORAGE" ]
+  }
+
+  if (chip_enable_pw_rpc) {
+    defines += [ "PW_RPC_ENABLED" ]
+  }
+}
+
+static_library("fabric-admin-utils") {
+  sources = [
+    "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
+    "${chip_root}/src/controller/ExamplePersistentStorage.h",
+    "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
+    "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/logging/DataModelLogger.cpp",
+    "commands/clusters/ModelCommand.cpp",
+    "commands/clusters/ModelCommand.h",
+    "commands/clusters/ReportCommand.cpp",
+    "commands/clusters/ReportCommand.h",
+    "commands/common/CHIPCommand.cpp",
+    "commands/common/CHIPCommand.h",
+    "commands/common/Command.cpp",
+    "commands/common/Command.h",
+    "commands/common/Commands.cpp",
+    "commands/common/Commands.h",
+    "commands/common/CredentialIssuerCommands.h",
+    "commands/common/HexConversion.h",
+    "commands/common/IcdManager.cpp",
+    "commands/common/IcdManager.h",
+    "commands/common/RemoteDataModelLogger.cpp",
+    "commands/common/RemoteDataModelLogger.h",
+    "commands/common/StayActiveSender.cpp",
+    "commands/common/StayActiveSender.h",
+    "commands/fabric-sync/FabricSyncCommand.cpp",
+    "commands/pairing/OpenCommissioningWindowCommand.cpp",
+    "commands/pairing/OpenCommissioningWindowCommand.h",
+    "commands/pairing/PairingCommand.cpp",
+    "commands/pairing/ToTLVCert.cpp",
+    "device_manager/DeviceManager.cpp",
+    "device_manager/DeviceManager.h",
+    "device_manager/DeviceSubscription.cpp",
+    "device_manager/DeviceSubscription.h",
+    "device_manager/DeviceSubscriptionManager.cpp",
+    "device_manager/DeviceSubscriptionManager.h",
+    "device_manager/DeviceSynchronization.cpp",
+    "device_manager/DeviceSynchronization.h",
+    "device_manager/PairingManager.cpp",
+    "device_manager/PairingManager.h",
+    "device_manager/UniqueIdGetter.cpp",
+    "device_manager/UniqueIdGetter.h",
+  ]
+
+  deps = [ "${chip_root}/src/app:events" ]
+
+  sources += [ "commands/interactive/InteractiveCommands.cpp" ]
+  deps += [
+    "${chip_root}/src/platform/logging:headers",
+    "${editline_root}:editline",
+  ]
+
+  if (chip_device_platform == "darwin") {
+    sources += [ "commands/common/DeviceScanner.cpp" ]
+  }
+
+  public_deps = [
+    "${chip_root}/examples/common/tracing:commandline",
+    "${chip_root}/src/app/icd/client:handler",
+    "${chip_root}/src/app/icd/client:manager",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/tests/suites/commands/interaction_model",
+    "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/credentials:file_attestation_trust_store",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support/jsontlv",
+    "${chip_root}/src/platform",
+    "${chip_root}/third_party/inipp",
+    "${chip_root}/third_party/jsoncpp",
+  ]
+
+  public_configs = [ ":config" ]
+
+  if (chip_enable_pw_rpc) {
+    defines = [
+      "PW_RPC_FABRIC_ADMIN_SERVICE=1",
+      "PW_RPC_FABRIC_BRIDGE_SERVICE=1",
+    ]
+
+    sources += [
+      "${chip_root}/examples/platform/linux/RpcClientProcessor.cpp",
+      "${chip_root}/examples/platform/linux/RpcClientProcessor.h",
+      "${chip_root}/examples/platform/linux/system_rpc_server.cc",
+      "rpc/RpcClient.cpp",
+      "rpc/RpcClient.h",
+      "rpc/RpcServer.cpp",
+      "rpc/RpcServer.h",
+    ]
+
+    deps += [
+      "$dir_pw_hdlc:default_addresses",
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_log",
+      "$dir_pw_rpc:server",
+      "$dir_pw_rpc/system_server:facade",
+      "$dir_pw_rpc/system_server:socket",
+      "$dir_pw_stream:socket_stream",
+      "$dir_pw_sync:mutex",
+      "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:fabric_admin_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:fabric_bridge_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:rpc_services",
+    ]
+
+    deps += pw_build_LINK_DEPS
+  } else {
+    # The system_rpc_server.cc file is in pigweed and doesn't compile with
+    # -Wconversion, remove check for RPC build only.
+    cflags = [ "-Wconversion" ]
+  }
+
+  if (chip_enable_transport_trace) {
+    public_deps +=
+        [ "${chip_root}/examples/common/tracing:trace_handlers_decoder" ]
+  }
+
+  output_dir = root_out_dir
+}
+
+executable("fabric-admin") {
+  sources = [ "main.cpp" ]
+
+  deps = [
+    ":fabric-admin-utils",
+    "${chip_root}/src/platform/logging:stdio",
+  ]
+
+  output_dir = root_out_dir
+}
+
+group("default") {
+  deps = [ ":fabric-admin" ]
+}

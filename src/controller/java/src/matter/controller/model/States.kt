@@ -22,7 +22,150 @@ package matter.controller.model
  *
  * @param endpoints A mapping of endpoint IDs with the associated cluster data.
  */
-data class NodeState(val endpoints: Map<Int, EndpointState>)
+class NodeState(val endpoints: MutableMap<Int, EndpointState> = mutableMapOf()) {
+  private fun addAttribute(
+    endpointId: UShort,
+    clusterId: UInt,
+    attributeId: UInt,
+    attributeState: AttributeState
+  ) {
+    getEndpointState(endpointId).addAttribute(clusterId, attributeId, attributeState)
+  }
+
+  private fun addEvent(endpointId: UShort, clusterId: UInt, eventId: UInt, eventState: EventState) {
+    getEndpointState(endpointId).addEvent(clusterId, eventId, eventState)
+  }
+
+  private fun setDataVersion(endpointId: UShort, clusterId: UInt, dataVersion: UInt) {
+    getEndpointState(endpointId).clusters[clusterId.toLong()]?.dataVersion = dataVersion
+  }
+
+  private fun addAttributeStatus(
+    endpointId: UShort,
+    clusterId: UInt,
+    attributeId: UInt,
+    statusToAdd: Status
+  ) {
+    val endpointState = getEndpointState(endpointId)
+    val clusterState = endpointState.getClusterState(clusterId)
+    if (clusterState.attributes[attributeId.toLong()] != null) {
+      clusterState.attributes.remove(attributeId.toLong())
+    }
+    clusterState.attributeStatuses[attributeId.toLong()] = statusToAdd
+  }
+
+  private fun addEventStatus(
+    endpointId: UShort,
+    clusterId: UInt,
+    eventId: UInt,
+    statusToAdd: Status
+  ) {
+    val endpointState = getEndpointState(endpointId)
+    val clusterState = endpointState.getClusterState(clusterId)
+    if (clusterState.events[eventId.toLong()] != null) {
+      clusterState.events.remove(eventId.toLong())
+    }
+    val eventStatuses = clusterState.eventStatuses.getOrDefault(eventId.toLong(), mutableListOf())
+    eventStatuses.add(statusToAdd)
+
+    clusterState.eventStatuses[eventId.toLong()] = eventStatuses
+  }
+
+  private fun getEndpointState(endpointId: UShort): EndpointState {
+    var endpointState: EndpointState? = endpoints[endpointId.toInt()]
+    if (endpointState == null) {
+      endpointState = EndpointState(endpointId.toInt())
+      endpoints[endpointId.toInt()] = endpointState
+    }
+    return endpointState
+  }
+
+  private fun addAttribute(
+    endpointId: Int,
+    clusterId: Long,
+    attributeId: Long,
+    valueObject: Any,
+    tlv: ByteArray,
+    jsonString: String
+  ) {
+    addAttribute(
+      endpointId.toUShort(),
+      clusterId.toUInt(),
+      attributeId.toUInt(),
+      AttributeState(
+        attributeId,
+        tlv,
+        jsonString,
+        AttributePath(endpointId.toUShort(), clusterId.toUInt(), attributeId.toUInt()),
+        valueObject
+      )
+    )
+  }
+
+  private fun addEvent(
+    endpointId: Int,
+    clusterId: Long,
+    eventId: Long,
+    eventNumber: Long,
+    priorityLevel: Int,
+    timestampType: Int,
+    timestampValue: Long,
+    valueObject: Any,
+    tlv: ByteArray,
+    jsonString: String
+  ) {
+    addEvent(
+      endpointId.toUShort(),
+      clusterId.toUInt(),
+      eventId.toUInt(),
+      EventState(
+        eventId,
+        eventNumber,
+        priorityLevel,
+        timestampType,
+        timestampValue,
+        tlv,
+        EventPath(endpointId.toUShort(), clusterId.toUInt(), eventId.toUInt()),
+        jsonString,
+        valueObject
+      )
+    )
+  }
+
+  private fun setDataVersion(endpointId: Int, clusterId: Long, dataVersion: Long) {
+    setDataVersion(endpointId.toUShort(), clusterId.toUInt(), dataVersion.toUInt())
+  }
+
+  private fun addAttributeStatus(
+    endpointId: Int,
+    clusterId: Long,
+    attributeId: Long,
+    status: Int,
+    clusterStatus: Int?
+  ) {
+    addAttributeStatus(
+      endpointId.toUShort(),
+      clusterId.toUInt(),
+      attributeId.toUInt(),
+      Status(status, clusterStatus)
+    )
+  }
+
+  private fun addEventStatus(
+    endpointId: Int,
+    clusterId: Long,
+    eventId: Long,
+    status: Int,
+    clusterStatus: Int?
+  ) {
+    addEventStatus(
+      endpointId.toUShort(),
+      clusterId.toUInt(),
+      eventId.toUInt(),
+      Status(status, clusterStatus)
+    )
+  }
+}
 
 /**
  * Represents information about an endpoint and its cluster data.
@@ -30,7 +173,24 @@ data class NodeState(val endpoints: Map<Int, EndpointState>)
  * @param id The endpoint ID.
  * @param clusters A mapping of cluster IDs to the cluster data.
  */
-data class EndpointState(val id: Int, val clusters: Map<Long, ClusterState>)
+class EndpointState(val id: Int, val clusters: MutableMap<Long, ClusterState> = mutableMapOf()) {
+  fun addAttribute(clusterId: UInt, attributeId: UInt, attributeState: AttributeState) {
+    getClusterState(clusterId).addAttribute(attributeId, attributeState)
+  }
+
+  fun addEvent(clusterId: UInt, eventId: UInt, eventState: EventState) {
+    getClusterState(clusterId).addEvent(eventId, eventState)
+  }
+
+  internal fun getClusterState(clusterId: UInt): ClusterState {
+    var clusterState: ClusterState? = clusters[clusterId.toLong()]
+    if (clusterState == null) {
+      clusterState = ClusterState(clusterId.toLong())
+      clusters[clusterId.toLong()] = clusterState
+    }
+    return clusterState
+  }
+}
 
 /**
  * Represents information about a cluster.
@@ -40,11 +200,28 @@ data class EndpointState(val id: Int, val clusters: Map<Long, ClusterState>)
  * @param events A mapping of event IDs to lists of events that occurred on the node under this
  *   cluster.
  */
-data class ClusterState(
+class ClusterState(
   val id: Long,
-  val attributes: Map<Long, AttributeState>,
-  val events: Map<Long, List<EventState>>
-)
+  val attributes: MutableMap<Long, AttributeState> = mutableMapOf(),
+  val events: MutableMap<Long, MutableList<EventState>> = mutableMapOf(),
+  var dataVersion: UInt? = null,
+  val attributeStatuses: MutableMap<Long, Status> = mutableMapOf(),
+  val eventStatuses: MutableMap<Long, MutableList<Status>> = mutableMapOf()
+) {
+  fun addAttribute(attributeId: UInt, attributeState: AttributeState) {
+    attributes[attributeId.toLong()] = attributeState
+  }
+
+  fun addEvent(eventId: UInt, eventState: EventState) {
+    var eventStateList = events[eventId.toLong()]
+    if (eventStateList == null) {
+      eventStateList = mutableListOf()
+      events[eventId.toLong()] = eventStateList
+    }
+
+    eventStateList.add(eventState)
+  }
+}
 
 /**
  * Represents information about an attribute.
@@ -53,7 +230,13 @@ data class ClusterState(
  * @param tlvValue The raw TLV-encoded attribute value.
  * @param jsonValue A JSON string representing the raw attribute value.
  */
-data class AttributeState(val id: Long, val tlvValue: ByteArray, val jsonValue: String)
+data class AttributeState(
+  val id: Long,
+  val tlvValue: ByteArray,
+  val jsonValue: String,
+  val path: AttributePath,
+  val valueObject: Any? = null
+)
 
 /**
  * Represents information about an event.
@@ -71,5 +254,22 @@ data class EventState(
   val priorityLevel: Int,
   val timestampType: Int,
   val timestampValue: Long,
-  val tlvValue: ByteArray
-)
+  val tlvValue: ByteArray,
+  val path: EventPath,
+  val jsonValue: String? = null,
+  val valueObject: Any? = null,
+) {
+  enum class TypeStampTypeEnum(val type: Int) {
+    MILLIS_SINCE_BOOT(0),
+    MILLIS_SINCE_EPOCH(1)
+  }
+
+  fun getTimestampType(): TypeStampTypeEnum? {
+    for (type in TypeStampTypeEnum.values()) {
+      if (type.type == timestampType) {
+        return type
+      }
+    }
+    return null
+  }
+}

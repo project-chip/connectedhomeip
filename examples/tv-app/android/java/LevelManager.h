@@ -19,6 +19,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <cstdint>
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 /**
  * @brief Handles interfacing between java code and C++ code for the purposes of LevelControl clusters.
@@ -41,6 +42,6 @@ public:
 private:
     // init with java objects
     CHIP_ERROR InitializeWithObjects(jobject managerObject);
-    jobject mLevelManagerObject         = nullptr;
+    chip::JniGlobalReference mLevelManagerObject;
     jmethodID mHandleLevelChangedMethod = nullptr;
 };

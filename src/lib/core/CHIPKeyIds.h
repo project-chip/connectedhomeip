@@ -22,10 +22,8 @@
  *      key flags, key ID fields, and helper API functions.
  *
  */
-
 #pragma once
 
-#include <limits.h>
 #include <stdint.h>
 
 namespace chip {

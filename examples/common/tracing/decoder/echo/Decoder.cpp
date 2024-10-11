@@ -21,11 +21,11 @@
 #include <protocols/echo/Echo.h>
 
 namespace {
-constexpr const char * kProtocolName = "Echo";
+constexpr char kProtocolName[] = "Echo";
 
-constexpr const char * kUnknown      = "Unknown";
-constexpr const char * kEchoRequest  = "Echo Request";
-constexpr const char * kEchoResponse = "Echo Response";
+constexpr char kUnknown[]      = "Unknown";
+constexpr char kEchoRequest[]  = "Echo Request";
+constexpr char kEchoResponse[] = "Echo Response";
 } // namespace
 
 using MessageType = chip::Protocols::Echo::MsgType;

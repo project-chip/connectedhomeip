@@ -21,7 +21,9 @@
 #include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
 
 #include <inet/IPPacketInfo.h>
-#include <lib/core/Optional.h>
+
+#include <cstdint>
+#include <optional>
 
 namespace mdns {
 namespace Minimal {
@@ -34,28 +36,26 @@ public:
     ResponseConfiguration() {}
     ~ResponseConfiguration() = default;
 
-    chip::Optional<uint32_t> GetTtlSecondsOverride() const { return mTtlSecondsOverride; }
-    ResponseConfiguration & SetTtlSecondsOverride(chip::Optional<uint32_t> override)
+    std::optional<uint32_t> GetTtlSecondsOverride() const { return mTtlSecondsOverride; }
+    ResponseConfiguration & SetTtlSecondsOverride(std::optional<uint32_t> override)
     {
         mTtlSecondsOverride = override;
         return *this;
     }
 
-    ResponseConfiguration & SetTtlSecondsOverride(uint32_t value) { return SetTtlSecondsOverride(chip::MakeOptional(value)); }
-    ResponseConfiguration & ClearTtlSecondsOverride() { return SetTtlSecondsOverride(chip::NullOptional); }
+    ResponseConfiguration & SetTtlSecondsOverride(uint32_t value) { return SetTtlSecondsOverride(std::make_optional(value)); }
+    ResponseConfiguration & ClearTtlSecondsOverride() { return SetTtlSecondsOverride(std::nullopt); }
 
     /// Applies any adjustments to resource records before they are being serialized
     /// to some form of reply.
     void Adjust(ResourceRecord & record) const
     {
-        if (mTtlSecondsOverride.HasValue())
-        {
-            record.SetTtl(mTtlSecondsOverride.Value());
-        }
+        VerifyOrReturn(mTtlSecondsOverride.has_value());
+        record.SetTtl(*mTtlSecondsOverride);
     }
 
 private:
-    chip::Optional<uint32_t> mTtlSecondsOverride;
+    std::optional<uint32_t> mTtlSecondsOverride;
 };
 
 // Delegates that responders can write themselves to

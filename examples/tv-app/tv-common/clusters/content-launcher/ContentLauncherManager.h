@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
@@ -15,10 +14,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <app/clusters/content-launch-server/content-launch-server.h>
+
+#include <list>
+#include <string>
 #include <vector>
 
 using chip::CharSpan;
@@ -29,6 +30,7 @@ using ContentLauncherDelegate = chip::app::Clusters::ContentLauncher::Delegate;
 using LaunchResponseType      = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Type;
 using ParameterType           = chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType;
 using BrandingInformationType = chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type;
+using PlaybackPreferencesType = chip::app::Clusters::ContentLauncher::Structs::PlaybackPreferencesStruct::DecodableType;
 
 class ContentEntry
 {
@@ -45,13 +47,15 @@ public:
 
     void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
                              const chip::app::DataModel::DecodableList<ParameterType> & parameterList, bool autoplay,
-                             const CharSpan & data) override;
+                             const CharSpan & data, const chip::Optional<PlaybackPreferencesType> playbackPreferences,
+                             bool useCurrentContext) override;
     void HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
                          const CharSpan & displayString, const BrandingInformationType & brandingInformation) override;
     CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+    uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 protected:
     std::list<std::string> mAcceptHeaderList;
@@ -60,5 +64,6 @@ protected:
 
 private:
     // TODO: set this based upon meta data from app
-    uint32_t mDynamicEndpointFeatureMap = 3;
+    static constexpr uint32_t kEndpointFeatureMap = 3;
+    static constexpr uint16_t kClusterRevision    = 2;
 };

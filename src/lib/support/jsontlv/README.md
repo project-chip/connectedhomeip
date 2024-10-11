@@ -9,15 +9,17 @@ Helper functions for converting TLV-encoded data to Json format and vice versa.
 The library supports
 
 -   full bi-directional conversion for matter data model payloads
--   Additional support for generic 32-bit unsigned integer ids using "implicit
-    profile tags":
 
-    -   8-bit IDs are encoded as `ContextTags`, which matches matter
-        specification for encoding field identifiers
-    -   For IDs that are larger, they will be encoded as
-        `Implicit Profile Tags`. The reason for allowing such IDs is to support
-        json formats where keys contain ids typically found in paths, like
-        `{"1234:INT": 10}` meaning `"Attribute 1234 has value 10"`.
+-   When the MEI prefix encodes a standard/scoped source, the tag is encoded
+    using ContextSpecific tag if tag_id is less than or equal to UINT8_MAX, and
+    ImplicitProfile tag if tag_id is larger than UINT8_MAX. The reason for
+    allowing such IDs is to support json formats where keys contain ids
+    typically found in paths, like `{"1234:INT": 10}` meaning
+    `"Attribute 1234 has value 10"`.
+
+-   When the MEI prefix encodes a manufacturer code, the tag is encoded using
+    FullyQualified_6Bytes tag, the Vendor ID SHALL be set to the manufacturer
+    code, the profile number set to 0 and the tag number set to the MEI suffix.
 
 ### Format details
 
@@ -75,12 +77,13 @@ limitations of this format are:
 -   TLV List types are not supported.
 -   TLV Array cannot contain another TLV Array.
 -   The top-level container MUST be an anonymous STRUCT.
--   Elements of the TLV Structure MUST have Context or Implicit Profile Tags.
+-   Elements of the TLV Structure MUST have Context or Implicit Profile Tags for
+    standard/scoped source and Fully Qualified Profile Tags for an MC source.
 -   Implicit Profile Tag number MUST be larger or equal to 256 and smaller than
     2^32 + 1.
 -   TLV Structure element MUST be sorted by tag numbers from low to high, where
     sorted elements with Context Tags MUST appear first followed by sorted
-    elements with Implicit Profile Tags.
+    elements with Implicit Profile Tags and then Profile Specific Tags.
 
 ## Format Example
 
@@ -120,6 +123,7 @@ elements, arrays, and structures.
     "8:DOUBLE" : 17.9,               // 17.9 as double
     "9:FLOAT" : 17.9,                // 17.9 as float
     "10:FLOAT" : "-Infinity",        // Negative infinity float
+    "4293984426:UINT" : 3,           // Vendor ID = 0xFFF1, Profile ID = 0, Tag ID = 0x00AA
     "contact:11:STRUCT" : {          // structure example with field_name in the Json name
         "name:1:STRING" : "John",
         "age:2:UINT" : 34,

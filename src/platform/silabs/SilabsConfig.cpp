@@ -33,7 +33,6 @@
 #include <nvm3_hal_flash.h>
 #include <nvm3_lock.h>
 
-#ifndef BRD4325A // TODO: fix semaphore usage in nvm3_lock for siwx917. use weak implementation for that board instead
 #include <FreeRTOS.h>
 #include <semphr.h>
 // Substitute the GSDK weak nvm3_lockBegin and nvm3_lockEnd
@@ -58,7 +57,6 @@ void nvm3_lockEnd(void)
     VerifyOrDie(nvm3_Sem != NULL);
     xSemaphoreGive(nvm3_Sem);
 }
-#endif // not BRD4325A
 
 namespace chip {
 namespace DeviceLayer {
@@ -78,9 +76,7 @@ CHIP_ERROR SilabsConfig::Init()
 
 void SilabsConfig::DeInit()
 {
-#ifndef BRD4325A // TODO: fix semaphore usage in nvm3_lock for siwx917. use weak implementation for that board instead
     vSemaphoreDelete(nvm3_Sem);
-#endif // not BRD4325A
     nvm3_close(nvm3_defaultHandle);
 }
 
@@ -552,11 +548,13 @@ bool SilabsConfig::ValidConfigKey(Key key)
     return false;
 }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 void SilabsConfig::RunConfigUnitTest()
 {
     // Run common unit test.
     ::chip::DeviceLayer::Internal::RunConfigUnitTest<SilabsConfig>();
 }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 void SilabsConfig::RepackNvm3Flash(void)
 {

@@ -21,7 +21,9 @@
 #include <app/util/config.h>
 #include <json/json.h>
 
-using namespace std;
+#include <list>
+#include <string>
+
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
@@ -29,7 +31,8 @@ using namespace chip::app::Clusters::ContentLauncher;
 using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 
 AppContentLauncherManager::AppContentLauncherManager(ContentAppAttributeDelegate * attributeDelegate,
-                                                     list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols) :
+                                                     std::list<std::string> acceptHeaderList,
+                                                     uint32_t supportedStreamingProtocols) :
     mAttributeDelegate(attributeDelegate)
 {
     mAcceptHeaderList            = acceptHeaderList;
@@ -38,10 +41,12 @@ AppContentLauncherManager::AppContentLauncherManager(ContentAppAttributeDelegate
 
 void AppContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
                                                     const DecodableList<ParameterType> & parameterList, bool autoplay,
-                                                    const CharSpan & data)
+                                                    const CharSpan & data,
+                                                    const chip::Optional<PlaybackPreferencesType> playbackPreferences,
+                                                    bool useCurrentContext)
 {
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleLaunchContent for endpoint %d", mEndpointId);
-    string dataString(data.data(), data.size());
+    std::string dataString(data.data(), data.size());
 
     ChipLogProgress(Zcl, " AutoPlay=%s", (autoplay ? "true" : "false"));
 
@@ -71,8 +76,8 @@ void AppContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResp
 {
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleLaunchUrl");
 
-    string contentUrlString(contentUrl.data(), contentUrl.size());
-    string displayStringString(displayString.data(), displayString.size());
+    std::string contentUrlString(contentUrl.data(), contentUrl.size());
+    std::string displayStringString(displayString.data(), displayString.size());
 
     // TODO: Insert code here
     LaunchResponseType response;
@@ -95,7 +100,7 @@ CHIP_ERROR AppContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEn
         Json::Value value;
         if (reader.parse(resStr, value))
         {
-            std::string attrId = to_string(chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::Id);
+            std::string attrId = std::to_string(chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::Id);
             ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetAcceptHeaderList response parsing done. reading attr %s",
                             attrId.c_str());
             if (value[attrId].isArray())
@@ -141,7 +146,7 @@ uint32_t AppContentLauncherManager::HandleGetSupportedStreamingProtocols()
     {
         return mSupportedStreamingProtocols;
     }
-    std::string attrId = to_string(chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id);
+    std::string attrId = std::to_string(chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id);
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response parsing done. reading attr %s",
                     attrId.c_str());
     if (!value[attrId].empty() && value[attrId].isInt())
@@ -154,12 +159,29 @@ uint32_t AppContentLauncherManager::HandleGetSupportedStreamingProtocols()
 
 uint32_t AppContentLauncherManager::GetFeatureMap(chip::EndpointId endpoint)
 {
-    if (endpoint >= EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return mDynamicEndpointFeatureMap;
+        return kEndpointFeatureMap;
     }
 
     uint32_t featureMap = 0;
     Attributes::FeatureMap::Get(endpoint, &featureMap);
     return featureMap;
+}
+
+uint16_t AppContentLauncherManager::GetClusterRevision(chip::EndpointId endpoint)
+{
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return kClusterRevision;
+    }
+
+    uint16_t clusterRevision = 0;
+    bool success =
+        (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == chip::Protocols::InteractionModel::Status::Success);
+    if (!success)
+    {
+        ChipLogError(Zcl, "AppContentLauncherManager::GetClusterRevision error reading cluster revision");
+    }
+    return clusterRevision;
 }

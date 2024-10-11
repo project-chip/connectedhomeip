@@ -28,7 +28,7 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
+#include <app/util/endpoint-config-api.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/ErrorStr.h>
@@ -37,6 +37,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <static-supported-modes-manager.h>
 #include <support/CHIPMem.h>
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
@@ -64,6 +65,7 @@ namespace { // Network Commissioning
 constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
+Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointMain /* Endpoint Id */,
                                       &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
@@ -170,6 +172,7 @@ static void InitServer(intptr_t context)
         // QR code will be used with CHIP Tool
         PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     }
+    Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 }
 
 extern "C" void ChipTest(void)

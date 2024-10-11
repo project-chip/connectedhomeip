@@ -72,16 +72,32 @@ private:
     enum CastingStoreTLVTag
     {
         kCastingStoreDataVersionTag = 1,
+
         kCastingPlayersContainerTag,
-        kCastingPlayerContainerTag,
         kCastingPlayerIdTag,
         kCastingPlayerNodeIdTag,
         kCastingPlayerFabricIndexTag,
         kCastingPlayerVendorIdTag,
         kCastingPlayerProductIdTag,
         kCastingPlayerDeviceTypeIdTag,
+        kCastingPlayerPortTag,
+        kCastingPlayerInstanceNameTag,
         kCastingPlayerDeviceNameTag,
         kCastingPlayerHostNameTag,
+
+        kCastingPlayerEndpointsContainerTag,
+        kCastingPlayerEndpointIdTag,
+        kCastingPlayerEndpointVendorIdTag,
+        kCastingPlayerEndpointProductIdTag,
+
+        kCastingPlayerEndpointDeviceTypeListContainerTag,
+        kCastingPlayerEndpointDeviceTypeTag,
+        kCastingPlayerEndpointDeviceTypeRevisionTag,
+
+        kCastingPlayerEndpointServerListContainerTag,
+        kCastingPlayerEndpointServerClusterIdTag,
+
+        kCastingPlayerSupportsCommissionerGeneratedPasscodeTag,
 
         kContextTagMaxNum = UINT8_MAX
     };

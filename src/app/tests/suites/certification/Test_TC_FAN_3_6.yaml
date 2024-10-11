@@ -25,7 +25,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -50,8 +50,8 @@ tests:
                 value: 1000
 
     - label:
-          "Step 3: TH reads from the DUT the AirflowDirection attribute and
-          check it is forwards"
+          "Step 3: after a few seconds, TH reads from the DUT the
+          AirflowDirection attribute"
       PICS: FAN.S.A000B
       command: "readAttribute"
       attribute: "AirflowDirection"
@@ -75,8 +75,8 @@ tests:
                 value: 1000
 
     - label:
-          "Step 5: TH reads from the DUT the AirflowDirection attribute and
-          check it is reverse"
+          "Step 5: after a few seconds, TH reads from the DUT the
+          AirflowDirection attribute"
       PICS: FAN.S.A000B
       command: "readAttribute"
       attribute: "AirflowDirection"

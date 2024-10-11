@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +18,12 @@
 
 #include "CastingApp.h"
 
+#include "CommissionerDeclarationHandler.h"
+#include "ConnectionCallbacks.h"
+#include "support/CastingStore.h"
 #include "support/ChipDeviceEventHandler.h"
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -46,6 +50,7 @@ CastingApp * CastingApp::GetInstance()
 
 CHIP_ERROR CastingApp::Initialize(const AppParameters & appParameters)
 {
+    ChipLogProgress(Discovery, "CastingApp::Initialize() called");
     VerifyOrReturnError(mState == CASTING_APP_UNINITIALIZED, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(appParameters.GetCommissionableDataProvider() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(appParameters.GetDeviceAttestationCredentialsProvider() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -81,23 +86,59 @@ CHIP_ERROR CastingApp::Initialize(const AppParameters & appParameters)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CastingApp::UpdateCommissionableDataProvider(chip::DeviceLayer::CommissionableDataProvider * commissionableDataProvider)
+{
+    ChipLogProgress(Discovery, "CastingApp::UpdateCommissionableDataProvider()");
+    chip::DeviceLayer::SetCommissionableDataProvider(commissionableDataProvider);
+    return mAppParameters->SetCommissionableDataProvider(commissionableDataProvider);
+}
+
+void ReconnectHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer)
+{
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "CastingApp::ConnectionHandler() Could not reconnect to CastingPlayer %" CHIP_ERROR_FORMAT,
+                     err.Format());
+    }
+    else
+    {
+        ChipLogProgress(AppServer, "CastingApp::ConnectionHandler() Reconnected to CastingPlayer(ID: %s)", castingPlayer->GetId());
+    }
+}
+
 CHIP_ERROR CastingApp::Start()
 {
+    ChipLogProgress(Discovery, "CastingApp::Start()");
     VerifyOrReturnError(mState == CASTING_APP_NOT_RUNNING, CHIP_ERROR_INCORRECT_STATE);
 
-    // start Matter server
+    // Start Matter server
     chip::ServerInitParams * serverInitParams = mAppParameters->GetServerInitParamsProvider()->Get();
     VerifyOrReturnError(serverInitParams != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(*serverInitParams));
 
-    // perform post server startup registrations
+    // Perform post server startup registrations
     ReturnErrorOnFailure(PostStartRegistrations());
+
+    // Reconnect (or verify connection) to the CastingPlayer that the app was connected to before being stopped, if any
+    if (CastingPlayer::GetTargetCastingPlayer() != nullptr)
+    {
+        matter::casting::core::ConnectionCallbacks connectionCallbacks;
+        connectionCallbacks.mOnConnectionComplete = ReconnectHandler;
+        // Re-connecting to a CastingPLayer does not require a full User Directed Commissioning (UDC) process so
+        // CommissionerDeclaration messages are not expected. Leaving ConnectionCallbacks mCommissionerDeclarationCallback as
+        // nullptr.
+        ChipLogProgress(
+            Discovery,
+            "CastingApp::Start() calling VerifyOrEstablishConnection() to reconnect (or verify connection) to a CastingPlayer");
+        CastingPlayer::GetTargetCastingPlayer()->VerifyOrEstablishConnection(connectionCallbacks);
+    }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CastingApp::PostStartRegistrations()
 {
+    ChipLogProgress(Discovery, "CastingApp::PostStartRegistrations()");
     VerifyOrReturnError(mState == CASTING_APP_NOT_RUNNING, CHIP_ERROR_INCORRECT_STATE);
     auto & server = chip::Server::GetInstance();
 
@@ -108,11 +149,21 @@ CHIP_ERROR CastingApp::PostStartRegistrations()
     chip::BindingManager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
 
-    // TODO: Set FabricDelegate
-    // chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&mPersistenceManager);
+    // Set FabricDelegate
+    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(support::CastingStore::GetInstance());
 
     // Register DeviceEvent Handler
     ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(ChipDeviceEventHandler::Handle, 0));
+
+    ChipLogProgress(
+        Discovery,
+        "CastingApp::PostStartRegistrations() calling GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler()");
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    // Set a handler for Commissioner's CommissionerDeclaration messages. This is set in
+    // connectedhomeip/src/protocols/user_directed_commissioning/UserDirectedCommissioning.h
+    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(
+        CommissionerDeclarationHandler::GetInstance());
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     mState = CASTING_APP_RUNNING; // CastingApp started successfully, set state to RUNNING
     return CHIP_NO_ERROR;
@@ -120,17 +171,32 @@ CHIP_ERROR CastingApp::PostStartRegistrations()
 
 CHIP_ERROR CastingApp::Stop()
 {
+    ChipLogProgress(Discovery, "CastingApp::Stop()");
     VerifyOrReturnError(mState == CASTING_APP_RUNNING, CHIP_ERROR_INCORRECT_STATE);
 
-    // TODO: add logic to capture CastingPlayers that we are currently connected to, so we can automatically reconnect with them on
-    // Start() again
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    // Remove the handler previously set for Commissioner's CommissionerDeclaration messages.
+    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(nullptr);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     // Shutdown the Matter server
     chip::Server::GetInstance().Shutdown();
 
     mState = CASTING_APP_NOT_RUNNING; // CastingApp stopped successfully, set state to NOT_RUNNING
 
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CastingApp::ShutdownAllSubscriptions()
+{
+    chip::app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptions();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CastingApp::ClearCache()
+{
+    return support::CastingStore::GetInstance()->DeleteAll();
 }
 
 }; // namespace core

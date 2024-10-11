@@ -20,21 +20,16 @@
 #include <app/OperationalSessionSetup.h>
 #include <app/data-model/NullObject.h>
 #include <controller/CHIPDeviceController.h>
+#include <controller/CommissioningWindowParams.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/Optional.h>
 #include <setup_payload/SetupPayload.h>
-#include <system/SystemClock.h>
 
 namespace chip {
 namespace Controller {
-
-// Passing SetupPayload by value on purpose, in case a consumer decides to reuse
-// this object from inside the callback.
-typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_ERROR status, SetupPayload payload);
-typedef void (*OnOpenBasicCommissioningWindow)(void * context, NodeId deviceId, CHIP_ERROR status);
 
 /**
  * A helper class to open a commissioning window given some parameters.
@@ -107,6 +102,38 @@ public:
                                        Callback::Callback<OnOpenCommissioningWindow> * callback, SetupPayload & payload,
                                        bool readVIDPIDAttributes = false);
 
+    /**
+     * @brief
+     *   Try to look up the device attached to our controller with the given
+     *   node id and ask it to re-enter commissioning mode with a PASE verifier
+     *   derived from the given information and the given discriminator. The
+     *   device will exit commissioning mode after a successful commissioning,
+     *   or after the given `timeout` time.
+     *
+     * @param[in] params        The parameters required to open an enhanced commissioning window
+     *                          with the provided or generated passcode.
+     * @param[out] payload      The setup payload, not including the VID/PID bits,
+     *                          even if those were asked for, that is generated
+     *                          based on the passed-in information.  The payload
+     *                          provided to the callback function, unlike this
+     *                          out parameter, will include the VID/PID bits if
+     *                          readVIDPIDAttributes is true.
+     */
+    CHIP_ERROR OpenCommissioningWindow(const CommissioningWindowPasscodeParams & params, SetupPayload & payload);
+
+    /**
+     * @brief
+     *   Try to look up the device attached to our controller with the given
+     *   node id and ask it to re-enter commissioning mode with a PASE verifier
+     *   derived from the given information and the given discriminator. The
+     *   device will exit commissioning mode after a successful commissioning,
+     *   or after the given `timeout` time.
+     *
+     * @param[in] params    The parameters required to open an enhanced commissioning window
+     *                      with the provided PAKE passcode verifier.
+     */
+    CHIP_ERROR OpenCommissioningWindow(const CommissioningWindowVerifierParams & params);
+
 private:
     enum class Step : uint8_t
     {
@@ -133,16 +160,19 @@ private:
     DeviceController * const mController = nullptr;
     Step mNextStep                       = Step::kAcceptCommissioningStart;
 
-    Callback::Callback<OnOpenCommissioningWindow> * mCommissioningWindowCallback           = nullptr;
-    Callback::Callback<OnOpenBasicCommissioningWindow> * mBasicCommissioningWindowCallback = nullptr;
+    Callback::Callback<OnOpenCommissioningWindow> * mCommissioningWindowCallback                     = nullptr;
+    Callback::Callback<OnOpenCommissioningWindowWithVerifier> * mCommissioningWindowVerifierCallback = nullptr;
+    Callback::Callback<OnOpenBasicCommissioningWindow> * mBasicCommissioningWindowCallback           = nullptr;
     SetupPayload mSetupPayload;
-    NodeId mNodeId                                       = kUndefinedNodeId;
+    SetupDiscriminator mDiscriminator{};
+    NodeId mNodeId               = kUndefinedNodeId;
+    EndpointId mTargetEndpointId = kRootEndpointId; // Default endpoint for Administrator Commissioning Cluster
     System::Clock::Seconds16 mCommissioningWindowTimeout = System::Clock::kZero;
     CommissioningWindowOption mCommissioningWindowOption = CommissioningWindowOption::kOriginalSetupCode;
-    Spake2pVerifier mVerifier; // Used for non-basic commissioning.
+    Crypto::Spake2pVerifier mVerifier; // Used for non-basic commissioning.
     // Parameters needed for non-basic commissioning.
     uint32_t mPBKDFIterations = 0;
-    uint8_t mPBKDFSaltBuffer[kSpake2p_Max_PBKDF_Salt_Length];
+    uint8_t mPBKDFSaltBuffer[Crypto::kSpake2p_Max_PBKDF_Salt_Length];
     ByteSpan mPBKDFSalt;
 
     Callback::Callback<OnDeviceConnected> mDeviceConnected;

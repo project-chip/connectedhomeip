@@ -18,7 +18,6 @@ import("//build_overrides/lwip.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/lwip/lwip.gni")
-import("${lwip_root}/lwip.gni")
 
 assert(chip_with_lwip)
 
@@ -31,7 +30,6 @@ if (lwip_platform == "") {
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "cc13xx_26xx" || lwip_platform == "cc32xx" ||
            lwip_platform == "nxp" || lwip_platform == "silabs" ||
-           lwip_platform == "k32w0" || lwip_platform == "k32w1" ||
            lwip_platform == "qpg" || lwip_platform == "mbed" ||
            lwip_platform == "psoc6" || lwip_platform == "cyw30739" ||
            lwip_platform == "bl602" || lwip_platform == "mw320" ||
@@ -55,10 +53,6 @@ if (lwip_platform == "cc13xx_26xx") {
 } else if (lwip_platform == "qpg") {
   import("//build_overrides/qpg_sdk.gni")
   import("${qpg_sdk_build_root}/qpg_sdk.gni")
-} else if (lwip_platform == "k32w0") {
-  import("//build_overrides/k32w0_sdk.gni")
-} else if (lwip_platform == "k32w1") {
-  import("//build_overrides/k32w1_sdk.gni")
 } else if (lwip_platform == "psoc6") {
   import("//build_overrides/psoc6.gni")
 } else if (lwip_platform == "cyw30739") {
@@ -70,6 +64,7 @@ if (lwip_platform == "cc13xx_26xx") {
   import("${chip_root}/src/platform/device.gni")
 } else if (lwip_platform == "bl702l") {
   import("//build_overrides/bouffalolab_iot_sdk.gni")
+  import("${chip_root}/src/platform/device.gni")
 } else if (lwip_platform == "nxp") {
   import("//build_overrides/nxp_sdk.gni")
 } else if (lwip_platform == "mw320") {
@@ -84,21 +79,24 @@ buildconfig_header("lwip_buildconfig") {
   header = "lwip_buildconfig.h"
   header_dir = "lwip"
 
-  defines = [ "HAVE_LWIP_UDP_BIND_NETIF=1" ]
+  defines = []
+
   if (lwip_platform != "external") {
     if (lwip_debug) {
       # Automatically enable LWIP_DEBUG for internal is_debug builds.
       defines += [ "LWIP_DEBUG=1" ]
-    }
-
-    if (current_os == "android") {
-      defines += [ "LWIP_NO_STDINT_H=1" ]
     }
   }
 }
 
 if (current_os == "zephyr" || current_os == "mbed") {
   group("lwip") {
+  }
+} else if (get_path_info(lwip_root, "abspath") !=
+           get_path_info("${chip_root}/third_party/lwip", "abspath")) {
+  # Redirect old dependencies on ${chip_root}/src/lwip onto ${lwip_root}:lwip
+  group("lwip") {
+    public_deps = [ "${lwip_root}:lwip" ]
   }
 } else if (lwip_platform == "external" || lwip_platform == "mw320") {
   group("lwip") {
@@ -118,11 +116,13 @@ if (current_os == "zephyr" || current_os == "mbed") {
     public_configs += [ "${psoc6_sdk_build_root}:psoc6_sdk_config" ]
   }
 } else if (lwip_platform == "qpg") {
+  import("${lwip_root}/lwip.gni")
+
   config("lwip_config") {
     include_dirs = [ "freertos" ]
   }
 
-  lwip_target("lwip") {
+  lwip_target("legacy_lwip") {
     public = [
       "${qpg_sdk_root}/Components/ThirdParty/Lwip/arch/cc.h",
       "${qpg_sdk_root}/Components/ThirdParty/Lwip/arch/perf.h",
@@ -138,6 +138,10 @@ if (current_os == "zephyr" || current_os == "mbed") {
       ":lwip_config",
       "${chip_root}/src:includes",
     ]
+  }
+
+  group("lwip") {
+    public_deps = [ ":legacy_lwip" ]
   }
 } else if (lwip_platform == "bl602") {
   group("lwip") {
@@ -176,6 +180,8 @@ if (current_os == "zephyr" || current_os == "mbed") {
     ]
   }
 } else {
+  import("${lwip_root}/lwip.gni")
+
   config("lwip_config") {
     include_dirs = [ lwip_platform ]
 
@@ -184,7 +190,7 @@ if (current_os == "zephyr" || current_os == "mbed") {
     }
   }
 
-  lwip_target("lwip") {
+  lwip_target("legacy_lwip") {
     public = [
       "${lwip_platform}/arch/cc.h",
       "${lwip_platform}/arch/perf.h",
@@ -214,12 +220,13 @@ if (current_os == "zephyr" || current_os == "mbed") {
       public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
     } else if (lwip_platform == "silabs") {
       public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
+
+      sources += [
+        "${lwip_platform}/lwipopts-rs911x.h",
+        "${lwip_platform}/lwipopts-wf200.h",
+      ]
     } else if (lwip_platform == "standalone") {
       public_deps += [ "${chip_root}/src/lib/support" ]
-    } else if (lwip_platform == "k32w0") {
-      public_deps += [ "${k32w0_sdk_build_root}:k32w0_sdk" ]
-    } else if (lwip_platform == "k32w1") {
-      public_deps += [ "${k32w1_sdk_build_root}:k32w1_sdk" ]
     } else if (lwip_platform == "cyw30739") {
       public_deps += [ "${cyw30739_sdk_build_root}:cyw30739_sdk" ]
     } else if (lwip_platform == "bl702") {
@@ -234,5 +241,9 @@ if (current_os == "zephyr" || current_os == "mbed") {
       ":lwip_config",
       "${chip_root}/src:includes",
     ]
+  }
+
+  group("lwip") {
+    public_deps = [ ":legacy_lwip" ]
   }
 }

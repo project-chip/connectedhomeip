@@ -584,12 +584,19 @@ public class AndroidBleManager implements BleManager {
   }
 
   class ConnectionGattCallback extends AndroidBluetoothGattCallback {
+    private static final int STATE_INIT = 1;
+    private static final int STATE_DISCOVER_SERVICE = 2;
+    private static final int STATE_REQUEST_MTU = 3;
+
+    private int mState = STATE_INIT;
+
     @Override
     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
       Log.i(TAG, "onConnectionStateChange status = " + status + ", newState= + " + newState);
       super.onConnectionStateChange(gatt, status, newState);
       if (newState == BluetoothProfile.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
         Log.i(TAG, "Discovering Services...");
+        mState = STATE_DISCOVER_SERVICE;
         gatt.discoverServices();
         return;
       } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
@@ -602,14 +609,23 @@ public class AndroidBleManager implements BleManager {
     public void onServicesDiscovered(BluetoothGatt gatt, int status) {
       Log.d(TAG, "onServicesDiscovered status = " + status);
       super.onServicesDiscovered(gatt, status);
+      if (mState != STATE_DISCOVER_SERVICE) {
+        Log.d(TAG, "Invalid state : " + mState);
+        return;
+      }
 
       Log.i(TAG, "Services Discovered");
+      mState = STATE_REQUEST_MTU;
       gatt.requestMtu(247);
     }
 
     @Override
     public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
       super.onMtuChanged(gatt, mtu, status);
+      if (mState != STATE_REQUEST_MTU) {
+        Log.d(TAG, "Invalid state : " + mState);
+        return;
+      }
       String deviceName = "";
       if (gatt != null && gatt.getDevice() != null) {
         deviceName = gatt.getDevice().getName();

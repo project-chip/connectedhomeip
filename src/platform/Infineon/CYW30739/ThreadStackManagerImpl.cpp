@@ -28,7 +28,6 @@
 
 #include <lib/support/CHIPPlatformMemory.h>
 #include <openthread-system.h>
-#include <wiced_platform.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -54,6 +53,14 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
     VerifyOrExit(result == WICED_SUCCESS, err = CHIP_ERROR_INTERNAL);
     otSysInit(0, NULL);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    mSrpClearAllSemaphore = wiced_rtos_create_mutex();
+    VerifyOrExit(mSrpClearAllSemaphore != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    result = wiced_rtos_init_mutex(mSrpClearAllSemaphore);
+    VerifyOrExit(result == WICED_SUCCESS, err = CHIP_ERROR_INTERNAL);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
     err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(NULL);
 
 exit:
@@ -65,7 +72,7 @@ void ThreadStackManagerImpl::SignalThreadActivityPending()
     mEventFlags.Set(kActivityPendingEventFlag);
 }
 
-void ThreadStackManagerImpl::SignalThreadActivityPendingFromISR()
+__attribute__((section(".text_in_ram"))) void ThreadStackManagerImpl::SignalThreadActivityPendingFromISR()
 {
     mEventFlags.Set(kActivityPendingFromISREventFlag);
 }
@@ -94,6 +101,21 @@ void ThreadStackManagerImpl::_UnlockThreadStack()
     const wiced_result_t result = wiced_rtos_unlock_mutex(mMutex);
     VerifyOrReturn(result == WICED_SUCCESS || result == WICED_NOT_OWNED, ChipLogError(DeviceLayer, "%s %x", __func__, result));
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+void ThreadStackManagerImpl::_WaitOnSrpClearAllComplete()
+{
+    const wiced_result_t result = wiced_rtos_lock_mutex(mSrpClearAllSemaphore);
+    VerifyOrReturn(result == WICED_SUCCESS, ChipLogError(DeviceLayer, "%s %x", __func__, result));
+}
+
+void ThreadStackManagerImpl::_NotifySrpClearAllComplete()
+{
+    const wiced_result_t result = wiced_rtos_unlock_mutex(mSrpClearAllSemaphore);
+    VerifyOrReturn(result == WICED_SUCCESS || result == WICED_NOT_OWNED, ChipLogError(DeviceLayer, "%s %x", __func__, result));
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+// ===== Methods that override the GenericThreadStackMa
 
 void ThreadStackManagerImpl::ThreadTaskMain(void)
 {
@@ -127,7 +149,7 @@ extern "C" void otTaskletsSignalPending(otInstance * p_instance)
     ThreadStackMgrImpl().SignalThreadActivityPending();
 }
 
-extern "C" void otSysEventSignalPending(void)
+extern "C" __attribute__((section(".text_in_ram"))) void otSysEventSignalPending(void)
 {
     ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
 }

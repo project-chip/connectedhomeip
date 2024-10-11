@@ -28,231 +28,110 @@
 
 #include "CHIPCert_test_vectors.h"
 
+using namespace chip::Credentials;
+
 namespace chip {
 namespace TestCerts {
 
-// clang-format off
-extern const TestCert gTestCerts[] = {
-    TestCert::kRoot01,
-    TestCert::kRoot02,
-    TestCert::kRoot03,
-    TestCert::kICA01,
-    TestCert::kICA02,
-    TestCert::kICA01_1,
-    TestCert::kFWSign01,
-    TestCert::kNode01_01,
-    TestCert::kNode01_02,
-    TestCert::kNode02_01,
-    TestCert::kNode02_02,
-    TestCert::kNode02_03,
-    TestCert::kNode02_04,
-    TestCert::kNode02_05,
-    TestCert::kNode02_06,
-    TestCert::kNode02_07,
-    TestCert::kNode02_08,
-    TestCert::kPDCID01,
-};
-// clang-format on
+// X-Macro style list of TestCert names, without prefix
+#define ENUMERATE_TEST_CERTS(X, ...)                                                                                               \
+    X(Root01, ##__VA_ARGS__)                                                                                                       \
+    X(Root02, ##__VA_ARGS__)                                                                                                       \
+    X(Root03, ##__VA_ARGS__)                                                                                                       \
+    X(ICA01, ##__VA_ARGS__)                                                                                                        \
+    X(ICA02, ##__VA_ARGS__)                                                                                                        \
+    X(ICA01_1, ##__VA_ARGS__)                                                                                                      \
+    X(FWSign01, ##__VA_ARGS__)                                                                                                     \
+    X(Node01_01, ##__VA_ARGS__)                                                                                                    \
+    X(Node01_02, ##__VA_ARGS__)                                                                                                    \
+    X(Node02_01, ##__VA_ARGS__)                                                                                                    \
+    X(Node02_02, ##__VA_ARGS__)                                                                                                    \
+    X(Node02_03, ##__VA_ARGS__)                                                                                                    \
+    X(Node02_04, ##__VA_ARGS__)                                                                                                    \
+    X(Node02_05, ##__VA_ARGS__)                                                                                                    \
+    X(Node02_06, ##__VA_ARGS__)                                                                                                    \
+    X(Node02_07, ##__VA_ARGS__)                                                                                                    \
+    X(Node02_08, ##__VA_ARGS__)                                                                                                    \
+    X(PDCID01, ##__VA_ARGS__)
 
-extern const size_t gNumTestCerts = ArraySize(gTestCerts);
+#define TEST_CERT_ENUM_REF_ENTRY(NAME) TestCert::k##NAME,
+extern const TestCert gTestCerts[] = { ENUMERATE_TEST_CERTS(TEST_CERT_ENUM_REF_ENTRY) };
+extern const size_t gNumTestCerts  = ArraySize(gTestCerts);
+
+#define TEST_CERT_SELECT_NAME(NAME)                                                                                                \
+    case TestCert::k##NAME:                                                                                                        \
+        return #NAME;
+
+#define TEST_CERT_SELECT_PROPERTY(NAME, PROP, OUT)                                                                                 \
+    case TestCert::k##NAME:                                                                                                        \
+        OUT = sTestCert_##NAME##_##PROP;                                                                                           \
+        return CHIP_NO_ERROR;
+
+#define TEST_CERT_SWITCH(EXPR, MACRO, ...)                                                                                         \
+    switch (EXPR)                                                                                                                  \
+    {                                                                                                                              \
+        ENUMERATE_TEST_CERTS(MACRO, ##__VA_ARGS__)                                                                                 \
+    default:                                                                                                                       \
+        break;                                                                                                                     \
+    }
 
 CHIP_ERROR GetTestCert(TestCert certType, BitFlags<TestCertLoadFlags> certLoadFlags, ByteSpan & cert)
 {
-    CHIP_ERROR err;
-    bool derForm = certLoadFlags.Has(TestCertLoadFlags::kDERForm);
-
-#define SELECT_CERT(NAME)                                                                                                          \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (certType == TestCert::k##NAME)                                                                                         \
-        {                                                                                                                          \
-            cert = (derForm) ? sTestCert_##NAME##_DER : sTestCert_##NAME##_Chip;                                                   \
-            ExitNow(err = CHIP_NO_ERROR);                                                                                          \
-        }                                                                                                                          \
-    } while (0)
-
-    SELECT_CERT(Root01);
-    SELECT_CERT(Root02);
-    SELECT_CERT(Root03);
-    SELECT_CERT(ICA01);
-    SELECT_CERT(ICA02);
-    SELECT_CERT(ICA01_1);
-    SELECT_CERT(FWSign01);
-    SELECT_CERT(Node01_01);
-    SELECT_CERT(Node01_02);
-    SELECT_CERT(Node02_01);
-    SELECT_CERT(Node02_02);
-    SELECT_CERT(Node02_03);
-    SELECT_CERT(Node02_04);
-    SELECT_CERT(Node02_05);
-    SELECT_CERT(Node02_06);
-    SELECT_CERT(Node02_07);
-    SELECT_CERT(Node02_08);
-    SELECT_CERT(PDCID01);
-
-#undef SELECT_CERT
-
-    err = CHIP_ERROR_CA_CERT_NOT_FOUND;
-
-exit:
-    return err;
+    if (certLoadFlags.Has(TestCertLoadFlags::kDERForm))
+    {
+        TEST_CERT_SWITCH(certType, TEST_CERT_SELECT_PROPERTY, DER, cert);
+    }
+    else
+    {
+        TEST_CERT_SWITCH(certType, TEST_CERT_SELECT_PROPERTY, Chip, cert);
+    }
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 const char * GetTestCertName(TestCert certType)
 {
-#define NAME_CERT(NAME)                                                                                                            \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (certType == TestCert::k##NAME)                                                                                         \
-        {                                                                                                                          \
-            return #NAME;                                                                                                          \
-        }                                                                                                                          \
-    } while (0)
-    NAME_CERT(Root01);
-    NAME_CERT(Root02);
-    NAME_CERT(Root03);
-    NAME_CERT(ICA01);
-    NAME_CERT(ICA02);
-    NAME_CERT(ICA01_1);
-    NAME_CERT(FWSign01);
-    NAME_CERT(Node01_01);
-    NAME_CERT(Node01_02);
-    NAME_CERT(Node02_01);
-    NAME_CERT(Node02_02);
-    NAME_CERT(Node02_03);
-    NAME_CERT(Node02_04);
-    NAME_CERT(Node02_05);
-    NAME_CERT(Node02_06);
-    NAME_CERT(Node02_07);
-    NAME_CERT(Node02_08);
-    NAME_CERT(PDCID01);
-
-#undef NAME_CERT
-
+    TEST_CERT_SWITCH(certType, TEST_CERT_SELECT_NAME);
     return nullptr;
 }
 
 CHIP_ERROR GetTestCertPubkey(TestCert certType, ByteSpan & pubkey)
 {
-    CHIP_ERROR err;
+    TEST_CERT_SWITCH(certType, TEST_CERT_SELECT_PROPERTY, PublicKey, pubkey);
+    return CHIP_ERROR_NOT_FOUND;
+}
 
-#define SELECT_PUBKEY(NAME)                                                                                                        \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (certType == TestCert::k##NAME)                                                                                         \
-        {                                                                                                                          \
-            pubkey = sTestCert_##NAME##_PublicKey;                                                                                 \
-            ExitNow(err = CHIP_NO_ERROR);                                                                                          \
-        }                                                                                                                          \
-    } while (0)
+CHIP_ERROR GetTestCertPrivkey(TestCert certType, ByteSpan & privkey)
+{
+    TEST_CERT_SWITCH(certType, TEST_CERT_SELECT_PROPERTY, PrivateKey, privkey)
+    return CHIP_ERROR_NOT_FOUND;
+}
 
-    SELECT_PUBKEY(Root01);
-    SELECT_PUBKEY(Root02);
-    SELECT_PUBKEY(Root03);
-    SELECT_PUBKEY(ICA01);
-    SELECT_PUBKEY(ICA02);
-    SELECT_PUBKEY(ICA01_1);
-    SELECT_PUBKEY(FWSign01);
-    SELECT_PUBKEY(Node01_01);
-    SELECT_PUBKEY(Node01_02);
-    SELECT_PUBKEY(Node02_01);
-    SELECT_PUBKEY(Node02_02);
-    SELECT_PUBKEY(Node02_03);
-    SELECT_PUBKEY(Node02_04);
-    SELECT_PUBKEY(Node02_05);
-    SELECT_PUBKEY(Node02_06);
-    SELECT_PUBKEY(Node02_07);
-    SELECT_PUBKEY(Node02_08);
-    SELECT_PUBKEY(PDCID01);
+CHIP_ERROR GetTestCertKeypair(TestCert certType, Crypto::P256SerializedKeypair & keypair)
+{
+    ByteSpan pubkey;
+    ReturnErrorOnFailure(GetTestCertPubkey(certType, pubkey));
+    VerifyOrReturnError(pubkey.size() == Crypto::kP256_PublicKey_Length, CHIP_ERROR_WRONG_KEY_TYPE);
 
-#undef SELECT_PUBKEY
+    ByteSpan privkey;
+    ReturnErrorOnFailure(GetTestCertPrivkey(certType, privkey));
+    VerifyOrReturnError(privkey.size() == Crypto::kP256_PrivateKey_Length, CHIP_ERROR_WRONG_KEY_TYPE);
 
-    err = CHIP_ERROR_CA_CERT_NOT_FOUND;
-
-exit:
-    return err;
+    ReturnErrorOnFailure(keypair.SetLength(Crypto::kP256_PublicKey_Length + Crypto::kP256_PrivateKey_Length));
+    memcpy(keypair.Bytes(), pubkey.data(), Crypto::kP256_PublicKey_Length);
+    memcpy(keypair.Bytes() + Crypto::kP256_PublicKey_Length, privkey.data(), Crypto::kP256_PrivateKey_Length);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR GetTestCertSKID(TestCert certType, ByteSpan & skid)
 {
-    CHIP_ERROR err;
-
-#define SELECT_SKID(NAME)                                                                                                          \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (certType == TestCert::k##NAME)                                                                                         \
-        {                                                                                                                          \
-            skid = sTestCert_##NAME##_SubjectKeyId;                                                                                \
-            ExitNow(err = CHIP_NO_ERROR);                                                                                          \
-        }                                                                                                                          \
-    } while (0)
-
-    SELECT_SKID(Root01);
-    SELECT_SKID(Root02);
-    SELECT_SKID(Root03);
-    SELECT_SKID(ICA01);
-    SELECT_SKID(ICA02);
-    SELECT_SKID(ICA01_1);
-    SELECT_SKID(FWSign01);
-    SELECT_SKID(Node01_01);
-    SELECT_SKID(Node01_02);
-    SELECT_SKID(Node02_01);
-    SELECT_SKID(Node02_02);
-    SELECT_SKID(Node02_03);
-    SELECT_SKID(Node02_04);
-    SELECT_SKID(Node02_05);
-    SELECT_SKID(Node02_06);
-    SELECT_SKID(Node02_07);
-    SELECT_SKID(Node02_08);
-    SELECT_SKID(PDCID01);
-
-#undef SELECT_SKID
-
-    err = CHIP_ERROR_CA_CERT_NOT_FOUND;
-
-exit:
-    return err;
+    TEST_CERT_SWITCH(certType, TEST_CERT_SELECT_PROPERTY, SubjectKeyId, skid)
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 CHIP_ERROR GetTestCertAKID(TestCert certType, ByteSpan & akid)
 {
-    CHIP_ERROR err;
-
-#define SELECT_AKID(NAME)                                                                                                          \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (certType == TestCert::k##NAME)                                                                                         \
-        {                                                                                                                          \
-            akid = sTestCert_##NAME##_AuthorityKeyId;                                                                              \
-            ExitNow(err = CHIP_NO_ERROR);                                                                                          \
-        }                                                                                                                          \
-    } while (0)
-
-    SELECT_AKID(Root01);
-    SELECT_AKID(Root02);
-    SELECT_AKID(Root03);
-    SELECT_AKID(ICA01);
-    SELECT_AKID(ICA02);
-    SELECT_AKID(ICA01_1);
-    SELECT_AKID(FWSign01);
-    SELECT_AKID(Node01_01);
-    SELECT_AKID(Node01_02);
-    SELECT_AKID(Node02_01);
-    SELECT_AKID(Node02_02);
-    SELECT_AKID(Node02_03);
-    SELECT_AKID(Node02_04);
-    SELECT_AKID(Node02_05);
-    SELECT_AKID(Node02_06);
-    SELECT_AKID(Node02_07);
-    SELECT_AKID(Node02_08);
-    SELECT_AKID(PDCID01);
-
-#undef SELECT_AKID
-
-    err = CHIP_ERROR_CA_CERT_NOT_FOUND;
-
-exit:
-    return err;
+    TEST_CERT_SWITCH(certType, TEST_CERT_SELECT_PROPERTY, AuthorityKeyId, akid)
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 CHIP_ERROR DecodeTestCert(ChipCertificateData & certData, TestCert certType)
@@ -2575,6 +2454,15 @@ extern constexpr ByteSpan sTestCert_PDCID01_AuthorityKeyId{};
 
 extern constexpr ByteSpan sTestCert_PDCID01_KeyId((const uint8_t[]){
     0x3a, 0x0e, 0x71, 0xe2, 0x09, 0x9a, 0x49, 0xda, 0xc9, 0x74, 0xfe, 0xd0, 0x5e, 0xa5, 0x3e, 0xba, 0xce, 0x29, 0x33, 0x90,
+});
+
+extern constexpr ByteSpan sTestCert_PDCID01_KeypairDER((const uint8_t[]){
+    0x30, 0x77, 0x02, 0x01, 0x01, 0x04, 0x20, 0x08, 0x0c, 0xa8, 0x62, 0xfc, 0x8b, 0x52, 0xca, 0x16, 0xea, 0x43, 0x82, 0x49, 0x78,
+    0xda, 0x64, 0x20, 0x9f, 0x55, 0xd2, 0xde, 0x83, 0x1d, 0xee, 0x70, 0x84, 0x35, 0xc5, 0x04, 0xc1, 0x5e, 0xab, 0xa0, 0x0a, 0x06,
+    0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0xa1, 0x44, 0x03, 0x42, 0x00, 0x04, 0x39, 0xcc, 0xd4, 0xac, 0x7e, 0x59,
+    0x68, 0xbd, 0xf1, 0xb0, 0x80, 0x11, 0x1d, 0x92, 0x53, 0x64, 0x94, 0xfc, 0x51, 0x62, 0x4c, 0x70, 0xaa, 0x6d, 0x73, 0x08, 0xda,
+    0xed, 0xf3, 0xa1, 0x5e, 0x38, 0x69, 0x17, 0x7b, 0x1b, 0xf3, 0xd0, 0x90, 0x47, 0xeb, 0xf0, 0x6b, 0xe8, 0xdd, 0x17, 0xbe, 0x23,
+    0xf2, 0xfb, 0x3d, 0x63, 0x90, 0xc6, 0xcf, 0x82, 0x80, 0x2f, 0x62, 0xd0, 0x53, 0x62, 0xc0, 0x08,
 });
 
 } // namespace TestCerts

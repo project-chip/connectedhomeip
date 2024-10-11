@@ -39,6 +39,11 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/ESP32Utils.h>
 
+#if CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS
+#include <tracing/esp32_trace/insights_sys_stats.h>
+#define START_TIMEOUT_MS 60000
+#endif
+
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
@@ -75,7 +80,7 @@ extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_s
 extern const char insights_auth_key_end[] asm("_binary_insights_auth_key_txt_end");
 #endif
 
-static const char * TAG = "light-app";
+static const char TAG[] = "light-app";
 
 static AppDeviceCallbacks EchoCallbacks;
 static AppDeviceCallbacksDelegate sAppDeviceCallbacksDelegate;
@@ -95,13 +100,25 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 DeviceLayer::ESP32SecureCertDACProvider gSecureCertDACProvider;
 #endif // CONFIG_SEC_CERT_DAC_PROVIDER
 
+#ifdef CONFIG_ENABLE_SET_CERT_DECLARATION_API
+extern const uint8_t cd_start[] asm("_binary_certification_declaration_der_start");
+extern const uint8_t cd_end[] asm("_binary_certification_declaration_der_end");
+ByteSpan cdSpan(cd_start, static_cast<size_t>(cd_end - cd_start));
+#endif // CONFIG_ENABLE_SET_CERT_DECLARATION_API
+
 chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
 {
 #if CONFIG_SEC_CERT_DAC_PROVIDER
+#ifdef CONFIG_ENABLE_SET_CERT_DECLARATION_API
+    gSecureCertDACProvider.SetCertificationDeclaration(cdSpan);
+#endif // CONFIG_ENABLE_SET_CERT_DECLARATION_API
     return &gSecureCertDACProvider;
 #elif CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+#ifdef CONFIG_ENABLE_SET_CERT_DECLARATION_API
+    sFactoryDataProvider.SetCertificationDeclaration(cdSpan);
+#endif // CONFIG_ENABLE_SET_CERT_DECLARATION_API
     return &sFactoryDataProvider;
-#else // EXAMPLE_DAC_PROVIDER
+#else  // EXAMPLE_DAC_PROVIDER
     return chip::Credentials::Examples::GetExampleDACProvider();
 #endif
 }
@@ -115,6 +132,7 @@ static void InitServer(intptr_t context)
 
     DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
     esp_insights_config_t config = {
         .log_type = ESP_DIAG_LOG_TYPE_ERROR | ESP_DIAG_LOG_TYPE_WARNING | ESP_DIAG_LOG_TYPE_EVENT,
@@ -130,6 +148,10 @@ static void InitServer(intptr_t context)
 
     static Tracing::Insights::ESP32Backend backend;
     Tracing::Register(backend);
+
+#if CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS
+    chip::System::Stats::InsightsSystemMetrics::GetInstance().RegisterAndEnable(chip::System::Clock::Timeout(START_TIMEOUT_MS));
+#endif
 #endif
 }
 

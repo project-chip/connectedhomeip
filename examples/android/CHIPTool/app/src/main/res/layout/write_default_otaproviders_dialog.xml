@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+  <TextView
+      android:id="@+id/titleText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/ota_provider_write_default_ota_providers_text"
+      android:textSize="22sp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+  <EditText
+      android:id="@+id/fabricIndexEd"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:hint="@string/ota_provider_fabric_index_text"
+      android:inputType="number"
+      android:textSize="16sp"
+      android:layout_marginBottom="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/titleText"
+      app:layout_constraintBottom_toTopOf="@id/providerNodeIdEd"/>
+
+  <EditText
+      android:id="@+id/providerNodeIdEd"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:hint="@string/ota_provider_provider_node_id_text"
+      android:inputType="number"
+      android:textSize="16sp"
+      android:layout_marginBottom="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/fabricIndexEd"
+      app:layout_constraintBottom_toTopOf="@id/endpointIdEd"/>
+
+  <EditText
+      android:id="@+id/endpointIdEd"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:hint="@string/ota_provider_endpoint_id_text"
+      android:inputType="number"
+      android:textSize="16sp"
+      android:layout_marginBottom="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/providerNodeIdEd"
+      app:layout_constraintBottom_toTopOf="@id/writeDefaultOtaProvidersBtn"/>
+
+  <Button
+      android:id="@+id/writeDefaultOtaProvidersBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/group_setting_write_btn_text"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

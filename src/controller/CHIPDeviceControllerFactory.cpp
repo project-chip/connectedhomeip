@@ -68,46 +68,43 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     mSessionResumptionStorage  = params.sessionResumptionStorage;
     mEnableServerInteractions  = params.enableServerInteractions;
 
+    // Initialize the system state. Note that it is left in a somewhat
+    // special state where it is initialized, but has a ref count of 0.
     CHIP_ERROR err = InitSystemState(params);
 
     return err;
 }
 
-CHIP_ERROR DeviceControllerFactory::InitSystemState()
+CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
 {
+    VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mSystemState->IsShutDown(), CHIP_NO_ERROR);
+
     FactoryInitParams params;
-    if (mSystemState != nullptr)
-    {
-        params.systemLayer        = mSystemState->SystemLayer();
-        params.udpEndPointManager = mSystemState->UDPEndPointManager();
+    params.systemLayer        = mSystemState->SystemLayer();
+    params.udpEndPointManager = mSystemState->UDPEndPointManager();
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        params.tcpEndPointManager = mSystemState->TCPEndPointManager();
+    params.tcpEndPointManager = mSystemState->TCPEndPointManager();
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-        params.bleLayer = mSystemState->BleLayer();
+    params.bleLayer = mSystemState->BleLayer();
 #endif
-        params.listenPort                = mListenPort;
-        params.fabricIndependentStorage  = mFabricIndependentStorage;
-        params.enableServerInteractions  = mEnableServerInteractions;
-        params.groupDataProvider         = mSystemState->GetGroupDataProvider();
-        params.sessionKeystore           = mSystemState->GetSessionKeystore();
-        params.fabricTable               = mSystemState->Fabrics();
-        params.operationalKeystore       = mOperationalKeystore;
-        params.opCertStore               = mOpCertStore;
-        params.certificateValidityPolicy = mCertificateValidityPolicy;
-        params.sessionResumptionStorage  = mSessionResumptionStorage;
-    }
+    params.listenPort                = mListenPort;
+    params.fabricIndependentStorage  = mFabricIndependentStorage;
+    params.enableServerInteractions  = mEnableServerInteractions;
+    params.groupDataProvider         = mSystemState->GetGroupDataProvider();
+    params.sessionKeystore           = mSystemState->GetSessionKeystore();
+    params.fabricTable               = mSystemState->Fabrics();
+    params.operationalKeystore       = mOperationalKeystore;
+    params.opCertStore               = mOpCertStore;
+    params.certificateValidityPolicy = mCertificateValidityPolicy;
+    params.sessionResumptionStorage  = mSessionResumptionStorage;
 
     return InitSystemState(params);
 }
 
 CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 {
-    if (mSystemState != nullptr && mSystemState->IsInitialized())
-    {
-        return CHIP_NO_ERROR;
-    }
-
     if (mSystemState != nullptr)
     {
         Platform::Delete(mSystemState);
@@ -144,6 +141,9 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #else
     stateParams.bleLayer = params.bleLayer;
 #endif // CONFIG_DEVICE_LAYER
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    stateParams.wifipaf_layer = params.wifipaf_layer;
+#endif
     VerifyOrReturnError(stateParams.bleLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 #endif
 
@@ -165,6 +165,16 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
                                                             ,
                                                         Transport::BleListenParameters(stateParams.bleLayer)
 #endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                                                            ,
+                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
+                                                            .SetAddressType(IPAddressType::kIPv6)
+                                                            .SetListenPort(params.listenPort)
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                                                            ,
+                                                        Transport::WiFiPAFListenParameters()
+#endif
                                                             ));
 
     // TODO(#16231): All the new'ed state above/below in this method is never properly released or null-checked!
@@ -177,6 +187,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.timerDelegate             = chip::Platform::New<chip::app::DefaultTimerDelegate>();
     stateParams.reportScheduler           = chip::Platform::New<app::reporting::ReportSchedulerImpl>(stateParams.timerDelegate);
     stateParams.sessionKeystore           = params.sessionKeystore;
+    stateParams.bdxTransferServer         = chip::Platform::New<bdx::BDXTransferServer>();
 
     // if no fabricTable was provided, create one and track it in stateParams for cleanup
     stateParams.fabricTable = params.fabricTable;
@@ -225,6 +236,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
     ReturnErrorOnFailure(stateParams.unsolicitedStatusHandler->Init(stateParams.exchangeMgr));
+    ReturnErrorOnFailure(stateParams.bdxTransferServer->Init(stateParams.systemLayer, stateParams.exchangeMgr));
 
     InitDataModelHandler();
 
@@ -268,7 +280,9 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         .exchangeMgr               = stateParams.exchangeMgr,
         .fabricTable               = stateParams.fabricTable,
         .groupDataProvider         = stateParams.groupDataProvider,
-        .mrpLocalConfig            = GetLocalMRPConfig(),
+        // Don't provide an MRP local config, so each CASE initiation will use
+        // the then-current value.
+        .mrpLocalConfig = NullOptional,
     };
 
     CASESessionManagerConfig sessionManagerConfig = {
@@ -301,11 +315,16 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.controllerRCAC                       = params.controllerRCAC;
     controllerParams.permitMultiControllerFabrics         = params.permitMultiControllerFabrics;
     controllerParams.removeFromFabricTableOnShutdown      = params.removeFromFabricTableOnShutdown;
+    controllerParams.deleteFromFabricTableOnShutdown      = params.deleteFromFabricTableOnShutdown;
 
     controllerParams.systemState        = mSystemState;
     controllerParams.controllerVendorId = params.controllerVendorId;
 
     controllerParams.enableServerInteractions = params.enableServerInteractions;
+    if (params.fabricIndex.HasValue())
+    {
+        controllerParams.fabricIndex.SetValue(params.fabricIndex.Value());
+    }
 }
 
 void DeviceControllerFactory::ControllerInitialized(const DeviceController & controller)
@@ -322,10 +341,8 @@ void DeviceControllerFactory::ControllerInitialized(const DeviceController & con
 
 CHIP_ERROR DeviceControllerFactory::SetupController(SetupParams params, DeviceController & controller)
 {
-    VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(params.controllerVendorId != VendorId::Unspecified, CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(InitSystemState());
+    ReturnErrorOnFailure(ReinitSystemStateIfNecessary());
 
     ControllerInitParams controllerParams;
     PopulateInitParams(controllerParams, params);
@@ -342,10 +359,8 @@ CHIP_ERROR DeviceControllerFactory::SetupController(SetupParams params, DeviceCo
 
 CHIP_ERROR DeviceControllerFactory::SetupCommissioner(SetupParams params, DeviceCommissioner & commissioner)
 {
-    VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(params.controllerVendorId != VendorId::Unspecified, CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(InitSystemState());
+    ReturnErrorOnFailure(ReinitSystemStateIfNecessary());
 
     CommissionerInitParams commissionerParams;
 
@@ -383,9 +398,16 @@ void DeviceControllerFactory::RetainSystemState()
     (void) mSystemState->Retain();
 }
 
-void DeviceControllerFactory::ReleaseSystemState()
+bool DeviceControllerFactory::ReleaseSystemState()
 {
-    mSystemState->Release();
+    return mSystemState->Release();
+}
+
+CHIP_ERROR DeviceControllerFactory::EnsureAndRetainSystemState()
+{
+    ReturnErrorOnFailure(ReinitSystemStateIfNecessary());
+    RetainSystemState();
+    return CHIP_NO_ERROR;
 }
 
 DeviceControllerFactory::~DeviceControllerFactory()
@@ -397,6 +419,8 @@ void DeviceControllerFactory::Shutdown()
 {
     if (mSystemState != nullptr)
     {
+        // ~DeviceControllerSystemState will call Shutdown(),
+        // which in turn ensures that the reference count is 0.
         Platform::Delete(mSystemState);
         mSystemState = nullptr;
     }
@@ -438,6 +462,13 @@ void DeviceControllerSystemState::Shutdown()
         mFabricTableDelegate = nullptr;
     }
 
+    if (mBDXTransferServer != nullptr)
+    {
+        mBDXTransferServer->Shutdown();
+        chip::Platform::Delete(mBDXTransferServer);
+        mBDXTransferServer = nullptr;
+    }
+
     if (mCASEServer != nullptr)
     {
         mCASEServer->Shutdown();
@@ -450,6 +481,15 @@ void DeviceControllerSystemState::Shutdown()
         mCASESessionManager->Shutdown();
         Platform::Delete(mCASESessionManager);
         mCASESessionManager = nullptr;
+    }
+
+    // The above took care of CASE handshakes, and shutting down all the
+    // controllers should have taken care of the PASE handshakes.  Clean up any
+    // outstanding secure sessions (shouldn't really be any, since controllers
+    // should have handled that, but just in case).
+    if (mSessionMgr != nullptr)
+    {
+        mSessionMgr->ExpireAllSecureSessions();
     }
 
     // mCASEClientPool and mSessionSetupPool must be deallocated

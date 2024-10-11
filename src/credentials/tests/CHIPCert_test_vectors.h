@@ -28,12 +28,11 @@
 
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPCertificateSet.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace TestCerts {
-
-using namespace chip::Credentials;
 
 enum TestCert
 {
@@ -72,12 +71,14 @@ enum class TestCertLoadFlags : uint8_t
 extern CHIP_ERROR GetTestCert(TestCert certType, BitFlags<TestCertLoadFlags> certLoadFlags, ByteSpan & cert);
 extern const char * GetTestCertName(TestCert certType);
 extern CHIP_ERROR GetTestCertPubkey(TestCert certType, ByteSpan & pubkey);
+extern CHIP_ERROR GetTestCertPrivkey(TestCert certType, ByteSpan & privkey);
+extern CHIP_ERROR GetTestCertKeypair(TestCert certType, Crypto::P256SerializedKeypair & keypair);
 extern CHIP_ERROR GetTestCertSKID(TestCert certType, ByteSpan & skid);
 extern CHIP_ERROR GetTestCertAKID(TestCert certType, ByteSpan & akid);
 
-extern CHIP_ERROR DecodeTestCert(ChipCertificateData & certData, TestCert certType);
-extern CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, TestCert certType, BitFlags<TestCertLoadFlags> certLoadFlags,
-                               BitFlags<CertDecodeFlags> decodeFlags);
+extern CHIP_ERROR DecodeTestCert(Credentials::ChipCertificateData & certData, TestCert certType);
+extern CHIP_ERROR LoadTestCert(Credentials::ChipCertificateSet & certSet, TestCert certType,
+                               BitFlags<TestCertLoadFlags> certLoadFlags, BitFlags<Credentials::CertDecodeFlags> decodeFlags);
 
 extern const TestCert gTestCerts[];
 extern const size_t gNumTestCerts;
@@ -139,6 +140,8 @@ extern const ByteSpan sTestCert_Node01_01_PublicKey;
 extern const ByteSpan sTestCert_Node01_01_PrivateKey;
 extern const ByteSpan sTestCert_Node01_01_SubjectKeyId;
 extern const ByteSpan sTestCert_Node01_01_AuthorityKeyId;
+inline constexpr NodeId kTestCert_Node01_01_NodeId     = 0xDEDEDEDE00010001;
+inline constexpr FabricId kTestCert_Node01_01_FabricId = 0xFAB000000000001D;
 
 extern const ByteSpan sTestCert_Node01_01_Err01_Chip;
 
@@ -148,6 +151,8 @@ extern const ByteSpan sTestCert_Node01_02_PublicKey;
 extern const ByteSpan sTestCert_Node01_02_PrivateKey;
 extern const ByteSpan sTestCert_Node01_02_SubjectKeyId;
 extern const ByteSpan sTestCert_Node01_02_AuthorityKeyId;
+inline constexpr NodeId kTestCert_Node01_02_NodeId     = 0xDEDEDEDE00010002;
+inline constexpr FabricId kTestCert_Node01_02_FabricId = 0xFAB000000000001D;
 
 extern const ByteSpan sTestCert_Node02_01_Chip;
 extern const ByteSpan sTestCert_Node02_01_DER;
@@ -155,6 +160,8 @@ extern const ByteSpan sTestCert_Node02_01_PublicKey;
 extern const ByteSpan sTestCert_Node02_01_PrivateKey;
 extern const ByteSpan sTestCert_Node02_01_SubjectKeyId;
 extern const ByteSpan sTestCert_Node02_01_AuthorityKeyId;
+inline constexpr NodeId kTestCert_Node02_01_NodeId     = 0xDEDEDEDE00020001;
+inline constexpr FabricId kTestCert_Node02_01_FabricId = 0xFAB000000000001D;
 
 extern const ByteSpan sTestCert_Node02_02_Chip;
 extern const ByteSpan sTestCert_Node02_02_DER;
@@ -162,6 +169,8 @@ extern const ByteSpan sTestCert_Node02_02_PublicKey;
 extern const ByteSpan sTestCert_Node02_02_PrivateKey;
 extern const ByteSpan sTestCert_Node02_02_SubjectKeyId;
 extern const ByteSpan sTestCert_Node02_02_AuthorityKeyId;
+inline constexpr NodeId kTestCert_Node02_02_NodeId     = 0xDEDEDEDE00020002;
+inline constexpr FabricId kTestCert_Node02_02_FabricId = 0xFAB000000000001D;
 
 extern const ByteSpan sTestCert_Node02_03_Chip;
 extern const ByteSpan sTestCert_Node02_03_DER;
@@ -169,6 +178,8 @@ extern const ByteSpan sTestCert_Node02_03_PublicKey;
 extern const ByteSpan sTestCert_Node02_03_PrivateKey;
 extern const ByteSpan sTestCert_Node02_03_SubjectKeyId;
 extern const ByteSpan sTestCert_Node02_03_AuthorityKeyId;
+inline constexpr NodeId kTestCert_Node02_03_NodeId     = 0xDEDEDEDE00020003;
+inline constexpr FabricId kTestCert_Node02_03_FabricId = 0xFAB000000000001D;
 
 extern const ByteSpan sTestCert_Node02_04_Chip;
 extern const ByteSpan sTestCert_Node02_04_DER;
@@ -176,6 +187,8 @@ extern const ByteSpan sTestCert_Node02_04_PublicKey;
 extern const ByteSpan sTestCert_Node02_04_PrivateKey;
 extern const ByteSpan sTestCert_Node02_04_SubjectKeyId;
 extern const ByteSpan sTestCert_Node02_04_AuthorityKeyId;
+inline constexpr NodeId kTestCert_Node02_04_NodeId     = 0xDEDEDEDE00020004;
+inline constexpr FabricId kTestCert_Node02_04_FabricId = 0xFAB000000000001D;
 
 extern const ByteSpan sTestCert_Node02_05_Chip;
 extern const ByteSpan sTestCert_Node02_05_DER;
@@ -183,6 +196,8 @@ extern const ByteSpan sTestCert_Node02_05_PublicKey;
 extern const ByteSpan sTestCert_Node02_05_PrivateKey;
 extern const ByteSpan sTestCert_Node02_05_SubjectKeyId;
 extern const ByteSpan sTestCert_Node02_05_AuthorityKeyId;
+inline constexpr NodeId kTestCert_Node02_05_NodeId     = 0xDEDEDEDE00020005;
+inline constexpr FabricId kTestCert_Node02_05_FabricId = 0xFAB000000000001D;
 
 extern const ByteSpan sTestCert_Node02_06_Chip;
 extern const ByteSpan sTestCert_Node02_06_DER;
@@ -190,6 +205,8 @@ extern const ByteSpan sTestCert_Node02_06_PublicKey;
 extern const ByteSpan sTestCert_Node02_06_PrivateKey;
 extern const ByteSpan sTestCert_Node02_06_SubjectKeyId;
 extern const ByteSpan sTestCert_Node02_06_AuthorityKeyId;
+inline constexpr NodeId kTestCert_Node02_06_NodeId     = 0xDEDEDEDE00020006;
+inline constexpr FabricId kTestCert_Node02_06_FabricId = 0xFAB000000000001D;
 
 extern const ByteSpan sTestCert_Node02_07_Chip;
 extern const ByteSpan sTestCert_Node02_07_DER;
@@ -197,6 +214,8 @@ extern const ByteSpan sTestCert_Node02_07_PublicKey;
 extern const ByteSpan sTestCert_Node02_07_PrivateKey;
 extern const ByteSpan sTestCert_Node02_07_SubjectKeyId;
 extern const ByteSpan sTestCert_Node02_07_AuthorityKeyId;
+inline constexpr NodeId kTestCert_Node02_07_NodeId     = 0xDEDEDEDE00020007;
+inline constexpr FabricId kTestCert_Node02_07_FabricId = 0xFAB000000000001D;
 
 extern const ByteSpan sTestCert_Node02_08_Chip;
 extern const ByteSpan sTestCert_Node02_08_DER;
@@ -204,6 +223,8 @@ extern const ByteSpan sTestCert_Node02_08_PublicKey;
 extern const ByteSpan sTestCert_Node02_08_PrivateKey;
 extern const ByteSpan sTestCert_Node02_08_SubjectKeyId;
 extern const ByteSpan sTestCert_Node02_08_AuthorityKeyId;
+inline constexpr NodeId kTestCert_Node02_08_NodeId     = 0xDEDEDEDE00020008;
+inline constexpr FabricId kTestCert_Node02_08_FabricId = 0xFAB000000000001D;
 
 extern const ByteSpan sTestCert_PDCID01_Chip;
 extern const ByteSpan sTestCert_PDCID01_ChipCompact;
@@ -213,6 +234,7 @@ extern const ByteSpan sTestCert_PDCID01_PrivateKey;
 extern const ByteSpan sTestCert_PDCID01_SubjectKeyId;   // empty
 extern const ByteSpan sTestCert_PDCID01_AuthorityKeyId; // empty
 extern const ByteSpan sTestCert_PDCID01_KeyId;
+extern const ByteSpan sTestCert_PDCID01_KeypairDER;
 
 } // namespace TestCerts
 } // namespace chip

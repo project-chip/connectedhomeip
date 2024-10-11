@@ -38,10 +38,11 @@ static_library("Zephyr") {
     "ConnectivityManagerImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
+    "DiagnosticDataProviderImplGetter.cpp",
     "InetPlatformConfig.h",
+    "InetUtils.cpp",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SysHeapMalloc.h",
@@ -83,4 +84,12 @@ static_library("Zephyr") {
   }
 
   cflags = [ "-Wconversion" ]
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "Logging.cpp" ]
 }

@@ -1,41 +1,49 @@
-/**
- * This is a boilerplat header to define the SILABS authentication credentials.
- * Applications must provide their own version of this header, and include:
- *  - The content of the CSA-provided Certification Declaration
- *  - The location and size of the PAI, and DAC
- *  - The key ID of the key-pair associated with the DAC
+/*
  *
- *  These credentials MUST be provided if the build variable "chip_build_device_attestation_credentials" is set to true.
+ *    Copyright (c) 2024 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
-#ifndef SILABS_DEVICE_CREDENTIALS
-#define SILABS_DEVICE_CREDENTIALS
+/**
+ *  To enable these credentias, compile the app with option
+ *  "chip_build_device_attestation_credentials=true".
+ */
 
-#ifndef SILABS_CREDENTIALS_DAC_KEY_ID
-#define SILABS_CREDENTIALS_DAC_KEY_ID 0x0002
+#ifndef SL_PROVISION_VERSION_1_0
+#define SL_PROVISION_VERSION_1_0 0
 #endif
 
-#ifndef SILABS_CREDENTIALS_DAC_OFFSET
-#define SILABS_CREDENTIALS_DAC_OFFSET 0x0000
+#ifndef SL_CREDENTIALS_DAC_OFFSET
+#define SL_CREDENTIALS_DAC_OFFSET 0x0000
 #endif
 
-#ifndef SILABS_CREDENTIALS_DAC_SIZE
-#define SILABS_CREDENTIALS_DAC_SIZE 0
+#ifndef SL_CREDENTIALS_DAC_SIZE
+#define SL_CREDENTIALS_DAC_SIZE 0
 #endif
 
-#ifndef SILABS_CREDENTIALS_PAI_OFFSET
-#define SILABS_CREDENTIALS_PAI_OFFSET 0x0200
+#ifndef SL_CREDENTIALS_PAI_OFFSET
+#define SL_CREDENTIALS_PAI_OFFSET 0x0200
 #endif
 
-#ifndef SILABS_CREDENTIALS_PAI_SIZE
-#define SILABS_CREDENTIALS_PAI_SIZE 0
+#ifndef SL_CREDENTIALS_PAI_SIZE
+#define SL_CREDENTIALS_PAI_SIZE 0
 #endif
 
-#ifndef SILABS_CREDENTIALS_CD_OFFSET
-#define SILABS_CREDENTIALS_CD_OFFSET 0x0400
+#ifndef SL_CREDENTIALS_CD_OFFSET
+#define SL_CREDENTIALS_CD_OFFSET 0x0400
 #endif
 
-#ifndef SILABS_CREDENTIALS_CD_SIZE
-#define SILABS_CREDENTIALS_CD_SIZE 0
+#ifndef SL_CREDENTIALS_CD_SIZE
+#define SL_CREDENTIALS_CD_SIZE 0
 #endif
-
-#endif // SILABS_DEVICE_CREDENTIALS

@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster apiMaturity="provisional">
+    <domain>Media</domain>
+    <name>Content App Observer</name>
+    <code>0x0510</code>
+    <define>CONTENT_APP_OBSERVER_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This cluster provides an interface for sending targeted commands to an Observer of a Content App on a Video Player device such as a Streaming Media Player, Smart TV or Smart Screen. The cluster server for Content App Observer is implemented by an endpoint that communicates with a Content App, such as a Casting Video Client. The cluster client for Content App Observer is implemented by a Content App endpoint. A Content App is informed of the NodeId of an Observer when a binding is set on the Content App. The Content App can then send the ContentAppMessage to the Observer (server cluster), and the Observer responds with a ContentAppMessageResponse.</description>
+
+    <command source="client" code="0x00" name="ContentAppMessage" response="ContentAppMessageResponse" optional="false">
+      <description>Upon receipt, the data field MAY be parsed and interpreted. Message encoding is specific to the Content App. A Content App MAY when possible read attributes from the Basic Information Cluster on the Observer and use this to determine the Message encoding.</description>
+      <arg name="Data" type="char_string" optional="true"/>
+      <arg name="EncodingHint" type="char_string" optional="false"/>
+    </command>
+
+    <command source="server" code="0x01" name="ContentAppMessageResponse" optional="false" apiMaturity="provisional">
+      <description>This command SHALL be generated in response to ContentAppMessage command.</description>
+      <arg name="Status" type="StatusEnum" optional="false"/>
+      <arg name="Data" type="char_string" optional="true"/>
+      <arg name="EncodingHint" type="char_string" optional="true"/>
+    </command>
+
+  </cluster>
+
+  <enum name="StatusEnum" type="enum8">
+    <cluster code="0x0510"/>
+    <item value="0x00" name="Success"/>
+    <item value="0x01" name="UnexpectedData" />
+  </enum>
+
+</configurator>

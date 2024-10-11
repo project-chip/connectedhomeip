@@ -32,6 +32,7 @@ chip_inet_config_enable_ipv4 = false
 
 chip_build_tests = false
 
-openthread_project_core_config_file = "openthread-core-cc13x4_26x4-config.h"
+openthread_project_core_config_file =
+    "openthread-core-cc13xx_cc26xx-config-matter.h"
 openthread_core_config_platform_check_file =
-    "openthread-core-cc13x4_26x4-config-check.h"
+    "openthread-core-cc13xx_cc26xx-config-check.h"

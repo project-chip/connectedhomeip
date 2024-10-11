@@ -24,12 +24,14 @@
 #include <stdint.h>
 
 #include <functional>
+#include <string>
 #include <vector>
 
 class Device
 {
 public:
-    static const int kDeviceNameSize = 32;
+    static const int kDeviceNameSize     = 32;
+    static const int kDeviceUniqueIdSize = 32;
 
     enum Changed_t
     {
@@ -45,12 +47,15 @@ public:
     bool IsReachable();
     void SetReachable(bool aReachable);
     void SetName(const char * szDeviceName);
+    void SetUniqueId(const char * szDeviceUniqueId);
     void SetLocation(std::string szLocation);
+    void GenerateUniqueId();
     inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
     inline chip::EndpointId GetEndpointId() { return mEndpointId; };
     inline void SetParentEndpointId(chip::EndpointId id) { mParentEndpointId = id; };
     inline chip::EndpointId GetParentEndpointId() { return mParentEndpointId; };
     inline char * GetName() { return mName; };
+    inline char * GetUniqueId() { return mUniqueId; };
     inline std::string GetLocation() { return mLocation; };
     inline std::string GetZone() { return mZone; };
     inline void SetZone(std::string zone) { mZone = zone; };
@@ -59,8 +64,9 @@ private:
     virtual void HandleDeviceChange(Device * device, Device::Changed_t changeMask) = 0;
 
 protected:
-    bool mReachable;
-    char mName[kDeviceNameSize];
+    bool mReachable                         = false;
+    char mName[kDeviceNameSize + 1]         = { 0 };
+    char mUniqueId[kDeviceUniqueIdSize + 1] = { 0 };
     std::string mLocation;
     chip::EndpointId mEndpointId;
     chip::EndpointId mParentEndpointId;

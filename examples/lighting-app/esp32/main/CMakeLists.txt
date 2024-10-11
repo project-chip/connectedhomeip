@@ -51,7 +51,6 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/time-format-localization-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/level-control"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/network-commissioning"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/occupancy-sensor-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/on-off-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/operational-credentials-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ota-requestor"
@@ -66,13 +65,6 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/group-key-mgmt-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/scenes-server"
 )
-
-set(PRIV_REQUIRES_LIST chip QRCode bt led_strip app_update openthread driver nvs_flash spi_flash)
-
-if(${IDF_TARGET} STREQUAL "esp32")
-    list(APPEND PRIV_REQUIRES_LIST spidriver screen-framework)
-endif()
-
 
 if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build
@@ -98,8 +90,7 @@ set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
 endif (CONFIG_ENABLE_PW_RPC)
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
-                       SRC_DIRS ${SRC_DIRS_LIST}
-                       PRIV_REQUIRES ${PRIV_REQUIRES_LIST})
+                       SRC_DIRS ${SRC_DIRS_LIST})
 get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 
 include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
@@ -109,6 +100,10 @@ chip_app_component_zapgen("${CHIP_ROOT}/examples/lighting-app/lighting-common/li
 
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
     target_add_binary_data(${COMPONENT_TARGET} "insights_auth_key.txt" TEXT)
+endif()
+
+if (CONFIG_ENABLE_SET_CERT_DECLARATION_API)
+    target_add_binary_data(${COMPONENT_TARGET} "certification_declaration.der" BINARY)
 endif()
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)

@@ -41,7 +41,8 @@ config:
         defaultValue: 5
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -49,7 +50,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 1a: Reads the OnOffTransitionTime attribute from the DUT"
+    - label: "Step 1a: TH reads the OnOffTransitionTime attribute from the DUT"
       PICS: LVL.S.A0010
       command: "readAttribute"
       attribute: "OnOffTransitionTime"
@@ -60,14 +61,16 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 1b: writes the OnOffTransitionTime attribute on the DUT"
+    - label:
+          "Step 1b: TH writes the OnOffTransitionTime attribute on the DUT with
+          a different value than that read in 1a"
       PICS: LVL.S.A0010
       command: "writeAttribute"
       attribute: "OnOffTransitionTime"
       arguments:
           value: OnOffTransitionTimeConfigValue
 
-    - label: "Step 1c: Reads the OnOffTransitionTime attribute from the DUT"
+    - label: "Step 1c: TH reads the OnOffTransitionTime attribute from the DUT"
       PICS: LVL.S.A0010
       command: "readAttribute"
       attribute: "OnOffTransitionTime"
@@ -77,7 +80,7 @@ tests:
               type: int16u
               notValue: OnOffTransitionTimeValue
 
-    - label: "Step 2a: Reads the OnLevel attribute from the DUT"
+    - label: "Step 2a: TH reads the OnLevel attribute from the DUT"
       PICS: LVL.S.A0011
       command: "readAttribute"
       attribute: "OnLevel"
@@ -88,14 +91,16 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Step 2b: writes the OnLevel attribute on the DUT"
+    - label:
+          "Step 2b: TH writes the OnLevel attribute on the DUT with a different
+          value than that read in 2a"
       PICS: LVL.S.A0011
       command: "writeAttribute"
       attribute: "OnLevel"
       arguments:
           value: OnLevelConfigValue
 
-    - label: "Step 2c: Reads the OnLevel attribute from the DUT"
+    - label: "Step 2c: TH reads the OnLevel attribute from the DUT"
       PICS: LVL.S.A0011
       command: "readAttribute"
       attribute: "OnLevel"
@@ -105,7 +110,7 @@ tests:
               type: int8u
               notValue: OnLevelValue
 
-    - label: "Step 3a: Reads the OnTransitionTime attribute from the DUT"
+    - label: "Step 3a: TH reads the OnTransitionTime attribute from the DUT"
       PICS: LVL.S.A0012
       command: "readAttribute"
       attribute: "OnTransitionTime"
@@ -116,14 +121,16 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 3b: Writes the OnTransitionTime attribute on the DUT"
+    - label:
+          "Step 3b: TH writes the OnTransitionTime attribute on the DUT with a
+          different value than that read in 3a"
       PICS: LVL.S.A0012
       command: "writeAttribute"
       attribute: "OnTransitionTime"
       arguments:
           value: OnTransitionTimeConfigValue
 
-    - label: "Step 3c: Reads the OnTransitionTime attribute from the DUT"
+    - label: "Step 3c: TH reads the OnTransitionTime attribute from the DUT"
       PICS: LVL.S.A0012
       command: "readAttribute"
       attribute: "OnTransitionTime"
@@ -133,7 +140,7 @@ tests:
               type: int16u
               notValue: OnTransitionTimeValue
 
-    - label: "Step 4a: Reads the OffTransitionTime attribute from the DUT"
+    - label: "Step 4a: TH reads the OffTransitionTime attribute from the DUT"
       PICS: LVL.S.A0013
       command: "readAttribute"
       attribute: "OffTransitionTime"
@@ -144,14 +151,16 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 4b: Writes the OffTransitionTime attribute on the DUT"
+    - label:
+          "Step 4b: TH writes the OffTransitionTime attribute on the DUT with a
+          different value than that read in 4a"
       PICS: LVL.S.A0013
       command: "writeAttribute"
       attribute: "OffTransitionTime"
       arguments:
           value: OffTransitionTimeConfigValue
 
-    - label: "Step 4c: Reads the OffTransitionTime attribute from the DUT"
+    - label: "Step 4c: TH reads the OffTransitionTime attribute from the DUT"
       PICS: LVL.S.A0013
       command: "readAttribute"
       attribute: "OffTransitionTime"
@@ -161,7 +170,7 @@ tests:
               type: int16u
               notValue: OffTransitionTimeValue
 
-    - label: "Step 5a: Reads the DefaultMoveRate attribute from the DUT"
+    - label: "Step 5a: TH reads the DefaultMoveRate attribute from the DUT"
       PICS: LVL.S.A0014
       command: "readAttribute"
       attribute: "DefaultMoveRate"
@@ -172,14 +181,16 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "Step 5b: Writes the DefaultMoveRate attribute on the DUT"
+    - label:
+          "Step 5b: TH writes the DefaultMoveRate attribute on the DUT with a
+          different value than that read in 5a"
       PICS: LVL.S.A0014
       command: "writeAttribute"
       attribute: "DefaultMoveRate"
       arguments:
           value: DefaultMoveRateConfigValue
 
-    - label: "Step 5c: Reads the DefaultMoveRate attribute from the DUT"
+    - label: "Step 5c: TH reads the DefaultMoveRate attribute from the DUT"
       PICS: LVL.S.A0014
       command: "readAttribute"
       attribute: "DefaultMoveRate"
@@ -189,7 +200,7 @@ tests:
               type: int8u
               notValue: DefaultMoveRatevalue
 
-    - label: "Step 6a: Reads the StartUpCurrentLevel attribute from the DUT"
+    - label: "Step 6a: TH reads the StartUpCurrentLevel attribute from the DUT"
       PICS: LVL.S.A4000
       command: "readAttribute"
       attribute: "StartUpCurrentLevel"
@@ -200,14 +211,16 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "Step 6b: Rwrites the StartUpCurrentLevel attribute on the DUT"
+    - label:
+          "Step 6b: TH writes the StartUpCurrentLevel attribute on the DUT with
+          a different value than that read in 6a"
       PICS: LVL.S.A4000
       command: "writeAttribute"
       attribute: "StartUpCurrentLevel"
       arguments:
           value: StartUpCurrentLevelConfigValue
 
-    - label: "Step 6c: Rreads the StartUpCurrentLevel attribute from the DUT"
+    - label: "Step 6c: TH reads the StartUpCurrentLevel attribute from the DUT"
       PICS: LVL.S.A4000
       command: "readAttribute"
       attribute: "StartUpCurrentLevel"

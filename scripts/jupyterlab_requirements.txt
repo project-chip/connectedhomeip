@@ -1,0 +1,17 @@
+# Requirements for running chip-repl in jupyterlab
+# Once installed, start with
+#
+# jupyter-lab
+#
+# --------------------------------------
+# import chip.native
+# import pkgutil
+# module = pkgutil.get_loader('chip.ChipReplStartup')
+# %run {module.path}
+# --------------------------------------
+#
+
+jupyterlab
+ipykernel
+jupyterlab-lsp
+python-lsp-server

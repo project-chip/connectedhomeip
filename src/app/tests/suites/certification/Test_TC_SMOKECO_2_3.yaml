@@ -108,6 +108,7 @@ tests:
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
           [TOO]   COState: 1
+          [1692339184.860796][1750:1752] CHIP:EM: <<< [E:53304i S:33644 M:118115310 (Ack:191893921)] (S) Msg TX to 1:0000000000000001 [4D97] --- Type 0000:10 (SecureChannel:StandaloneAck)
       arguments:
           values:
               - name: "message"
@@ -194,6 +195,7 @@ tests:
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
           [TOO]   COState: 2
+          [1692339184.860796][1750:1752] CHIP:EM: <<< [E:53304i S:33644 M:118115310 (Ack:191893921)] (S) Msg TX to 1:0000000000000001 [4D97] --- Type 0000:10 (SecureChannel:StandaloneAck)
       arguments:
           values:
               - name: "message"
@@ -245,6 +247,7 @@ tests:
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
           [TOO]   COState: 0
+          [1692339184.860796][1750:1752] CHIP:EM: <<< [E:53304i S:33644 M:118115310 (Ack:191893921)] (S) Msg TX to 1:0000000000000001 [4D97] --- Type 0000:10 (SecureChannel:StandaloneAck)
       arguments:
           values:
               - name: "message"

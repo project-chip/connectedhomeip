@@ -82,7 +82,7 @@ bool ESP32Utils::IsStationProvisioned(void)
 CHIP_ERROR ESP32Utils::IsStationConnected(bool & connected)
 {
     wifi_ap_record_t apInfo;
-    connected = (esp_wifi_sta_get_ap_info(&apInfo) == ESP_OK);
+    connected = (esp_wifi_sta_get_ap_info(&apInfo) == ESP_OK && apInfo.ssid[0] != 0);
     return CHIP_NO_ERROR;
 }
 

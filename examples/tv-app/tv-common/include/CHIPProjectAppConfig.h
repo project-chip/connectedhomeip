@@ -30,6 +30,12 @@
 // TVs need to be commissioners and likely want to be discoverable
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 1
 
+// TVs can handle the memory impact of supporting a larger list
+#define CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS 10
+
+// TVs will often enable this feature
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_PASSCODE 1
+
 // TVs need to be both commissioners and commissionees
 #define CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE 1
 

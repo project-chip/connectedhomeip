@@ -23,7 +23,8 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -53,7 +54,7 @@ tests:
       arguments:
           value: 0
 
-    - label: "Step 1: TH writes 0 to the Options attribute"
+    - label: "Step 1: TH writes 0x00 to the Options attribute"
       PICS: LVL.S.A000f
       command: "writeAttribute"
       attribute: "Options"
@@ -120,8 +121,9 @@ tests:
           value: 50
 
     - label:
-          "Step 4a: TH sends a Step command to the DUT with StepMode =0x00 (up),
-          StepSize =150 and TransitionTime =300"
+          "Step 4a: TH sends a Step command to the DUT with StepMode_ =0x00
+          (up), StepSize =150 and TransitionTime =300 (30 s). This means the
+          level should increase by 150 units in 30s, so 5 units/s."
       PICS: LVL.S.C02.Rsp
       command: "Step"
       arguments:
@@ -145,7 +147,8 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "Step 4b: TH reads CurrentLevel attribute from DUT"
+    - label:
+          "Step 4b: After 10 seconds, TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C02.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -162,7 +165,9 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "Step 4c: TH reads CurrentLevel attribute from DUT"
+    - label:
+          "Step 4c: After another 10 seconds, TH reads CurrentLevel attribute
+          from DUT"
       PICS: LVL.S.C02.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -179,7 +184,9 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "Step 4d: TH reads CurrentLevel attribute from DUT"
+    - label:
+          "Step 4d: After another 10 seconds, TH reads CurrentLevel attribute
+          from DUT"
       PICS: LVL.S.C02.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -196,7 +203,9 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "Step 4e: TH reads CurrentLevel attribute from DUT"
+    - label:
+          "Step 4e: After another 5 seconds, TH reads CurrentLevel attribute
+          from DUT"
       PICS: LVL.S.C02.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "CurrentLevel"

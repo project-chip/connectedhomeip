@@ -116,7 +116,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 3a: Scan the TH Devices QR code (that includes the additional
+          "Step 3a: Scan the TH Device’s QR code (that includes the additional
           TLV data) using DUT. Using the example provided above, the payload
           would be 'MT:-24J029Q00KA064IJ3P0IXZB0DK5N1K8SQ1RYCU1-A40'."
       PICS: MCORE.DD.SCAN_QR_CODE

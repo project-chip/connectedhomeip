@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,8 +33,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label:
-          "Step 2: Read the mandatory attribute constraints: MinMeasuredValue"
+    - label: "Step 2: TH reads from the DUT the MinMeasuredValue attribute."
       PICS: PRS.S.A0001
       command: "readAttribute"
       attribute: "MinMeasuredValue"
@@ -43,8 +44,7 @@ tests:
               minValue: -32767
               maxValue: 32766
 
-    - label:
-          "Step 3: Read the mandatory attribute constraints: MaxMeasuredValue"
+    - label: "Step 3: TH reads from the DUT the MaxMeasuredValue attribute."
       PICS: PRS.S.A0002
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
@@ -55,7 +55,7 @@ tests:
               minValue: MinMeasuredValueValue
               maxValue: 32767
 
-    - label: "Step 4: Read the mandatory attribute constraints: MeasuredValue"
+    - label: "Step 4: TH reads from the DUT the MeasuredValue attribute."
       PICS: PRS.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
@@ -65,7 +65,7 @@ tests:
               minValue: MinMeasuredValueValue
               maxValue: MaxMeasuredValueValue
 
-    - label: "Step 5: Read the optional attribute: Tolerance"
+    - label: "Step 5: TH reads from the DUT the Tolerance attribute."
       PICS: PRS.S.A0003
       command: "readAttribute"
       attribute: "Tolerance"
@@ -75,7 +75,7 @@ tests:
               minValue: 0
               maxValue: 2048
 
-    - label: "Step 6: Read the optional attribute: MinScaledValue"
+    - label: "Step 6: TH reads from the DUT the MinScaledValue attribute."
       PICS: PRS.S.A0011
       command: "readAttribute"
       attribute: "MinScaledValue"
@@ -86,7 +86,7 @@ tests:
               minValue: -32767
               maxValue: 32766
 
-    - label: "Step 7: Read the optional attribute: MaxScaledValue"
+    - label: "Step 7: TH reads from the DUT the MaxScaledValue attribute."
       PICS: PRS.S.A0012
       command: "readAttribute"
       attribute: "MaxScaledValue"
@@ -97,7 +97,7 @@ tests:
               minValue: MinScaledValueValue
               maxValue: 32767
 
-    - label: "Step 8: Read the optional attribute: ScaledValue"
+    - label: "Step 8: TH reads from the DUT the ScaledValue attribute."
       PICS: PRS.S.A0010
       command: "readAttribute"
       attribute: "ScaledValue"
@@ -107,7 +107,7 @@ tests:
               minValue: MinScaledValueValue
               maxValue: MaxScaledValueValue
 
-    - label: "Step 9: Read the optional attribute: ScaledTolerance"
+    - label: "Step 9: TH reads from the DUT the ScaledTolerance attribute."
       PICS: PRS.S.A0013
       command: "readAttribute"
       attribute: "ScaledTolerance"
@@ -117,7 +117,7 @@ tests:
               minValue: 0
               maxValue: 2048
 
-    - label: "Step 10: Read the optional attribute: Scale"
+    - label: "Step 10: TH reads from the DUT the Scale attribute."
       PICS: PRS.S.A0014
       command: "readAttribute"
       attribute: "Scale"

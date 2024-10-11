@@ -17,7 +17,6 @@
 
 #include "Resolver.h"
 
-#include <lib/dnssd/ResolverProxy.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -31,7 +30,6 @@ public:
     bool IsInitialized() override { return true; }
     void Shutdown() override {}
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override {}
-    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override {}
 
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override
     {
@@ -42,12 +40,11 @@ public:
     {
         ChipLogError(Discovery, "Failed to stop resolving node ID: dnssd resolving not available");
     }
-    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override
+    CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR StopDiscovery() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StopDiscovery(DiscoveryContext & context) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -58,35 +55,14 @@ NoneResolver gResolver;
 
 } // namespace
 
-Resolver & chip::Dnssd::Resolver::Instance()
+#if CHIP_DNSSD_DEFAULT_NONE
+
+Resolver & GetDefaultResolver()
 {
     return gResolver;
 }
 
-ResolverProxy::~ResolverProxy()
-{
-    Shutdown();
-}
-
-CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ResolverProxy::DiscoverCommissioners(DiscoveryFilter filter)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ResolverProxy::StopDiscovery()
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ResolverProxy::ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
+#endif // CHIP_DNSSD_DEFAULT_NONE
 
 } // namespace Dnssd
 } // namespace chip

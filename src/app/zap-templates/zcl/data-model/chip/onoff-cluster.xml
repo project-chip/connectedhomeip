@@ -55,6 +55,33 @@ limitations under the License.
     <description>Attributes and commands for switching devices between 'On' and 'Off' states.</description>
     <globalAttribute side="either" code="0xFFFD" value="6"/>
 
+    <features>
+      <feature bit="0" code="LT" name="Lighting" summary="Behavior that supports lighting applications.">
+        <optionalConform>
+          <notTerm>
+            <feature name="OFFONLY"/>
+          </notTerm>
+        </optionalConform>
+      </feature>
+      <feature bit="1" code="DF" name="DeadFrontBehavior" summary="Device has DeadFrontBehavior Feature">
+        <optionalConform>
+          <notTerm>
+            <feature name="OFFONLY"/>
+          </notTerm>
+        </optionalConform>
+      </feature>
+      <feature bit="2" code="OFFONLY" name="OffOnly" summary="Device supports the OffOnly Feature feature">
+        <optionalConform>
+          <notTerm>
+            <orTerm>
+              <feature name="LT"/>
+              <feature name="DF"/>
+            </orTerm>
+          </notTerm>
+        </optionalConform>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="ON_OFF"               type="boolean" default="0" reportable="true"              >OnOff</attribute>
     <attribute side="server" code="0x4000" define="GLOBAL_SCENE_CONTROL" type="boolean" default="1"                 optional="true">GlobalSceneControl</attribute>
     <attribute side="server" code="0x4001" define="ON_TIME"              type="int16u"  default="0" writable="true" optional="true">OnTime</attribute>
@@ -95,10 +122,4 @@ limitations under the License.
     </command>
   </cluster>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0006" />
-    <field name="Lighting" mask="0x01" />
-    <field name="DeadFrontBehavior" mask="0x02" />
-    <field name="OffOnly" mask="0x04" />
-  </bitmap>
 </configurator>

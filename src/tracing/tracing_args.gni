@@ -11,9 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("${build_root}/config/compiler/compiler.gni")
+import("${chip_root}/config/recommended.gni")
 import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
@@ -23,7 +22,9 @@ declare_args() {
   #
   # Additionally, if tracing is enabled, the main() function has to add
   # backends explicitly
-  matter_enable_tracing_support = current_os == "android"
+  matter_enable_tracing_support =
+      matter_enable_recommended &&
+      (current_os == "android" || chip_device_platform == "darwin")
 
   # Defines the trace backend. Current matter tracing splits the logic
   # into two parts:
@@ -46,6 +47,8 @@ declare_args() {
   #
   if (current_os == "linux" || current_os == "android") {
     matter_trace_config = "${chip_root}/src/tracing/perfetto:perfetto_tracing"
+  } else if (chip_device_platform == "darwin") {
+    matter_trace_config = "${chip_root}/src/tracing/darwin:darwin_tracing"
   } else {
     matter_trace_config = "${chip_root}/src/tracing/none"
   }

@@ -16,24 +16,54 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements reporting engine for CHIP
- *      Data Model profile.
- *
- */
-
 #include <app/AppConfig.h>
+#include <app/ConcreteEventPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/Provider.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/Engine.h>
+#include <app/reporting/Read-Checked.h>
+#include <app/reporting/Read.h>
+#include <app/reporting/reporting.h>
 #include <app/util/MatterCallbacks.h>
+#include <app/util/ember-compatibility-functions.h>
+#include <lib/core/DataModelTypes.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/server/ICDNotifier.h> // nogncheck
+#endif
 
 using namespace chip::Access;
 
 namespace chip {
 namespace app {
 namespace reporting {
+namespace {
+
+using Protocols::InteractionModel::Status;
+
+Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eventPath)
+{
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+
+    if (!model->GetClusterInfo(eventPath).has_value())
+    {
+        return model->EndpointExists(eventPath.mEndpointId) ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
+    }
+
+    return Status::Success;
+#else
+    return CheckEventSupportStatus(eventPath);
+#endif
+}
+
+} // namespace
+
+Engine::Engine(InteractionModelEngine * apImEngine) : mpImEngine(apImEngine) {}
+
 CHIP_ERROR Engine::Init()
 {
     mNumReportsInFlight = 0;
@@ -51,7 +81,7 @@ void Engine::Shutdown()
     mGlobalDirtySet.ReleaseAll();
 }
 
-bool Engine::IsClusterDataVersionMatch(const ObjectList<DataVersionFilter> * aDataVersionFilterList,
+bool Engine::IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFilter> * aDataVersionFilterList,
                                        const ConcreteReadAttributePath & aPath)
 {
     bool existPathMatch       = false;
@@ -61,27 +91,16 @@ bool Engine::IsClusterDataVersionMatch(const ObjectList<DataVersionFilter> * aDa
         if (aPath.mEndpointId == filter->mValue.mEndpointId && aPath.mClusterId == filter->mValue.mClusterId)
         {
             existPathMatch = true;
-            if (!IsClusterDataVersionEqual(ConcreteClusterPath(filter->mValue.mEndpointId, filter->mValue.mClusterId),
-                                           filter->mValue.mDataVersion.Value()))
+
+            if (!Impl::IsClusterDataVersionEqualTo(mpImEngine->GetDataModelProvider(),
+                                                   ConcreteClusterPath(filter->mValue.mEndpointId, filter->mValue.mClusterId),
+                                                   filter->mValue.mDataVersion.Value()))
             {
                 existVersionMismatch = true;
             }
         }
     }
     return existPathMatch && !existVersionMismatch;
-}
-
-CHIP_ERROR
-Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                            AttributeReportIBs::Builder & aAttributeReportIBs, const ConcreteReadAttributePath & aPath,
-                            AttributeValueEncoder::AttributeEncodeState * aEncoderState)
-{
-    ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", aPath.mClusterId,
-                  aPath.mAttributeId);
-    MatterPreAttributeReadCallback(aPath);
-    ReturnErrorOnFailure(ReadSingleClusterData(aSubjectDescriptor, aIsFabricFiltered, aPath, aAttributeReportIBs, aEncoderState));
-    MatterPostAttributeReadCallback(aPath);
-    return CHIP_NO_ERROR;
 }
 
 static bool IsOutOfWriterSpaceError(CHIP_ERROR err)
@@ -185,21 +204,26 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             attributeReportIBs.Checkpoint(attributeBackup);
             ConcreteReadAttributePath pathForRetrieval(readPath);
             // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
-            AttributeValueEncoder::AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
-            err = RetrieveClusterData(apReadHandler->GetSubjectDescriptor(), apReadHandler->IsFabricFiltered(), attributeReportIBs,
-                                      pathForRetrieval, &encodeState);
-            if (err != CHIP_NO_ERROR)
+            AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
+            DataModel::ActionReturnStatus status =
+                Impl::RetrieveClusterData(mpImEngine->GetDataModelProvider(), apReadHandler->GetSubjectDescriptor(),
+                                          apReadHandler->IsFabricFiltered(), attributeReportIBs, pathForRetrieval, &encodeState);
+            if (status.IsError())
             {
-                ChipLogError(DataManagement,
-                             "Error retrieving data from clusterId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
-                             ChipLogValueMEI(pathForRetrieval.mClusterId), err.Format());
+                // Operation error set, since this will affect early return or override on status encoding
+                // it will also be used for error reporting below.
+                err = status.GetUnderlyingError();
 
                 // If error is not an "out of writer space" error, rollback and encode status.
                 // Otherwise, if partial data allowed, save the encode state.
                 // Otherwise roll back. If we have already encoded some chunks, we are done; otherwise encode status.
 
-                if (encodeState.AllowPartialData() && IsOutOfWriterSpaceError(err))
+                if (encodeState.AllowPartialData() && status.IsOutOfSpaceEncodingResponse())
                 {
+                    ChipLogDetail(DataManagement,
+                                  "List does not fit in packet, chunk between list items for clusterId: " ChipLogFormatMEI
+                                  ", attributeId: " ChipLogFormatMEI,
+                                  ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId));
                     // Encoding is aborted but partial data is allowed, then we don't rollback and save the state for next chunk.
                     // The expectation is that RetrieveClusterData has already reset attributeReportIBs to a good state (rolled
                     // back any partially-written AttributeReportIB instances, reset its error status).  Since AllowPartialData()
@@ -212,12 +236,17 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     // We met a error during writing reports, one common case is we are running out of buffer, rollback the
                     // attributeReportIB to avoid any partial data.
                     attributeReportIBs.Rollback(attributeBackup);
-                    apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
+                    apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
 
-                    if (!IsOutOfWriterSpaceError(err))
+                    if (!status.IsOutOfSpaceEncodingResponse())
                     {
+                        ChipLogError(DataManagement,
+                                     "Fail to retrieve data, roll back and encode status on clusterId: " ChipLogFormatMEI
+                                     ", attributeId: " ChipLogFormatMEI "err = %" CHIP_ERROR_FORMAT,
+                                     ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId),
+                                     err.Format());
                         // Try to encode our error as a status response.
-                        err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
+                        err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(status.GetStatusCode()));
                         if (err != CHIP_NO_ERROR)
                         {
                             // OK, just roll back again and give up; if we still ran out of space we
@@ -225,11 +254,19 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                             attributeReportIBs.Rollback(attributeBackup);
                         }
                     }
+                    else
+                    {
+                        ChipLogDetail(DataManagement,
+                                      "Next attribute value does not fit in packet, roll back on clusterId: " ChipLogFormatMEI
+                                      ", attributeId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
+                                      ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId),
+                                      err.Format());
+                    }
                 }
             }
             SuccessOrExit(err);
             // Successfully encoded the attribute, clear the internal state.
-            apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
+            apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
         }
         // We just visited all paths interested by this read handler and did not abort in the middle of iteration, there are no more
         // chunks for this report.
@@ -311,7 +348,8 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
         }
 
         ConcreteEventPath path(current->mValue.mEndpointId, current->mValue.mClusterId, current->mValue.mEventId);
-        Status status = CheckEventSupportStatus(path);
+        Status status = EventPathValid(mpImEngine->GetDataModelProvider(), path);
+
         if (status != Status::Success)
         {
             TLV::TLVWriter checkpoint = aWriter;
@@ -324,27 +362,33 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
             aHasEncodedData = true;
         }
 
-        Access::RequestPath requestPath{ .cluster = current->mValue.mClusterId, .endpoint = current->mValue.mEndpointId };
+        Access::RequestPath requestPath{ .cluster     = current->mValue.mClusterId,
+                                         .endpoint    = current->mValue.mEndpointId,
+                                         .requestType = RequestType::kEventReadRequest,
+                                         .entityId    = current->mValue.mEventId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
 
         err = Access::GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege);
-        if (err != CHIP_ERROR_ACCESS_DENIED)
+        if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
         {
             ReturnErrorOnFailure(err);
         }
         else
         {
             TLV::TLVWriter checkpoint = aWriter;
-            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path, StatusIB(Status::UnsupportedAccess));
+            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path,
+                                                        err == CHIP_ERROR_ACCESS_DENIED ? StatusIB(Status::UnsupportedAccess)
+                                                                                                              : StatusIB(Status::AccessRestricted));
+
             if (err != CHIP_NO_ERROR)
             {
                 aWriter = checkpoint;
                 break;
             }
             aHasEncodedData = true;
-            ChipLogDetail(InteractionModel, "Access to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by ACL",
+            ChipLogDetail(InteractionModel, "Access to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by %s",
                           current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId),
-                          ChipLogValueMEI(current->mValue.mEventId));
+                          ChipLogValueMEI(current->mValue.mEventId), err == CHIP_ERROR_ACCESS_DENIED ? "ACL" : "ARL");
         }
         current = current->mpNext;
     }
@@ -465,10 +509,11 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter reportDataWriter;
     ReportDataMessage::Builder reportDataBuilder;
-    chip::System::PacketBufferHandle bufHandle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+    chip::System::PacketBufferHandle bufHandle = nullptr;
     uint16_t reservedSize                      = 0;
     bool hasMoreChunks                         = false;
     bool needCloseReadHandler                  = false;
+    size_t reportBufferMaxSize                 = 0;
 
     // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
     const uint32_t kReservedSizeForMoreChunksFlag = 1 + 1;
@@ -485,11 +530,15 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     VerifyOrExit(apReadHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(apReadHandler->GetSession() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    reportBufferMaxSize = apReadHandler->GetReportBufferMaxSize();
+
+    bufHandle = System::PacketBufferHandle::New(reportBufferMaxSize);
     VerifyOrExit(!bufHandle.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
-    if (bufHandle->AvailableDataLength() > kMaxSecureSduLengthBytes)
+    if (bufHandle->AvailableDataLength() > reportBufferMaxSize)
     {
-        reservedSize = static_cast<uint16_t>(bufHandle->AvailableDataLength() - kMaxSecureSduLengthBytes);
+        reservedSize = static_cast<uint16_t>(bufHandle->AvailableDataLength() - reportBufferMaxSize);
     }
 
     reportDataWriter.Init(std::move(bufHandle));
@@ -498,8 +547,8 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     reportDataWriter.ReserveBuffer(mReservedSize);
 #endif
 
-    // Always limit the size of the generated packet to fit within kMaxSecureSduLengthBytes regardless of the available buffer
-    // capacity.
+    // Always limit the size of the generated packet to fit within the max size returned by the ReadHandler regardless
+    // of the available buffer capacity.
     // Also, we need to reserve some extra space for the MIC field.
     reportDataWriter.ReserveBuffer(static_cast<uint32_t>(reservedSize + chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
@@ -509,6 +558,12 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     if (apReadHandler->IsType(ReadHandler::InteractionType::Subscribe))
     {
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        // Notify the ICDManager that we are about to send a subscription report before we prepare the Report payload.
+        // This allows the ICDManager to trigger any necessary updates and have the information in the report about to be sent.
+        app::ICDNotifier::GetInstance().NotifySubscriptionReport();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
         SubscriptionId subscriptionId = 0;
         apReadHandler->GetSubscriptionId(subscriptionId);
         reportDataBuilder.SubscriptionId(subscriptionId);
@@ -606,7 +661,7 @@ CHIP_ERROR Engine::ScheduleRun()
         return CHIP_NO_ERROR;
     }
 
-    Messaging::ExchangeManager * exchangeManager = InteractionModelEngine::GetInstance()->GetExchangeManager();
+    Messaging::ExchangeManager * exchangeManager = mpImEngine->GetExchangeManager();
     if (exchangeManager == nullptr)
     {
         return CHIP_ERROR_INCORRECT_STATE;
@@ -630,18 +685,18 @@ void Engine::Run()
 {
     uint32_t numReadHandled = 0;
 
-    InteractionModelEngine * imEngine = InteractionModelEngine::GetInstance();
-
     // We may be deallocating read handlers as we go.  Track how many we had
     // initially, so we make sure to go through all of them.
-    size_t initialAllocated = imEngine->mReadHandlers.Allocated();
+    size_t initialAllocated = mpImEngine->mReadHandlers.Allocated();
     while ((mNumReportsInFlight < CHIP_IM_MAX_REPORTS_IN_FLIGHT) && (numReadHandled < initialAllocated))
     {
-        ReadHandler * readHandler = imEngine->ActiveHandlerAt(mCurReadHandlerIdx % (uint32_t) imEngine->mReadHandlers.Allocated());
+        ReadHandler * readHandler =
+            mpImEngine->ActiveHandlerAt(mCurReadHandlerIdx % (uint32_t) mpImEngine->mReadHandlers.Allocated());
         VerifyOrDie(readHandler != nullptr);
 
-        if (readHandler->ShouldReportUnscheduled() || imEngine->GetReportScheduler()->IsReportableNow(readHandler))
+        if (readHandler->ShouldReportUnscheduled() || mpImEngine->GetReportScheduler()->IsReportableNow(readHandler))
         {
+
             mRunningReadHandler = readHandler;
             CHIP_ERROR err      = BuildAndSendSingleReportData(readHandler);
             mRunningReadHandler = nullptr;
@@ -663,14 +718,14 @@ void Engine::Run()
     // This isn't strictly necessary, but does make it easier to debug issues in this code if they
     // do arise.
     //
-    if (mCurReadHandlerIdx >= imEngine->mReadHandlers.Allocated())
+    if (mCurReadHandlerIdx >= mpImEngine->mReadHandlers.Allocated())
     {
         mCurReadHandlerIdx = 0;
     }
 
     bool allReadClean = true;
 
-    imEngine->mReadHandlers.ForEachActiveObject([&allReadClean](ReadHandler * handler) {
+    mpImEngine->mReadHandlers.ForEachActiveObject([&allReadClean](ReadHandler * handler) {
         if (handler->IsDirty())
         {
             allReadClean = false;
@@ -823,31 +878,30 @@ CHIP_ERROR Engine::InsertPathIntoDirtySet(const AttributePathParams & aAttribute
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
+CHIP_ERROR Engine::SetDirty(const AttributePathParams & aAttributePath)
 {
     BumpDirtySetGeneration();
 
     bool intersectsInterestPath = false;
-    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject(
-        [&aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
-            // We call AttributePathIsDirty for both read interactions and subscribe interactions, since we may send inconsistent
-            // attribute data between two chunks. AttributePathIsDirty will not schedule a new run for read handlers which are
-            // waiting for a response to the last message chunk for read interactions.
-            if (handler->CanStartReporting() || handler->IsAwaitingReportResponse())
+    mpImEngine->mReadHandlers.ForEachActiveObject([&aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
+        // We call AttributePathIsDirty for both read interactions and subscribe interactions, since we may send inconsistent
+        // attribute data between two chunks. AttributePathIsDirty will not schedule a new run for read handlers which are
+        // waiting for a response to the last message chunk for read interactions.
+        if (handler->CanStartReporting() || handler->IsAwaitingReportResponse())
+        {
+            for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
             {
-                for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
+                if (object->mValue.Intersects(aAttributePath))
                 {
-                    if (object->mValue.Intersects(aAttributePath))
-                    {
-                        handler->AttributePathIsDirty(aAttributePath);
-                        intersectsInterestPath = true;
-                        break;
-                    }
+                    handler->AttributePathIsDirty(aAttributePath);
+                    intersectsInterestPath = true;
+                    break;
                 }
             }
+        }
 
-            return Loop::Continue;
-        });
+        return Loop::Continue;
+    });
 
     if (!intersectsInterestPath)
     {
@@ -888,7 +942,7 @@ void Engine::OnReportConfirm()
 
 void Engine::GetMinEventLogPosition(uint32_t & aMinLogPosition)
 {
-    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aMinLogPosition](ReadHandler * handler) {
+    mpImEngine->mReadHandlers.ForEachActiveObject([&aMinLogPosition](ReadHandler * handler) {
         if (handler->IsType(ReadHandler::InteractionType::Read))
         {
             return Loop::Continue;
@@ -923,13 +977,13 @@ CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBy
     // we don't need to call schedule run for event.
     // If schedule run is called, actually we would not delivery events as well.
     // Just wanna save one schedule run here
-    if (InteractionModelEngine::GetInstance()->mEventPathPool.Allocated() == 0)
+    if (mpImEngine->mEventPathPool.Allocated() == 0)
     {
         return CHIP_NO_ERROR;
     }
 
     bool isUrgentEvent = false;
-    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aPath, &isUrgentEvent](ReadHandler * handler) {
+    mpImEngine->mReadHandlers.ForEachActiveObject([&aPath, &isUrgentEvent](ReadHandler * handler) {
         if (handler->IsType(ReadHandler::InteractionType::Read))
         {
             return Loop::Continue;
@@ -960,7 +1014,7 @@ CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBy
 
 void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
 {
-    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([fabricIndex](ReadHandler * handler) {
+    mpImEngine->mReadHandlers.ForEachActiveObject([fabricIndex](ReadHandler * handler) {
         if (handler->IsType(ReadHandler::InteractionType::Read))
         {
             return Loop::Continue;
@@ -979,12 +1033,18 @@ void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
     Run();
 }
 
-}; // namespace reporting
+void Engine::MarkDirty(const AttributePathParams & path)
+{
+    CHIP_ERROR err = SetDirty(path);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Failed to set path dirty: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+} // namespace reporting
 } // namespace app
 } // namespace chip
-
-void __attribute__((weak)) MatterPreAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
-void __attribute__((weak)) MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
 
 // TODO: MatterReportingAttributeChangeCallback should just live in libCHIP,
 // instead of being in ember-compatibility-functions.  It does not depend on any

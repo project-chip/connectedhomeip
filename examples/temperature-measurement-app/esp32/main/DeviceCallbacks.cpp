@@ -23,8 +23,9 @@
  *
  **/
 #include "DeviceCallbacks.h"
+#include <esp_log.h>
 
-static const char * TAG = "echo-devicecallbacks";
+static const char TAG[] = "echo-devicecallbacks";
 
 using namespace ::chip;
 using namespace ::chip::Inet;

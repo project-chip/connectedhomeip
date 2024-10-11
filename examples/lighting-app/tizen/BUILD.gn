@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/tizen.gni")
 
+import("${build_root}/config/linux/pkg_config.gni")
 import("${chip_root}/build/chip/linux/gdbus_library.gni")
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/app/common_flags.gni")
@@ -25,6 +27,10 @@ assert(chip_build_tools)
 declare_args() {
   # Enable D-Bus based UI functionality for example app
   chip_examples_enable_ui = false
+}
+
+pkg_config("capi-system-peripheral-io") {
+  packages = [ "capi-system-peripheral-io" ]
 }
 
 gdbus_library("chip-lighting-app-manager") {
@@ -49,6 +55,8 @@ executable("chip-lighting-app") {
     "${chip_root}/examples/platform/tizen:app-main",
     "${chip_root}/src/lib",
   ]
+
+  configs += [ ":capi-system-peripheral-io" ]
 
   if (chip_examples_enable_ui) {
     sources += [ "src/DBusInterface.cpp" ]

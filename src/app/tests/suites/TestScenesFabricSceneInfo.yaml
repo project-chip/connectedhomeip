@@ -26,7 +26,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Scenes"
+    cluster: "Scenes Management"
     endpoint: 1
     payload:
         type: char_string
@@ -63,14 +63,6 @@ tests:
       attribute: "CurrentFabricIndex"
       response:
           saveAs: th1FabricIndex
-
-    - label: "Read FeatureMap FabricScene bit (global attribute 65532)"
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: bitmap32
-              hasMasksSet: [0x8]
 
     - label: "Read the FabricSceneInfo attribute (0x0007) "
       command: "readAttribute"
@@ -207,7 +199,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
-                value: 0x0001
+                value: 1000
               - name: "SceneName"
                 value: "Scene1"
               - name: "ExtensionFieldSets"
@@ -216,12 +208,50 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x64 }],
+                        },
+                        {
+                            ClusterID: 0x0300,
+                            AttributeValueList:
+                                [
+                                    {
+                                        AttributeID: 0x0001,
+                                        ValueUnsigned8: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x0003,
+                                        ValueUnsigned16: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x0004,
+                                        ValueUnsigned16: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x0007,
+                                        ValueUnsigned16: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x4000,
+                                        ValueUnsigned16: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x4001,
+                                        ValueUnsigned8: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x4002,
+                                        ValueUnsigned8: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x4003,
+                                        ValueUnsigned8: 0x64,
+                                    },
+                                ],
                         },
                     ]
       response:
@@ -267,19 +297,57 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
-                value: 0x0001
+                value: 1000
               - name: "ExtensionFieldSets"
                 value:
                     [
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x64 }],
+                        },
+                        {
+                            ClusterID: 0x0300,
+                            AttributeValueList:
+                                [
+                                    {
+                                        AttributeID: 0x0001,
+                                        ValueUnsigned8: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x0003,
+                                        ValueUnsigned16: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x0004,
+                                        ValueUnsigned16: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x0007,
+                                        ValueUnsigned16: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x4000,
+                                        ValueUnsigned16: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x4001,
+                                        ValueUnsigned8: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x4002,
+                                        ValueUnsigned8: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x4003,
+                                        ValueUnsigned8: 0x64,
+                                    },
+                                ],
                         },
                     ]
 
@@ -333,7 +401,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
-                value: 0x0002
+                value: 2000
               - name: "SceneName"
                 value: "Scene1"
               - name: "ExtensionFieldSets"
@@ -342,12 +410,12 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x00 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x00 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0xFA }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0xFA }],
                         },
                     ]
 
@@ -368,19 +436,19 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
-                value: 0x0002
+                value: 2000
               - name: "ExtensionFieldSets"
                 value:
                     [
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x00 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x00 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0xFA }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0xFA }],
                         },
                     ]
 

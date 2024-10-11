@@ -78,7 +78,7 @@ public:
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
 
 private:
-    const char * kNamespace = "CHIP_KVS";
+    static inline const char kNamespace[] = "CHIP_KVS";
     static CHIP_ERROR MapNvdmStatus(nvdm_status_t nvdm_status);
     // ===== Members for internal use by the following friends.
 

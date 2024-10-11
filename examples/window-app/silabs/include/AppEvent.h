@@ -32,14 +32,6 @@ struct AppEvent
     {
         kEventType_Button = 0,
         kEventType_Timer,
-        kEventType_Light,
-        kEventType_Install,
-        kEventType_ButtonDown,
-        kEventType_ButtonUp,
-
-        kEventType_None,
-        kEventType_Reset,
-        kEventType_ResetPressed,
         kEventType_ResetWarning,
         kEventType_ResetCanceled,
         // Button events
@@ -54,13 +46,6 @@ struct AppEvent
 
         // Cover Attribute update events
         kEventType_AttributeChange,
-
-        // Provisioning events
-        kEventType_ProvisionedStateChanged,
-        kEventType_ConnectivityStateChanged,
-        kEventType_BLEConnectionsChanged,
-        kEventType_WinkOff,
-        kEventType_WinkOn,
     };
 
     uint16_t Type;

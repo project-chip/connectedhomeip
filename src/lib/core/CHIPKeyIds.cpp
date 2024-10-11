@@ -15,15 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/core/CHIPKeyIds.h>
 
-/**
- *    @file
- *      This file implements CHIP key types helper functions.
- *
- */
-#include "CHIPKeyIds.h"
-
-#include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {

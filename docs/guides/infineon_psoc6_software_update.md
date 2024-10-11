@@ -25,7 +25,7 @@ Infineon PSoC6 example applications by passing the
 
            ```
            $ scripts/build/build_examples.py --enable-flashbundle --target infineon-psoc6-lock-ota build
-           $ third_party/infineon/psoc6/psoc6_sdk/ota/ota_base_build.sh out/infineon-psoc6-lock-ota chip-psoc6-lock-example
+           $ third_party/infineon/psoc6/psoc6_sdk/ota/ota_base_build.sh psoc6-lock chip-psoc6-lock-example
            ```
 
 -   Build the PSoC6 OTA Update application from the chip root dir and create OTA
@@ -33,14 +33,21 @@ Infineon PSoC6 example applications by passing the
 
            ```
            $ scripts/build/build_examples.py --enable-flashbundle --no-log-timestamps --target infineon-psoc6-lock-ota-updateimage build
-           $ third_party/infineon/psoc6/psoc6_sdk/ota/ota_update_build.sh out/infineon-psoc6-lock-ota-updateimage chip-psoc6-lock-example
+           $ third_party/infineon/psoc6/psoc6_sdk/ota/ota_update_build.sh psoc6-lock chip-psoc6-lock-example
            ```
 
-*   Additionally a pre-compiled bootloader must be flashed to the board using
+*   Additionally a pre-compiled bootloader must be flashed to the board before
+    flashing the application using
     [Cypress Programmer](https://softwaretools.infineon.com/tools/com.ifx.tb.tool.cypressprogrammer).
     This image can be found at:
 
           $ ./third_party/infineon/psoc6/psoc6_sdk/ota/matter-psoc6-mcuboot-bootloader.hex
+
+*   Flash the application after putting the CY8CKIT-062S2-43012 board on
+    KitProg3 CMSIS-DAP Mode by pressing the `MODE SELECT` button.
+
+          $ cd ~/connectedhomeip
+          $ python3 out/infineon-psoc6-lock-ota/chip-psoc6-lock-example.flash.py
 
 *   In a terminal start the Provider app passing to it the path to the Matter
     OTA file created in the previous step:(output of ota_update_build step)

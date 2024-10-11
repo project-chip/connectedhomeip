@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
@@ -54,6 +55,9 @@ constexpr uint8_t kFabricSensitiveCharLength = 128;
 
 // The maximum length of the fabric sensitive integer list within the TestFabricScoped struct.
 constexpr uint8_t kFabricSensitiveIntListLength = 8;
+
+// The maximum buffer size allowed in TestBatchHelperResponse
+constexpr uint16_t kTestBatchHelperResponseBufferMax = 800;
 
 namespace {
 
@@ -97,10 +101,22 @@ private:
                                                              AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadStructAttribute(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteStructAttribute(AttributeValueDecoder & aDecoder);
+    CHIP_ERROR ReadGlobalStruct(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteGlobalStruct(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadNullableStruct(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteNullableStruct(AttributeValueDecoder & aDecoder);
+    CHIP_ERROR ReadNullableGlobalStruct(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteNullableGlobalStruct(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadListFabricScopedAttribute(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteListFabricScopedAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
+};
+
+struct AsyncBatchCommandsWorkData
+{
+    CommandHandler::Handle asyncCommandHandle;
+    ConcreteCommandPath commandPath = ConcreteCommandPath(0, 0, 0);
+    uint16_t sizeOfResponseBuffer;
+    uint8_t fillCharacter;
 };
 
 TestAttrAccess gAttrAccess;
@@ -114,7 +130,9 @@ size_t gListLongOctetStringLen = kAttributeListLength;
 Structs::TestListStructOctet::Type listStructOctetStringData[kAttributeListLength];
 OctetStringData gStructAttributeByteSpanData;
 Structs::SimpleStruct::Type gStructAttributeValue;
+Globals::Structs::TestGlobalStruct::Type gGlobalStructAttributeValue;
 NullableStruct::TypeInfo::Type gNullableStructAttributeValue;
+DataModel::Nullable<Globals::Structs::TestGlobalStruct::Type> gNullableGlobalStructAttributeValue;
 
 chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::Type gListFabricScopedAttributeValue[kAttributeListLength];
 uint8_t gListFabricScoped_fabricSensitiveInt8uList[kAttributeListLength][kFabricSensitiveIntListLength];
@@ -137,6 +155,36 @@ SimpleEnum gSimpleEnums[kAttributeListLength];
 size_t gSimpleEnumCount = 0;
 Structs::NullablesAndOptionalsStruct::Type gNullablesAndOptionalsStruct;
 
+void AsyncBatchCommandWork(AsyncBatchCommandsWorkData * asyncWorkData)
+{
+    auto commandHandleRef = std::move(asyncWorkData->asyncCommandHandle);
+    auto commandHandle    = commandHandleRef.Get();
+    if (commandHandle == nullptr)
+    {
+        // Very weird that we are even in here, what set this to nullptr?
+        Platform::Delete(asyncWorkData);
+        return;
+    }
+
+    uint8_t buffer[kTestBatchHelperResponseBufferMax];
+    memset(buffer, asyncWorkData->fillCharacter, asyncWorkData->sizeOfResponseBuffer);
+    Commands::TestBatchHelperResponse::Type response;
+    response.buffer = ByteSpan(buffer, asyncWorkData->sizeOfResponseBuffer);
+    commandHandle->AddResponse(asyncWorkData->commandPath, response);
+    Platform::Delete(asyncWorkData);
+}
+
+static void timerCallback(System::Layer *, void * callbackContext)
+{
+    AsyncBatchCommandWork(reinterpret_cast<AsyncBatchCommandsWorkData *>(callbackContext));
+}
+
+static void scheduleTimerCallbackMs(AsyncBatchCommandsWorkData * asyncWorkData, uint32_t delayMs)
+{
+    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
+                                          reinterpret_cast<void *>(asyncWorkData));
+}
+
 CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
@@ -156,6 +204,9 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     case StructAttr::Id: {
         return ReadStructAttribute(aEncoder);
     }
+    case GlobalStruct::Id: {
+        return ReadGlobalStruct(aEncoder);
+    }
     case ListLongOctetString::Id: {
         return ReadListLongOctetStringAttribute(aEncoder);
     }
@@ -164,6 +215,9 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     }
     case NullableStruct::Id: {
         return ReadNullableStruct(aEncoder);
+    }
+    case NullableGlobalStruct::Id: {
+        return ReadNullableGlobalStruct(aEncoder);
     }
     case GeneralErrorBoolean::Id: {
         return StatusIB(Protocols::InteractionModel::Status::InvalidDataType).ToChipError();
@@ -207,8 +261,14 @@ CHIP_ERROR TestAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attrib
     case StructAttr::Id: {
         return WriteStructAttribute(aDecoder);
     }
+    case GlobalStruct::Id: {
+        return WriteGlobalStruct(aDecoder);
+    }
     case NullableStruct::Id: {
         return WriteNullableStruct(aDecoder);
+    }
+    case NullableGlobalStruct::Id: {
+        return WriteNullableGlobalStruct(aDecoder);
     }
     case GeneralErrorBoolean::Id: {
         return StatusIB(Protocols::InteractionModel::Status::InvalidDataType).ToChipError();
@@ -232,6 +292,26 @@ CHIP_ERROR TestAttrAccess::ReadNullableStruct(AttributeValueEncoder & aEncoder)
 CHIP_ERROR TestAttrAccess::WriteNullableStruct(AttributeValueDecoder & aDecoder)
 {
     return aDecoder.Decode(gNullableStructAttributeValue);
+}
+
+CHIP_ERROR TestAttrAccess::ReadNullableGlobalStruct(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(gNullableGlobalStructAttributeValue);
+}
+
+CHIP_ERROR TestAttrAccess::WriteNullableGlobalStruct(AttributeValueDecoder & aDecoder)
+{
+    Attributes::NullableGlobalStruct::TypeInfo::DecodableType temp;
+    ReturnErrorOnFailure(aDecoder.Decode(temp));
+
+    if (!temp.IsNull())
+    {
+        // We don't support a nonempty charspan here for now.
+        VerifyOrReturnError(temp.Value().name.empty(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+
+    gNullableGlobalStructAttributeValue = temp;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TestAttrAccess::ReadListInt8uAttribute(AttributeValueEncoder & aEncoder)
@@ -546,6 +626,23 @@ CHIP_ERROR TestAttrAccess::WriteStructAttribute(AttributeValueDecoder & aDecoder
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR TestAttrAccess::ReadGlobalStruct(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(gGlobalStructAttributeValue);
+}
+
+CHIP_ERROR TestAttrAccess::WriteGlobalStruct(AttributeValueDecoder & aDecoder)
+{
+    // We don't support a nonempty charspan here for now.
+    Attributes::GlobalStruct::TypeInfo::DecodableType temp;
+    ReturnErrorOnFailure(aDecoder.Decode(temp));
+
+    VerifyOrReturnError(temp.name.empty(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    gGlobalStructAttributeValue = temp;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR TestAttrAccess::ReadListFabricScopedAttribute(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
@@ -679,7 +776,7 @@ bool emberAfUnitTestingClusterTestCallback(app::CommandHandler * commandObj, con
                                            const Clusters::UnitTesting::Commands::Test::DecodableType & commandData)
 {
     // Setup the test variables
-    emAfLoadAttributeDefaults(commandPath.mEndpointId, true, MakeOptional(commandPath.mClusterId));
+    emberAfInitializeAttributes(commandPath.mEndpointId);
     for (int i = 0; i < kAttributeListLength; ++i)
     {
         gListUint8Data[i] = 0;
@@ -739,6 +836,27 @@ static bool SendBooleanResponse(CommandHandler * commandObj, const ConcreteComma
     return true;
 }
 
+bool emberAfUnitTestingClusterTestDifferentVendorMeiRequestCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::TestDifferentVendorMeiRequest::DecodableType & commandData)
+{
+    Commands::TestDifferentVendorMeiResponse::Type response;
+
+    {
+        Events::TestDifferentVendorMeiEvent::Type event{ commandData.arg1 };
+
+        if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, response.eventNumber))
+        {
+            commandObj->AddStatus(commandPath, Status::Failure);
+            return true;
+        }
+    }
+
+    response.arg1 = commandData.arg1;
+    commandObj->AddResponse(commandPath, response);
+    return true;
+}
+
 bool emberAfUnitTestingClusterTestStructArgumentRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::TestStructArgumentRequest::DecodableType & commandData)
@@ -792,6 +910,7 @@ bool emberAfUnitTestingClusterTestEmitTestEventRequestCallback(
         commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
+
     commandObj->AddResponse(commandPath, responseData);
     return true;
 }
@@ -977,6 +1096,16 @@ bool emberAfUnitTestingClusterSimpleStructEchoRequestCallback(CommandHandler * c
     return true;
 }
 
+bool emberAfUnitTestingClusterStringEchoRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                        const Commands::StringEchoRequest::DecodableType & commandData)
+{
+    Commands::StringEchoResponse::Type response;
+    response.payload = commandData.payload;
+
+    commandObj->AddResponse(commandPath, response);
+    return true;
+}
+
 bool emberAfUnitTestingClusterTimedInvokeRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                          const Commands::TimedInvokeRequest::DecodableType & commandData)
 {
@@ -994,10 +1123,67 @@ bool emberAfUnitTestingClusterTestSimpleOptionalArgumentRequestCallback(
     return true;
 }
 
+// TestBatchHelperRequest and TestSecondBatchHelperRequest do the same thing.
+// The reason there are two identical commands is because batch command requires
+// command paths in the same batch to be unique. These command allow for
+// client to control order of the response and control size of CommandDataIB
+// being sent back to help test some corner cases.
+bool TestBatchHelperCommon(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, const uint16_t sleepTimeMs,
+                           const uint16_t sizeOfResponseBuffer, const uint8_t fillCharacter)
+{
+    if (sizeOfResponseBuffer > kTestBatchHelperResponseBufferMax)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError);
+        return true;
+    }
+
+    AsyncBatchCommandsWorkData * asyncWorkData = Platform::New<AsyncBatchCommandsWorkData>();
+    if (asyncWorkData == nullptr)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Busy);
+        return true;
+    }
+
+    asyncWorkData->asyncCommandHandle   = commandObj;
+    asyncWorkData->commandPath          = commandPath;
+    asyncWorkData->sizeOfResponseBuffer = sizeOfResponseBuffer;
+    asyncWorkData->fillCharacter        = fillCharacter;
+
+    scheduleTimerCallbackMs(asyncWorkData, sleepTimeMs);
+
+    return true;
+}
+
+bool emberAfUnitTestingClusterTestBatchHelperRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                             const Commands::TestBatchHelperRequest::DecodableType & commandData)
+{
+    return TestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs, commandData.sizeOfResponseBuffer,
+                                 commandData.fillCharacter);
+}
+
+bool emberAfUnitTestingClusterTestSecondBatchHelperRequestCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::TestSecondBatchHelperRequest::DecodableType & commandData)
+{
+    return TestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs, commandData.sizeOfResponseBuffer,
+                                 commandData.fillCharacter);
+}
+
+bool emberAfUnitTestingClusterGlobalEchoRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                        const Commands::GlobalEchoRequest::DecodableType & commandData)
+{
+    Commands::GlobalEchoResponse::Type response;
+    response.field1 = commandData.field1;
+    response.field2 = commandData.field2;
+
+    commandObj->AddResponse(commandPath, response);
+    return true;
+}
+
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
 void MatterUnitTestingPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }

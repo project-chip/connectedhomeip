@@ -22,7 +22,5 @@ chip_data_model("silabs-pump") {
   } else {
     zap_file = "pump-thread-app.zap"
   }
-
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/pump-app/zap-generated"
   is_server = true
 }

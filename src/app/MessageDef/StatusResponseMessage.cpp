@@ -52,7 +52,7 @@ CHIP_ERROR StatusResponseMessage::Parser::PrettyPrint() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case kInteractionModelRevisionTag:
+        case Revision::kInteractionModelRevisionTag:
             ReturnErrorOnFailure(MessageParser::CheckInteractionModelRevision(reader));
             break;
         default:

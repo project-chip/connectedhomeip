@@ -55,14 +55,18 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
                     {{/zcl_event_fields}}
                     jclass {{asLowerCamelCase name}}StructClass;
-                    err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipEventStructs${{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event", {{asLowerCamelCase name}}StructClass);
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ChipEventStructs${{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event", {{asLowerCamelCase name}}StructClass);
                     if (err != CHIP_NO_ERROR) {
                         ChipLogError(Zcl, "Could not find class ChipEventStructs${{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event");
                         return nullptr;
                     }
-                    jmethodID {{asLowerCamelCase name}}StructCtor = env->GetMethodID({{asLowerCamelCase name}}StructClass, "<init>"
-                        , "({{#zcl_event_fields}}{{asJniSignature type null (asUpperCamelCase parent.parent.name) true}}{{/zcl_event_fields}})V");
-                    if ({{asLowerCamelCase name}}StructCtor == nullptr) {
+
+                    jmethodID {{asLowerCamelCase name}}StructCtor;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                       env, {{asLowerCamelCase name}}StructClass, "<init>",
+                       "({{#zcl_event_fields}}{{asJniSignature type null (asUpperCamelCase parent.parent.name) true}}{{/zcl_event_fields}})V",
+                       &{{asLowerCamelCase name}}StructCtor);
+                    if (err != CHIP_NO_ERROR || {{asLowerCamelCase name}}StructCtor == nullptr) {
                         ChipLogError(Zcl, "Could not find ChipEventStructs${{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event constructor");
                         return nullptr;
                     }

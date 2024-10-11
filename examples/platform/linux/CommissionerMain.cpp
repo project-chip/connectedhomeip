@@ -19,6 +19,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
+#include <string>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -69,6 +71,7 @@ using namespace chip::DeviceLayer;
 using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::app::Clusters;
+using namespace chip::Protocols::UserDirectedCommissioning;
 
 using namespace ::chip::Messaging;
 using namespace ::chip::Controller;
@@ -181,7 +184,8 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     params.controllerICAC     = icacSpan;
     params.controllerNOC      = nocSpan;
 
-    params.defaultCommissioner = &gAutoCommissioner;
+    params.defaultCommissioner      = &gAutoCommissioner;
+    params.enableServerInteractions = true;
 
     // assign prefered feature settings
     CommissioningParameters commissioningParams = gAutoCommissioner.GetCommissioningParameters();
@@ -212,7 +216,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     gCommissionerDiscoveryController.SetCommissionerCallback(&gCommissionerCallback);
 
     // advertise operational since we are an admin
-    app::DnssdServer::Instance().AdvertiseOperational();
+    ReturnLogErrorOnFailure(app::DnssdServer::Instance().AdvertiseOperational());
 
     ChipLogProgress(Support,
                     "InitCommissioner nodeId=0x" ChipLogFormatX64 " fabric.fabricId=0x" ChipLogFormatX64 " fabricIndex=0x%x",
@@ -273,6 +277,13 @@ void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
         break;
     case DevicePairingDelegate::Status::SecurePairingFailed:
         ChipLogError(AppServer, "Secure Pairing Failed");
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+        if (cdc != nullptr)
+        {
+            cdc->CommissioningFailed(CHIP_ERROR_CONNECTION_ABORTED);
+        }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
         break;
     }
 }
@@ -341,10 +352,32 @@ void PairingCommand::OnCommissioningStatusUpdate(PeerId peerId, CommissioningSta
     }
 }
 
-void PairingCommand::OnReadCommissioningInfo(const ReadCommissioningInfo & info)
+void PairingCommand::OnReadCommissioningInfo(const Controller::ReadCommissioningInfo & info)
 {
     ChipLogProgress(AppServer, "OnReadCommissioningInfo - vendorId=0x%04X productId=0x%04X", info.basic.vendorId,
                     info.basic.productId);
+
+    // The string in CharSpan received from the device is not null-terminated, we use std::string here for coping and
+    // appending a numm-terminator at the end of the string.
+    std::string userActiveModeTriggerInstruction;
+
+    // Note: the callback doesn't own the buffer, should make a copy if it will be used it later.
+    if (info.icd.userActiveModeTriggerInstruction.size() != 0)
+    {
+        userActiveModeTriggerInstruction =
+            std::string(info.icd.userActiveModeTriggerInstruction.data(), info.icd.userActiveModeTriggerInstruction.size());
+    }
+
+    if (info.icd.userActiveModeTriggerHint.HasAny())
+    {
+        ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerHint=0x%08x",
+                        info.icd.userActiveModeTriggerHint.Raw());
+        ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerInstruction=%s",
+                        userActiveModeTriggerInstruction.c_str());
+    }
+
+    ChipLogProgress(AppServer, "OnReadCommissioningInfo ICD - IdleModeDuration=%u activeModeDuration=%u activeModeThreshold=%u",
+                    info.icd.idleModeDuration, info.icd.activeModeDuration, info.icd.activeModeThreshold);
 }
 
 void PairingCommand::OnFabricCheck(NodeId matchingNodeId)

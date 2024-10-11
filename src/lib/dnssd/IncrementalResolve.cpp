@@ -137,7 +137,8 @@ SerializedQNameIterator StoredServerName::Get() const
     return SerializedQNameIterator(BytesRange(mNameBuffer, mNameBuffer + sizeof(mNameBuffer)), mNameBuffer);
 }
 
-CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const mdns::Minimal::SrvRecord & srv)
+CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const uint64_t ttl,
+                                                  const mdns::Minimal::SrvRecord & srv)
 {
     AutoInactiveResetter inactiveReset(*this);
 
@@ -183,6 +184,7 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
             {
                 return err;
             }
+            mSpecificResolutionData.Get<OperationalNodeData>().hasZeroTTL = (ttl == 0);
         }
 
         LogFoundOperationalSrvRecord(mSpecificResolutionData.Get<OperationalNodeData>().peerId, mTargetHostName.Get());
@@ -347,8 +349,14 @@ CHIP_ERROR IncrementalResolver::Take(DiscoveredNodeData & outputData)
 
     IPAddressSorter::Sort(mCommonResolutionData.ipAddress, mCommonResolutionData.numIPs, mCommonResolutionData.interfaceId);
 
-    outputData.resolutionData = mCommonResolutionData;
-    outputData.commissionData = mSpecificResolutionData.Get<CommissionNodeData>();
+    // Set the DiscoveredNodeData with CommissionNodeData info specific to commissionable/commisssioner
+    // node available in mSpecificResolutionData.
+    outputData.Set<CommissionNodeData>(mSpecificResolutionData.Get<CommissionNodeData>());
+
+    // IncrementalResolver stored CommonResolutionData separately in mCommonResolutionData hence copy the
+    //  CommonResolutionData info from mCommonResolutionData, to CommissionNodeData within DiscoveredNodeData
+    CommonResolutionData & resolutionData = outputData.Get<CommissionNodeData>();
+    resolutionData                        = mCommonResolutionData;
 
     ResetToInactive();
 

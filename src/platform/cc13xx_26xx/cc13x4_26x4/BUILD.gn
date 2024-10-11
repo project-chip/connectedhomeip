@@ -16,6 +16,8 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
+import("../factory_data_config.gni")
+
 assert(chip_device_platform == "cc13x4_26x4")
 
 if (chip_enable_openthread) {
@@ -30,10 +32,11 @@ static_library("cc13x4_26x4") {
     "../CC13XX_26XXConfig.h",
     "../ConfigurationManagerImpl.cpp",
     "../ConnectivityManagerImpl.cpp",
+    "../DefaultTestEventTriggerDelegate.cpp",
+    "../DefaultTestEventTriggerDelegate.h",
     "../DiagnosticDataProviderImpl.cpp",
     "../DiagnosticDataProviderImpl.h",
     "../KeyValueStoreManagerImpl.cpp",
-    "../Logging.cpp",
     "../PlatformManagerImpl.cpp",
     "../Random.c",
     "BlePlatformConfig.h",
@@ -48,12 +51,17 @@ static_library("cc13x4_26x4") {
 
   deps = [ "${chip_root}/src/platform/logging:headers" ]
 
+  public = [
+    "${chip_root}/src/credentials/CHIPCert.h",
+    "${chip_root}/src/credentials/CertificationDeclaration.h",
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+  ]
+
   public_deps = [
+    "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
-  public_configs =
-      [ "${chip_root}/src/lib/address_resolve:default_address_resolve_config" ]
 
   if (chip_enable_ble) {
     sources += [
@@ -62,34 +70,25 @@ static_library("cc13x4_26x4") {
     ]
   }
 
-  if (chip_enable_ota_requestor) {
+  if (custom_factory_data) {
     sources += [
-      # this needs to be in the final link to place the data correctly
-      # see ${chip_root}/third_party/ti_simplelink_sdk/ti_simplelink_executable.gni
-      #"oad_image_header.c",
-      "../OTAImageProcessorImpl.cpp",
-      "../OTAImageProcessorImpl.h",
+      "../FactoryDataProvider.cpp",
+      "../FactoryDataProvider.h",
     ]
   }
 
+  if (chip_enable_ota_requestor) {
+    sources += [ "OTAImageProcessorImpl.cpp" ]
+  }
+
   if (chip_enable_openthread) {
-    # needed for MTD/FTD
-    import("//build_overrides/ti_simplelink_sdk.gni")
-    import("${ti_simplelink_sdk_build_root}/ti_simplelink_board.gni")
     public_deps += [
-      "${chip_root}/third_party/openthread/platforms/cc13x4_26x4:libopenthread-cc13x4_cc26x4",
+      "${chip_root}/third_party/openthread:openthread",
+      "${chip_root}/third_party/openthread/platforms/ti:libopenthread-ti",
       "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
       "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sdk",
       "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
     ]
-
-    if (chip_openthread_ftd) {
-      public_deps +=
-          [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
-    } else {
-      public_deps +=
-          [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
-    }
 
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
@@ -106,4 +105,13 @@ static_library("cc13x4_26x4") {
       ]
     }
   }
+}
+
+source_set("logging") {
+  deps = [
+    ":cc13x4_26x4",  # TODO: is this necessary?
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "../Logging.cpp" ]
 }

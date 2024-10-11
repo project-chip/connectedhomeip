@@ -26,12 +26,14 @@
 
 #pragma once
 
+#include <app/AppConfig.h>
 #include <app/CASEClient.h>
 #include <app/CASEClientPool.h>
 #include <app/DeviceProxy.h>
 #include <app/util/basic-types.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/address_resolve/AddressResolve.h>
+#include <lib/core/GroupedCallbackList.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
@@ -155,6 +157,26 @@ typedef void (*OnDeviceConnectionRetry)(void * context, const ScopedNodeId & pee
 class DLL_EXPORT OperationalSessionSetup : public SessionEstablishmentDelegate, public AddressResolve::NodeListener
 {
 public:
+    struct ConnectionFailureInfo
+    {
+        const ScopedNodeId peerId;
+        CHIP_ERROR error;
+        SessionEstablishmentStage sessionStage;
+
+        // When the response was BUSY, error will be CHIP_ERROR_BUSY and
+        // requestedBusyDelay will be set, if handling of BUSY responses is
+        // enabled.
+#if CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
+        Optional<System::Clock::Milliseconds16> requestedBusyDelay;
+#endif // CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
+
+        ConnectionFailureInfo(const ScopedNodeId & peer, CHIP_ERROR err, SessionEstablishmentStage stage) :
+            peerId(peer), error(err), sessionStage(stage)
+        {}
+    };
+
+    using OnSetupFailure = void (*)(void * context, const ConnectionFailureInfo & failureInfo);
+
     ~OperationalSessionSetup() override;
 
     OperationalSessionSetup(const CASEClientInitParams & params, CASEClientPoolDelegate * clientPool, ScopedNodeId peerId,
@@ -180,8 +202,8 @@ public:
      * The device is expected to have been commissioned, A CASE session
      * setup will be triggered.
      *
-     * On establishing the session, the callback function `onConnection` will be called. If the
-     * session setup fails, `onFailure` will be called.
+     * If session setup succeeds, the callback function `onConnection` will be called.
+     * If session setup fails, `onFailure` will be called.
      *
      * If the session already exists, `onConnection` will be called immediately,
      * before the Connect call returns.
@@ -189,14 +211,40 @@ public:
      * `onFailure` may be called before the Connect call returns, for error
      * cases that are detected synchronously (e.g. inability to start an address
      * lookup).
+     *
+     * `transportPayloadCapability` is set to kLargePayload when the session needs to be established
+     * over a transport that allows large payloads to be transferred, e.g., TCP.
      */
-    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                 TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
+
+    /*
+     * This function can be called to establish a secure session with the device.
+     *
+     * The device is expected to have been commissioned, A CASE session
+     * setup will be triggered.
+     *
+     * If session setup succeeds, the callback function `onConnection` will be called.
+     * If session setup fails, `onSetupFailure` will be called.
+     *
+     * If the session already exists, `onConnection` will be called immediately,
+     * before the Connect call returns.
+     *
+     * `onSetupFailure` may be called before the Connect call returns, for error cases that are detected synchronously
+     * (e.g. inability to start an address lookup).
+     *
+     * `transportPayloadCapability` is set to kLargePayload when the session needs to be established
+     * over a transport that allows large payloads to be transferred, e.g., TCP.
+     */
+    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnSetupFailure> * onSetupFailure,
+                 TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
 
     bool IsForAddressUpdate() const { return mPerformingAddressUpdate; }
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablished(const SessionHandle & session) override;
-    void OnSessionEstablishmentError(CHIP_ERROR error) override;
+    void OnSessionEstablishmentError(CHIP_ERROR error, SessionEstablishmentStage stage) override;
+    void OnResponderBusy(System::Clock::Milliseconds16 requestedDelay) override;
 
     ScopedNodeId GetPeerId() const { return mPeerId; }
 
@@ -262,8 +310,8 @@ private:
 
     SessionHolder mSecureSession;
 
-    Callback::CallbackDeque mConnectionSuccess;
-    Callback::CallbackDeque mConnectionFailure;
+    typedef Callback::GroupedCallbackList<OnDeviceConnected, OnDeviceConnectionFailure, OnSetupFailure> SuccessFailureCallbackList;
+    SuccessFailureCallbackList mCallbacks;
 
     OperationalSessionReleaseDelegate * mReleaseDelegate;
 
@@ -273,6 +321,12 @@ private:
     State mState = State::Uninitialized;
 
     bool mPerformingAddressUpdate = false;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES || CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
+    System::Clock::Milliseconds16 mRequestedBusyDelay = System::Clock::kZero;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES || CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
+
+    TransportPayloadCapability mTransportPayloadCapability = TransportPayloadCapability::kMRPPayload;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     // When we TryNextResult on the resolver, it will synchronously call back
@@ -293,7 +347,7 @@ private:
 
     void MoveToState(State aTargetState);
 
-    CHIP_ERROR EstablishConnection(const ReliableMessageProtocolConfig & config);
+    CHIP_ERROR EstablishConnection(const AddressResolve::ResolveResult & result);
 
     /*
      * This checks to see if an existing CASE session exists to the peer within the SessionManager
@@ -306,8 +360,13 @@ private:
 
     void CleanupCASEClient();
 
+    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                 Callback::Callback<OnSetupFailure> * onSetupFailure,
+                 TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
+
     void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
-                                    Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+                                    Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                                    Callback::Callback<OnSetupFailure> * onSetupFailure);
 
     enum class ReleaseBehavior
     {
@@ -316,11 +375,13 @@ private:
     };
 
     /*
-     * This dequeues all failure and success callbacks and appropriately
-     * invokes either set depending on the value of error.
+     * This dequeues all failure and success callbacks and appropriately invokes either set depending
+     * on the value of error.
      *
-     * If error == CHIP_NO_ERROR, only success callbacks are invoked.
-     * Otherwise, only failure callbacks are invoked.
+     * If error == CHIP_NO_ERROR, only success callbacks are invoked. Otherwise, only failure callbacks are invoked.
+     *
+     * The state offers additional context regarding the failure, indicating the specific state in which
+     * the error occurs. It is only relayed through failure callbacks when the error is not equal to CHIP_NO_ERROR.
      *
      * If releaseBehavior is Release, this uses mReleaseDelegate to release
      * ourselves (aka `this`). As a result any caller should return right away
@@ -328,17 +389,27 @@ private:
      *
      * Setting releaseBehavior to DoNotRelease is meant for use from the destructor
      */
-    void DequeueConnectionCallbacks(CHIP_ERROR error, ReleaseBehavior releaseBehavior = ReleaseBehavior::Release);
+    void DequeueConnectionCallbacks(CHIP_ERROR error, SessionEstablishmentStage stage,
+                                    ReleaseBehavior releaseBehavior = ReleaseBehavior::Release);
+
+    void DequeueConnectionCallbacks(CHIP_ERROR error, ReleaseBehavior releaseBehavior = ReleaseBehavior::Release)
+    {
+        this->DequeueConnectionCallbacks(error, SessionEstablishmentStage::kNotInKeyExchange, releaseBehavior);
+    }
 
     /**
      * Helper for DequeueConnectionCallbacks that handles the actual callback
      * notifications. This happens after the object has been released, if it's
      * being released.
      */
-    static void NotifyConnectionCallbacks(Callback::Cancelable & failureReady, Callback::Cancelable & successReady,
-                                          CHIP_ERROR error, const ScopedNodeId & peerId, bool performingAddressUpdate,
-                                          Messaging::ExchangeManager * exchangeMgr,
-                                          const Optional<SessionHandle> & optionalSessionHandle);
+    static void NotifyConnectionCallbacks(SuccessFailureCallbackList & ready, CHIP_ERROR error, SessionEstablishmentStage stage,
+                                          const ScopedNodeId & peerId, Messaging::ExchangeManager * exchangeMgr,
+                                          const Optional<SessionHandle> & optionalSessionHandle,
+                                          // requestedBusyDelay will be 0 if not
+                                          // CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP,
+                                          // and only has a meaningful value
+                                          // when the error is CHIP_ERROR_BUSY.
+                                          System::Clock::Milliseconds16 requestedBusyDelay);
 
     /**
      * Triggers a DNSSD lookup to find a usable peer address.
@@ -348,7 +419,7 @@ private:
     /**
      * This function will set new IP address, port and MRP retransmission intervals of the device.
      */
-    void UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config);
+    void UpdateDeviceData(const AddressResolve::ResolveResult & result);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     /**

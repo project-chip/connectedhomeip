@@ -27,8 +27,12 @@
 
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
-#include <ble/BLEEndPoint.h>
+#include <ble/Ble.h>
 #include <platform/CHIPDeviceLayer.h>
+
+extern "C" {
+#include "flash_map_backend.h"
+}
 
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)

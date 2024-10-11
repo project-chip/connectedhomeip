@@ -52,8 +52,12 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     openthread_init_stack();
-    return GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(esp_openthread_get_instance());
+    _LockThreadStack();
+    err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(esp_openthread_get_instance());
+    _UnlockThreadStack();
+    return err;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
@@ -76,6 +80,30 @@ void ThreadStackManagerImpl::_UnlockThreadStack()
 {
     esp_openthread_lock_release();
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+void ThreadStackManagerImpl::_WaitOnSrpClearAllComplete()
+{
+    // Only 1 task can be blocked on a srpClearAll request
+    if (mSrpClearAllRequester == nullptr)
+    {
+        mSrpClearAllRequester = xTaskGetCurrentTaskHandle();
+        // Wait on OnSrpClientNotification which confirms the clearing is done.
+        // It will notify this current task with NotifySrpClearAllComplete.
+        // However, we won't wait more than 2s.
+        ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(2000));
+        mSrpClearAllRequester = nullptr;
+    }
+}
+
+void ThreadStackManagerImpl::_NotifySrpClearAllComplete()
+{
+    if (mSrpClearAllRequester)
+    {
+        xTaskNotifyGive(mSrpClearAllRequester);
+    }
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
 void ThreadStackManagerImpl::_ProcessThreadActivity()
 {

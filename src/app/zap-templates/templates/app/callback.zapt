@@ -18,10 +18,7 @@
 
 {{#zcl_clusters}}
 
-/** @brief {{label}} Cluster Init
- *
- * Cluster Init
- *
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAf{{asUpperCamelCase label}}ClusterInitCallback(chip::EndpointId endpoint);
@@ -36,42 +33,27 @@ void emberAf{{asUpperCamelCase label}}ClusterInitCallback(chip::EndpointId endpo
 // {{label}} Cluster
 //
 
-/** @brief {{label}} Cluster Server Init
- *
- * Server Init
- *
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAf{{asUpperCamelCase label}}ClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief {{label}} Cluster Server Shutdown
- *
- * Server Shutdown
- *
+/**
  * @param endpoint    Endpoint that is being shutdown
  */
 void Matter{{asUpperCamelCase label}}ClusterServerShutdownCallback(chip::EndpointId endpoint);
 
-/** @brief {{label}} Cluster Client Init
- *
- * Client Init
- *
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAf{{asUpperCamelCase label}}ClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief {{label}} Cluster Server Attribute Changed
- *
- * Server Attribute Changed
- *
+/**
  * @param attributePath Concrete attribute path that changed
  */
 void Matter{{asUpperCamelCase label}}ClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief {{label}} Cluster Server Pre Attribute Changed
- *
- * Server Pre Attribute Changed
- *
+/**
  * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
@@ -79,32 +61,10 @@ void Matter{{asUpperCamelCase label}}ClusterServerAttributeChangedCallback(const
  */
 chip::Protocols::InteractionModel::Status Matter{{asUpperCamelCase label}}ClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief {{label}} Cluster Client Pre Attribute Changed
- *
- * Client Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status Matter{{asUpperCamelCase label}}ClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief {{label}} Cluster Server Tick
- *
- * Server Tick
- *
+/**
  * @param endpoint  Endpoint that is being served
  */
 void emberAf{{asUpperCamelCase label}}ClusterServerTickCallback(chip::EndpointId endpoint);
-
-/** @brief {{label}} Cluster Client Tick
- *
- * Client Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAf{{asUpperCamelCase label}}ClusterClientTickCallback(chip::EndpointId endpoint);
 
 {{/zcl_clusters}}
 

@@ -28,6 +28,7 @@ executable("chip-shell") {
   deps = [
     "${chip_root}/src/lib/shell",
     "${chip_root}/src/platform",
+    "${chip_root}/src/platform/logging:default",
     "${project_dir}/shell_common:shell_common",
   ]
 
@@ -37,5 +38,9 @@ executable("chip-shell") {
 }
 
 group("standalone") {
+  deps = [ ":chip-shell" ]
+}
+
+group("default") {
   deps = [ ":chip-shell" ]
 }

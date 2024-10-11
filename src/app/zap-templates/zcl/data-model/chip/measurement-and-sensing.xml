@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2024 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="Measurement &amp; Sensing"/>
+  <enum name="MeasurementTypeEnum" type="enum16">
+    <cluster code="0x0090"/>
+    <cluster code="0x0091"/>
+    <item name="Unspecified" value="0x0000"/>
+    <item name="Voltage" value="0x0001"/>
+    <item name="ActiveCurrent" value="0x0002"/>
+    <item name="ReactiveCurrent" value="0x0003"/>
+    <item name="ApparentCurrent" value="0x0004"/>
+    <item name="ActivePower" value="0x0005"/>
+    <item name="ReactivePower" value="0x0006"/>
+    <item name="ApparentPower" value="0x0007"/>
+    <item name="RMSVoltage" value="0x0008"/>
+    <item name="RMSCurrent" value="0x0009"/>
+    <item name="RMSPower" value="0x000A"/>
+    <item name="Frequency" value="0x000B"/>
+    <item name="PowerFactor" value="0x000C"/>
+    <item name="NeutralCurrent" value="0x000D"/>
+    <item name="ElectricalEnergy" value="0x000E"/>
+  </enum>
+  <struct name="MeasurementAccuracyRangeStruct" apiMaturity="provisional">
+    <cluster code="0x0090"/>
+    <cluster code="0x0091"/>
+    <item fieldId="0" name="RangeMin" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
+    <item fieldId="1" name="RangeMax" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
+    <item fieldId="2" name="PercentMax" type="percent100ths" optional="true"/>
+    <item fieldId="3" name="PercentMin" type="percent100ths" optional="true"/>
+    <item fieldId="4" name="PercentTypical" type="percent100ths" optional="true"/>
+    <item fieldId="5" name="FixedMax" type="int64u" optional="true" max="4611686018427387903"/>
+    <item fieldId="6" name="FixedMin" type="int64u" optional="true" max="4611686018427387903"/>
+    <item fieldId="7" name="FixedTypical" type="int64u" optional="true" max="4611686018427387903"/>
+  </struct>
+  <struct name="MeasurementAccuracyStruct" apiMaturity="provisional">
+    <cluster code="0x0090"/>
+    <cluster code="0x0091"/>
+    <item fieldId="0" name="MeasurementType" type="MeasurementTypeEnum" min="0x0000" max="0x000E"/>
+    <item fieldId="1" name="Measured" type="boolean" default="0"/>
+    <item fieldId="2" name="MinMeasuredValue" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
+    <item fieldId="3" name="MaxMeasuredValue" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
+    <item fieldId="4" name="AccuracyRanges" array="true" type="MeasurementAccuracyRangeStruct" minLength="1"/>
+  </struct>
+</configurator>

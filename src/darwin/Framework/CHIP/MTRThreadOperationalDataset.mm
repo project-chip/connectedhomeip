@@ -29,14 +29,9 @@ size_t const MTRSizeThreadMasterKey = chip::Thread::kSizeMasterKey;
 size_t const MTRSizeThreadPSKc = chip::Thread::kSizePSKc;
 size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
 
-@interface MTRThreadOperationalDataset ()
-
-@property (readonly) chip::Thread::OperationalDataset cppThreadOperationalDataset;
-@property (nonatomic, copy) NSNumber * channelNumber;
-
-@end
-
-@implementation MTRThreadOperationalDataset
+@implementation MTRThreadOperationalDataset {
+    chip::Thread::OperationalDataset _cppThreadOperationalDataset;
+}
 
 - (instancetype _Nullable)initWithNetworkName:(NSString *)networkName
                                 extendedPANID:(NSData *)extendedPANID
@@ -107,7 +102,7 @@ size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
 - (BOOL)_checkDataLength:(NSData *)data expectedLength:(size_t)expectedLength
 {
     if (data.length != expectedLength) {
-        MTR_LOG_ERROR("Length Check Failed. Length:%tu is incorrect, must be %tu", data.length, expectedLength);
+        MTR_LOG_ERROR("Length Check Failed. Length:%lu is incorrect, must be %tu", static_cast<unsigned long>(data.length), expectedLength);
         return NO;
     }
     return YES;
@@ -157,7 +152,7 @@ size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
 
 - (void)setChannel:(uint16_t)channel
 {
-    self.channelNumber = @(channel);
+    _channelNumber = @(channel);
 }
 
 - (uint16_t)channel

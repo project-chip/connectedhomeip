@@ -206,12 +206,52 @@ tests:
       command: "readAttribute"
       attribute: "SpecificationVersion"
       response:
-          # For now all-clusters-app has a version 1.3.
-          value: 0x01030000
+          # For now all-clusters-app has a version 1.4.
+          value: 0x01040000
 
     - label: "Read the Max Paths Per Invoke value"
       command: "readAttribute"
       attribute: "MaxPathsPerInvoke"
       response:
-          # For now all-clusters-app only supports 1 max paths per invoke.
+          constraints:
+              minValue: 1
+
+    - label: "Write global ClusterRevision attribute"
+      command: "writeAttribute"
+      attribute: "ClusterRevision"
+      arguments:
           value: 1
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Write global FeatureMap attribute"
+      command: "writeAttribute"
+      attribute: "FeatureMap"
+      arguments:
+          value: 1
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Write global AttributeList attribute"
+      command: "writeAttribute"
+      attribute: "AttributeList"
+      arguments:
+          value: []
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Write global GeneratedCommandList attribute"
+      command: "writeAttribute"
+      attribute: "GeneratedCommandList"
+      arguments:
+          value: []
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Write global AcceptedCommandList attribute"
+      command: "writeAttribute"
+      attribute: "AcceptedCommandList"
+      arguments:
+          value: []
+      response:
+          error: UNSUPPORTED_WRITE

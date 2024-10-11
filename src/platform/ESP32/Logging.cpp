@@ -3,7 +3,6 @@
 #include <platform/logging/LogV.h>
 
 #include <lib/core/CHIPConfig.h>
-#include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 
 #include <stdio.h>
@@ -19,7 +18,7 @@ namespace chip {
 namespace Logging {
 namespace Platform {
 
-void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
+void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     char tag[11];
 
@@ -30,9 +29,9 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
     {
     case kLogCategory_Error: {
         {
-            printf(LOG_COLOR_E "E (%" PRIu32 ") %s: ", esp_log_timestamp(), tag);
+            esp_log_write(ESP_LOG_ERROR, tag, LOG_COLOR_E "E (%" PRIu32 ") %s: ", esp_log_timestamp(), tag);
             esp_log_writev(ESP_LOG_ERROR, tag, msg, v);
-            printf(LOG_RESET_COLOR "\n");
+            esp_log_write(ESP_LOG_ERROR, tag, LOG_RESET_COLOR "\n");
         }
     }
     break;
@@ -40,18 +39,18 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
     case kLogCategory_Progress:
     default: {
         {
-            printf(LOG_COLOR_I "I (%" PRIu32 ") %s: ", esp_log_timestamp(), tag);
+            esp_log_write(ESP_LOG_INFO, tag, LOG_COLOR_I "I (%" PRIu32 ") %s: ", esp_log_timestamp(), tag);
             esp_log_writev(ESP_LOG_INFO, tag, msg, v);
-            printf(LOG_RESET_COLOR "\n");
+            esp_log_write(ESP_LOG_INFO, tag, LOG_RESET_COLOR "\n");
         }
     }
     break;
 
     case kLogCategory_Detail: {
         {
-            printf(LOG_COLOR_D "D (%" PRIu32 ") %s: ", esp_log_timestamp(), tag);
+            esp_log_write(ESP_LOG_DEBUG, tag, LOG_COLOR_D "D (%" PRIu32 ") %s: ", esp_log_timestamp(), tag);
             esp_log_writev(ESP_LOG_DEBUG, tag, msg, v);
-            printf(LOG_RESET_COLOR "\n");
+            esp_log_write(ESP_LOG_DEBUG, tag, LOG_RESET_COLOR "\n");
         }
     }
     break;

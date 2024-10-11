@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,8 +20,10 @@
 
 #include "core/CastingPlayer.h"
 #include "core/CastingPlayerDiscovery.h"
+#include "core/IdentificationDeclarationOptions.h"
 #include "core/Types.h"
-
+#include <LinuxCommissionableDataProvider.h>
+#include <Options.h>
 #include <platform/CHIPDeviceLayer.h>
 
 /**
@@ -30,6 +32,15 @@
  * 35 represents device type of Matter Video Player
  */
 const uint64_t kTargetPlayerDeviceType = 35;
+
+/**
+ * @brief Test values used for demo command and attribute read/subscribe calls
+ */
+const char kContentURL[]                          = "https://www.test.com/videoid";
+const char kContentDisplayStr[]                   = "Test video";
+const unsigned short kTimedInvokeCommandTimeoutMs = 5 * 1000;
+const uint16_t kMinIntervalFloorSeconds           = 0;
+const uint16_t kMaxIntervalCeilingSeconds         = 1;
 
 /**
  * @brief Singleton that reacts to CastingPlayer discovery results
@@ -58,6 +69,12 @@ public:
      */
     void HandleOnUpdated(matter::casting::memory::Strong<matter::casting::core::CastingPlayer> player) override;
 };
+
+/**
+ * @brief Initializes a LinuxCommissionableDataProvider using configuration options provided via a LinuxDeviceOptions. It first
+ * checks if a setup PIN code is specified; if not, it attempts to use a temporary default passcode.
+ */
+CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, LinuxDeviceOptions & options);
 
 /**
  * @brief Linux tv-casting-app's onCompleted handler for CastingPlayer.VerifyOrEstablishConnection API

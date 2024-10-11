@@ -23,6 +23,7 @@
 #include <app/util/config.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::KeypadInput;
@@ -43,19 +44,21 @@ void KeypadInputManager::NewManager(jint endpoint, jobject manager)
 
 void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper, const CECKeyCodeEnum & keyCode)
 {
+    DeviceLayer::StackUnlock unlock;
     Commands::SendKeyResponse::Type response;
 
     jint ret       = -1;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received keypadInputClusterSendKey: %c", to_underlying(keyCode));
-    VerifyOrExit(mKeypadInputManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mKeypadInputManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mSendKeyMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     env->ExceptionClear();
-    ret = env->CallIntMethod(mKeypadInputManagerObject, mSendKeyMethod, static_cast<jint>(keyCode));
+    ret = env->CallIntMethod(mKeypadInputManagerObject.ObjectRef(), mSendKeyMethod, static_cast<jint>(keyCode));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -74,9 +77,10 @@ void KeypadInputManager::InitializeWithObjects(jobject managerObject)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for KeypadInputManager"));
+    JniLocalReferenceScope scope(env);
 
-    mKeypadInputManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturn(mKeypadInputManagerObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef KeypadInputManager"));
+    VerifyOrReturn(mKeypadInputManagerObject.Init(managerObject) == CHIP_NO_ERROR,
+                   ChipLogError(Zcl, "Failed to init mKeypadInputManagerObject"));
 
     jclass KeypadInputManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturn(KeypadInputManagerClass != nullptr, ChipLogError(Zcl, "Failed to get KeypadInputManager Java class"));
@@ -91,9 +95,9 @@ void KeypadInputManager::InitializeWithObjects(jobject managerObject)
 
 uint32_t KeypadInputManager::GetFeatureMap(chip::EndpointId endpoint)
 {
-    if (endpoint >= EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return mDynamicEndpointFeatureMap;
+        return kEndpointFeatureMap;
     }
 
     uint32_t featureMap = 0;

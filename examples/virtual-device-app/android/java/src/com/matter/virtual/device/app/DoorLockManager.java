@@ -6,6 +6,7 @@ public interface DoorLockManager {
   int DlLockState_kLocked = 1;
   int DlLockState_kUnlocked = 2;
   int DlLockState_kUnlatched = 3;
+  int DlLockState_kUnknownEnumValue = 4;
 
   int DlLockType_kDeadBolt = 0;
   int DlLockType_kMagnetic = 1;

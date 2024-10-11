@@ -136,7 +136,7 @@ private:
 
             chip::Messaging::SendFlags sendFlags;
             if (!event.msgTypeData.HasMessageType(chip::bdx::MessageType::BlockAckEOF) &&
-                !event.msgTypeData.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
+                !event.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
             {
                 sendFlags.Set(chip::Messaging::SendMessageFlags::kExpectResponse);
             }
@@ -162,7 +162,7 @@ private:
             mDownloader->OnMessageReceived(payloadHeader, std::move(payload));
 
             // For a receiver using BDX Protocol, all received messages will require a response except for a StatusReport
-            if (!payloadHeader.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
+            if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
             {
                 ec->WillSendMessage();
             }

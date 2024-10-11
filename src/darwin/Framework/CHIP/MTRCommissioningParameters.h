@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Information that can be provided to commissionWithNodeID to commision devices.
  */
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRCommissioningParameters : NSObject
 
 /**

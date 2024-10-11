@@ -31,12 +31,15 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/PlatformManager.h>
-#include <platform/Tizen/NetworkCommissioningDriver.h>
+
+#include "ErrorUtils.h"
+#include "NetworkCommissioningDriver.h"
 
 using namespace ::chip::DeviceLayer::NetworkCommissioning;
 
 namespace {
-static constexpr const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e state)
+
+constexpr const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e state)
 {
     switch (state)
     {
@@ -49,7 +52,7 @@ static constexpr const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e
     }
 }
 
-static constexpr const char * __WiFiScanStateToStr(wifi_manager_scan_state_e state)
+constexpr const char * __WiFiScanStateToStr(wifi_manager_scan_state_e state)
 {
     switch (state)
     {
@@ -62,7 +65,7 @@ static constexpr const char * __WiFiScanStateToStr(wifi_manager_scan_state_e sta
     }
 }
 
-static constexpr const char * __WiFiConnectionStateToStr(wifi_manager_connection_state_e state)
+constexpr const char * __WiFiConnectionStateToStr(wifi_manager_connection_state_e state)
 {
     switch (state)
     {
@@ -81,7 +84,7 @@ static constexpr const char * __WiFiConnectionStateToStr(wifi_manager_connection
     }
 }
 
-static constexpr const char * __WiFiIPConflictStateToStr(wifi_manager_ip_conflict_state_e state)
+constexpr const char * __WiFiIPConflictStateToStr(wifi_manager_ip_conflict_state_e state)
 {
     switch (state)
     {
@@ -94,7 +97,7 @@ static constexpr const char * __WiFiIPConflictStateToStr(wifi_manager_ip_conflic
     }
 }
 
-static constexpr const char * __WiFiModuleStateToStr(wifi_manager_module_state_e state)
+constexpr const char * __WiFiModuleStateToStr(wifi_manager_module_state_e state)
 {
     switch (state)
     {
@@ -107,7 +110,7 @@ static constexpr const char * __WiFiModuleStateToStr(wifi_manager_module_state_e
     }
 }
 
-static constexpr const char * __WiFiSecurityTypeToStr(wifi_manager_security_type_e type)
+constexpr const char * __WiFiSecurityTypeToStr(wifi_manager_security_type_e type)
 {
     switch (type)
     {
@@ -136,7 +139,7 @@ static constexpr const char * __WiFiSecurityTypeToStr(wifi_manager_security_type
 
 // wifi_manager's scan results don't contains the channel infomation, so we need this lookup table for resolving the band and
 // channel infomation.
-std::pair<WiFiBand, int> _GetBandAndChannelFromFrequency(int freq)
+constexpr std::pair<WiFiBand, int> _GetBandAndChannelFromFrequency(int freq)
 {
     std::pair<WiFiBand, int> ret = std::make_pair(WiFiBand::k2g4, 0);
     if (freq <= 931)
@@ -229,7 +232,7 @@ std::pair<WiFiBand, int> _GetBandAndChannelFromFrequency(int freq)
     return ret;
 }
 
-uint8_t _GetNetworkSecurityType(wifi_manager_security_type_e type)
+constexpr uint8_t _GetNetworkSecurityType(wifi_manager_security_type_e type)
 {
     switch (type)
     {
@@ -255,6 +258,7 @@ uint8_t _GetNetworkSecurityType(wifi_manager_security_type_e type)
         return 0x0;
     }
 }
+
 } // namespace
 
 namespace chip {
@@ -398,14 +402,14 @@ bool WiFiManager::_FoundAPOnScanCb(wifi_manager_ap_h ap, void * userData)
     wifi_manager_security_type_e type;
     WiFiScanResponse scannedAP;
 
-    wifiErr = wifi_manager_ap_get_essid(ap, &MakeUniquePointerReceiver(essid).Get());
+    wifiErr = wifi_manager_ap_get_essid(ap, &essid.GetReceiver());
     VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE,
                  ChipLogError(DeviceLayer, "FAIL: get AP essid [%s]", get_error_message(wifiErr)));
     ChipLogProgress(DeviceLayer, "Essid Found: %s\n", essid.get());
     scannedAP.ssidLen = static_cast<uint8_t>(std::min(strlen(essid.get()), sizeof(scannedAP.ssid)));
     memcpy(scannedAP.ssid, essid.get(), scannedAP.ssidLen);
 
-    wifiErr = wifi_manager_ap_get_bssid(ap, &MakeUniquePointerReceiver(bssid).Get());
+    wifiErr = wifi_manager_ap_get_bssid(ap, &bssid.GetReceiver());
     VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE,
                  ChipLogError(DeviceLayer, "Fail: get AP bssid [%s]", get_error_message(wifiErr)));
     memcpy(scannedAP.bssid, bssid.get(), std::min(strlen(bssid.get()), sizeof(scannedAP.bssid)));
@@ -441,7 +445,7 @@ bool WiFiManager::_FoundAPCb(wifi_manager_ap_h ap, void * userData)
     bool isPassphraseRequired = false;
     auto clonedAp             = reinterpret_cast<wifi_manager_ap_h *>(userData);
 
-    wifiErr = wifi_manager_ap_get_essid(ap, &MakeUniquePointerReceiver(essid).Get());
+    wifiErr = wifi_manager_ap_get_essid(ap, &essid.GetReceiver());
     VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE,
                  ChipLogError(DeviceLayer, "FAIL: get AP essid [%s]", get_error_message(wifiErr)));
 
@@ -501,7 +505,7 @@ bool WiFiManager::_ConfigListCb(const wifi_manager_config_h config, void * userD
     GAutoPtr<char> name;
     wifi_manager_security_type_e securityType = WIFI_MANAGER_SECURITY_TYPE_NONE;
 
-    wifi_manager_config_get_name(config, &MakeUniquePointerReceiver(name).Get());
+    wifi_manager_config_get_name(config, &name.GetReceiver());
     wifi_manager_config_get_security_type(config, &securityType);
 
     wifiErr = wifi_manager_config_remove(sInstance.mWiFiManagerHandle, config);
@@ -1093,34 +1097,23 @@ CHIP_ERROR WiFiManager::GetConnectionState(wifi_manager_connection_state_e * con
     return err;
 }
 
-CHIP_ERROR WiFiManager::GetBssId(uint8_t * bssId)
+CHIP_ERROR WiFiManager::GetBssId(MutableByteSpan & value)
 {
-    VerifyOrReturnError(bssId != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    char * bssIdStr = nullptr;
-    std::unique_ptr<char, decltype(&::free)> _{ bssIdStr, &::free };
+    VerifyOrReturnError(value.size() >= kWiFiBSSIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     wifi_manager_ap_h connectedAp = _WiFiGetConnectedAP();
-    if (connectedAp == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(connectedAp != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    int wifiErr = wifi_manager_ap_get_bssid(connectedAp, &bssIdStr);
-    if (wifiErr != WIFI_MANAGER_ERROR_NONE)
-    {
-        ChipLogError(DeviceLayer, "FAIL: get bssid [%s]", get_error_message(wifiErr));
-        return CHIP_ERROR_READ_FAILED;
-    }
+    GAutoPtr<char> bssIdStr;
+    int wifiErr = wifi_manager_ap_get_bssid(connectedAp, &bssIdStr.GetReceiver());
+    VerifyOrReturnError(wifiErr == WIFI_MANAGER_ERROR_NONE, TizenToChipError(wifiErr),
+                        ChipLogError(DeviceLayer, "FAIL: Get AP BSSID: %s", get_error_message(wifiErr)));
 
-    if (sscanf(bssIdStr, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &mWiFiBSSID[0], &mWiFiBSSID[1], &mWiFiBSSID[2], &mWiFiBSSID[3],
-               &mWiFiBSSID[4], &mWiFiBSSID[5]) != 6)
-    {
-        ChipLogError(DeviceLayer, "FAIL: parse bssid");
-        return CHIP_ERROR_READ_FAILED;
-    }
+    uint8_t * data = value.data();
+    int rv = sscanf(bssIdStr.get(), "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &data[0], &data[1], &data[2], &data[3], &data[4], &data[5]);
+    VerifyOrReturnError(rv == kWiFiBSSIDLength, CHIP_ERROR_READ_FAILED, ChipLogError(DeviceLayer, "FAIL: Parse AP BSSID"));
 
-    bssId = mWiFiBSSID;
+    value.reduce_size(kWiFiBSSIDLength);
     return CHIP_NO_ERROR;
 }
 
@@ -1153,7 +1146,7 @@ CHIP_ERROR WiFiManager::GetConfiguredNetwork(NetworkCommissioning::Network & net
         return CHIP_ERROR_INCORRECT_STATE;
     }
     GAutoPtr<char> essid;
-    int wifiErr = wifi_manager_ap_get_essid(connectedAp, &MakeUniquePointerReceiver(essid).Get());
+    int wifiErr = wifi_manager_ap_get_essid(connectedAp, &essid.GetReceiver());
     VerifyOrReturnError(wifiErr == WIFI_MANAGER_ERROR_NONE, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: get essid [%s]", get_error_message(wifiErr)));
     network.networkIDLen = static_cast<uint8_t>(std::min(strlen(essid.get()), sizeof(network.networkID)));

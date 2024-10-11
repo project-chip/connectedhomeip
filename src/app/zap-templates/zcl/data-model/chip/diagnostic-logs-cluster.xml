@@ -52,7 +52,7 @@ limitations under the License.
         <command source="server" code="0x01" name="RetrieveLogsResponse" optional="false" cli="chip logs response">
             <description>Response to the RetrieveLogsRequest</description>
             <arg name="Status" type="StatusEnum"/>
-            <arg name="LogContent" type="LONG_OCTET_STRING"/>
+            <arg name="LogContent" type="long_octet_string"/>
             <arg name="UTCTimeStamp" type="epoch_us" optional="true"/>
             <arg name="TimeSinceBoot" type="systime_us" optional="true"/>
         </command>

@@ -20,13 +20,14 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "DeviceCallbacks.h"
 
-static const char * TAG = "bridge-devicecallbacks";
+static const char TAG[] = "bridge-devicecallbacks";
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -78,7 +79,7 @@ CHIP_ERROR ActionsAttrAccess::ReadEndpointListAttribute(EndpointId endpoint, Att
 
 CHIP_ERROR ActionsAttrAccess::ReadSetupUrlAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    const char SetupUrl[] = "https://example.com";
+    static const char SetupUrl[] = "https://example.com";
     return aEncoder.Encode(chip::CharSpan::fromCharString(SetupUrl));
 }
 
@@ -112,5 +113,5 @@ CHIP_ERROR ActionsAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attr
 
 void MatterActionsPluginServerInitCallback(void)
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }

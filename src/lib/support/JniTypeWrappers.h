@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@
 
 #include <cstdint>
 #include <jni.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/Span.h>
 #include <string>
 
-#define JNI_LOCAL_REF_COUNT 256
 namespace chip {
 /// Exposes the underlying UTF string from a jni string
 class JniUtfString
@@ -51,13 +51,15 @@ public:
 
     chip::CharSpan charSpan() const { return chip::CharSpan(c_str(), static_cast<size_t>(size())); }
 
+    chip::ByteSpan byteSpan() const { return chip::ByteSpan(chip::Uint8::from_const_char(c_str()), static_cast<size_t>(size())); }
+
     jsize size() const { return mDataLength; }
 
 private:
-    JNIEnv * mEnv;
-    jstring mString;
-    const char * mChars;
-    jsize mDataLength;
+    JNIEnv * mEnv       = nullptr;
+    jstring mString     = nullptr;
+    const char * mChars = nullptr;
+    jsize mDataLength   = 0;
 };
 
 /// Exposes the underlying binary data from a jni byte array
@@ -167,81 +169,19 @@ private:
     jbyteArray mArray = nullptr;
 };
 
-/// Manages an pre-existing global reference to a jclass.
-class JniClass
+// Manages an pre-existing global reference to a jobject.
+class JniGlobalRefWrapper
 {
 public:
-    explicit JniClass(jclass mClassRef) : mClassRef(mClassRef) {}
-    ~JniClass() { chip::JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mClassRef); }
-
-    jclass classRef() { return mClassRef; }
+    explicit JniGlobalRefWrapper(jobject mGlobalRef) : mGlobalRef(mGlobalRef) {}
+    ~JniGlobalRefWrapper()
+    {
+        chip::JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mGlobalRef);
+        mGlobalRef = nullptr;
+    }
+    jobject classRef() { return mGlobalRef; }
 
 private:
-    jclass mClassRef;
+    jobject mGlobalRef = nullptr;
 };
-
-class JniLocalReferenceManager
-{
-public:
-    JniLocalReferenceManager(JNIEnv * env) : mEnv(env)
-    {
-        if (mEnv->PushLocalFrame(JNI_LOCAL_REF_COUNT) == 0)
-        {
-            mlocalFramePushed = true;
-        }
-    }
-    ~JniLocalReferenceManager()
-    {
-        if (mlocalFramePushed)
-        {
-            mEnv->PopLocalFrame(nullptr);
-            mlocalFramePushed = false;
-        }
-    }
-
-private:
-    JNIEnv * mEnv          = nullptr;
-    bool mlocalFramePushed = false;
-};
-
-class JniGlobalReference
-{
-public:
-    JniGlobalReference() {}
-
-    CHIP_ERROR Init(jobject aObjectRef)
-    {
-        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-        VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-        VerifyOrReturnError(aObjectRef != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-        VerifyOrReturnError(mObjectRef == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        mObjectRef = env->NewGlobalRef(aObjectRef);
-        VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        VerifyOrReturnError(mObjectRef != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-        return CHIP_NO_ERROR;
-    }
-
-    JniGlobalReference(JniGlobalReference && aOther)
-    {
-        mObjectRef        = aOther.mObjectRef;
-        aOther.mObjectRef = nullptr;
-    }
-
-    ~JniGlobalReference()
-    {
-        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-        if (env != nullptr && mObjectRef != nullptr)
-        {
-            env->DeleteGlobalRef(mObjectRef);
-        }
-    }
-
-    jobject ObjectRef() { return mObjectRef; }
-
-    bool HasValidObjectRef() { return mObjectRef != nullptr; }
-
-private:
-    jobject mObjectRef = nullptr;
-};
-
 } // namespace chip

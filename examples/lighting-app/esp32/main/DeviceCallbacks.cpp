@@ -29,7 +29,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-static const char * TAG = "light-app-callbacks";
+static const char TAG[] = "light-app-callbacks";
 
 extern LEDWidget AppLED;
 

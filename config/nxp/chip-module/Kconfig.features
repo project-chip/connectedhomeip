@@ -1,0 +1,102 @@
+#
+#   Copyright (c) 2024 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+# The purpose of this file is to define Kconfig options enabling specific features.
+# Feature options will define defaults for settings that are related to the specific feature.
+
+if CHIP
+
+config CHIP_WIFI
+	bool "Enable NXP Wi-Fi support"
+	default y
+	select WIFI
+	select WIFI_NXP
+	select WIFI_NM_WPA_SUPPLICANT
+	select WIFI_NM_WPA_SUPPLICANT_CRYPTO_ENTERPRISE
+	select WIFI_NM_WPA_SUPPLICANT_DPP
+	select WIFI_NM_WPA_SUPPLICANT_EAPOL
+	select WIFI_NM_WPA_SUPPLICANT_WPS
+	select NET_L2_ETHERNET
+	select NET_IPV4
+	select NET_DHCPV4
+	select DNS_RESOLVER
+	imply THREAD_CUSTOM_DATA
+	imply MBEDTLS_ENTROPY_C
+	imply NET_STATISTICS
+	imply NET_PKT_TXTIME
+	imply NET_PKT_TIMESTAMP
+	imply NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
+	imply NET_IPV6_NBR_CACHE
+	imply NET_STATISTICS_IPV6
+	imply NET_STATISTICS_USER_API
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
+	int "Define the minimum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 500
+	help
+	  Specifies the minimum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL
+	int "Define the maximum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 3600000 # 1 hour
+	help
+	  Specifies the maximum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAX_RETRIES_NUMBER
+	int "Define the maximum amount of connection recovery occurrences"
+	depends on CHIP_WIFI
+	default 0
+	help
+	  Specifies the maximum number of connection recovery attempts.
+	  If set to 0, no limitation is applied and attempts
+	  to recover the connection are performed indefinitely.
+
+config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
+	int "Define the connection recovery jitter in milliseconds"
+	depends on CHIP_WIFI
+	default 2000
+	help
+	  Specifies the maximum connection recovery jitter interval (in milliseconds).
+	  Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
+	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
+	  within range [-JITTER; +JITTER].
+
+config CHIP_ETHERNET
+	bool "Enable NXP Ethernet support"
+	default n
+	depends on !CHIP_WIFI
+	select NET_MGMT_EVENT
+	select NET_MGMT_EVENT_INFO
+	select NET_L2_ETHERNET
+	select NET_L2_ETHERNET_MGMT
+	select NET_UDP
+	select NET_IP
+	select NET_CONFIG_SETTINGS
+	select NET_MGMT
+	select NET_IPV4
+	select NET_DHCPV4
+	select NET_NATIVE_IPV4
+	select NET_NATIVE
+	select NET_TCP
+	select DNS_RESOLVER
+	select MDNS_RESOLVER
+	select MBEDTLS_PKCS5_C
+	select MBEDTLS_HKDF_C
+	select MBEDTLS_ECDSA_C
+	select PSA_CRYPTO_ENABLE_ALL
+endif # CHIP

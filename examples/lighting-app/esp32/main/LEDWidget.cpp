@@ -22,7 +22,7 @@
 #endif
 #include "led_strip.h"
 
-static const char * TAG = "LEDWidget";
+static const char TAG[] = "LEDWidget";
 
 void LEDWidget::Init(void)
 {

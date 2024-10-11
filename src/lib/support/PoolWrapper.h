@@ -33,10 +33,9 @@ public:
 
     virtual ~PoolInterface() {}
 
-    virtual U * CreateObject(ConstructorArguments... args)              = 0;
-    virtual void ReleaseObject(U * element)                             = 0;
-    virtual void ReleaseAll()                                           = 0;
-    virtual void ResetObject(U * element, ConstructorArguments... args) = 0;
+    virtual U * CreateObject(ConstructorArguments... args) = 0;
+    virtual void ReleaseObject(U * element)                = 0;
+    virtual void ReleaseAll()                              = 0;
 
     template <typename Function>
     Loop ForEachActiveObject(Function && function)
@@ -81,11 +80,6 @@ public:
     void ReleaseObject(U * element) override { Impl().ReleaseObject(static_cast<T *>(element)); }
 
     void ReleaseAll() override { Impl().ReleaseAll(); }
-
-    void ResetObject(U * element, ConstructorArguments... args) override
-    {
-        return Impl().ResetObject(static_cast<T *>(element), std::move(args)...);
-    }
 
 protected:
     Loop ForEachActiveObjectInner(void * context, typename PoolInterface<U, ConstructorArguments...>::Lambda lambda) override

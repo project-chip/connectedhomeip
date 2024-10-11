@@ -30,13 +30,16 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
-#include <app/util/af.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/core/ErrorStr.h>
 #include <platform/Ameba/AmebaConfig.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#if CONFIG_ENABLE_AMEBA_CRYPTO
+#include <platform/Ameba/crypto/AmebaPersistentStorageOperationalKeystore.h>
+#endif
 
 #include <lwip_netconf.h>
 
@@ -48,6 +51,7 @@
 #define AIR_QUALITY_SENSOR_ENDPOINT 2
 #define TEMPERATURE_SENSOR_ENDPOINT 3
 #define RELATIVE_HUMIDITY_SENSOR_ENDPOINT 4
+#define THERMOSTAT_ENDPOINT 5
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -116,11 +120,12 @@ static void InitAirPurifierManager(void)
 {
     Clusters::AirPurifierManager::InitInstance(EndpointId(AIR_PURIFIER_ENDPOINT), EndpointId(AIR_QUALITY_SENSOR_ENDPOINT),
                                                EndpointId(TEMPERATURE_SENSOR_ENDPOINT),
-                                               EndpointId(RELATIVE_HUMIDITY_SENSOR_ENDPOINT));
+                                               EndpointId(RELATIVE_HUMIDITY_SENSOR_ENDPOINT), EndpointId(THERMOSTAT_ENDPOINT));
 
     SetParentEndpointForEndpoint(AIR_QUALITY_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
     SetParentEndpointForEndpoint(TEMPERATURE_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
     SetParentEndpointForEndpoint(RELATIVE_HUMIDITY_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
+    SetParentEndpointForEndpoint(THERMOSTAT_ENDPOINT, AIR_PURIFIER_ENDPOINT);
 }
 
 static void InitServer(intptr_t context)
@@ -128,6 +133,12 @@ static void InitServer(intptr_t context)
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+#if CONFIG_ENABLE_AMEBA_CRYPTO
+    ChipLogProgress(DeviceLayer, "platform crypto enabled!");
+    static chip::AmebaPersistentStorageOperationalKeystore sAmebaPersistentStorageOpKeystore;
+    VerifyOrDie((sAmebaPersistentStorageOpKeystore.Init(initParams.persistentStorageDelegate)) == CHIP_NO_ERROR);
+    initParams.operationalKeystore = &sAmebaPersistentStorageOpKeystore;
+#endif
     chip::Server::GetInstance().Init(initParams);
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);

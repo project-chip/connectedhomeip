@@ -62,7 +62,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
+    - label: "Step 1a: TH_CR1 starts a commissioning process with DUT_CE"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
       PICS: CADMIN.S
@@ -73,7 +73,7 @@ tests:
               - name: "payload"
                 value: payload
 
-    - label: "Step 1a: TH_CR1 commissioned with DUT_CE"
+    - label: "Step 1b: TH_CR1 commissioned with DUT_CE"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       PICS: CADMIN.S

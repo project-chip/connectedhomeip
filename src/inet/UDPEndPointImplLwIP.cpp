@@ -23,10 +23,6 @@
 
 #include <inet/UDPEndPointImplLwIP.h>
 
-#if CHIP_HAVE_CONFIG_H
-#include <lwip/lwip_buildconfig.h> // nogncheck
-#endif                             // CHIP_HAVE_CONFIG_H
-
 #if INET_CONFIG_ENABLE_IPV4
 #include <lwip/igmp.h>
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -121,13 +117,9 @@ CHIP_ERROR UDPEndPointImplLwIP::LwIPBindInterface(struct udp_pcb * aUDP, Interfa
 
 InterfaceId UDPEndPointImplLwIP::GetBoundInterface() const
 {
-#if HAVE_LWIP_UDP_BIND_NETIF
     struct netif * netif;
     RunOnTCPIP([this, &netif]() { netif = netif_get_by_index(mUDP->netif_idx); });
     return InterfaceId(netif);
-#else
-    return InterfaceId(mUDP->intf_filter);
-#endif
 }
 
 uint16_t UDPEndPointImplLwIP::GetBoundPort() const
@@ -360,7 +352,7 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     if (buf->HasChainedBuffer())
     {
         // Have to allocate a new big-enough buffer and copy.
-        uint16_t messageSize            = buf->TotalLength();
+        size_t messageSize              = buf->TotalLength();
         System::PacketBufferHandle copy = System::PacketBufferHandle::New(messageSize, 0);
         if (copy.IsNull() || buf->Read(copy->Start(), messageSize) != CHIP_NO_ERROR)
         {

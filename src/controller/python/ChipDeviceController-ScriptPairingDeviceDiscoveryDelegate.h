@@ -44,7 +44,7 @@ public:
         return chip::DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(discoveryTimeoutMsec), OnDiscoveredTimeout,
                                                            this);
     }
-    void OnDiscoveredDevice(const Dnssd::DiscoveredNodeData & nodeData);
+    void OnDiscoveredDevice(const Dnssd::CommissionNodeData & nodeData);
 
 private:
     static void OnDiscoveredTimeout(System::Layer * layer, void * context)

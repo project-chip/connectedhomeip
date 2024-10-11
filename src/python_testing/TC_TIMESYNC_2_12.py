@@ -15,6 +15,26 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
 import queue
 import time
 import typing
@@ -50,6 +70,9 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
             asserts.assert_equal(ret.Data.name, expected_name, "Unexpected name returned")
         except queue.Empty:
             asserts.fail("Did not receive TZStatus event")
+
+    def pics_TC_TIMESYNC_2_12(self) -> list[str]:
+        return ["TIMESYNC.S.F00"]
 
     @async_test_body
     async def test_TC_TIMESYNC_2_12(self):

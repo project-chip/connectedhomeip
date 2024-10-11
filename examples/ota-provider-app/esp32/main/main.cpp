@@ -58,7 +58,7 @@ void OnTransferComplete(void * context);
 void OnTransferFailed(void * context, BdxSenderErrorTypes status);
 
 namespace {
-const char * TAG               = "ota-provider-app";
+extern const char TAG[]        = "ota-provider-app";
 const uint8_t kMaxImagePathlen = 35;
 static AppDeviceCallbacks EchoCallbacks;
 

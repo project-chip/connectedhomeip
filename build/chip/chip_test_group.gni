@@ -39,10 +39,14 @@ template("chip_test_group") {
                            [
                              "build_monolithic_library",
                              "deps",
+                             "tests",
                            ])
 
     deps = []
-    foreach(_test, invoker.deps) {
+    if (defined(invoker.deps)) {
+      deps = invoker.deps
+    }
+    foreach(_test, invoker.tests) {
       deps += [ get_label_info(_test, "label_no_toolchain") + ".lib" ]
     }
 
@@ -53,7 +57,7 @@ template("chip_test_group") {
 
   group("${_test_group_name}") {
     deps = []
-    data_deps = invoker.deps
+    data_deps = invoker.tests
 
     if (_build_monolithic_library) {
       deps += [ ":${_lib_target_name}" ]
@@ -64,7 +68,10 @@ template("chip_test_group") {
     group("${_test_group_name}_run") {
       if (chip_link_tests) {
         deps = []
-        foreach(_test, invoker.deps) {
+        if (defined(invoker.deps)) {
+          deps = invoker.deps
+        }
+        foreach(_test, invoker.tests) {
           deps += [ get_label_info(_test, "label_no_toolchain") + "_run" ]
         }
       }

@@ -19,6 +19,13 @@ package com.matter.tv.server.tvapp;
 
 public class ChannelInfo {
 
+  public enum ChannelType {
+    Satellite,
+    Cable,
+    Terrestrial,
+    OTT
+  }
+
   public static final int kSuccess = 0;
   public static final int kMultipleMatches = 1;
   public static final int kNoMatches = 2;
@@ -29,15 +36,25 @@ public class ChannelInfo {
   public String name;
   public String callSign;
   public String affiliateCallSign;
+  public String identifier;
+  public ChannelType type;
 
   public ChannelInfo(
-      int majorNumber, int minorNumber, String name, String callSign, String affiliateCallSign) {
+      int majorNumber,
+      int minorNumber,
+      String name,
+      String callSign,
+      String affiliateCallSign,
+      String identifier,
+      ChannelType type) {
     this.status = kSuccess;
     this.majorNumber = majorNumber;
     this.minorNumber = minorNumber;
     this.name = name;
     this.callSign = callSign;
     this.affiliateCallSign = affiliateCallSign;
+    this.identifier = identifier;
+    this.type = type;
   }
 
   public ChannelInfo(int status) {

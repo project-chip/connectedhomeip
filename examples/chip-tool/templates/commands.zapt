@@ -9,6 +9,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
+#include <commands/common/Commands.h>
 #include <commands/clusters/ComplexArgument.h>
 #include <commands/clusters/ClusterCommand.h>
 #include <commands/clusters/ReportCommand.h>
@@ -30,7 +31,7 @@ public:
     {
         {{#zcl_command_arguments}}
         {{#if_chip_complex}}
-        AddArgument("{{asUpperCamelCase label}}", &mComplex_{{asUpperCamelCase label}});
+        AddArgument("{{asUpperCamelCase label}}", &mComplex_{{asUpperCamelCase label}}{{#if isOptional}}, "", Argument::kOptional{{/if}});
         {{else if (isString type)}}
         AddArgument("{{asUpperCamelCase label}}", &mRequest.{{asLowerCamelCase label}});
         {{else}}

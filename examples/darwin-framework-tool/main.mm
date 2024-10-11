@@ -18,9 +18,12 @@
 
 #import <Matter/Matter.h>
 
+#import "debug/LeakChecker.h"
 #import "logging/logging.h"
 
+#include "commands/bdx/Commands.h"
 #include "commands/common/Commands.h"
+#include "commands/configuration/Commands.h"
 #include "commands/delay/Commands.h"
 #include "commands/discover/Commands.h"
 #include "commands/interactive/Commands.h"
@@ -30,14 +33,15 @@
 #include "commands/storage/Commands.h"
 
 #include <zap-generated/cluster/Commands.h>
-#include <zap-generated/test/Commands.h>
 
 int main(int argc, const char * argv[])
 {
+    int exitCode = EXIT_SUCCESS;
     @autoreleasepool {
         dft::logging::Setup();
 
         Commands commands;
+        registerCommandsBdx(commands);
         registerCommandsPairing(commands);
         registerCommandsDelay(commands);
         registerCommandsDiscover(commands);
@@ -45,8 +49,9 @@ int main(int argc, const char * argv[])
         registerCommandsPayload(commands);
         registerClusterOtaSoftwareUpdateProviderInteractive(commands);
         registerCommandsStorage(commands);
-        registerCommandsTests(commands);
+        registerCommandsConfiguration(commands);
         registerClusters(commands);
-        return commands.Run(argc, (char **) argv);
+        exitCode = commands.Run(argc, (char **) argv);
     }
+    return ConditionalLeaksCheck(exitCode);
 }

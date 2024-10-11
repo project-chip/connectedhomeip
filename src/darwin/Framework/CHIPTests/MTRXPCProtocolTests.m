@@ -23,8 +23,6 @@
 
 #import "MTRErrorTestUtils.h"
 
-#import <app/util/af-enums.h>
-
 #import <math.h> // For INFINITY
 
 // system dependencies
@@ -33,48 +31,6 @@
 static const uint16_t kTimeoutInSeconds = 3;
 // Inverted expectation timeout
 static const uint16_t kNegativeTimeoutInSeconds = 1;
-
-@interface MTRAttributePath (Test)
-- (BOOL)isEqual:(id)object;
-@end
-
-@implementation MTRAttributePath (Test)
-- (BOOL)isEqual:(id)object
-{
-    if ([object isKindOfClass:[MTRAttributePath class]]) {
-        MTRAttributePath * other = object;
-        return [self.endpoint isEqualToNumber:other.endpoint] && [self.cluster isEqualToNumber:other.cluster] &&
-            [self.attribute isEqualToNumber:other.attribute];
-    }
-    return NO;
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"MTRAttributePath(%@,%@,%@)", self.endpoint, self.cluster, self.attribute];
-}
-@end
-
-@interface MTRCommandPath (Test)
-- (BOOL)isEqual:(id)object;
-@end
-
-@implementation MTRCommandPath (Test)
-- (BOOL)isEqual:(id)object
-{
-    if ([object isKindOfClass:[MTRCommandPath class]]) {
-        MTRCommandPath * other = object;
-        return [self.endpoint isEqualToNumber:other.endpoint] && [self.cluster isEqualToNumber:other.cluster] &&
-            [self.command isEqualToNumber:other.command];
-    }
-    return NO;
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"MTRCommandPath(%@,%@,%@)", self.endpoint, self.cluster, self.command];
-}
-@end
 
 @interface MTRClusterStateCacheContainer (Test)
 // Obsolete method is moved to this test suite to keep tests compatible
@@ -160,6 +116,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 @property (readwrite, strong) void (^handleReadClusterStateCache)
     (id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
         NSNumber * _Nullable attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error));
+@property (readwrite, strong) void (^handleDownloadLog)(id controller, NSNumber * nodeId, MTRDiagnosticLogType type, NSTimeInterval timeout,
+    void (^completion)(NSString * _Nullable url, NSError * _Nullable error));
 
 @end
 
@@ -318,6 +276,18 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     });
 }
 
+- (void)downloadLogWithController:(id)controller
+                           nodeId:(NSNumber *)nodeId
+                             type:(MTRDiagnosticLogType)type
+                          timeout:(NSTimeInterval)timeout
+                       completion:(void (^)(NSString * _Nullable url, NSError * _Nullable error))completion
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        XCTAssertNotNil(self.handleDownloadLog);
+        self.handleDownloadLog(controller, nodeId, type, timeout, completion);
+    });
+}
+
 - (void)setUp
 {
     [self setContinueAfterFailure:NO];
@@ -342,6 +312,44 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [_xpcListener suspend];
     _xpcListener = nil;
     _xpcDisconnectExpectation = nil;
+}
+
+- (void)testDownloadLogSuccess
+{
+    uint64_t myNodeId = 9876543210;
+    NSString * myBdxURL = @"bdx://foo";
+    NSTimeInterval myTimeout = 10;
+
+    XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
+    XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
+
+    __auto_type uuid = self.controllerUUID;
+    _handleDownloadLog = ^(id controller, NSNumber * nodeId, MTRDiagnosticLogType type, NSTimeInterval timeout,
+        void (^completion)(NSString * _Nullable url, NSError * _Nullable error)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
+        [callExpectation fulfill];
+        completion(myBdxURL, nil);
+    };
+
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Downloading...");
+    [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport
+                      timeout:myTimeout
+                        queue:dispatch_get_main_queue()
+                   completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+                       NSLog(@"Read url: %@", url);
+                       XCTAssertNotNil(url);
+                       XCTAssertNil(error);
+                       [responseExpectation fulfill];
+                       self.xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+                   }];
+
+    [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, responseExpectation, nil] timeout:kTimeoutInSeconds];
+
+    // When download is done, connection should have been released
+    [self waitForExpectations:[NSArray arrayWithObject:_xpcDisconnectExpectation] timeout:kTimeoutInSeconds];
+    XCTAssertNil(_xpcConnection);
 }
 
 - (void)testReadAttributeSuccess

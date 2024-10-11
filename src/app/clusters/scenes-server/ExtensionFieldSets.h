@@ -34,10 +34,10 @@ public:
     ExtensionFieldSets(){};
     virtual ~ExtensionFieldSets() = default;
 
-    virtual CHIP_ERROR Serialize(TLV::TLVWriter & writer, TLV::Tag structTa) const = 0;
-    virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader, TLV::Tag structTa)     = 0;
-    virtual void Clear()                                                           = 0;
-    virtual bool IsEmpty() const                                                   = 0;
+    virtual CHIP_ERROR Serialize(TLV::TLVWriter & writer) const = 0;
+    virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader)     = 0;
+    virtual void Clear()                                        = 0;
+    virtual bool IsEmpty() const                                = 0;
     /// @brief Gets a count of how many initialized fields sets are in the object
     /// @return The number of initialized field sets the object
     /// @note Field set refers to extension field sets, from the scene cluster (see 1.4.6.2 ExtensionFieldSet in Matter Application

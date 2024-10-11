@@ -31,7 +31,7 @@ limitations under the License.
     <attribute side="server" code="0x0004" define="APPLICATION_APP"                 type="ApplicationStruct"                                                   writable="false" optional="false">Application</attribute>
     <attribute side="server" code="0x0005" define="APPLICATION_STATUS"              type="ApplicationStatusEnum"      default="0x01" min="0x00"   max="0xFF"   writable="false" optional="false">Status</attribute>
     <attribute side="server" code="0x0006" define="APPLICATION_VERSION"             type="char_string"                               length="32"               writable="false" optional="false">ApplicationVersion</attribute>
-    <attribute side="server" code="0x0007" define="APPLICATION_ALLOWED_VENDOR_LIST" type="ARRAY" entryType="vendor_id"               length="32"               writable="false" optional="false">
+    <attribute side="server" code="0x0007" define="APPLICATION_ALLOWED_VENDOR_LIST" type="array" entryType="vendor_id"               length="32"               writable="false" optional="false">
         <description>AllowedVendorList</description>
         <access op="read" role="administer"/>
     </attribute>

@@ -16,18 +16,13 @@ import os
 from typing import Union
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeQuality, AttributeStorage, ClusterSide,
-                                         Command, CommandQuality, Event, EventPriority, EventQuality, FieldQuality, Idl,
-                                         StructQuality, StructTag)
+from matter_idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeQuality, AttributeStorage, Command,
+                                         CommandQuality, Event, EventPriority, EventQuality, FieldQuality, Idl, StructQuality,
+                                         StructTag)
 
 
-def human_text_string(value: Union[ClusterSide, StructTag, StructQuality, EventPriority, EventQuality, AccessPrivilege, AttributeQuality, CommandQuality, ApiMaturity, AttributeStorage]) -> str:
-    if type(value) is ClusterSide:
-        if value == ClusterSide.CLIENT:
-            return "client"
-        if value == ClusterSide.SERVER:
-            return "server"
-    elif type(value) is StructTag:
+def human_text_string(value: Union[StructTag, StructQuality, EventPriority, EventQuality, AccessPrivilege, AttributeQuality, CommandQuality, ApiMaturity, AttributeStorage]) -> str:
+    if type(value) is StructTag:
         if value == StructTag.REQUEST:
             return "request"
         if value == StructTag.RESPONSE:

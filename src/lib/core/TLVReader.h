@@ -24,14 +24,25 @@
  *      shares many properties with the commonly used JSON serialization format while being considerably
  *      more compact over the wire.
  */
-
 #pragma once
 
+#include <stddef.h>
+#include <stdint.h>
+#include <type_traits>
+#include <utility>
+
+#include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
-
-#include "TLVCommon.h"
-#include "TLVWriter.h"
+#include <lib/core/TLVBackingStore.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVTypes.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/BitMask.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/Span.h>
 
 /**
  * @namespace chip::TLV
@@ -75,6 +86,8 @@ class DLL_EXPORT TLVReader
     friend class TLVUpdater;
 
 public:
+    TLVReader();
+
     /**
      * Initializes a TLVReader object from another TLVReader object.
      *

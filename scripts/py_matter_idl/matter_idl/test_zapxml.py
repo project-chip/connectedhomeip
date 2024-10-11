@@ -27,9 +27,9 @@ except ImportError:
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_idl.zapxml import ParseSource, ParseXmls
 
-from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, Command,
-                                         ConstantEntry, DataType, Enum, Event, EventPriority, EventQuality, Field, FieldQuality,
-                                         Idl, Struct, StructQuality, StructTag)
+from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, Command, ConstantEntry,
+                                         DataType, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, Struct,
+                                         StructQuality, StructTag)
 
 
 def XmlToIdl(what: Union[str, List[str]]) -> Idl:
@@ -90,7 +90,6 @@ class TestXmlParser(unittest.TestCase):
         self.assertEqual(idl,
                          Idl(clusters=[
                              Cluster(
-                                 side=ClusterSide.CLIENT,
                                  name='Test',
                                  code=0x1234,
                                  description="Test",
@@ -174,10 +173,8 @@ class TestXmlParser(unittest.TestCase):
 
         self.assertEqual(idl,
                          Idl(clusters=[
-                             Cluster(side=ClusterSide.CLIENT,
-                                     name='Test1', code=1, bitmaps=[bitmap]),
-                             Cluster(side=ClusterSide.CLIENT,
-                                     name='Test2', code=2, bitmaps=[bitmap]),
+                             Cluster(name='Test1', code=1, bitmaps=[bitmap]),
+                             Cluster(name='Test2', code=2, bitmaps=[bitmap]),
                          ]))
 
     def testFabricScopedAndSensitive(self):
@@ -206,8 +203,7 @@ class TestXmlParser(unittest.TestCase):
             </configurator>
         ''')
         self.assertEqual(idl,
-                         Idl(clusters=[Cluster(side=ClusterSide.CLIENT,
-                                               name='Test',
+                         Idl(clusters=[Cluster(name='Test',
                                                code=1,
                                                events=[Event(priority=EventPriority.INFO,
                                                              name='FabricEvent',
@@ -237,6 +233,36 @@ class TestXmlParser(unittest.TestCase):
                                                     name='Field10')],
                                       qualities=StructQuality.FABRIC_SCOPED)],
                          )]))
+
+    def testGlobalEnum(self):
+        idl = XmlToIdl('''<?xml version="1.0"?>
+            <configurator>
+              <enum name="One" type="ENUM8">
+                <item value="3" name="Three" />
+              </enum>
+
+              <enum name="Two" type="ENUM8">
+                <item value="100" name="Big" />
+                <item value="2000" name="Bigger" />
+              </enum>
+            </configurator>
+        ''')
+        e1 = Enum(
+            name='One',
+            base_type="ENUM8",
+            entries=[
+                ConstantEntry(name="Three", code=3),
+            ]
+        )
+        e2 = Enum(
+            name='Two',
+            base_type="ENUM8",
+            entries=[
+                ConstantEntry(name="Big", code=100),
+                ConstantEntry(name="Bigger", code=2000),
+            ]
+        )
+        self.assertEqual(idl, Idl(global_enums=[e1, e2]))
 
     def testEnum(self):
         idl = XmlToIdl('''<?xml version="1.0"?>
@@ -274,11 +300,65 @@ class TestXmlParser(unittest.TestCase):
         )
         self.assertEqual(idl,
                          Idl(clusters=[
-                             Cluster(side=ClusterSide.CLIENT,
-                                     name='Test1', code=10, enums=[e2, e3]),
-                             Cluster(side=ClusterSide.CLIENT,
-                                     name='Test2', code=20, enums=[e3])],
+                             Cluster(name='Test1', code=10, enums=[e2, e3]),
+                             Cluster(name='Test2', code=20, enums=[e3])],
                              ))
+
+    def testFeatures(self):
+        idl = XmlToIdl('''<?xml version="1.0"?>
+            <configurator>
+              <cluster>
+                  <name>TestFeatures</name>
+                  <code>20</code>
+
+                  <features>
+                    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Test">
+                      <optionalConform/>
+                    </feature>
+                    <feature bit="1" code="TEST" name="TestFeature" summary="Test2">
+                      <optionalConform/>
+                    </feature>
+                    <feature bit="2" code="XYZ" name="AnotherTest" summary="Test2">
+                      <optionalConform/>
+                    </feature>
+                  </features>
+              </cluster>
+            </configurator>
+        ''')
+        bitmap = Bitmap(
+            name='Feature',
+            base_type='bitmap32',
+            entries=[
+                ConstantEntry(name='OnOff', code=1),
+                ConstantEntry(name='TestFeature', code=2),
+                ConstantEntry(name='AnotherTest', code=4),
+            ])
+        self.assertEqual(idl,
+                         Idl(clusters=[
+                             Cluster(name='TestFeatures', code=20, bitmaps=[bitmap])
+                         ])),
+
+    def testGlobalStruct(self):
+        idl = XmlToIdl('''<?xml version="1.0"?>
+            <configurator>
+              <struct name="SomeStruct" isFabricScoped="true">
+                <item name="FirstMember" type="int16u" />
+                <item name="SecondMember" type="int32u" />
+              </struct>
+
+            </configurator>
+        ''')
+        struct = Struct(
+            name='SomeStruct',
+            qualities=StructQuality.FABRIC_SCOPED,
+            fields=[
+                Field(data_type=DataType(name='int16u'),
+                      code=0, name='FirstMember'),
+                Field(data_type=DataType(name='int32u'),
+                      code=1, name='SecondMember')
+            ]
+        )
+        self.assertEqual(idl, Idl(global_structs=[struct]))
 
     def testStruct(self):
         idl = XmlToIdl('''<?xml version="1.0"?>
@@ -314,9 +394,8 @@ class TestXmlParser(unittest.TestCase):
         )
         self.assertEqual(idl,
                          Idl(clusters=[
-                             Cluster(side=ClusterSide.CLIENT,
-                                     name='Test1', code=10, structs=[struct]),
-                             Cluster(side=ClusterSide.CLIENT, name='Test2', code=20,
+                             Cluster(name='Test1', code=10, structs=[struct]),
+                             Cluster(name='Test2', code=20,
                                      structs=[struct],
                                      attributes=[
                                          Attribute(
@@ -366,7 +445,7 @@ Some copyright here... testing that we skip over comments
         ''')
         self.assertEqual(idl,
                          Idl(clusters=[
-                             Cluster(side=ClusterSide.CLIENT, name='WindowCovering', code=0x102,
+                             Cluster(name='WindowCovering', code=0x102,
                                      description='Provides an interface for controlling and adjusting automatic window coverings. ',
                                      structs=[],
                                      attributes=[

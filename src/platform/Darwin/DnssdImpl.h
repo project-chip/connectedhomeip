@@ -20,6 +20,7 @@
 #include <dns_sd.h>
 #include <lib/core/Global.h>
 #include <lib/dnssd/platform/Dnssd.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include "DnssdHostNameRegistrar.h"
 
@@ -42,7 +43,13 @@ struct GenericContext
 {
     ContextType type;
     void * context;
-    DNSServiceRef serviceRef;
+    // When using a GenericContext, if a DNSServiceRef is created successfully
+    // API consumers must ensure that it gets set as serviceRef on the context
+    // immediately, before any other operations that might fail can happen.
+    //
+    // In all cases, once a context has been created, Finalize() must be called
+    // on it to clean it up properly.
+    DNSServiceRef serviceRef = nullptr;
 
     virtual ~GenericContext() {}
 
@@ -68,7 +75,8 @@ public:
     ~MdnsContexts();
     static MdnsContexts & GetInstance() { return sInstance.get(); }
 
-    CHIP_ERROR Add(GenericContext * context, DNSServiceRef sdRef);
+    // The context being added is expected to have a valid serviceRef.
+    CHIP_ERROR Add(GenericContext * context);
     CHIP_ERROR Remove(GenericContext * context);
     CHIP_ERROR RemoveAllOfType(ContextType type);
     CHIP_ERROR Has(GenericContext * context);
@@ -130,7 +138,7 @@ public:
 
 private:
     MdnsContexts() = default;
-    friend class Global<MdnsContexts>;
+    friend Global<MdnsContexts>;
     static Global<MdnsContexts> sInstance;
 
     std::vector<GenericContext *> mContexts;
@@ -167,7 +175,8 @@ struct BrowseHandler : public GenericContext
 struct BrowseContext : public BrowseHandler
 {
     DnssdBrowseCallback callback;
-    std::vector<DnssdService> services;
+    std::vector<std::pair<DnssdService, std::string>> services;
+    bool dispatchedSuccessOnce = false;
 
     BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol);
 
@@ -194,6 +203,7 @@ struct BrowseContext : public BrowseHandler
     // TODO: Consider fixing the higher-level APIs to make it possible to pass
     // in multiple IPs for a successful browse result.
     static BrowseContext * sContextDispatchingSuccess;
+    static std::vector<DnssdService> * sDispatchedServices;
 };
 
 struct BrowseWithDelegateContext : public BrowseHandler
@@ -222,35 +232,90 @@ struct InterfaceInfo
     DnssdService service;
     std::vector<Inet::IPAddress> addresses;
     std::string fullyQualifiedDomainName;
+    bool isDNSLookUpRequested = false;
+    bool HasAddresses() const { return addresses.size() != 0; };
+};
+
+struct InterfaceKey
+{
+    InterfaceKey()  = default;
+    ~InterfaceKey() = default;
+    inline bool operator<(const InterfaceKey & other) const
+    {
+        return (this->interfaceId < other.interfaceId) ||
+            ((this->interfaceId == other.interfaceId) && (this->hostname < other.hostname)) ||
+            ((this->interfaceId == other.interfaceId) && (this->hostname == other.hostname) &&
+             (this->isSRPResult < other.isSRPResult));
+    }
+
+    inline bool operator==(const InterfaceKey & other) const
+    {
+        return this->interfaceId == other.interfaceId && this->hostname == other.hostname && this->isSRPResult == other.isSRPResult;
+    }
+
+    uint32_t interfaceId;
+    std::string hostname;
+    bool isSRPResult = false;
+};
+
+struct ResolveContextWithType
+{
+    ResolveContextWithType()  = delete;
+    ~ResolveContextWithType() = default;
+
+    ResolveContext * const context;
+    const bool isSRPResolve;
 };
 
 struct ResolveContext : public GenericContext
 {
     DnssdResolveCallback callback;
-    std::map<uint32_t, InterfaceInfo> interfaces;
+    std::map<InterfaceKey, InterfaceInfo> interfaces;
     DNSServiceProtocol protocol;
     std::string instanceName;
     std::shared_ptr<uint32_t> consumerCounter;
     BrowseContext * const browseThatCausedResolve; // Can be null
 
+    // Indicates whether the timer should be started to give the resolve
+    // on SRP domain some extra time to complete.
+    bool shouldStartSRPTimerForResolve = false;
+    bool isSRPTimerRunning             = false;
+
+    ResolveContextWithType resolveContextWithSRPType    = { this, true };
+    ResolveContextWithType resolveContextWithNonSRPType = { this, false };
+
     // browseCausingResolve can be null.
     ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
                    const char * instanceNameToResolve, BrowseContext * browseCausingResolve,
                    std::shared_ptr<uint32_t> && consumerCounterToUse);
-    ResolveContext(CommissioningResolveDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
-                   const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse);
+    ResolveContext(DiscoverNodeDelegate * delegate, chip::Inet::IPAddressType cbAddressType, const char * instanceNameToResolve,
+                   std::shared_ptr<uint32_t> && consumerCounterToUse);
     virtual ~ResolveContext();
 
     void DispatchFailure(const char * errorStr, CHIP_ERROR err) override;
     void DispatchSuccess() override;
 
-    CHIP_ERROR OnNewAddress(uint32_t interfaceId, const struct sockaddr * address);
+    CHIP_ERROR OnNewAddress(const InterfaceKey & interfaceKey, const struct sockaddr * address);
     bool HasAddress();
 
     void OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostname, uint16_t port, uint16_t txtLen,
-                        const unsigned char * txtRecord);
+                        const unsigned char * txtRecord, bool isSRPResult);
     bool HasInterface();
     bool Matches(const char * otherInstanceName) const { return instanceName == otherInstanceName; }
+
+    /**
+     * @brief Callback that is called when the timeout for resolving on the kSRPDot domain has expired.
+     *
+     * @param[in] systemLayer The system layer.
+     * @param[in] callbackContext The context passed to the timer callback.
+     */
+    static void SRPTimerExpiredCallback(chip::System::Layer * systemLayer, void * callbackContext);
+
+    /**
+     * @brief Cancels the timer that was started to wait for the resolution on the kSRPDot domain to happen.
+     *
+     */
+    void CancelSRPTimerIfRunning();
 };
 
 } // namespace Dnssd

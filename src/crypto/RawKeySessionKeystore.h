@@ -25,12 +25,18 @@ namespace Crypto {
 class RawKeySessionKeystore : public SessionKeystore
 {
 public:
-    CHIP_ERROR CreateKey(const Aes128KeyByteArray & keyMaterial, Aes128KeyHandle & key) override;
+    CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key) override;
+    CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128KeyHandle & key) override;
+    CHIP_ERROR CreateKey(const ByteSpan & keyMaterial, HkdfKeyHandle & key) override;
     CHIP_ERROR DeriveKey(const P256ECDHDerivedSecret & secret, const ByteSpan & salt, const ByteSpan & info,
                          Aes128KeyHandle & key) override;
     CHIP_ERROR DeriveSessionKeys(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info, Aes128KeyHandle & i2rKey,
                                  Aes128KeyHandle & r2iKey, AttestationChallenge & attestationChallenge) override;
-    void DestroyKey(Aes128KeyHandle & key) override;
+    CHIP_ERROR DeriveSessionKeys(const HkdfKeyHandle & hkdfKey, const ByteSpan & salt, const ByteSpan & info,
+                                 Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
+                                 AttestationChallenge & attestationChallenge) override;
+    void DestroyKey(Symmetric128BitsKeyHandle & key) override;
+    void DestroyKey(HkdfKeyHandle & key) override;
 };
 
 } // namespace Crypto

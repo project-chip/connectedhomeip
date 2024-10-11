@@ -69,6 +69,7 @@ size_t ReadLine(char * buffer, size_t max)
                 done = true;
             }
             break;
+        case 0x08:
         case 0x7F:
             // Do not accept backspace character (i.e. don't increment line_sz) and remove 1 additional character if it exists.
             if (line_sz >= 1u)
@@ -167,13 +168,7 @@ void ProcessShellLine(intptr_t args)
 
         if (retval != CHIP_NO_ERROR)
         {
-            char errorStr[160];
-            bool errorStrFound = FormatCHIPError(errorStr, sizeof(errorStr), retval);
-            if (!errorStrFound)
-            {
-                errorStr[0] = 0;
-            }
-            streamer_printf(streamer_get(), "Error %s: %s\r\n", argv[0], errorStr);
+            streamer_printf(streamer_get(), "Error %s: %" CHIP_ERROR_FORMAT "\r\n", argv[0], retval.Format());
         }
         else
         {

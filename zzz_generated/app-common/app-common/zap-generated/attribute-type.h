@@ -20,6 +20,8 @@
 // Prevent multiple inclusion
 #pragma once
 
+#include <cstdint>
+
 // ZCL attribute types
 enum
 {
@@ -27,7 +29,6 @@ enum
     ZCL_BOOLEAN_ATTRIBUTE_TYPE           = 0x10, // Boolean
     ZCL_BITMAP8_ATTRIBUTE_TYPE           = 0x18, // 8-bit bitmap
     ZCL_BITMAP16_ATTRIBUTE_TYPE          = 0x19, // 16-bit bitmap
-    ZCL_BITMAP24_ATTRIBUTE_TYPE          = 0x1A, // 24-bit bitmap
     ZCL_BITMAP32_ATTRIBUTE_TYPE          = 0x1B, // 32-bit bitmap
     ZCL_BITMAP64_ATTRIBUTE_TYPE          = 0x1F, // 64-bit bitmap
     ZCL_INT8U_ATTRIBUTE_TYPE             = 0x20, // Unsigned 8-bit integer
@@ -74,6 +75,10 @@ enum
     ZCL_SYSTIME_MS_ATTRIBUTE_TYPE        = 0xD1, // System Time Milliseconds
     ZCL_ELAPSED_S_ATTRIBUTE_TYPE         = 0xD2, // Elapsed Time Seconds
     ZCL_TEMPERATURE_ATTRIBUTE_TYPE       = 0xD8, // Temperature
+    ZCL_POWER_MW_ATTRIBUTE_TYPE          = 0xD9, // Power milliwatts
+    ZCL_AMPERAGE_MA_ATTRIBUTE_TYPE       = 0xDA, // Amperage milliamps
+    ZCL_VOLTAGE_MV_ATTRIBUTE_TYPE        = 0xDB, // Voltage millivolts
+    ZCL_ENERGY_MWH_ATTRIBUTE_TYPE        = 0xDC, // Energy milliwatt-hours
     ZCL_TOD_ATTRIBUTE_TYPE               = 0xE0, // Time of day
     ZCL_DATE_ATTRIBUTE_TYPE              = 0xE1, // Date
     ZCL_EPOCH_US_ATTRIBUTE_TYPE          = 0xE3, // Epoch Microseconds
@@ -96,3 +101,42 @@ enum
     ZCL_HWADR_ATTRIBUTE_TYPE             = 0xF6, // Hardware Address
     ZCL_UNKNOWN_ATTRIBUTE_TYPE           = 0xFF, // Unknown
 };
+
+namespace chip {
+namespace app {
+inline bool IsSignedAttributeType(uint8_t attributeType)
+{
+    switch (attributeType)
+    {
+    case ZCL_INT8S_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_INT16S_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_INT24S_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_INT32S_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_INT40S_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_INT48S_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_INT56S_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_INT64S_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_TEMPERATURE_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_POWER_MW_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_AMPERAGE_MA_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_VOLTAGE_MV_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_ENERGY_MWH_ATTRIBUTE_TYPE:
+        return true;
+    default:
+        return false;
+    }
+}
+} // namespace app
+} // namespace chip

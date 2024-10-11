@@ -42,7 +42,7 @@ tests:
       verification: |
           ./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify TH receives Lock Door command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Lock Door command response on TH(lock-app) log:
 
           [1698646727.274715][11887:11887] CHIP:DMG: InvokeRequestMessage =
           [1698646727.274753][11887:11887] CHIP:DMG: {
@@ -75,7 +75,7 @@ tests:
       verification: |
           ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify TH receives Unlock Door command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Unlock Door command response on TH(lock-app) log:
 
           [1698646754.942170][11887:11887] CHIP:DMG: InvokeRequestMessage =
           [1698646754.942214][11887:11887] CHIP:DMG: {
@@ -108,7 +108,7 @@ tests:
       verification: |
           ./chip-tool doorlock unlock-with-timeout 60 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify TH receives Unlock with Timeout command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Unlock with Timeout command response on TH(lock-app) log:
 
           [1698646961.411111][11905:11905] CHIP:DMG: InvokeRequestMessage =
           [1698646961.411145][11905:11905] CHIP:DMG: {
@@ -142,7 +142,7 @@ tests:
       verification: |
           ./chip-tool doorlock set-user 0 1 xxx 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify TH receives Set user command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Set user command response on TH(lock-app) log:
 
           [1698646982.058610][11905:11905] CHIP:DMG: InvokeRequestMessage =
           [1698646982.058637][11905:11905] CHIP:DMG: {
@@ -253,7 +253,7 @@ tests:
       verification: |
           ./chip-tool doorlock clear-week-day-schedule 1 1 1 1
 
-          Verify TH receives Clear Week Day Schedule command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Clear Week Day Schedule command response on TH(lock-app) log:
 
           [1698646775.513834][11887:11887] CHIP:DMG: InvokeRequestMessage =
           [1698646775.513862][11887:11887] CHIP:DMG: {
@@ -288,7 +288,7 @@ tests:
       verification: |
           ./chip-tool doorlock set-year-day-schedule 1 1 1080 2100 1 1
 
-          Verify TH receives Set Year Day Schedule command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Set Year Day Schedule command response on TH(lock-app) log:
 
           [1698646805.099727][11887:11887] CHIP:DMG: InvokeRequestMessage =
           [1698646805.099759][11887:11887] CHIP:DMG: {
@@ -360,7 +360,7 @@ tests:
       verification: |
           ./chip-tool doorlock clear-year-day-schedule 1 1 1 1
 
-          Verify TH receives Clear Year Day Schedule command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Clear Year Day Schedule command response on TH(lock-app) log:
 
           [1698647125.062059][11905:11905] CHIP:DMG: InvokeRequestMessage =
           [1698647125.062092][11905:11905] CHIP:DMG: {
@@ -395,7 +395,7 @@ tests:
       verification: |
           ./chip-tool doorlock set-holiday-schedule 1 20 30 0 1 1
 
-          Verify TH receives Set Holiday Day Schedule command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Set Holiday Day Schedule command response on TH(lock-app) log:
 
           [1698647147.130306][11905:11905] CHIP:DMG: InvokeRequestMessage =
           [1698647147.130327][11905:11905] CHIP:DMG: {
@@ -466,7 +466,7 @@ tests:
       verification: |
           ./chip-tool doorlock clear-holiday-schedule 1 1 1
 
-          Verify TH receives Clear Holiday Day Schedule command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Clear Holiday Day Schedule command response on TH(lock-app) log:
 
           [1698647186.638119][11905:11905] CHIP:DMG: InvokeRequestMessage =
           [1698647186.638155][11905:11905] CHIP:DMG: {
@@ -500,7 +500,7 @@ tests:
       verification: |
           ./chip-tool doorlock set-user 0 2 xxx 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify TH receives Set User command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Set User command response on TH(lock-app) log:
 
           [1698647215.994171][11905:11905] CHIP:DMG: InvokeRequestMessage =
           [1698647215.994229][11905:11905] CHIP:DMG: {
@@ -574,7 +574,7 @@ tests:
       verification: |
           ./chip-tool doorlock clear-user 2 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify TH receives Clear User command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Clear User command response on TH(lock-app) log:
 
           [1698647262.792533][11905:11905] CHIP:DMG: InvokeRequestMessage =
           [1698647262.792569][11905:11905] CHIP:DMG: {
@@ -691,7 +691,7 @@ tests:
       verification: |
           ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 1 }' 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify TH receives Clear Credential command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Clear Credential command response on TH(lock-app) log:
 
           [1698647366.030707][11905:11905] CHIP:DMG: InvokeRequestMessage =
           [1698647366.030759][11905:11905] CHIP:DMG: {
@@ -729,7 +729,7 @@ tests:
       verification: |
           ./chip-tool doorlock clear-user 1 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify TH receives Clear User command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Clear User command response on TH(lock-app) log:
 
           [1698647393.727713][11905:11905] CHIP:DMG: InvokeRequestMessage =
           [1698647393.727764][11905:11905] CHIP:DMG: {

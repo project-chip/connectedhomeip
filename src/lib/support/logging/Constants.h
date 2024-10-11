@@ -59,6 +59,8 @@ enum LogModule
     kLogModule_OperationalSessionSetup,
     kLogModule_Automation,
     kLogModule_CASESessionManager,
+    kLogModule_ICD,
+    kLogModule_FabricSync,
 
     kLogModule_Max
 };
@@ -224,6 +226,14 @@ enum LogModule
 
 #ifndef CHIP_CONFIG_LOG_MODULE_CASESessionManager
 #define CHIP_CONFIG_LOG_MODULE_CASESessionManager 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_ICD
+#define CHIP_CONFIG_LOG_MODULE_ICD 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_FabricSync
+#define CHIP_CONFIG_LOG_MODULE_FabricSync 1
 #endif
 
 /**

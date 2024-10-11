@@ -70,7 +70,7 @@
  *
  * Enable support for Chip-over-BLE (CHIPoBLE).
  */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
+#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0
 
 /**
  * CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
@@ -123,3 +123,6 @@
  * 30000 (30 secondes).
  */
 #define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT (30 * 1000)
+
+// Enable unit-test only features
+#define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1

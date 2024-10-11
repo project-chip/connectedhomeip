@@ -24,6 +24,8 @@
 #include <json/json.h>
 #include <lib/core/CHIPError.h>
 
+#include <string>
+
 namespace chip {
 namespace trace {
 
@@ -40,7 +42,7 @@ public:
 
     void AddField(const std::string & tag, const std::string & data) override
     {
-        char buffer[2048] = {};
+        char buffer[4096] = {};
         snprintf(buffer, sizeof(buffer), "    %s\t %s", tag.c_str(), data.c_str());
         CHIP_ERROR err = ReadString(buffer);
 

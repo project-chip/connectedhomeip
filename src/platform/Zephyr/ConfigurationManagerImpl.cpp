@@ -32,12 +32,22 @@
 
 #include "InetUtils.h"
 
+#ifdef CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#if (CHIP_DEVICE_CONFIG_ENABLE_WIFI) || (CHIP_DEVICE_CONFIG_ENABLE_ETHERNET)
+#include <zephyr/net/net_if.h>
+#endif //(CHIP_DEVICE_CONFIG_ENABLE_WIFI) || (CHIP_DEVICE_CONFIG_ENABLE_ETHERNET)
+#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
 #include <zephyr/fs/nvs.h>
 #include <zephyr/settings/settings.h>
+#endif
+
+#ifdef CONFIG_NET_L2_OPENTHREAD
+#include <platform/ThreadStackManager.h>
 #endif
 
 namespace chip {
@@ -179,6 +189,15 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    ThreadStackMgr().ClearAllSrpHostAndServices();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
+// Lock the Thread stack to avoid unwanted interaction with settings NVS during factory reset.
+#ifdef CONFIG_NET_L2_OPENTHREAD
+    ThreadStackMgr().LockThreadStack();
+#endif
+
 #ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
     void * storage = nullptr;
     int status     = settings_storage_get(&storage);
@@ -208,9 +227,14 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    const net_if * const iface = InetUtils::GetWiFiInterface();
+#else
     const net_if * const iface = InetUtils::GetInterface();
-    VerifyOrReturnError(iface != nullptr && iface->if_dev != nullptr, CHIP_ERROR_INTERNAL);
+#endif
+
+    VerifyOrReturnError(iface != nullptr, CHIP_ERROR_INTERNAL);
 
     const auto linkAddrStruct = iface->if_dev->link_addr;
     memcpy(buf, linkAddrStruct.addr, linkAddrStruct.len);

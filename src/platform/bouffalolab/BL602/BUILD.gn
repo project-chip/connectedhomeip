@@ -34,12 +34,10 @@ static_library("BL602") {
   sources += [
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "../common/BLConfig.cpp",
     "../common/ConfigurationManagerImpl.cpp",
     "../common/ConnectivityManagerImpl.cpp",
     "../common/DiagnosticDataProviderImpl.cpp",
     "../common/KeyValueStoreManagerImpl.cpp",
-    "../common/Logging.cpp",
     "../common/PlatformManagerImpl.cpp",
   ]
 
@@ -57,13 +55,17 @@ static_library("BL602") {
     ]
   }
 
-  defines =
-      [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
-  if (chip_enable_factory_data || chip_enable_factory_data_test) {
+  if (chip_enable_factory_data) {
     sources += [
       "../common/FactoryDataProvider.cpp",
       "../common/FactoryDataProvider.h",
     ]
+  }
+
+  if (bouffalo_sdk_component_easyflash_enabled) {
+    sources += [ "../common/BLConfig.cpp" ]
+  } else {
+    sources += [ "../common/BLConfig_littlefs.cpp" ]
   }
 
   deps = [

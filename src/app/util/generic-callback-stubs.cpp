@@ -19,17 +19,11 @@
 #include <app/util/basic-types.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/Constants.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
 
 // This file contains overridable callbacks that are not cluster specific.
-
-EmberAfAttributeWritePermission __attribute__((weak))
-emberAfAllowNetworkWriteAttributeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t * value,
-                                          uint8_t type)
-{
-    return EmberAfAttributeWritePermission::AllowWriteNormal; // Default
-}
 
 bool __attribute__((weak)) emberAfAttributeReadAccessCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
@@ -41,18 +35,18 @@ bool __attribute__((weak)) emberAfAttributeWriteAccessCallback(EndpointId endpoi
     return true;
 }
 
-EmberAfStatus __attribute__((weak))
+chip::Protocols::InteractionModel::Status __attribute__((weak))
 emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
                                      uint8_t * buffer, uint16_t maxReadLength)
 {
-    return EMBER_ZCL_STATUS_FAILURE;
+    return chip::Protocols::InteractionModel::Status::Failure;
 }
 
-EmberAfStatus __attribute__((weak))
+chip::Protocols::InteractionModel::Status __attribute__((weak))
 emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
                                       uint8_t * buffer)
 {
-    return EMBER_ZCL_STATUS_FAILURE;
+    return chip::Protocols::InteractionModel::Status::Failure;
 }
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))

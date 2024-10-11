@@ -52,7 +52,7 @@ class LogPipe(threading.Thread):
     def CapturedLogContains(self, txt: str, index=0):
         for i, line in enumerate(self.captured_logs[index:]):
             if txt in line:
-                return True, i
+                return True, index + i
         return False, len(self.captured_logs)
 
     def FindLastMatchingLine(self, matcher):

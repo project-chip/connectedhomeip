@@ -92,7 +92,7 @@ tests:
       cluster: "SystemCommands"
       command: "Reboot"
 
-    - label: "Step 1: Reboot target device(DUT)"
+    - label: "Step 1a: Reboot target device(DUT)"
       verification: |
           Did the DUT successfully reboot?
       cluster: "LogCommands"
@@ -113,7 +113,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: TH reads the StartUp event from DUT"
+    - label: "Step 1b: TH reads the StartUp event from DUT"
       PICS: BINFO.S.E00
       command: "readEvent"
       event: "StartUp"
@@ -132,7 +132,7 @@ tests:
                 value: "y"
 
     - label:
-          "Step 3: TH subscribes to the ShutDown event on the DUT. Shutdown DUT."
+          "Step 2: TH subscribes to the ShutDown event on the DUT. Shutdown DUT."
       PICS: BINFO.S.E01
       command: "subscribeEvent"
       event: "ShutDown"

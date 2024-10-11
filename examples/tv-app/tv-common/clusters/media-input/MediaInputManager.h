@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/clusters/media-input-server/media-input-server.h>
 #include <vector>
 

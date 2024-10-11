@@ -364,7 +364,7 @@ JNI_METHOD(jbyteArray, BaseChipCluster, encodeToTlv)(JNIEnv * env, jclass clazz,
     CHIP_ERROR err = encodeTLVFromValue(env, value, writer, chip::TLV::AnonymousTag());
     VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "Encode Error: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    err = chip::JniReferences::GetInstance().N2J_ByteArray(env, buffer, writer.GetLengthWritten(), tlv);
+    err = chip::JniReferences::GetInstance().N2J_ByteArray(env, buffer, static_cast<jint>(writer.GetLengthWritten()), tlv);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "JNI Error: %" CHIP_ERROR_FORMAT, err.Format()));
 
     return tlv;

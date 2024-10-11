@@ -22,6 +22,7 @@ import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.net.wifi.WifiManager.MulticastLock;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import java.util.concurrent.Executors;
@@ -38,9 +39,9 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
   private final long callbackHandle;
   private final long contextHandle;
   private final ChipMdnsCallback chipMdnsCallback;
-  private final Runnable timeoutRunnable;
   private final MulticastLock multicastLock;
-  private final Handler mainThreadHandler;
+  private final ScheduledFuture<?> resolveTimeoutExecutor;
+  private NsdServiceInfo discoveredServiceInfo = null;
 
   @Nullable
   private final NsdManagerServiceResolver.NsdManagerResolverAvailState nsdManagerResolverAvailState;
@@ -53,26 +54,21 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
       final long callbackHandle,
       final long contextHandle,
       final ChipMdnsCallback chipMdnsCallback,
-      final Runnable timeoutRunnable,
       final MulticastLock multicastLock,
-      final Handler mainThreadHandler,
+      final ScheduledFuture<?> resolveTimeoutExecutor,
       final NsdManagerServiceResolver.NsdManagerResolverAvailState nsdManagerResolverAvailState) {
     this.nsdManager = nsdManager;
     this.targetServiceInfo = targetServiceInfo;
     this.callbackHandle = callbackHandle;
     this.contextHandle = contextHandle;
     this.chipMdnsCallback = chipMdnsCallback;
-    this.timeoutRunnable = timeoutRunnable;
     this.multicastLock = multicastLock;
-    this.mainThreadHandler = mainThreadHandler;
+    this.resolveTimeoutExecutor = resolveTimeoutExecutor;
     this.nsdManagerResolverAvailState = nsdManagerResolverAvailState;
   }
 
   public void start() {
     multicastLock.acquire();
-
-    this.nsdManager.discoverServices(
-        targetServiceInfo.getServiceType(), NsdManager.PROTOCOL_DNS_SD, this);
 
     NsdServiceFinderAndResolver serviceFinderResolver = this;
     this.stopDiscoveryRunnable =
@@ -92,25 +88,21 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
                 },
                 BROWSE_SERVICE_TIMEOUT_MS,
                 TimeUnit.MILLISECONDS);
+
+    this.nsdManager.discoverServices(
+        targetServiceInfo.getServiceType(), NsdManager.PROTOCOL_DNS_SD, this);
   }
 
   @Override
   public void onServiceFound(NsdServiceInfo service) {
-    if (targetServiceInfo.getServiceName().equals(service.getServiceName())) {
+    if (discoveredServiceInfo == null
+        && targetServiceInfo.getServiceName().equals(service.getServiceName())) {
       Log.d(TAG, "onServiceFound: found target service " + service);
 
       if (stopDiscoveryRunnable.cancel(false)) {
         nsdManager.stopServiceDiscovery(this);
-        if (multicastLock.isHeld()) {
-          multicastLock.release();
-        }
       }
-
-      if (nsdManagerResolverAvailState != null) {
-        nsdManagerResolverAvailState.acquireResolver();
-      }
-
-      resolveService(service, callbackHandle, contextHandle, chipMdnsCallback, timeoutRunnable);
+      discoveredServiceInfo = service;
     } else {
       Log.d(TAG, "onServiceFound: found service not a target for resolution, ignoring " + service);
     }
@@ -120,8 +112,7 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
       NsdServiceInfo serviceInfo,
       final long callbackHandle,
       final long contextHandle,
-      final ChipMdnsCallback chipMdnsCallback,
-      Runnable timeoutRunnable) {
+      final ChipMdnsCallback chipMdnsCallback) {
     this.nsdManager.resolveService(
         serviceInfo,
         new NsdManager.ResolveListener() {
@@ -130,20 +121,24 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
             Log.w(
                 TAG,
                 "Failed to resolve service '" + serviceInfo.getServiceName() + "': " + errorCode);
-            chipMdnsCallback.handleServiceResolve(
-                serviceInfo.getServiceName(),
-                // Use the target service info since the resolved service info sometimes appends a
-                // "." at the front likely because it is trying to strip the service name out of it
-                // and something is missed.
-                // The target service info service type should be effectively the same as the
-                // resolved service info.
-                NsdServiceFinderAndResolver.this.targetServiceInfo.getServiceType(),
-                null,
-                null,
-                0,
-                null,
-                callbackHandle,
-                contextHandle);
+            new Handler(Looper.getMainLooper())
+                .post(
+                    () -> {
+                      chipMdnsCallback.handleServiceResolve(
+                          serviceInfo.getServiceName(),
+                          // Use the target service info since the resolved service info sometimes
+                          // appends a "." at the front likely because it is trying to strip the
+                          // service name out of it and something is missed.
+                          // The target service info service type should be effectively the same as
+                          // the resolved service info.
+                          NsdServiceFinderAndResolver.this.targetServiceInfo.getServiceType(),
+                          null,
+                          null,
+                          0,
+                          null,
+                          callbackHandle,
+                          contextHandle);
+                    });
 
             if (multicastLock.isHeld()) {
               multicastLock.release();
@@ -152,7 +147,7 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
                 nsdManagerResolverAvailState.signalFree();
               }
             }
-            mainThreadHandler.removeCallbacks(timeoutRunnable);
+            resolveTimeoutExecutor.cancel(false);
           }
 
           @Override
@@ -165,21 +160,28 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
                     + serviceInfo.getHost()
                     + ", type : "
                     + serviceInfo.getServiceType());
-            // TODO: Find out if DNS-SD results for Android should contain interface ID
-            chipMdnsCallback.handleServiceResolve(
-                serviceInfo.getServiceName(),
-                // Use the target service info since the resolved service info sometimes appends a
-                // "." at the front likely because it is trying to strip the service name out of it
-                // and something is missed.
-                // The target service info service type should be effectively the same as the
-                // resolved service info.
-                NsdServiceFinderAndResolver.this.targetServiceInfo.getServiceType(),
-                serviceInfo.getHost().getHostName(),
-                serviceInfo.getHost().getHostAddress(),
-                serviceInfo.getPort(),
-                serviceInfo.getAttributes(),
-                callbackHandle,
-                contextHandle);
+            final String hostName = serviceInfo.getHost().getHostName();
+            final String address = serviceInfo.getHost().getHostAddress();
+            final int port = serviceInfo.getPort();
+            new Handler(Looper.getMainLooper())
+                .post(
+                    () -> {
+                      // TODO: Find out if DNS-SD results for Android should contain interface ID
+                      chipMdnsCallback.handleServiceResolve(
+                          serviceInfo.getServiceName(),
+                          // Use the target service info since the resolved service info sometimes
+                          // appends a "." at the front likely because it is trying to strip the
+                          // service name out of it and something is missed.
+                          // The target service info service type should be effectively the same as
+                          // the resolved service info.
+                          NsdServiceFinderAndResolver.this.targetServiceInfo.getServiceType(),
+                          hostName,
+                          address,
+                          port,
+                          serviceInfo.getAttributes(),
+                          callbackHandle,
+                          contextHandle);
+                    });
 
             if (multicastLock.isHeld()) {
               multicastLock.release();
@@ -188,7 +190,7 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
                 nsdManagerResolverAvailState.signalFree();
               }
             }
-            mainThreadHandler.removeCallbacks(timeoutRunnable);
+            resolveTimeoutExecutor.cancel(false);
           }
         });
   }
@@ -205,7 +207,13 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
 
   @Override
   public void onDiscoveryStopped(String serviceType) {
-    Log.i(TAG, "Discovery stopped: " + serviceType);
+    Log.i(
+        TAG,
+        "Discovery stopped: " + serviceType + ", discoveredServiceInfo: " + discoveredServiceInfo);
+    if (discoveredServiceInfo != null) {
+      resolveService(discoveredServiceInfo, callbackHandle, contextHandle, chipMdnsCallback);
+      discoveredServiceInfo = null;
+    }
   }
 
   @Override

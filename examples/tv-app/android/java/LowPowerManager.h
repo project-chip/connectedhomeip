@@ -22,6 +22,7 @@
 
 #include <jni.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/JniReferences.h>
 
 class LowPowerManager : public chip::app::Clusters::LowPower::Delegate
 {
@@ -32,6 +33,6 @@ public:
     bool HandleSleep() override;
 
 private:
-    jobject mLowPowerManagerObject = nullptr;
-    jmethodID mSleepMethod         = nullptr;
+    chip::JniGlobalReference mLowPowerManagerObject;
+    jmethodID mSleepMethod = nullptr;
 };

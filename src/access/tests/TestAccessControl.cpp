@@ -19,12 +19,13 @@
 #include "access/AccessControl.h"
 #include "access/examples/ExampleAccessControlDelegate.h"
 
+#include <pw_unit_test/framework.h>
+
 #include <lib/core/CHIPCore.h>
-#include <lib/support/UnitTestRegistration.h>
+#include <lib/core/StringBuilderAdapters.h>
 
-#include <nlunit-test.h>
-
-namespace {
+namespace chip {
+namespace Access {
 
 using namespace chip;
 using namespace chip::Access;
@@ -1077,62 +1078,79 @@ constexpr CheckData checkData1[] = {
       .allow             = true },
 };
 
-void MetaTest(nlTestSuite * inSuite, void * inContext)
+class TestAccessControl : public ::testing::Test
 {
-    NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, entryData1, entryData1Count) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, CompareAccessControl(accessControl, entryData1, entryData1Count) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, accessControl.DeleteEntry(3) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, CompareAccessControl(accessControl, entryData1, entryData1Count) != CHIP_NO_ERROR);
+public: // protected
+    void SetUp() override { ASSERT_EQ(ClearAccessControl(accessControl), CHIP_NO_ERROR); }
+    static void SetUpTestSuite()
+    {
+        AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate();
+        SetAccessControl(accessControl);
+        VerifyOrDie(GetAccessControl().Init(delegate, testDeviceTypeResolver) == CHIP_NO_ERROR);
+    }
+    static void TearDownTestSuite()
+    {
+        GetAccessControl().Finish();
+        ResetAccessControlToDefault();
+    }
+};
+
+TEST_F(TestAccessControl, MetaTest)
+{
+    EXPECT_EQ(LoadAccessControl(accessControl, entryData1, entryData1Count), CHIP_NO_ERROR);
+    EXPECT_EQ(CompareAccessControl(accessControl, entryData1, entryData1Count), CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.DeleteEntry(3), CHIP_NO_ERROR);
+    EXPECT_NE(CompareAccessControl(accessControl, entryData1, entryData1Count), CHIP_NO_ERROR);
 }
 
-void TestAclValidateAuthModeSubject(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestAccessControl, TestAclValidateAuthModeSubject)
 {
     TestEntryDelegate delegate; // outlive entry
     Entry entry;
 
     // Use prepared entry for valid cases
-    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kView) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, kOperationalNodeId0) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { .flags = Target::kCluster, .cluster = kOnOffCluster }) == CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.PrepareEntry(entry), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetFabricIndex(1), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetPrivilege(Privilege::kView), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetAuthMode(AuthMode::kCase), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddSubject(nullptr, kOperationalNodeId0), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddTarget(nullptr, { .flags = Target::kCluster, .cluster = kOnOffCluster }), CHIP_NO_ERROR);
 
     // Each case tries to update the first entry, then add a second entry, then unconditionally delete it
-    NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
 
     // CASE and group may have empty subjects list
     {
-        NL_TEST_ASSERT(inSuite, entry.RemoveSubject(0) == CHIP_NO_ERROR);
+        EXPECT_EQ(entry.RemoveSubject(0), CHIP_NO_ERROR);
 
-        NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetAuthMode(AuthMode::kCase), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
 
-        NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kGroup) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetAuthMode(AuthMode::kGroup), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
 
-        NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, kOperationalNodeId0) == CHIP_NO_ERROR);
+        EXPECT_EQ(entry.AddSubject(nullptr, kOperationalNodeId0), CHIP_NO_ERROR);
     }
 
-    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetAuthMode(AuthMode::kCase), CHIP_NO_ERROR);
     for (auto subject : validCaseSubjects)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 
-    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kGroup) == CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetAuthMode(AuthMode::kGroup), CHIP_NO_ERROR);
     for (auto subject : validGroupSubjects)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 
@@ -1140,155 +1158,155 @@ void TestAclValidateAuthModeSubject(nlTestSuite * inSuite, void * inContext)
     entry.SetDelegate(delegate);
 
     // Operational PASE not supported
-    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kPase) == CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetAuthMode(AuthMode::kPase), CHIP_NO_ERROR);
     for (auto subject : validPaseSubjects)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 
-    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetAuthMode(AuthMode::kCase), CHIP_NO_ERROR);
     for (auto subject : validGroupSubjects)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
     for (auto subject : validPaseSubjects)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
     for (auto subject : invalidSubjects)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 
-    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kGroup) == CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetAuthMode(AuthMode::kGroup), CHIP_NO_ERROR);
     for (auto subject : validCaseSubjects)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
     for (auto subject : validPaseSubjects)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
     for (auto subject : invalidSubjects)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 
-    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kPase) == CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetAuthMode(AuthMode::kPase), CHIP_NO_ERROR);
     for (auto subject : validCaseSubjects)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
-    }
-    for (auto subject : validGroupSubjects)
-    {
-        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
-    }
-    for (auto subject : invalidSubjects)
-    {
-        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
-    }
-
-    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kNone) == CHIP_NO_ERROR);
-    for (auto subject : validCaseSubjects)
-    {
-        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
     for (auto subject : validGroupSubjects)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
-    }
-    for (auto subject : validPaseSubjects)
-    {
-        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
     for (auto subject : invalidSubjects)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    EXPECT_EQ(entry.SetAuthMode(AuthMode::kNone), CHIP_NO_ERROR);
+    for (auto subject : validCaseSubjects)
+    {
+        EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+    for (auto subject : validGroupSubjects)
+    {
+        EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+    for (auto subject : validPaseSubjects)
+    {
+        EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+    for (auto subject : invalidSubjects)
+    {
+        EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 
     // Next cases have no subject
-    NL_TEST_ASSERT(inSuite, entry.RemoveSubject(0) == CHIP_NO_ERROR);
+    EXPECT_EQ(entry.RemoveSubject(0), CHIP_NO_ERROR);
 
     // PASE must have subject
     {
-        NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kPase) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetAuthMode(AuthMode::kPase), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 
     // None is not a real auth mode but also shouldn't work with no subject
     {
-        NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kNone) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetAuthMode(AuthMode::kNone), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 }
 
-void TestAclValidateFabricIndex(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestAccessControl, TestAclValidateFabricIndex)
 {
     TestEntryDelegate delegate; // outlive entry
     Entry entry;
 
     // Use prepared entry for valid cases
-    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kView) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, kOperationalNodeId0) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { .flags = Target::kCluster, .cluster = kOnOffCluster }) == CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.PrepareEntry(entry), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetFabricIndex(1), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetPrivilege(Privilege::kView), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetAuthMode(AuthMode::kCase), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddSubject(nullptr, kOperationalNodeId0), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddTarget(nullptr, { .flags = Target::kCluster, .cluster = kOnOffCluster }), CHIP_NO_ERROR);
 
     // Each case tries to update the first entry, then add a second entry, then unconditionally delete it
-    NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
 
     for (auto fabricIndex : fabricIndexes)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(fabricIndex) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetFabricIndex(fabricIndex), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 
@@ -1297,34 +1315,34 @@ void TestAclValidateFabricIndex(nlTestSuite * inSuite, void * inContext)
 
     for (auto fabricIndex : invalidFabricIndexes)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(fabricIndex) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetFabricIndex(fabricIndex), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 }
 
-void TestAclValidatePrivilege(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestAccessControl, TestAclValidatePrivilege)
 {
     TestEntryDelegate delegate; // outlive entry
     Entry entry;
 
     // Use prepared entry for valid cases
-    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kView) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, kOperationalNodeId0) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { .flags = Target::kCluster, .cluster = kOnOffCluster }) == CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.PrepareEntry(entry), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetFabricIndex(1), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetPrivilege(Privilege::kView), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetAuthMode(AuthMode::kCase), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddSubject(nullptr, kOperationalNodeId0), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddTarget(nullptr, { .flags = Target::kCluster, .cluster = kOnOffCluster }), CHIP_NO_ERROR);
 
     // Each case tries to update the first entry, then add a second entry, then unconditionally delete it
-    NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
 
     for (auto privilege : privileges)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetPrivilege(privilege) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetPrivilege(privilege), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 
@@ -1333,52 +1351,52 @@ void TestAclValidatePrivilege(nlTestSuite * inSuite, void * inContext)
 
     // Cannot grant administer privilege to group auth mode
     {
-        NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kAdminister) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kGroup) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, kGroup4) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetPrivilege(Privilege::kAdminister), CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetAuthMode(AuthMode::kGroup), CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetSubject(0, kGroup4), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 }
 
-void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestAccessControl, TestAclValidateTarget)
 {
     TestEntryDelegate delegate; // outlive entry
     Entry entry;
 
     // Use prepared entry for valid cases
-    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kView) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, kOperationalNodeId0) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { .flags = Target::kCluster, .cluster = kOnOffCluster }) == CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.PrepareEntry(entry), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetFabricIndex(1), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetPrivilege(Privilege::kView), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetAuthMode(AuthMode::kCase), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddSubject(nullptr, kOperationalNodeId0), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddTarget(nullptr, { .flags = Target::kCluster, .cluster = kOnOffCluster }), CHIP_NO_ERROR);
 
     // Each case tries to update the first entry, then add a second entry, then unconditionally delete it
-    NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
 
     for (auto cluster : validClusters)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetTarget(0, { .flags = Target::kCluster, .cluster = cluster }) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetTarget(0, { .flags = Target::kCluster, .cluster = cluster }), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 
     for (auto endpoint : validEndpoints)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetTarget(0, { .flags = Target::kEndpoint, .endpoint = endpoint }) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetTarget(0, { .flags = Target::kEndpoint, .endpoint = endpoint }), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 
     for (auto deviceType : validDeviceTypes)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetTarget(0, { .flags = Target::kDeviceType, .deviceType = deviceType }) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetTarget(0, { .flags = Target::kDeviceType, .deviceType = deviceType }), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 
@@ -1386,12 +1404,11 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
     {
         for (auto endpoint : validEndpoints)
         {
-            NL_TEST_ASSERT(
-                inSuite,
-                entry.SetTarget(0, { .flags = Target::kCluster | Target::kEndpoint, .cluster = cluster, .endpoint = endpoint }) ==
-                    CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+            EXPECT_EQ(
+                entry.SetTarget(0, { .flags = Target::kCluster | Target::kEndpoint, .cluster = cluster, .endpoint = endpoint }),
+                CHIP_NO_ERROR);
+            EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+            EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
             accessControl.DeleteEntry(1);
         }
     }
@@ -1400,13 +1417,11 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
     {
         for (auto deviceType : validDeviceTypes)
         {
-            NL_TEST_ASSERT(
-                inSuite,
-                entry.SetTarget(
-                    0, { .flags = Target::kCluster | Target::kDeviceType, .cluster = cluster, .deviceType = deviceType }) ==
-                    CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+            EXPECT_EQ(entry.SetTarget(
+                          0, { .flags = Target::kCluster | Target::kDeviceType, .cluster = cluster, .deviceType = deviceType }),
+                      CHIP_NO_ERROR);
+            EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+            EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
             accessControl.DeleteEntry(1);
         }
     }
@@ -1419,13 +1434,11 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
     {
         for (auto deviceType : validDeviceTypes)
         {
-            NL_TEST_ASSERT(
-                inSuite,
-                entry.SetTarget(
-                    0, { .flags = Target::kEndpoint | Target::kDeviceType, .endpoint = endpoint, .deviceType = deviceType }) ==
-                    CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            EXPECT_EQ(entry.SetTarget(
+                          0, { .flags = Target::kEndpoint | Target::kDeviceType, .endpoint = endpoint, .deviceType = deviceType }),
+                      CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
             accessControl.DeleteEntry(1);
         }
     }
@@ -1437,14 +1450,14 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
         {
             for (auto deviceType : validDeviceTypes)
             {
-                NL_TEST_ASSERT(inSuite,
-                               entry.SetTarget(0,
-                                               { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
-                                                 .cluster    = cluster,
-                                                 .endpoint   = endpoint,
-                                                 .deviceType = deviceType }) == CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+                EXPECT_EQ(entry.SetTarget(0,
+                                          { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
+                                            .cluster    = cluster,
+                                            .endpoint   = endpoint,
+                                            .deviceType = deviceType }),
+                          CHIP_NO_ERROR);
+                EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+                EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
                 accessControl.DeleteEntry(1);
             }
         }
@@ -1452,33 +1465,33 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
 
     // Cannot target none
     {
-        NL_TEST_ASSERT(inSuite, entry.SetTarget(0, { .flags = 0 }) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetTarget(0, { .flags = 0 }), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 
     for (auto cluster : invalidClusters)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetTarget(0, { .flags = Target::kCluster, .cluster = cluster }) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetTarget(0, { .flags = Target::kCluster, .cluster = cluster }), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 
     for (auto endpoint : invalidEndpoints)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetTarget(0, { .flags = Target::kEndpoint, .endpoint = endpoint }) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetTarget(0, { .flags = Target::kEndpoint, .endpoint = endpoint }), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 
     for (auto deviceType : invalidDeviceTypes)
     {
-        NL_TEST_ASSERT(inSuite, entry.SetTarget(0, { .flags = Target::kDeviceType, .deviceType = deviceType }) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        EXPECT_EQ(entry.SetTarget(0, { .flags = Target::kDeviceType, .deviceType = deviceType }), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+        EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 
@@ -1486,12 +1499,11 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
     {
         for (auto endpoint : invalidEndpoints)
         {
-            NL_TEST_ASSERT(
-                inSuite,
-                entry.SetTarget(0, { .flags = Target::kCluster | Target::kEndpoint, .cluster = cluster, .endpoint = endpoint }) ==
-                    CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            EXPECT_EQ(
+                entry.SetTarget(0, { .flags = Target::kCluster | Target::kEndpoint, .cluster = cluster, .endpoint = endpoint }),
+                CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
             accessControl.DeleteEntry(1);
         }
     }
@@ -1500,12 +1512,11 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
     {
         for (auto endpoint : validEndpoints)
         {
-            NL_TEST_ASSERT(
-                inSuite,
-                entry.SetTarget(0, { .flags = Target::kCluster | Target::kEndpoint, .cluster = cluster, .endpoint = endpoint }) ==
-                    CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            EXPECT_EQ(
+                entry.SetTarget(0, { .flags = Target::kCluster | Target::kEndpoint, .cluster = cluster, .endpoint = endpoint }),
+                CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
             accessControl.DeleteEntry(1);
         }
     }
@@ -1514,12 +1525,11 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
     {
         for (auto endpoint : invalidEndpoints)
         {
-            NL_TEST_ASSERT(
-                inSuite,
-                entry.SetTarget(0, { .flags = Target::kCluster | Target::kEndpoint, .cluster = cluster, .endpoint = endpoint }) ==
-                    CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            EXPECT_EQ(
+                entry.SetTarget(0, { .flags = Target::kCluster | Target::kEndpoint, .cluster = cluster, .endpoint = endpoint }),
+                CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
             accessControl.DeleteEntry(1);
         }
     }
@@ -1528,13 +1538,11 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
     {
         for (auto deviceType : invalidDeviceTypes)
         {
-            NL_TEST_ASSERT(
-                inSuite,
-                entry.SetTarget(
-                    0, { .flags = Target::kCluster | Target::kDeviceType, .cluster = cluster, .deviceType = deviceType }) ==
-                    CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            EXPECT_EQ(entry.SetTarget(
+                          0, { .flags = Target::kCluster | Target::kDeviceType, .cluster = cluster, .deviceType = deviceType }),
+                      CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
             accessControl.DeleteEntry(1);
         }
     }
@@ -1543,13 +1551,11 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
     {
         for (auto deviceType : validDeviceTypes)
         {
-            NL_TEST_ASSERT(
-                inSuite,
-                entry.SetTarget(
-                    0, { .flags = Target::kCluster | Target::kDeviceType, .cluster = cluster, .deviceType = deviceType }) ==
-                    CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            EXPECT_EQ(entry.SetTarget(
+                          0, { .flags = Target::kCluster | Target::kDeviceType, .cluster = cluster, .deviceType = deviceType }),
+                      CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
             accessControl.DeleteEntry(1);
         }
     }
@@ -1558,13 +1564,11 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
     {
         for (auto deviceType : invalidDeviceTypes)
         {
-            NL_TEST_ASSERT(
-                inSuite,
-                entry.SetTarget(
-                    0, { .flags = Target::kCluster | Target::kDeviceType, .cluster = cluster, .deviceType = deviceType }) ==
-                    CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            EXPECT_EQ(entry.SetTarget(
+                          0, { .flags = Target::kCluster | Target::kDeviceType, .cluster = cluster, .deviceType = deviceType }),
+                      CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
             accessControl.DeleteEntry(1);
         }
     }
@@ -1573,13 +1577,11 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
     {
         for (auto deviceType : invalidDeviceTypes)
         {
-            NL_TEST_ASSERT(
-                inSuite,
-                entry.SetTarget(
-                    0, { .flags = Target::kEndpoint | Target::kDeviceType, .endpoint = endpoint, .deviceType = deviceType }) ==
-                    CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            EXPECT_EQ(entry.SetTarget(
+                          0, { .flags = Target::kEndpoint | Target::kDeviceType, .endpoint = endpoint, .deviceType = deviceType }),
+                      CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
             accessControl.DeleteEntry(1);
         }
     }
@@ -1588,13 +1590,11 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
     {
         for (auto deviceType : validDeviceTypes)
         {
-            NL_TEST_ASSERT(
-                inSuite,
-                entry.SetTarget(
-                    0, { .flags = Target::kEndpoint | Target::kDeviceType, .endpoint = endpoint, .deviceType = deviceType }) ==
-                    CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            EXPECT_EQ(entry.SetTarget(
+                          0, { .flags = Target::kEndpoint | Target::kDeviceType, .endpoint = endpoint, .deviceType = deviceType }),
+                      CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
             accessControl.DeleteEntry(1);
         }
     }
@@ -1603,13 +1603,11 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
     {
         for (auto deviceType : invalidDeviceTypes)
         {
-            NL_TEST_ASSERT(
-                inSuite,
-                entry.SetTarget(
-                    0, { .flags = Target::kEndpoint | Target::kDeviceType, .endpoint = endpoint, .deviceType = deviceType }) ==
-                    CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            EXPECT_EQ(entry.SetTarget(
+                          0, { .flags = Target::kEndpoint | Target::kDeviceType, .endpoint = endpoint, .deviceType = deviceType }),
+                      CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+            EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
             accessControl.DeleteEntry(1);
         }
     }
@@ -1620,14 +1618,14 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
         {
             for (auto deviceType : invalidDeviceTypes)
             {
-                NL_TEST_ASSERT(inSuite,
-                               entry.SetTarget(0,
-                                               { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
-                                                 .cluster    = cluster,
-                                                 .endpoint   = endpoint,
-                                                 .deviceType = deviceType }) == CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+                EXPECT_EQ(entry.SetTarget(0,
+                                          { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
+                                            .cluster    = cluster,
+                                            .endpoint   = endpoint,
+                                            .deviceType = deviceType }),
+                          CHIP_NO_ERROR);
+                EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+                EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
                 accessControl.DeleteEntry(1);
             }
         }
@@ -1639,14 +1637,14 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
         {
             for (auto deviceType : validDeviceTypes)
             {
-                NL_TEST_ASSERT(inSuite,
-                               entry.SetTarget(0,
-                                               { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
-                                                 .cluster    = cluster,
-                                                 .endpoint   = endpoint,
-                                                 .deviceType = deviceType }) == CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+                EXPECT_EQ(entry.SetTarget(0,
+                                          { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
+                                            .cluster    = cluster,
+                                            .endpoint   = endpoint,
+                                            .deviceType = deviceType }),
+                          CHIP_NO_ERROR);
+                EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+                EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
                 accessControl.DeleteEntry(1);
             }
         }
@@ -1658,14 +1656,14 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
         {
             for (auto deviceType : invalidDeviceTypes)
             {
-                NL_TEST_ASSERT(inSuite,
-                               entry.SetTarget(0,
-                                               { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
-                                                 .cluster    = cluster,
-                                                 .endpoint   = endpoint,
-                                                 .deviceType = deviceType }) == CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+                EXPECT_EQ(entry.SetTarget(0,
+                                          { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
+                                            .cluster    = cluster,
+                                            .endpoint   = endpoint,
+                                            .deviceType = deviceType }),
+                          CHIP_NO_ERROR);
+                EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+                EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
                 accessControl.DeleteEntry(1);
             }
         }
@@ -1677,14 +1675,14 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
         {
             for (auto deviceType : invalidDeviceTypes)
             {
-                NL_TEST_ASSERT(inSuite,
-                               entry.SetTarget(0,
-                                               { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
-                                                 .cluster    = cluster,
-                                                 .endpoint   = endpoint,
-                                                 .deviceType = deviceType }) == CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+                EXPECT_EQ(entry.SetTarget(0,
+                                          { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
+                                            .cluster    = cluster,
+                                            .endpoint   = endpoint,
+                                            .deviceType = deviceType }),
+                          CHIP_NO_ERROR);
+                EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+                EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
                 accessControl.DeleteEntry(1);
             }
         }
@@ -1696,14 +1694,14 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
         {
             for (auto deviceType : validDeviceTypes)
             {
-                NL_TEST_ASSERT(inSuite,
-                               entry.SetTarget(0,
-                                               { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
-                                                 .cluster    = cluster,
-                                                 .endpoint   = endpoint,
-                                                 .deviceType = deviceType }) == CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+                EXPECT_EQ(entry.SetTarget(0,
+                                          { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
+                                            .cluster    = cluster,
+                                            .endpoint   = endpoint,
+                                            .deviceType = deviceType }),
+                          CHIP_NO_ERROR);
+                EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+                EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
                 accessControl.DeleteEntry(1);
             }
         }
@@ -1715,14 +1713,14 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
         {
             for (auto deviceType : validDeviceTypes)
             {
-                NL_TEST_ASSERT(inSuite,
-                               entry.SetTarget(0,
-                                               { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
-                                                 .cluster    = cluster,
-                                                 .endpoint   = endpoint,
-                                                 .deviceType = deviceType }) == CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+                EXPECT_EQ(entry.SetTarget(0,
+                                          { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
+                                            .cluster    = cluster,
+                                            .endpoint   = endpoint,
+                                            .deviceType = deviceType }),
+                          CHIP_NO_ERROR);
+                EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+                EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
                 accessControl.DeleteEntry(1);
             }
         }
@@ -1734,42 +1732,44 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
         {
             for (auto deviceType : invalidDeviceTypes)
             {
-                NL_TEST_ASSERT(inSuite,
-                               entry.SetTarget(0,
-                                               { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
-                                                 .cluster    = cluster,
-                                                 .endpoint   = endpoint,
-                                                 .deviceType = deviceType }) == CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+                EXPECT_EQ(entry.SetTarget(0,
+                                          { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
+                                            .cluster    = cluster,
+                                            .endpoint   = endpoint,
+                                            .deviceType = deviceType }),
+                          CHIP_NO_ERROR);
+                EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
+                EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
                 accessControl.DeleteEntry(1);
             }
         }
     }
 }
 
-void TestCheck(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestAccessControl, TestCheck)
 {
     LoadAccessControl(accessControl, entryData1, entryData1Count);
     for (const auto & checkData : checkData1)
     {
         CHIP_ERROR expectedResult = checkData.allow ? CHIP_NO_ERROR : CHIP_ERROR_ACCESS_DENIED;
-        NL_TEST_ASSERT(inSuite,
-                       accessControl.Check(checkData.subjectDescriptor, checkData.requestPath, checkData.privilege) ==
-                           expectedResult);
+        auto requestPath          = checkData.requestPath;
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+        requestPath.requestType = Access::RequestType::kAttributeReadRequest;
+#endif
+        EXPECT_EQ(accessControl.Check(checkData.subjectDescriptor, requestPath, checkData.privilege), expectedResult);
     }
 }
 
-void TestCreateReadEntry(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestAccessControl, TestCreateReadEntry)
 {
     for (size_t i = 0; i < entryData1Count; ++i)
     {
-        NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, entryData1 + i, 1) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, CompareAccessControl(accessControl, entryData1, i + 1) == CHIP_NO_ERROR);
+        EXPECT_EQ(LoadAccessControl(accessControl, entryData1 + i, 1), CHIP_NO_ERROR);
+        EXPECT_EQ(CompareAccessControl(accessControl, entryData1, i + 1), CHIP_NO_ERROR);
     }
 }
 
-void TestDeleteEntry(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestAccessControl, TestDeleteEntry)
 {
     EntryData data[entryData1Count];
     for (size_t pos = 0; pos < ArraySize(data); ++pos)
@@ -1777,51 +1777,51 @@ void TestDeleteEntry(nlTestSuite * inSuite, void * inContext)
         for (size_t count = ArraySize(data) - pos; count > 0; --count)
         {
             memcpy(data, entryData1, sizeof(data));
-            NL_TEST_ASSERT(inSuite, ClearAccessControl(accessControl) == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, data, ArraySize(data)) == CHIP_NO_ERROR);
+            EXPECT_EQ(ClearAccessControl(accessControl), CHIP_NO_ERROR);
+            EXPECT_EQ(LoadAccessControl(accessControl, data, ArraySize(data)), CHIP_NO_ERROR);
 
             memmove(&data[pos], &data[pos + count], (ArraySize(data) - count - pos) * sizeof(data[0]));
 
             for (size_t i = 0; i < count; ++i)
             {
-                NL_TEST_ASSERT(inSuite, accessControl.DeleteEntry(pos) == CHIP_NO_ERROR);
+                EXPECT_EQ(accessControl.DeleteEntry(pos), CHIP_NO_ERROR);
             }
 
-            NL_TEST_ASSERT(inSuite, CompareAccessControl(accessControl, data, ArraySize(data) - count) == CHIP_NO_ERROR);
+            EXPECT_EQ(CompareAccessControl(accessControl, data, ArraySize(data) - count), CHIP_NO_ERROR);
         }
     }
 
     // Test fabric removal
     {
         memcpy(data, entryData1, sizeof(data));
-        NL_TEST_ASSERT(inSuite, ClearAccessControl(accessControl) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, data, ArraySize(data)) == CHIP_NO_ERROR);
+        EXPECT_EQ(ClearAccessControl(accessControl), CHIP_NO_ERROR);
+        EXPECT_EQ(LoadAccessControl(accessControl, data, ArraySize(data)), CHIP_NO_ERROR);
 
         // After deleting Fabric index 1, we should have the number of entries of Fabric index 2
-        NL_TEST_ASSERT(inSuite, accessControl.DeleteAllEntriesForFabric(1) == CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.DeleteAllEntriesForFabric(1), CHIP_NO_ERROR);
         size_t numEntriesForFabricIndex2 = 0;
         size_t numTotalEntries           = 0;
-        NL_TEST_ASSERT(inSuite, accessControl.GetEntryCount(2, numEntriesForFabricIndex2) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.GetEntryCount(numTotalEntries) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, numEntriesForFabricIndex2 == kNumFabric2EntriesInEntryData1);
-        NL_TEST_ASSERT(inSuite, numTotalEntries == kNumFabric2EntriesInEntryData1);
+        EXPECT_EQ(accessControl.GetEntryCount(2, numEntriesForFabricIndex2), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.GetEntryCount(numTotalEntries), CHIP_NO_ERROR);
+        EXPECT_EQ(numEntriesForFabricIndex2, kNumFabric2EntriesInEntryData1);
+        EXPECT_EQ(numTotalEntries, kNumFabric2EntriesInEntryData1);
 
         // Delete fabric 2 as well, we should be at zero
         numTotalEntries = 1000;
-        NL_TEST_ASSERT(inSuite, accessControl.DeleteAllEntriesForFabric(2) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.GetEntryCount(numTotalEntries) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, numTotalEntries == 0);
+        EXPECT_EQ(accessControl.DeleteAllEntriesForFabric(2), CHIP_NO_ERROR);
+        EXPECT_EQ(accessControl.GetEntryCount(numTotalEntries), CHIP_NO_ERROR);
+        EXPECT_EQ(numTotalEntries, 0u);
     }
 }
 
-void TestFabricFilteredCreateEntry(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestAccessControl, TestFabricFilteredCreateEntry)
 {
     for (auto & fabricIndex : fabricIndexes)
     {
         for (size_t count = 0; count < entryData1Count; ++count)
         {
-            NL_TEST_ASSERT(inSuite, ClearAccessControl(accessControl) == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, entryData1, count) == CHIP_NO_ERROR);
+            EXPECT_EQ(ClearAccessControl(accessControl), CHIP_NO_ERROR);
+            EXPECT_EQ(LoadAccessControl(accessControl, entryData1, count), CHIP_NO_ERROR);
 
             constexpr size_t expectedIndexes[][entryData1Count] = {
                 { 0, 1, 2, 2, 3, 3, 3, 4, 4 },
@@ -1831,23 +1831,23 @@ void TestFabricFilteredCreateEntry(nlTestSuite * inSuite, void * inContext)
             const size_t expectedIndex = expectedIndexes[&fabricIndex - fabricIndexes][count];
 
             Entry entry;
-            NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(fabricIndex) == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
+            EXPECT_EQ(accessControl.PrepareEntry(entry), CHIP_NO_ERROR);
+            EXPECT_EQ(entry.SetFabricIndex(fabricIndex), CHIP_NO_ERROR);
+            EXPECT_EQ(entry.SetAuthMode(AuthMode::kCase), CHIP_NO_ERROR);
 
             size_t outIndex            = 999;
             FabricIndex outFabricIndex = 123;
-            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(&outIndex, entry, &outFabricIndex) == CHIP_NO_ERROR);
+            EXPECT_EQ(accessControl.CreateEntry(&outIndex, entry, &outFabricIndex), CHIP_NO_ERROR);
 
-            NL_TEST_ASSERT(inSuite, outIndex == expectedIndex);
-            NL_TEST_ASSERT(inSuite, outFabricIndex == fabricIndex);
+            EXPECT_EQ(outIndex, expectedIndex);
+            EXPECT_EQ(outFabricIndex, fabricIndex);
         }
     }
 }
 
-void TestFabricFilteredReadEntry(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestAccessControl, TestFabricFilteredReadEntry)
 {
-    NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, entryData1, entryData1Count) == CHIP_NO_ERROR);
+    EXPECT_EQ(LoadAccessControl(accessControl, entryData1, entryData1Count), CHIP_NO_ERROR);
 
     for (auto & fabricIndex : fabricIndexes)
     {
@@ -1867,18 +1867,18 @@ void TestFabricFilteredReadEntry(nlTestSuite * inSuite, void * inContext)
 
             if (expectedIndex != illegalIndex)
             {
-                NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, CompareEntry(entry, entryData1[expectedIndex]) == CHIP_NO_ERROR);
+                EXPECT_EQ(err, CHIP_NO_ERROR);
+                EXPECT_EQ(CompareEntry(entry, entryData1[expectedIndex]), CHIP_NO_ERROR);
             }
             else
             {
-                NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+                EXPECT_NE(err, CHIP_NO_ERROR);
             }
         }
     }
 }
 
-void TestIterator(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestAccessControl, TestIterator)
 {
     LoadAccessControl(accessControl, entryData1, entryData1Count);
 
@@ -1887,43 +1887,43 @@ void TestIterator(nlTestSuite * inSuite, void * inContext)
     Entry entry;
     size_t count;
 
-    NL_TEST_ASSERT(inSuite, accessControl.Entries(iterator) == CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.Entries(iterator), CHIP_NO_ERROR);
     count = 0;
     while (iterator.Next(entry) == CHIP_NO_ERROR)
     {
-        NL_TEST_ASSERT(inSuite, CompareEntry(entry, entryData1[count]) == CHIP_NO_ERROR);
+        EXPECT_EQ(CompareEntry(entry, entryData1[count]), CHIP_NO_ERROR);
         count++;
     }
-    NL_TEST_ASSERT(inSuite, count == entryData1Count);
+    EXPECT_EQ(count, entryData1Count);
 
     fabricIndex = kUndefinedFabricIndex;
-    NL_TEST_ASSERT(inSuite, accessControl.Entries(iterator, &fabricIndex) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, iterator.Next(entry) != CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.Entries(iterator, &fabricIndex), CHIP_NO_ERROR);
+    EXPECT_NE(iterator.Next(entry), CHIP_NO_ERROR);
 
     fabricIndex = 1;
-    NL_TEST_ASSERT(inSuite, accessControl.Entries(iterator, &fabricIndex) == CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.Entries(iterator, &fabricIndex), CHIP_NO_ERROR);
     size_t fabric1[] = { 0, 1, 3, 6 };
     count            = 0;
     while (iterator.Next(entry) == CHIP_NO_ERROR)
     {
-        NL_TEST_ASSERT(inSuite, CompareEntry(entry, entryData1[fabric1[count]]) == CHIP_NO_ERROR);
+        EXPECT_EQ(CompareEntry(entry, entryData1[fabric1[count]]), CHIP_NO_ERROR);
         count++;
     }
-    NL_TEST_ASSERT(inSuite, count == ArraySize(fabric1));
+    EXPECT_EQ(count, ArraySize(fabric1));
 
     fabricIndex = 2;
-    NL_TEST_ASSERT(inSuite, accessControl.Entries(iterator, &fabricIndex) == CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.Entries(iterator, &fabricIndex), CHIP_NO_ERROR);
     size_t fabric2[] = { 2, 4, 5, 7, 8 };
     count            = 0;
     while (iterator.Next(entry) == CHIP_NO_ERROR)
     {
-        NL_TEST_ASSERT(inSuite, CompareEntry(entry, entryData1[fabric2[count]]) == CHIP_NO_ERROR);
+        EXPECT_EQ(CompareEntry(entry, entryData1[fabric2[count]]), CHIP_NO_ERROR);
         count++;
     }
-    NL_TEST_ASSERT(inSuite, count == ArraySize(fabric2));
+    EXPECT_EQ(count, ArraySize(fabric2));
 }
 
-void TestPrepareEntry(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestAccessControl, TestPrepareEntry)
 {
     Entry entry;
     for (auto authMode : authModes)
@@ -1932,20 +1932,20 @@ void TestPrepareEntry(nlTestSuite * inSuite, void * inContext)
         {
             for (auto privilege : privileges)
             {
-                NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
+                EXPECT_EQ(accessControl.PrepareEntry(entry), CHIP_NO_ERROR);
 
                 size_t subjectCount = 0;
                 size_t targetCount  = 0;
 
-                NL_TEST_ASSERT(inSuite, entry.GetSubjectCount(subjectCount) == CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, entry.GetTargetCount(targetCount) == CHIP_NO_ERROR);
+                EXPECT_EQ(entry.GetSubjectCount(subjectCount), CHIP_NO_ERROR);
+                EXPECT_EQ(entry.GetTargetCount(targetCount), CHIP_NO_ERROR);
 
-                NL_TEST_ASSERT(inSuite, subjectCount == 0);
-                NL_TEST_ASSERT(inSuite, targetCount == 0);
+                EXPECT_EQ(subjectCount, 0u);
+                EXPECT_EQ(targetCount, 0u);
 
-                NL_TEST_ASSERT(inSuite, entry.SetAuthMode(authMode) == CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(fabricIndex) == CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, entry.SetPrivilege(privilege) == CHIP_NO_ERROR);
+                EXPECT_EQ(entry.SetAuthMode(authMode), CHIP_NO_ERROR);
+                EXPECT_EQ(entry.SetFabricIndex(fabricIndex), CHIP_NO_ERROR);
+                EXPECT_EQ(entry.SetPrivilege(privilege), CHIP_NO_ERROR);
 
                 int subjectIndex;
                 switch (authMode)
@@ -1961,83 +1961,83 @@ void TestPrepareEntry(nlTestSuite * inSuite, void * inContext)
 
                 for (auto subject : subjects[subjectIndex])
                 {
-                    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, subject) == CHIP_NO_ERROR);
+                    EXPECT_EQ(entry.AddSubject(nullptr, subject), CHIP_NO_ERROR);
                 }
 
                 for (auto & target : targets)
                 {
-                    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, target) == CHIP_NO_ERROR);
+                    EXPECT_EQ(entry.AddTarget(nullptr, target), CHIP_NO_ERROR);
                 }
 
                 AuthMode a;
                 FabricIndex f;
                 Privilege p;
 
-                NL_TEST_ASSERT(inSuite, entry.GetAuthMode(a) == CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, entry.GetFabricIndex(f) == CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, entry.GetPrivilege(p) == CHIP_NO_ERROR);
+                EXPECT_EQ(entry.GetAuthMode(a), CHIP_NO_ERROR);
+                EXPECT_EQ(entry.GetFabricIndex(f), CHIP_NO_ERROR);
+                EXPECT_EQ(entry.GetPrivilege(p), CHIP_NO_ERROR);
 
-                NL_TEST_ASSERT(inSuite, a == authMode);
-                NL_TEST_ASSERT(inSuite, f == fabricIndex);
-                NL_TEST_ASSERT(inSuite, p == privilege);
+                EXPECT_EQ(a, authMode);
+                EXPECT_EQ(f, fabricIndex);
+                EXPECT_EQ(p, privilege);
 
-                NL_TEST_ASSERT(inSuite, entry.GetSubjectCount(subjectCount) == CHIP_NO_ERROR);
-                NL_TEST_ASSERT(inSuite, entry.GetTargetCount(targetCount) == CHIP_NO_ERROR);
+                EXPECT_EQ(entry.GetSubjectCount(subjectCount), CHIP_NO_ERROR);
+                EXPECT_EQ(entry.GetTargetCount(targetCount), CHIP_NO_ERROR);
 
-                NL_TEST_ASSERT(inSuite, subjectCount == ArraySize(subjects[0]));
-                NL_TEST_ASSERT(inSuite, targetCount == ArraySize(targets));
+                EXPECT_EQ(subjectCount, ArraySize(subjects[0]));
+                EXPECT_EQ(targetCount, ArraySize(targets));
 
                 for (size_t i = 0; i < ArraySize(subjects[subjectIndex]); ++i)
                 {
                     NodeId n;
-                    NL_TEST_ASSERT(inSuite, entry.GetSubject(i, n) == CHIP_NO_ERROR);
-                    NL_TEST_ASSERT(inSuite, n == subjects[subjectIndex][i]);
+                    EXPECT_EQ(entry.GetSubject(i, n), CHIP_NO_ERROR);
+                    EXPECT_EQ(n, subjects[subjectIndex][i]);
                 }
 
                 for (size_t i = 0; i < ArraySize(targets); ++i)
                 {
                     Target t;
-                    NL_TEST_ASSERT(inSuite, entry.GetTarget(i, t) == CHIP_NO_ERROR);
-                    NL_TEST_ASSERT(inSuite, t == targets[i]);
+                    EXPECT_EQ(entry.GetTarget(i, t), CHIP_NO_ERROR);
+                    EXPECT_EQ(t, targets[i]);
                 }
             }
         }
     }
 }
 
-void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestAccessControl, TestSubjectsTargets)
 {
     Entry entry;
     size_t index;
 
-    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kAdminister) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { Target::kCluster, 1, 0, 0 }) == CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.PrepareEntry(entry), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetFabricIndex(1), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetPrivilege(Privilege::kAdminister), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetAuthMode(AuthMode::kCase), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddTarget(nullptr, { Target::kCluster, 1, 0, 0 }), CHIP_NO_ERROR);
     index = 999;
-    NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(&index, entry) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, int(index) == 0);
+    EXPECT_EQ(accessControl.CreateEntry(&index, entry), CHIP_NO_ERROR);
+    EXPECT_EQ(index, 0u);
 
-    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(2) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kManage) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, kOperationalNodeId1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { Target::kEndpoint, 0, 2, 0 }) == CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.PrepareEntry(entry), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetFabricIndex(2), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetPrivilege(Privilege::kManage), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetAuthMode(AuthMode::kCase), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddSubject(nullptr, kOperationalNodeId1), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddTarget(nullptr, { Target::kEndpoint, 0, 2, 0 }), CHIP_NO_ERROR);
     index = 999;
-    NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(&index, entry) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, int(index) == 1);
+    EXPECT_EQ(accessControl.CreateEntry(&index, entry), CHIP_NO_ERROR);
+    EXPECT_EQ(index, 1u);
 
-    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(3) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kOperate) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kGroup) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, kGroup2) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { Target::kCluster, 2, 0, 0 }) == CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.PrepareEntry(entry), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetFabricIndex(3), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetPrivilege(Privilege::kOperate), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetAuthMode(AuthMode::kGroup), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddSubject(nullptr, kGroup2), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddTarget(nullptr, { Target::kCluster, 2, 0, 0 }), CHIP_NO_ERROR);
     index = 999;
-    NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(&index, entry) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, int(index) == 2);
+    EXPECT_EQ(accessControl.CreateEntry(&index, entry), CHIP_NO_ERROR);
+    EXPECT_EQ(index, 2u);
 
     FabricIndex fabricIndex = 0;
     Privilege privilege     = Privilege::kView;
@@ -2046,126 +2046,131 @@ void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
     NodeId subject          = kUndefinedNodeId;
     Target target;
 
-    NL_TEST_ASSERT(inSuite, accessControl.ReadEntry(0, entry) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.GetFabricIndex(fabricIndex) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, fabricIndex == 1);
-    NL_TEST_ASSERT(inSuite, entry.GetPrivilege(privilege) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, privilege == Privilege::kAdminister);
-    NL_TEST_ASSERT(inSuite, entry.GetAuthMode(authMode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, authMode == AuthMode::kCase);
-    NL_TEST_ASSERT(inSuite, entry.GetSubjectCount(count) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, count == 0);
-    NL_TEST_ASSERT(inSuite, entry.GetTargetCount(count) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, count == 1);
-    NL_TEST_ASSERT(inSuite, entry.GetTarget(0, target) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, target.flags == Target::kCluster && target.cluster == 1);
+    EXPECT_EQ(accessControl.ReadEntry(0, entry), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.GetFabricIndex(fabricIndex), CHIP_NO_ERROR);
+    EXPECT_EQ(fabricIndex, 1);
+    EXPECT_EQ(entry.GetPrivilege(privilege), CHIP_NO_ERROR);
+    EXPECT_EQ(privilege, Privilege::kAdminister);
+    EXPECT_EQ(entry.GetAuthMode(authMode), CHIP_NO_ERROR);
+    EXPECT_EQ(authMode, AuthMode::kCase);
+    EXPECT_EQ(entry.GetSubjectCount(count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 0u);
+    EXPECT_EQ(entry.GetTargetCount(count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 1u);
+    EXPECT_EQ(entry.GetTarget(0, target), CHIP_NO_ERROR);
+    EXPECT_EQ(target.flags, Target::kCluster);
+    EXPECT_EQ(target.cluster, 1u);
 
-    NL_TEST_ASSERT(inSuite, accessControl.ReadEntry(1, entry) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.GetFabricIndex(fabricIndex) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, fabricIndex == 2);
-    NL_TEST_ASSERT(inSuite, entry.GetPrivilege(privilege) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, privilege == Privilege::kManage);
-    NL_TEST_ASSERT(inSuite, entry.GetAuthMode(authMode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, authMode == AuthMode::kCase);
-    NL_TEST_ASSERT(inSuite, entry.GetSubjectCount(count) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, count == 1);
-    NL_TEST_ASSERT(inSuite, entry.GetSubject(0, subject) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, subject == kOperationalNodeId1);
-    NL_TEST_ASSERT(inSuite, entry.GetTargetCount(count) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, count == 1);
-    NL_TEST_ASSERT(inSuite, entry.GetTarget(0, target) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, target.flags == Target::kEndpoint && target.endpoint == 2);
+    EXPECT_EQ(accessControl.ReadEntry(1, entry), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.GetFabricIndex(fabricIndex), CHIP_NO_ERROR);
+    EXPECT_EQ(fabricIndex, 2);
+    EXPECT_EQ(entry.GetPrivilege(privilege), CHIP_NO_ERROR);
+    EXPECT_EQ(privilege, Privilege::kManage);
+    EXPECT_EQ(entry.GetAuthMode(authMode), CHIP_NO_ERROR);
+    EXPECT_EQ(authMode, AuthMode::kCase);
+    EXPECT_EQ(entry.GetSubjectCount(count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 1u);
+    EXPECT_EQ(entry.GetSubject(0, subject), CHIP_NO_ERROR);
+    EXPECT_EQ(subject, kOperationalNodeId1);
+    EXPECT_EQ(entry.GetTargetCount(count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 1u);
+    EXPECT_EQ(entry.GetTarget(0, target), CHIP_NO_ERROR);
+    EXPECT_EQ(target.flags, Target::kEndpoint);
+    EXPECT_EQ(target.endpoint, 2);
 
-    NL_TEST_ASSERT(inSuite, accessControl.ReadEntry(2, entry) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.GetFabricIndex(fabricIndex) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, fabricIndex == 3);
-    NL_TEST_ASSERT(inSuite, entry.GetPrivilege(privilege) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, privilege == Privilege::kOperate);
-    NL_TEST_ASSERT(inSuite, entry.GetAuthMode(authMode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, authMode == AuthMode::kGroup);
-    NL_TEST_ASSERT(inSuite, entry.GetSubjectCount(count) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, count == 1);
-    NL_TEST_ASSERT(inSuite, entry.GetSubject(0, subject) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, subject == kGroup2);
-    NL_TEST_ASSERT(inSuite, entry.GetTargetCount(count) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, count == 1);
-    NL_TEST_ASSERT(inSuite, entry.GetTarget(0, target) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, target.flags == Target::kCluster && target.cluster == 2);
+    EXPECT_EQ(accessControl.ReadEntry(2, entry), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.GetFabricIndex(fabricIndex), CHIP_NO_ERROR);
+    EXPECT_EQ(fabricIndex, 3);
+    EXPECT_EQ(entry.GetPrivilege(privilege), CHIP_NO_ERROR);
+    EXPECT_EQ(privilege, Privilege::kOperate);
+    EXPECT_EQ(entry.GetAuthMode(authMode), CHIP_NO_ERROR);
+    EXPECT_EQ(authMode, AuthMode::kGroup);
+    EXPECT_EQ(entry.GetSubjectCount(count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 1u);
+    EXPECT_EQ(entry.GetSubject(0, subject), CHIP_NO_ERROR);
+    EXPECT_EQ(subject, kGroup2);
+    EXPECT_EQ(entry.GetTargetCount(count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 1u);
+    EXPECT_EQ(entry.GetTarget(0, target), CHIP_NO_ERROR);
+    EXPECT_EQ(target.flags, Target::kCluster);
+    EXPECT_EQ(target.cluster, 2u);
 
-    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.PrepareEntry(entry), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(11) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kProxyView) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetFabricIndex(11), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetPrivilege(Privilege::kProxyView), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.SetAuthMode(AuthMode::kCase), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, 0x11111111AAAAAAAA) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, 0x22222222BBBBBBBB) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, 0x33333333CCCCCCCC) == CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddSubject(nullptr, 0x11111111AAAAAAAA), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddSubject(nullptr, 0x22222222BBBBBBBB), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddSubject(nullptr, 0x33333333CCCCCCCC), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { Target::kCluster | Target::kEndpoint, 11, 22, 0 }) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { Target::kCluster | Target::kEndpoint, 33, 44, 0 }) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite,
-                   entry.AddTarget(nullptr, { Target::kCluster | Target::kEndpoint, 0xAAAAFC01, 0x6666, 0 }) == CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddTarget(nullptr, { Target::kCluster | Target::kEndpoint, 11, 22, 0 }), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddTarget(nullptr, { Target::kCluster | Target::kEndpoint, 33, 44, 0 }), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.AddTarget(nullptr, { Target::kCluster | Target::kEndpoint, 0xAAAAFC01, 0x6666, 0 }), CHIP_NO_ERROR);
 
     index = 999;
-    NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(&index, entry) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, int(index) == 3);
+    EXPECT_EQ(accessControl.CreateEntry(&index, entry), CHIP_NO_ERROR);
+    EXPECT_EQ(index, 3u);
 
-    NL_TEST_ASSERT(inSuite, accessControl.ReadEntry(3, entry) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.GetFabricIndex(fabricIndex) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, fabricIndex == 11);
-    NL_TEST_ASSERT(inSuite, entry.GetPrivilege(privilege) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, privilege == Privilege::kProxyView);
-    NL_TEST_ASSERT(inSuite, entry.GetAuthMode(authMode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, authMode == AuthMode::kCase);
-    NL_TEST_ASSERT(inSuite, entry.GetSubjectCount(count) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, count == 3);
-    NL_TEST_ASSERT(inSuite, entry.GetSubject(0, subject) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, subject == 0x11111111AAAAAAAA);
-    NL_TEST_ASSERT(inSuite, entry.GetSubject(1, subject) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, subject == 0x22222222BBBBBBBB);
-    NL_TEST_ASSERT(inSuite, entry.GetSubject(2, subject) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, subject == 0x33333333CCCCCCCC);
-    NL_TEST_ASSERT(inSuite, entry.GetTargetCount(count) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, count == 3);
-    NL_TEST_ASSERT(inSuite, entry.GetTarget(0, target) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite,
-                   target.flags == (Target::kCluster | Target::kEndpoint) && target.cluster == 11 && target.endpoint == 22);
-    NL_TEST_ASSERT(inSuite, entry.GetTarget(1, target) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite,
-                   target.flags == (Target::kCluster | Target::kEndpoint) && target.cluster == 33 && target.endpoint == 44);
-    NL_TEST_ASSERT(inSuite, entry.GetTarget(2, target) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite,
-                   target.flags == (Target::kCluster | Target::kEndpoint) && target.cluster == 0xAAAAFC01 &&
-                       target.endpoint == 0x6666);
+    EXPECT_EQ(accessControl.ReadEntry(3, entry), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.GetFabricIndex(fabricIndex), CHIP_NO_ERROR);
+    EXPECT_EQ(fabricIndex, 11);
+    EXPECT_EQ(entry.GetPrivilege(privilege), CHIP_NO_ERROR);
+    EXPECT_EQ(privilege, Privilege::kProxyView);
+    EXPECT_EQ(entry.GetAuthMode(authMode), CHIP_NO_ERROR);
+    EXPECT_EQ(authMode, AuthMode::kCase);
+    EXPECT_EQ(entry.GetSubjectCount(count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 3u);
+    EXPECT_EQ(entry.GetSubject(0, subject), CHIP_NO_ERROR);
+    EXPECT_EQ(subject, 0x11111111AAAAAAAAu);
+    EXPECT_EQ(entry.GetSubject(1, subject), CHIP_NO_ERROR);
+    EXPECT_EQ(subject, 0x22222222BBBBBBBBu);
+    EXPECT_EQ(entry.GetSubject(2, subject), CHIP_NO_ERROR);
+    EXPECT_EQ(subject, 0x33333333CCCCCCCCu);
+    EXPECT_EQ(entry.GetTargetCount(count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 3u);
+    EXPECT_EQ(entry.GetTarget(0, target), CHIP_NO_ERROR);
+    EXPECT_EQ(target.flags, (Target::kCluster | Target::kEndpoint));
+    EXPECT_EQ(target.cluster, 11u);
+    EXPECT_EQ(target.endpoint, 22);
+    EXPECT_EQ(entry.GetTarget(1, target), CHIP_NO_ERROR);
+    EXPECT_EQ(target.flags, (Target::kCluster | Target::kEndpoint));
+    EXPECT_EQ(target.cluster, 33u);
+    EXPECT_EQ(target.endpoint, 44);
+    EXPECT_EQ(entry.GetTarget(2, target), CHIP_NO_ERROR);
+    EXPECT_EQ(target.flags, (Target::kCluster | Target::kEndpoint));
+    EXPECT_EQ(target.cluster, 0xAAAAFC01);
+    EXPECT_EQ(target.endpoint, 0x6666);
 
-    NL_TEST_ASSERT(inSuite, entry.RemoveSubject(1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.GetSubjectCount(count) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, count == 2);
-    NL_TEST_ASSERT(inSuite, entry.GetSubject(0, subject) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, subject == 0x11111111AAAAAAAA);
-    NL_TEST_ASSERT(inSuite, entry.GetSubject(1, subject) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, subject == 0x33333333CCCCCCCC);
-    NL_TEST_ASSERT(inSuite, entry.GetSubject(2, subject) != CHIP_NO_ERROR);
+    EXPECT_EQ(entry.RemoveSubject(1), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.GetSubjectCount(count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 2u);
+    EXPECT_EQ(entry.GetSubject(0, subject), CHIP_NO_ERROR);
+    EXPECT_EQ(subject, 0x11111111AAAAAAAAu);
+    EXPECT_EQ(entry.GetSubject(1, subject), CHIP_NO_ERROR);
+    EXPECT_EQ(subject, 0x33333333CCCCCCCCu);
+    EXPECT_NE(entry.GetSubject(2, subject), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, entry.RemoveTarget(1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.GetTargetCount(count) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, count == 2);
-    NL_TEST_ASSERT(inSuite, entry.GetTarget(0, target) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite,
-                   target.flags == (Target::kCluster | Target::kEndpoint) && target.cluster == 11 && target.endpoint == 22);
-    NL_TEST_ASSERT(inSuite, entry.GetTarget(1, target) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite,
-                   target.flags == (Target::kCluster | Target::kEndpoint) && target.cluster == 0xAAAAFC01 &&
-                       target.endpoint == 0x6666);
-    NL_TEST_ASSERT(inSuite, entry.GetTarget(2, target) != CHIP_NO_ERROR);
+    EXPECT_EQ(entry.RemoveTarget(1), CHIP_NO_ERROR);
+    EXPECT_EQ(entry.GetTargetCount(count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 2u);
+    EXPECT_EQ(entry.GetTarget(0, target), CHIP_NO_ERROR);
+    EXPECT_EQ(target.flags, (Target::kCluster | Target::kEndpoint));
+    EXPECT_EQ(target.cluster, 11u);
+    EXPECT_EQ(target.endpoint, 22u);
+    EXPECT_EQ(entry.GetTarget(1, target), CHIP_NO_ERROR);
+    EXPECT_EQ(target.flags, (Target::kCluster | Target::kEndpoint));
+    EXPECT_EQ(target.cluster, 0xAAAAFC01);
+    EXPECT_EQ(target.endpoint, 0x6666);
+    EXPECT_NE(entry.GetTarget(2, target), CHIP_NO_ERROR);
 }
 
-void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestAccessControl, TestUpdateEntry)
 {
     EntryData data[entryData1Count];
     memcpy(data, entryData1, sizeof(data));
-    NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, data, ArraySize(data)) == CHIP_NO_ERROR);
+    EXPECT_EQ(LoadAccessControl(accessControl, data, ArraySize(data)), CHIP_NO_ERROR);
 
     for (size_t i = 0; i < ArraySize(data); ++i)
     {
@@ -2181,75 +2186,14 @@ void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)
 
         {
             Entry entry;
-            NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, LoadEntry(entry, updateData) == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(i, entry) == CHIP_NO_ERROR);
+            EXPECT_EQ(accessControl.PrepareEntry(entry), CHIP_NO_ERROR);
+            EXPECT_EQ(LoadEntry(entry, updateData), CHIP_NO_ERROR);
+            EXPECT_EQ(accessControl.UpdateEntry(i, entry), CHIP_NO_ERROR);
         }
 
-        NL_TEST_ASSERT(inSuite, CompareAccessControl(accessControl, data, ArraySize(data)) == CHIP_NO_ERROR);
+        EXPECT_EQ(CompareAccessControl(accessControl, data, ArraySize(data)), CHIP_NO_ERROR);
     }
 }
 
-int Setup(void * inContext)
-{
-    AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate();
-    SetAccessControl(accessControl);
-    VerifyOrDie(GetAccessControl().Init(delegate, testDeviceTypeResolver) == CHIP_NO_ERROR);
-    return SUCCESS;
-}
-
-int Teardown(void * inContext)
-{
-    GetAccessControl().Finish();
-    ResetAccessControlToDefault();
-    return SUCCESS;
-}
-
-int Initialize(void * inContext)
-{
-    return ClearAccessControl(accessControl) == CHIP_NO_ERROR ? SUCCESS : FAILURE;
-}
-
-int Terminate(void * inContext)
-{
-    return SUCCESS;
-}
-
-} // namespace
-
-int TestAccessControl()
-{
-    // clang-format off
-    constexpr nlTest tests[] = {
-        NL_TEST_DEF("MetaTest", MetaTest),
-        NL_TEST_DEF("TestPrepareEntry", TestPrepareEntry),
-        NL_TEST_DEF("TestCreateReadEntry", TestCreateReadEntry),
-        NL_TEST_DEF("TestUpdateEntry", TestUpdateEntry),
-        NL_TEST_DEF("TestDeleteEntry", TestDeleteEntry),
-        NL_TEST_DEF("TestAclValidateFabricIndex", TestAclValidateFabricIndex),
-        NL_TEST_DEF("TestAclValidatePrivilege", TestAclValidatePrivilege),
-        NL_TEST_DEF("TestAclValidateAuthModeSubject", TestAclValidateAuthModeSubject),
-        NL_TEST_DEF("TestAclValidateTarget", TestAclValidateTarget),
-        NL_TEST_DEF("TestSubjectsTargets", TestSubjectsTargets),
-        NL_TEST_DEF("TestIterator", TestIterator),
-        NL_TEST_DEF("TestFabricFilteredReadEntry", TestFabricFilteredReadEntry),
-        NL_TEST_DEF("TestFabricFilteredCreateEntry", TestFabricFilteredCreateEntry),
-        NL_TEST_DEF("TestCheck", TestCheck),
-        NL_TEST_SENTINEL()
-    };
-    // clang-format on
-
-    nlTestSuite suite = {
-        .name       = "AccessControl",
-        .tests      = tests,
-        .setup      = Setup,
-        .tear_down  = Teardown,
-        .initialize = Initialize,
-        .terminate  = Terminate,
-    };
-
-    nlTestRunner(&suite, nullptr);
-    return nlTestRunnerStats(&suite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestAccessControl);
+} // namespace Access
+} // namespace chip

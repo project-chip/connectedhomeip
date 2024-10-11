@@ -19,6 +19,7 @@
 #pragma once
 
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 class DeviceAppJNI
 {
@@ -31,7 +32,7 @@ private:
     friend DeviceAppJNI & DeviceAppJNIMgr();
 
     static DeviceAppJNI sInstance;
-    jobject mDeviceAppObject         = nullptr;
+    chip::JniGlobalReference mDeviceAppObject;
     jmethodID mPostClusterInitMethod = nullptr;
     jmethodID mPostEventMethod       = nullptr;
 };

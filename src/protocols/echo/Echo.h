@@ -38,7 +38,7 @@ namespace chip {
 namespace Protocols {
 namespace Echo {
 
-inline constexpr const char * kProtocolName = "Echo";
+inline constexpr char kProtocolName[] = "Echo";
 
 /**
  * Echo Protocol Message Types

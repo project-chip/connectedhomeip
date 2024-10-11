@@ -31,21 +31,12 @@ static constexpr ClusterId Id = 0x00000003;
 namespace Groups {
 static constexpr ClusterId Id = 0x00000004;
 } // namespace Groups
-namespace Scenes {
-static constexpr ClusterId Id = 0x00000005;
-} // namespace Scenes
 namespace OnOff {
 static constexpr ClusterId Id = 0x00000006;
 } // namespace OnOff
-namespace OnOffSwitchConfiguration {
-static constexpr ClusterId Id = 0x00000007;
-} // namespace OnOffSwitchConfiguration
 namespace LevelControl {
 static constexpr ClusterId Id = 0x00000008;
 } // namespace LevelControl
-namespace BinaryInputBasic {
-static constexpr ClusterId Id = 0x0000000F;
-} // namespace BinaryInputBasic
 namespace PulseWidthModulation {
 static constexpr ClusterId Id = 0x0000001C;
 } // namespace PulseWidthModulation
@@ -151,6 +142,9 @@ static constexpr ClusterId Id = 0x00000046;
 namespace Timer {
 static constexpr ClusterId Id = 0x00000047;
 } // namespace Timer
+namespace OvenCavityOperationalState {
+static constexpr ClusterId Id = 0x00000048;
+} // namespace OvenCavityOperationalState
 namespace OvenMode {
 static constexpr ClusterId Id = 0x00000049;
 } // namespace OvenMode
@@ -205,30 +199,66 @@ static constexpr ClusterId Id = 0x00000060;
 namespace RvcOperationalState {
 static constexpr ClusterId Id = 0x00000061;
 } // namespace RvcOperationalState
+namespace ScenesManagement {
+static constexpr ClusterId Id = 0x00000062;
+} // namespace ScenesManagement
 namespace HepaFilterMonitoring {
 static constexpr ClusterId Id = 0x00000071;
 } // namespace HepaFilterMonitoring
 namespace ActivatedCarbonFilterMonitoring {
 static constexpr ClusterId Id = 0x00000072;
 } // namespace ActivatedCarbonFilterMonitoring
-namespace BooleanSensorConfiguration {
+namespace BooleanStateConfiguration {
 static constexpr ClusterId Id = 0x00000080;
-} // namespace BooleanSensorConfiguration
+} // namespace BooleanStateConfiguration
 namespace ValveConfigurationAndControl {
 static constexpr ClusterId Id = 0x00000081;
 } // namespace ValveConfigurationAndControl
+namespace ElectricalPowerMeasurement {
+static constexpr ClusterId Id = 0x00000090;
+} // namespace ElectricalPowerMeasurement
+namespace ElectricalEnergyMeasurement {
+static constexpr ClusterId Id = 0x00000091;
+} // namespace ElectricalEnergyMeasurement
+namespace WaterHeaterManagement {
+static constexpr ClusterId Id = 0x00000094;
+} // namespace WaterHeaterManagement
 namespace DemandResponseLoadControl {
 static constexpr ClusterId Id = 0x00000096;
 } // namespace DemandResponseLoadControl
+namespace Messages {
+static constexpr ClusterId Id = 0x00000097;
+} // namespace Messages
+namespace DeviceEnergyManagement {
+static constexpr ClusterId Id = 0x00000098;
+} // namespace DeviceEnergyManagement
+namespace EnergyEvse {
+static constexpr ClusterId Id = 0x00000099;
+} // namespace EnergyEvse
+namespace EnergyPreference {
+static constexpr ClusterId Id = 0x0000009B;
+} // namespace EnergyPreference
+namespace PowerTopology {
+static constexpr ClusterId Id = 0x0000009C;
+} // namespace PowerTopology
+namespace EnergyEvseMode {
+static constexpr ClusterId Id = 0x0000009D;
+} // namespace EnergyEvseMode
+namespace WaterHeaterMode {
+static constexpr ClusterId Id = 0x0000009E;
+} // namespace WaterHeaterMode
+namespace DeviceEnergyManagementMode {
+static constexpr ClusterId Id = 0x0000009F;
+} // namespace DeviceEnergyManagementMode
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock
 namespace WindowCovering {
 static constexpr ClusterId Id = 0x00000102;
 } // namespace WindowCovering
-namespace BarrierControl {
-static constexpr ClusterId Id = 0x00000103;
-} // namespace BarrierControl
+namespace ServiceArea {
+static constexpr ClusterId Id = 0x00000150;
+} // namespace ServiceArea
 namespace PumpConfigurationAndControl {
 static constexpr ClusterId Id = 0x00000200;
 } // namespace PumpConfigurationAndControl
@@ -295,6 +325,15 @@ static constexpr ClusterId Id = 0x0000042E;
 namespace RadonConcentrationMeasurement {
 static constexpr ClusterId Id = 0x0000042F;
 } // namespace RadonConcentrationMeasurement
+namespace WiFiNetworkManagement {
+static constexpr ClusterId Id = 0x00000451;
+} // namespace WiFiNetworkManagement
+namespace ThreadBorderRouterManagement {
+static constexpr ClusterId Id = 0x00000452;
+} // namespace ThreadBorderRouterManagement
+namespace ThreadNetworkDirectory {
+static constexpr ClusterId Id = 0x00000453;
+} // namespace ThreadNetworkDirectory
 namespace WakeOnLan {
 static constexpr ClusterId Id = 0x00000503;
 } // namespace WakeOnLan
@@ -331,9 +370,30 @@ static constexpr ClusterId Id = 0x0000050D;
 namespace AccountLogin {
 static constexpr ClusterId Id = 0x0000050E;
 } // namespace AccountLogin
-namespace ElectricalMeasurement {
-static constexpr ClusterId Id = 0x00000B04;
-} // namespace ElectricalMeasurement
+namespace ContentControl {
+static constexpr ClusterId Id = 0x0000050F;
+} // namespace ContentControl
+namespace ContentAppObserver {
+static constexpr ClusterId Id = 0x00000510;
+} // namespace ContentAppObserver
+namespace ZoneManagement {
+static constexpr ClusterId Id = 0x00000550;
+} // namespace ZoneManagement
+namespace WebRTCTransportProvider {
+static constexpr ClusterId Id = 0x00000553;
+} // namespace WebRTCTransportProvider
+namespace WebRTCTransportRequestor {
+static constexpr ClusterId Id = 0x00000554;
+} // namespace WebRTCTransportRequestor
+namespace Chime {
+static constexpr ClusterId Id = 0x00000556;
+} // namespace Chime
+namespace EcosystemInformation {
+static constexpr ClusterId Id = 0x00000750;
+} // namespace EcosystemInformation
+namespace CommissionerControl {
+static constexpr ClusterId Id = 0x00000751;
+} // namespace CommissionerControl
 namespace UnitTesting {
 static constexpr ClusterId Id = 0xFFF1FC05;
 } // namespace UnitTesting

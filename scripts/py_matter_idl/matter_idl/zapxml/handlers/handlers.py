@@ -15,9 +15,8 @@
 import logging
 from typing import Any, Optional
 
-from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
-                                         Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, Struct, StructQuality,
-                                         StructTag)
+from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, Command, CommandQuality, ConstantEntry, DataType, Enum, Event,
+                                         EventPriority, EventQuality, Field, FieldQuality, Idl, Struct, StructQuality, StructTag)
 
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
@@ -226,7 +225,7 @@ class StructHandler(BaseHandler, IdlPostProcessor):
         #   - inside a cluster if a code exists
         #   - inside top level if no codes were associated
         if not self._cluster_codes:
-            LOGGER.error('Struct %s has no cluster codes' % self._struct.name)
+            idl.global_structs.append(self._struct)
             return
 
         for code in self._cluster_codes:
@@ -271,9 +270,9 @@ class EnumHandler(BaseHandler, IdlPostProcessor):
 
     def FinalizeProcessing(self, idl: Idl):
         if not self._cluster_codes:
-            LOGGER.error("Found enum without a cluster code: %s" %
-                         (self._enum.name))
+            idl.global_enums.append(self._enum)
             return
+
         found = set()
         for c in idl.clusters:
             if c.code in self._cluster_codes:
@@ -314,14 +313,11 @@ class BitmapHandler(BaseHandler):
             return BaseHandler(self.context)
 
     def FinalizeProcessing(self, idl: Idl):
-        # We have two choices of adding an enum:
+        # We have two choices of adding a bitmap:
         #   - inside a cluster if a code exists
         #   - inside top level if a code does not exist
         if not self._cluster_codes:
-            # Log only instead of critical, as not our XML is well formed.
-            # For example at the time of writing this, SwitchFeature in switch-cluster.xml
-            # did not have a code associated with it.
-            LOGGER.error("Bitmap %r has no cluster codes" % self._bitmap)
+            idl.global_bitmaps.append(self._bitmap)
             return
 
         for code in self._cluster_codes:
@@ -336,6 +332,33 @@ class BitmapHandler(BaseHandler):
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
+
+
+class FeaturesHandler(BaseHandler):
+    """Handles .../features 
+
+       Attaches a "Feature" bitmap to the given structure
+    """
+
+    def __init__(self, context: Context, cluster: Cluster):
+        super().__init__(context)
+        self._features = Bitmap(name='Feature', base_type="bitmap32", entries=[])
+        self._cluster = cluster
+
+    def GetNextProcessor(self, name, attrs):
+        if name.lower() == 'feature':
+            self._features.entries.append(ConstantEntry(
+                name=attrs['name'],
+                code=1 << ParseInt(attrs['bit']),
+            ))
+
+            # Sub-elements are conformance which is not representable in IDL
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        return BaseHandler(self.context)
+
+    def EndProcessing(self):
+        if self._features.entries:
+            self._cluster.bitmaps.append(self._features)
 
 
 class DescriptionHandler(BaseHandler):
@@ -490,7 +513,6 @@ class ClusterHandler(BaseHandler):
     def __init__(self, context: Context, idl: Optional[Idl]):
         super().__init__(context)
         self._cluster = Cluster(
-            side=ClusterSide.CLIENT,
             name="NAME-MISSING",
             code=-1,
             parse_meta=context.GetCurrentLocationMeta()
@@ -513,6 +535,8 @@ class ClusterHandler(BaseHandler):
             return CommandHandler(self.context, self._cluster, attrs)
         elif name.lower() == 'description':
             return DescriptionHandler(self.context, self._cluster)
+        elif name.lower() == 'features':
+            return FeaturesHandler(self.context, self._cluster)
         elif name.lower() in ['define', 'domain', 'tag', 'client', 'server']:
             # NOTE: we COULD use client and server to create separate definitions
             #       of each, but the usefulness of this is unclear as the definitions are

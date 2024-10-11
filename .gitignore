@@ -10,11 +10,13 @@
 
 # Build System
 out/
+/examples/virtual-device-app/android/App/buildSrc/build/
 /src/test_driver/nrfconnect/build/
 /src/darwin/Framework/build/
+/src/python_testing/matter_testing_infrastructure/build/
 
 # Pigweed Environment
-.environment/
+.environment*/
 build_overrides/pigweed_environment.gni
 
 # Temporary Directories
@@ -80,3 +82,6 @@ examples/thermostat/ameba/build
 # https://github.com/espressif/idf-component-manager#using-with-a-project
 examples/*/esp32/managed_components
 examples/*/esp32/dependencies.lock
+
+# jupyter temporary files
+.ipynb_checkpoints

@@ -70,6 +70,14 @@ CHIP_ERROR InvokeRequests::Parser::PrettyPrint() const
 }
 #endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
+CHIP_ERROR InvokeRequests::Builder::InitWithEndBufferReserved(TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse)
+{
+    ReturnErrorOnFailure(Init(apWriter, aContextTagToUse));
+    ReturnErrorOnFailure(GetWriter()->ReserveBuffer(GetSizeToEndInvokeRequests()));
+    mIsEndBufferReserved = true;
+    return CHIP_NO_ERROR;
+}
+
 CommandDataIB::Builder & InvokeRequests::Builder::CreateCommandData()
 {
     if (mError == CHIP_NO_ERROR)
@@ -81,8 +89,22 @@ CommandDataIB::Builder & InvokeRequests::Builder::CreateCommandData()
 
 CHIP_ERROR InvokeRequests::Builder::EndOfInvokeRequests()
 {
+    // If any changes are made to how we end the invoke requests that involves how many bytes are
+    // needed, a corresponding change to GetSizeToEndInvokeRequests indicating the new size that
+    // will be required.
+    if (mIsEndBufferReserved)
+    {
+        ReturnErrorOnFailure(GetWriter()->UnreserveBuffer(GetSizeToEndInvokeRequests()));
+        mIsEndBufferReserved = false;
+    }
     EndOfContainer();
     return GetError();
+}
+
+uint32_t InvokeRequests::Builder::GetSizeToEndInvokeRequests()
+{
+    uint32_t kEndOfContainerSize = 1;
+    return kEndOfContainerSize;
 }
 } // namespace app
 } // namespace chip

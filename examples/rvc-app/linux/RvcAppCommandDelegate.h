@@ -23,6 +23,8 @@
 #include <json/json.h>
 #include <platform/DiagnosticDataProvider.h>
 
+#include <string>
+
 class RvcAppCommandHandler
 {
 public:
@@ -53,9 +55,21 @@ private:
 
     void OnActivityCompleteHandler();
 
+    void OnAreaCompleteHandler();
+
+    void OnAddServiceAreaMap(Json::Value jsonValue);
+
+    void OnAddServiceAreaArea(Json::Value jsonValue);
+
+    void OnRemoveServiceAreaMap(uint32_t mapId);
+
+    void OnRemoveServiceAreaArea(uint32_t areaId);
+
     void OnErrorEventHandler(const std::string & error);
 
     void OnClearErrorHandler();
+
+    void OnResetHandler();
 };
 
 class RvcAppCommandDelegate : public NamedPipeCommandDelegate

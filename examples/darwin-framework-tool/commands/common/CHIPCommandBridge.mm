@@ -26,12 +26,15 @@
 
 #include "MTRError_Utils.h"
 
+#include <map>
+#include <string>
+
 static CHIPToolPersistentStorageDelegate * storage = nil;
 std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
 std::map<std::string, MTRDeviceController *> CHIPCommandBridge::mControllers;
 dispatch_queue_t CHIPCommandBridge::mOTAProviderCallbackQueue;
 OTAProviderDelegate * CHIPCommandBridge::mOTADelegate;
-constexpr const char * kTrustStorePathVariable = "PAA_TRUST_STORE_PATH";
+constexpr char kTrustStorePathVariable[] = "PAA_TRUST_STORE_PATH";
 
 CHIPToolKeypair * gNocSigner = [[CHIPToolKeypair alloc] init];
 
@@ -191,6 +194,14 @@ void CHIPCommandBridge::SetIdentity(const char * identity)
 MTRDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrentController; }
 
 MTRDeviceController * CHIPCommandBridge::GetCommissioner(const char * identity) { return mControllers[identity]; }
+
+MTRBaseDevice * CHIPCommandBridge::BaseDeviceWithNodeId(chip::NodeId nodeId)
+{
+    MTRDeviceController * controller = CurrentCommissioner();
+    VerifyOrReturnValue(controller != nil, nil);
+    return [controller deviceBeingCommissionedWithNodeID:@(nodeId) error:nullptr]
+        ?: [MTRBaseDevice deviceWithNodeID:@(nodeId) controller:controller];
+}
 
 void CHIPCommandBridge::StopCommissioners()
 {

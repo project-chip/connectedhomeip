@@ -25,8 +25,8 @@
 #include "dmd.h"
 #include "glib.h"
 
-#if (SIWX_917)
-#include "rsi_chip.h"
+#if (SLI_SI91X_MCU_INTERFACE)
+#include "sl_memlcd.h"
 #endif
 
 #ifdef QR_CODE_ENABLED
@@ -66,11 +66,8 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     }
 
     /* Enable the memory lcd */
-#if (SIWX_917)
-    RSI_NPSSGPIO_InputBufferEn(SL_BOARD_ENABLE_DISPLAY_PIN, 1U);
-    RSI_NPSSGPIO_SetPinMux(SL_BOARD_ENABLE_DISPLAY_PIN, 0);
-    RSI_NPSSGPIO_SetDir(SL_BOARD_ENABLE_DISPLAY_PIN, 0);
-    RSI_NPSSGPIO_SetPin(SL_BOARD_ENABLE_DISPLAY_PIN, 1U);
+#if (SLI_SI91X_MCU_INTERFACE)
+    sl_memlcd_display_enable();
 #else
     status = sl_board_enable_display();
     if (status != SL_STATUS_OK)
@@ -192,11 +189,11 @@ void SilabsLCD::WriteStatus()
     GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
     sprintf(str, "Advertising : %c", mStatus.advertising ? 'Y' : 'N');
     GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    GLIB_drawStringOnLine(&glibContext, "Is ICD : Y", lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
-#else
-    GLIB_drawStringOnLine(&glibContext, "Is ICD : N", lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
-#endif
+    if (mStatus.icdMode != NotICD)
+    {
+        sprintf(str, "ICD : %s", mStatus.icdMode == SIT ? "SIT" : "LIT");
+        GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
+    }
 
     updateDisplay();
 }
@@ -204,6 +201,11 @@ void SilabsLCD::WriteStatus()
 void SilabsLCD::SetCustomUI(customUICB cb)
 {
     customUI = cb;
+}
+
+void SilabsLCD::GetScreen(Screen_e & screen)
+{
+    screen = static_cast<Screen_e>(mCurrentScreen);
 }
 
 void SilabsLCD::SetScreen(Screen_e screen)
@@ -229,6 +231,7 @@ void SilabsLCD::SetScreen(Screen_e screen)
     default:
         break;
     }
+    mCurrentScreen = screen;
 }
 
 void SilabsLCD::CycleScreens(void)

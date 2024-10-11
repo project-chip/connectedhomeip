@@ -1,17 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="appbar_layout_height">350dp</dimen>
-    <dimen name="collapse_title_text_size">25sp</dimen>
     <dimen name="toolbar_title_text_size">17sp</dimen>
     <dimen name="toolbar_more_menu_button_margin_end">20dp</dimen>
 
-    <dimen name="device_title_icon_width">60dp</dimen>
-    <dimen name="device_title_icon_height">60dp</dimen>
-    <dimen name="device_title_icon_margin_top">20dp</dimen>
-    <dimen name="device_title_text_margin_top">10sp</dimen>
-    <dimen name="device_title_text_size">24sp</dimen>
-
-    <dimen name="device_item_top_space_height">44dp</dimen>
     <dimen name="device_item_margin_horizontal">12dp</dimen>
     <dimen name="device_item_bottom_space_height">25dp</dimen>
     <dimen name="device_item_padding_start">20dp</dimen>

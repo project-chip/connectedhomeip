@@ -109,6 +109,23 @@ tests:
               - name: "GroupID"
                 value: 0x0101
 
+    - label: "Add Group 1 (endpoint 2)"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 2
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+              - name: "GroupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0101
+
     - label: "Add Group 2 (endpoint 0)"
       cluster: "Groups"
       command: "AddGroup"
@@ -216,6 +233,14 @@ tests:
       response:
           value: 0
 
+    - label: "Check on/off attribute value is false for endpoint 2"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      endpoint: 2
+      response:
+          value: 0
+
     - label: "Turn On the light to see attribute change"
       cluster: "On/Off"
       command: "On"
@@ -241,10 +266,39 @@ tests:
       response:
           value: 1
 
-    - label: "Turn off the light to get ready for the next test"
+    - label:
+          "Check on/off attribute value is true after on command for endpoint 2"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      endpoint: 2
+      response:
+          value: 1
+
+    - label: "Turn off the light to get ready for the next test for endpoint 1"
       cluster: "On/Off"
       command: "Off"
       endpoint: 1
+
+    - label: "Turn off the light to get ready for the next test for endpoint 2"
+      cluster: "On/Off"
+      command: "Off"
+      endpoint: 2
+
+    - label: "Cleanup for next test remove Group 1 (endpoint 2)"
+      cluster: "Groups"
+      command: "RemoveGroup"
+      endpoint: 2
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0101
 
     - label: "Cleanup ACLs"
       cluster: "Access Control"

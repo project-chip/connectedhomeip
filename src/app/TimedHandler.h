@@ -15,21 +15,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      Definition of a handler for timed interactions.
- *
- */
-
 #pragma once
 
+#include <app/InteractionModelDelegatePointers.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
+
+namespace chip {
+namespace app {
+
+class TimedHandler;
 
 /**
  * A TimedHandler handles a Timed Request action and then waits for a
@@ -43,14 +42,37 @@
  * either the exchange is closed or the interaction is handed on to the
  * InteractionModelEngine.
  */
+class TimedHandlerDelegate
+{
+public:
+    virtual ~TimedHandlerDelegate() = default;
 
-namespace chip {
-namespace app {
+    /**
+     * Called when a timed invoke is received.  This function takes over all
+     * handling of the exchange, status reporting, and so forth.
+     */
+    virtual void OnTimedInvoke(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
+                               const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) = 0;
+
+    /**
+     * Called when a timed write is received.  This function takes over all
+     * handling of the exchange, status reporting, and so forth.
+     */
+    virtual void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
+                              const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) = 0;
+
+    /**
+     * Called when a timed interaction has failed (i.e. the exchange it was
+     * happening on has closed while the exchange delegate was the timed
+     * handler).
+     */
+    virtual void OnTimedInteractionFailed(TimedHandler * apTimedHandler) = 0;
+};
 
 class TimedHandler : public Messaging::ExchangeDelegate
 {
 public:
-    TimedHandler() {}
+    TimedHandler(TimedHandlerDelegate * delegate) : mDelegate(delegate) {}
     ~TimedHandler() override {}
 
     // ExchangeDelegate implementation.
@@ -83,15 +105,31 @@ private:
         kExpectingFollowingAction, // Expecting write or invoke.
     };
 
-    // Because we have a vtable pointer and mTimeLimit needs to be 8-byte
-    // aligned on ARM, putting mState first here means we fit in 16 bytes on
-    // 32-bit ARM, whereas if we put it second we'd be 24 bytes.
-    // On platforms where either vtable pointers are 8 bytes or 64-bit ints can
-    // be 4-byte-aligned the ordering here does not matter.
     State mState = State::kExpectingTimedAction;
+
+    /// This may be "fake" pointer or a real delegate pointer, depending
+    /// on CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE setting.
+    ///
+    /// When this is not a real pointer, it checks that the value is always
+    /// set to the global InteractionModelEngine and the size of this
+    /// member is 1 byte.
+    InteractionModelDelegatePointer<TimedHandlerDelegate> mDelegate;
+
     // We keep track of the time limit for message reception, in case our
     // exchange's "response expected" timer gets delayed and does not fire when
     // the time runs out.
+    //
+    // NOTE: mTimeLimit needs to be 8-byte aligned on ARM so we place this last,
+    //       to allow previous values to potentially use remaining packing space.
+    //       Rationale:
+    //         -   vtable is 4-byte aligned on 32-bit arm
+    //         -   mTimeLimit requires 8-byte aligment
+    //         =>  As a result we may gain 4 bytes if we place mTimeLimit last.
+    // Expectation of memory layout:
+    //   - vtable pointer (4 bytes & 4 byte alignment)
+    //   - other members  (2 bytes on embedded "global pointer" arm)
+    //                    (2 bytes padding for 8-byte alignment)
+    //   - mTimeLimit     (8 bytes & 8 byte alignment)
     System::Clock::Timestamp mTimeLimit;
 };
 

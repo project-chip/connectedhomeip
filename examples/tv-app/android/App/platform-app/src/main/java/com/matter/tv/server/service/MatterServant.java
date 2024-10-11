@@ -17,7 +17,6 @@
  */
 package com.matter.tv.server.service;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import androidx.annotation.NonNull;
@@ -31,6 +30,8 @@ import chip.platform.NsdManagerServiceResolver;
 import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
 import com.matter.tv.server.MatterCommissioningPrompter;
+import com.matter.tv.server.handlers.ApplicationLauncherManagerImpl;
+import com.matter.tv.server.tvapp.ApplicationLauncherManager;
 import com.matter.tv.server.tvapp.ChannelManagerStub;
 import com.matter.tv.server.tvapp.Clusters;
 import com.matter.tv.server.tvapp.ContentLaunchManagerStub;
@@ -41,6 +42,7 @@ import com.matter.tv.server.tvapp.LevelManagerStub;
 import com.matter.tv.server.tvapp.LowPowerManagerStub;
 import com.matter.tv.server.tvapp.MediaInputManagerStub;
 import com.matter.tv.server.tvapp.MediaPlaybackManagerStub;
+import com.matter.tv.server.tvapp.MessagesManagerStub;
 import com.matter.tv.server.tvapp.OnOffManagerStub;
 import com.matter.tv.server.tvapp.TvApp;
 import com.matter.tv.server.tvapp.WakeOnLanManagerStub;
@@ -55,6 +57,8 @@ public class MatterServant {
   private boolean mIsOn = true;
   private int mOnOffEndpoint;
   private int mLevelEndpoint;
+  private MatterCommissioningPrompter matterCommissioningPrompter;
+  private ApplicationLauncherManager applicationLauncherManager;
 
   private MatterServant() {}
 
@@ -67,11 +71,12 @@ public class MatterServant {
   }
 
   private Context context;
-  private Activity activity;
 
   public void init(@NonNull Context context) {
 
     this.context = context;
+
+    this.applicationLauncherManager = new ApplicationLauncherManagerImpl(context);
 
     // The order is important, must
     // first new TvApp to load dynamic library
@@ -79,11 +84,17 @@ public class MatterServant {
     // then TvApp.preServerInit to initialize any server configuration
     // then start ChipAppServer
     // then TvApp.postServerInit to init app platform
+    //
+    // TODO: Move all of the bellow KeypadInputManager...LevelManagerStub to
+    // PlatformAppCommandDelegate
+    // There is no need for this complicated logic
     mTvApp =
         new TvApp(
             (app, clusterId, endpoint) -> {
               if (clusterId == Clusters.ClusterId_KeypadInput) {
                 app.setKeypadInputManager(endpoint, new KeypadInputManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_ApplicationLauncher) {
+                app.setApplicationLauncherManager(endpoint, applicationLauncherManager);
               } else if (clusterId == Clusters.ClusterId_WakeOnLan) {
                 app.setWakeOnLanManager(endpoint, new WakeOnLanManagerStub(endpoint));
               } else if (clusterId == Clusters.ClusterId_MediaInput) {
@@ -96,6 +107,8 @@ public class MatterServant {
                 app.setMediaPlaybackManager(endpoint, new MediaPlaybackManagerStub(endpoint));
               } else if (clusterId == Clusters.ClusterId_Channel) {
                 app.setChannelManager(endpoint, new ChannelManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_Messaging) {
+                app.setMessagesManager(endpoint, new MessagesManagerStub(endpoint));
               } else if (clusterId == Clusters.ClusterId_OnOff) {
                 mOnOffEndpoint = endpoint;
                 app.setOnOffManager(endpoint, new OnOffManagerStub(endpoint));
@@ -145,14 +158,6 @@ public class MatterServant {
   public void toggleOnOff() {
     mTvApp.setOnOff(mOnOffEndpoint, mIsOn);
     mIsOn = !mIsOn;
-  }
-
-  public void setActivity(Activity activity) {
-    this.activity = activity;
-  }
-
-  public Activity getActivity() {
-    return activity;
   }
 
   public void sendCustomCommand(String customCommand) {

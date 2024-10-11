@@ -132,6 +132,7 @@ protected:
     static constexpr TLV::Tag kAttributeIdTag        = TLV::ContextTag(13);
     static constexpr TLV::Tag kEventIdTag            = TLV::ContextTag(14);
     static constexpr TLV::Tag kEventPathTypeTag      = TLV::ContextTag(16);
+    static constexpr TLV::Tag kResumptionRetriesTag  = TLV::ContextTag(17);
 
     PersistentStorageDelegate * mStorage;
     ObjectPool<SimpleSubscriptionInfoIterator, kIteratorsMax> mSubscriptionInfoIterators;

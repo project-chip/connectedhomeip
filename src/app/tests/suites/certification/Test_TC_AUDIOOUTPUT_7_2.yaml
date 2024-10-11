@@ -60,7 +60,11 @@ tests:
           "Step 3: TH reads the OutputList attribute from the DUT. Verify that
           the output at the index provided in step 2 has the name CertTest"
       verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool audiooutput read output-list 1 1
+          ./chip-tv-casting-app audiooutput read output-list 1 1
+
+          On TH(chip-tool),  Verify that the output at the index provided in step 2 has the name "CertTest".
           [1651061821.366426][156898:156903] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_050B Attribute 0x0000_0000 DataVersion: 372822880
           [1651061821.366510][156898:156903] CHIP:TOO:   OutputList: 3 entries
           [1651061821.366575][156898:156903] CHIP:TOO:     [1]: {
@@ -68,6 +72,16 @@ tests:
           [1651061821.366619][156898:156903] CHIP:TOO:       OutputType: 0
           [1651061821.366635][156898:156903] CHIP:TOO:       Name: CertTest
           [1651061821.366651][156898:156903] CHIP:TOO:      }
+          [1651061821.366675][156898:156903] CHIP:TOO:     [2]: {
+          [1651061821.366690][156898:156903] CHIP:TOO:       Index: 2
+          [1651061821.366705][156898:156903] CHIP:TOO:       OutputType: 0
+          [1651061821.366719][156898:156903] CHIP:TOO:       Name: HDMI
+          [1651061821.366734][156898:156903] CHIP:TOO:      }
+          [1651061821.366755][156898:156903] CHIP:TOO:     [3]: {
+          [1651061821.366770][156898:156903] CHIP:TOO:       Index: 3
+          [1651061821.366785][156898:156903] CHIP:TOO:       OutputType: 0
+          [1651061821.366799][156898:156903] CHIP:TOO:       Name: HDMI
+          [1651061821.366814][156898:156903] CHIP:TOO:      }
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && AUDIOOUTPUT.S.A0001 && AUDIOOUTPUT.S.C01.Rsp

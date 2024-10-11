@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#include <lib/shell/Engine.h>
-
 #include <app/server/Dnssd.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Base64.h>
@@ -35,22 +33,35 @@
 
 #include <zephyr/logging/log.h>
 
-#if CONFIG_ENABLE_CHIP_SHELL || CONFIG_CHIP_LIB_SHELL
-#include <ChipShellCollection.h>
-#endif
-
 #ifdef CONFIG_CHIP_PW_RPC
 #include "Rpc.h"
+#endif
+
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#include <crypto/PSAOperationalKeystore.h>
+#ifdef CONFIG_CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
+#include "MigrationManager.h"
+#endif
 #endif
 
 LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace chip;
-using namespace chip::Shell;
 using namespace chip::DeviceLayer;
 
 namespace {
 constexpr int kExtDiscoveryTimeoutSecs = 20;
+
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
+#endif
+} // namespace
+
+extern void ApplicationInit();
+
+void InitServer(intptr_t)
+{
+    ApplicationInit();
 }
 
 int main()
@@ -110,6 +121,9 @@ int main()
 
     // Start IM server
     static chip::CommonCaseDeviceServerInitParams initParams;
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    initParams.operationalKeystore = &sPSAOperationalKeystore;
+#endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     err = chip::Server::GetInstance().Init(initParams);
     if (err != CHIP_NO_ERROR)
@@ -138,25 +152,7 @@ int main()
         ChipLogError(AppServer, "OpenBasicCommissioningWindow() failed");
     }
 
-#if CONFIG_CHIP_LIB_SHELL
-    int rc = Engine::Root().Init();
-    if (rc != 0)
-    {
-        ChipLogError(AppServer, "Streamer initialization failed: %d", rc);
-        return 1;
-    }
-
-    cmd_misc_init();
-    cmd_otcli_init();
-#endif
-
-#if CHIP_SHELL_ENABLE_CMD_SERVER
-    cmd_app_server_init();
-#endif
-
-#if CONFIG_CHIP_LIB_SHELL
-    Engine::Root().RunMainLoop();
-#endif
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer);
 
     return 0;
 }

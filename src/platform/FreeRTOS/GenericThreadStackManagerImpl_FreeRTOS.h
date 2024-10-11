@@ -64,6 +64,10 @@ protected:
     bool _TryLockThreadStack(void);
     void _UnlockThreadStack(void);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    void _WaitOnSrpClearAllComplete();
+    void _NotifySrpClearAllComplete();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     // ===== Members available to the implementation subclass.
 
     SemaphoreHandle_t mThreadStackLock;
@@ -87,6 +91,10 @@ private:
 
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE) && CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE
     StaticSemaphore_t mThreadStackLockMutex;
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    TaskHandle_t mSrpClearAllRequester = nullptr;
 #endif
 };
 

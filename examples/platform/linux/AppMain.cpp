@@ -19,7 +19,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include "app/clusters/network-commissioning/network-commissioning.h"
+#include <app/InteractionModelEngine.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/endpoint-config-api.h>
@@ -74,10 +76,25 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-#include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
+#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER
-#include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h>
+#include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
+#include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
+#include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
+#include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER
+#include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
+#include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #endif
 #include <app/TestEventTriggerDelegate.h>
 
@@ -85,6 +102,10 @@
 
 #include "AppMain.h"
 #include "CommissionableInit.h"
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+#include "ExampleAccessRestrictionProvider.h"
+#endif
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
 #include <platform/Darwin/NetworkCommissioningDriver.h>
@@ -104,6 +125,7 @@ using namespace chip::DeviceLayer;
 using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::app::Clusters;
+using namespace chip::Access;
 
 // Network comissioning implementation
 namespace {
@@ -163,6 +185,10 @@ Optional<app::Clusters::NetworkCommissioning::Instance> sWiFiNetworkCommissionin
 app::Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kRootEndpointId, &sEthernetDriver);
 #endif // CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
 
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+auto exampleAccessRestrictionProvider = std::make_unique<ExampleAccessRestrictionProvider>();
+#endif
+
 void EnableThreadNetworkCommissioning()
 {
 #if CHIP_APP_MAIN_HAS_THREAD_DRIVER
@@ -186,23 +212,24 @@ void InitNetworkCommissioning()
         emberAfEndpointEnableDisable(sSecondaryNetworkCommissioningEndpoint.Value(), false);
     }
 
-    const bool kThreadEnabled = {
+    bool isThreadEnabled = false;
 #if CHIP_APP_MAIN_HAS_THREAD_DRIVER
-        LinuxDeviceOptions::GetInstance().mThread
-#else
-        false
-#endif
-    };
+    isThreadEnabled = LinuxDeviceOptions::GetInstance().mThread;
+#endif // CHIP_APP_MAIN_HAS_THREAD_DRIVER
 
-    const bool kWiFiEnabled = {
+    bool isWiFiEnabled = false;
 #if CHIP_APP_MAIN_HAS_WIFI_DRIVER
-        LinuxDeviceOptions::GetInstance().mWiFi
-#else
-        false
-#endif
-    };
+    isWiFiEnabled = LinuxDeviceOptions::GetInstance().mWiFi;
 
-    if (kThreadEnabled && kWiFiEnabled)
+    // On Linux, command-line indicates whether Wi-Fi is supported since determining it from
+    // the OS level is not easily portable.
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+    sWiFiDriver.Set5gSupport(LinuxDeviceOptions::GetInstance().wifiSupports5g);
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
+
+#endif // CHIP_APP_MAIN_HAS_WIFI_DRIVER
+
+    if (isThreadEnabled && isWiFiEnabled)
     {
         if (sSecondaryNetworkCommissioningEndpoint.HasValue())
         {
@@ -217,11 +244,11 @@ void InitNetworkCommissioning()
             EnableThreadNetworkCommissioning();
         }
     }
-    else if (kThreadEnabled)
+    else if (isThreadEnabled)
     {
         EnableThreadNetworkCommissioning();
     }
-    else if (kWiFiEnabled)
+    else if (isWiFiEnabled)
     {
         EnableWiFiNetworkCommissioning(kRootEndpointId);
     }
@@ -238,15 +265,15 @@ void InitNetworkCommissioning()
 using chip::Shell::Engine;
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 /*
  * The device shall check every kWiFiStartCheckTimeUsec whether Wi-Fi management
  * has been fully initialized. If after kWiFiStartCheckAttempts Wi-Fi management
  * still hasn't been initialized, the device configuration is reset, and device
  * needs to be paired again.
  */
-static constexpr useconds_t kWiFiStartCheckTimeUsec = 100 * 1000; // 100 ms
-static constexpr uint8_t kWiFiStartCheckAttempts    = 5;
+static constexpr useconds_t kWiFiStartCheckTimeUsec = WIFI_START_CHECK_TIME_USEC;
+static constexpr uint8_t kWiFiStartCheckAttempts    = WIFI_START_CHECK_ATTEMPTS;
 #endif
 
 namespace {
@@ -263,6 +290,11 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     if (event->Type == DeviceLayer::DeviceEventType::kCHIPoBLEConnectionEstablished)
     {
         ChipLogProgress(DeviceLayer, "Receive kCHIPoBLEConnectionEstablished");
+    }
+    else if ((event->Type == chip::DeviceLayer::DeviceEventType::kInternetConnectivityChange))
+    {
+        // Restart the server on connectivity change
+        app::DnssdServer::Instance().StartServer();
     }
 }
 
@@ -298,7 +330,7 @@ void StopSignalHandler(int signal)
 
 } // namespace
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 static bool EnsureWiFiIsStarted()
 {
     for (int cnt = 0; cnt < kWiFiStartCheckAttempts; cnt++)
@@ -315,34 +347,13 @@ static bool EnsureWiFiIsStarted()
 }
 #endif
 
-class SampleTestEventTriggerDelegate : public TestEventTriggerDelegate
+class SampleTestEventTriggerHandler : public TestEventTriggerHandler
 {
-public:
-    /// NOTE: If you copy this, please use the reserved range FFFF_FFFF_<VID_HEX>_xxxx for your trigger codes.
+    /// NOTE: If you copy this for NON-STANDARD CLUSTERS OR USAGES, please use the reserved range FFFF_FFFF_<VID_HEX>_xxxx for your
+    /// trigger codes. NOTE: Standard codes are <CLUSTER_ID_HEX>_xxxx_xxxx_xxxx.
     static constexpr uint64_t kSampleTestEventTriggerAlwaysSuccess = static_cast<uint64_t>(0xFFFF'FFFF'FFF1'0000ull);
 
-    SampleTestEventTriggerDelegate() { memset(&mEnableKey[0], 0, sizeof(mEnableKey)); }
-
-    /**
-     * @brief Initialize the delegate with a key and an optional other handler
-     *
-     * The `otherDelegate` will be called if there is no match of the eventTrigger
-     * when HandleEventTrigger is called, if it is non-null.
-     *
-     * @param enableKey - EnableKey to use for this instance.
-     * @param otherDelegate - Other delegate (e.g. OTA delegate) where defer trigger. Can be nullptr
-     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if enableKey is wrong size.
-     */
-    CHIP_ERROR Init(ByteSpan enableKey, TestEventTriggerDelegate * otherDelegate)
-    {
-        VerifyOrReturnError(enableKey.size() == sizeof(mEnableKey), CHIP_ERROR_INVALID_ARGUMENT);
-        mOtherDelegate = otherDelegate;
-        MutableByteSpan ourEnableKeySpan(mEnableKey);
-        return CopySpanToMutableSpan(enableKey, ourEnableKeySpan);
-    }
-
-    bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override { return enableKey.data_equal(ByteSpan(mEnableKey)); }
-
+public:
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override
     {
         ChipLogProgress(Support, "Saw TestEventTrigger: " ChipLogFormatX64, ChipLogValueX64(eventTrigger));
@@ -354,12 +365,8 @@ public:
             return CHIP_NO_ERROR;
         }
 
-        return (mOtherDelegate != nullptr) ? mOtherDelegate->HandleEventTrigger(eventTrigger) : CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
-
-private:
-    uint8_t mEnableKey[TestEventTriggerDelegate::kEnableKeyLength];
-    TestEventTriggerDelegate * mOtherDelegate = nullptr;
 };
 
 int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
@@ -369,11 +376,14 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #if CONFIG_NETWORK_LAYER_BLE
     RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kBLE;
 #else  // CONFIG_NETWORK_LAYER_BLE
-    RendezvousInformationFlag rendezvousFlags = RendezvousInformationFlag::kOnNetwork;
+    RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kOnNetwork;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 #ifdef CONFIG_RENDEZVOUS_MODE
     rendezvousFlags = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    rendezvousFlags.Set(RendezvousInformationFlag::kWiFiPAF);
 #endif
 
     err = Platform::MemoryInit();
@@ -425,7 +435,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     }
 
 #if defined(PW_RPC_ENABLED)
-    rpc::Init();
+    rpc::Init(LinuxDeviceOptions::GetInstance().rpcServerPort);
     ChipLogProgress(NotSpecified, "PW_RPC initialized.");
 #endif // defined(PW_RPC_ENABLED)
 
@@ -462,9 +472,10 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (LinuxDeviceOptions::GetInstance().mWiFi)
     {
+        // Start WiFi management in Concurrent mode
         DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
         if (!EnsureWiFiIsStarted())
         {
@@ -472,6 +483,20 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    ChipLogProgress(NotSpecified, "WiFi-PAF: initialzing");
+    if (LinuxDeviceOptions::GetInstance().mWiFi)
+    {
+        if (EnsureWiFiIsStarted())
+        {
+            ChipLogProgress(NotSpecified, "Wi-Fi Management started");
+            DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
+            args.enable  = LinuxDeviceOptions::GetInstance().mWiFiPAF;
+            args.ExtCmds = LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds;
+            DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(args);
+        }
+    }
+#endif
 
 #if CHIP_ENABLE_OPENTHREAD
     if (LinuxDeviceOptions::GetInstance().mThread)
@@ -532,25 +557,44 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
         initParams.operationalKeystore = &LinuxDeviceOptions::GetInstance().mCSRResponseOptions.badCsrOperationalKeyStoreForTest;
     }
 
-    TestEventTriggerDelegate * otherDelegate = nullptr;
+    // For general testing of TestEventTrigger, we have a common "core" event trigger delegate.
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
+    static SampleTestEventTriggerHandler sTestEventTriggerHandler;
+    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey)) ==
+                CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sTestEventTriggerHandler) == CHIP_NO_ERROR);
+
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     // We want to allow triggering OTA queries if OTA requestor is enabled
-    static OTATestEventTriggerDelegate otaTestEventTriggerDelegate{ ByteSpan(
-        LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey) };
-    otherDelegate = &otaTestEventTriggerDelegate;
+    static OTATestEventTriggerHandler sOtaTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER
-    static SmokeCOTestEventTriggerDelegate smokeCOTestEventTriggerDelegate{
-        ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey), otherDelegate
-    };
-    otherDelegate = &smokeCOTestEventTriggerDelegate;
+    static SmokeCOTestEventTriggerHandler sSmokeCOTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sSmokeCOTestEventTriggerHandler);
 #endif
-    // For general testing of TestEventTrigger, we have a common "core" event trigger delegate.
-    static SampleTestEventTriggerDelegate testEventTriggerDelegate;
-    VerifyOrDie(testEventTriggerDelegate.Init(ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey),
-                                              otherDelegate) == CHIP_NO_ERROR);
+#if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
+    static BooleanStateConfigurationTestEventTriggerHandler sBooleanStateConfigurationTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sBooleanStateConfigurationTestEventTriggerHandler);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
+    static EnergyEvseTestEventTriggerHandler sEnergyEvseTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sEnergyEvseTestEventTriggerHandler);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
+    static EnergyReportingTestEventTriggerHandler sEnergyReportingTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sEnergyReportingTestEventTriggerHandler);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER
+    static WaterHeaterManagementTestEventTriggerHandler sWaterHeaterManagementTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sWaterHeaterManagementTestEventTriggerHandler);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
+    static DeviceEnergyManagementTestEventTriggerHandler sDeviceEnergyManagementTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler);
+#endif
 
-    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     // We need to set DeviceInfoProvider before Server::Init to setup the storage of DeviceInfoProvider properly.
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
@@ -558,8 +602,38 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     chip::app::RuntimeOptionsProvider::Instance().SetSimulateNoInternalTime(
         LinuxDeviceOptions::GetInstance().mSimulateNoInternalTime);
 
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    initParams.accessRestrictionProvider = exampleAccessRestrictionProvider.get();
+#endif
+
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    if (LinuxDeviceOptions::GetInstance().commissioningArlEntries.HasValue())
+    {
+        exampleAccessRestrictionProvider->SetCommissioningEntries(
+            LinuxDeviceOptions::GetInstance().commissioningArlEntries.Value());
+    }
+
+    if (LinuxDeviceOptions::GetInstance().arlEntries.HasValue())
+    {
+        // This example use of the ARL feature proactively installs the provided entries on fabric index 1
+        exampleAccessRestrictionProvider->SetEntries(1, LinuxDeviceOptions::GetInstance().arlEntries.Value());
+    }
+#endif
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    // Set ReadHandler Capacity for Subscriptions
+    chip::app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(
+        LinuxDeviceOptions::GetInstance().subscriptionCapacity);
+    chip::app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    // Set subscription time resumption retry interval seconds
+    chip::app::InteractionModelEngine::GetInstance()->SetSubscriptionTimeoutResumptionRetryIntervalSeconds(
+        LinuxDeviceOptions::GetInstance().subscriptionResumptionRetryIntervalSec);
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     // Now that the server has started and we are done with our startup logging,
     // log our discovery/onboarding information again so it's not lost in the
@@ -605,15 +679,15 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     ApplicationShutdown();
 
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    ShutdownCommissioner();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-
 #if defined(ENABLE_CHIP_SHELL)
     shellThread.join();
 #endif
 
     Server::GetInstance().Shutdown();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    ShutdownCommissioner();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #if ENABLE_TRACING
     tracing_setup.StopTracing();

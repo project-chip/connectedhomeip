@@ -1,17 +1,18 @@
-# CHIP Linux Air Quality Example
+# Matter Linux Air Quality Example
 
-An example showing the use of CHIP on the Linux. The document will describe how
-to build and run CHIP Linux Air Quality Example on Raspberry Pi. This doc is
-tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu
+An example showing the use of Matter on the Linux. The document will describe
+how to build and run Matter Linux Air Quality Example on Raspberry Pi. This doc
+is tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu
 for Raspberry Pi Desktop 20.10 (aarch64)**
 
 To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 **EVK**, see the associated
-[README document](../../../docs/guides/nxp_imx8m_linux_examples.md) for details.
+[README document](../../../docs/guides/nxp/nxp_imx8m_linux_examples.md) for
+details.
 
 <hr>
 
--   [CHIP Linux Air Quality Example](#chip-linux-air-quality-example)
+-   [Matter Linux Air Quality Example](#matter-linux-air-quality-example)
     -   [Building](#building)
     -   [Commandline Arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
@@ -74,8 +75,8 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 
     1. A Raspberry Pi 4 board
     2. A USB Bluetooth Dongle, Ubuntu desktop will send Bluetooth advertisement,
-       which will block CHIP from connecting via BLE. On Ubuntu server, you need
-       to install `pi-bluetooth` via APT.
+       which will block Matter from connecting via BLE. On Ubuntu server, you
+       need to install `pi-bluetooth` via APT.
     3. Ubuntu 20.04 or newer image for ARM64 platform.
 
 -   Building
@@ -136,10 +137,11 @@ $ echo '{"Name":"TemperatureMeasurement","NewValue":1800}' > /tmp/chip_air_quali
 
 ### Trigger Humidity change event
 
-Generate event `RelativeHumidityMeasurement`, to change the temperate value.
+Generate event `RelativeHumidityMeasurement`, to change the relative humidity
+value (6000 for 60,0 %).
 
 ```
-$ echo '{"Name":"RelativeHumidityMeasurement","NewValue":60}' > /tmp/chip_air_quality_fifo_<PID>
+$ echo '{"Name":"RelativeHumidityMeasurement","NewValue":6000}' > /tmp/chip_air_quality_fifo_<PID>
 ```
 
 ### Trigger concentration change event
@@ -151,4 +153,42 @@ Generate event `CarbonDioxideConcentrationMeasurement`, to change the CO2 value.
 
 ```
 $ echo '{"Name":"CarbonDioxideConcentrationMeasurement","NewValue":400}' > /tmp/chip_air_quality_fifo_<PID>
+```
+
+Generate event `CarbonMonoxideConcentrationMeasurement`, to change the CO value.
+
+```
+$ echo '{"Name":"CarbonMonoxideConcentrationMeasurement","NewValue":1}' > /tmp/chip_air_quality_fifo_<PID>
+```
+
+Generate event `NitrogenDioxideConcentrationMeasurement`, to change the NO₂
+value.
+
+```
+$ echo '{"Name":"NitrogenDioxideConcentrationMeasurement","NewValue":1}' > /tmp/chip_air_quality_fifo_<PID>
+```
+
+Generate event `Pm1ConcentrationMeasurement`, to change the PM1 value.
+
+```
+echo '{"Name":"Pm1ConcentrationMeasurement","NewValue":1}' > /tmp/chip_air_quality_fifo_<PID>
+```
+
+Generate event `Pm25ConcentrationMeasurement`, to change the PM2.5 value.
+
+```
+echo '{"Name":"Pm25ConcentrationMeasurement","NewValue":2.5}' > /tmp/chip_air_quality_fifo_<PID>
+```
+
+Generate event `Pm10ConcentrationMeasurement`, to change the PM10 value.
+
+```
+echo '{"Name":"Pm10ConcentrationMeasurement","NewValue":10}' > /tmp/chip_air_quality_fifo_<PID>
+```
+
+Generate event `TotalVolatileOrganicCompoundsConcentrationMeasurement`, to
+change the TVOC value.
+
+```
+$ echo '{"Name":"TotalVolatileOrganicCompoundsConcentrationMeasurement","NewValue":100}' > /tmp/chip_air_quality_fifo_<PID>
 ```

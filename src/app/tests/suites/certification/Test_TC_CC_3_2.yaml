@@ -86,41 +86,45 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 10s"
+    - label: "Wait 5s"
       PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 10000
+                value: 5000
 
-    - label: "Step 2c: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              minValue: 215
-              maxValue: 255
-
-    - label: "Wait 10s"
-      PICS: CC.S.F00
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 10000
-
+    #Tolerance to be computed from the range (note)
+    # In 5 seconds, the value will have changed by 25. A 15% tolerance is 1.7, so ~2, and value must be 225 +/- 2
     - label: "Step 2d: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 38
-              maxValue: 52
+              minValue: 223
+              maxValue: 227
+
+    - label: "Wait 15s"
+      PICS: CC.S.F00
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 15000
+
+    # Tolerance to be computed from the range (20*5=100) that hue changed (note that hue reaches max, wraps back to 0 then continues from min value)
+    # In 20s the value will have changed by 100 and wrapped around to 45. A 15% tolerance is 15, so 30 to 60
+    - label: "Step 2d: TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 30
+              maxValue: 60
 
     - label: "Wait 10s"
       PICS: CC.S.F00
@@ -147,14 +151,16 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
+    #Tolerance to be computed from the range
+    #Start value 200, expected value 95, 200 - 95 = 155, 105 % 15 = 16 , So 95+/-16
     - label: "Step 2f: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 80
-              maxValue: 110
+              minValue: 79
+              maxValue: 111
 
     - label: "Wait 2s"
       PICS: CC.S.F00
@@ -171,8 +177,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 80
-              maxValue: 110
+              minValue: 79
+              maxValue: 111
 
     - label:
           "Step 3a: TH sends MoveToHue command to DUT with Hue=60,
@@ -326,6 +332,58 @@ tests:
           constraints:
               minValue: 0
               maxValue: 3
+
+    - label:
+          "Step 5a: TH sends MoveHue command to DUT with MoveMode=0x01 (up) and
+          Rate=0 (units/s)"
+      PICS: CC.S.F00 && CC.S.C01.Rsp
+      command: "MoveHue"
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 1
+              - name: "Rate"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 5b: TH sends MoveHue command to DUT with MoveMode=0x03 (down)
+          and Rate=0 (units/s)"
+      PICS: CC.S.F00 && CC.S.C01.Rsp
+      command: "MoveHue"
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 3
+              - name: "Rate"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 5c: TH sends MoveHue command to DUT with MoveMode=0x00 (stop)
+          and Rate=0 (units/s)"
+      PICS: CC.S.F00 && CC.S.C01.Rsp
+      command: "MoveHue"
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 0
+              - name: "Rate"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
     - label: "Turn off light that we turned on"
       PICS: OO.S.C00.Rsp

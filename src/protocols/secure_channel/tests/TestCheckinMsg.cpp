@@ -16,257 +16,493 @@
  *    limitations under the License.
  */
 
-#include <protocols/secure_channel/CheckinMessage.h>
+#include <pw_unit_test/framework.h>
 
 #include <crypto/DefaultSessionKeystore.h>
+#include <crypto/RandUtils.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <protocols/Protocols.h>
+#include <protocols/secure_channel/CheckinMessage.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/StatusReport.h>
+#include <protocols/secure_channel/tests/CheckIn_Message_test_vectors.h>
 #include <transport/CryptoContext.h>
-
-#include <crypto/tests/AES_CCM_128_test_vectors.h>
-
-#include <crypto/RandUtils.h>
-
-#include <lib/support/UnitTestExtendedAssertions.h>
-#include <lib/support/UnitTestRegistration.h>
-#include <nlunit-test.h>
 
 using namespace chip;
 using namespace chip::Protocols;
 using namespace chip::Protocols::SecureChannel;
+using namespace chip::Crypto;
 using TestSessionKeystoreImpl = Crypto::DefaultSessionKeystore;
 
-void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
+namespace {
+
+/**
+ * @brief Helper function that generates the Check-In message based on the test vector
+ *        and verifies the generated Check-In message
+ *        Helper is to avoid having the same code three times in different tests
+ *
+ * @return CHIP_NO_ERROR if the generation was successful
+ *         error code if the generation failed - see GenerateCheckinMessagePayload
+ */
+CHIP_ERROR GenerateAndVerifyPayload(MutableByteSpan & output, const CheckIn_Message_test_vector & vector)
 {
-    uint8_t a[300] = { 0 };
-    uint8_t b[300] = { 0 };
-    MutableByteSpan outputBuffer{ a };
-    MutableByteSpan oldOutputBuffer{ b };
-    uint32_t counter = 0;
-    ByteSpan userData;
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TestSessionKeystoreImpl keystore;
 
-    // Verify that keys imported to the keystore behave as expected.
-    for (const ccm_128_test_vector * testPtr : ccm_128_test_vectors)
+    // Two distinct key material buffers to ensure crypto-hardware-assist with single-usage keys create two different handles.
+    Symmetric128BitsKeyByteArray aesKeyMaterial;
+    memcpy(aesKeyMaterial, vector.key, vector.key_len);
+
+    Symmetric128BitsKeyByteArray hmacKeyMaterial;
+    memcpy(hmacKeyMaterial, vector.key, vector.key_len);
+
+    Aes128KeyHandle aes128KeyHandle;
+    EXPECT_EQ(keystore.CreateKey(aesKeyMaterial, aes128KeyHandle), CHIP_NO_ERROR);
+
+    Hmac128KeyHandle hmac128KeyHandle;
+    EXPECT_EQ(keystore.CreateKey(hmacKeyMaterial, hmac128KeyHandle), CHIP_NO_ERROR);
+
+    // Create application data ByteSpan
+    ByteSpan applicationData(vector.application_data, vector.application_data_len);
+
+    // Verify that the generation succeeded
+    CHIP_ERROR err =
+        CheckinMessage::GenerateCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, vector.counter, applicationData, output);
+    if (err != CHIP_NO_ERROR)
     {
-        const ccm_128_test_vector & test = *testPtr;
+        keystore.DestroyKey(aes128KeyHandle);
+        keystore.DestroyKey(hmac128KeyHandle);
 
-        Aes128KeyByteArray keyMaterial;
-        memcpy(keyMaterial, test.key, test.key_len);
-
-        Aes128KeyHandle keyHandle;
-        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
-
-        // Validate that counter change, indeed changes the output buffer content
-        counter = 0;
-        for (uint8_t j = 0; j < 5; j++)
-        {
-            err = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, userData, outputBuffer);
-            NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
-
-            // Verifiy that the output buffer changed
-            NL_TEST_ASSERT(inSuite, !outputBuffer.data_equal(oldOutputBuffer));
-            CopySpanToMutableSpan(outputBuffer, oldOutputBuffer);
-
-            // Increment by a random count. On the slim changes the increment is 0 add 1 to change output buffer
-            counter += chip::Crypto::GetRandU32() + 1;
-            outputBuffer = MutableByteSpan(a);
-        }
-        keystore.DestroyKey(keyHandle);
+        return err;
     }
 
-    // Parameter check
+    // Validate Full payload
+    EXPECT_EQ(output.size(), vector.payload_len);
+    EXPECT_EQ(memcmp(vector.payload, output.data(), output.size()), 0);
+
+    size_t cursorIndex = 0;
+
+    // Validate Nonce
+    MutableByteSpan nonce = output.SubSpan(cursorIndex, vector.nonce_len);
+    EXPECT_EQ(memcmp(vector.nonce, nonce.data(), nonce.size()), 0);
+    cursorIndex += nonce.size();
+
+    // Validate ciphertext
+    MutableByteSpan ciphertext = output.SubSpan(cursorIndex, vector.ciphertext_len);
+    EXPECT_EQ(memcmp(vector.ciphertext, ciphertext.data(), ciphertext.size()), 0);
+    cursorIndex += ciphertext.size();
+
+    // Validate MIC
+    MutableByteSpan mic = output.SubSpan(cursorIndex, vector.mic_len);
+    EXPECT_EQ(memcmp(vector.mic, mic.data(), mic.size()), 0);
+    cursorIndex += mic.size();
+
+    // Clean up
+    keystore.DestroyKey(aes128KeyHandle);
+    keystore.DestroyKey(hmac128KeyHandle);
+
+    return err;
+}
+
+/**
+ * @brief Helper function that parses the Check-In message based on the test vector
+ *        and verifies parsed Check-In message
+ *        Helper is to avoid having the same code in multiple tests
+ *
+ * @return CHIP_NO_ERROR if the parsing was successful
+ *         error code if the generation failed - see ParseCheckinMessagePayload
+ */
+CHIP_ERROR ParseAndVerifyPayload(MutableByteSpan & applicationData, const CheckIn_Message_test_vector & vector,
+                                 bool injectInvalidNonce)
+{
+    TestSessionKeystoreImpl keystore;
+
+    // Copy payload to be able to modify it for invalid nonce tests
+    uint8_t payloadBuffer[300] = { 0 };
+    memcpy(payloadBuffer, vector.payload, vector.payload_len);
+
+    if (injectInvalidNonce)
     {
-        uint8_t data[]                                               = { "This is some user Data. It should be encrypted" };
-        userData                                                     = chip::ByteSpan(data);
-        const ccm_128_test_vector & test                             = *ccm_128_test_vectors[0];
-        uint8_t gargantuaBuffer[2 * CheckinMessage::sMaxAppDataSize] = { 0 };
-
-        Aes128KeyByteArray keyMaterial;
-        memcpy(keyMaterial, test.key, test.key_len);
-
-        Aes128KeyHandle keyHandle;
-        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
-
-        // As of now passing an empty key handle while using PSA crypto will result in a failure.
-        // However when using OpenSSL this same test result in a success.
-        // Issue #28986
-
-        // Aes128KeyHandle emptyKeyHandle;
-        // err = CheckinMessage::GenerateCheckinMessagePayload(emptyKeyHandle, counter, userData, outputBuffer);
-        // ChipLogError(Inet, "%s", err.AsString());
-        // NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
-
-        ByteSpan emptyData;
-        err = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, emptyData, outputBuffer);
-        NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
-
-        MutableByteSpan empty;
-        err = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, emptyData, empty);
-        NL_TEST_ASSERT(inSuite, (CHIP_ERROR_INVALID_ARGUMENT == err));
-
-        userData = chip::ByteSpan(gargantuaBuffer, sizeof(gargantuaBuffer));
-        err      = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, userData, outputBuffer);
-        NL_TEST_ASSERT(inSuite, (CHIP_ERROR_INVALID_ARGUMENT == err));
-
-        // Cleanup
-        keystore.DestroyKey(keyHandle);
+        // Modify nonce to validate that the parsing can detect that the message was manipulated
+        payloadBuffer[0] ^= 0xFF;
     }
-}
 
-void TestCheckin_Parse(nlTestSuite * inSuite, void * inContext)
-{
-    uint8_t a[300] = { 0 };
-    uint8_t b[300] = { 0 };
-    MutableByteSpan outputBuffer{ a };
-    MutableByteSpan buffer{ b };
-    uint32_t counter = 0, decryptedCounter;
-    ByteSpan userData;
+    // Create payload byte span
+    ByteSpan payload(payloadBuffer, vector.payload_len);
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CounterType decryptedCounter = 0;
 
-    TestSessionKeystoreImpl keystore;
+    // Two distinct key material buffers to ensure crypto-hardware-assist with single-usage keys create two different handles.
+    Symmetric128BitsKeyByteArray aesKeyMaterial;
+    memcpy(aesKeyMaterial, vector.key, vector.key_len);
 
-    // Verify User Data Encryption Decryption
-    uint8_t data[]                   = { "This is some user Data. It should be encrypted" };
-    userData                         = chip::ByteSpan(data);
-    const ccm_128_test_vector & test = *ccm_128_test_vectors[0];
+    Symmetric128BitsKeyByteArray hmacKeyMaterial;
+    memcpy(hmacKeyMaterial, vector.key, vector.key_len);
 
-    Aes128KeyByteArray keyMaterial;
-    memcpy(keyMaterial, test.key, test.key_len);
+    Aes128KeyHandle aes128KeyHandle;
+    EXPECT_EQ(keystore.CreateKey(aesKeyMaterial, aes128KeyHandle), CHIP_NO_ERROR);
 
-    Aes128KeyHandle keyHandle;
-    NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
+    Hmac128KeyHandle hmac128KeyHandle;
+    EXPECT_EQ(keystore.CreateKey(hmacKeyMaterial, hmac128KeyHandle), CHIP_NO_ERROR);
 
-    //=================Encrypt=======================
-
-    err              = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, userData, outputBuffer);
-    ByteSpan payload = chip::ByteSpan(outputBuffer.data(), outputBuffer.size());
-    NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
-
-    //=================Decrypt=======================
-
-    MutableByteSpan empty;
-    err = CheckinMessage::ParseCheckinMessagePayload(keyHandle, payload, decryptedCounter, empty);
-    NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR != err));
-
-    ByteSpan emptyPayload;
-    err = CheckinMessage::ParseCheckinMessagePayload(keyHandle, emptyPayload, decryptedCounter, buffer);
-    NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR != err));
-}
-
-void TestCheckin_GenerateParse(nlTestSuite * inSuite, void * inContext)
-{
-    uint8_t a[300] = { 0 };
-    uint8_t b[300] = { 0 };
-    MutableByteSpan outputBuffer{ a };
-    MutableByteSpan buffer{ b };
-    uint32_t counter = 0xDEADBEEF;
-    ByteSpan userData;
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    TestSessionKeystoreImpl keystore;
-
-    // Verify User Data Encryption Decryption
-    uint8_t data[] = { "This is some user Data. It should be encrypted" };
-    userData       = chip::ByteSpan(data);
-    for (const ccm_128_test_vector * testPtr : ccm_128_test_vectors)
+    // Verify that the Parsing succeeded
+    CHIP_ERROR err =
+        CheckinMessage::ParseCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, payload, decryptedCounter, applicationData);
+    if (err != CHIP_NO_ERROR)
     {
-        const ccm_128_test_vector & test = *testPtr;
+        keystore.DestroyKey(aes128KeyHandle);
+        keystore.DestroyKey(hmac128KeyHandle);
 
-        Aes128KeyByteArray keyMaterial;
-        memcpy(keyMaterial, test.key, test.key_len);
+        return err;
+    }
 
-        Aes128KeyHandle keyHandle;
-        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
+    // Verify decrypted counter value
+    EXPECT_EQ(vector.counter, decryptedCounter);
 
-        //=================Encrypt=======================
+    // Verify application data
+    EXPECT_EQ(vector.application_data_len, applicationData.size());
+    EXPECT_EQ(memcmp(vector.application_data, applicationData.data(), applicationData.size()), 0);
 
-        err = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, userData, outputBuffer);
-        NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
+    // Cleanup
+    keystore.DestroyKey(aes128KeyHandle);
+    keystore.DestroyKey(hmac128KeyHandle);
 
-        //=================Decrypt=======================
-        uint32_t decryptedCounter = 0;
-        ByteSpan payload          = chip::ByteSpan(outputBuffer.data(), outputBuffer.size());
+    return err;
+}
 
-        err = CheckinMessage::ParseCheckinMessagePayload(keyHandle, payload, decryptedCounter, buffer);
-        NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
+/**
+ * @brief Test verifies that the Check-In message generation is successful when using an output size equal to the payload size
+ */
+TEST(TestCheckInMsg, TestCheckinMessageGenerate_ValidInputsSameSizeOutputAsPayload)
+{
+    int numOfTestCases = ArraySize(checkIn_message_test_vectors);
+    for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
+    {
+        CheckIn_Message_test_vector vector = checkIn_message_test_vectors[numOfTestsExecuted];
 
-        NL_TEST_ASSERT(inSuite, (memcmp(data, buffer.data(), sizeof(data)) == 0));
-        NL_TEST_ASSERT(inSuite, (counter == decryptedCounter));
+        // Create output buffer
+        uint8_t buffer[300] = { 0 };
+        MutableByteSpan output(buffer, sizeof(buffer));
 
-        // reset buffers
-        memset(a, 0, sizeof(a));
-        memset(b, 0, sizeof(b));
-        outputBuffer = MutableByteSpan(a);
-        buffer       = MutableByteSpan(b);
+        // Force output buffer to the payload size
+        output.reduce_size(vector.payload_len);
 
-        counter += chip::Crypto::GetRandU32() + 1;
-        keystore.DestroyKey(keyHandle);
+        EXPECT_EQ(GenerateAndVerifyPayload(output, vector), CHIP_NO_ERROR);
     }
 }
 
-// Test Suite
-
 /**
- *  Test Suite that lists all the test functions.
+ * @brief Test verifies that the Check-In message generation is successful when using an output size greater than the payload size
  */
-// clang-format off
-static const nlTest sTests[] =
+TEST(TestCheckInMsg, TestCheckinMessageGenerate_ValidInputsBiggerSizeOutput)
 {
-    NL_TEST_DEF("TestCheckin_Generate", TestCheckin_Generate),
-    NL_TEST_DEF("TestCheckin_Parse", TestCheckin_Parse),
-    NL_TEST_DEF("TestCheckin_GenerateParse", TestCheckin_GenerateParse),
+    int numOfTestCases = ArraySize(checkIn_message_test_vectors);
+    for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
+    {
+        CheckIn_Message_test_vector vector = checkIn_message_test_vectors[numOfTestsExecuted];
 
-    NL_TEST_SENTINEL()
-};
-// clang-format on
+        // Create output buffer
+        uint8_t buffer[300] = { 0 };
+        MutableByteSpan output(buffer, sizeof(buffer));
 
-/**
- *  Set up the test suite.
- */
-static int TestSetup(void * inContext)
-{
-    CHIP_ERROR error = chip::Platform::MemoryInit();
-    if (error != CHIP_NO_ERROR)
-        return FAILURE;
-    return SUCCESS;
+        EXPECT_EQ(GenerateAndVerifyPayload(output, vector), CHIP_NO_ERROR);
+    }
 }
 
 /**
- *  Tear down the test suite.
+ * @brief Test verifies that the Check-In message generation returns an error if the output buffer is too small
  */
-static int TestTeardown(void * inContext)
+TEST(TestCheckInMsg, TestCheckinMessageGenerate_ValidInputsTooSmallOutput)
 {
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
+    CheckIn_Message_test_vector vector = checkIn_message_test_vectors[0];
 
-// clang-format off
-static nlTestSuite sSuite =
-{
-    "Test-CHIP-Checkin-Message",
-    &sTests[0],
-    TestSetup,
-    TestTeardown,
-};
-// clang-format on
+    // Create output buffer with 0 size
+    MutableByteSpan output;
+    EXPECT_EQ(GenerateAndVerifyPayload(output, vector), CHIP_ERROR_BUFFER_TOO_SMALL);
+}
 
 /**
- *  Main
+ * @brief Test verifies that the Check-In Message generations returns an error if the AesKeyHandle is empty
  */
-int TestCheckinMessage()
+TEST(TestCheckInMsg, TestCheckInMessageGenerate_EmptyAesKeyHandle)
 {
-    // Run test suit against one context
-    nlTestRunner(&sSuite, nullptr);
+    TestSessionKeystoreImpl keystore;
+    CheckIn_Message_test_vector vector = checkIn_message_test_vectors[0];
 
-    return (nlTestRunnerStats(&sSuite));
+    // Create output buffer
+    uint8_t buffer[300] = { 0 };
+    MutableByteSpan output(buffer, sizeof(buffer));
+
+    // Force output buffer to the payload size
+    output.reduce_size(vector.payload_len);
+
+    // Empty AES Key handle
+    Aes128KeyHandle aes128KeyHandle;
+
+    Symmetric128BitsKeyByteArray hmacKeyMaterial;
+    memcpy(hmacKeyMaterial, vector.key, vector.key_len);
+
+    Hmac128KeyHandle hmac128KeyHandle;
+    EXPECT_EQ(keystore.CreateKey(hmacKeyMaterial, hmac128KeyHandle), CHIP_NO_ERROR);
+
+    // Create application data ByteSpan
+    ByteSpan applicationData(vector.application_data, vector.application_data_len);
+
+/*
+    TODO(#28986): Passing an empty key handle while using PSA crypto will result in a failure.
+                  When using OpenSSL this same test result in a success.
+*/
+#if 0
+    // Verify that the generation fails with an empty key handle
+    EXPECT_NE(
+        CHIP_NO_ERROR,
+        CheckinMessage::GenerateCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, vector.counter, applicationData, output));
+#endif
+
+    // Clean up
+    keystore.DestroyKey(hmac128KeyHandle);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestCheckinMessage)
+/**
+ * @brief Test verifies that the Check-In Message generations returns an error if the HmacKeyHandle is empty
+ */
+TEST(TestCheckInMsg, TestCheckInMessageGenerate_EmptyHmacKeyHandle)
+{
+    TestSessionKeystoreImpl keystore;
+    CheckIn_Message_test_vector vector = checkIn_message_test_vectors[0];
+
+    // Create output buffer
+    uint8_t buffer[300] = { 0 };
+    MutableByteSpan output(buffer, sizeof(buffer));
+
+    // Force output buffer to the payload size
+    output.reduce_size(vector.payload_len);
+
+    Symmetric128BitsKeyByteArray aesKeyMaterial;
+    memcpy(aesKeyMaterial, vector.key, vector.key_len);
+
+    Aes128KeyHandle aes128KeyHandle;
+    EXPECT_EQ(keystore.CreateKey(aesKeyMaterial, aes128KeyHandle), CHIP_NO_ERROR);
+
+    Hmac128KeyHandle hmac128KeyHandle;
+
+    // Create application data ByteSpan
+    ByteSpan applicationData(vector.application_data, vector.application_data_len);
+
+/*
+    TODO(#28986): Passing an empty key handle while using PSA crypto will result in a failure.
+                  When using OpenSSL this same test result in a success.
+*/
+#if 0
+    // Verify that the generation fails with an empty key handle
+    EXPECT_NE(
+        CHIP_NO_ERROR,
+        CheckinMessage::GenerateCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, vector.counter, applicationData, output));
+#endif
+
+    // Clean up
+    keystore.DestroyKey(aes128KeyHandle);
+}
+
+/**
+ * @brief Test verifies that the Check-In message parsing succeeds with the Application buffer set to the minimum required size
+ */
+TEST(TestCheckInMsg, TestCheckinMessageParse_ValidInputsSameSizeMinAppData)
+{
+    int numOfTestCases = ArraySize(checkIn_message_test_vectors);
+    for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
+    {
+        CheckIn_Message_test_vector vector = checkIn_message_test_vectors[numOfTestsExecuted];
+
+        uint8_t applicationDataBuffer[128] = { 0 };
+        MutableByteSpan applicationData(applicationDataBuffer, sizeof(applicationDataBuffer));
+        applicationData.reduce_size(vector.application_data_len + sizeof(CounterType));
+
+        EXPECT_EQ(ParseAndVerifyPayload(applicationData, vector, false), CHIP_NO_ERROR);
+    }
+}
+
+/**
+ * @brief Test verifies that the Check-In message parsing succeeds with the Application buffer set to a larger than necessary size
+ */
+TEST(TestCheckInMsg, TestCheckinMessageParse_ValidInputsBiggerSizeMinAppData)
+{
+    int numOfTestCases = ArraySize(checkIn_message_test_vectors);
+    for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
+    {
+        CheckIn_Message_test_vector vector = checkIn_message_test_vectors[numOfTestsExecuted];
+
+        uint8_t applicationDataBuffer[128] = { 0 };
+        MutableByteSpan applicationData(applicationDataBuffer, sizeof(applicationDataBuffer));
+
+        EXPECT_EQ(ParseAndVerifyPayload(applicationData, vector, false), CHIP_NO_ERROR);
+    }
+}
+
+/**
+ * @brief Test verifies that the Check-In message throws an error if the application data buffer is too small
+ */
+TEST(TestCheckInMsg, TestCheckinMessageParse_ValidInputsTooSmallAppData)
+{
+    CheckIn_Message_test_vector vector = checkIn_message_test_vectors[0];
+
+    // Create applicationData buffer with 0 size
+    MutableByteSpan applicationData;
+
+    EXPECT_EQ(ParseAndVerifyPayload(applicationData, vector, false), CHIP_ERROR_BUFFER_TOO_SMALL);
+}
+
+/**
+ * @brief Test verifies that the Check-In Message parsing returns an error if the AesKeyHandle is empty
+ */
+TEST(TestCheckInMsg, TestCheckInMessageParse_EmptyAesKeyHandle)
+{
+    TestSessionKeystoreImpl keystore;
+    CheckIn_Message_test_vector vector = checkIn_message_test_vectors[0];
+
+    // Create application data ByteSpan
+    uint8_t applicationDataBuffer[128] = { 0 };
+    MutableByteSpan applicationData(applicationDataBuffer, sizeof(applicationDataBuffer));
+    applicationData.reduce_size(vector.application_data_len + sizeof(CounterType));
+
+    // Create payload byte span
+    ByteSpan payload(vector.payload, vector.payload_len);
+
+    CounterType decryptedCounter = 0;
+    //
+    (void) decryptedCounter;
+
+    // Empty AES Key handle
+    Aes128KeyHandle aes128KeyHandle;
+
+    Symmetric128BitsKeyByteArray hmacKeyMaterial;
+    memcpy(hmacKeyMaterial, vector.key, vector.key_len);
+
+    Hmac128KeyHandle hmac128KeyHandle;
+    EXPECT_EQ(keystore.CreateKey(hmacKeyMaterial, hmac128KeyHandle), CHIP_NO_ERROR);
+
+/*
+    TODO(#28986): Passing an empty key handle while using PSA crypto will result in a failure.
+                  When using OpenSSL this same test result in a success.
+*/
+#if 0
+    // Verify that the generation fails with an empty key handle
+    EXPECT_NE(
+        CHIP_NO_ERROR,
+        CheckinMessage::ParseCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, payload, decryptedCounter, applicationData));
+#endif
+
+    // Clean up
+    keystore.DestroyKey(hmac128KeyHandle);
+}
+
+/**
+ * @brief Test verifies that the Check-In Message parsing returns an error if the HmacKeyHandle is empty
+ */
+TEST(TestCheckInMsg, TestCheckInMessageParse_EmptyHmacKeyHandle)
+{
+    TestSessionKeystoreImpl keystore;
+    CheckIn_Message_test_vector vector = checkIn_message_test_vectors[0];
+
+    // Create application data ByteSpan
+    uint8_t applicationDataBuffer[128] = { 0 };
+    MutableByteSpan applicationData(applicationDataBuffer, sizeof(applicationDataBuffer));
+    applicationData.reduce_size(vector.application_data_len + sizeof(CounterType));
+
+    // Create payload byte span
+    ByteSpan payload(vector.payload, vector.payload_len);
+
+    CounterType decryptedCounter = 0;
+    //
+    (void) decryptedCounter;
+
+    // Empty Hmac Key handle
+    Hmac128KeyHandle hmac128KeyHandle;
+
+    Symmetric128BitsKeyByteArray aesKeyMaterial;
+    memcpy(aesKeyMaterial, vector.key, vector.key_len);
+
+    Aes128KeyHandle aes128KeyHandle;
+    EXPECT_EQ(keystore.CreateKey(aesKeyMaterial, aes128KeyHandle), CHIP_NO_ERROR);
+
+/*
+    TODO(#28986): Passing an empty key handle while using PSA crypto will result in a failure.
+                  When using OpenSSL this same test result in a success.
+*/
+#if 0
+    // Verify that the generation fails with an empty key handle
+    EXPECT_NE(
+        CHIP_NO_ERROR,
+        CheckinMessage::ParseCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, payload, decryptedCounter, applicationData));
+#endif
+
+    // Clean up
+    keystore.DestroyKey(aes128KeyHandle);
+}
+
+/**
+ * @brief Test verifies that the Check-In message processing throws an error if the nonce is corrupted
+ */
+TEST(TestCheckInMsg, TestCheckinMessageParse_CorruptedNonce)
+{
+    int numOfTestCases = ArraySize(checkIn_message_test_vectors);
+    for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
+    {
+        CheckIn_Message_test_vector vector = checkIn_message_test_vectors[numOfTestsExecuted];
+
+        uint8_t applicationDataBuffer[128] = { 0 };
+        MutableByteSpan applicationData(applicationDataBuffer, sizeof(applicationDataBuffer));
+        applicationData.reduce_size(vector.application_data_len + sizeof(CounterType));
+
+        EXPECT_EQ(ParseAndVerifyPayload(applicationData, vector, true), CHIP_ERROR_INTERNAL);
+    }
+}
+
+/**
+ * @brief Test verifies that the Check-In message processing throws an error if the nonce was not calculated with the counter in the
+ * payload
+ */
+TEST(TestCheckInMsg, TestCheckinMessageParse_InvalidNonce)
+{
+    CheckIn_Message_test_vector vector = invalidNonceVector;
+
+    uint8_t applicationDataBuffer[128] = { 0 };
+    MutableByteSpan applicationData(applicationDataBuffer, sizeof(applicationDataBuffer));
+    applicationData.reduce_size(vector.application_data_len + sizeof(CounterType));
+
+    EXPECT_EQ(ParseAndVerifyPayload(applicationData, vector, true), CHIP_ERROR_INTERNAL);
+}
+
+/**
+ * @brief test verifies that GetAppDataSize returns the correct application data size
+ */
+TEST(TestCheckInMsg, TestCheckInMessagePayloadSize)
+{
+    int numOfTestCases = ArraySize(checkIn_message_test_vectors);
+    for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
+    {
+        CheckIn_Message_test_vector vector = checkIn_message_test_vectors[numOfTestsExecuted];
+
+        ByteSpan payload(vector.payload, vector.payload_len);
+        size_t calculated_size = CheckinMessage::GetAppDataSize(payload);
+
+        // Verify the AppData size matches the expected application data size
+        EXPECT_EQ(vector.application_data_len, calculated_size);
+    }
+}
+
+/**
+ * @brief test verifies that GetAppDataSize returns 0 if the payload is smaller that the minimum size
+ */
+TEST(TestCheckInMsg, TestCheckInMessagePayloadSizeNullBuffer)
+{
+    ByteSpan payload;
+    size_t calculated_size = CheckinMessage::GetAppDataSize(payload);
+    size_t expected_size   = 0;
+
+    // Verify that the size is 0
+    EXPECT_EQ(calculated_size, expected_size);
+}
+
+} // namespace

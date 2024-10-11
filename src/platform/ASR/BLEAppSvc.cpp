@@ -39,7 +39,7 @@ extern "C" {
 }
 #endif
 #include "BLEAppSvc.h"
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/internal/BLEManager.h>
 using namespace chip::DeviceLayer;

@@ -27,13 +27,16 @@
 #include "LowPowerManager.h"
 #include "MediaInputManager.h"
 #include "MediaPlaybackManager.h"
+#include "MessagesManager.h"
 #include "MyUserPrompter-JNI.h"
 #include "OnOffManager.h"
 #include "WakeOnLanManager.h"
+#include "application-launcher/ApplicationLauncherManager.h"
 #include "credentials/DeviceAttestationCredsProvider.h"
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/server/Dnssd.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
+#include <controller/CHIPCluster.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <jni.h>
@@ -41,13 +44,13 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <zap-generated/CHIPClusters.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::AppPlatform;
 using namespace chip::Credentials;
+using namespace chip::Protocols::UserDirectedCommissioning;
 
 #define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_com_matter_tv_server_tvapp_TvApp_##METHOD_NAME
 
@@ -58,10 +61,9 @@ void TvAppJNI::InitializeWithObjects(jobject app)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for TvAppJNI"));
 
-    mTvAppObject = env->NewGlobalRef(app);
-    VerifyOrReturn(mTvAppObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef TvAppJNI"));
+    VerifyOrReturn(mTvAppObject.Init(app) == CHIP_NO_ERROR, ChipLogError(Zcl, "Failed to init mTvAppObject"));
 
-    jclass managerClass = env->GetObjectClass(mTvAppObject);
+    jclass managerClass = env->GetObjectClass(app);
     VerifyOrReturn(managerClass != nullptr, ChipLogError(Zcl, "Failed to get TvAppJNI Java class"));
 
     mPostClusterInitMethod = env->GetMethodID(managerClass, "postClusterInit", "(JI)V");
@@ -76,10 +78,11 @@ void TvAppJNI::PostClusterInit(int clusterId, int endpoint)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for TvAppJNI::PostClusterInit"));
-    VerifyOrReturn(mTvAppObject != nullptr, ChipLogError(Zcl, "TvAppJNI::mTvAppObject null"));
+    VerifyOrReturn(mTvAppObject.HasValidObjectRef(), ChipLogError(Zcl, "TvAppJNI::mTvAppObject is not valid"));
     VerifyOrReturn(mPostClusterInitMethod != nullptr, ChipLogError(Zcl, "TvAppJNI::mPostClusterInitMethod null"));
 
-    env->CallVoidMethod(mTvAppObject, mPostClusterInitMethod, static_cast<jlong>(clusterId), static_cast<jint>(endpoint));
+    env->CallVoidMethod(mTvAppObject.ObjectRef(), mPostClusterInitMethod, static_cast<jlong>(clusterId),
+                        static_cast<jint>(endpoint));
     if (env->ExceptionCheck())
     {
         ChipLogError(Zcl, "Failed to call TvAppJNI 'postClusterInit' method");
@@ -137,6 +140,16 @@ JNI_METHOD(void, setMediaPlaybackManager)(JNIEnv *, jobject, jint endpoint, jobj
     MediaPlaybackManager::NewManager(endpoint, manager);
 }
 
+JNI_METHOD(void, setApplicationLauncherManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
+{
+    ApplicationLauncherManager::NewManager(endpoint, manager);
+}
+
+JNI_METHOD(void, setMessagesManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
+{
+    MessagesManager::NewManager(endpoint, manager);
+}
+
 JNI_METHOD(void, setChannelManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
 {
     ChannelManager::NewManager(endpoint, manager);
@@ -189,24 +202,71 @@ JNI_METHOD(void, setChipDeviceEventProvider)(JNIEnv *, jobject, jobject provider
 }
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-class MyPincodeService : public PincodeService
+class MyPincodeService : public PasscodeService
 {
-    uint32_t FetchCommissionPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
+    void LookupTargetContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId,
+                                chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info) override
     {
-        return ContentAppPlatform::GetInstance().GetPincodeFromContentApp(vendorId, productId, rotatingId);
+        uint32_t passcode;
+        bool foundApp = ContentAppPlatform::GetInstance().HasTargetContentApp(vendorId, productId, rotatingId, info, passcode);
+        if (!foundApp)
+        {
+            info.checkState = TargetAppCheckState::kAppNotFound;
+        }
+        else if (passcode != 0)
+        {
+            info.checkState = TargetAppCheckState::kAppFoundPasscodeReturned;
+        }
+        else
+        {
+            info.checkState = TargetAppCheckState::kAppFoundNoPasscode;
+        }
+        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+        if (cdc != nullptr)
+        {
+            cdc->HandleTargetContentAppCheck(info, passcode);
+        }
+    }
+
+    uint32_t GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) override
+    {
+        // TODO: randomly generate this value
+        return 12345678;
+    }
+
+    void FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
+    {
+        uint32_t passcode = ContentAppPlatform::GetInstance().GetPasscodeFromContentApp(vendorId, productId, rotatingId);
+        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+        if (cdc != nullptr)
+        {
+            cdc->HandleContentAppPasscodeResponse(passcode);
+        }
     }
 };
 MyPincodeService gMyPincodeService;
 
+class SampleTvAppInstallationService : public AppInstallationService
+{
+    bool LookupTargetContentApp(uint16_t vendorId, uint16_t productId) override
+    {
+        return ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId) != nullptr;
+    }
+};
+
+SampleTvAppInstallationService gSampleTvAppInstallationService;
+
 class MyPostCommissioningListener : public PostCommissioningListener
 {
-    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
-                                const SessionHandle & sessionHandle) override
+    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, CharSpan rotatingId, uint32_t passcode,
+                                Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle) override
     {
         // read current binding list
-        chip::Controller::BindingCluster cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
+        chip::Controller::ClusterBase cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
 
-        cacheContext(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
+        ContentAppPlatform::GetInstance().StoreNodeIdForContentApp(vendorId, productId, nodeId);
+
+        cacheContext(vendorId, productId, nodeId, rotatingId, passcode, exchangeMgr, sessionHandle);
 
         CHIP_ERROR err =
             cluster.ReadAttribute<Binding::Attributes::Binding::TypeInfo>(this, OnReadSuccessResponse, OnReadFailureResponse);
@@ -290,17 +350,23 @@ class MyPostCommissioningListener : public PostCommissioningListener
 
         Optional<SessionHandle> opt   = mSecureSession.Get();
         SessionHandle & sessionHandle = opt.Value();
+        auto rotatingIdSpan           = CharSpan{ mRotatingId.data(), mRotatingId.size() };
         ContentAppPlatform::GetInstance().ManageClientAccess(*mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId,
-                                                             bindings, OnSuccessResponse, OnFailureResponse);
+                                                             rotatingIdSpan, mPasscode, bindings, OnSuccessResponse,
+                                                             OnFailureResponse);
         clearContext();
     }
 
-    void cacheContext(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
-                      const SessionHandle & sessionHandle)
+    void cacheContext(uint16_t vendorId, uint16_t productId, NodeId nodeId, CharSpan rotatingId, uint32_t passcode,
+                      Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
     {
-        mVendorId    = vendorId;
-        mProductId   = productId;
-        mNodeId      = nodeId;
+        mVendorId   = vendorId;
+        mProductId  = productId;
+        mNodeId     = nodeId;
+        mRotatingId = std::string{
+            rotatingId.data(), rotatingId.size()
+        }; // Allocates and copies to string instead of storing span to make sure lifetime is valid.
+        mPasscode    = passcode;
         mExchangeMgr = &exchangeMgr;
         mSecureSession.ShiftToSession(sessionHandle);
     }
@@ -310,12 +376,17 @@ class MyPostCommissioningListener : public PostCommissioningListener
         mVendorId    = 0;
         mProductId   = 0;
         mNodeId      = 0;
+        mRotatingId  = {};
+        mPasscode    = 0;
         mExchangeMgr = nullptr;
         mSecureSession.SessionReleased();
     }
-    uint16_t mVendorId                        = 0;
-    uint16_t mProductId                       = 0;
-    NodeId mNodeId                            = 0;
+
+    uint16_t mVendorId  = 0;
+    uint16_t mProductId = 0;
+    NodeId mNodeId      = 0;
+    std::string mRotatingId;
+    uint32_t mPasscode                        = 0;
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
     SessionHolder mSecureSession;
 };
@@ -329,7 +400,8 @@ void TvAppJNI::InitializeCommissioner(JNIMyUserPrompter * userPrompter)
     CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
     if (cdc != nullptr && userPrompter != nullptr)
     {
-        cdc->SetPincodeService(&gMyPincodeService);
+        cdc->SetPasscodeService(&gMyPincodeService);
+        cdc->SetAppInstallationService(&gSampleTvAppInstallationService);
         cdc->SetUserPrompter(userPrompter);
         cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
     }

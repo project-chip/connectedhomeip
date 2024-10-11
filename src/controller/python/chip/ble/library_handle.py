@@ -57,8 +57,10 @@ def _GetBleLibraryHandle() -> ctypes.CDLL:
         setter.Set('pychip_ble_adapter_list_get_raw_adapter',
                    VoidPointer, [VoidPointer])
 
-        setter.Set('pychip_ble_start_scanning', VoidPointer, [
-            py_object, VoidPointer, c_uint32, DeviceScannedCallback, ScanDoneCallback, ScanErrorCallback
+        setter.Set('pychip_ble_scanner_start', VoidPointer, [
+            py_object, VoidPointer, c_uint32, DeviceScannedCallback,
+            ScanDoneCallback, ScanErrorCallback,
         ])
+        setter.Set('pychip_ble_scanner_delete', None, [VoidPointer])
 
     return handle

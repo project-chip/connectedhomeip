@@ -101,6 +101,7 @@ public:
     Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                               uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
+    uint32_t GetSupportedWiFiBandsMask() const override;
 
 private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
@@ -147,6 +148,8 @@ public:
     // ThreadDriver
     Status AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
     void ScanNetworks(ThreadDriver::ScanCallback * callback) override;
+    ThreadCapabilities GetSupportedThreadFeatures() override;
+    uint16_t GetThreadVersion() override;
 
 private:
     ThreadNetworkIterator mThreadIterator = ThreadNetworkIterator(this);

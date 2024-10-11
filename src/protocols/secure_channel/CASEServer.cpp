@@ -18,9 +18,11 @@
 #include <protocols/secure_channel/CASEServer.h>
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <tracing/macros.h>
 #include <transport/SessionManager.h>
 
 using namespace ::chip::Inet;
@@ -58,6 +60,7 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
 
 CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 {
+    MATTER_TRACE_SCOPE("InitCASEHandshake", "CASEServer");
     ReturnErrorCodeIf(ec == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Hand over the exchange context to the CASE session.
@@ -76,7 +79,11 @@ CHIP_ERROR CASEServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloa
 CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                          System::PacketBufferHandle && payload)
 {
-    if (GetSession().GetState() != CASESession::State::kInitialized)
+    MATTER_TRACE_SCOPE("OnMessageReceived", "CASEServer");
+
+    bool busy = GetSession().GetState() != CASESession::State::kInitialized;
+    CHIP_FAULT_INJECT(FaultInjection::kFault_CASEServerBusy, busy = true);
+    if (busy)
     {
         // We are in the middle of CASE handshake
 
@@ -87,9 +94,31 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
             // Handshake wasn't stuck, send the busy status report and let the existing handshake continue.
 
             // A successful CASE handshake can take several seconds and some may time out (30 seconds or more).
-            // TODO: Come up with better estimate: https://github.com/project-chip/connectedhomeip/issues/28288
-            // For now, setting minimum wait time to 5000 milliseconds.
-            CHIP_ERROR err = SendBusyStatusReport(ec, System::Clock::Milliseconds16(5000));
+
+            System::Clock::Milliseconds16 delay = System::Clock::kZero;
+            if (GetSession().GetState() == CASESession::State::kSentSigma2)
+            {
+                // The delay should be however long we think it will take for
+                // that to time out.
+                auto sigma2Timeout = CASESession::ComputeSigma2ResponseTimeout(GetSession().GetRemoteMRPConfig());
+                if (sigma2Timeout < System::Clock::Milliseconds16::max())
+                {
+                    delay = std::chrono::duration_cast<System::Clock::Milliseconds16>(sigma2Timeout);
+                }
+                else
+                {
+                    // Avoid overflow issues, just wait for as long as we can to
+                    // get close to our expected Sigma2 timeout.
+                    delay = System::Clock::Milliseconds16::max();
+                }
+            }
+            else
+            {
+                // For now, setting minimum wait time to 5000 milliseconds if we
+                // have no other information.
+                delay = System::Clock::Milliseconds16(5000);
+            }
+            CHIP_ERROR err = SendBusyStatusReport(ec, delay);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Inet, "Failed to send the busy status report, err:%" CHIP_ERROR_FORMAT, err.Format());
@@ -177,13 +206,16 @@ void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyE
 
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 {
+    MATTER_TRACE_SCOPE("OnSessionEstablishmentError", "CASEServer");
     ChipLogError(Inet, "CASE Session establishment failed: %" CHIP_ERROR_FORMAT, err.Format());
 
+    MATTER_TRACE_SCOPE("CASEFail", "CASESession");
     PrepareForSessionEstablishment();
 }
 
 void CASEServer::OnSessionEstablished(const SessionHandle & session)
 {
+    MATTER_TRACE_SCOPE("OnSessionEstablished", "CASEServer");
     ChipLogProgress(Inet, "CASE Session established to peer: " ChipLogFormatScopedNodeId,
                     ChipLogValueScopedNodeId(session->GetPeer()));
     PrepareForSessionEstablishment(session->GetPeer());
@@ -191,6 +223,7 @@ void CASEServer::OnSessionEstablished(const SessionHandle & session)
 
 CHIP_ERROR CASEServer::SendBusyStatusReport(Messaging::ExchangeContext * ec, System::Clock::Milliseconds16 minimumWaitTime)
 {
+    MATTER_TRACE_SCOPE("SendBusyStatusReport", "CASEServer");
     ChipLogProgress(Inet, "Already in the middle of CASE handshake, sending busy status report");
 
     System::PacketBufferHandle handle = Protocols::SecureChannel::StatusReport::MakeBusyStatusReportMessage(minimumWaitTime);

@@ -18,10 +18,11 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/clusters/content-launch-server/content-launch-server.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/JniReferences.h>
 
 using chip::CharSpan;
 using chip::app::AttributeValueEncoder;
@@ -30,6 +31,7 @@ using ContentLauncherDelegate = chip::app::Clusters::ContentLauncher::Delegate;
 using LaunchResponseType      = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Type;
 using ParameterType           = chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType;
 using BrandingInformationType = chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type;
+using PlaybackPreferencesType = chip::app::Clusters::ContentLauncher::Structs::PlaybackPreferencesStruct::DecodableType;
 
 class ContentLauncherManager : public ContentLauncherDelegate
 {
@@ -39,18 +41,23 @@ public:
 
     void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
                              const chip::app::DataModel::DecodableList<ParameterType> & parameterList, bool autoplay,
-                             const CharSpan & data) override;
+                             const CharSpan & data, const chip::Optional<PlaybackPreferencesType> playbackPreferences,
+                             bool useCurrentContext) override;
     void HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
                          const CharSpan & displayString, const BrandingInformationType & brandingInformation) override;
     CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+    uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 private:
-    jobject mContentLauncherManagerObject           = nullptr;
+    chip::JniGlobalReference mContentLauncherManagerObject;
     jmethodID mGetAcceptHeaderMethod                = nullptr;
     jmethodID mGetSupportedStreamingProtocolsMethod = nullptr;
     jmethodID mLaunchContentMethod                  = nullptr;
     jmethodID mLaunchUrlMethod                      = nullptr;
+
+    // TODO: set this based upon meta data from app
+    static constexpr uint16_t kClusterRevision = 2;
 };

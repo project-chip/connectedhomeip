@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/build.gni")
+import("//build_overrides/pigweed.gni")
 
 # The location of the build configuration file.
 buildconfig = "${build_root}/config/BUILDCONFIG.gn"
@@ -30,4 +31,6 @@ default_args = {
       [ "//third_party/connectedhomeip/scripts/setup/requirements.build.txt" ]
 
   import("//args.gni")
+
+  optimize_debug_level = "s"
 }

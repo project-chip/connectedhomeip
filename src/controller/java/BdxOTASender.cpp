@@ -160,19 +160,6 @@ CHIP_ERROR BdxOTASender::OnMessageToSend(TransferSession::OutputEvent & event)
     return err;
 }
 
-bdx::StatusCode BdxOTASender::GetBdxStatusCodeFromChipError(CHIP_ERROR err)
-{
-    if (err == CHIP_ERROR_INCORRECT_STATE)
-    {
-        return bdx::StatusCode::kUnexpectedMessage;
-    }
-    if (err == CHIP_ERROR_INVALID_ARGUMENT)
-    {
-        return bdx::StatusCode::kBadMessageContents;
-    }
-    return bdx::StatusCode::kUnknown;
-}
-
 CHIP_ERROR BdxOTASender::OnTransferSessionBegin(TransferSession::OutputEvent & event)
 {
     assertChipStackLockedByCurrentThread();
@@ -192,7 +179,7 @@ CHIP_ERROR BdxOTASender::OnTransferSessionBegin(TransferSession::OutputEvent & e
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
     UtfString fileDesignator(env, fileDesignatorSpan);
 
     uint64_t offset = mTransfer.GetStartOffset();
@@ -282,7 +269,7 @@ CHIP_ERROR BdxOTASender::OnBlockQuery(TransferSession::OutputEvent & event)
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
     jmethodID handleBDXQueryMethod;
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(
         env, mOtaDelegate, "handleBDXQuery", "(JIJJ)Lchip/devicecontroller/OTAProviderDelegate$BDXData;", &handleBDXQueryMethod);

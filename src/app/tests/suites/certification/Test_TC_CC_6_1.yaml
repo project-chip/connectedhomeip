@@ -48,7 +48,7 @@ tests:
       cluster: "On/Off"
       command: "On"
 
-    - label: "Step 1a: H reads ColorTempPhysicalMinMireds attribute from DUT"
+    - label: "Step 1a: TH reads ColorTempPhysicalMinMireds attribute from DUT"
       PICS: CC.S.F04 && CC.S.A400b
       command: "readAttribute"
       attribute: "ColorTempPhysicalMinMireds"

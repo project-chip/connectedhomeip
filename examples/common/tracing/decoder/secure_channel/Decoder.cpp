@@ -24,22 +24,22 @@
 #include <protocols/secure_channel/PASESession.h>
 
 namespace {
-constexpr const char * kProtocolName = "Secure Channel";
+constexpr char kProtocolName[] = "Secure Channel";
 
-constexpr const char * kUnknown            = "Unknown";
-constexpr const char * kMsgCounterSyncReq  = "Message Counter Sync Request";
-constexpr const char * kMsgCounterSyncResp = "Message Counter Sync Response";
-constexpr const char * kStandaloneAck      = "Standalone Ack";
-constexpr const char * kPBKDFParamRequest  = "Password-Based Key Derivation Parameters Request";
-constexpr const char * kPBKDFParamResponse = "Password-Based Key Derivation Parameters Response";
-constexpr const char * kPASE_Pake1         = "Password Authenticated Session Establishment '1'";
-constexpr const char * kPASE_Pake2         = "Password Authenticated Session Establishment '2'";
-constexpr const char * kPASE_Pake3         = "Password Authenticated Session Establishment '3'";
-constexpr const char * kCASE_Sigma1        = "Certificate Authenticated Session Establishment Sigma '1'";
-constexpr const char * kCASE_Sigma2        = "Certificate Authenticated Session Establishment Sigma '2'";
-constexpr const char * kCASE_Sigma3        = "Certificate Authenticated Session Establishment Sigma '3'";
-constexpr const char * kCASE_Sigma2Resume  = "Certificate Authenticated Session Establishment Sigma '2' Resume";
-constexpr const char * kStatusReport       = "Status Report";
+constexpr char kUnknown[]            = "Unknown";
+constexpr char kMsgCounterSyncReq[]  = "Message Counter Sync Request";
+constexpr char kMsgCounterSyncResp[] = "Message Counter Sync Response";
+constexpr char kStandaloneAck[]      = "Standalone Ack";
+constexpr char kPBKDFParamRequest[]  = "Password-Based Key Derivation Parameters Request";
+constexpr char kPBKDFParamResponse[] = "Password-Based Key Derivation Parameters Response";
+constexpr char kPASE_Pake1[]         = "Password Authenticated Session Establishment '1'";
+constexpr char kPASE_Pake2[]         = "Password Authenticated Session Establishment '2'";
+constexpr char kPASE_Pake3[]         = "Password Authenticated Session Establishment '3'";
+constexpr char kCASE_Sigma1[]        = "Certificate Authenticated Session Establishment Sigma '1'";
+constexpr char kCASE_Sigma2[]        = "Certificate Authenticated Session Establishment Sigma '2'";
+constexpr char kCASE_Sigma3[]        = "Certificate Authenticated Session Establishment Sigma '3'";
+constexpr char kCASE_Sigma2Resume[]  = "Certificate Authenticated Session Establishment Sigma '2' Resume";
+constexpr char kStatusReport[]       = "Status Report";
 } // namespace
 
 using MessageType = chip::Protocols::SecureChannel::MsgType;

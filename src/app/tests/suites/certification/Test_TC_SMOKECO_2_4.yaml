@@ -121,6 +121,7 @@ tests:
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
           [TOO]   BatteryAlert: 1
+          [1692340991.009882][1860:1862] CHIP:EM: <<< [E:56796i S:13603 M:58223585 (Ack:16238538)] (S) Msg TX to 1:0000000000000001 [3304] --- Type 0000:10 (SecureChannel:StandaloneAck)
       arguments:
           values:
               - name: "message"
@@ -172,6 +173,7 @@ tests:
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
           [TOO]   BatteryAlert: 2
+          [1692340991.009882][1860:1862] CHIP:EM: <<< [E:56796i S:13603 M:58223585 (Ack:16238538)] (S) Msg TX to 1:0000000000000001 [3304] --- Type 0000:10 (SecureChannel:StandaloneAck)
       arguments:
           values:
               - name: "message"
@@ -223,6 +225,7 @@ tests:
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
           [TOO]   BatteryAlert: 0
+          [1692340991.009882][1860:1862] CHIP:EM: <<< [E:56796i S:13603 M:58223585 (Ack:16238538)] (S) Msg TX to 1:0000000000000001 [3304] --- Type 0000:10 (SecureChannel:StandaloneAck)
       arguments:
           values:
               - name: "message"
@@ -285,6 +288,7 @@ tests:
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0006 DataVersion: 1795725838
           [TOO]   HardwareFaultAlert: TRUE
+          [1692341722.458322][1923:1925] CHIP:EM: <<< [E:13580i S:23647 M:42886390 (Ack:222437492)] (S) Msg TX to 1:0000000000000001 [3304] --- Type 0000:10 (SecureChannel:StandaloneAck)
       arguments:
           values:
               - name: "message"
@@ -337,6 +341,7 @@ tests:
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0006 DataVersion: 1795725838
           [TOO]   HardwareFaultAlert: FALSE
+          [1692341722.458322][1923:1925] CHIP:EM: <<< [E:13580i S:23647 M:42886390 (Ack:222437492)] (S) Msg TX to 1:0000000000000001 [3304] --- Type 0000:10 (SecureChannel:StandaloneAck)
       arguments:
           values:
               - name: "message"
@@ -399,6 +404,7 @@ tests:
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0007 DataVersion: 1795725838
           [TOO]   EndOfServiceAlert: 1
+          [1692342076.348701][1956:1958] CHIP:EM: <<< [E:51164i S:58720 M:186716445 (Ack:135114063)] (S) Msg TX to 1:0000000000000001 [3304] --- Type 0000:10 (SecureChannel:StandaloneAck)
       arguments:
           values:
               - name: "message"
@@ -451,6 +457,7 @@ tests:
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0007 DataVersion: 1795725838
           [TOO]   EndOfServiceAlert: 0
+          [1692342076.348701][1956:1958] CHIP:EM: <<< [E:51164i S:58720 M:186716445 (Ack:135114063)] (S) Msg TX to 1:0000000000000001 [3304] --- Type 0000:10 (SecureChannel:StandaloneAck)
       arguments:
           values:
               - name: "message"
@@ -583,6 +590,7 @@ tests:
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0005 DataVersion: 1795725838
           [TOO]   TestInProgress: TRUE
+          [1690268959.715817][13732:13734] CHIP:EM: <<< [E:12324i S:6365 M:86298174 (Ack:6158737)] (S) Msg TX to 1:0000000000000001 [D1BB] --- Type 0000:10 (SecureChannel:StandaloneAck)
       arguments:
           values:
               - name: "message"

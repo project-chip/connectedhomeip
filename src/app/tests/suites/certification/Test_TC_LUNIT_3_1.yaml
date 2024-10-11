@@ -33,7 +33,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 1: TH reads TemperatureUnit attribute from DUT"
+    - label: "Step 1: TH reads from the DUT the TemperatureUnit"
       PICS: LUNIT.S.A0000
       command: "readAttribute"
       attribute: "TemperatureUnit"
@@ -41,7 +41,7 @@ tests:
           constraints:
               type: enum8
 
-    - label: "Step 2: TH writes 0 (Fahrenheit) to TemperatureUnit attribute"
+    - label: "Step 2: TH writes 0 to TemperatureUnit"
       PICS: LUNIT.S.A0000 && LUNIT.S.M.Fahrenheit
       cluster: "Unit Localization"
       command: "writeAttribute"
@@ -49,14 +49,14 @@ tests:
       arguments:
           value: 0
 
-    - label: "Step 3: TH reads TemperatureUnit attribute"
+    - label: "Step 3: TH reads from the DUT the TemperatureUnit"
       PICS: LUNIT.S.A0000 && LUNIT.S.M.Fahrenheit
       command: "readAttribute"
       attribute: "TemperatureUnit"
       response:
           value: 0
 
-    - label: "Step 4: TH writes 1 (Celsius) to TemperatureUnit attribute"
+    - label: "Step 4: TH writes 1 to TemperatureUnit"
       PICS: LUNIT.S.A0000 && LUNIT.S.M.Celsius
       cluster: "Unit Localization"
       command: "writeAttribute"
@@ -64,14 +64,14 @@ tests:
       arguments:
           value: 1
 
-    - label: "Step 5: TH reads TemperatureUnit attribute"
+    - label: "Step 5: TH reads from the DUT the TemperatureUnit"
       PICS: LUNIT.S.A0000 && LUNIT.S.M.Celsius
       command: "readAttribute"
       attribute: "TemperatureUnit"
       response:
           value: 1
 
-    - label: "Step 6: TH writes 2 (Kelvin) to TemperatureUnit attribute"
+    - label: "Step 6: TH writes 2 to TemperatureUnit"
       PICS: LUNIT.S.A0000 && LUNIT.S.M.Kelvin
       cluster: "Unit Localization"
       command: "writeAttribute"
@@ -79,14 +79,14 @@ tests:
       arguments:
           value: 2
 
-    - label: "Step 7: TH reads TemperatureUnit attribute"
+    - label: "Step 7: TH reads from the DUT the TemperatureUnit"
       PICS: LUNIT.S.A0000 && LUNIT.S.M.Kelvin
       command: "readAttribute"
       attribute: "TemperatureUnit"
       response:
           value: 2
 
-    - label: "Step 8: TH writes 5 to TemperatureUnit attribute"
+    - label: "Step 8: TH writes 5 to TemperatureUnit"
       PICS: LUNIT.S.A0000
       cluster: "Unit Localization"
       command: "writeAttribute"
@@ -94,6 +94,6 @@ tests:
       arguments:
           # Per spec, if [TEMP] feature is enabled, then this attribute can be
           # one of 0 (Farenheit), 1 (Celsius) or 2 (Kelvin)
-          value: 5 # INVALID
+          value: TempUnitEnum.UnknownEnumValue(5)
       response:
           error: CONSTRAINT_ERROR

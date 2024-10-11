@@ -99,8 +99,6 @@ bl_iot_sdk("sdk") {
 
 chip_data_model("bouffalolab-lighting") {
   zap_file = "${example_dir}/data_model/lighting-app-thread.zap"
-
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
   is_server = true
 }
 
@@ -117,9 +115,6 @@ bouffalolab_executable("lighting_app") {
   defines += [ "CONF_ENABLE_FRAME_PTR=${enable_debug_frame_ptr}" ]
   defines +=
       [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
-  defines += [
-    "CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST=${chip_enable_factory_data_test}",
-  ]
   if (chip_config_network_layer_ble) {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1" ]
   }
@@ -150,6 +145,7 @@ bouffalolab_executable("lighting_app") {
     ":sdk",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
   ]
 
@@ -214,6 +210,7 @@ bouffalolab_executable("lighting_app") {
     ]
 
     deps += [
+      "$dir_pw_hdlc:default_addresses",
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_stream:sys_io_stream",
 

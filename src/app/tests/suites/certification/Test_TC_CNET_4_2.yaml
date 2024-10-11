@@ -56,7 +56,7 @@ tests:
           [1698660637.937911][6429:6431] CHIP:IN: Clearing BLE pending packets.
           [1698660637.938582][6429:6431] CHIP:BLE: Auto-closing end point's BLE connection.
           [1698660637.938645][6429:6431] CHIP:DL: Closing BLE GATT connection (con 0xffff9c034bb0)
-          [1698660637.938805][6429:6430] CHIP:DL: BluezDisconnect peer=F7:D4:24:D2:4A:1F
+          [1698660637.938805][6429:6430] CHIP:DL: Close BLE connection: peer=F7:D4:24:D2:4A:1F
           [1698660638.365208][6429:6431] CHIP:IN: SecureSession[0xffff9400f900]: MarkForEviction Type:1 LSID:62220
           [1698660638.365311][6429:6431] CHIP:SC: SecureSession[0xffff9400f900, LSID:62220]: State change 'kActive' --> 'kPendingEviction'
           [1698660638.365440][6429:6431] CHIP:IN: SecureSession[0xffff9400f900]: Released - Type:1 LSID:62220
@@ -193,3 +193,26 @@ tests:
           value: null
           constraints:
               type: int32s
+
+    #Possibilites if Bit 4 (IsSynchronizedSleepyEndDeviceCapable) is only set if bit 2 (IsSleepyEndDeviceCapable) is also set expects value 20
+    #Verify that Bit 0 (IsBorderRouterCapable) is only set if bit 3 (IsFullThreadDevice) is also set expected value 9
+    #Verify that Bit 1 (IsRouterCapable) is only set if bit 3 (IsFullThreadDevice) is also set expected value 10
+    #So the possibilites of value here are in the range of 0-20 expected value as per test-plan [0, 4, 8, 9, 10, 16, 20]
+    - label:
+          "Step 14: TH reads the SupportedThreadFeatures attribute from the DUT"
+      PICS: CNET.S.A0009
+      command: "readAttribute"
+      attribute: "SupportedThreadFeatures"
+      response:
+          constraints:
+              type: bitmap16
+              anyOf: [0, 4, 8, 9, 10, 16, 20]
+
+    - label: "Step 15:TH reads the ThreadVersion attribute from the DUT"
+      PICS: CNET.S.A000A
+      command: "readAttribute"
+      attribute: "ThreadVersion"
+      response:
+          constraints:
+              type: int16u
+              minValue: 4

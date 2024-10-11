@@ -26,13 +26,10 @@
 #include <lib/support/Pool.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <transport/SessionDelegate.h>
+#include <transport/SessionManager.h>
 #include <transport/SessionUpdateDelegate.h>
 
-#include <lib/dnssd/ResolverProxy.h>
-
 namespace chip {
-
-class OperationalSessionSetupPoolDelegate;
 
 struct CASESessionManagerConfig
 {
@@ -62,7 +59,7 @@ public:
     }
 
     CHIP_ERROR Init(chip::System::Layer * systemLayer, const CASESessionManagerConfig & params);
-    void Shutdown() {}
+    void Shutdown();
 
     /**
      * Find an existing session for the given node ID, or trigger a new session
@@ -82,12 +79,68 @@ public:
      * setup is not successful.
      */
     void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                Callback::Callback<OnDeviceConnectionFailure> * onFailure
+                                Callback::Callback<OnDeviceConnectionFailure> * onFailure,
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-                                ,
-                                uint8_t attemptCount = 1, Callback::Callback<OnDeviceConnectionRetry> * onRetry = nullptr
+                                uint8_t attemptCount = 1, Callback::Callback<OnDeviceConnectionRetry> * onRetry = nullptr,
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-    );
+                                TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
+
+    /**
+     * Find an existing session for the given node ID or trigger a new session request.
+     *
+     * The caller can optionally provide `onConnection` and `onSetupFailure`
+     * callback objects. If provided, these will be used to inform the caller about successful or
+     * failed connection establishment.
+     *
+     * If the connection is already established, the `onConnection` callback will be immediately called,
+     * before `FindOrEstablishSession` returns.
+     *
+     * The `onSetupFailure` callback may be called before the `FindOrEstablishSession`
+     * call returns, for error cases that are detected synchronously.
+     *
+     * The `attemptCount` parameter can be used to automatically retry multiple times if session setup is
+     * not successful.
+     *
+     * @param peerId The node ID to find or establish a session with.
+     * @param onConnection A callback to be called upon successful connection establishment.
+     * @param onSetupFailure A callback to be called upon an extended device connection failure.
+     * @param attemptCount The number of retry attempts if session setup fails (default is 1).
+     * @param onRetry A callback to be called on a retry attempt (enabled by a config flag).
+     * @param transportPayloadCapability An indicator of what payload types the session needs to be able to transport.
+     */
+    void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onSetupFailure,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                uint8_t attemptCount = 1, Callback::Callback<OnDeviceConnectionRetry> * onRetry = nullptr,
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
+
+    /**
+     * Find an existing session for the given node ID or trigger a new session request.
+     *
+     * The caller can optionally provide `onConnection`
+     * callback objects. If provided, these will be used to inform the caller about successful connection establishment.
+     *
+     * If the connection is already established, the `onConnection` callback will be immediately called,
+     * before `FindOrEstablishSession` returns.
+     *
+     * The `attemptCount` parameter can be used to automatically retry multiple times if session setup is
+     * not successful.
+     *
+     * This function allows passing 'nullptr' for the error handler to compile, which is useful in scenarios where error
+     * handling is not needed.
+     *
+     * @param peerId The node ID to find or establish a session with.
+     * @param onConnection A callback to be called upon successful connection establishment.
+     * @param attemptCount The number of retry attempts if session setup fails (default is 1).
+     * @param onRetry A callback to be called on a retry attempt (enabled by a config flag).
+     * @param transportPayloadCapability An indicator of what payload types the session needs to be able to transport.
+     */
+    void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection, std::nullptr_t,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                uint8_t attemptCount = 1, Callback::Callback<OnDeviceConnectionRetry> * onRetry = nullptr,
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
 
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 
@@ -101,7 +154,8 @@ public:
      * an ongoing session with the peer node. If the session doesn't exist, the API will return
      * `CHIP_ERROR_NOT_CONNECTED` error.
      */
-    CHIP_ERROR GetPeerAddress(const ScopedNodeId & peerId, Transport::PeerAddress & addr);
+    CHIP_ERROR GetPeerAddress(const ScopedNodeId & peerId, Transport::PeerAddress & addr,
+                              TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
 
     //////////// OperationalSessionReleaseDelegate Implementation ///////////////
     void ReleaseSession(OperationalSessionSetup * device) override;
@@ -112,7 +166,17 @@ public:
 private:
     OperationalSessionSetup * FindExistingSessionSetup(const ScopedNodeId & peerId, bool forAddressUpdate = false) const;
 
-    Optional<SessionHandle> FindExistingSession(const ScopedNodeId & peerId) const;
+    Optional<SessionHandle> FindExistingSession(
+        const ScopedNodeId & peerId,
+        const TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload) const;
+
+    void FindOrEstablishSessionHelper(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                                      Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onSetupFailure,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                      uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
+#endif
+                                      TransportPayloadCapability transportPayloadCapability);
 
     CASESessionManagerConfig mConfig;
 };

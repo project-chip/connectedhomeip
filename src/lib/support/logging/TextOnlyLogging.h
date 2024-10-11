@@ -36,6 +36,7 @@
 
 #include <lib/core/CHIPConfig.h>
 
+#include <lib/support/Compiler.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/VerificationMacrosNoLogging.h>
@@ -44,6 +45,7 @@
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdint.h>
+#include <typeinfo>
 
 #if CHIP_SYSTEM_CONFIG_PLATFORM_LOG && defined(CHIP_SYSTEM_CONFIG_PLATFORM_LOG_INCLUDE)
 #include CHIP_SYSTEM_CONFIG_PLATFORM_LOG_INCLUDE
@@ -268,21 +270,47 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
 #define ChipLogValueMEI(aValue) static_cast<uint16_t>(aValue >> 16), static_cast<uint16_t>(aValue)
 
 /**
- * Logging helpers for exchanges.  For now just log the exchange id and whether
- * it's an initiator or responder, but eventually we may want to log the peer
- * node id as well (especially for the responder case).  Some callsites only
+ * Logging helpers for exchanges.  Log the exchange id, whether
+ * it's an initiator or responder and the scoped node.  Some callsites only
  * have the exchange id and initiator/responder boolean, not an actual exchange,
  * so we want to have a helper for that case too.
  */
 #define ChipLogFormatExchangeId "%u%c"
 #define ChipLogValueExchangeId(id, isInitiator) id, ((isInitiator) ? 'i' : 'r')
+
+#if CHIP_EXCHANGE_NODE_ID_LOGGING
+#define ChipLogFormatExchange ChipLogFormatExchangeId " with Node: " ChipLogFormatScopedNodeId
+#define ChipLogValueExchange(ec)                                                                                                   \
+    ChipLogValueExchangeId((ec)->GetExchangeId(), (ec)->IsInitiator()),                                                            \
+        ChipLogValueScopedNodeId((ec)->HasSessionHandle() ? (ec)->GetSessionHandle()->GetPeer() : ScopedNodeId())
+#else // CHIP_EXCHANGE_NODE_ID_LOGGING
 #define ChipLogFormatExchange ChipLogFormatExchangeId
 #define ChipLogValueExchange(ec) ChipLogValueExchangeId((ec)->GetExchangeId(), (ec)->IsInitiator())
+#endif // CHIP_EXCHANGE_NODE_ID_LOGGING
+
 #define ChipLogValueExchangeIdFromSentHeader(payloadHeader)                                                                        \
     ChipLogValueExchangeId((payloadHeader).GetExchangeID(), (payloadHeader).IsInitiator())
 // A received header's initiator boolean is the inverse of the exchange's.
 #define ChipLogValueExchangeIdFromReceivedHeader(payloadHeader)                                                                    \
     ChipLogValueExchangeId((payloadHeader).GetExchangeID(), !(payloadHeader).IsInitiator())
+
+/**
+ * Logging helpers for logging the dynamic type of an object, if possible.
+ *
+ * Primarily useful when logging the type of delegates or similar objects when
+ * performing logging for a fatal error in DumpToLog().
+ *
+ * Example:
+ * @code
+ * ChipLogError(Foo, "Delegate=" ChipLogFormatRtti, ChipLogValueRtti(mDelegate));
+ * @endcode
+ */
+#define ChipLogFormatRtti "%s"
+#if CHIP_HAVE_RTTI
+#define ChipLogValueRtti(ptr) ((ptr) != nullptr ? typeid(*(ptr)).name() : "null")
+#else
+#define ChipLogValueRtti(ptr) ((ptr) != nullptr ? "?" : "null")
+#endif
 
 /**
  * Logging helpers for protocol ids.  A protocol id is a (vendor-id,
@@ -304,6 +332,14 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
 /** Logging helpers for scoped node ids, which is a tuple of <NodeId, FabricIndex> */
 #define ChipLogFormatScopedNodeId "<" ChipLogFormatX64 ", %d>"
 #define ChipLogValueScopedNodeId(id) ChipLogValueX64((id).GetNodeId()), (id).GetFabricIndex()
+
+/** Logging helpers for PeerId, which is a tuple of <Compressed Fabric Id, NodeId>
+ *
+ * This gets logged in the form that's used for the DNS-SD instance name for the
+ * peer.
+ */
+#define ChipLogFormatPeerId ChipLogFormatX64 "-" ChipLogFormatX64
+#define ChipLogValuePeerId(id) ChipLogValueX64((id).GetCompressedFabricId()), ChipLogValueX64((id).GetNodeId())
 
 /**
  * CHIP Logging Implementation internals.

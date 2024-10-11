@@ -9,8 +9,10 @@ and features.
 :hidden:
 
 *
+bouffalolab/matter_factory_data
 esp32/README
-ti/ti_platform_overview
+nxp/README
+ti/ti_matter_overview
 ```
 
 ## Build Guides
@@ -22,6 +24,7 @@ ti/ti_platform_overview
 -   [Android - Building](./android_building.md)
 -   [Apple - Testing with iPhone, iPad, macOS, Apple TV, HomePod, Watch, etc](./darwin.md)
 -   [ASR - Getting Started Guide](./asr_getting_started_guide.md)
+-   [Bouffalo Lab - Matter factory data generation](./bouffalolab/matter_factory_data.md)
 -   [Espressif (ESP32) - Getting Started Guide](./esp32/README.md)
 -   [Infineon PSoC6 - Software Update](./infineon_psoc6_software_update.md)
 -   [Linux - Simulated Devices](./simulated_device_linux.md)
@@ -34,13 +37,12 @@ ti/ti_platform_overview
 -   [nRF Connect - Factory Data Configuration](./nrfconnect_factory_data_configuration.md)
 -   [nRF Connect - Platform Overview](./nrfconnect_platform_overview.md)
 -   [nRF Connect - Software Update](./nrfconnect_examples_software_update.md)
--   [NXP - Android Commissioning](./nxp_k32w_android_commissioning.md)
--   [NXP - Linux Examples](./nxp_imx8m_linux_examples.md)
--   [NXP - Manufacturing Data](./nxp_manufacturing_flow.md)
--   [Silicon Labs - Documentation](https://github.com/SiliconLabs/matter#readme)
--   [Silicon Labs - Building](./silabs_efr32_building.md)
+-   [NXP - Getting Started Guide](./nxp/README.md)
+-   [Silicon Labs - Documentation](https://siliconlabs.github.io/matter/latest/index.html)
+-   [Silicon Labs - Getting Started](./silabs_getting_started.md)
 -   [Silicon Labs - Software Update](./silabs_efr32_software_update.md)
--   [TI - Platform Overview](./ti/ti_platform_overview.md)
+-   [Silicon Labs - CLI Guide](./silabs_cli_guide.md)
+-   [TI - Platform Overview](./ti/ti_matter_overview.md)
 
 ## Tool Guides
 
@@ -54,14 +56,9 @@ ti/ti_platform_overview
 ## Development Guides
 
 -   [Access Control](./access-control-guide.md)
--   [IP Commissioning](./ip_commissioning.md)
 -   [Matter IDL tooling and validation](./matter_idl_tooling.md)
 
 ## Setup Guides
 
 -   [Open Thread - Hardware suggestions](./openthread_rcp_nrf_dongle.md)
 -   [Open Thread - Setting up a Raspberry Pi as a Border Router](./openthread_border_router_pi.md)
-
-## Troubleshooting Guides
-
--   [Avahi - Troubleshooting](./troubleshooting_avahi.md)

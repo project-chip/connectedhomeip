@@ -27,7 +27,7 @@ void appError(int err)
     snprintf(faultMessage, sizeof faultMessage, "App Critical Error:%d", err);
     SILABS_LOG("!!!!!!!!!!!! %s !!!!!!!!!!!", faultMessage);
     chip::DeviceLayer::Silabs::OnSoftwareFaultEventHandler(faultMessage);
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    vTaskSuspendAll();
     /* Force an assert. */
     chipAbort();
 }

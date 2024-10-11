@@ -76,6 +76,7 @@ asr_executable("lock_app") {
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
   ]
 

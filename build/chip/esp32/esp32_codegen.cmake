@@ -17,6 +17,7 @@
 
 macro(chip_app_component_codegen IDL_NAME)
   include("${CHIP_ROOT}/build/chip/chip_codegen.cmake")
+  include("${CHIP_ROOT}/src/app/codegen-data-model-provider/model.cmake")
 
   # The IDF build system performs a two-pass expansion to determine
   # component expansion. The first pass runs in script-mode
@@ -33,6 +34,7 @@ macro(chip_app_component_codegen IDL_NAME)
       OUTPUTS
             "app/PluginApplicationCallbacks.h"
             "app/callback-stub.cpp"
+            "app/cluster-init-callback.cpp"
       OUTPUT_PATH   APP_GEN_DIR
       OUTPUT_FILES  APP_GEN_FILES
     )
@@ -60,7 +62,6 @@ macro(chip_app_component_zapgen ZAP_NAME)
       GENERATOR "app-templates"
       OUTPUTS
             "zap-generated/access.h"
-            "zap-generated/CHIPClusters.h"
             "zap-generated/endpoint_config.h"
             "zap-generated/gen_config.h"
             "zap-generated/IMClusterCommandHandler.cpp"
@@ -71,5 +72,14 @@ macro(chip_app_component_zapgen ZAP_NAME)
     add_dependencies(${COMPONENT_LIB} app-zapgen)
     target_include_directories(${COMPONENT_LIB} PUBLIC "${APP_TEMPLATE_GEN_DIR}")
     target_sources(${COMPONENT_LIB} PRIVATE ${APP_TEMPLATE_GEN_FILES})
+
+    # When data model interface is used, provide a default code-generation data model as
+    # part of zapgen. See `chip_data_model.cmake` for similar logic
+    set(CHIP_DATA_MODEL_INTERFACE "disabled" CACHE STRING "Data model interface option to use: enabled or disabled")
+
+    if ("${CHIP_DATA_MODEL_INTERFACE}" STREQUAL "enabled")
+      target_sources(${COMPONENT_LIB} PRIVATE ${CODEGEN_DATA_MODEL_SOURCES})
+    endif()
+
   endif()
 endmacro()

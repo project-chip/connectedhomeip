@@ -207,9 +207,8 @@ bool PrintCert(const char * fileName, X509 * cert)
     bool res       = true;
     CHIP_ERROR err = CHIP_NO_ERROR;
     FILE * file    = nullptr;
-    ChipCertificateSet certSet;
-    const ChipCertificateData * certData;
-    chip::BitFlags<CertDecodeFlags> decodeFlags;
+    ChipCertificateData certDataStorage;
+    const auto certData = &certDataStorage;
     uint8_t chipCertBuf[kMaxCHIPCertLength];
     MutableByteSpan chipCert(chipCertBuf);
     int indent = 4;
@@ -222,21 +221,12 @@ bool PrintCert(const char * fileName, X509 * cert)
     res = X509ToChipCert(cert, chipCert);
     VerifyTrueOrExit(res);
 
-    err = certSet.Init(1);
-    if (err != CHIP_NO_ERROR)
-    {
-        fprintf(stderr, "Failed to initialize certificate set: %s\n", chip::ErrorStr(err));
-        ExitNow(res = false);
-    }
-
-    err = certSet.LoadCert(chipCert, decodeFlags);
+    err = DecodeChipCert(chipCert, certDataStorage);
     if (err != CHIP_NO_ERROR)
     {
         fprintf(stderr, "Error reading %s: %s\n", fileName, chip::ErrorStr(err));
         ExitNow(res = false);
     }
-
-    certData = certSet.GetLastCert();
 
     fprintf(file, "CHIP Certificate:\n");
 

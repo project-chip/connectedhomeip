@@ -37,13 +37,13 @@ tests:
       disabled: true
 
     - label: "Step 2a: Bring the DUT into a state so StateValue is FALSE."
-      PICS: BOOL.M.ManuallyControlled && BOOL.S.A0000
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.A0000
       verification: |
           Manual operation
       disabled: true
 
     - label: "Step 2b: TH reads the StateValue attribute from the DUT."
-      PICS: BOOL.M.ManuallyControlled && BOOL.S.A0000
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.A0000
       verification: |
           ./chip-tool booleanstate read state-value 1 1
 
@@ -54,13 +54,13 @@ tests:
       disabled: true
 
     - label: "Step 3a: Bring the DUT into a state so StateValue is TRUE."
-      PICS: BOOL.M.ManuallyControlled && BOOL.S.A0000
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.A0000
       verification: |
           Manual operation
       disabled: true
 
     - label: "Step 3b: TH reads the StateValue attribute from the DUT."
-      PICS: BOOL.M.ManuallyControlled && BOOL.S.A0000
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.A0000
       verification: |
           ./chip-tool booleanstate read state-value 1 1
 
@@ -71,7 +71,7 @@ tests:
       disabled: true
 
     - label: "Step 4a: Set up subscription to StateChange event."
-      PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
           This event is not supported in all clusters app, so there are no reference logs.
 
@@ -84,13 +84,13 @@ tests:
       disabled: true
 
     - label: "Step 4b: Bring the DUT into a state so StateValue is FALSE."
-      PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
           Verify the StateValue value is FALSE On TH(chip-tool), if the state-change event is generated
       disabled: true
 
     - label: "Step 4c: TH reads the StateValue attribute from the DUT."
-      PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
           This event is not supported in all clusters app, so there are no reference logs.
 
@@ -100,13 +100,13 @@ tests:
       disabled: true
 
     - label: "Step 4d: Bring the DUT into a state so StateValue is TRUE."
-      PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
           Verify the StateValue value is TRUE On TH(chip-tool),  if the state-change event is generated
       disabled: true
 
     - label: "Step 4e: TH reads the StateValue attribute from the DUT."
-      PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
           booleanstate read state-value 1 1
 

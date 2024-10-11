@@ -24,6 +24,7 @@
 #include <functional>
 #include <netdb.h>
 #include <sstream>
+#include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
 
@@ -38,7 +39,7 @@
 #include <lib/support/StringSplitter.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-constexpr const char * kOptionalArgumentPrefix = "--";
+constexpr char kOptionalArgumentPrefix[]       = "--";
 constexpr size_t kOptionalArgumentPrefixLength = 2;
 
 bool Command::InitArguments(int argc, char ** argv)
@@ -347,8 +348,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
             // By default the parameter separator is ";" in order to not collapse with the argument itself if it contains commas
             // (e.g a struct argument with multiple fields). In case one needs to use ";" it can be overriden with the following
             // environment variable.
-            constexpr const char * kSeparatorVariable = "CHIPTOOL_CUSTOM_ARGUMENTS_SEPARATOR";
-            char * getenvSeparatorVariableResult      = getenv(kSeparatorVariable);
+            static constexpr char kSeparatorVariable[] = "CHIPTOOL_CUSTOM_ARGUMENTS_SEPARATOR";
+            char * getenvSeparatorVariableResult       = getenv(kSeparatorVariable);
             getline(ss, valueAsString, getenvSeparatorVariableResult ? getenvSeparatorVariableResult[0] : ';');
 
             CustomArgument * customArgument = new CustomArgument();
@@ -1067,6 +1068,11 @@ void Command::ResetArguments()
             {
                 auto vectorArgument = static_cast<std::vector<uint32_t> *>(arg.value);
                 vectorArgument->clear();
+            }
+            else if (type == ArgumentType::Custom)
+            {
+                auto argument = static_cast<CustomArgument *>(arg.value);
+                argument->Reset();
             }
             else if (type == ArgumentType::VectorCustom)
             {

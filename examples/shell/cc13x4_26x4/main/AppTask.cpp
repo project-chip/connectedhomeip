@@ -41,6 +41,7 @@
 #include <lib/support/CHIPPlatformMemory.h>
 
 #include <app/server/OnboardingCodesUtil.h>
+#include <static-supported-modes-manager.h>
 
 /* syscfg */
 #include <ti_drivers_config.h>
@@ -54,6 +55,7 @@ using namespace ::chip::DeviceLayer;
 using chip::Shell::Engine;
 
 AppTask AppTask::sAppTask;
+Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 
 static TaskHandle_t sAppTaskHandle;
 
@@ -122,7 +124,7 @@ CHIP_ERROR AppTask::Init()
             ;
     }
 
-#ifdef CONFIG_OPENTHREAD_MTD_SED
+#ifdef CHIP_CONFIG_ENABLE_ICD_SERVER
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #elif CONFIG_OPENTHREAD_MTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
@@ -136,13 +138,6 @@ CHIP_ERROR AppTask::Init()
             ;
     }
 
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        while (true)
-            ;
-    }
-
     ret = ThreadStackMgrImpl().StartThreadTask();
     if (ret != CHIP_NO_ERROR)
     {
@@ -150,21 +145,35 @@ CHIP_ERROR AppTask::Init()
             ;
     }
 
+    // Initialize device attestation config
+#ifdef CC13X4_26X4_ATTESTATION_CREDENTIALS
+#ifdef CC13XX_26XX_FACTORY_DATA
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+    SetCommissionableDataProvider(&mFactoryDataProvider);
+#else
+    SetDeviceAttestationCredentialsProvider(CC13X4_26X4::GetCC13X4_26X4DacProvider());
+#endif
+#else
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
+
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 
-    // Initialize device attestation config
-#ifdef CC13X4_26X4_ATTESTATION_CREDENTIALS
-    SetDeviceAttestationCredentialsProvider(CC13X4_26X4::GetCC13X4_26X4DacProvider());
-#else
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-#endif
+    ret = PlatformMgr().StartEventLoopTask();
+    if (ret != CHIP_NO_ERROR)
+    {
+        while (true)
+            ;
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     InitializeOTARequestor();
 #endif
+    Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
     return err;
 }
 

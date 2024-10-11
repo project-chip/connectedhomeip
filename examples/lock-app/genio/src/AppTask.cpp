@@ -60,8 +60,6 @@
 #error "Must have portYIELD_FROM_ISR or portEND_SWITCHING_ISR"
 #endif
 
-#define UNUSED_PARAMETER(a) (a = a)
-
 namespace {
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
@@ -596,11 +594,12 @@ void AppTask::UpdateClusterState(intptr_t context)
     OperationSourceEnum source = OperationSourceEnum::kUnspecified;
 
     // write the new lock value
-    EmberAfStatus status =
-        DoorLockServer::Instance().SetLockState(1, newState, source) ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
+    Protocols::InteractionModel::Status status = DoorLockServer::Instance().SetLockState(1, newState, source)
+        ? Protocols::InteractionModel::Status::Success
+        : Protocols::InteractionModel::Status::Failure;
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        MT793X_LOG("ERR: updating lock state %x", status);
+        MT793X_LOG("ERR: updating lock state %x", to_underlying(status));
     }
 }

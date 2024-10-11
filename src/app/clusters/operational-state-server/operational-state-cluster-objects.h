@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/af-enums.h>
+
 #include <lib/support/CommonIterator.h>
 
 namespace chip {
@@ -170,50 +170,6 @@ struct GenericOperationalError : public app::Clusters::detail::Structs::ErrorSta
 private:
     char mErrorStateLabelBuffer[kOperationalErrorLabelMaxSize];
     char mErrorStateDetailsBuffer[kOperationalErrorDetailsMaxSize];
-};
-
-/**
- * A class which represents the operational phase of an Operational State cluster derivation instance.
- */
-struct GenericOperationalPhase
-{
-    GenericOperationalPhase(app::DataModel::Nullable<CharSpan> name) { Set(name); }
-
-    GenericOperationalPhase(const GenericOperationalPhase & ph) { *this = ph; }
-
-    GenericOperationalPhase & operator=(const GenericOperationalPhase & ph)
-    {
-        Set(ph.mPhaseName);
-        return *this;
-    }
-
-    bool IsMissing() const { return mPhaseName.IsNull(); }
-    app::DataModel::Nullable<CharSpan> mPhaseName;
-
-private:
-    void Set(app::DataModel::Nullable<CharSpan> name)
-    {
-        if (name.IsNull())
-        {
-            mPhaseName.SetNull();
-        }
-        else
-        {
-            memset(mPhaseNameBuffer, 0, sizeof(mPhaseNameBuffer));
-            if (name.Value().size() > sizeof(mPhaseNameBuffer))
-            {
-                memcpy(mPhaseNameBuffer, name.Value().data(), sizeof(mPhaseNameBuffer));
-                mPhaseName = app::DataModel::Nullable<CharSpan>(CharSpan(mPhaseNameBuffer, sizeof(mPhaseNameBuffer)));
-            }
-            else
-            {
-                memcpy(mPhaseNameBuffer, name.Value().data(), name.Value().size());
-                mPhaseName = app::DataModel::Nullable<CharSpan>(CharSpan(mPhaseNameBuffer, name.Value().size()));
-            }
-        }
-    }
-
-    char mPhaseNameBuffer[kOperationalPhaseNameMaxSize];
 };
 
 /**

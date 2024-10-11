@@ -16,14 +16,14 @@
 
 import ctypes
 import threading
-import typing
-from ctypes import CFUNCTYPE, c_uint8, c_uint32, c_uint64, c_void_p
+from ctypes import CFUNCTYPE, POINTER, c_uint8, c_uint32, c_uint64, c_void_p
 from dataclasses import dataclass
+from typing import Any, Dict, Optional
 
 import chip.exceptions
 import chip.native
 import chip.tlv
-from construct import Int8ul, Int16ul, Int32ul, Int64ul, Struct
+from construct import Int8ul, Int16ul, Int32ul, Int64ul, Struct  # type: ignore
 
 # The type should match CommandStatus in interaction_model/Delegate.h
 # CommandStatus should not contain padding
@@ -69,6 +69,16 @@ DataVersionFilterIBstruct = Struct(
     "DataVersion" / Int32ul,
 )
 
+SessionParametersStruct = Struct(
+    "SessionIdleInterval" / Int32ul,
+    "SessionActiveInterval" / Int32ul,
+    "SessionActiveThreshold" / Int16ul,
+    "DataModelRevision" / Int16ul,
+    "InteractionModelRevision" / Int16ul,
+    "SpecificationVersion" / Int32ul,
+    "MaxPathsPerInvoke" / Int16ul,
+)
+
 
 @dataclass
 class AttributePath:
@@ -91,20 +101,136 @@ class EventPath:
 class AttributeReadResult:
     path: AttributePath
     status: int
-    value: 'typing.Any'
+    value: 'Any'
     dataVersion: int
 
 
 @dataclass
 class EventReadResult:
     path: EventPath
-    value: 'typing.Any'
+    value: 'Any'
 
 
 @dataclass
 class AttributeWriteResult:
     path: AttributePath
     status: int
+
+
+@dataclass
+class SessionParameters:
+    sessionIdleInterval: Optional[int]
+    sessionActiveInterval: Optional[int]
+    sessionActiveThreshold: Optional[int]
+    dataModelRevision: Optional[int]
+    interactionModelRevision: Optional[int]
+    specficiationVersion: Optional[int]
+    maxPathsPerInvoke: int
+
+
+class PyCommandPath(ctypes.Structure):
+    ''' InvokeRequest Path struct that has c++ counterpart for CFFI.
+
+    We are using the following struct for passing the information of InvokeRequest between Python and C++:
+
+    ```c
+    struct PyCommandPath
+    {
+        chip::EndpointId endpointId;
+        chip::ClusterId clusterId;
+        chip::CommandId commandId;
+    };
+    ```
+    '''
+    _fields_ = [('endpointId', ctypes.c_uint16), ('clusterId', ctypes.c_uint32), ('commandId', ctypes.c_uint32)]
+
+
+class PyInvokeRequestData(ctypes.Structure):
+    ''' InvokeRequest struct that has c++ counterpart for CFFI.
+
+    We are using the following struct for passing the information of InvokeRequest between Python and C++:
+
+    ```c
+    struct PyInvokeRequestData
+    {
+        PyCommandPath commandPath;
+        void * tlvData;
+        size_t tlvLength;
+    };
+    ```
+    '''
+    _fields_ = [('commandPath', PyCommandPath), ('tlvData', ctypes.c_void_p), ('tlvLength', ctypes.c_size_t)]
+
+
+class PyAttributePath(ctypes.Structure):
+    ''' Attributed Path struct that has c++ counterpart for CFFI.
+
+    We are using the following struct for passing the information of WriteAttributes between Python and C++:
+
+    ```c
+    struct PyAttributePath
+    {
+        chip::EndpointId endpointId;
+        chip::ClusterId clusterId;
+        chip::AttributeId attributeId;
+        chip::DataVersion dataVersion;
+        uint8_t hasDataVersion;
+    };
+    ```
+    '''
+    _fields_ = [('endpointId', ctypes.c_uint16), ('clusterId', ctypes.c_uint32), ('attributeId',
+                                                                                  ctypes.c_uint32), ('dataVersion', ctypes.c_uint32), ('hasDataVersion', ctypes.c_uint8)]
+
+
+class PyWriteAttributeData(ctypes.Structure):
+    ''' WriteAttribute struct that has c++ counterpart for CFFI.
+
+    We are using the following struct for passing the information of WriteAttributes between Python and C++:
+
+    ```c
+    struct PyWriteAttributeData
+    {
+        PyAttributePath attributePath;
+        void * tlvData;
+        size_t tlvLength;
+    };
+    ```
+    '''
+    _fields_ = [('attributePath', PyAttributePath), ('tlvData', ctypes.c_void_p), ('tlvLength', ctypes.c_size_t)]
+
+
+class TestOnlyPyBatchCommandsOverrides(ctypes.Structure):
+    ''' TestOnly struct for overriding aspects of batch command to send invalid commands.
+
+    We are using the following struct for passing the information of TestOnlyPyBatchCommandsOverrides between Python and C++:
+
+    ```c
+    struct TestOnlyPyBatchCommandsOverrides
+    {
+        uint16_t overrideRemoteMaxPathsPerInvoke;
+        bool suppressTimedRequestMessage;
+        uint16_t * overrideCommandRefsList;
+        size_t overrideCommandRefsListLength;
+    };
+    ```
+    '''
+    _fields_ = [('overrideRemoteMaxPathsPerInvoke', ctypes.c_uint16), ('suppressTimedRequestMessage', ctypes.c_bool),
+                ('overrideCommandRefsList', POINTER(ctypes.c_uint16)), ('overrideCommandRefsListLength', ctypes.c_size_t)]
+
+
+class TestOnlyPyOnDoneInfo(ctypes.Structure):
+    ''' TestOnly struct for overriding aspects of batch command to send invalid commands.
+
+    We are using the following struct for passing the information of TestOnlyPyBatchCommandsOverrides between Python and C++:
+
+    ```c
+    struct TestOnlyPyOnDoneInfo
+    {
+        size_t responseMessageCount;
+    };
+    ```
+    '''
+    _fields_ = [('responseMessageCount', ctypes.c_size_t)]
 
 
 # typedef void (*PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct)(uint64_t commandSenderPtr,
@@ -118,15 +244,15 @@ _OnCommandResponseProtocolErrorFunct = CFUNCTYPE(None, c_uint64, c_uint8)
 _OnCommandResponseFunct = CFUNCTYPE(None, c_uint64, c_uint32)
 _OnWriteResponseStatusFunct = CFUNCTYPE(None, c_void_p, c_uint32)
 
-_commandStatusDict = dict()
-_commandIndexStatusDict = dict()
+_commandStatusDict: Dict[int, Any] = dict()
+_commandIndexStatusDict: Dict[int, Any] = dict()
 _commandStatusLock = threading.RLock()
 _commandStatusCV = threading.Condition(_commandStatusLock)
 
-_attributeDict = dict()
+_attributeDict: Dict[int, Any] = dict()
 _attributeDictLock = threading.RLock()
 
-_writeStatusDict = dict()
+_writeStatusDict: Dict[int, Any] = dict()
 _writeStatusDictLock = threading.RLock()
 
 # A placeholder commandHandle, will be removed once we decouple CommandSender with CHIPClusters
@@ -204,7 +330,7 @@ def InitIMDelegate():
         setter.Set("pychip_InteractionModelDelegate_SetCommandResponseErrorCallback", None, [
                    _OnCommandResponseFunct])
         setter.Set("pychip_InteractionModel_GetCommandSenderHandle",
-                   c_uint32, [ctypes.POINTER(c_uint64)])
+                   chip.native.PyChipError, [ctypes.POINTER(c_uint64)])
         setter.Set("pychip_InteractionModelDelegate_SetOnWriteResponseStatusCallback", None, [
                    _OnWriteResponseStatusFunct])
 
@@ -263,10 +389,8 @@ def WaitCommandIndexStatus(commandHandle: int, commandIndex: int):
 def GetCommandSenderHandle() -> int:
     handle = chip.native.GetLibraryHandle()
     resPointer = c_uint64()
-    res = handle.pychip_InteractionModel_GetCommandSenderHandle(
-        ctypes.pointer(resPointer))
-    if res != 0:
-        raise chip.exceptions.ChipStackError(res)
+    handle.pychip_InteractionModel_GetCommandSenderHandle(
+        ctypes.pointer(resPointer)).raise_on_error()
     ClearCommandStatus(resPointer.value)
     return resPointer.value
 

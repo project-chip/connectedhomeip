@@ -21,7 +21,6 @@
 
 #include "AppConfig.h"
 #include "AppTask.h"
-#include <FreeRTOS.h>
 
 #include <lib/support/TypeTraits.h>
 
@@ -30,9 +29,6 @@ using namespace ::chip::app::Clusters::OnOff;
 using namespace ::chip::DeviceLayer;
 
 LightingManager LightingManager::sLight;
-
-TimerHandle_t sLightTimer;
-
 namespace {
 
 /**********************************************************
@@ -50,17 +46,16 @@ OnOffEffect gEffect = {
 
 CHIP_ERROR LightingManager::Init()
 {
-    // Create FreeRTOS sw timer for light timer.
-    sLightTimer = xTimerCreate("lightTmr",       // Just a text name, not used by the RTOS kernel
-                               pdMS_TO_TICKS(1), // == default timer period
-                               false,            // no timer reload (==one-shot)
-                               (void *) this,    // init timer id = light obj context
-                               TimerEventHandler // timer callback handler
+    // Create cmsis os sw timer for light timer.
+    mLightTimer = osTimerNew(TimerEventHandler, // timer callback handler
+                             osTimerOnce,       // no timer reload (one-shot timer)
+                             (void *) this,     // pass the app task obj context
+                             NULL               // No osTimerAttr_t to provide.
     );
 
-    if (sLightTimer == NULL)
+    if (mLightTimer == NULL)
     {
-        SILABS_LOG("sLightTimer timer create failed");
+        SILABS_LOG("mLightTimer timer create failed");
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
@@ -157,38 +152,30 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
 
 void LightingManager::StartTimer(uint32_t aTimeoutMs)
 {
-    if (xTimerIsTimerActive(sLightTimer))
+    // Starts or restarts the function timer
+    if (osTimerStart(mLightTimer, pdMS_TO_TICKS(aTimeoutMs)) != osOK)
     {
-        SILABS_LOG("app timer already started!");
-        CancelTimer();
-    }
-
-    // timer is not active, change its period to required value (== restart).
-    // FreeRTOS- Block for a maximum of 100 ms if the change period command
-    // cannot immediately be sent to the timer command queue.
-    if (xTimerChangePeriod(sLightTimer, pdMS_TO_TICKS(aTimeoutMs), pdMS_TO_TICKS(100)) != pdPASS)
-    {
-        SILABS_LOG("sLightTimer timer start() failed");
+        SILABS_LOG("mLightTimer timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
 
 void LightingManager::CancelTimer(void)
 {
-    if (xTimerStop(sLightTimer, pdMS_TO_TICKS(0)) == pdFAIL)
+    if (osTimerStop(mLightTimer) == osError)
     {
-        SILABS_LOG("sLightTimer stop() failed");
+        SILABS_LOG("mLightTimer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 }
 
-void LightingManager::TimerEventHandler(TimerHandle_t xTimer)
+void LightingManager::TimerEventHandler(void * timerCbArg)
 {
-    // Get light obj context from timer id.
-    LightingManager * light = static_cast<LightingManager *>(pvTimerGetTimerID(xTimer));
+    // The callback argument is the light obj context assigned at timer creation.
+    LightingManager * light = static_cast<LightingManager *>(timerCbArg);
 
     // The timer event handler will be called in the context of the timer task
-    // once sLightTimer expires. Post an event to apptask queue with the actual handler
+    // once mLightTimer expires. Post an event to apptask queue with the actual handler
     // so that the event can be handled in the context of the apptask.
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;

@@ -75,11 +75,6 @@ class EventQuality(enum.Flag):
     FABRIC_SENSITIVE = enum.auto()
 
 
-class ClusterSide(enum.Enum):
-    CLIENT = enum.auto()
-    SERVER = enum.auto()
-
-
 class StructTag(enum.Enum):
     REQUEST = enum.auto()
     RESPONSE = enum.auto()
@@ -167,6 +162,7 @@ class Struct:
     code: Optional[int] = None  # for responses only
     qualities: StructQuality = StructQuality.NONE
     api_maturity: ApiMaturity = ApiMaturity.STABLE
+    is_global: bool = False
 
 
 @dataclass
@@ -198,6 +194,7 @@ class Enum:
     base_type: str
     entries: List[ConstantEntry]
     api_maturity: ApiMaturity = ApiMaturity.STABLE
+    is_global: bool = False
 
 
 @dataclass
@@ -206,6 +203,7 @@ class Bitmap:
     base_type: str
     entries: List[ConstantEntry]
     api_maturity: ApiMaturity = ApiMaturity.STABLE
+    is_global: bool = False
 
 
 @dataclass
@@ -220,7 +218,7 @@ class Command:
     api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None)
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
     @property
     def is_timed_invoke(self):
@@ -229,9 +227,9 @@ class Command:
 
 @dataclass
 class Cluster:
-    side: ClusterSide
     name: str
     code: int
+    revision: int = 1
     enums: List[Enum] = field(default_factory=list)
     bitmaps: List[Bitmap] = field(default_factory=list)
     events: List[Event] = field(default_factory=list)
@@ -242,7 +240,7 @@ class Cluster:
     api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None)
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
 
 @dataclass
@@ -252,7 +250,7 @@ class AttributeInstantiation:
     default: Optional[Union[str, int, bool]] = None
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None)
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
 
 @dataclass
@@ -260,7 +258,7 @@ class CommandInstantiation:
     name: str
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None)
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
 
 @dataclass
@@ -271,7 +269,7 @@ class ServerClusterInstantiation:
     events_emitted: Set[str] = field(default_factory=set)
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None)
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
 
 @dataclass
@@ -294,6 +292,11 @@ class Endpoint:
 class Idl:
     clusters: List[Cluster] = field(default_factory=list)
     endpoints: List[Endpoint] = field(default_factory=list)
+
+    # Global types
+    global_bitmaps: List[Bitmap] = field(default_factory=list)
+    global_enums: List[Enum] = field(default_factory=list)
+    global_structs: List[Struct] = field(default_factory=list)
 
     # IDL file name is available only if parsing provides a file name
     parse_file_name: Optional[str] = field(default=None)

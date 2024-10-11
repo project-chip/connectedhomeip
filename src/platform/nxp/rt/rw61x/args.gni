@@ -34,14 +34,13 @@ chip_ble_project_config_include = "<CHIPProjectConfig.h>"
 
 chip_build_tests = false
 
-#This enables the EventList global attribute
-enable_eventlist_attribute = true
-
 declare_args() {
   spinel_interface_rpmsg = true
 
   # if rw610_mbedtls_port_els_pkc is set to false software mbedtls is used instead
   rw610_mbedtls_port_els_pkc = true
+
+  chip_enable_secondary_nwk_if = false
 }
 
 # TODO : Enable the OTA Requestor by default.
@@ -54,10 +53,9 @@ declare_args() {
   no_mcuboot = true
 }
 
-# As a temporary workaround, we are disabling the session resumption because currently
-# the mbedtls port does not support this.
-# If not disabled, reconnecting to the OTA Provider node will fail.
-chip_enable_session_resumption = false
+# By default nxp_nvm_component is set to "littlefs" in nxp_sdk.gni,
+# here we override it to set it to "nvs" for RW61x platform
+nxp_nvm_component = "nvs"
 
 mbedtls_target = "${nxp_sdk_build_root}:nxp_mbedtls"
 

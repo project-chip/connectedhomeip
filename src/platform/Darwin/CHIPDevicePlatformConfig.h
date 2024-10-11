@@ -25,7 +25,6 @@
 
 // ==================== Platform Adaptations ====================
 
-#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC 1
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 0
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
 
@@ -58,9 +57,8 @@
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
 #endif // CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
 
-// Reserve a single dynamic endpoint that we can use to host things like OTA
-// Provider server.
+// Default to as many dynamic endpoints as we can manage.
 #if !defined(CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT) || CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT == 0
 #undef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
-#define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 1
+#define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 254
 #endif // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT

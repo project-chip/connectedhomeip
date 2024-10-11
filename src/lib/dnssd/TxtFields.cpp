@@ -38,6 +38,9 @@ namespace Dnssd {
 
 namespace Internal {
 
+constexpr uint8_t kTCPClient = 1;
+constexpr uint8_t kTCPServer = 2;
+
 namespace {
 
 char SafeToLower(uint8_t ch)
@@ -105,14 +108,14 @@ bool MakeBoolFromAsciiDecimal(const ByteSpan & val)
     return val.size() == 1 && static_cast<char>(*val.data()) == '1';
 }
 
-Optional<bool> MakeOptionalBoolFromAsciiDecimal(const ByteSpan & val)
+std::optional<bool> MakeOptionalBoolFromAsciiDecimal(const ByteSpan & val)
 {
     char character = static_cast<char>(*val.data());
     if (val.size() == 1 && ((character == '1') || (character == '0')))
     {
-        return MakeOptional(character == '1');
+        return std::make_optional(character == '1');
     }
-    return NullOptional;
+    return std::nullopt;
 }
 
 size_t GetPlusSignIdx(const ByteSpan & value)
@@ -183,27 +186,32 @@ void GetPairingInstruction(const ByteSpan & value, char * pairingInstruction)
     Platform::CopyString(pairingInstruction, kMaxPairingInstructionLen + 1, value);
 }
 
-Optional<System::Clock::Milliseconds32> GetRetryInterval(const ByteSpan & value)
+uint8_t GetCommissionerPasscode(const ByteSpan & value)
+{
+    return MakeBoolFromAsciiDecimal(value);
+}
+
+std::optional<System::Clock::Milliseconds32> GetRetryInterval(const ByteSpan & value)
 {
     const auto undefined     = std::numeric_limits<uint32_t>::max();
     const auto retryInterval = MakeU32FromAsciiDecimal(value, undefined);
 
     if (retryInterval != undefined && retryInterval <= kMaxRetryInterval.count())
-        return MakeOptional(System::Clock::Milliseconds32(retryInterval));
+        return std::make_optional(System::Clock::Milliseconds32(retryInterval));
 
-    return NullOptional;
+    return std::nullopt;
 }
 
-Optional<System::Clock::Milliseconds16> GetRetryActiveThreshold(const ByteSpan & value)
+std::optional<System::Clock::Milliseconds16> GetRetryActiveThreshold(const ByteSpan & value)
 {
     const auto retryInterval = MakeU16FromAsciiDecimal(value);
 
     if (retryInterval == 0)
     {
-        return NullOptional;
+        return std::nullopt;
     }
 
-    return MakeOptional(System::Clock::Milliseconds16(retryInterval));
+    return std::make_optional(System::Clock::Milliseconds16(retryInterval));
 }
 
 TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
@@ -250,7 +258,11 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, CommissionN
     case TxtFieldKey::kPairingHint:
         nodeData.pairingHint = Internal::GetPairingHint(val);
         break;
+    case TxtFieldKey::kCommissionerPasscode:
+        nodeData.supportsCommissionerGeneratedPasscode = Internal::GetCommissionerPasscode(val);
+        break;
     default:
+        FillNodeDataFromTxt(key, val, static_cast<CommonResolutionData &>(nodeData));
         break;
     }
 }
@@ -268,9 +280,13 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommonRes
     case TxtFieldKey::kSessionActiveThreshold:
         nodeData.mrpRetryActiveThreshold = Internal::GetRetryActiveThreshold(value);
         break;
-    case TxtFieldKey::kTcpSupported:
-        nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
+    case TxtFieldKey::kTcpSupported: {
+        // bit 0 is reserved and deprecated
+        uint8_t support            = Internal::MakeU8FromAsciiDecimal(value);
+        nodeData.supportsTcpClient = (support & (1 << Internal::kTCPClient)) != 0;
+        nodeData.supportsTcpServer = (support & (1 << Internal::kTCPServer)) != 0;
         break;
+    }
     case TxtFieldKey::kLongIdleTimeICD:
         nodeData.isICDOperatingAsLIT = Internal::MakeOptionalBoolFromAsciiDecimal(value);
         break;

@@ -23,7 +23,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <app/util/af-enums.h>
+
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lock/AppConfig.h>
@@ -99,7 +99,7 @@ CHIP_ERROR AppTask::Init()
 
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
 
-    chip::DeviceLayer::SystemLayer().ScheduleWork(UpdateClusterState, nullptr);
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -322,7 +322,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     }
     else
     {
-        // If the button was released before factory reset got initiated, start BLE advertissement in fast mode
+        // If the button was released before factory reset got initiated, start BLE advertisement in fast mode
         if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
         {
             sAppTask.CancelTimer();
@@ -336,7 +336,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             }
             else
             {
-                ESP_LOGI(TAG, "Network is already provisioned, Ble advertissement not enabled");
+                ESP_LOGI(TAG, "Network is already provisioned, Ble advertisement not enabled");
             }
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
@@ -424,7 +424,7 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     }
     if (sAppTask.mSyncClusterToButtonAction)
     {
-        chip::DeviceLayer::SystemLayer().ScheduleWork(UpdateClusterState, nullptr);
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
         sAppTask.mSyncClusterToButtonAction = false;
     }
 }
@@ -463,14 +463,14 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 }
 
 /* if unlocked then it locked it first*/
-void AppTask::UpdateClusterState(chip::System::Layer *, void * context)
+void AppTask::UpdateClusterState(intptr_t context)
 {
     uint8_t newValue = !BoltLockMgr().IsUnlocked();
 
     // write the new on/off value
-    EmberAfStatus status = chip::app::Clusters::OnOff::Attributes::OnOff::Set(1, newValue);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    Protocols::InteractionModel::Status status = chip::app::Clusters::OnOff::Attributes::OnOff::Set(1, newValue);
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ESP_LOGI(TAG, "ERR: updating on/off %x", status);
+        ESP_LOGI(TAG, "ERR: updating on/off %x", to_underlying(status));
     }
 }

@@ -38,7 +38,6 @@ def download_and_extract_zip(url, dest_dir, *member_names):
 
 def process_project_args(gn_args_json_file, *params):
     processor = ProjectArgProcessor(gn_args_json_file)
-    processor.process_defaults()
     processor.process_env()
     processor.process_parameters(params)
     for arg, value in processor.args.items():
@@ -63,10 +62,10 @@ class ProjectArgProcessor:
             for arg in json.load(fh):
                 self.gn_args[arg['name']] = arg['default']['value'][0].translate(argtype)
 
-    def process_defaults(self):
-        self.add_default('custom_toolchain', 'custom')
-
     def process_env(self):
+        self.add_env_arg('chip_code_pre_generated_directory', 'CHIP_PREGEN_DIR')
+
+        self.add_default('custom_toolchain', 'custom')
         self.add_env_arg('target_cc', 'CC', 'cc')
         self.add_env_arg('target_cxx', 'CXX', 'cxx')
         self.add_env_arg('target_ar', 'AR', 'ar')

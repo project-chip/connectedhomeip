@@ -30,7 +30,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRCluster ()
 @property (readonly, nonatomic) dispatch_queue_t callbackQueue;
-@property (nonatomic, readonly) chip::EndpointId endpoint;
 
 - (instancetype)initWithEndpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue;
 @end

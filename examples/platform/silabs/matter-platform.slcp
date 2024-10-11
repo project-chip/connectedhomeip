@@ -27,27 +27,37 @@ include:
   file_list:
   - {path: app.h}
   - {path: reset_util.h}
-sdk: {id: gecko_sdk, version: 4.3.1}
+sdk: {id: simplicity_sdk, version: 2024.6.0}
 toolchain_settings: []
 
 component:
-- {id: bluetooth_feature_nvm}
-- {id: bluetooth_feature_gatt_server}
-- {id: nvm3_lib}
-- {id: bluetooth_feature_sm}
-- {id: bluetooth_feature_gap}
-- {id: bluetooth_feature_legacy_advertiser}
+#bluetooth components
 - {id: gatt_configuration}
-- {id: freertos}
+- {id: bluetooth_feature_gatt_server}
+- {id: bluetooth_feature_legacy_advertiser}
+- {id: bluetooth_feature_connection}
+- {id: bluetooth_feature_system}
 - {id: bluetooth_stack}
+# Platform support
+- {id: cpp_support}
+- {id: sl_system}
+- {id: device_init}
+- {id: board_control}
+- {id: memory_manager}
+- {id: silabs_core_memory_manager}
+- {id: clock_manager}
+- {id: silabs_core_circular_queue}
+- {id: sleeptimer}
+- {id: nvm3_lib}
+- {id: freertos}
+- {id: freertos_heap_3}
+- {id: iostream_rtt}
+- {id: toolchain_gcc}
 - {id: brd4002a}
 - {id: rail_util_pti}
-- {id: bluetooth_feature_gatt}
-- {id: bluetooth_feature_connection}
 - {id: rail_lib_multiprotocol}
-- {id: bluetooth_feature_system}
-- {id: bluetooth_feature_scanner}
 - {id: rail_util_power_manager_init}
+# crypto components
 - {id: psa_crypto}
 - {id: psa_crypto_aes}
 - {id: psa_crypto_ccm}
@@ -62,8 +72,9 @@ component:
 - {id: mbedtls_platform_dynamic_memory_allocation_config_init_runtime }
 - {id: mbedtls_base64}
 - {id: ot_psa_crypto}
-- {id: bluetooth_crypto}
-- {id: iostream_rtt}
+- {id: ot_platform_abstraction}
+- {id: ot_rtos_wrappers_real}
+- {id: sl_ot_custom_cli}
 # Necessary componenets for ot coap cert lib
 # - {id: mbedtls_dtls} # Requried by COAP lib
 # - {id: mbedtls_tls_server} # Requried by COAP lib
@@ -78,6 +89,10 @@ config_file:
     directory: btconf
 
 configuration:
+- name: SL_OPENTHREAD_ENABLE_APP_TASK
+  value: 0
+- name: SL_OPENTHREAD_ENABLE_CLI_TASK
+  value: 0
 - {name: SL_MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED, value: '0'}
 - {name: SL_MBEDTLS_KEY_EXCHANGE_PSK_ENABLED, value: '1'}
 - condition: [uartdrv_usart]
@@ -90,9 +105,15 @@ configuration:
   name: SL_IOSTREAM_USART_VCOM_RX_BUFFER_SIZE
   value: '128'
 - {name: SL_HEAP_SIZE, value: '0'}
-- {name: SL_STACK_SIZE, value: '0'}
+- {name: SL_STACK_SIZE, value: '4608'}
 - {name: SL_BOARD_ENABLE_VCOM, value: '0'}
 - {name: EMDRV_UARTDRV_FLOW_CONTROL_ENABLE, value: '0'}
+- {name: NVM3_DEFAULT_MAX_OBJECT_SIZE, value: '4092'}
+- {name: CIRCULAR_QUEUE_LEN_MAX, value: '16'}
+- {name: SL_CLOCK_MANAGER_HFRCO_DPLL_EN, value: 1}
+- {name: SL_BT_RTOS_LINK_LAYER_TASK_STACK_SIZE, value: 1024}
+- {name: SL_BT_RTOS_HOST_STACK_TASK_STACK_SIZE, value: 2048}
+- {name: SL_BT_RTOS_EVENT_HANDLER_STACK_SIZE, value: 1536}
 
 template_contribution:
   - name: mbedtls_ssl_content_len_in_requirement
@@ -101,8 +122,6 @@ template_contribution:
     value: 900
 
 requires:
-- condition: [device_series_1]
-  name: uartdrv_usart
 - condition: [device_series_2]
   name: uartdrv_eusart
 - condition: [device_series_2]

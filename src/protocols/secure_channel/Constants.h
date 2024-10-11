@@ -43,7 +43,7 @@ namespace chip {
 namespace Protocols {
 namespace SecureChannel {
 
-inline constexpr const char * kProtocolName = "SecureChannel";
+inline constexpr char kProtocolName[] = "SecureChannel";
 
 /**
  * SecureChannel Protocol Message Types
@@ -129,7 +129,7 @@ struct MessageTypeTraits<SecureChannel::MsgType>
 
     static auto GetTypeToNameTable()
     {
-        static const std::array<MessageTypeNameLookup, 13> typeToNameTable = {
+        static const std::array<MessageTypeNameLookup, 14> typeToNameTable = {
             {
                 { SecureChannel::MsgType::MsgCounterSyncReq, "MsgCounterSyncReq" },
                 { SecureChannel::MsgType::MsgCounterSyncRsp, "MsgCounterSyncRsp" },
@@ -144,6 +144,7 @@ struct MessageTypeTraits<SecureChannel::MsgType>
                 { SecureChannel::MsgType::CASE_Sigma3, "CASE_Sigma3" },
                 { SecureChannel::MsgType::CASE_Sigma2Resume, "CASE_Sigma2Resume" },
                 { SecureChannel::MsgType::StatusReport, "StatusReport" },
+                { SecureChannel::MsgType::ICD_CheckIn, "ICD_CheckInMessage" },
             },
         };
 

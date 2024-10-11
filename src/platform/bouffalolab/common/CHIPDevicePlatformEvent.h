@@ -18,6 +18,7 @@
 #pragma once
 
 #include <platform/CHIPDeviceEvent.h>
+#include <system/SystemPacketBuffer.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <bluetooth/bluetooth.h>

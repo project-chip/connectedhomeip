@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/attribute-storage.h>
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 /**
  * @brief Handles interfacing between java code and C++ code for the purposes of PowerSource clusters.
@@ -35,5 +36,5 @@ public:
 private:
     // init with java objects
     CHIP_ERROR InitializeWithObjects(jobject managerObject);
-    jobject mPowerSourceManagerObject = nullptr;
+    chip::JniGlobalReference mPowerSourceManagerObject;
 };

@@ -20,6 +20,7 @@
 #pragma once
 
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/ESP32/CHIPDevicePlatformConfig.h>
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>

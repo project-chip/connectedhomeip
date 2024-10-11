@@ -9,7 +9,7 @@
 [![ASR](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20ASR/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-asr.yaml)
 [![BouffaloLab](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20BouffaloLab/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-bouffalolab.yaml)
 [![Darwin](https://github.com/project-chip/connectedhomeip/workflows/Darwin/badge.svg)](https://github.com/project-chip/connectedhomeip/blob/master/.github/workflows/darwin.yaml)
-[![TI CC26X2X7](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20TI%20CC26X2X7/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-cc13x2x7_26x2x7.yaml)
+[![TI CC26X2X7](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20TI%20CC13XX_26XX/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-cc13xx_26xx.yaml)
 [![TI CC32XX](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20TI%20CC32XX/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-cc32xx.yaml)
 [![EFR32](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20EFR32/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-efr32.yaml)
 [![ESP32](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20ESP32/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-esp32.yaml)
@@ -210,18 +210,18 @@ The Matter repository is structured as follows:
 | credentials        | Development and test credentials                                                                                                                      |
 | docs               | Documentation, including guides. Visit the [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html) to read it. |
 | examples           | Example firmware applications that demonstrate use of Matter                                                                                          |
-| integrations       | 3rd Party integrations                                                                                                                                |
+| integrations       | 3rd party integrations                                                                                                                                |
 | scripts            | Scripts needed to work with the Matter repository                                                                                                     |
 | src                | Implementation of Matter                                                                                                                              |
 | third_party        | 3rd party code used by Matter                                                                                                                         |
-| zzz_generated      | zap generated template code - Revolving around cluster information                                                                                    |
-| BUILD.gn           | Build file for the gn build system                                                                                                                    |
+| zzz_generated      | ZAP generated template code - Revolving around cluster information                                                                                    |
+| BUILD.gn           | Build file for the GN build system                                                                                                                    |
 | CODE_OF_CONDUCT.md | Code of conduct for Matter and contribution to it                                                                                                     |
 | CONTRIBUTING.md    | Guidelines for contributing to Matter                                                                                                                 |
 | LICENSE            | Matter license file                                                                                                                                   |
 | REVIEWERS.md       | PR reviewers                                                                                                                                          |
 | gn_build.sh        | Build script for specific projects such as Android, EFR32, etc.                                                                                       |
-| README.md          | This File                                                                                                                                             |
+| README.md          | This file                                                                                                                                             |
 
 # License
 

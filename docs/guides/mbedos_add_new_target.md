@@ -2,6 +2,8 @@
 
 # Mbed-OS add new hardware target
 
+### WARNING, MbedOS is deprecated and support for it will be removed from the connectedhomeip project
+
 ## Overview
 
 This document shows how to add the new Mbed OS hardware target to Matter

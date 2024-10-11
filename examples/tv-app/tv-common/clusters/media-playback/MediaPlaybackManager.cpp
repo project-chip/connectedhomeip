@@ -19,7 +19,8 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
 
-using namespace std;
+#include <string>
+
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::MediaPlayback;
 using namespace chip::Uint8;
@@ -60,6 +61,40 @@ uint64_t MediaPlaybackManager::HandleGetSeekRangeEnd()
     return mDuration;
 }
 
+CHIP_ERROR MediaPlaybackManager::HandleGetActiveAudioTrack(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(mActiveAudioTrack);
+}
+
+CHIP_ERROR MediaPlaybackManager::HandleGetAvailableAudioTracks(AttributeValueEncoder & aEncoder)
+{
+    // TODO: Insert code here
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (auto const & audioTrack : mAvailableAudioTracks)
+        {
+            ReturnErrorOnFailure(encoder.Encode(audioTrack));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR MediaPlaybackManager::HandleGetActiveTextTrack(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(mActiveTextTrack);
+}
+
+CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTextTracks(AttributeValueEncoder & aEncoder)
+{
+    // TODO: Insert code here
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (auto const & textTrack : mAvailableTextTracks)
+        {
+            ReturnErrorOnFailure(encoder.Encode(textTrack));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
 void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
@@ -97,7 +132,8 @@ void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackRe
     helper.Success(response);
 }
 
-void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
+void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                             const chip::Optional<bool> & audioAdvanceUnmuted)
 {
     // TODO: Insert code here
     if (mPlaybackSpeed == kPlaybackMaxForwardSpeed)
@@ -137,7 +173,8 @@ void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::Playba
     helper.Success(response);
 }
 
-void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
+void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                        const chip::Optional<bool> & audioAdvanceUnmuted)
 {
     // TODO: Insert code here
     if (mPlaybackSpeed == kPlaybackMaxRewindSpeed)
@@ -239,14 +276,71 @@ void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::Playb
     helper.Success(response);
 }
 
+bool MediaPlaybackManager::HandleActivateAudioTrack(const chip::CharSpan & trackId, const uint8_t & audioOutputIndex)
+{
+    std::string idString(trackId.data(), trackId.size());
+    for (auto const & availableAudioTrack : mAvailableAudioTracks)
+    {
+        std::string nextIdString(availableAudioTrack.id.data(), availableAudioTrack.id.size());
+        if (nextIdString == idString)
+        {
+            mActiveAudioTrack = availableAudioTrack;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool MediaPlaybackManager::HandleActivateTextTrack(const chip::CharSpan & trackId)
+{
+    std::string idString(trackId.data(), trackId.size());
+    for (auto const & availableTextTrack : mAvailableTextTracks)
+    {
+        std::string nextIdString(availableTextTrack.id.data(), availableTextTrack.id.size());
+        if (nextIdString == idString)
+        {
+            mActiveTextTrack = availableTextTrack;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool MediaPlaybackManager::HandleDeactivateTextTrack()
+{
+    // Handle Deactivate Text Track
+    if (mActiveTextTrack.id.data() != nullptr)
+    {
+        mActiveTextTrack = {};
+    }
+    return true;
+}
+
 uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
 {
-    if (endpoint >= EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return mDynamicEndpointFeatureMap;
+        return kEndpointFeatureMap;
     }
 
     uint32_t featureMap = 0;
     Attributes::FeatureMap::Get(endpoint, &featureMap);
     return featureMap;
+}
+
+uint16_t MediaPlaybackManager::GetClusterRevision(chip::EndpointId endpoint)
+{
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return kClusterRevision;
+    }
+
+    uint16_t clusterRevision = 0;
+    bool success =
+        (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == chip::Protocols::InteractionModel::Status::Success);
+    if (!success)
+    {
+        ChipLogError(Zcl, "MediaPlaybackManager::GetClusterRevision error reading cluster revision");
+    }
+    return clusterRevision;
 }

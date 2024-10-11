@@ -27,16 +27,19 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
-#include "FreeRTOS.h"
-#include "timers.h" // provides FreeRTOS timer support
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/server/AppDelegate.h>
 #include <app/util/config.h>
-#include <ble/BLEEndPoint.h>
+#include <ble/Ble.h>
+#include <cmsis_os2.h>
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
+#include "LEDWidget.h"
+
+#ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 #include <app/clusters/identify-server/identify-server.h>
 #endif
 
@@ -60,6 +63,23 @@
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
 
+class BaseApplicationDelegate : public AppDelegate, public chip::FabricTable::Delegate
+{
+public:
+    bool isCommissioningInProgress() { return isComissioningStarted; }
+
+private:
+    // AppDelegate
+    bool isComissioningStarted = false;
+    void OnCommissioningSessionStarted() override;
+    void OnCommissioningSessionStopped() override;
+    void OnCommissioningWindowClosed() override;
+
+    // FabricTable::Delegate
+    void OnFabricCommitted(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override;
+    void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override;
+};
+
 /**********************************************************
  * BaseApplication Declaration
  *********************************************************/
@@ -71,6 +91,9 @@ public:
     BaseApplication() = default;
     virtual ~BaseApplication(){};
     static bool sIsProvisioned;
+    static bool sIsFactoryResetTriggered;
+    static LEDWidget * sAppActionLed;
+    static BaseApplicationDelegate sAppDelegate;
 
     /**
      * @brief Create AppTask task and Event Queue
@@ -78,7 +101,21 @@ public:
      *
      * @return CHIP_ERROR CHIP_NO_ERROR if no errors
      */
-    CHIP_ERROR StartAppTask(TaskFunction_t taskFunction);
+    CHIP_ERROR StartAppTask(osThreadFunc_t taskFunction);
+
+    /**
+     * @brief Links the application specific led to the baseApplication context
+     * in order to synchronize both LED animations.
+     * Some apps may not have an application led or no animation patterns.
+     *
+     * @param appLed Pointer to the configure LEDWidget for the application defined LED
+     */
+    void LinkAppLed(LEDWidget * appLed) { sAppActionLed = appLed; }
+
+    /**
+     * @brief Remove the app Led linkage form the baseApplication context
+     */
+    void UnlinkAppLed() { sAppActionLed = nullptr; }
 
     /**
      * @brief PostEvent function that add event to AppTask queue for processing
@@ -87,11 +124,18 @@ public:
      */
     static void PostEvent(const AppEvent * event);
 
+    /**
+     * @brief Overridable function used to update display on button press
+     */
+    virtual void UpdateDisplay();
+
 #ifdef DISPLAY_ENABLED
     /**
      * @brief Return LCD object
      */
     static SilabsLCD & GetLCD(void);
+
+    static void UpdateLCDStatusScreen(bool withChipStackLock = true);
 #endif
 
     /**
@@ -104,9 +148,12 @@ public:
      *        Turns off Status LED before stopping timer
      */
     static void StopStatusLEDTimer(void);
-    static bool getWifiProvisionStatus(void);
+    static bool GetProvisionStatus(void);
 
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
+    static void StartFactoryResetSequence(void);
+    static void CancelFactoryResetSequence(void);
+
+#ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
     // Idenfiy server command callbacks.
     static void OnIdentifyStart(Identify * identify);
     static void OnIdentifyStop(Identify * identify);
@@ -114,15 +161,17 @@ public:
     static void OnTriggerIdentifyEffect(Identify * identify);
 #endif
 
-    enum Function_t
-    {
-        kFunction_NoneSelected   = 0,
-        kFunction_SoftwareUpdate = 0,
-        kFunction_StartBleAdv    = 1,
-        kFunction_FactoryReset   = 2,
+    /**
+     * @brief Updates the static boolean isCommissioned to the desired state
+     *
+     */
+    static void UpdateCommissioningStatus(bool newState);
 
-        kFunction_Invalid
-    } Function;
+    /**
+     * @brief Called when the last Fabric is removed, clears all Fabric related data, including Thread and Wifi provision.
+     * @note This function preserves some NVM3 data that is not Fabric scoped, like Attribute Value or Boot Count.
+     */
+    static void DoProvisioningReset();
 
 protected:
     CHIP_ERROR Init();
@@ -150,9 +199,9 @@ protected:
      * @brief Function Timer finished callback function
      *        Post an FunctionEventHandler event
      *
-     * @param xTimer timer that finished
+     * @param timerCbArg argument to the timer callback function assigned at timer creation
      */
-    static void FunctionTimerEventHandler(TimerHandle_t xTimer);
+    static void FunctionTimerEventHandler(void * timerCbArg);
 
     /**
      * @brief Timer Event processing function
@@ -175,9 +224,9 @@ protected:
      * @brief Light Timer finished callback function
      *        Calls LED processing function
      *
-     * @param xTimer timer that finished
+     * @param timerCbArg argument to the timer callback function assigned at timer creation
      */
-    static void LightTimerEventHandler(TimerHandle_t xTimer);
+    static void LightTimerEventHandler(void * timerCbArg);
 
     /**
      * @brief Updates device LEDs
@@ -217,4 +266,7 @@ protected:
      * Protected Attributes declaration
      *********************************************************/
     bool mSyncClusterToButtonAction;
+
+private:
+    static void InitOTARequestorHandler(chip::System::Layer * systemLayer, void * appState);
 };

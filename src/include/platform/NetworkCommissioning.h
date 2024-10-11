@@ -29,6 +29,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/Optional.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/TypeTraits.h>
 #include <lib/support/Variant.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/internal/DeviceNetworkInfo.h>
@@ -36,6 +37,7 @@
 #include <app-common/zap-generated/cluster-enums.h>
 
 #include <limits>
+#include <utility>
 
 namespace chip {
 namespace DeviceLayer {
@@ -129,8 +131,13 @@ using NetworkIterator            = Iterator<Network>;
 using WiFiScanResponseIterator   = Iterator<WiFiScanResponse>;
 using ThreadScanResponseIterator = Iterator<ThreadScanResponse>;
 using Status                     = app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum;
-using WiFiBand                   = app::Clusters::NetworkCommissioning::WiFiBandEnum;
-using WiFiSecurity               = app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
+using WiFiBandEnum               = app::Clusters::NetworkCommissioning::WiFiBandEnum;
+// For backwards compatibility with pre-rename enum values.
+using WiFiBand           = WiFiBandEnum;
+using WiFiSecurityBitmap = app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
+// For backwards compatibility with pre-rename bitmap values.
+using WiFiSecurity       = WiFiSecurityBitmap;
+using ThreadCapabilities = app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap;
 
 // BaseDriver and WirelessDriver are the common interfaces for a network driver, platform drivers should not implement this
 // directly, instead, users are expected to implement WiFiDriver, ThreadDriver and EthernetDriver.
@@ -240,6 +247,13 @@ public:
      * called inside ConnectNetwork.
      */
     virtual void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) = 0;
+
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    /**
+     * @brief Disconnect from network, if currently connected.
+     */
+    virtual CHIP_ERROR DisconnectFromNetwork() { return CHIP_ERROR_NOT_IMPLEMENTED; }
+#endif
 };
 } // namespace Internal
 
@@ -344,11 +358,35 @@ public:
     /**
      * @brief Signs the specified message with the private key of a Network Client Identity.
      */
-    virtual CHIP_ERROR SignWithClientIdentity(uint8_t networkIndex, ByteSpan & message, Crypto::P256ECDSASignature & outSignature)
+    virtual CHIP_ERROR SignWithClientIdentity(uint8_t networkIndex, const ByteSpan & message,
+                                              Crypto::P256ECDSASignature & outSignature)
     {
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
+    /**
+     *  @brief Provide all the frequency bands supported by the Wi-Fi interface.
+     *
+     *  The default implementation returns the 2.4 GHz band support.
+     *  Note: WiFi platforms should implement this function in their WiFiDriver to provide their complete device capabilities.
+     *
+     *  The returned bit mask has values of WiFiBandEnum packed into the bits. For example:
+     *
+     *    - Bit 0 = (WiFiBandEnum::k2g4 == 0) --> (1 << 0) == (1 << WiFiBandEnum::k2g4)
+     *    - Bit 2 = (WiFiBandEnum::k5g == 2) --> (1 << 2) == (1 << WiFiBandEnum::k5g)
+     *    - If both 2.4G and 5G are supported --> ((1 << k2g4) || (1 << k5g)) == (1 || 4) == 5
+     *
+     *  On error, return 0 (no bands supported). This should never happen... Note that
+     *  certification tests will REQUIRE at least one bit set in the set.
+     *
+     *  @return a bitmask of supported Wi-Fi bands where each bit is associated with a WiFiBandEnum value.
+     */
+    virtual uint32_t GetSupportedWiFiBandsMask() const
+    {
+        // Default to 2.4G support (100% example platform coverage as of Matter 1.3) listed.
+        return static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
+    }
 
     ~WiFiDriver() override = default;
 };
@@ -388,6 +426,16 @@ public:
      * be called inside ScanNetworks.
      */
     virtual void ScanNetworks(ScanCallback * callback) = 0;
+
+    /**
+     * @brief Provide all of the Thread features supported by the Thread interface
+     */
+    virtual ThreadCapabilities GetSupportedThreadFeatures() = 0;
+
+    /**
+     * @brief Return the Thread version supported by the Thread interface
+     */
+    virtual uint16_t GetThreadVersion() = 0;
 
     ~ThreadDriver() override = default;
 };

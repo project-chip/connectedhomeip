@@ -20,7 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
-#include <app/util/af-enums.h>
+
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -34,7 +34,7 @@ typedef void (RvcDevice::*HandleOpStateCommand)(Clusters::OperationalState::Gene
 namespace RvcOperationalState {
 
 // This is an application level delegate to handle operational state commands according to the specific business logic.
-class RvcOperationalStateDelegate : public OperationalState::Delegate
+class RvcOperationalStateDelegate : public RvcOperationalState::Delegate
 {
 private:
     const Clusters::OperationalState::GenericOperationalState mOperationalStateList[7] = {
@@ -47,16 +47,14 @@ private:
         OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kCharging)),
         OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kDocked)),
     };
-
-    const Clusters::OperationalState::GenericOperationalPhase mOperationalPhaseList[1] = {
-        // Phase List is null
-        OperationalState::GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
-    };
+    const Span<const CharSpan> mOperationalPhaseList;
 
     RvcDevice * mPauseRvcDeviceInstance;
     HandleOpStateCommand mPauseCallback;
     RvcDevice * mResumeRvcDeviceInstance;
     HandleOpStateCommand mResumeCallback;
+    RvcDevice * mGoHomeRvcDeviceInstance;
+    HandleOpStateCommand mGoHomeCallback;
 
 public:
     /**
@@ -77,15 +75,18 @@ public:
                                           Clusters::OperationalState::GenericOperationalState & operationalState) override;
 
     /**
-     * Fills in the provided GenericOperationalPhase with the phase at index `index` if there is one,
+     * Fills in the provided MutableCharSpan with the phase at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of phases.
+     *
+     * If CHIP_ERROR_NOT_FOUND is returned for index 0, that indicates that the PhaseList attribute is null
+     * (there are no phases defined at all).
+     *
      * Note: This is used by the SDK to populate the phase list attribute. If the contents of this list changes, the
      * device SHALL call the Instance's ReportPhaseListChange method to report that this attribute has changed.
      * @param index The index of the phase, with 0 representing the first phase.
-     * @param operationalPhase  The GenericOperationalPhase is filled.
+     * @param operationalPhase  The MutableCharSpan is filled.
      */
-    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index,
-                                          Clusters::OperationalState::GenericOperationalPhase & operationalPhase) override;
+    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override;
 
     // command callback
     /**
@@ -101,20 +102,10 @@ public:
     void HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
     /**
-     * Handle Command Callback in application: Start
+     * Handle Command Callback in application: GoHome
      * @param[out] get operational error after callback.
      */
-    void HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
-        // This command in not supported.
-    };
-
-    /**
-     * Handle Command Callback in application: Stop
-     * @param[out] get operational error after callback.
-     */
-    void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
-        // This command in not supported.
-    };
+    void HandleGoHomeCommandCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
     void SetPauseCallback(HandleOpStateCommand aCallback, RvcDevice * aInstance)
     {
@@ -126,6 +117,12 @@ public:
     {
         mResumeCallback          = aCallback;
         mResumeRvcDeviceInstance = aInstance;
+    };
+
+    void SetGoHomeCallback(HandleOpStateCommand aCallback, RvcDevice * aInstance)
+    {
+        mGoHomeCallback          = aCallback;
+        mGoHomeRvcDeviceInstance = aInstance;
     };
 };
 

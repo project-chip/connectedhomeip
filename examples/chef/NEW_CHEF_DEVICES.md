@@ -94,13 +94,13 @@ Basic device availability should show when running:
 
 ### Compilation
 
-This example uses `rootnode_contactsensor_lFAGG1bfRO` for commands. Substitute
+This example uses `rootnode_contactsensor_27f76aeaf5` for commands. Substitute
 your own device for testing newly created devices.
 
 ```
 ./examples/chef/chef.py                 \
    -t linux                             \
-   -d rootnode_contactsensor_lFAGG1bfRO \
+   -d rootnode_contactsensor_27f76aeaf5 \
    -b
 ```
 
@@ -113,5 +113,5 @@ Where options used are:
 ### Execution
 
 Build will be available in
-`examples/chef/linux/out/rootnode_contactsensor_lFAGG1bfRO` (path will vary
+`examples/chef/linux/out/rootnode_contactsensor_27f76aeaf5` (path will vary
 based on platform and device being built)

@@ -46,6 +46,7 @@ constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kClusterIdTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kAttributeIdTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kEventIdTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kEventPathTypeTag;
+constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kResumptionRetriesTag;
 
 SimpleSubscriptionResumptionStorage::SimpleSubscriptionInfoIterator::SimpleSubscriptionInfoIterator(
     SimpleSubscriptionResumptionStorage & storage) :
@@ -252,6 +253,18 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Load(uint16_t subscriptionIndex,
     }
     ReturnErrorOnFailure(reader.ExitContainer(eventsListType));
 
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    // If the reader cannot get resumption retries, set it to 0 for subscriptionInfo
+    if (reader.Next(kResumptionRetriesTag) == CHIP_NO_ERROR)
+    {
+        ReturnErrorOnFailure(reader.Get(subscriptionInfo.mResumptionRetries));
+    }
+    else
+    {
+        subscriptionInfo.mResumptionRetries = 0;
+    }
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
     ReturnErrorOnFailure(reader.ExitContainer(subscriptionContainerType));
 
     return CHIP_NO_ERROR;
@@ -307,6 +320,9 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Save(TLV::TLVWriter & writer, Su
         ReturnErrorOnFailure(writer.EndContainer(eventContainerType));
     }
     ReturnErrorOnFailure(writer.EndContainer(eventsListType));
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    ReturnErrorOnFailure(writer.Put(kResumptionRetriesTag, subscriptionInfo.mResumptionRetries));
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 
     ReturnErrorOnFailure(writer.EndContainer(subscriptionContainerType));
 

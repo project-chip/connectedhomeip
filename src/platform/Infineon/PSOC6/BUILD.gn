@@ -41,7 +41,6 @@ static_library("PSOC6") {
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "LwIPCoreLock.cpp",
     "MTBKeyValueStore.cpp",
     "MTBKeyValueStore.h",
@@ -49,10 +48,10 @@ static_library("PSOC6") {
     "NetworkCommissioningWiFiDriver.cpp",
     "OTAImageProcessorImpl.cpp",
     "OTAImageProcessorImpl.h",
-    "P6Config.cpp",
-    "P6Config.h",
-    "P6Utils.cpp",
-    "P6Utils.h",
+    "PSOC6Config.cpp",
+    "PSOC6Config.h",
+    "PSOC6Utils.cpp",
+    "PSOC6Utils.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
@@ -77,4 +76,12 @@ static_library("PSOC6") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "Logging.cpp" ]
 }

@@ -21,7 +21,9 @@
 #include <lib/support/IniEscaping.h>
 
 #include <fstream>
+#include <map>
 #include <memory>
+#include <string>
 
 using String   = std::basic_string<char>;
 using Section  = std::map<String, String>;
@@ -32,12 +34,12 @@ using namespace ::chip::Controller;
 using namespace ::chip::IniEscaping;
 using namespace ::chip::Logging;
 
-constexpr const char kDefaultSectionName[]  = "Default";
-constexpr const char kPortKey[]             = "ListenPort";
-constexpr const char kLoggingKey[]          = "LoggingLevel";
-constexpr const char kLocalNodeIdKey[]      = "LocalNodeId";
-constexpr const char kCommissionerCATsKey[] = "CommissionerCATs";
-constexpr LogCategory kDefaultLoggingLevel  = kLogCategory_Automation;
+constexpr char kDefaultSectionName[]       = "Default";
+constexpr char kPortKey[]                  = "ListenPort";
+constexpr char kLoggingKey[]               = "LoggingLevel";
+constexpr char kLocalNodeIdKey[]           = "LocalNodeId";
+constexpr char kCommissionerCATsKey[]      = "CommissionerCATs";
+constexpr LogCategory kDefaultLoggingLevel = kLogCategory_Automation;
 
 const char * GetUsedDirectory(const char * directory)
 {
@@ -83,6 +85,7 @@ CHIP_ERROR PersistentStorage::Init(const char * name, const char * directory)
 
     mName      = name;
     mDirectory = directory;
+    mConfig.clear();
     mConfig.parse(ifs);
     ifs.close();
 

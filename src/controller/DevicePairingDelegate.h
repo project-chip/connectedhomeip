@@ -114,6 +114,40 @@ public:
      * in order to resume the commissioning process.
      */
     virtual void OnScanNetworksFailure(CHIP_ERROR error) {}
+
+    /**
+     * @brief
+     *  Called when the ICD registration information (ICD symmetric key, check-in node ID and monitored subject) is required.
+     *
+     * The DeviceCommissioner will be waiting in the kICDGetRegistrationInfo step and not advancing the commissioning process.
+     *
+     * The implementation should set the ICD registration info on the CommissioningParameters of the CommissioningDelegate
+     * using CommissioningDelegate.SetCommissioningParameters(), and then call DeviceCommissioner.ICDRegistrationInfoReady()
+     * in order to resume the commissioning process.
+     *
+     * Not called if the ICD registration info is provided up front.
+     */
+    virtual void OnICDRegistrationInfoRequired() {}
+
+    /**
+     * @brief
+     *   Called when the registration flow for the ICD completes.
+     *
+     * @param[in] icdNodeId    The node id of the ICD.
+     * @param[in] icdCounter   The ICD Counter received from the device.
+     */
+    virtual void OnICDRegistrationComplete(ScopedNodeId icdNodeId, uint32_t icdCounter) {}
+
+    /**
+     * @brief
+     *   Called upon completion of the LIT ICD commissioning flow, when ICDStayActiveDuration is set
+     *   and the corresponding stayActive command response is received
+     *
+     * @param[in] icdNodeId    The node id of the ICD.
+     * @param[in] promisedActiveDurationMsec   The actual duration that the ICD server can stay active
+     *            from the time it receives the StayActiveRequest command.
+     */
+    virtual void OnICDStayActiveComplete(ScopedNodeId icdNodeId, uint32_t promisedActiveDurationMsec) {}
 };
 
 } // namespace Controller

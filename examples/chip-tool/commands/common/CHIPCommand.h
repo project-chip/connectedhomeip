@@ -24,7 +24,12 @@
 
 #include "Command.h"
 
+#include "BDXDiagnosticLogsServerDelegate.h"
+
 #include <TracingCommandLineArgument.h>
+#include <app/icd/client/CheckInHandler.h>
+#include <app/icd/client/DefaultCheckInDelegate.h>
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
 #include <credentials/GroupDataProviderImpl.h>
@@ -32,11 +37,11 @@
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <crypto/RawKeySessionKeystore.h>
 
-#pragma once
+#include <string>
 
-inline constexpr const char kIdentityAlpha[] = "alpha";
-inline constexpr const char kIdentityBeta[]  = "beta";
-inline constexpr const char kIdentityGamma[] = "gamma";
+inline constexpr char kIdentityAlpha[] = "alpha";
+inline constexpr char kIdentityBeta[]  = "beta";
+inline constexpr char kIdentityGamma[] = "gamma";
 // The null fabric commissioner is a commissioner that isn't on a fabric.
 // This is a legal configuration in which the commissioner delegates
 // operational communication and invocation of the commssioning complete
@@ -46,7 +51,7 @@ inline constexpr const char kIdentityGamma[] = "gamma";
 // commissioner portion of such an architecture.  The null-fabric-commissioner
 // can carry a commissioning flow up until the point of operational channel
 // (CASE) communcation.
-inline constexpr const char kIdentityNull[] = "null-fabric-commissioner";
+inline constexpr char kIdentityNull[] = "null-fabric-commissioner";
 
 class CHIPCommand : public Command
 {
@@ -81,6 +86,10 @@ public:
         AddArgument("only-allow-trusted-cd-keys", 0, 1, &mOnlyAllowTrustedCdKeys,
                     "Only allow trusted CD verifying keys (disallow test keys). If not provided or 0 (\"false\"), untrusted CD "
                     "verifying keys are allowed. If 1 (\"true\"), test keys are disallowed.");
+        AddArgument("dac-revocation-set-path", &mDacRevocationSetPath,
+                    "Path to JSON file containing the device attestation revocation set. "
+                    "This argument caches the path to the revocation set. Once set, this will be used by all commands in "
+                    "interactive mode.");
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
@@ -155,9 +164,12 @@ protected:
 #endif // CONFIG_USE_LOCAL_STORAGE
     chip::PersistentStorageOperationalKeystore mOperationalKeystore;
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
-    chip::Crypto::RawKeySessionKeystore mSessionKeystore;
+    static chip::Crypto::RawKeySessionKeystore sSessionKeystore;
 
     static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
+    static chip::app::DefaultICDClientStorage sICDClientStorage;
+    static chip::app::DefaultCheckInDelegate sCheckInDelegate;
+    static chip::app::CheckInHandler sCheckInHandler;
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();
@@ -214,10 +226,15 @@ private:
     chip::Optional<char *> mCDTrustStorePath;
     chip::Optional<bool> mUseMaxSizedCerts;
     chip::Optional<bool> mOnlyAllowTrustedCdKeys;
+    chip::Optional<char *> mDacRevocationSetPath;
 
     // Cached trust store so commands other than the original startup command
     // can spin up commissioners as needed.
     static const chip::Credentials::AttestationTrustStore * sTrustStore;
+
+    // Cached DAC revocation delegate, this can be set using "--dac-revocation-set-path" argument
+    // Once set this will be used by all commands.
+    static chip::Credentials::DeviceAttestationRevocationDelegate * sRevocationDelegate;
 
     static void RunQueuedCommand(intptr_t commandArg);
     typedef decltype(RunQueuedCommand) MatterWorkCallback;

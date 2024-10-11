@@ -16,9 +16,13 @@
  */
 #pragma once
 
+#include <pw_unit_test/framework.h>
+
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#include <lib/core/CASEAuthTag.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -29,8 +33,6 @@
 #include <transport/TransportMgr.h>
 #include <transport/tests/LoopbackTransportManager.h>
 #include <transport/tests/UDPTransportManager.h>
-
-#include <nlunit-test.h>
 
 #include <vector>
 
@@ -78,7 +80,7 @@ public:
     enum MRPMode
     {
         kDefault = 1, // This adopts the default MRP values for idle/active as per the spec.
-                      //      i.e IDLE = 4s, ACTIVE = 300ms
+                      //      i.e IDLE = 500ms, ACTIVE = 300ms
 
         kResponsive = 2, // This adopts values that are better suited for loopback tests that
                          // don't actually go over a network interface, and are tuned much lower
@@ -92,14 +94,10 @@ public:
     static constexpr System::Clock::Timeout kResponsiveIdleRetransTimeout   = System::Clock::Milliseconds32(10);
     static constexpr System::Clock::Timeout kResponsiveActiveRetransTimeout = System::Clock::Milliseconds32(10);
 
-    MessagingContext() :
-        mInitialized(false), mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
-        mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT))
-    {}
-    ~MessagingContext() { VerifyOrDie(mInitialized == false); }
+    MessagingContext() : mpData(std::make_unique<MessagingContextData>()) {}
 
     // Whether Alice and Bob are initialized, must be called before Init
-    void ConfigInitializeNodes(bool initializeNodes) { mInitializeNodes = initializeNodes; }
+    void ConfigInitializeNodes(bool initializeNodes) { mpData->mInitializeNodes = initializeNodes; }
 
     /// Initialize the underlying layers and test suite pointer
     CHIP_ERROR Init(TransportMgrBase * transport, IOContext * io);
@@ -126,23 +124,25 @@ public:
     static const uint16_t kAliceKeyId   = 2;
     static const uint16_t kCharlieKeyId = 3;
     static const uint16_t kDavidKeyId   = 4;
-    GroupId GetFriendsGroupId() const { return mFriendsGroupId; }
+    GroupId GetFriendsGroupId() const { return mpData->mFriendsGroupId; }
 
-    SessionManager & GetSecureSessionManager() { return mSessionManager; }
-    Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
-    secure_channel::MessageCounterManager & GetMessageCounterManager() { return mMessageCounterManager; }
-    FabricTable & GetFabricTable() { return mFabricTable; }
-    Crypto::DefaultSessionKeystore & GetSessionKeystore() { return mSessionKeystore; }
+    SessionManager & GetSecureSessionManager() { return mpData->mSessionManager; }
+    Messaging::ExchangeManager & GetExchangeManager() { return mpData->mExchangeManager; }
+    secure_channel::MessageCounterManager & GetMessageCounterManager() { return mpData->mMessageCounterManager; }
+    FabricTable & GetFabricTable() { return mpData->mFabricTable; }
+    Crypto::DefaultSessionKeystore & GetSessionKeystore() { return mpData->mSessionKeystore; }
 
-    FabricIndex GetAliceFabricIndex() { return mAliceFabricIndex; }
-    FabricIndex GetBobFabricIndex() { return mBobFabricIndex; }
-    const FabricInfo * GetAliceFabric() { return mFabricTable.FindFabricWithIndex(mAliceFabricIndex); }
-    const FabricInfo * GetBobFabric() { return mFabricTable.FindFabricWithIndex(mBobFabricIndex); }
+    FabricIndex GetAliceFabricIndex() { return mpData->mAliceFabricIndex; }
+    FabricIndex GetBobFabricIndex() { return mpData->mBobFabricIndex; }
+    const FabricInfo * GetAliceFabric() { return mpData->mFabricTable.FindFabricWithIndex(mpData->mAliceFabricIndex); }
+    const FabricInfo * GetBobFabric() { return mpData->mFabricTable.FindFabricWithIndex(mpData->mBobFabricIndex); }
 
     CHIP_ERROR CreateSessionBobToAlice(); // Creates PASE session
     CHIP_ERROR CreateCASESessionBobToAlice();
+    CHIP_ERROR CreateCASESessionBobToAlice(const CATValues & cats);
     CHIP_ERROR CreateSessionAliceToBob(); // Creates PASE session
     CHIP_ERROR CreateCASESessionAliceToBob();
+    CHIP_ERROR CreateCASESessionAliceToBob(const CATValues & cats);
     CHIP_ERROR CreateSessionBobToFriends(); // Creates PASE session
     CHIP_ERROR CreatePASESessionCharlieToDavid();
     CHIP_ERROR CreatePASESessionDavidToCharlie();
@@ -162,8 +162,8 @@ public:
     CHIP_ERROR CreateAliceFabric();
     CHIP_ERROR CreateBobFabric();
 
-    const Transport::PeerAddress & GetAliceAddress() { return mAliceAddress; }
-    const Transport::PeerAddress & GetBobAddress() { return mBobAddress; }
+    const Transport::PeerAddress & GetAliceAddress() { return mpData->mAliceAddress; }
+    const Transport::PeerAddress & GetBobAddress() { return mpData->mBobAddress; }
 
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate);
@@ -171,117 +171,153 @@ public:
     Messaging::ExchangeContext * NewExchangeToAlice(Messaging::ExchangeDelegate * delegate, bool isInitiator = true);
     Messaging::ExchangeContext * NewExchangeToBob(Messaging::ExchangeDelegate * delegate, bool isInitiator = true);
 
-    System::Layer & GetSystemLayer() { return mIOContext->GetSystemLayer(); }
+    System::Layer & GetSystemLayer() { return mpData->mIOContext->GetSystemLayer(); }
 
 private:
-    bool mInitializeNodes = true;
-    bool mInitialized;
-    FabricTable mFabricTable;
+    // These members are encapsulated in a struct which is allocated upon construction of MessagingContext and freed upon
+    // destruction of MessagingContext.  This is done to save stack space.
+    struct MessagingContextData
+    {
+        MessagingContextData() :
+            mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
+            mBobAddress(LoopbackTransport::LoopbackPeer(mAliceAddress))
+        {}
+        ~MessagingContextData() { EXPECT_FALSE(mInitialized); }
 
-    SessionManager mSessionManager;
-    Messaging::ExchangeManager mExchangeManager;
-    secure_channel::MessageCounterManager mMessageCounterManager;
-    IOContext * mIOContext;
-    TransportMgrBase * mTransport;                // Only needed for InitFromExisting.
-    chip::TestPersistentStorageDelegate mStorage; // for SessionManagerInit
-    chip::PersistentStorageOperationalKeystore mOpKeyStore;
-    chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
-    chip::Crypto::DefaultSessionKeystore mSessionKeystore;
+        bool mInitializeNodes = true;
+        bool mInitialized     = false;
+        FabricTable mFabricTable;
 
-    FabricIndex mAliceFabricIndex = kUndefinedFabricIndex;
-    FabricIndex mBobFabricIndex   = kUndefinedFabricIndex;
-    GroupId mFriendsGroupId       = 0x0101;
-    Transport::PeerAddress mAliceAddress;
-    Transport::PeerAddress mBobAddress;
-    Transport::PeerAddress mCharlieAddress;
-    Transport::PeerAddress mDavidAddress;
-    SessionHolder mSessionAliceToBob;
-    SessionHolder mSessionBobToAlice;
-    SessionHolder mSessionCharlieToDavid;
-    SessionHolder mSessionDavidToCharlie;
-    Optional<Transport::OutgoingGroupSession> mSessionBobToFriends;
+        SessionManager mSessionManager;
+        Messaging::ExchangeManager mExchangeManager;
+        secure_channel::MessageCounterManager mMessageCounterManager;
+        IOContext * mIOContext        = nullptr;
+        TransportMgrBase * mTransport = nullptr;      // Only needed for InitFromExisting.
+        chip::TestPersistentStorageDelegate mStorage; // for SessionManagerInit
+        chip::PersistentStorageOperationalKeystore mOpKeyStore;
+        chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
+        chip::Crypto::DefaultSessionKeystore mSessionKeystore;
+
+        FabricIndex mAliceFabricIndex = kUndefinedFabricIndex;
+        FabricIndex mBobFabricIndex   = kUndefinedFabricIndex;
+        GroupId mFriendsGroupId       = 0x0101;
+        Transport::PeerAddress mAliceAddress;
+        Transport::PeerAddress mBobAddress;
+        Transport::PeerAddress mCharlieAddress;
+        Transport::PeerAddress mDavidAddress;
+        SessionHolder mSessionAliceToBob;
+        SessionHolder mSessionBobToAlice;
+        SessionHolder mSessionCharlieToDavid;
+        SessionHolder mSessionDavidToCharlie;
+        Optional<Transport::OutgoingGroupSession> mSessionBobToFriends;
+    };
+    std::unique_ptr<MessagingContextData> mpData;
 };
 
 // LoopbackMessagingContext enriches MessagingContext with an async loopback transport
-class LoopbackMessagingContext : public LoopbackTransportManager, public MessagingContext
+class LoopbackMessagingContext : public ::testing::Test, public MessagingContext
 {
 public:
     virtual ~LoopbackMessagingContext() {}
 
-    /// Initialize the underlying layers.
-    virtual CHIP_ERROR Init()
+    // Pigweed test pure virtual will get overriden
+    // TODO: why is a context a Test?
+    virtual void PigweedTestBody() {}
+
+    // These functions wrap spLoopbackTransportManager methods
+    static auto & GetSystemLayer() { return spLoopbackTransportManager->GetSystemLayer(); }
+    static auto & GetLoopback() { return spLoopbackTransportManager->GetLoopback(); }
+    static auto & GetTransportMgr() { return spLoopbackTransportManager->GetTransportMgr(); }
+    static auto & GetIOContext() { return spLoopbackTransportManager->GetIOContext(); }
+
+    template <typename... Ts>
+    static void DrainAndServiceIO(Ts... args)
     {
-        ReturnErrorOnFailure(chip::Platform::MemoryInit());
-        ReturnErrorOnFailure(LoopbackTransportManager::Init());
-        ReturnErrorOnFailure(MessagingContext::Init(&GetTransportMgr(), &GetIOContext()));
-        return CHIP_NO_ERROR;
+        return spLoopbackTransportManager->DrainAndServiceIO(args...);
     }
 
-    // Shutdown all layers, finalize operations
-    virtual void Shutdown()
+    // Performs shared setup for all tests in the test suite
+    static void SetUpTestSuite()
     {
-        MessagingContext::Shutdown();
-        LoopbackTransportManager::Shutdown();
+        // Initialize memory.
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        // Instantiate the LoopbackTransportManager.
+        ASSERT_EQ(spLoopbackTransportManager, nullptr);
+        spLoopbackTransportManager = new LoopbackTransportManager();
+        ASSERT_NE(spLoopbackTransportManager, nullptr);
+        // Initialize the LoopbackTransportManager.
+        ASSERT_EQ(spLoopbackTransportManager->Init(), CHIP_NO_ERROR);
+    }
+
+    // Performs shared teardown for all tests in the test suite
+    static void TearDownTestSuite()
+    {
+        // Shutdown the LoopbackTransportManager.
+        spLoopbackTransportManager->Shutdown();
+        // Destroy the LoopbackTransportManager.
+        if (spLoopbackTransportManager != nullptr)
+        {
+            delete spLoopbackTransportManager;
+            spLoopbackTransportManager = nullptr;
+        }
+        // Shutdown memory.
         chip::Platform::MemoryShutdown();
     }
 
-    // Init/Shutdown Helpers that can be used directly as the nlTestSuite
-    // initialize/finalize function.
-    static int Initialize(void * context)
-    {
-        auto * ctx = static_cast<LoopbackMessagingContext *>(context);
-        return ctx->Init() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
-    }
+    // Performs setup for each individual test in the test suite
+    virtual void SetUp() { ASSERT_EQ(MessagingContext::Init(&GetTransportMgr(), &GetIOContext()), CHIP_NO_ERROR); }
 
-    static int Finalize(void * context)
-    {
-        auto * ctx = static_cast<LoopbackMessagingContext *>(context);
-        ctx->Shutdown();
-        return SUCCESS;
-    }
+    // Performs teardown for each individual test in the test suite
+    virtual void TearDown() { MessagingContext::Shutdown(); }
 
-    using LoopbackTransportManager::GetSystemLayer;
+    static LoopbackTransportManager * spLoopbackTransportManager;
 };
 
 // UDPMessagingContext enriches MessagingContext with an UDP transport
-class UDPMessagingContext : public UDPTransportManager, public MessagingContext
+class UDPMessagingContext : public ::testing::Test, public MessagingContext
 {
 public:
     virtual ~UDPMessagingContext() {}
 
-    /// Initialize the underlying layers.
-    virtual CHIP_ERROR Init()
+    static auto & GetSystemLayer() { return spUDPTransportManager->GetSystemLayer(); }
+    static auto & GetTransportMgr() { return spUDPTransportManager->GetTransportMgr(); }
+    static auto & GetIOContext() { return spUDPTransportManager->GetIOContext(); }
+
+    // Performs shared setup for all tests in the test suite
+    static void SetUpTestSuite()
     {
-        ReturnErrorOnFailure(chip::Platform::MemoryInit());
-        ReturnErrorOnFailure(UDPTransportManager::Init());
-        ReturnErrorOnFailure(MessagingContext::Init(&GetTransportMgr(), &GetIOContext()));
-        return CHIP_NO_ERROR;
+        // Initialize memory.
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        // Instantiate the UDPTransportManager.
+        ASSERT_EQ(spUDPTransportManager, nullptr);
+        spUDPTransportManager = new UDPTransportManager();
+        ASSERT_NE(spUDPTransportManager, nullptr);
+        // Initialize the UDPTransportManager.
+        ASSERT_EQ(spUDPTransportManager->Init(), CHIP_NO_ERROR);
     }
 
-    // Shutdown all layers, finalize operations
-    virtual void Shutdown()
+    // Performs shared teardown for all tests in the test suite
+    static void TearDownTestSuite()
     {
-        MessagingContext::Shutdown();
-        UDPTransportManager::Shutdown();
+        // Shutdown the UDPTransportManager.
+        spUDPTransportManager->Shutdown();
+        // Destroy the UDPTransportManager.
+        if (spUDPTransportManager != nullptr)
+        {
+            delete spUDPTransportManager;
+            spUDPTransportManager = nullptr;
+        }
+        // Shutdown memory.
         chip::Platform::MemoryShutdown();
     }
 
-    // Init/Shutdown Helpers that can be used directly as the nlTestSuite
-    // initialize/finalize function.
-    static int Initialize(void * context)
-    {
-        auto * ctx = static_cast<UDPMessagingContext *>(context);
-        return ctx->Init() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
-    }
+    // Performs setup for each individual test in the test suite
+    virtual void SetUp() { ASSERT_EQ(MessagingContext::Init(&GetTransportMgr(), &GetIOContext()), CHIP_NO_ERROR); }
 
-    static int Finalize(void * context)
-    {
-        auto * ctx = static_cast<UDPMessagingContext *>(context);
-        ctx->Shutdown();
-        return SUCCESS;
-    }
+    // Performs teardown for each individual test in the test suite
+    virtual void TearDown() { MessagingContext::Shutdown(); }
 
-    using UDPTransportManager::GetSystemLayer;
+    static UDPTransportManager * spUDPTransportManager;
 };
 
 // Class that can be used to capture decrypted message traffic in tests using

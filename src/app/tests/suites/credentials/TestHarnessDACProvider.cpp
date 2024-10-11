@@ -29,6 +29,7 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #include <fstream>
+#include <string>
 
 //-> format_version = 1
 //-> vendor_id = 0xFFF1/0xFFF2/0xFFF3
@@ -176,6 +177,11 @@ bool ReadValue(Json::Value jsonValue)
     return false;
 }
 
+uint16_t ReadUint16(Json::Value jsonValue)
+{
+    return static_cast<uint16_t>(jsonValue.asUInt());
+}
+
 // TODO: This should be moved to a method of P256Keypair
 CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
 {
@@ -196,14 +202,15 @@ TestHarnessDACProvider::TestHarnessDACProvider()
 
 void TestHarnessDACProvider::Init(const char * filepath)
 {
-    constexpr const char kDacCertKey[]      = "dac_cert";
-    constexpr const char kDacPrivateKey[]   = "dac_private_key";
-    constexpr const char kDacPublicKey[]    = "dac_public_key";
-    constexpr const char kPaiCertKey[]      = "pai_cert";
-    constexpr const char kCertDecKey[]      = "certification_declaration";
-    constexpr const char kFirmwareInfoKey[] = "firmware_information";
-    constexpr const char kIsSuccessKey[]    = "is_success_case";
-    constexpr const char kDescription[]     = "description";
+    static constexpr char kDacCertKey[]      = "dac_cert";
+    static constexpr char kDacPrivateKey[]   = "dac_private_key";
+    static constexpr char kDacPublicKey[]    = "dac_public_key";
+    static constexpr char kPaiCertKey[]      = "pai_cert";
+    static constexpr char kCertDecKey[]      = "certification_declaration";
+    static constexpr char kFirmwareInfoKey[] = "firmware_information";
+    static constexpr char kIsSuccessKey[]    = "is_success_case";
+    static constexpr char kDescription[]     = "description";
+    static constexpr char kPid[]             = "basic_info_pid";
 
     std::ifstream json(filepath, std::ifstream::binary);
     if (!json)
@@ -271,6 +278,11 @@ void TestHarnessDACProvider::Init(const char * filepath)
         data.description.SetValue(ReadValue(root[kDescription], buf, sizeof(buf)));
     }
 
+    if (root.isMember(kPid))
+    {
+        data.pid.SetValue(ReadUint16(root[kPid]));
+    }
+
     Init(data);
 }
 
@@ -287,6 +299,8 @@ void TestHarnessDACProvider::Init(const TestHarnessDACProviderData & data)
 
     // TODO: We need a real example FirmwareInformation to be populated.
     mFirmwareInformation = data.firmwareInformation.HasValue() ? data.firmwareInformation.Value() : ByteSpan();
+
+    mPid = data.pid.ValueOr(0x8000);
 }
 
 CHIP_ERROR TestHarnessDACProvider::GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer)

@@ -20,6 +20,7 @@ namespace dft {
 namespace logging {
 
 void Setup();
+void LogRedirectCallback(const char * moduleName, uint8_t category, const char * format, va_list args);
 
-}
+} // namespace logging
 } // namespace dft

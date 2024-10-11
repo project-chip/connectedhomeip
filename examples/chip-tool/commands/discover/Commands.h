@@ -53,7 +53,8 @@ public:
                         result.mrpRemoteConfig.mIdleRetransTimeout.count());
         ChipLogProgress(chipTool, "   MRP retry interval (active): %" PRIu32 "ms",
                         result.mrpRemoteConfig.mActiveRetransTimeout.count());
-        ChipLogProgress(chipTool, "   Supports TCP: %s", result.supportsTcp ? "yes" : "no");
+        ChipLogProgress(chipTool, "   Supports TCP Client: %s", result.supportsTcpClient ? "yes" : "no");
+        ChipLogProgress(chipTool, "   Supports TCP Server: %s", result.supportsTcpServer ? "yes" : "no");
         ChipLogProgress(chipTool, "   ICD is operating as: %s", result.isICDOperatingAsLIT ? "LIT" : "SIT");
         SetCommandExitStatus(CHIP_NO_ERROR);
     }
@@ -83,6 +84,7 @@ void registerCommandsDiscover(Commands & commands, CredentialIssuerCommands * cr
         make_unique<DiscoverCommissionableByCommissioningModeCommand>(credsIssuerConfig),
         make_unique<DiscoverCommissionableByVendorIdCommand>(credsIssuerConfig),
         make_unique<DiscoverCommissionableByDeviceTypeCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionableByInstanceNameCommand>(credsIssuerConfig),
         make_unique<DiscoverCommissionersCommand>(credsIssuerConfig),
     };
 

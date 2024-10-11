@@ -31,6 +31,10 @@
 
 #include <ti/drivers/apps/Button.h>
 
+#ifdef CC13XX_26XX_FACTORY_DATA
+#include <platform/cc13xx_26xx/FactoryDataProvider.h>
+#endif
+
 struct Identify;
 
 class AppTask
@@ -56,6 +60,7 @@ private:
     static void ActionCompleted(PumpManager::Action_t aAction, int32_t aActor);
 
     void DispatchEvent(AppEvent * event);
+    void uiInit(void);
 
     static void ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events);
     static void ButtonRightEventHandler(Button_Handle handle, Button_EventMask events);
@@ -74,6 +79,10 @@ private:
     bool mFunctionTimerActive;
 
     static AppTask sAppTask;
+
+#ifdef CC13XX_26XX_FACTORY_DATA
+    chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
+#endif
 };
 
 inline AppTask & GetAppTask(void)

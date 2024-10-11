@@ -1,3 +1,4 @@
 mobly
 pyasn1
 pyasn1_modules
+zeroconf

@@ -27,14 +27,15 @@
 #pragma once
 
 #include "EventLoggingDelegate.h"
-#include "EventLoggingTypes.h"
 #include <access/SubjectDescriptor.h>
+#include <app/EventLoggingTypes.h>
 #include <app/MessageDef/EventDataIB.h>
 #include <app/MessageDef/StatusIB.h>
-#include <app/ObjectList.h>
+#include <app/data-model-provider/EventsGenerator.h>
 #include <app/util/basic-types.h>
 #include <lib/core/TLVCircularBuffer.h>
 #include <lib/support/CHIPCounter.h>
+#include <lib/support/LinkedList.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <system/SystemClock.h>
@@ -196,7 +197,7 @@ struct LogStorageResources
  *   more space for new events.
  */
 
-class EventManagement
+class EventManagement : public DataModel::EventsGenerator
 {
 public:
     /**
@@ -359,7 +360,7 @@ public:
      *                                       available.
      *
      */
-    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, const ObjectList<EventPathParams> * apEventPathList,
+    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, const SingleLinkedListNode<EventPathParams> * apEventPathList,
                                 EventNumber & aEventMin, size_t & aEventCount,
                                 const Access::SubjectDescriptor & aSubjectDescriptor);
     /**
@@ -386,6 +387,10 @@ public:
      *  Logger would save last logged event number and initial written event bytes number into schedule event number array
      */
     void SetScheduledEventInfo(EventNumber & aEventNumber, uint32_t & aInitialWrittenEventBytes) const;
+
+    /* EventsGenerator implementation */
+    CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
+                             EventNumber & generatedEventNumber) override;
 
 private:
     /**
@@ -559,5 +564,6 @@ private:
 
     System::Clock::Milliseconds64 mMonotonicStartupTime;
 };
+
 } // namespace app
 } // namespace chip

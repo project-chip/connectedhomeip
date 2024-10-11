@@ -22,7 +22,7 @@
 
 extern "C" {
 #include "btl_interface.h"
-#include "em_bus.h" // For CORE_CRITICAL_SECTION
+#include "sl_core.h"
 #if SL_WIFI
 #include "spi_multiplex.h"
 #endif // SL_WIFI
@@ -33,6 +33,8 @@ extern "C" {
 /// No error, operation OK
 #define SL_BOOTLOADER_OK 0L
 
+static chip::OTAImageProcessorImpl gImageProcessor;
+
 namespace chip {
 
 // Define static memebers
@@ -40,6 +42,15 @@ uint8_t OTAImageProcessorImpl::mSlotId                                          
 uint32_t OTAImageProcessorImpl::mWriteOffset                                            = 0;
 uint16_t OTAImageProcessorImpl::writeBufOffset                                          = 0;
 uint8_t OTAImageProcessorImpl::writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
+
+CHIP_ERROR OTAImageProcessorImpl::Init(OTADownloader * downloader)
+{
+    ReturnErrorCodeIf(downloader == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    gImageProcessor.SetOTADownloader(downloader);
+
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
@@ -398,6 +409,11 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 
     mBlock = MutableByteSpan();
     return CHIP_NO_ERROR;
+}
+
+OTAImageProcessorImpl & OTAImageProcessorImpl::GetDefaultInstance()
+{
+    return gImageProcessor;
 }
 
 } // namespace chip

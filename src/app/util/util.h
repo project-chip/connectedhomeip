@@ -21,18 +21,9 @@
 
 #include <app/util/af-types.h>
 #include <app/util/endpoint-config-api.h>
-
-// Cluster name structure
-typedef struct
-{
-    chip::ClusterId id;
-    const char * name;
-} EmberAfClusterName;
-
-extern const EmberAfClusterName zclClusterNames[];
+#include <lib/core/DataModelTypes.h>
 
 void emberAfInit();
-uint16_t emberAfFindClusterNameIndex(chip::ClusterId cluster);
 
 /**
  * Retrieves the difference between the two passed values.

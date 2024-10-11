@@ -44,7 +44,12 @@ tests:
 
     - label:
           "Step 2: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT."
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2) GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2:18446744073709551614"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -88,7 +93,11 @@ tests:
 
     - label:
           "Step 4: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT on EP0."
+          cluster to DUT on EP0 with GroupKeySet fields are as
+          follows:1)GroupKeySetID: 0x01a 2) GroupKeySecurityPolicy: TrustFirst
+          (0) 3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: null 6)EpochStartTime1:null 7)EpochKey2: null
+          8)EpochStartTime2:null"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -108,7 +117,12 @@ tests:
 
     - label:
           "Step 5: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT on EP0."
+          cluster to DUT on EP0 with GroupKeySet fields are as
+          follows:1)GroupKeySetID: 0x01a 2) GroupKeySecurityPolicy: TrustFirst
+          (0) 3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          6)EpochStartTime1:18446744073709551613 7)EpochKey2: null
+          8)EpochStartTime2:null"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -128,7 +142,12 @@ tests:
 
     - label:
           "Step 6: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT."
+          cluster to DUT on EP0 with command fields as follows:1)GroupKeySetID:
+          0x01a 2) GroupKeySecurityPolicy: TrustFirst (0) 3)EpochKey0: null
+          4)EpochStartTime0: 1 5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          6)EpochStartTime1:18446744073709551613 7)EpochKey2:
+          d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2:18446744073709551614"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -150,7 +169,12 @@ tests:
 
     - label:
           "Step 7: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT."
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: null
+          5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2: 18446744073709551614"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -172,7 +196,12 @@ tests:
 
     - label:
           "Step 8: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT."
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 0
+          5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2:18446744073709551614"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -194,7 +223,12 @@ tests:
 
     - label:
           "Step 9: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT."
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: null 6)EpochStartTime1: 18446744073709551613 7)EpochKey2:
+          d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2:18446744073709551614"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -216,7 +250,12 @@ tests:
 
     - label:
           "Step 10: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT."
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1: null
+          7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2:18446744073709551614"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -238,7 +277,12 @@ tests:
 
     - label:
           "Step 11: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT. Note: EpochStartTime1 is earlier than EpochStartTime0"
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0:
+          18446744073709551613 5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          6)EpochStartTime1: 1 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2: 18446744073709551614"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -260,7 +304,12 @@ tests:
 
     - label:
           "Step 12: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT. Note: EpochKey1 and EpochStartTime1 are null when
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: null 6)EpochStartTime1: null 7)EpochKey2:
+          d2d1d2d3d4d5d6d7d8d9dadbdcdddedf 8)EpochStartTime2:
+          18446744073709551614 Note: EpochKey1 and EpochStartTime1 are null when
           EpochKey2 and EpochStartTime2 are not null"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
@@ -283,8 +332,13 @@ tests:
 
     - label:
           "Step 13: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT. Note: EpochKey2 is set to null and EpochStartTime2 is
-          not null"
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          18446744073709551613 7)EpochKey2: null 8)EpochStartTime2:
+          18446744073709551614 Note: EpochKey2 is set to null and
+          EpochStartTime2 is not null"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -306,8 +360,13 @@ tests:
 
     - label:
           "Step 14: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT. Note: EpochKey2 is not null and EpochStartTime2 is
-          null"
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2: null Note: EpochKey2 is not null and
+          EpochStartTime2 is null"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -329,7 +388,13 @@ tests:
 
     - label:
           "Step 15: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT. Note: EpochStartTime2 is earlier than EpochStartTime1"
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          6)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 7)EpochStartTime1:
+          18446744073709551613 8)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          9)EpochStartTime2: 1 Note: EpochStartTime2 is earlier than
+          EpochStartTime1"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -351,7 +416,13 @@ tests:
 
     - label:
           "Step 16: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT."
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0 4)EpochStartTime0: 1 5)EpochKey1:
+          d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2: 1 Note1: Repeat the step by sending EpochKey1 and
+          EpochKey2 with 1 byte value (< 16 bytes)"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -553,8 +624,14 @@ tests:
 
     - label:
           "Step 17: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT on EP0. Note: KeySetWrite command is sent with
-          different EpochKeys,EpochStartTime1 and EpochStartTime2 values"
+          cluster to DUT on EP0 with GroupKeySet fields as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d3d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: d4d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          17446744073709551613 7)EpochKey2: d5d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2: 17446744073709551614 Note: KeySetWrite command is
+          sent with different EpochKeys,EpochStartTime1 and EpochStartTime2
+          values"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:

@@ -6,7 +6,6 @@ void MatterAdministratorCommissioningPluginServerInitCallback();
 void MatterApplicationBasicPluginServerInitCallback();
 void MatterApplicationLauncherPluginServerInitCallback();
 void MatterAudioOutputPluginServerInitCallback();
-void MatterBarrierControlPluginServerInitCallback();
 void MatterBasicInformationPluginServerInitCallback();
 void MatterBinaryInputBasicPluginServerInitCallback();
 void MatterBindingPluginServerInitCallback();
@@ -17,7 +16,6 @@ void MatterContentLauncherPluginServerInitCallback();
 void MatterDescriptorPluginServerInitCallback();
 void MatterDiagnosticLogsPluginServerInitCallback();
 void MatterDoorLockPluginServerInitCallback();
-void MatterElectricalMeasurementPluginServerInitCallback();
 void MatterEthernetNetworkDiagnosticsPluginServerInitCallback();
 void MatterFanControlPluginServerInitCallback();
 void MatterFaultInjectionPluginServerInitCallback();
@@ -33,13 +31,13 @@ void MatterKeypadInputPluginServerInitCallback();
 void MatterLevelControlPluginServerInitCallback();
 void MatterLocalizationConfigurationPluginServerInitCallback();
 void MatterLowPowerPluginServerInitCallback();
+void MatterMatterScenesPluginServerInitCallback();
 void MatterMediaInputPluginServerInitCallback();
 void MatterMediaPlaybackPluginServerInitCallback();
 void MatterModeSelectPluginServerInitCallback();
 void MatterNetworkCommissioningPluginServerInitCallback();
 void MatterOccupancySensingPluginServerInitCallback();
 void MatterOnOffPluginServerInitCallback();
-void MatterOnOffSwitchConfigurationPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
 void MatterPowerSourcePluginServerInitCallback();
@@ -47,7 +45,6 @@ void MatterPowerSourceConfigurationPluginServerInitCallback();
 void MatterPressureMeasurementPluginServerInitCallback();
 void MatterPumpConfigurationAndControlPluginServerInitCallback();
 void MatterRelativeHumidityMeasurementPluginServerInitCallback();
-void MatterScenesPluginServerInitCallback();
 void MatterSoftwareDiagnosticsPluginServerInitCallback();
 void MatterSwitchPluginServerInitCallback();
 void MatterTargetNavigatorPluginServerInitCallback();
@@ -71,7 +68,6 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterApplicationBasicPluginServerInitCallback(); \
     MatterApplicationLauncherPluginServerInitCallback(); \
     MatterAudioOutputPluginServerInitCallback(); \
-    MatterBarrierControlPluginServerInitCallback(); \
     MatterBasicInformationPluginServerInitCallback(); \
     MatterBinaryInputBasicPluginServerInitCallback(); \
     MatterBindingPluginServerInitCallback(); \
@@ -82,7 +78,6 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterDescriptorPluginServerInitCallback(); \
     MatterDiagnosticLogsPluginServerInitCallback(); \
     MatterDoorLockPluginServerInitCallback(); \
-    MatterElectricalMeasurementPluginServerInitCallback(); \
     MatterEthernetNetworkDiagnosticsPluginServerInitCallback(); \
     MatterFanControlPluginServerInitCallback(); \
     MatterFaultInjectionPluginServerInitCallback(); \
@@ -98,13 +93,13 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterLevelControlPluginServerInitCallback(); \
     MatterLocalizationConfigurationPluginServerInitCallback(); \
     MatterLowPowerPluginServerInitCallback(); \
+    MatterMatterScenesPluginServerInitCallback(); \
     MatterMediaInputPluginServerInitCallback(); \
     MatterMediaPlaybackPluginServerInitCallback(); \
     MatterModeSelectPluginServerInitCallback(); \
     MatterNetworkCommissioningPluginServerInitCallback(); \
     MatterOccupancySensingPluginServerInitCallback(); \
     MatterOnOffPluginServerInitCallback(); \
-    MatterOnOffSwitchConfigurationPluginServerInitCallback(); \
     MatterOperationalCredentialsPluginServerInitCallback(); \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback(); \
     MatterPowerSourcePluginServerInitCallback(); \
@@ -112,7 +107,6 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterPressureMeasurementPluginServerInitCallback(); \
     MatterPumpConfigurationAndControlPluginServerInitCallback(); \
     MatterRelativeHumidityMeasurementPluginServerInitCallback(); \
-    MatterScenesPluginServerInitCallback(); \
     MatterSoftwareDiagnosticsPluginServerInitCallback(); \
     MatterSwitchPluginServerInitCallback(); \
     MatterTargetNavigatorPluginServerInitCallback(); \

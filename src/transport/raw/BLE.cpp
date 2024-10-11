@@ -46,9 +46,8 @@ void BLEBase::ClearState()
     if (mBleLayer)
     {
         mBleLayer->CancelBleIncompleteConnection();
-        mBleLayer->OnChipBleConnectReceived = nullptr;
-        mBleLayer->mBleTransport            = nullptr;
-        mBleLayer                           = nullptr;
+        mBleLayer->mBleTransport = nullptr;
+        mBleLayer                = nullptr;
     }
 
     if (mBleEndPoint)
@@ -77,7 +76,6 @@ CHIP_ERROR BLEBase::Init(const BleListenParameters & param)
     {
         ChipLogDetail(Inet, "BLEBase::Init - not overriding transport");
     }
-    mBleLayer->OnChipBleConnectReceived = nullptr;
 
     mState = State::kInitialized;
 
@@ -99,6 +97,7 @@ CHIP_ERROR BLEBase::SetEndPoint(Ble::BLEEndPoint * endPoint)
 CHIP_ERROR BLEBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
     ReturnErrorCodeIf(address.GetTransportType() != Type::kBle, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(mBleEndPoint == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
 
     if (mState == State::kConnected)

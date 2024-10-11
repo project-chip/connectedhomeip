@@ -20,13 +20,15 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
 
-using namespace std;
+#include <list>
+#include <string>
+
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
 
-ContentLauncherManager::ContentLauncherManager(list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols)
+ContentLauncherManager::ContentLauncherManager(std::list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols)
 {
     mAcceptHeaderList            = acceptHeaderList;
     mSupportedStreamingProtocols = supportedStreamingProtocols;
@@ -95,13 +97,18 @@ ContentLauncherManager::ContentLauncherManager(list<std::string> acceptHeaderLis
 
 void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
                                                  const DecodableList<ParameterType> & parameterList, bool autoplay,
-                                                 const CharSpan & data)
+                                                 const CharSpan & data,
+                                                 const chip::Optional<PlaybackPreferencesType> playbackPreferences,
+                                                 bool useCurrentContext)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent");
-    string dataString(data.data(), data.size());
+    std::string dataString(data.data(), data.size());
 
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent TEST CASE autoplay=%d data=%s ", (autoplay ? 1 : 0),
                     dataString.c_str());
+
+    // TODO: Add playbackPreferences as part of search query
+    // TODO: Add useCurrentContext as part of search query
 
     bool foundMatch = false;
     for (auto const & contentEntry : this->mContentList)
@@ -114,8 +121,8 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
             {
                 if (parameter.type == parameterType.type)
                 {
-                    string val1(parameter.value.data(), parameter.value.size());
-                    string val2(parameterType.value.data(), parameterType.value.size());
+                    std::string val1(parameter.value.data(), parameter.value.size());
+                    std::string val2(parameterType.value.data(), parameterType.value.size());
                     if (strcmp(val1.c_str(), val2.c_str()) == 0)
                     {
                         ChipLogProgress(Zcl, " TEST CASE found match=%s type=%d", contentEntry.mName.c_str(),
@@ -144,9 +151,9 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl");
 
-    string contentUrlString(contentUrl.data(), contentUrl.size());
-    string displayStringString(displayString.data(), displayString.size());
-    string providerNameString(brandingInformation.providerName.data(), brandingInformation.providerName.size());
+    std::string contentUrlString(contentUrl.data(), contentUrl.size());
+    std::string displayStringString(displayString.data(), displayString.size());
+    std::string providerNameString(brandingInformation.providerName.data(), brandingInformation.providerName.size());
 
     ChipLogProgress(
         Zcl, "ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=%s DisplayString=%s BrandingInformation.ProviderName=%s",
@@ -191,12 +198,29 @@ uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
 
 uint32_t ContentLauncherManager::GetFeatureMap(chip::EndpointId endpoint)
 {
-    if (endpoint >= EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return mDynamicEndpointFeatureMap;
+        return kEndpointFeatureMap;
     }
 
     uint32_t featureMap = 0;
     Attributes::FeatureMap::Get(endpoint, &featureMap);
     return featureMap;
+}
+
+uint16_t ContentLauncherManager::GetClusterRevision(chip::EndpointId endpoint)
+{
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return kClusterRevision;
+    }
+
+    uint16_t clusterRevision = 0;
+    bool success =
+        (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == chip::Protocols::InteractionModel::Status::Success);
+    if (!success)
+    {
+        ChipLogError(Zcl, "ContentLauncherManager::GetClusterRevision error reading cluster revision");
+    }
+    return clusterRevision;
 }

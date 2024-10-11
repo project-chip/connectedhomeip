@@ -33,6 +33,7 @@
 #include <cstdio>
 #include <sstream>
 #include <string.h>
+#include <string>
 
 #include "mDNSDebug.h"
 #include "task.h"
@@ -52,9 +53,9 @@ extern void mDNSPlatformWriteLogRedirect(void (*)(const char *, const char *));
 }
 
 namespace {
-constexpr const char * kLocalDot        = "local.";
-constexpr const char * kProtocolTcp     = "._tcp";
-constexpr const char * kProtocolUdp     = "._udp";
+constexpr char kLocalDot[]              = "local.";
+constexpr char kProtocolTcp[]           = "._tcp";
+constexpr char kProtocolUdp[]           = "._udp";
 static constexpr uint32_t kTimeoutMilli = 3000;
 static constexpr size_t kMaxResults     = 20;
 

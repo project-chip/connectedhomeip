@@ -15,6 +15,87 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: --storage-path admin_storage.json --manual-code 10054912339
+#     factory-reset: true
+#     quiet: true
+#   run3:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00
+#     factory-reset: true
+#     quiet: true
+#   run4:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --discriminator 1234
+#       --passcode 20202021
+#     factory-reset: true
+#     quiet: true
+#   run5:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --commissioning-method on-network
+#     factory-reset: true
+#     quiet: true
+#   run6:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --qr-code MT:-24J0Q1212-10648G00
+#       --commissioning-method on-network
+#     factory-reset: true
+#     quiet: true
+#   run7:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --discriminator 1234
+#       --passcode 20202021
+#       --commissioning-method on-network
+#     factory-reset: true
+#     quiet: true
+#   run8:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: --storage-path admin_storage.json
+#     factory-reset: false
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
+# Run 1: runs through all tests
+# Run 2: tests PASE connection using manual code (12.1 only)
+# Run 3: tests PASE connection using QR code (12.1 only)
+# Run 4: tests PASE connection using discriminator and passcode (12.1 only)
+# Run 5: Tests CASE connection using manual code (12.1 only)
+# Run 6: Tests CASE connection using QR code (12.1 only)
+# Run 7: Tests CASE connection using manual discriminator and passcode (12.1 only)
+
 import logging
 from dataclasses import dataclass
 from typing import Any, Callable
@@ -23,14 +104,23 @@ import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
 from basic_composition_support import BasicCompositionTests
+from chip import ChipUtility
 from chip.clusters.Attribute import ValueDecodeFailure
-from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
+from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
+from chip.interaction_model import InteractionModelError, Status
+from chip.tlv import uint
+from global_attribute_ids import AttributeIdType, ClusterIdType, GlobalAttributeIds, attribute_id_type, cluster_id_type
+from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
                                     async_test_body, default_matter_test_main)
 from mobly import asserts
 from taglist_and_topology_test_support import (create_device_type_list_for_root, create_device_type_lists, find_tag_list_problems,
-                                               find_tree_roots, get_all_children, get_direct_children_of_root, parts_list_cycles,
+                                               find_tree_roots, flat_list_ok, get_direct_children_of_root, parts_list_cycles,
                                                separate_endpoint_types)
+
+
+def get_vendor_id(mei: int) -> int:
+    """Get the vendor ID portion (MEI prefix) of an overall MEI."""
+    return (mei >> 16) & 0xffff
 
 
 def check_int_in_range(min_value: int, max_value: int, allow_null: bool = False) -> Callable:
@@ -150,7 +240,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                                   problem=f'Root node does not contain required cluster {c}', spec_location="Root node device type")
                 self.fail_current_test()
 
-    def test_DT_1_1(self):
+    def test_TC_DT_1_1(self):
         self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
         self.print_step(2, "Verify that each endpoint includes a descriptor cluster")
         success = True
@@ -165,7 +255,41 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         if not success:
             self.fail_current_test("At least one endpoint was missing the descriptor cluster.")
 
-    def test_IDM_10_1(self):
+    async def _read_non_standard_attribute_check_unsupported_read(self, endpoint_id, cluster_id, attribute_id) -> bool:
+        @dataclass
+        class TempAttribute(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return cluster_id
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return attribute_id
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            @ChipUtility.classproperty
+            def standard_attribute(cls) -> bool:
+                return False
+
+            value: 'uint' = 0
+
+        result = await self.default_controller.Read(nodeid=self.dut_node_id, attributes=[(endpoint_id, TempAttribute)])
+        try:
+            attr_ret = result.tlvAttributes[endpoint_id][cluster_id][attribute_id]
+        except KeyError:
+            attr_ret = None
+
+        error_type_ok = attr_ret is not None and isinstance(
+            attr_ret, Clusters.Attribute.ValueDecodeFailure) and isinstance(attr_ret.Reason, InteractionModelError)
+
+        got_expected_error = error_type_ok and attr_ret.Reason.status == Status.UnsupportedRead
+        return got_expected_error
+
+    @async_test_body
+    async def test_TC_IDM_10_1(self):
         self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
 
         @dataclass
@@ -222,6 +346,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                                               problem=f"Failed validation of value on {location.as_string(self.cluster_mapper)}: {str(e)}", spec_location="Global Elements")
                             success = False
                             continue
+                        except KeyError:
+                            # A KeyError here means the attribute does not exist. This problem was already recorded in step 2,
+                            # but we don't assert until the end of the test, so ignore this and don't re-record the error.
+                            continue
 
         self.print_step(4, "Validate the attribute list exactly matches the set of reported attributes")
         if success:
@@ -236,15 +364,19 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                         logging.debug(
                             f"Checking presence of claimed supported {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}: {'found' if has_attribute else 'not_found'}")
 
-                        # Check attribute is actually present.
                         if not has_attribute:
-                            # TODO: Handle detecting write-only attributes from schema.
-                            if "WriteOnly" in attribute_string:
-                                continue
+                            # Check if this is a write-only attribute by trying to read it.
+                            # If it's present and write-only it should return an UNSUPPORTED_READ error. All other errors are a failure.
+                            # Because these can be MEI attributes, we need to build the ClusterAttributeDescriptor manually since it's
+                            # not guaranteed to be generated. Since we expect an error back anyway, the type doesn't matter.
 
-                            self.record_error(self.get_test_name(), location=location,
-                                              problem=f"Did not find {attribute_string} on {location.as_cluster_string(self.cluster_mapper)} when it was claimed in AttributeList ({attribute_list})", spec_location="AttributeList Attribute")
-                            success = False
+                            write_only_attribute = await self._read_non_standard_attribute_check_unsupported_read(
+                                endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+
+                            if not write_only_attribute:
+                                self.record_error(self.get_test_name(), location=location,
+                                                  problem=f"Did not find {attribute_string} on {location.as_cluster_string(self.cluster_mapper)} when it was claimed in AttributeList ({attribute_list})", spec_location="AttributeList Attribute")
+                                success = False
                             continue
 
                         attribute_value = cluster[attribute_id]
@@ -347,8 +479,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         self.print_step(
             6, "Validate that none of the global attribute IDs contain values with prefixes outside of the allowed standard or MEI prefix range")
-        is_ci = self.check_pics('PICS_SDK_CI_ONLY')
-        if is_ci:
+        if self.is_pics_sdk_ci_only:
             # test vendor prefixes are allowed in the CI because we use them internally in examples
             bad_prefix_min = 0xFFF5_0000
         else:
@@ -362,15 +493,17 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                 cmd_prefixes = [a & 0xFFFF_0000 for a in cmd_values]
                 bad_attrs = [a for a in attr_prefixes if a >= bad_prefix_min]
                 bad_cmds = [a for a in cmd_prefixes if a >= bad_prefix_min]
-                for bad in bad_attrs:
-                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=bad)
+                for bad_attrib_id in bad_attrs:
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=bad_attrib_id)
+                    vendor_id = get_vendor_id(bad_attrib_id)
                     self.record_error(self.get_test_name(
-                    ), location=location, problem=f'Attribute with bad prefix {attribute_id} in cluster {cluster_id}', spec_location='Manufacturer Extensible Identifier (MEI)')
+                    ), location=location, problem=f'Attribute 0x{bad_attrib_id:08x} with bad prefix 0x{vendor_id:04x} in cluster 0x{cluster_id:08x}' + (' (Test Vendor)' if attribute_id_type(bad_attrib_id) == AttributeIdType.kTest else ''), spec_location='Manufacturer Extensible Identifier (MEI)')
                     success = False
-                for bad in bad_cmds:
-                    location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=bad)
+                for bad_cmd_id in bad_cmds:
+                    location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=bad_cmd_id)
+                    vendor_id = get_vendor_id(bad_cmd_id)
                     self.record_error(self.get_test_name(
-                    ), location=location, problem=f'Command with bad prefix {attribute_id} in cluster {cluster_id}', spec_location='Manufacturer Extensible Identifier (MEI)')
+                    ), location=location, problem=f'Command 0x{bad_cmd_id:08x} with bad prefix 0x{vendor_id:04x} in cluster 0x{cluster_id:08x}', spec_location='Manufacturer Extensible Identifier (MEI)')
                     success = False
 
         self.print_step(7, "Validate that none of the MEI global attribute IDs contain values outside of the allowed suffix range")
@@ -413,10 +546,11 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             cluster_prefixes = [a & 0xFFFF_0000 for a in endpoint.keys()]
             bad_clusters_ids = [a for a in cluster_prefixes if a >= bad_prefix_min]
-            for bad in bad_clusters_ids:
-                location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad)
+            for bad_cluster_id in bad_clusters_ids:
+                location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad_cluster_id)
+                vendor_id = get_vendor_id(bad_cluster_id)
                 self.record_error(self.get_test_name(), location=location,
-                                  problem=f'Bad cluster id prefix {bad}', spec_location='Manufacturer Extensible Identifier (MEI)')
+                                  problem=f'Cluster 0x{bad_cluster_id:08x} with bad prefix 0x{vendor_id:04x}' + (' (Test Vendor)' if cluster_id_type(bad_cluster_id) == ClusterIdType.kTest else ''), spec_location='Manufacturer Extensible Identifier (MEI)')
                 success = False
 
         self.print_step(9, "Validate that all clusters in the standard range have a known cluster ID")
@@ -464,7 +598,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             self.fail_current_test(
                 "At least one cluster has failed the range and support checks for its listed attributes, commands or features")
 
-    def test_IDM_11_1(self):
+    def test_TC_IDM_11_1(self):
         success = True
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
@@ -554,13 +688,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         ok = True
         for endpoint_id in flat:
             # ensure that every sub-id in the parts list is included in the parent
-            sub_children = []
-            for child in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
-                sub_children.update(get_all_children(child))
-            if not all(item in sub_children for item in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]):
+            if not flat_list_ok(endpoint_id, self.endpoints):
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                 self.record_error(self.get_test_name(), location=location,
-                                  problem='Flat parts list does not include all the sub-parts', spec_location='Endpoint composition')
+                                  problem='Flat parts list does not exactly match sub-parts', spec_location='Endpoint composition')
                 ok = False
         if not ok:
             self.fail_current_test()
@@ -671,7 +802,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         if not success:
             self.fail_current_test("power source EndpointList attribute is incorrect")
 
-    def test_DESC_2_2(self):
+    def test_TC_DESC_2_2(self):
         self.print_step(0, "Wildcard read of device - already done")
 
         self.print_step(
@@ -704,6 +835,34 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         if problems or root_problems:
             self.fail_current_test("Problems with tags lists")
+
+    def steps_TC_IDM_12_1(self):
+        return [TestStep(0, "TH performs a wildcard read of all attributes and endpoints on the device"),
+                TestStep(1, "TH creates a MatterTlvJson dump of the wildcard attributes for submission to certification.")]
+
+    def test_TC_IDM_12_1(self):
+        # wildcard read - already done.
+        self.step(0)
+
+        # Create the dump
+        self.step(1)
+        pid = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.ProductID]
+        vid = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.VendorID]
+        software_version = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SoftwareVersion]
+        filename = f'device_dump_0x{vid:04X}_0x{pid:04X}_{software_version}.json'
+        dump_device_composition_path = self.user_params.get("dump_device_composition_path", filename)
+        json_str, txt_str = self.dump_wildcard(dump_device_composition_path)
+
+        # Structured dump so we can pull these back out of the logs
+        def log_structured_data(start_tag: str, dump_string):
+            lines = dump_string.splitlines()
+            logging.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
+            for line in lines:
+                logging.info(f'{start_tag}{line}')
+            logging.info(f'{start_tag}END ====')
+
+        log_structured_data('==== json: ', json_str)
+        log_structured_data('==== txt: ', txt_str)
 
 
 if __name__ == "__main__":

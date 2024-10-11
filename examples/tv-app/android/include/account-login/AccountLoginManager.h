@@ -39,12 +39,14 @@ public:
 
     inline void SetSetupPin(char * setupPin) override { CopyString(mSetupPin, sizeof(mSetupPin), setupPin); };
 
-    bool HandleLogin(const CharSpan & tempAccountIdentifierString, const CharSpan & setupPinString) override;
-    bool HandleLogout() override;
+    bool HandleLogin(const CharSpan & tempAccountIdentifierString, const CharSpan & setupPinString,
+                     const chip::Optional<chip::NodeId> & nodeId) override;
+    bool HandleLogout(const chip::Optional<chip::NodeId> & nodeId) override;
     void HandleGetSetupPin(CommandResponseHelper<GetSetupPINResponse> & helper,
                            const CharSpan & tempAccountIdentifierString) override;
     void GetSetupPin(char * setupPin, size_t setupPinSize, const CharSpan & tempAccountIdentifierString) override;
     void SetEndpointId(EndpointId epId) { mEndpointId = epId; };
+    uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 protected:
     static const size_t kSetupPinSize = 12;
@@ -53,4 +55,6 @@ protected:
 private:
     ContentAppCommandDelegate * mCommandDelegate;
     EndpointId mEndpointId;
+
+    static constexpr uint16_t kClusterRevision = 2;
 };

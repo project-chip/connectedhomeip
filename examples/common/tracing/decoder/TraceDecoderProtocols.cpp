@@ -30,7 +30,7 @@
 
 namespace {
 
-constexpr const char * kUnknown = "Unknown";
+constexpr char kUnknown[] = "Unknown";
 
 void ENFORCE_FORMAT(1, 2) TLVPrettyPrinter(const char * aFormat, ...)
 {

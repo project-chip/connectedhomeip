@@ -23,16 +23,16 @@
 
 #pragma once
 
-#include <lib/support/CodeUtils.h>
-
 #include <cstdint>
+
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 
 class SetupDiscriminator
 {
 public:
-    constexpr SetupDiscriminator() : mDiscriminator(0), mIsShortDiscriminator(0) {}
+    constexpr SetupDiscriminator() : mDiscriminator(0), mIsShortDiscriminator(false) {}
 
     // See section 5.1.2. QR Code in the Matter specification
     static constexpr int kLongBits = 12;
@@ -104,8 +104,8 @@ private:
     // discriminator).
     static_assert(kLongBits == 12, "Unexpected field length");
     static_assert(kShortBits <= kLongBits, "Unexpected field length");
-    uint16_t mDiscriminator : 12;
-    uint16_t mIsShortDiscriminator : 1;
+    uint16_t mDiscriminator;
+    bool mIsShortDiscriminator;
 };
 
 } // namespace chip

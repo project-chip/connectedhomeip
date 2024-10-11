@@ -41,5 +41,16 @@ CHIP_ERROR FactoryDataDecoder::DecodeFactoryData(uint8_t * buffer, FactoryData *
     return err;
 }
 
+#if CONFIG_ENABLE_AMEBA_CRYPTO
+CHIP_ERROR FactoryDataDecoder::GetSign(uint8_t * PublicKeyData, size_t PublicKeySize, const unsigned char * MessageData,
+                                       size_t MessageSize, unsigned char * Signature)
+{
+    int32_t error  = matter_get_signature(PublicKeyData, PublicKeySize, MessageData, MessageSize, Signature);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    return err;
+}
+#endif
+
 } // namespace DeviceLayer
 } // namespace chip

@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+import 'pw_protobuf_protos/common.proto';
+import 'fabric_sync_common/fabric_sync_common.proto';
+
+package chip.rpc;
+
+// Define the message for a synchronized end device with necessary fields
+message SynchronizedDevice {
+  ScopedNode id = 1;
+
+  optional string unique_id = 2;
+  optional string vendor_name = 3;
+  optional uint32 vendor_id = 4;
+  optional string product_name = 5;
+  optional uint32 product_id = 6;
+  optional string node_label = 7;
+  optional uint32 hardware_version = 8;
+  optional string hardware_version_string = 9;
+  optional uint32 software_version = 10;
+  optional string software_version_string = 11;
+  optional bool is_icd = 12;
+}
+
+message KeepActiveChanged {
+  ScopedNode id = 1;
+  uint32 promised_active_duration_ms = 2;
+}
+
+message AdministratorCommissioningChanged {
+  ScopedNode id = 1;
+  uint32 window_status = 2;
+  optional uint32 opener_fabric_index = 3;
+  optional uint32 opener_vendor_id = 4;
+}
+
+service FabricBridge {
+  rpc AddSynchronizedDevice(SynchronizedDevice) returns (pw.protobuf.Empty){}
+  rpc RemoveSynchronizedDevice(SynchronizedDevice) returns (pw.protobuf.Empty){}
+  rpc ActiveChanged(KeepActiveChanged) returns (pw.protobuf.Empty){}
+  rpc AdminCommissioningAttributeChanged(AdministratorCommissioningChanged) returns (pw.protobuf.Empty){}
+}

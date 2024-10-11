@@ -23,16 +23,16 @@
  * @{
  */
 
+#include "att-storage.h"
 #include <stdbool.h> // For bool
-#include <stddef.h>  // For NULL.
 #include <stdint.h>  // For various uint*_t types
 
-#include <app/util/af-enums.h>
 #include <app/util/basic-types.h>
 #include <app/util/types_stub.h> // For various types.
 
 #include <app/util/attribute-metadata.h> // EmberAfAttributeMetadata
 
+#include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/DataModelTypes.h>
@@ -41,6 +41,7 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 /**
  * @brief Type for the cluster mask
@@ -59,12 +60,12 @@ typedef void (*EmberAfGenericClusterFunction)(void);
  * @brief A distinguished manufacturer code that is used to indicate the
  * absence of a manufacturer-specific cluster, command, or attribute.
  */
-#define EMBER_AF_NULL_MANUFACTURER_CODE 0x0000
+#define MATTER_DM_NULL_MANUFACTURER_CODE 0x0000
 
 /**
  * @brief Struct describing cluster
  */
-typedef struct
+struct EmberAfCluster
 {
     /**
      *  ID of cluster according to ZCL spec
@@ -117,7 +118,9 @@ typedef struct
      * Total number of events supported by the cluster instance (in eventList array).
      */
     uint16_t eventCount;
-} EmberAfCluster;
+
+    bool IsServer() const { return (mask & CLUSTER_MASK_SERVER) != 0; }
+};
 
 /**
  * @brief Struct that represents a logical device type consisting
@@ -234,12 +237,12 @@ struct EmberAfDefinedEndpoint
 /**
  * @brief Indicates the absence of a Scene table entry.
  */
-#define EMBER_AF_SCENE_TABLE_NULL_INDEX 0xFF
+#define MATTER_DM_SCENE_TABLE_NULL_INDEX 0xFF
 /**
  * @brief Value used when setting or getting the endpoint in a Scene table
  * entry.  It indicates that the entry is not in use.
  */
-#define EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID 0x00
+#define MATTER_DM_SCENE_TABLE_UNUSED_ENDPOINT_ID 0x00
 /**
  * @brief Maximum length of Scene names, not including the length byte.
  */
@@ -290,11 +293,37 @@ typedef void (*EmberAfClusterAttributeChangedCallback)(const chip::app::Concrete
  *
  * This function is called before an attribute changes.
  */
-typedef EmberAfStatus (*EmberAfClusterPreAttributeChangedCallback)(const chip::app::ConcreteAttributePath & attributePath,
-                                                                   EmberAfAttributeType attributeType, uint16_t size,
-                                                                   uint8_t * value);
+typedef chip::Protocols::InteractionModel::Status (*EmberAfClusterPreAttributeChangedCallback)(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 #define MAX_INT32U_VALUE (0xFFFFFFFFUL)
 #define MAX_INT16U_VALUE (0xFFFF)
 
 /** @} END addtogroup */
+
+namespace chip {
+namespace app {
+
+enum class MarkAttributeDirty
+{
+    kIfChanged,
+    kNo,
+    // kYes might need to be used if the attribute value was previously changed
+    // without reporting, and now is being set in a situation where we know
+    // reporting needs to be triggered (e.g. because QuieterReportingAttribute
+    // indicated that).
+    kYes,
+};
+
+/// Notification object of a specific path being changed
+class AttributesChangedListener
+{
+public:
+    virtual ~AttributesChangedListener() = default;
+
+    /// Called when the set of attributes identified by AttributePathParams (which may contain wildcards) is to be considered dirty.
+    virtual void MarkDirty(const AttributePathParams & path) = 0;
+};
+
+} // namespace app
+} // namespace chip

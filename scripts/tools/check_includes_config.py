@@ -28,7 +28,7 @@ IGNORE: Set[str] = {
     '/examples/',
     '/java/',
     '/Jni',
-    '/pybindings/',
+    '/mock/',
     '/python/',
     '/Test',
     '/tests/',
@@ -52,6 +52,7 @@ IGNORE: Set[str] = {
     '/platform/webos/',
     '/platform/mt793x/',
     '/platform/ASR/',
+    '/platform/NuttX/',
     r'POSIX\.h$',
 }
 
@@ -92,7 +93,7 @@ DENY: Set[str] = {
     'vector',
 
     # CHIP headers using STL containers.
-    'lib/support/CHIPListUtils.h',      # uses std::set
+    'app/data-model/ListLargeSystemExtensions.h',      # uses std::set
     'src/platform/DeviceSafeQueue.h',   # uses std::deque
 }
 
@@ -112,7 +113,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/lib/support/IniEscaping.h': {'string'},
 
     # Itself in DENY.
-    'src/lib/support/CHIPListUtils.h': {'set'},
+    'src/app/data-model/ListLargeSystemExtensions.h': {'set'},
     'src/platform/DeviceSafeQueue.h': {'queue'},
 
     # Only uses <chrono> for zero-cost types.
@@ -120,10 +121,14 @@ ALLOW: Dict[str, Set[str]] = {
     'src/platform/mbed/MbedEventTimeout.h': {'chrono'},
 
     'src/app/app-platform/ContentApp.h': {'list', 'string'},
-    'src/app/clusters/application-basic-server/application-basic-delegate.h': {'list'},
-    'src/app/clusters/application-basic-server/application-basic-server.cpp': {'list'},
+    'src/app/app-platform/ContentAppPlatform.cpp': {'string'},
+    'src/app/clusters/application-basic-server/application-basic-delegate.h': {'list', 'string'},
+    'src/app/clusters/application-basic-server/application-basic-server.cpp': {'list', 'string'},
+    'src/app/clusters/application-launcher-server/application-launcher-server.cpp': {'string'},
     'src/app/clusters/application-launcher-server/application-launcher-delegate.h': {'list'},
     'src/app/clusters/audio-output-server/audio-output-delegate.h': {'list'},
+    # EcosystemInformationCluster is for Fabric Sync and is intended to run on device that are capable of handling these types.
+    'src/app/clusters/ecosystem-information-server/ecosystem-information-server.h': {'map', 'string', 'vector'},
     'src/app/clusters/channel-server/channel-delegate.h': {'list'},
     'src/app/clusters/content-launch-server/content-launch-delegate.h': {'list'},
     'src/app/clusters/content-launch-server/content-launch-server.cpp': {'list'},
@@ -133,15 +138,18 @@ ALLOW: Dict[str, Set[str]] = {
 
     'src/credentials/attestation_verifier/FileAttestationTrustStore.h': {'vector'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.cpp': {'string'},
+    'src/credentials/attestation_verifier/TestDACRevocationDelegateImpl.cpp': {'fstream'},
 
     'src/setup_payload/AdditionalDataPayload.h': {'string'},
-    'src/setup_payload/AdditionalDataPayloadParser.cpp': {'vector'},
+    'src/setup_payload/AdditionalDataPayloadParser.cpp': {'vector', 'string'},
     'src/setup_payload/Base38Decode.h': {'string', 'vector'},
     'src/setup_payload/ManualSetupPayloadGenerator.h': {'string'},
     'src/setup_payload/ManualSetupPayloadParser.cpp': {'string', 'vector'},
     'src/setup_payload/ManualSetupPayloadParser.h': {'string'},
     'src/setup_payload/QRCodeSetupPayloadParser.cpp': {'vector'},
     'src/setup_payload/QRCodeSetupPayloadParser.h': {'string'},
+    'src/setup_payload/QRCodeSetupPayloadGenerator.cpp': {'string'},
+    'src/setup_payload/QRCodeSetupPayloadGenerator.h': {'string'},
     'src/setup_payload/SetupPayloadHelper.cpp': {'fstream'},
     'src/setup_payload/SetupPayloadHelper.h': {'string'},
     'src/setup_payload/SetupPayload.h': {'map', 'string', 'vector'},
@@ -153,15 +161,30 @@ ALLOW: Dict[str, Set[str]] = {
     # of a list of discovered things.
     'src/controller/SetUpCodePairer.h': {'deque'},
 
-    'src/controller/ExamplePersistentStorage.cpp': {'fstream'},
+    'src/controller/ExamplePersistentStorage.cpp': {'fstream', 'string', 'map'},
 
     # Library meant for non-embedded
     'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
-    'src/tracing/json/json_tracing.h': {'fstream'},
+    'src/tracing/json/json_tracing.h': {'fstream', 'unordered_map', 'string'},
+
+    # esp32 tracing
+    'src/tracing/esp32_trace/esp32_tracing.h': {'unordered_map'},
 
     # Not intended for embedded clients
-    'src/lib/support/jsontlv/JsonToTlv.cpp': {'sstream'},
+    'src/app/PendingResponseTrackerImpl.h': {'unordered_set'},
+
+    # Not intended for embedded clients
+    'src/lib/core/TLVVectorWriter.cpp': {'vector'},
+    'src/lib/core/TLVVectorWriter.h': {'vector'},
+    'src/lib/support/jsontlv/JsonToTlv.cpp': {'sstream', 'string', 'vector'},
     'src/lib/support/jsontlv/JsonToTlv.h': {'string'},
     'src/lib/support/jsontlv/TlvToJson.h': {'string'},
-    'src/lib/support/jsontlv/TextFormat.h': {'string'}
+    'src/lib/support/jsontlv/TextFormat.h': {'string'},
+    'src/lib/support/TemporaryFileStream.h': {'ostream', 'streambuf', 'string'},
+    'src/app/icd/client/DefaultICDClientStorage.cpp': {'vector'},
+    'src/app/icd/client/DefaultICDClientStorage.h': {'vector'},
+    'src/app/icd/client/DefaultICDStorageKey.h': {'vector'},
+    'src/controller/CHIPDeviceController.cpp': {'string'},
+    'src/qrcodetool/setup_payload_commands.cpp': {'string'},
+    'src/access/AccessRestrictionProvider.h': {'vector', 'map'},
 }

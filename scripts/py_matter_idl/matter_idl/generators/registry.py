@@ -20,6 +20,7 @@ from matter_idl.generators.cpp.tlvmeta import TLVMetaDataGenerator
 from matter_idl.generators.idl import IdlGenerator
 from matter_idl.generators.java import JavaClassGenerator, JavaJNIGenerator
 from matter_idl.generators.kotlin import KotlinClassGenerator
+from matter_idl.generators.markdown import SummaryMarkdownGenerator
 
 
 class CodeGenerator(enum.Enum):
@@ -34,6 +35,7 @@ class CodeGenerator(enum.Enum):
     CPP_APPLICATION = enum.auto()
     CPP_TLVMETA = enum.auto()
     IDL = enum.auto()
+    SUMMARY_MARKDOWN = enum.auto()
     CUSTOM = enum.auto()
 
     def Create(self, *args, **kargs):
@@ -49,6 +51,8 @@ class CodeGenerator(enum.Enum):
             return TLVMetaDataGenerator(*args, **kargs)
         elif self == CodeGenerator.IDL:
             return IdlGenerator(*args, **kargs)
+        elif self == CodeGenerator.SUMMARY_MARKDOWN:
+            return SummaryMarkdownGenerator(*args, **kargs)
         elif self == CodeGenerator.CUSTOM:
             # Use a package naming convention to find the custom generator:
             # ./matter_idl_plugin/__init__.py defines a subclass of CodeGenerator named CustomGenerator.
@@ -80,5 +84,6 @@ GENERATORS = {
     'cpp-app': CodeGenerator.CPP_APPLICATION,
     'cpp-tlvmeta': CodeGenerator.CPP_TLVMETA,
     'idl': CodeGenerator.IDL,
+    'summary-markdown': CodeGenerator.SUMMARY_MARKDOWN,
     'custom': CodeGenerator.CUSTOM,
 }

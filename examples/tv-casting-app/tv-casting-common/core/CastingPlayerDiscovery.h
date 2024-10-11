@@ -52,7 +52,7 @@ public:
     virtual void HandleOnUpdated(memory::Strong<CastingPlayer> players) = 0;
     // virtual void HandleOnRemoved(memory::Strong<CastingPlayer> players) = 0;
 };
-
+class CastingPlayer; // Forward declaration of the CastingPlayer class
 class CastingPlayerDiscovery;
 
 /**
@@ -68,18 +68,21 @@ public:
     DeviceDiscoveryDelegateImpl() {}
     DeviceDiscoveryDelegateImpl(DiscoveryDelegate * delegate) { mClientDelegate = delegate; }
 
-    void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
+    void OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData) override;
 };
 
 /**
- * @brief CastingPlayerDiscovery represents the discovery of Casting Players.
- * This class is a singleton.
+ * @brief CastingPlayerDiscovery is a singleton utility class for discovering CastingPlayers.
  */
 class CastingPlayerDiscovery
 {
 
 private:
     std::vector<memory::Strong<CastingPlayer>> mCastingPlayers;
+    // This vector is used to store CastingPlayers that we might want to connect to. This ensures
+    // that CastingPlayers are not deleted prior to calling verify VerifyOrEstablishConnection() on
+    // the CastingPlayer we want to connect to.
+    std::vector<memory::Strong<CastingPlayer>> mCastingPlayersInternal;
     DeviceDiscoveryDelegateImpl mDelegate;
 
     CastingPlayerDiscovery();
@@ -91,8 +94,23 @@ private:
     chip::Controller::CommissionableNodeController mCommissionableNodeController;
     CastingPlayerDiscoveryState mState = DISCOVERY_NOT_READY;
 
+    /**
+     * @brief Clear CastingPlayers in mCastingPlayersInternal with ConnectionState == CASTING_PLAYER_NOT_CONNECTED
+     */
+    void ClearDisconnectedCastingPlayersInternal();
+
+    /**
+     * @brief Clear all CastingPlayers in mCastingPlayersInternal
+     */
+    void ClearCastingPlayersInternal();
+
 public:
     static CastingPlayerDiscovery * GetInstance();
+    ~CastingPlayerDiscovery()
+    {
+        mCastingPlayers.clear();
+        mCastingPlayersInternal.clear();
+    }
 
     /**
      * @brief Starts the discovery for CastingPlayers
@@ -101,7 +119,7 @@ public:
      * with CastingPlayers whose deviceType matches filterBydeviceType
      * @return CHIP_ERROR - CHIP_NO_ERROR if discovery for CastingPlayers started successfully, specific error code otherwise.
      */
-    CHIP_ERROR StartDiscovery(uint64_t filterBydeviceType = 0);
+    CHIP_ERROR StartDiscovery(uint32_t filterBydeviceType = 0);
 
     /**
      * @brief Stop the discovery for CastingPlayers
@@ -112,6 +130,7 @@ public:
 
     void SetDelegate(DiscoveryDelegate * clientDelegate)
     {
+        ChipLogProgress(Discovery, "CastingPlayerDiscovery::SetDelegate() called");
         if (clientDelegate == nullptr)
         {
             mState = DISCOVERY_NOT_READY;
@@ -126,6 +145,7 @@ public:
     std::vector<memory::Strong<CastingPlayer>> GetCastingPlayers() { return mCastingPlayers; }
 
     friend class DeviceDiscoveryDelegateImpl;
+    friend class CastingPlayer;
 };
 
 }; // namespace core

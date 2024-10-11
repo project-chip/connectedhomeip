@@ -219,6 +219,19 @@
 #endif // CHIP_CONFIG_SHA256_CONTEXT_ALIGN
 
 /**
+ *  @def CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE
+ *
+ *  @brief
+ *    Size of the statically allocated context for the HKDF key handle in CryptoPAL.
+ *
+ *  The default size is selected so that the key handle is able to fit 256-bit raw key
+ *  material along with the size information.
+ */
+#ifndef CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE
+#define CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE (32 + 1)
+#endif // CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE
+
+/**
  *  @def CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
  *
  *  @brief
@@ -293,12 +306,23 @@
  *  @def CHIP_UDC_PORT
  *
  *  @brief
- *    chip TCP/UDP port for unsecured user-directed-commissioning traffic.
+ *    chip TCP/UDP port on commissioner for unsecured user-directed-commissioning traffic.
  *
  */
 #ifndef CHIP_UDC_PORT
 #define CHIP_UDC_PORT CHIP_PORT + 10
 #endif // CHIP_UDC_PORT
+
+/**
+ *  @def CHIP_UDC_COMMISSIONEE_PORT
+ *
+ *  @brief
+ *    chip TCP/UDP port on commisionee for unsecured user-directed-commissioning traffic.
+ *
+ */
+#ifndef CHIP_UDC_COMMISSIONEE_PORT
+#define CHIP_UDC_COMMISSIONEE_PORT CHIP_UDC_PORT + 10
+#endif // CHIP_UDC_COMMISSIONEE_PORT
 
 /**
  *  @def CHIP_CONFIG_SECURITY_TEST_MODE
@@ -1183,6 +1207,27 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_ACCESS_RESTRICTION_MAX_ENTRIES_PER_FABRIC
+ *
+ * Defines the maximum number of access restriction list entries per
+ * fabric in the access control code's ARL attribute.
+ */
+#ifndef CHIP_CONFIG_ACCESS_RESTRICTION_MAX_ENTRIES_PER_FABRIC
+#define CHIP_CONFIG_ACCESS_RESTRICTION_MAX_ENTRIES_PER_FABRIC 10
+#endif
+
+/**
+ * @def CHIP_CONFIG_ACCESS_RESTRICTION_MAX_RESTRICTIONS_PER_ENTRY
+ *
+ * Defines the maximum number of access restrictions for each entry
+ * in the ARL attribute (each entry is for a specific cluster on an
+ * endpoint on a fabric).
+ */
+#ifndef CHIP_CONFIG_ACCESS_RESTRICTION_MAX_RESTRICTIONS_PER_ENTRY
+#define CHIP_CONFIG_ACCESS_RESTRICTION_MAX_RESTRICTIONS_PER_ENTRY 10
+#endif
+
+/**
  * @def CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE
  *
  * @brief
@@ -1346,6 +1391,28 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS 1
 #endif // CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS
 
+/**
+ * @def CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS
+ *
+ * @brief Default minimum lookup time to wait during address resolve for
+ *        additional DNSSD queries even if a reply has already been received, or
+ *        to allow for additional heuristics regarding node choice to succeed, in
+ *        milliseconds
+ */
+#ifndef CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS
+#define CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS 200
+#endif // CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS
+
+/**
+ * @def CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS
+ *
+ * @brief Default maximum lookup time to wait during address resolve before
+ *        a TIMEOUT error, in milliseconds
+ */
+#ifndef CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS
+#define CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS 45000
+#endif // CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS
+
 /*
  * @def CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
  *
@@ -1430,6 +1497,62 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER
 #define CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER 128
+#endif
+
+/**
+ * @brief The maximum number bytes taken by a scene. This needs to be increased if the number of clusters per scene is increased.
+ * @note The default number (256) is based on the assumption that the maximum number of clusters per scene is 3 and that those
+ * clusers are onOff, level control and color control cluster.
+ * @warning Changing this value will not only affect the RAM usage of a scene but also the size of the scene table in the flash.
+ *  A scene's size can be calculated based on the following structure:
+ *  Scene TLV (struct)
+ *  {
+ *  	2 bytes GroupID,
+ *  	1 byte SceneID,
+ *  	0 - 16 bytes SceneName,
+ *  	4 bytes Transition time in miliseconds,
+ *
+ *  	Extension field sets TLV (array)
+ *  	[
+ *  		EFS TLV (struct)
+ *  		{
+ *  			4 bytes for the cluster ID,
+ *  			Attribute Value List TLV (array)
+ *  			[
+ *  				AttributeValue Pair TLV (struct)
+ *  				{
+ *  					Attribute ID
+ *  					4 bytes attributeID,
+ *  					AttributeValue
+ *  					1 - 8 bytes AttributeValue,
+ *  				},
+ *  				.
+ *  				.
+ *  				.
+ *
+ *  			],
+ *
+ *  		},
+ *  		.
+ *  		.
+ *  		.
+ *  	],
+ *  }
+ *
+ *  Including all the TLV fields, the following values can help estimate the needed size for a scenes given a number of clusters:
+ *  Empty EFS Scene Max name size: 37 bytes
+ *  Scene Max name size + OnOff : 55 bytes
+ *  Scene Max name size + LevelControl : 64 bytes
+ *  Scene Max name size + ColorControl : 130 bytes
+ *  Scene Max name size + OnOff + LevelControl + ColoControl : 175 bytes
+ *
+ *  Cluster Sizes:
+ *  OnOff Cluster Max Size: 21 bytes
+ *  LevelControl Cluster Max Size: 30 bytes
+ *  Color Control Cluster Max Size: 96 bytes
+ * */
+#ifndef CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES
+#define CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES 256
 #endif
 
 /**
@@ -1532,7 +1655,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Default value for the ICD Management cluster ActiveModeThreshold attribute, in milliseconds
  */
 #ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS
-#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS 300
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS 5000
 #endif
 
 /**
@@ -1542,6 +1665,31 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
 #define CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC 2
+#endif
+
+/**
+ * @def CHIP_CONFIG_CRYPTO_PSA_ICD_MAX_CLIENTS
+ *
+ * @brief
+ *   Maximum number of ICD clients. Based on this number, platforms that utilize the
+ *   PSA Crypto API should reserve key slot range.
+ *
+ * @note
+ *   For platforms that utilize the PSA Crypto API, this configuration is used to
+ *   compute the number of PSA key slots. It should remain unchanged during the device's lifetime,
+ *   as alterations may lead to issues with backwards compatibility.
+ */
+#ifndef CHIP_CONFIG_CRYPTO_PSA_ICD_MAX_CLIENTS
+#define CHIP_CONFIG_CRYPTO_PSA_ICD_MAX_CLIENTS 256
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF
+ *
+ * @brief Default value for the ICD Management cluster MaximumCheckInBackoff attribute, in seconds
+ */
+#ifndef CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF_SEC
+#define CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF_SEC CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
 #endif
 
 /**
@@ -1612,6 +1760,47 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS
+ *
+ * @brief Defines the number of simultaneous ICD Clients info iterators that can be allocated
+ *
+ * Number of iterator instances that can be allocated at any one time
+ */
+#ifndef CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS
+#define CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CAPACITY
+ *
+ * Defines the number of networks the default ThreadNetworkDirectoryStorage implementation will store.
+ */
+#ifndef CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CAPACITY
+#define CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CAPACITY (CHIP_CONFIG_MAX_FABRICS * 2)
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CONCURRENT_ITERATORS
+ *
+ * Defines the number of ThreadNetworkDirectoryStorage iterators that can be allocated at any one time.
+ */
+#ifndef CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CONCURRENT_ITERATORS
+#define CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CONCURRENT_ITERATORS 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
+ *
+ * @brief CommandSender will use built-in support to enable sending batch commands in a single Invoke Request Message.
+ *
+ * **Important:** This feature is code and RAM intensive. Enable only on platforms where these
+ * resources are not constrained.
+ */
+#ifndef CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
+#define CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS 0
+#endif
+
+/**
  * @def CHIP_CONFIG_MAX_PATHS_PER_INVOKE
  *
  * @brief The maximum number of elements in the InvokeRequests list that the Node is able to process.
@@ -1633,6 +1822,27 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
 #define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 2
 #endif
+
+/**
+ * @def CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
+ *
+ * @brief Enables support for diagnostic logs transfer using the BDX protocol
+ *
+ */
+#ifndef CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
+#define CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER 0
+#endif
+
+/**
+ *  @def CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
+ *
+ *  @brief
+ *    Maximum number of simultaneously active bdx log transfers.
+ *
+ */
+#ifndef CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
+#define CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS 5
+#endif // CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
 
 /**
  * @}

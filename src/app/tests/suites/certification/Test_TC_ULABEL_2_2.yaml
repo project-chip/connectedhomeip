@@ -23,7 +23,8 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +32,10 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 1: TH writes LabelList attribute from the DUT"
+    - label:
+          "Step 1: TH writes LabelList attribute on the DUT with following
+          entry: 'roomName':'master bedroom 1','orientation':'east',
+          'floor':'2', 'roomType':'bedroom'"
       PICS: ULABEL.S.A0000
       command: "writeAttribute"
       attribute: "LabelList"
@@ -44,7 +48,7 @@ tests:
                   { Label: "roomType", Value: "bedroom" },
               ]
 
-    - label: "Step 2: TH reads LabelList attribute from the DUT"
+    - label: "Step 2: TH reads LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "readAttribute"
       attribute: "LabelList"

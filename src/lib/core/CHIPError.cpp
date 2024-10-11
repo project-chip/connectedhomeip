@@ -15,13 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file contains functions for working with CHIP errors.
- */
-
-#include <stddef.h>
+#include <lib/core/CHIPError.h>
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/ErrorStr.h>
@@ -140,17 +134,20 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_WRONG_KEY_TYPE.AsInteger():
         desc = "Wrong key type";
         break;
-    case CHIP_ERROR_WELL_UNINITIALIZED.AsInteger():
-        desc = "Well uninitialized";
+    case CHIP_ERROR_UNINITIALIZED.AsInteger():
+        desc = "Uninitialized";
         break;
-    case CHIP_ERROR_WELL_EMPTY.AsInteger():
-        desc = "Well empty";
+    case CHIP_ERROR_INVALID_IPK.AsInteger():
+        desc = "Invalid IPK";
         break;
     case CHIP_ERROR_INVALID_STRING_LENGTH.AsInteger():
         desc = "Invalid string length";
         break;
     case CHIP_ERROR_INVALID_LIST_LENGTH.AsInteger():
-        desc = "invalid list length";
+        desc = "Invalid list length";
+        break;
+    case CHIP_ERROR_FAILED_DEVICE_ATTESTATION.AsInteger():
+        desc = "Failed Device Attestation";
         break;
     case CHIP_END_OF_TLV.AsInteger():
         desc = "End of TLV";
@@ -320,6 +317,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_FABRIC_EXISTS.AsInteger():
         desc = "Trying to add a NOC for a fabric that already exists";
         break;
+    case CHIP_ERROR_ENDPOINT_EXISTS.AsInteger():
+        desc = "Trying to add dynamic endpoint that already exists";
+        break;
     case CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER.AsInteger():
         desc = "Wrong encryption type error code received from peer";
         break;
@@ -361,6 +361,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         break;
     case CHIP_ERROR_VERSION_MISMATCH.AsInteger():
         desc = "Version mismatch";
+        break;
+    case CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL.AsInteger():
+        desc = "The CHIP message's access is restricted by ARL";
         break;
     case CHIP_EVENT_ID_FOUND.AsInteger():
         desc = "Event ID matching criteria was found";

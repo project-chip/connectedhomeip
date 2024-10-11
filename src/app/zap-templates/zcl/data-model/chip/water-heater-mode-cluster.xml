@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2024 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <enum name="ModeTag" type="enum16">
+    <cluster code="0x009E"/>
+
+    <!-- These are the base values (see `enum class ModeTag`
+         in src/app/clusters/mode-base-server/mode-base-cluster-objects.h for the namespace source of truth
+         until it is possible to auto-include these without duplication in codegen. -->
+    <item value="0x0000" name="Auto"/>
+    <item value="0x0001" name="Quick"/>
+    <item value="0x0002" name="Quiet"/>
+    <item value="0x0003" name="LowNoise"/>
+    <item value="0x0004" name="LowEnergy"/>
+    <item value="0x0005" name="Vacation"/>
+    <item value="0x0006" name="Min"/>
+    <item value="0x0007" name="Max"/>
+    <item value="0x0008" name="Night"/>
+    <item value="0x0009" name="Day"/>
+
+    <!-- Derived cluster-specific values -->
+    <item value="0x4000" name="Off"/>
+    <item value="0x4001" name="Manual"/>
+    <item value="0x4002" name="Timed"/>
+  </enum>
+
+  <cluster>
+    <domain>General</domain>
+    <name>Water Heater Mode</name>
+    <code>0x009E</code>
+    <define>WATER_HEATER_MODE_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>Attributes and commands for selecting a mode from a list of supported options.</description>
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
+
+    <features>
+      <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
+        <optionalConform/>
+      </feature>
+    </features>
+
+    <!-- Base data types -->
+    <attribute side="server" code="0x0000" define="SUPPORTED_MODES"  type="array" entryType="ModeOptionStruct" writable="false" optional="false" isNullable="false" length="255">SupportedModes</attribute>
+    <attribute side="server" code="0x0001" define="CURRENT_MODE"     type="int8u"                              writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>
+    <attribute side="server" code="0x0002" define="START_UP_MODE"    type="int8u"                              writable="true"  optional="true"  isNullable="true">StartUpMode</attribute>
+    <attribute side="server" code="0x0003" define="ON_MODE"          type="int8u"                              writable="true"  optional="true"  isNullable="true">OnMode</attribute>
+
+    <!-- Commands -->
+    <command source="client" code="0x00" name="ChangeToMode" response="ChangeToModeResponse" optional="false">
+      <description>
+        This command is used to change device modes.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command.
+      </description>
+      <arg name="NewMode" type="int8u" optional="false"/>
+    </command>
+
+    <command source="server" code="0x01" name="ChangeToModeResponse" disableDefaultResponse="true" optional="false">
+      <description>
+        This command is sent by the device on receipt of the ChangeToModeWithStatus command.
+      </description>
+      <arg name="Status"     type="enum8"                   optional="false"/>
+      <arg name="StatusText" type="char_string" lenght="64" optional="true"/>
+    </command>
+  </cluster>
+</configurator>

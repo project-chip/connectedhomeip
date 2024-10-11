@@ -29,7 +29,6 @@
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
-using namespace ::chip::TLV;
 
 namespace chip {
 namespace DeviceLayer {
@@ -43,7 +42,7 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImplWiFi::_GetWiFiStatio
 {
     if (mStationMode != ConnectivityManager::WiFiStationMode::kWiFiStationMode_ApplicationControlled)
     {
-        mStationMode = (WiFiManager::StationStatus::DISABLED == WiFiManager().Instance().GetStationStatus())
+        mStationMode = (WiFiManager::StationStatus::DISABLED == WiFiManager::Instance().GetStationStatus())
             ? ConnectivityManager::WiFiStationMode::kWiFiStationMode_Disabled
             : ConnectivityManager::WiFiStationMode::kWiFiStationMode_Enabled;
     }
@@ -61,7 +60,7 @@ CHIP_ERROR ConnectivityManagerImplWiFi::_SetWiFiStationMode(ConnectivityManager:
 
 bool ConnectivityManagerImplWiFi::_IsWiFiStationEnabled(void)
 {
-    return (WiFiManager::StationStatus::DISABLED <= WiFiManager().Instance().GetStationStatus());
+    return (WiFiManager::StationStatus::DISABLED <= WiFiManager::Instance().GetStationStatus());
 }
 
 bool ConnectivityManagerImplWiFi::_IsWiFiStationApplicationControlled(void)
@@ -71,7 +70,7 @@ bool ConnectivityManagerImplWiFi::_IsWiFiStationApplicationControlled(void)
 
 bool ConnectivityManagerImplWiFi::_IsWiFiStationConnected(void)
 {
-    return (WiFiManager::StationStatus::CONNECTED == WiFiManager().Instance().GetStationStatus());
+    return (WiFiManager::StationStatus::CONNECTED == WiFiManager::Instance().GetStationStatus());
 }
 
 System::Clock::Timeout ConnectivityManagerImplWiFi::_GetWiFiStationReconnectInterval(void)
@@ -89,14 +88,14 @@ bool ConnectivityManagerImplWiFi::_IsWiFiStationProvisioned(void)
 {
     // from Matter perspective `provisioned` means that the supplicant has been provided
     // with SSID and password (doesn't matter if valid or not)
-    return (WiFiManager::StationStatus::CONNECTING <= WiFiManager().Instance().GetStationStatus());
+    return (WiFiManager::StationStatus::CONNECTING <= WiFiManager::Instance().GetStationStatus());
 }
 
 void ConnectivityManagerImplWiFi::_ClearWiFiStationProvision(void)
 {
     if (_IsWiFiStationProvisioned())
     {
-        if (CHIP_NO_ERROR != WiFiManager().Instance().ClearStationProvisioningData())
+        if (CHIP_NO_ERROR != WiFiManager::Instance().ClearStationProvisioningData())
         {
             ChipLogError(DeviceLayer, "Cannot clear WiFi station provisioning data");
         }
@@ -105,9 +104,9 @@ void ConnectivityManagerImplWiFi::_ClearWiFiStationProvision(void)
 
 bool ConnectivityManagerImplWiFi::_CanStartWiFiScan()
 {
-    return (WiFiManager::StationStatus::DISABLED != WiFiManager().Instance().GetStationStatus() &&
-            WiFiManager::StationStatus::SCANNING != WiFiManager().Instance().GetStationStatus() &&
-            WiFiManager::StationStatus::CONNECTING != WiFiManager().Instance().GetStationStatus());
+    return (WiFiManager::StationStatus::DISABLED != WiFiManager::Instance().GetStationStatus() &&
+            WiFiManager::StationStatus::SCANNING != WiFiManager::Instance().GetStationStatus() &&
+            WiFiManager::StationStatus::CONNECTING != WiFiManager::Instance().GetStationStatus());
 }
 
 void ConnectivityManagerImplWiFi::_OnWiFiStationProvisionChange()

@@ -25,6 +25,8 @@
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <string>
+
 namespace chip {
 
 const uint16_t kSmallBufferSizeInBytes   = 1;
@@ -39,7 +41,7 @@ const uint32_t kOptionalDefaultIntValue = 12;
 inline constexpr char kSerialNumberDefaultStringValue[] = "123456789";
 const uint32_t kSerialNumberDefaultUInt32Value          = 123456789;
 
-inline constexpr const char * kDefaultPayloadQRCode = "MT:M5L90MP500K64J00000";
+inline constexpr char kDefaultPayloadQRCode[] = "MT:M5L90MP500K64J00000";
 
 inline SetupPayload GetDefaultPayload()
 {

@@ -33,10 +33,14 @@ CHIP_ERROR JsonToTlv(const std::string & jsonString, MutableByteSpan & tlv);
 CHIP_ERROR JsonToTlv(const std::string & jsonString, TLV::TLVWriter & writer);
 
 /*
- * Convert a uint64_t tagNumber to a TLV tag. When tagNumber is less than or equal to UINT8_MAX,
- * the tag is encoded using ContextTag. When tagNumber is larger than UINT8_MAX and less than or equal to UINT32_MAX,
- * the tag is encoded using an implicit profile tag.
+ * Convert a uint32_t tagNumber (from MEI) to a TLV tag.
+ * The upper 16 bits of tag_number represent the vendor_id.
+ * The lower 16 bits of tag_number represent the tag_id.
+ * When the MEI prefix encodes a standard/scoped source, the tag is encoded using ContextSpecific tag if tag_id is less than or
+ * equal to UINT8_MAX, and ImplicitProfile tag if tag_id is larger than UINT8_MAX. When the MEI prefix encodes a manufacturer code,
+ * the tag is encoded using FullyQualified_6Bytes tag, the Vendor ID SHALL be set to the manufacturer code, the profile number set
+ * to 0 and the tag number set to the MEI suffix.
  */
-CHIP_ERROR ConvertTlvTag(const uint64_t tagNumber, TLV::Tag & tag);
+CHIP_ERROR ConvertTlvTag(uint32_t tagNumber, TLV::Tag & tag);
 
 } // namespace chip

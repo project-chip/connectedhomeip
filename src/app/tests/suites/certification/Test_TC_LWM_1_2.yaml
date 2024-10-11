@@ -40,7 +40,6 @@ tests:
           - Verify that the list has at least 2 and at most 255 entries
           - Verify that each ModeOptionsStruct entry has a unique Mode field value and Label field value
           - If ModeOptionsStruct entry’s ModeTags field is not empty,  then Verify the values of the Value fields that are not larger than 16 bits, for each Value field: Is the mode tag value a defined common tag value ( Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a defined cluster derived tag value ( Normal, Delicate, Heavy, Whites) or in the MfgTags (0x8000 to 0xBFFF) range
-          - If the Value field is in the MfgTags (0x8000 to 0xBFFF) range, the TagName field is a string with a length between 1 and 64
           - Verify that at least one ModeOptionsStruct entry includes the Normal mode tag
           - Save the Mode field values as supported_modes_dut on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
@@ -98,26 +97,4 @@ tests:
 
           [1690184642.211028][15428:15430] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Attribute 0x0000_0001 DataVersion: 3075628268
           [1690184642.211042][15428:15430] CHIP:TOO:   CurrentMode: 0
-      disabled: true
-
-    - label: "Step 4: TH reads from the DUT the OnMode attribute."
-      PICS: LWM.S.A0003
-      verification: |
-          ./chip-tool laundrywashermode read on-mode 1 1
-
-          Verify on TH(chip-tool) logs, OnMode attribute value is an integer value from supported_modes_dut or null, below is the sample log provided for the raspi platform, Here OnMode attribute value is Null
-
-          [1690184668.519026][15432:15434] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Attribute 0x0000_0003 DataVersion: 3075628268
-          [1690184668.519041][15432:15434] CHIP:TOO:   OnMode: null
-      disabled: true
-
-    - label: "Step 5: TH reads from the DUT the StartUpMode attribute."
-      PICS: LWM.S.A0002
-      verification: |
-          ./chip-tool laundrywashermode read start-up-mode 1 1
-
-          Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer value from supported_modes_dut or null, below is the sample log provided for the raspi platform, Here StartUpMode attribute value is Null
-
-          [1690184690.235037][15436:15438] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Attribute 0x0000_0002 DataVersion: 3075628268
-          [1690184690.235048][15436:15438] CHIP:TOO:   StartUpMode: null
       disabled: true

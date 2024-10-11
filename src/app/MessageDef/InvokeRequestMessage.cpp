@@ -74,7 +74,7 @@ CHIP_ERROR InvokeRequestMessage::Parser::PrettyPrint() const
             PRETTY_PRINT_DECDEPTH();
         }
         break;
-        case kInteractionModelRevisionTag:
+        case Revision::kInteractionModelRevisionTag:
             ReturnErrorOnFailure(MessageParser::CheckInteractionModelRevision(reader));
             break;
         default:
@@ -113,6 +113,14 @@ CHIP_ERROR InvokeRequestMessage::Parser::GetInvokeRequests(InvokeRequests::Parse
     return apInvokeRequests->Init(reader);
 }
 
+CHIP_ERROR InvokeRequestMessage::Builder::InitWithEndBufferReserved(TLV::TLVWriter * const apWriter)
+{
+    ReturnErrorOnFailure(Init(apWriter));
+    ReturnErrorOnFailure(GetWriter()->ReserveBuffer(GetSizeToEndInvokeRequestMessage()));
+    mIsEndBufferReserved = true;
+    return CHIP_NO_ERROR;
+}
+
 InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::SuppressResponse(const bool aSuppressResponse)
 {
     if (mError == CHIP_NO_ERROR)
@@ -131,17 +139,33 @@ InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::TimedRequest(cons
     return *this;
 }
 
-InvokeRequests::Builder & InvokeRequestMessage::Builder::CreateInvokeRequests()
+InvokeRequests::Builder & InvokeRequestMessage::Builder::CreateInvokeRequests(const bool aReserveEndBuffer)
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mInvokeRequests.Init(mpWriter, to_underlying(Tag::kInvokeRequests));
+        if (aReserveEndBuffer)
+        {
+            mError = mInvokeRequests.InitWithEndBufferReserved(mpWriter, to_underlying(Tag::kInvokeRequests));
+        }
+        else
+        {
+            mError = mInvokeRequests.Init(mpWriter, to_underlying(Tag::kInvokeRequests));
+        }
     }
     return mInvokeRequests;
 }
 
 CHIP_ERROR InvokeRequestMessage::Builder::EndOfInvokeRequestMessage()
 {
+    // If any changes are made to how we end the invoke request message that involves how many
+    // bytes are needed, a corresponding change to GetSizeToEndInvokeRequestMessage indicating
+    // the new size that will be required.
+    ReturnErrorOnFailure(mError);
+    if (mIsEndBufferReserved)
+    {
+        ReturnErrorOnFailure(GetWriter()->UnreserveBuffer(GetSizeToEndInvokeRequestMessage()));
+        mIsEndBufferReserved = false;
+    }
     if (mError == CHIP_NO_ERROR)
     {
         mError = MessageBuilder::EncodeInteractionModelRevision();
@@ -151,6 +175,16 @@ CHIP_ERROR InvokeRequestMessage::Builder::EndOfInvokeRequestMessage()
         EndOfContainer();
     }
     return GetError();
+}
+
+uint32_t InvokeRequestMessage::Builder::GetSizeToEndInvokeRequestMessage()
+{
+    // EncodeInteractionModelRevision() encodes a uint8_t with context tag 0xFF. This means 1 control byte,
+    // 1 byte for the tag, 1 byte for the value.
+    uint32_t kEncodeInteractionModelSize = 1 + 1 + 1;
+    uint32_t kEndOfContainerSize         = 1;
+
+    return kEncodeInteractionModelSize + kEndOfContainerSize;
 }
 }; // namespace app
 }; // namespace chip

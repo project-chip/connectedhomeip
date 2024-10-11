@@ -5,9 +5,12 @@ darwin:
   # (like "kiosk" or whatnot), but do allow matching "ios8" and things
   # like that.
   #
+  # Make sure we don't trigger for the string "MAC", which almost
+  # certainly has nothing to do with Darwin.
+  #
   # \\b means "word boundary"
   # (?![a-z]) means "there is no next char in the range a-z".
-  - "/(\\bios(?![a-z])|homepod|darwin|\\bmac\\b|macos)/i"
+  - "/(\\b[Ii][Oo][Ss](?![a-zA-Z])|[Hh][Oo][Mm][Ee][Pp][Oo][Dd]|[Dd][Aa][Rr][Ww][Ii][Nn]|\\bm[Aa][Cc]\\b|\\bMa[Cc]\\b|\\bM[Aa]c\\b|[Mm][Aa][Cc][Oo][Ss])/"
 
 linux:
   - "/(linux)/i"

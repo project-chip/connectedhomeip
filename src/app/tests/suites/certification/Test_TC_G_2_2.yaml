@@ -46,11 +46,12 @@ tests:
     - label:
           "Step 1a: TH sends KeySetWrite command in the GroupKeyManagement
           cluster to DUT on EP0 using a key that is pre-installed on the TH.
-          GroupKeySet fields are as follows: GroupKeySetID: 1
-          GroupKeySecurityPolicy: TrustFirst (0) EpochKey0:
-          0d0d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime0: 2220000 EpochKey1:
-          0d1d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime1: 2220001 EpochKey2:
-          0d2d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime2: 2220002"
+          GroupKeySet fields are as follows: GroupKeySetID: 1,
+          GroupKeySecurityPolicy: TrustFirst (0), EpochKey0:
+          d0d1d2d3d4d5d6d7d8d9dadbdcdddedf, EpochStartTime0: 1, EpochKey1:
+          d1d1d2d3d4d5d6d7d8d9dadbdcdddedf, EpochStartTime1:
+          18446744073709551613, EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf,
+          EpochStartTime2: 18446744073709551614"
       verification: |
           ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 18446744073709551613,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 18446744073709551614 }' 1 0
 
@@ -1135,16 +1136,16 @@ tests:
           unicast with the following fields: GroupID as 0x0002"
       PICS: G.S.C01.Rsp && G.S.C01.Tx
       verification: |
-          ./chip-tool groups view-group 0x0001 1 0
+          ./chip-tool groups view-group 0x0002 1 0
 
           Verify the ViewGroupResponse with status as NOT_FOUND on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
-          [1653559917.259920][3227:3232] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
-          [1653559917.259993][3227:3232] CHIP:TOO:   ViewGroupResponse: {
-          [1653559917.260040][3227:3232] CHIP:TOO:     status: 139
-          [1653559917.260075][3227:3232] CHIP:TOO:     groupId: 1
-          [1653559917.260107][3227:3232] CHIP:TOO:     groupName:
-          [1653559917.260138][3227:3232] CHIP:TOO:    }
+          [1700468046.366768][31682:31684] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
+          [1700468046.366826][31682:31684] CHIP:TOO:   ViewGroupResponse: {
+          [1700468046.366841][31682:31684] CHIP:TOO:     status: 139
+          [1700468046.366853][31682:31684] CHIP:TOO:     groupID: 2
+          [1700468046.366863][31682:31684] CHIP:TOO:     groupName:
+          [1700468046.366874][31682:31684] CHIP:TOO:    }
       disabled: true
 
     - label:
@@ -1155,6 +1156,37 @@ tests:
           ./chip-tool groupkeymanagement read group-table 1 0
 
           Verify the GroupTable entries are 0 on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
+
+          [1656332191.739327][27032:27037] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 3761602970
+          [1656332191.739391][27032:27037] CHIP:TOO:   GroupTable: 0 entries
+      disabled: true
+
+    - label:
+          "Step 23: TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT as
+          unicast with the following fields: GroupID as 0x0001, GroupName as
+          Gp123456789123456, Note: GroupName length > 16"
+      PICS: G.S.C00.Rsp && G.S.C00.Tx && G.S.F00
+      verification: |
+          ./chip-tool groups add-group 0x0001 Gp123456789123456 1 0
+
+          Verify the status is CONSTRAINT_ERROR (when GroupName is of length greater than 16) on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
+
+          [1701784321.750191][14898:14900] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0004 Command=0x0000_0000
+          [1701784321.750198][14898:14900] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
+          [1701784321.750215][14898:14900] CHIP:TOO:   AddGroupResponse: {
+          [1701784321.750219][14898:14900] CHIP:TOO:     status: 135
+          [1701784321.750222][14898:14900] CHIP:TOO:     groupID: 1
+          [1701784321.750225][14898:14900] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 24: TH reads GroupTable attribute from the GroupKeyManagement
+          cluster from DUT on EP0"
+      PICS: GRPKEY.S.A0001 && G.S.F00
+      verification: |
+          ./chip-tool groupkeymanagement read group-table 1 0
+
+          Verify that there is no entry with GroupId 0x0001 in GroupTable entries  on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
           [1656332191.739327][27032:27037] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 3761602970
           [1656332191.739391][27032:27037] CHIP:TOO:   GroupTable: 0 entries

@@ -414,6 +414,11 @@ public:
         ConstIterator(IntrusiveListBase::ConstIteratorBase && base) : IntrusiveListBase::ConstIteratorBase(std::move(base)) {}
         const T * operator->() { return Hook::ToObject(mCurrent); }
         const T & operator*() { return *Hook::ToObject(mCurrent); }
+
+        ConstIterator & operator++() { return static_cast<ConstIterator &>(IntrusiveListBase::ConstIteratorBase::operator++()); }
+        ConstIterator operator++(int) { return IntrusiveListBase::ConstIteratorBase::operator++(1); }
+        ConstIterator & operator--() { return static_cast<ConstIterator &>(IntrusiveListBase::ConstIteratorBase::operator--()); }
+        ConstIterator operator--(int) { return IntrusiveListBase::ConstIteratorBase::operator--(1); }
     };
 
     class Iterator : public IntrusiveListBase::IteratorBase
@@ -426,6 +431,11 @@ public:
         Iterator(IntrusiveListBase::IteratorBase && base) : IntrusiveListBase::IteratorBase(std::move(base)) {}
         T * operator->() { return Hook::ToObject(mCurrent); }
         T & operator*() { return *Hook::ToObject(mCurrent); }
+
+        Iterator & operator++() { return static_cast<Iterator &>(IntrusiveListBase::IteratorBase::operator++()); }
+        Iterator operator++(int) { return IntrusiveListBase::IteratorBase::operator++(1); }
+        Iterator & operator--() { return static_cast<Iterator &>(IntrusiveListBase::IteratorBase::operator--()); }
+        Iterator operator--(int) { return IntrusiveListBase::IteratorBase::operator--(1); }
     };
 
     ConstIterator begin() const { return IntrusiveListBase::begin(); }
@@ -439,6 +449,14 @@ public:
     void Remove(T * value) { IntrusiveListBase::Remove(Hook::ToNode(value)); }
     void Replace(T * original, T * replacement) { IntrusiveListBase::Replace(Hook::ToNode(original), Hook::ToNode(replacement)); }
     bool Contains(const T * value) const { return IntrusiveListBase::Contains(Hook::ToNode(value)); }
+
+    void Clear()
+    {
+        while (begin() != end())
+        {
+            Remove(&(*begin()));
+        }
+    }
 };
 
 } // namespace chip

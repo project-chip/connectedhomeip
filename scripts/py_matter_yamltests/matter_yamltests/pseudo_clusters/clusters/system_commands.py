@@ -30,6 +30,10 @@ _DEFINITION = '''<?xml version="1.0"?>
       <arg name="kvs" type="char_string" optional="true"/>
       <arg name="filepath" type="char_string" optional="true"/>
       <arg name="otaDownloadPath" type="char_string" optional="true"/>
+      <arg name="endUserSupportLogPath" type="char_string" optional="true"/>
+      <arg name="networkDiagnosticsLogPath" type="char_string" optional="true"/>
+      <arg name="crashLogPath" type="char_string" optional="true"/>
+      <arg name="traceDecode" type="int8u" optional="true"/>
     </command>
 
     <command source="client" code="1" name="Stop">
@@ -53,6 +57,15 @@ _DEFINITION = '''<?xml version="1.0"?>
     <command source="client" code="5" name="CompareFiles">
       <arg name="file1" type="char_string"/>
       <arg name="file2" type="char_string"/>
+    </command>
+
+    <command source="client" code="6" name="CreateFile">
+      <arg name="filePath" type="char_string"/>
+      <arg name="fileContent" type="char_string"/>
+    </command>
+
+    <command source="client" code="7" name="DeleteFile">
+      <arg name="filePath" type="char_string"/>
     </command>
 
 </cluster>
@@ -81,3 +94,9 @@ class SystemCommands(PseudoCluster):
 
     async def CompareFiles(self, request):
         AccessoryServerBridge.compareFiles(request)
+
+    async def CreateFile(self, request):
+        AccessoryServerBridge.createFile(request)
+
+    async def DeleteFile(self, request):
+        AccessoryServerBridge.deleteFile(request)

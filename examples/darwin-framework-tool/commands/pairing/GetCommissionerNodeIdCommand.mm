@@ -19,15 +19,17 @@
 #import <Matter/Matter.h>
 
 #include "GetCommissionerNodeIdCommand.h"
+#include "RemoteDataModelLogger.h"
 
 CHIP_ERROR GetCommissionerNodeIdCommand::RunCommand()
 {
     auto * controller = CurrentCommissioner();
     VerifyOrReturnError(nil != controller, CHIP_ERROR_INCORRECT_STATE);
 
-    ChipLogProgress(
-        chipTool, "Commissioner Node Id 0x" ChipLogFormatX64, ChipLogValueX64(controller.controllerNodeId.unsignedLongLongValue));
+    auto controllerNodeId = controller.controllerNodeId;
+    ChipLogProgress(chipTool, "Commissioner Node Id 0x" ChipLogFormatX64, ChipLogValueX64(controllerNodeId.unsignedLongLongValue));
 
+    ReturnErrorOnFailure(RemoteDataModelLogger::LogGetCommissionerNodeId(controllerNodeId));
     SetCommandExitStatus(CHIP_NO_ERROR);
     return CHIP_NO_ERROR;
 }

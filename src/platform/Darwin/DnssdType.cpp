@@ -18,9 +18,10 @@
 #include "DnssdType.h"
 
 #include <sstream>
+#include <string>
 
-constexpr const char * kProtocolTcp = "._tcp";
-constexpr const char * kProtocolUdp = "._udp";
+constexpr char kProtocolTcp[] = "._tcp";
+constexpr char kProtocolUdp[] = "._udp";
 
 namespace chip {
 namespace Dnssd {

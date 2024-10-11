@@ -15,10 +15,9 @@
  *    limitations under the License.
  */
 
-#include <app/util/af.h>
-
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/util/attribute-metadata.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip::app;
@@ -26,10 +25,7 @@ using namespace chip::app::Clusters::ThermostatUserInterfaceConfiguration;
 using chip::Protocols::InteractionModel::Status;
 
 namespace {
-//
-// Those types are defined as drafts in
-// src/app/zap-templates/zcl/data-model/draft/types/thermostat-user-interface-configuration.xml
-//
+
 enum class TemperatureDisplayMode : uint8_t
 {
     kCelsius    = 0x0,

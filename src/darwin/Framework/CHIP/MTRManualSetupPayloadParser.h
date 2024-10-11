@@ -21,7 +21,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_DEPRECATED("Please use [MTRSetupPayload setupPayloadWithOnboardingPayload:error:]", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use -[MTRSetupPayload initWithPayload:]", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRManualSetupPayloadParser : NSObject
 - (instancetype)initWithDecimalStringRepresentation:(NSString *)decimalStringRepresentation;

@@ -24,7 +24,17 @@
 
 #pragma once
 
+namespace chip {
+namespace DeviceLayer {
+namespace Internal {
+class BLEConnection;
+} // namespace Internal
+} // namespace DeviceLayer
+} // namespace chip
+
 // ==================== Platform Adaptations ====================
+#define BLE_CONNECTION_OBJECT chip::DeviceLayer::Internal::BLEConnection *
+#define BLE_CONNECTION_UNINITIALIZED nullptr
 
 // ========== Platform-specific Configuration Overrides =========
 

@@ -37,20 +37,21 @@ void BusFault_Handler(void);
 void UsageFault_Handler(void);
 void SVC_Handler(void);
 void DebugMon_Handler(void);
-void PendSV_Handler(void);
-void SysTick_Handler(void);
 void IPCC_C1_RX_IRQHandler(void);
 void IPCC_C1_TX_IRQHandler(void);
-void EXTI4_IRQHandler(void);
-void EXTI0_IRQHandler(void);
-void EXTI1_IRQHandler(void);
+#if (CFG_HW_USART1_ENABLED == 1)
 void USART1_IRQHandler(void);
-void DMA2_Channel4_IRQHandler(void);
+#endif
+#if (CFG_HW_USART1_DMA_TX_SUPPORTED == 1)
 void CFG_HW_USART1_DMA_TX_IRQHandler(void);
+#endif
+#if (CFG_HW_LPUART1_DMA_TX_SUPPORTED == 1)
+void CFG_HW_USART1_DMA_TX_IRQHandler(void);
+#endif
 void RTC_WKUP_IRQHandler(void);
+#if (CFG_HW_LPUART1_ENABLED == 1)
 void LPUART1_IRQHandler(void);
-void DMA1_Channel4_IRQHandler(void);
-void QUADSPI_IRQHandler(void);
+#endif
 
 #ifdef __cplusplus
 }

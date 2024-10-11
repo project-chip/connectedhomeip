@@ -23,7 +23,7 @@
 #include <lib/core/ErrorStr.h>
 #include <platform/KeyValueStoreManager.h>
 
-const char * TAG = "persistent-storage";
+extern const char TAG[] = "persistent-storage";
 
 extern "C" void app_main()
 {

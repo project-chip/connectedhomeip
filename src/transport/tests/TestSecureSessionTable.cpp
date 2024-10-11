@@ -21,31 +21,28 @@
  *      This file implements unit tests for the SessionManager implementation.
  */
 
-#include "system/SystemClock.h"
-#include <lib/core/CHIPCore.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/UnitTestRegistration.h>
-#include <transport/SecureSessionTable.h>
-#include <transport/SessionHolder.h>
-
-#include <nlbyteorder.h>
-#include <nlunit-test.h>
-
 #include <errno.h>
 #include <vector>
+
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/CodeUtils.h>
+#include <system/SystemClock.h>
+#include <transport/SecureSessionTable.h>
+#include <transport/SessionHolder.h>
 
 namespace chip {
 namespace Transport {
 
-class TestSecureSessionTable
+class TestSecureSessionTable : public ::testing::Test
 {
 public:
-    //
-    // This test specifically validates eviction of sessions in the session table
-    // with various scenarios based on the existing set of sessions in the table
-    // and a provided session eviction hint
-    //
-    static void ValidateSessionSorting(nlTestSuite * inSuite, void * inContext);
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
+    void ValidateSessionSorting();
 
 private:
     struct SessionParameters
@@ -88,7 +85,6 @@ private:
     //
     void CreateSessionTable(std::vector<SessionParameters> & sessionParams);
 
-    nlTestSuite * mTestSuite;
     Platform::UniquePtr<SecureSessionTable> mSessionTable;
     std::vector<Platform::UniquePtr<SessionNotificationListener>> mSessionList;
 };
@@ -97,8 +93,8 @@ void TestSecureSessionTable::AllocateSession(const ScopedNodeId & sessionEvictio
                                              std::vector<SessionParameters> & sessionParameters, uint16_t evictedSessionIndex)
 {
     auto session = mSessionTable->CreateNewSecureSession(SecureSession::Type::kCASE, sessionEvictionHint);
-    NL_TEST_ASSERT(mTestSuite, session.HasValue());
-    NL_TEST_ASSERT(mTestSuite, mSessionList[evictedSessionIndex].get()->mSessionReleased == true);
+    EXPECT_TRUE(session.HasValue());
+    EXPECT_TRUE(mSessionList[evictedSessionIndex].get()->mSessionReleased);
 }
 
 void TestSecureSessionTable::CreateSessionTable(std::vector<SessionParameters> & sessionParams)
@@ -106,7 +102,7 @@ void TestSecureSessionTable::CreateSessionTable(std::vector<SessionParameters> &
     mSessionList.clear();
 
     mSessionTable = Platform::MakeUnique<SecureSessionTable>();
-    NL_TEST_ASSERT(mTestSuite, mSessionTable.get() != nullptr);
+    EXPECT_NE(mSessionTable.get(), nullptr);
 
     mSessionTable->Init();
     mSessionTable->SetMaxSessionTableSize(static_cast<uint32_t>(sessionParams.size()));
@@ -114,24 +110,25 @@ void TestSecureSessionTable::CreateSessionTable(std::vector<SessionParameters> &
     for (unsigned int i = 0; i < sessionParams.size(); i++)
     {
         auto session = mSessionTable->CreateNewSecureSession(SecureSession::Type::kCASE, ScopedNodeId());
-        NL_TEST_ASSERT(mTestSuite, session.HasValue());
+        EXPECT_TRUE(session.HasValue());
 
         session.Value()->AsSecureSession()->Activate(
             ScopedNodeId(1, sessionParams[i].mPeer.GetFabricIndex()), sessionParams[i].mPeer, CATValues(), static_cast<uint16_t>(i),
             ReliableMessageProtocolConfig(System::Clock::Milliseconds32(0), System::Clock::Milliseconds32(0),
                                           System::Clock::Milliseconds16(0)));
+
+        // Make sure we set up our holder _before_ the session goes into a state
+        // other than active, because holders refuse to hold non-active
+        // sessions.
+        mSessionList.push_back(Platform::MakeUnique<SessionNotificationListener>(session.Value()));
+
         session.Value()->AsSecureSession()->mLastActivityTime = sessionParams[i].mLastActivityTime;
         session.Value()->AsSecureSession()->mState            = sessionParams[i].mState;
-
-        mSessionList.push_back(Platform::MakeUnique<SessionNotificationListener>(session.Value()));
     }
 }
 
-void TestSecureSessionTable::ValidateSessionSorting(nlTestSuite * inSuite, void * inContext)
+void TestSecureSessionTable::ValidateSessionSorting()
 {
-    Platform::UniquePtr<TestSecureSessionTable> & _this = *static_cast<Platform::UniquePtr<TestSecureSessionTable> *>(inContext);
-    _this->mTestSuite                                   = inSuite;
-
     //
     // This validates basic eviction. The table is full of sessions from Fabric1 from the same
     // Node (2). Eviction should select the oldest session in the table (with timestamp 1) and evict that
@@ -148,8 +145,8 @@ void TestSecureSessionTable::ValidateSessionSorting(nlTestSuite * inSuite, void 
             { { 2, kFabric1 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(2, kFabric1), sessionParamList, 4);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(2, kFabric1), sessionParamList, 4);
     }
 
     //
@@ -170,8 +167,8 @@ void TestSecureSessionTable::ValidateSessionSorting(nlTestSuite * inSuite, void 
             { { 2, kFabric1 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(2, kFabric2), sessionParamList, 4);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(2, kFabric2), sessionParamList, 4);
     }
 
     //
@@ -196,8 +193,8 @@ void TestSecureSessionTable::ValidateSessionSorting(nlTestSuite * inSuite, void 
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(2, kFabric1), sessionParamList, 1);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(2, kFabric1), sessionParamList, 1);
     }
 
     //
@@ -222,8 +219,8 @@ void TestSecureSessionTable::ValidateSessionSorting(nlTestSuite * inSuite, void 
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(2, kFabric1), sessionParamList, 3);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(2, kFabric1), sessionParamList, 3);
     }
 
     //
@@ -248,8 +245,8 @@ void TestSecureSessionTable::ValidateSessionSorting(nlTestSuite * inSuite, void 
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(2, kFabric1), sessionParamList, 4);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(2, kFabric1), sessionParamList, 4);
     }
 
     //
@@ -271,20 +268,84 @@ void TestSecureSessionTable::ValidateSessionSorting(nlTestSuite * inSuite, void 
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 2);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 2);
     }
 
     //
     // This validates evicting from a table with equally loaded fabrics. In this scenario,
     // bias is given to the fabric that matches that of the eviction hint.
     //
-    // There are equal sessions to Node 2 as well as Node 3 in that fabric, so the Node
-    // that matches the session eviction hint will be selected, and in that, the older session.
+    // There is an equal number sessions to nodes 1, 2, and 3 in that fabric, so the Node
+    // that matches the session eviction hint will be selected.
+    //
+    // All the sessions in the table are defunct, because for unique active
+    // sessions eviction hints are ignored.
+    //
+    {
+        ChipLogProgress(
+            SecureChannel,
+            "-------- Equal Fabrics Eviction (Single equal # Sessions to Nodes, Hint Match On Fabric & Node) ---------");
+
+        std::vector<SessionParameters> sessionParamList = {
+            { { 1, kFabric1 }, System::Clock::Timestamp(9), SecureSession::State::kDefunct },
+            { { 1, kFabric2 }, System::Clock::Timestamp(3), SecureSession::State::kDefunct },
+            { { 2, kFabric1 }, System::Clock::Timestamp(2), SecureSession::State::kDefunct },
+            { { 3, kFabric1 }, System::Clock::Timestamp(7), SecureSession::State::kDefunct },
+            { { 3, kFabric2 }, System::Clock::Timestamp(1), SecureSession::State::kDefunct },
+            { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kDefunct },
+        };
+
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 3);
+    }
+
+    //
+    // This validates evicting from a table with equally loaded fabrics. In this scenario,
+    // bias is given to the fabric that matches that of the eviction hint.
+    //
+    // There is an equal number sessions to nodes 1, 2, and 3 in that fabric, so the Node
+    // that matches the session eviction hint will be selected.
+    //
+    // All the peers in this table have two sessions to them, so that we pay
+    // attention to the eviction hint.  The older of the two should be selected.
+    //
+    {
+        ChipLogProgress(
+            SecureChannel,
+            "-------- Equal Fabrics Eviction (Multiple equal # Sessions to Nodes, Hint Match On Fabric & Node) ---------");
+
+        std::vector<SessionParameters> sessionParamList = {
+            { { 1, kFabric1 }, System::Clock::Timestamp(9), SecureSession::State::kActive },
+            { { 1, kFabric2 }, System::Clock::Timestamp(3), SecureSession::State::kActive },
+            { { 2, kFabric1 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
+            { { 3, kFabric1 }, System::Clock::Timestamp(7), SecureSession::State::kActive },
+            { { 3, kFabric2 }, System::Clock::Timestamp(1), SecureSession::State::kActive },
+            { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
+            { { 1, kFabric1 }, System::Clock::Timestamp(10), SecureSession::State::kActive },
+            { { 1, kFabric2 }, System::Clock::Timestamp(4), SecureSession::State::kActive },
+            { { 2, kFabric1 }, System::Clock::Timestamp(3), SecureSession::State::kActive },
+            { { 3, kFabric1 }, System::Clock::Timestamp(8), SecureSession::State::kActive },
+            { { 3, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
+            { { 4, kFabric2 }, System::Clock::Timestamp(3), SecureSession::State::kActive },
+        };
+
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 3);
+    }
+
+    //
+    // This validates evicting from a table with equally loaded fabrics. In this scenario,
+    // bias is given to the fabric that matches that of the eviction hint.
+    //
+    // There is an equal sessions to nodes 1, 2, and 3 in that fabric, and only
+    // one per node.  Since all the sessions are active, the eviction hint's
+    // node id will be ignored and the oldest session on the fabric will be selected.
     //
     {
         ChipLogProgress(SecureChannel,
-                        "-------- Equal Fabrics Eviction (Equal # Sessions to Nodes, Hint Match On Fabric & Node) ---------");
+                        "-------- Equal Fabrics Eviction (Equal # Sessions to Nodes, Hint Match On Fabric & Node, hint node "
+                        "ignored) ---------");
 
         std::vector<SessionParameters> sessionParamList = {
             { { 1, kFabric1 }, System::Clock::Timestamp(9), SecureSession::State::kActive },
@@ -295,8 +356,35 @@ void TestSecureSessionTable::ValidateSessionSorting(nlTestSuite * inSuite, void 
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 3);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 2);
+    }
+
+    //
+    // This validates evicting from a table with equally loaded fabrics. In this scenario,
+    // bias is given to the fabric that matches that of the eviction hint.
+    //
+    // There is an equal sessions to nodes 1, 2, and 3 in that fabric, and only
+    // one per node.  Since the hinted session is active, the eviction hint's
+    // node id will be ignored and the defunct session will be selected, even
+    // though it's the newest one.
+    //
+    {
+        ChipLogProgress(SecureChannel,
+                        "-------- Equal Fabrics Eviction (Equal # Sessions to Nodes, Hint Match On Fabric & Node, hint node "
+                        "ignored and state wins) ---------");
+
+        std::vector<SessionParameters> sessionParamList = {
+            { { 1, kFabric1 }, System::Clock::Timestamp(9), SecureSession::State::kDefunct },
+            { { 1, kFabric2 }, System::Clock::Timestamp(3), SecureSession::State::kActive },
+            { { 2, kFabric1 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
+            { { 3, kFabric1 }, System::Clock::Timestamp(7), SecureSession::State::kActive },
+            { { 3, kFabric2 }, System::Clock::Timestamp(1), SecureSession::State::kActive },
+            { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
+        };
+
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 0);
     }
 
     //
@@ -317,8 +405,8 @@ void TestSecureSessionTable::ValidateSessionSorting(nlTestSuite * inSuite, void 
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(4, kFabric1), sessionParamList, 2);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(4, kFabric1), sessionParamList, 2);
     }
 
     //
@@ -337,8 +425,8 @@ void TestSecureSessionTable::ValidateSessionSorting(nlTestSuite * inSuite, void 
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(4, kFabric3), sessionParamList, 4);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(4, kFabric3), sessionParamList, 4);
     }
 
     //
@@ -359,67 +447,19 @@ void TestSecureSessionTable::ValidateSessionSorting(nlTestSuite * inSuite, void 
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(4, kFabric3), sessionParamList, 5);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(4, kFabric3), sessionParamList, 5);
     }
 }
 
-Platform::UniquePtr<TestSecureSessionTable> gTestSecureSessionTable;
+TEST_F(TestSecureSessionTable, ValidateSessionSorting)
+{
+    // This calls TestSecureSessionTable::ValidateSessionSorting instead of just doing the
+    // tests directly in here, since the tests reference `SecureSession::State`, which is
+    // private.  Defining the function inside TestSecureSessionTable allows State to be
+    // accessible since SecureSession contains `friend class TestSecureSessionTable`.
+    ValidateSessionSorting();
+}
 
 } // namespace Transport
 } // namespace chip
-
-// Test Suite
-
-namespace {
-
-/**
- *  Test Suite that lists all the test functions.
- */
-// clang-format off
-const nlTest sTests[] =
-{
-    NL_TEST_DEF("Validate Session Sorting (Over Minima)",               chip::Transport::TestSecureSessionTable::ValidateSessionSorting),
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-int Initialize(void * apSuite)
-{
-    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    chip::Transport::gTestSecureSessionTable = chip::Platform::MakeUnique<chip::Transport::TestSecureSessionTable>();
-    return SUCCESS;
-}
-
-int Finalize(void * aContext)
-{
-    chip::Transport::gTestSecureSessionTable.reset();
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-
-// clang-format off
-nlTestSuite sSuite =
-{
-    "TestSecureSessionTable",
-    &sTests[0],
-    Initialize,
-    Finalize
-};
-// clang-format on
-
-} // namespace
-
-/**
- *  Main
- */
-int SecureSessionTableTest()
-{
-    // Run test suit against one context
-    nlTestRunner(&sSuite, &chip::Transport::gTestSecureSessionTable);
-
-    int r = (nlTestRunnerStats(&sSuite));
-    return r;
-}
-
-CHIP_REGISTER_TEST_SUITE(SecureSessionTableTest);

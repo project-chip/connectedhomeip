@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,12 +22,25 @@ declare_args() {
 
 assert(psoc6_target_project != "", "psoc6_target_project must be specified")
 
+mtb_json_local =
+    mtb_core_json  # Can't modify without copying into current scope
+
+if (is_debug) {
+  mtb_json_local.cflags += [ "-Og" ]
+  mtb_json_local.cxxflags += [ "-Og" ]
+  mtb_json_local.defines += [ "-DDEBUG" ]
+} else {
+  mtb_json_local.cflags += [ "-Os" ]
+  mtb_json_local.cxxflags += [ "-Os" ]
+  mtb_json_local.defines += [ "-DNDEBUG" ]
+}
+
 # Add includes, cflags, asmflags, etc in config
 config("psoc6_sdk_config") {
   # Pull out includes from generated json
   # Treat these includes as system includes, so warnings in them are not fatal.
   _system_include_dirs = []
-  foreach(include_dir, mtb_json.includes) {
+  foreach(include_dir, mtb_json_local.includes) {
     # Strip off leading -I part
     include_dir = string_replace(include_dir, "-I", "", 1)
 
@@ -48,24 +61,24 @@ config("psoc6_sdk_config") {
 
   # Pull out defines from generated json
   defines = []
-  foreach(def, mtb_json.defines) {
+  foreach(def, mtb_json_local.defines) {
     # Strip off leading -D part
     defines += [ string_replace(def, "-D", "", 1) ]
   }
 
   # Pull out static libs (.a files) from generated json
   libs = []
-  foreach(lib, mtb_json.libs) {
+  foreach(lib, mtb_json_local.libs) {
     # Path is relative to SDK
     lib = "${psoc6_sdk_root}/${lib}"
 
     libs += [ lib ]
   }
 
-  cflags_c = mtb_json.cflags
-  cflags_cc = mtb_json.cxxflags
-  asmflags = mtb_json.asflags
-  ldflags = filter_exclude(mtb_json.ldflags, [ "-T*" ])
+  cflags_c = mtb_json_local.cflags
+  cflags_cc = mtb_json_local.cxxflags
+  asmflags = mtb_json_local.asflags
+  ldflags = filter_exclude(mtb_json_local.ldflags, [ "-T*" ])
 
   # TODO, once the issue is properly fixed we should no longer need this warning.
   cflags_c += [ "-Wno-error=array-parameter" ]
@@ -73,7 +86,7 @@ config("psoc6_sdk_config") {
   # Pull out linker flags with paths (-T flags) and make paths absolute
   # OTA app provides it's own linker script
   if (!chip_enable_ota_requestor) {
-    linker_script_flags = filter_include(mtb_json.ldflags, [ "-T*" ])
+    linker_script_flags = filter_include(mtb_json_local.ldflags, [ "-T*" ])
     foreach(linker_script, linker_script_flags) {
       # Strip off leading -T part
       linker_script = string_replace(linker_script, "-T", "", 1)

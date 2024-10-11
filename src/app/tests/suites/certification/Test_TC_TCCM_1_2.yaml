@@ -82,25 +82,3 @@ tests:
           [1690189682.782276][16162:16164] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0001 DataVersion: 473867547
           [1690189682.782314][16162:16164] CHIP:TOO:   CurrentMode: 0
       disabled: true
-
-    - label: "Step 4: TH reads from the DUT the OnMode attribute."
-      PICS: TCCM.S.A0003
-      verification: |
-          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read on-mode 1 1
-
-          Verify on TH(chip-tool) logs, OnMode attribute value is an integer from supported_modes_dut or null, below is the sample log provided for the raspi platform, Here OnMode attribute value is Null
-
-          [1690189699.711642][16169:16171] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0003 DataVersion: 473867547
-          [1690189699.711687][16169:16171] CHIP:TOO:   OnMode: null
-      disabled: true
-
-    - label: "Step 5: TH reads from the DUT the StartUpMode attribute."
-      PICS: TCCM.S.A0002
-      verification: |
-          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read start-up-mode 1 1
-
-          Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer from supported_modes_dut or null, below is the sample log provided for the raspi platform, Here StartUpMode attribute value is Null
-
-          [1690189713.973520][16173:16175] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0002 DataVersion: 473867547
-          [1690189713.973576][16173:16175] CHIP:TOO:   StartUpMode: null
-      disabled: true

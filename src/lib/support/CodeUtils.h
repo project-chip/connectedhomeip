@@ -29,6 +29,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/support/ObjectDump.h>
 #include <lib/support/VerificationMacrosNoLogging.h>
 #include <lib/support/logging/TextOnlyLogging.h>
 
@@ -362,10 +363,10 @@ constexpr inline const _T & max(const _T & a, const _T & b)
     } while (false)
 
 /**
- *  @def SuccessOrExit(aStatus)
+ *  @def SuccessOrExit(error)
  *
  *  @brief
- *    This checks for the specified status, which is expected to
+ *    This checks for the specified error, which is expected to
  *    commonly be successful (CHIP_NO_ERROR), and branches to
  *    the local label 'exit' if the status is unsuccessful.
  *
@@ -387,10 +388,23 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  }
  *  @endcode
  *
- *  @param[in]  aStatus     A scalar status to be evaluated against zero (0).
+ *  @param[in]  error  A ChipError object to be evaluated against success (CHIP_NO_ERROR).
  *
  */
-#define SuccessOrExit(aStatus) nlEXPECT(::chip::ChipError::IsSuccess((aStatus)), exit)
+#define SuccessOrExit(error) nlEXPECT(::chip::ChipError::IsSuccess((error)), exit)
+
+/**
+ *  @def SuccessOrExitAction(error, anAction)
+ *
+ *  @brief
+ *    This checks for the specified error, which is expected to
+ *    commonly be successful (CHIP_NO_ERROR), and both executes
+ *    @a anAction and branches to the local label 'exit' if the
+ *    status is unsuccessful.
+ *
+ *  @param[in]  error  A ChipError object to be evaluated against success (CHIP_NO_ERROR).
+ */
+#define SuccessOrExitAction(error, action) nlEXPECT_ACTION(::chip::ChipError::IsSuccess((error)), exit, action)
 
 /**
  *  @def VerifyOrExit(aCondition, anAction)
@@ -529,9 +543,24 @@ inline void chipDie(void)
  */
 #if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDie(aCondition)                                                                                                    \
-    nlABORT_ACTION(aCondition, ChipLogDetail(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
+    nlABORT_ACTION(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDie(aCondition) VerifyOrDieWithoutLogging(aCondition)
+#endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+
+/**
+ * @def VerifyOrDieWithObject(aCondition, aObject)
+ *
+ * Like VerifyOrDie(), but calls DumpObjectToLog()
+ * on the provided object on failure before aborting
+ * if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE is enabled.
+ */
+#if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+#define VerifyOrDieWithObject(aCondition, aObject)                                                                                 \
+    nlABORT_ACTION(aCondition, ::chip::DumpObjectToLog(aObject);                                                                   \
+                   ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
+#else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+#define VerifyOrDieWithObject(aCondition, aObject) VerifyOrDieWithoutLogging(aCondition)
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 
 /**
@@ -569,7 +598,7 @@ inline void chipDie(void)
  *
  */
 #define VerifyOrDieWithMsg(aCondition, aModule, aMessage, ...)                                                                     \
-    nlABORT_ACTION(aCondition, ChipLogDetail(aModule, aMessage, ##__VA_ARGS__))
+    nlABORT_ACTION(aCondition, ChipLogError(aModule, aMessage, ##__VA_ARGS__))
 
 /**
  *  @def LogErrorOnFailure(expr)

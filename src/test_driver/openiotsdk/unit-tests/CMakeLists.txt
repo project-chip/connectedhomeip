@@ -28,11 +28,13 @@ set(CONFIG_CHIP_DETAIL_LOGGING NO)
 set(CONFIG_CHIP_PROGRESS_LOGGING NO)
 set(CONFIG_CHIP_AUTOMATION_LOGGING YES)
 set(CONFIG_CHIP_ERROR_LOGGING NO)
+set(CONFIG_CHIP_FORCE_LOGGING_STDIO YES)
 
 # Toolchain files need to exist before first call to project
 include(toolchain)
 
 project(chip-open-iot-sdk-unit-tests LANGUAGES C CXX ASM)
+
 
 include(sdk)
 include(chip)
@@ -41,6 +43,7 @@ include(linker)
 add_subdirectory(${OPEN_IOT_SDK_EXAMPLE_COMMON}/app ./app_build)
 
 file(STRINGS test_components.txt TEST_NAMES_FROM_FILE)
+
 
 target_compile_definitions(openiotsdk-startup
     PRIVATE
@@ -52,8 +55,7 @@ foreach(TEST_NAME IN LISTS TEST_NAMES_FROM_FILE)
     add_executable(${APP_TARGET})
     target_include_directories(${APP_TARGET}
         PRIVATE
-            main/include
-            ${CHIP_ROOT}/third_party/nlunit-test/repo/src
+        main/include
     )
 
     target_sources(${APP_TARGET}
@@ -70,6 +72,7 @@ foreach(TEST_NAME IN LISTS TEST_NAMES_FROM_FILE)
     target_link_options(${APP_TARGET}
         PUBLIC
             -Wl,--whole-archive "${CMAKE_CURRENT_BINARY_DIR}/chip_build/lib/lib${TEST_NAME}.a"
+            "${CMAKE_CURRENT_BINARY_DIR}/chip_build/lib/libPWTestsWrapper.a"
             -Wl,--no-whole-archive)
 
     set_target_link(${APP_TARGET})

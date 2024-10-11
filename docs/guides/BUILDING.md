@@ -25,11 +25,52 @@ The Matter build system has the following features:
 
 ## Checking out the Matter code
 
-To check out the Matter repository, run the following command:
+To check out the Matter code, there are two options: one is to check out all
+platforms together, which is recommended; the other is to check out with support
+for specific platforms, which can obviously reduce the project size.
+
+### Checking out All Platforms
+
+To check out the Matter repository with all platforms, run the following
+command:
 
 ```
 git clone --recurse-submodules git@github.com:project-chip/connectedhomeip.git
+
 ```
+
+### Specific platforms Checking out
+
+-   first step, checking out matter top level repo with command below:
+
+```
+  git clone --depth=1 git@github.com:project-chip/connectedhomeip.git
+
+```
+
+-   Second step, check out third-party platform support repos as follows:
+
+```
+  python3 scripts/checkout_submodules.py --shallow --platform platform1,platform2...
+
+```
+
+For Linux host example:
+
+```
+ ./scripts/checkout_submodules.py --shallow --platform  linux
+
+```
+
+For Darwin host example:
+
+```
+ ./scripts/checkout_submodules.py --shallow --platform  darwin
+
+```
+
+Please note that in the above commands, you should replace platform1,platform2
+with the specific platform names you wish to check out.
 
 ## Updating Matter code
 
@@ -53,7 +94,8 @@ satisfied with the following command:
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
-     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
+     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev \
+     default-jre
 ```
 
 #### UI builds
@@ -94,6 +136,40 @@ Complete the following steps:
 
 1. Reboot your Raspberry Pi after installing `pi-bluetooth`.
 
+#### Enable experimental Bluetooth support and disable battery plugin in BlueZ
+
+The Matter application on Linux uses BlueZ to communicate with the Bluetooth
+controller. The BlueZ version that comes with Ubuntu 22.04 does not support all
+the features required by the Matter application by default. To enable these
+features, you need to enable experimental Bluetooth support in BlueZ.
+
+Also disable the battery plugin from BlueZ, because iOS devices advertises a
+battery service via BLE, which requires pairing if accessed. BlueZ includes a
+battery plugin by default which tries to connect to the battery service. The
+authentication fails, because in this case no BLE pairing has been done. If the
+BlueZ battery plugin is not disabled, the BLE connection will be terminated
+during the Matter commissioning process.
+
+1. Edit the `bluetooth.service` unit by running the following command:
+
+    ```sh
+    sudo systemctl edit bluetooth.service
+    ```
+
+1. Add the following content to the override file:
+
+    ```ini
+    [Service]
+    ExecStart=
+    ExecStart=/usr/lib/bluetooth/bluetoothd -E -P battery
+    ```
+
+1. Restart the Bluetooth service by running the following command:
+
+    ```sh
+    sudo systemctl restart bluetooth.service
+    ```
+
 #### Configuring wpa_supplicant for storing permanent changes
 
 By default, wpa_supplicant is not allowed to update (overwrite) configuration.
@@ -131,22 +207,27 @@ permanently, you need to make the following changes:
 
 ## Installing ZAP tool
 
-`bootstrap.sh` will download a compatible ZAP tool version and set it up in
-`$PATH`. If you want to install or use a different version of the tool, you may
-download one from the ZAP project's
-[Releases](https://github.com/project-chip/zap/releases) page.
+For platforms defined in [`scripts/setup/zap.json`](/scripts/setup/zap.json),
+`bootstrap.sh` will download a compatible ZAP tool version from CIPD and set it
+up in `$PATH`.
 
-### Linux ARM
+ZAP releases are copied to CIPD by an automated bot. You can check if a release
+was copied by looking at tags created for
+[ZAP CIPD Packages](https://chrome-infra-packages.appspot.com/p/fuchsia/third_party/zap)
+in various platforms.
 
-Zap does not provide binary releases for arm. Rosetta solves this for Darwin,
-however for linux arm you will have to use a local ZAP, generally through
-setting `$ZAP_DEVELOPMENT_PATH` (see the section `Which zap to use` below).
+### Custom ZAP
+
+If you want to install or use a different version of the tool, you may download
+one from the [ZAP releases](https://github.com/project-chip/zap/releases) or
+build it from source.
 
 The file `scripts/setup/zap.json` contains the version that CIPD would download,
-so you can download a compatible version from the zap project
-[Releases](https://github.com/project-chip/zap/releases). To checkout as source
-code the corresponding tag should exist in the zap
-[repository tags](https://github.com/project-chip/zap/tags) list.
+so you can refer to it to find a compatible version. The version is also
+maintained at [`scripts/setup/zap.version`](/scripts/setup/zap.version).
+
+To check out as source code, the corresponding tag should exist in the
+[ZAP repository tags](https://github.com/project-chip/zap/tags) list.
 
 Example commands:
 
@@ -302,6 +383,30 @@ They pick up environment variables such as `$CFLAGS`, `$CXXFLAGS` and
 
 You likely want `libfuzzer` + `asan` builds instead for local testing.
 
+### `pw_fuzzer` `FuzzTests`
+
+An Alternative way for writing and running Fuzz Tests is Google's `FuzzTest`
+framework, integrated through `pw_fuzzer`. The Tests will have to be built and
+executed manually.
+
+```
+./scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest build
+```
+
+NOTE: `asan` is enabled by default in FuzzTest, so please do not add it in
+build_examples.py invocation.
+
+Tests will be located in:
+`out/linux-x64-tests-clang-pw-fuzztest/chip_pw_fuzztest/tests/` where
+`chip_pw_fuzztest` is the name of the toolchain used.
+
+-   Details on How To Run Fuzz Tests in
+    [Running FuzzTests](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#running-fuzztests)
+
+FAQ: In the event of a build failure related to missing files or dependencies
+for pw_fuzzer, check the
+[FuzzTest FAQ](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#FAQ)
+
 ## Build custom configuration
 
 The build is configured by setting build arguments. These you can set in one of
@@ -402,7 +507,7 @@ gn desc out/unified '//src/controller(//build/toolchain/host:linux_x64_clang)'
 > **Note:** Some platforms that can be built as part of the unified build
 > require downloading additional tools. To add these to the build, the location
 > must be provided as a build argument. For example, to add the Simplelink
-> cc13x2_26x2 examples to the unified build, install
+> cc13xx_26xx examples to the unified build, install
 > [SysConfig](https://www.ti.com/tool/SYSCONFIG) and add the following build
 > arguments:
 >

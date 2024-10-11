@@ -24,7 +24,7 @@
 namespace chip {
 namespace Protocols {
 
-static const char * sUnknownTypeName = "----";
+static const char sUnknownTypeName[] = "----";
 
 static const char * LookupMessageTypeName(const MessageTypeNameLookup * lookupTable, size_t tableSize, uint8_t msgType)
 {
@@ -86,27 +86,27 @@ const char * GetMessageTypeName(Id protocolId, uint8_t msgType)
     switch (protocolId.GetProtocolId())
     {
     case InteractionModel::Id.GetProtocolId():
-        lookupTable     = MessageTypeTraits<InteractionModel::MsgType>::GetTypeToNameTable()->begin();
+        lookupTable     = MessageTypeTraits<InteractionModel::MsgType>::GetTypeToNameTable()->data();
         lookupTableSize = MessageTypeTraits<InteractionModel::MsgType>::GetTypeToNameTable()->size();
         break;
 
     case SecureChannel::Id.GetProtocolId():
-        lookupTable     = MessageTypeTraits<SecureChannel::MsgType>::GetTypeToNameTable()->begin();
+        lookupTable     = MessageTypeTraits<SecureChannel::MsgType>::GetTypeToNameTable()->data();
         lookupTableSize = MessageTypeTraits<SecureChannel::MsgType>::GetTypeToNameTable()->size();
         break;
 
     case BDX::Id.GetProtocolId():
-        lookupTable     = MessageTypeTraits<bdx::MessageType>::GetTypeToNameTable()->begin();
+        lookupTable     = MessageTypeTraits<bdx::MessageType>::GetTypeToNameTable()->data();
         lookupTableSize = MessageTypeTraits<bdx::MessageType>::GetTypeToNameTable()->size();
         break;
 
     case Echo::Id.GetProtocolId():
-        lookupTable     = MessageTypeTraits<Echo::MsgType>::GetTypeToNameTable()->begin();
+        lookupTable     = MessageTypeTraits<Echo::MsgType>::GetTypeToNameTable()->data();
         lookupTableSize = MessageTypeTraits<Echo::MsgType>::GetTypeToNameTable()->size();
         break;
 
     case UserDirectedCommissioning::Id.GetProtocolId():
-        lookupTable     = MessageTypeTraits<UserDirectedCommissioning::MsgType>::GetTypeToNameTable()->begin();
+        lookupTable     = MessageTypeTraits<UserDirectedCommissioning::MsgType>::GetTypeToNameTable()->data();
         lookupTableSize = MessageTypeTraits<UserDirectedCommissioning::MsgType>::GetTypeToNameTable()->size();
         break;
 

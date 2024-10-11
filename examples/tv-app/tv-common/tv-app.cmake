@@ -56,10 +56,13 @@ macro(chip_add_tv_app_common target)
             ${CHIP_TV_COMMON_BASE_DIR}/clusters/audio-output/AudioOutputManager.cpp
             ${CHIP_TV_COMMON_BASE_DIR}/clusters/channel/ChannelManager.cpp
             ${CHIP_TV_COMMON_BASE_DIR}/clusters/content-launcher/ContentLauncherManager.cpp
+            ${CHIP_TV_COMMON_BASE_DIR}/clusters/content-control/ContentController.cpp
+            ${CHIP_TV_COMMON_BASE_DIR}/clusters/content-app-observer/ContentAppObserver.cpp
             ${CHIP_TV_COMMON_BASE_DIR}/clusters/keypad-input/KeypadInputManager.cpp
             ${CHIP_TV_COMMON_BASE_DIR}/clusters/low-power/LowPowerManager.cpp
             ${CHIP_TV_COMMON_BASE_DIR}/clusters/media-input/MediaInputManager.cpp
             ${CHIP_TV_COMMON_BASE_DIR}/clusters/media-playback/MediaPlaybackManager.cpp
+            ${CHIP_TV_COMMON_BASE_DIR}/clusters/messages/MessagesManager.cpp
             ${CHIP_TV_COMMON_BASE_DIR}/clusters/target-navigator/TargetNavigatorManager.cpp
             ${CHIP_TV_COMMON_BASE_DIR}/clusters/wake-on-lan/WakeOnLanManager.cpp
 

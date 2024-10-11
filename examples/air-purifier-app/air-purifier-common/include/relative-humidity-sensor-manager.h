@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -31,19 +32,20 @@ public:
 
     void Init()
     {
-        EmberAfStatus status = RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Set(mEndpointId, 0);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+        Protocols::InteractionModel::Status status = RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Set(mEndpointId, 0);
+        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
                        ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MinMeasuredValue attribute"));
 
         status = RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Set(mEndpointId, 10000);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
                        ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MaxMeasuredValue attribute"));
     };
 
     void OnHumidityChangeHandler(uint16_t newValue)
     {
-        EmberAfStatus status = RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(mEndpointId, newValue);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+        Protocols::InteractionModel::Status status =
+            RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(mEndpointId, newValue);
+        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
                        ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MeasuredValue attribute"));
         ChipLogDetail(NotSpecified, "The new RelativeHumidityMeasurement value: %d", newValue);
     }

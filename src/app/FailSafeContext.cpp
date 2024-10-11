@@ -19,14 +19,15 @@
  *    @file
  *          Provides the implementation of the FailSafeContext object.
  */
-
-#include <app/icd/ICDNotifier.h>
+#include "FailSafeContext.h"
+#include <app/icd/server/ICDServerConfig.h>
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/server/ICDNotifier.h> // nogncheck
+#endif
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include "FailSafeContext.h"
 
 using namespace chip::DeviceLayer;
 
@@ -56,9 +57,7 @@ void FailSafeContext::SetFailSafeArmed(bool armed)
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     if (IsFailSafeArmed() != armed)
     {
-        ICDListener::KeepActiveFlags activeRequest = ICDListener::KeepActiveFlags::kFailSafeArmed;
-        armed ? ICDNotifier::GetInstance().BroadcastActiveRequestNotification(activeRequest)
-              : ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(activeRequest);
+        ICDNotifier::GetInstance().BroadcastActiveRequest(ICDListener::KeepActiveFlag::kFailSafeArmed, armed);
     }
 #endif
     mFailSafeArmed = armed;
@@ -86,12 +85,11 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
 
     SetFailSafeArmed(false);
 
-    ChipDeviceEvent event;
-    event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
-    event.FailSafeTimerExpired.fabricIndex                    = fabricIndex;
-    event.FailSafeTimerExpired.addNocCommandHasBeenInvoked    = addNocCommandInvoked;
-    event.FailSafeTimerExpired.updateNocCommandHasBeenInvoked = updateNocCommandInvoked;
-    CHIP_ERROR status                                         = PlatformMgr().PostEvent(&event);
+    ChipDeviceEvent event{ .Type                 = DeviceEventType::kFailSafeTimerExpired,
+                           .FailSafeTimerExpired = { .fabricIndex                    = fabricIndex,
+                                                     .addNocCommandHasBeenInvoked    = addNocCommandInvoked,
+                                                     .updateNocCommandHasBeenInvoked = updateNocCommandInvoked } };
+    CHIP_ERROR status = PlatformMgr().PostEvent(&event);
 
     if (status != CHIP_NO_ERROR)
     {

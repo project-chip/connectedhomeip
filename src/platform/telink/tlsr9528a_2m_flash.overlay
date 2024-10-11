@@ -1,0 +1,43 @@
+&flash {
+	reg = <0x20000000 0x200000>;
+
+	/delete-node/ partitions;
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 0x13000>;
+		};
+		slot0_partition: partition@13000 {
+			label = "image-0";
+			reg = <0x13000 0xec000>;
+		};
+		factory_partition: partition@ff000 {
+			label = "factory-data";
+			reg = <0xff000 0x1000>;
+		};
+		dac_keypair_partition: partition@100000 {
+ 			label = "dac-keypair";
+			reg = <0x100000 0x1000>; //store dac and key pair.
+ 		};
+		descriptor_partition: partition@101000 {
+			label = "sboot-descriptor";
+			reg = <0x101000 0x2000>;
+		};
+		storage_partition: partition@103000 {
+			label = "storage";
+			reg = <0x103000 0xf000>;
+		};
+		slot1_partition: partition@112000 {
+			label = "image-1";
+			reg = <0x112000 0xec000>;
+		};
+		vendor_partition: partition@1fe000 {
+			label = "vendor-data";
+			reg = <0x1fe000 0x2000>;
+		};
+	};
+};

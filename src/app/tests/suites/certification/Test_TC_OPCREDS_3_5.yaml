@@ -84,7 +84,6 @@ tests:
     - label:
           "Step 5: TH1 Sends CSRRequest command with the IsForUpdateNOC field
           set to true"
-      PICS: OPCREDS.S.C04.Rsp
       verification: |
           To get csr nonce give below command 2 times in TH(chip-tool)
            echo hex:$(hexdump -vn32 -e'4/4 "%08X" ' /dev/urandom)
@@ -116,7 +115,6 @@ tests:
           "Step 7: TH1 sends the UpdateNOC command to the Node Operational
           Credentials cluster with the following fields: NOCValue is set to
           noc_update1 ICACValue is to set icac_update1"
-      PICS: OPCREDS.S.C07.Rsp
       verification: |
 
       disabled: true
@@ -152,7 +150,6 @@ tests:
     - label:
           "Step 12: TH1 Sends CSRRequest command with the IsForUpdateNOC field
           set to true"
-      PICS: OPCREDS.S.C04.Rsp
       verification: |
 
       disabled: true
@@ -174,7 +171,6 @@ tests:
           "Step 14: TH1 sends the UpdateNOC command to the Node Operational
           Credentials cluster with the following fields: NOCValue is set to
           noc_update2 ICACValue is to set icac_update2"
-      PICS: OPCREDS.S.C07.Rsp
       verification: |
 
       disabled: true

@@ -31,8 +31,8 @@ and the ESP32S3.
 
 All the applications support variants of ESP32, ESP32C3, ESP32S3 chips.
 
-ESP32H2 and ESP32C6 are only supported and tested with lighting-app and
-all-clusters-app.
+ESP32H2 and ESP32C6 are only supported and tested with lighting-app,
+lit-icd-app, and all-clusters-app.
 
 Note: M5Stack Core 2 display is not supported in the tft component, while other
 functionality can still work fine.
@@ -83,15 +83,6 @@ functionality can still work fine.
 
     ```
     $ idf.py set-target (target chip)
-    ```
-
-    All the example applications supports target chips: esp32, esp32s3, esp32c3
-
-    ESP32H2 and ESP32C6 are only supported in lighting-app, to set it as target
-
-    ```
-    $ idf.py --preview set-target esp32h2
-    $ idf.py --preview set-target esp32c6
     ```
 
 -   Configuration Options
@@ -177,9 +168,9 @@ $ out/debug/chip-tool pairing ble-wifi 12345 MY_SSID MY_PASSWORD 20202021 3840
 #### Commissioning the Thread device (ESP32H2)
 
 -   For ESP32-H2, firstly start OpenThread Border Router, you can either use
-    [Raspberry Pi OpenThread Border Router](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/openthread_border_router_pi.md)
+    [Raspberry Pi OpenThread Border Router](../openthread_border_router_pi.md)
     OR
-    [ESP32 OpenThread Border Router](https://github.com/espressif/esp-idf/tree/master/examples/openthread/ot_br)
+    [ESP32 OpenThread Border Router](../../../examples/thread-br-app/esp32/README.md)
 
 -   Get the active operational dataset.
 

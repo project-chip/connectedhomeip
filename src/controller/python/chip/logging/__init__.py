@@ -19,11 +19,12 @@ import logging
 from chip.logging.library_handle import _GetLoggingLibraryHandle
 from chip.logging.types import LogRedirectCallback_t
 
-# Defines match support/logging/Constants.h (LogCategory enum)
-ERROR_CATEGORY_NONE = 0
-ERROR_CATEGORY_ERROR = 1
-ERROR_CATEGORY_PROGRESS = 2
-ERROR_CATEGORY_DETAIL = 3
+# Defines match src/lib/support/logging/Constants.h (LogCategory enum)
+LOG_CATEGORY_NONE = 0
+LOG_CATEGORY_ERROR = 1
+LOG_CATEGORY_PROGRESS = 2
+LOG_CATEGORY_DETAIL = 3
+LOG_CATEGORY_AUTOMATION = 4
 
 
 @LogRedirectCallback_t
@@ -32,13 +33,13 @@ def _RedirectToPythonLogging(category, module, message):
     module = module.decode('utf-8')
     message = message.decode('utf-8')
 
-    logger = logging.getLogger('chip.%s' % module)
+    logger = logging.getLogger('chip.native.%s' % module)
 
-    if category == ERROR_CATEGORY_ERROR:
+    if category == LOG_CATEGORY_ERROR:
         logger.error("%s", message)
-    elif category == ERROR_CATEGORY_PROGRESS:
+    elif category == LOG_CATEGORY_PROGRESS:
         logger.info("%s", message)
-    elif category == ERROR_CATEGORY_DETAIL:
+    elif category in (LOG_CATEGORY_DETAIL, LOG_CATEGORY_AUTOMATION):
         logger.debug("%s", message)
     else:
         # All logs are expected to have some reasonable category. This treats
@@ -51,3 +52,16 @@ def RedirectToPythonLogging():
 
     handle = _GetLoggingLibraryHandle()
     handle.pychip_logging_set_callback(_RedirectToPythonLogging)
+
+
+def SetLogFilter(category):
+    if category < 0 or category > pow(2, 8):
+        raise ValueError("category must be an unsigned 8-bit integer")
+
+    handle = _GetLoggingLibraryHandle()
+    handle.pychip_logging_SetLogFilter(category)
+
+
+def GetLogFilter():
+    handle = _GetLoggingLibraryHandle()
+    return handle.pychip_logging_GetLogFilter()

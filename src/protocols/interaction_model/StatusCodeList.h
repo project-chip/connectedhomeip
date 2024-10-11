@@ -22,7 +22,10 @@
  * include this file, then undefine the macro.
  */
 
-/// WARNING: If you touch this list, please also update src/controller/python/chip/interaction_model/__init__.py
+/// WARNING: If you touch this list,
+///          please update src/controller/python/chip/interaction_model/__init__.py
+///          please update src/controller/java/src/chip/devicecontroller/model/Status.java
+///          please update src/controller/java/src/matter/controller/model/Status.kt
 
 // clang-format off
 CHIP_IM_STATUS_CODE(Success               , SUCCESS                 , 0x0)
@@ -58,6 +61,7 @@ CHIP_IM_STATUS_CODE(Reserved98            , Reserved98              , 0x98)
 CHIP_IM_STATUS_CODE(Reserved99            , Reserved99              , 0x99)
 CHIP_IM_STATUS_CODE(Reserved9a            , Reserved9a              , 0x9a)
 CHIP_IM_STATUS_CODE(Busy                  , BUSY                    , 0x9c)
+CHIP_IM_STATUS_CODE(AccessRestricted      , ACCESS_RESTRICTED       , 0x9d)
 CHIP_IM_STATUS_CODE(Deprecatedc0          , Deprecatedc0            , 0xc0)
 CHIP_IM_STATUS_CODE(Deprecatedc1          , Deprecatedc1            , 0xc1)
 CHIP_IM_STATUS_CODE(Deprecatedc2          , Deprecatedc2            , 0xc2)
@@ -70,5 +74,6 @@ CHIP_IM_STATUS_CODE(PathsExhausted        , PATHS_EXHAUSTED         , 0xc8)
 CHIP_IM_STATUS_CODE(TimedRequestMismatch  , TIMED_REQUEST_MISMATCH  , 0xc9)
 CHIP_IM_STATUS_CODE(FailsafeRequired      , FAILSAFE_REQUIRED       , 0xca)
 CHIP_IM_STATUS_CODE(InvalidInState        , INVALID_IN_STATE        , 0xcb)
+CHIP_IM_STATUS_CODE(NoCommandResponse     , NO_COMMAND_RESPONSE     , 0xcc)
 CHIP_IM_STATUS_CODE(WriteIgnored          , WRITE_IGNORED           , 0xF0) // non-spec error code and use only internally
 // clang-format on

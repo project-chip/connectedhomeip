@@ -91,6 +91,23 @@ limitations under the License.
     <code>0x0035</code>
     <define>THREAD_NETWORK_DIAGNOSTICS_CLUSTER</define>
     <description>The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems</description>
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
+
+    <features>
+      <feature bit="0" code="PKTCNT" name="PacketCounts" summary="Server supports the counts for the number of received and transmitted packets on the Thread interface.">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="ERRCNT" name="ErrorCounts" summary="Server supports the counts for the number of errors that have occurred during the reception and transmission of packets on the Thread interface.">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="MLECNT" name="MLECounts" summary="Server supports the counts for various MLE layer happenings.">
+        <optionalConform/>
+      </feature>
+      <feature bit="3" code="MACCNT" name="MACCounts" summary="Server supports the counts for various MAC layer happenings.">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x00" define="CHANNEL" type="int16u" min="0x00" max="0xFFFF" writable="false" isNullable="true" optional="false">Channel</attribute>
     <attribute side="server" code="0x01" define="ROUTING_ROLE" type="RoutingRoleEnum" writable="false" isNullable="true" optional="false">RoutingRole</attribute>
     <attribute side="server" code="0x02" define="NETWORK_NAME" type="char_string" length="16" writable="false" default="" isNullable="true" optional="false">NetworkName</attribute>
@@ -98,8 +115,8 @@ limitations under the License.
     <attribute side="server" code="0x04" define="DIAG_EXTENDED_PAN_ID" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" isNullable="true" optional="false">ExtendedPanId</attribute>
     <attribute side="server" code="0x05" define="MESH_LOCAL_PREFIX" type="octet_string" length="17" writable="false" isNullable="true" optional="false">MeshLocalPrefix</attribute>
     <attribute side="server" code="0x06" define="DIAG_OVERRUN_COUNT" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">OverrunCount</attribute>
-    <attribute side="server" code="0x07" define="NEIGHBOR_TABLE" type="ARRAY" entryType="NeighborTableStruct" length="254" writable="false" optional="false">NeighborTable</attribute>
-    <attribute side="server" code="0x08" define="ROUTE_TABLE" type="ARRAY" entryType="RouteTableStruct" length="254" writable="false" optional="false">RouteTable</attribute>
+    <attribute side="server" code="0x07" define="NEIGHBOR_TABLE" type="array" entryType="NeighborTableStruct" length="254" writable="false" optional="false">NeighborTable</attribute>
+    <attribute side="server" code="0x08" define="ROUTE_TABLE" type="array" entryType="RouteTableStruct" length="254" writable="false" optional="false">RouteTable</attribute>
     <attribute side="server" code="0x09" define="PARTITION_ID" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" isNullable="true" optional="false">PartitionId</attribute>
     <attribute side="server" code="0x0A" define="WEIGHTING" type="int16u" max="0xFF" writable="false"  isNullable="true" optional="false">Weighting</attribute>
     <attribute side="server" code="0x0B" define="DATA_VERSION" type="int16u" max="0xFF" writable="false"  isNullable="true" optional="false">DataVersion</attribute>
@@ -153,7 +170,7 @@ limitations under the License.
     <attribute side="server" code="0x3B" define="SECURITY_POLICY" type="SecurityPolicy" writable="false" isNullable="true" optional="false">SecurityPolicy</attribute>
     <attribute side="server" code="0x3C" define="DIAG_CHANNEL_MASK" type="octet_string" length="4" writable="false" isNullable="true" optional="false">ChannelPage0Mask</attribute>
     <attribute side="server" code="0x3D" define="OPERATIONAL_DATASET_COMPONENTS" type="OperationalDatasetComponents" writable="false" isNullable="true" optional="false">OperationalDatasetComponents</attribute>
-    <attribute side="server" code="0x3E" define="ACTIVE_THREAD_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFaultEnum" length="4" writable="false" optional="false">ActiveNetworkFaultsList</attribute>
+    <attribute side="server" code="0x3E" define="ACTIVE_THREAD_NETWORK_FAULTS" type="array" entryType="NetworkFaultEnum" length="4" writable="false" optional="false">ActiveNetworkFaultsList</attribute>
     <command source="client" code="0x00" name="ResetCounts" optional="true" cli="chip thread_network_diagnostics resetcounts">
       <description>Reception of this command SHALL reset the OverrunCount attributes to 0</description>
       <access op="invoke" privilege="manage"/>
@@ -168,11 +185,5 @@ limitations under the License.
       <field id="1" name="Previous" type="NetworkFaultEnum" array="true"/>
     </event>    
   </cluster>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0035"/>
-    <field name="PacketCounts" mask="0x1"/>
-    <field name="ErrorCounts" mask="0x2"/>
-    <field name="MLECounts" mask="0x4"/>
-    <field name="MACCounts" mask="0x8"/>
-  </bitmap>  
+
 </configurator>

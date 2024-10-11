@@ -61,9 +61,13 @@ command_with_access: "command"i command_access? id
 
 command: command_qualities command_with_access "(" id? ")" ":" id "=" positive_integer ";"
 
-cluster: [maturity] cluster_side "cluster"i id "=" positive_integer "{" cluster_content* "}"
-?cluster_side: "server"i -> server_cluster
-             | "client"i -> client_cluster
+cluster_revision: "revision"i positive_integer ";"
+
+// NOTE:
+//   Client or server cluster entries are for backwards compatibility only and have
+//   no direct meaning currently
+cluster: [maturity] ( "client" | "server" )? "cluster"i id "=" positive_integer "{" [cluster_revision] cluster_content* "}"
+
 ?cluster_content: [maturity] (enum|bitmap|event|attribute|struct|request_struct|response_struct|command)
 
 endpoint: "endpoint"i positive_integer "{" endpoint_content* "}"
@@ -112,7 +116,7 @@ POSITIVE_INTEGER: /\d+/
 HEX_INTEGER: /0x[A-Fa-f0-9]+/
 ID: /[a-zA-Z_][a-zA-Z0-9_]*/
 
-idl: (cluster|endpoint)*
+idl: (struct|enum|bitmap|cluster|endpoint)*
 
 %import common.ESCAPED_STRING
 %import common.WS

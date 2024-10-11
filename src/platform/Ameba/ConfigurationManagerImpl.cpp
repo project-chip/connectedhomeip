@@ -158,8 +158,8 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 
     char temp[32];
     uint32_t mac[ETH_ALEN];
-    char * token = strtok(temp, ":");
-    int i        = 0;
+    char * token;
+    int i = 0;
 
     error = matter_wifi_get_mac_address(temp);
     err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
@@ -169,6 +169,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
         goto exit;
     }
 
+    token = strtok(temp, ":");
     while (token != NULL)
     {
         mac[i] = (uint32_t) strtol(token, NULL, 16);

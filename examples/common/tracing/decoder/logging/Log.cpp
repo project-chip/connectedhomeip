@@ -34,7 +34,7 @@ uint8_t gIndentLevel              = 0;
 
 void ENFORCE_FORMAT(1, 2) LogFormatted(const char * format, ...)
 {
-    char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE] = {};
+    char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE + 1] = {};
 
     int indentation = gIndentLevel * kSpacePerIndent;
     snprintf(buffer, sizeof(buffer), "%*s", indentation, "");
@@ -76,9 +76,20 @@ void Log(const char * name, ByteSpan & data)
         return;
     }
 
-    char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    // If the size of the data is larger than half of the maximum size for a log message (minus 1 for null-termination),
+    // reduce the size of the data to fit within this limit.
+    // The limit is half the size of the message because we will be logging a hex representation of that data, at 2 chars per byte.
+    if (data.size() > (CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE / 2) - 1)
+    {
+        data.reduce_size((CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE / 2) - 1);
+    }
+
+    char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE] = { 0 };
     chip::MutableCharSpan destination(buffer);
 
+    // Check if the size of the data can be cast to uint16_t.
+    // If yes, log the name and size of the data followed by its hexadecimal string representation.
+    // If no, log the name and a marker indicating the size exceeds UINT16_MAX, followed by the data's hexadecimal string.
     CanCastTo<uint16_t>(data.size())
         ? LogFormatted("%s (%u) = %s", name, static_cast<uint16_t>(data.size()), ToHexString(data, destination))
         : LogFormatted("%s (>UINT16_MAX) = %s", name, ToHexString(data, destination));
@@ -114,6 +125,11 @@ void Log(const char * name, const char * value)
 void Log(const char * name)
 {
     LogFormatted("%s", name);
+}
+
+void LogAsHex(const char * name, uint8_t value)
+{
+    LogFormatted("%s = 0x%02x", name, value);
 }
 
 void LogAsHex(const char * name, uint16_t value)

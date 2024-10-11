@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +33,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Read the mandatory attribute: MaxPressure"
+    - label: "Step 2: TH reads from the DUT the MaxPressure attribute."
       PICS: PCC.S.A0000
       command: "readAttribute"
       attribute: "MaxPressure"
@@ -41,7 +43,7 @@ tests:
               minValue: -32768
               maxValue: 32767
 
-    - label: "Step 3: Read the mandatory attribute: MaxSpeed"
+    - label: "Step 3: TH reads from the DUT the MaxSpeed attribute."
       PICS: PCC.S.A0001
       command: "readAttribute"
       attribute: "MaxSpeed"
@@ -51,7 +53,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 4: Read the mandatory attribute: MaxFlow"
+    - label: "Step 4: TH reads from the DUT the MaxFlow attribute."
       PICS: PCC.S.A0002
       command: "readAttribute"
       attribute: "MaxFlow"
@@ -61,7 +63,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 5: Read the optional attribute: MinConstPressure"
+    - label: "Step 5: TH reads from the DUT the MinConstPressure attribute."
       PICS: PCC.S.A0003
       command: "readAttribute"
       attribute: "MinConstPressure"
@@ -71,7 +73,7 @@ tests:
               minValue: -32768
               maxValue: 32767
 
-    - label: "Step 6: Read the optional attribute: MaxConstPressure"
+    - label: "Step 6: TH reads from the DUT the MaxConstPressure attribute."
       PICS: PCC.S.A0004
       command: "readAttribute"
       attribute: "MaxConstPressure"
@@ -81,7 +83,7 @@ tests:
               minValue: -32768
               maxValue: 32767
 
-    - label: "Step 7: Read the optional attribute: MinCompPressure"
+    - label: "Step 7: TH reads from the DUT the MinCompPressure attribute."
       PICS: PCC.S.A0005
       command: "readAttribute"
       attribute: "MinCompPressure"
@@ -91,7 +93,7 @@ tests:
               minValue: -32768
               maxValue: 32767
 
-    - label: "Step 8: Read the optional attribute: MaxCompPressure"
+    - label: "Step 8: TH reads from the DUT the MaxCompPressure attribute."
       PICS: PCC.S.A0006
       command: "readAttribute"
       attribute: "MaxCompPressure"
@@ -101,7 +103,7 @@ tests:
               minValue: -32768
               maxValue: 32767
 
-    - label: "Step 9: Read the optional attribute: MinConstSpeed"
+    - label: "Step 9: TH reads from the DUT the MinConstSpeed attribute."
       PICS: PCC.S.A0007
       command: "readAttribute"
       attribute: "MinConstSpeed"
@@ -111,7 +113,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 10: Read the optional attribute: MaxConstSpeed"
+    - label: "Step 10: TH reads from the DUT the MaxConstSpeed attribute."
       PICS: PCC.S.A0008
       command: "readAttribute"
       attribute: "MaxConstSpeed"
@@ -121,7 +123,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 11: Read the optional attribute: MinConstFlow"
+    - label: "Step 11: TH reads from the DUT the MinConstFlow attribute."
       PICS: PCC.S.A0009
       command: "readAttribute"
       attribute: "MinConstFlow"
@@ -131,7 +133,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 12: Read the optional attribute: MaxConstFlow"
+    - label: "Step 12: TH reads from the DUT the MaxConstFlow attribute."
       PICS: PCC.S.A000a
       command: "readAttribute"
       attribute: "MaxConstFlow"
@@ -141,7 +143,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 13: Read the optional attribute: MinConstTemp"
+    - label: "Step 13: TH reads from the DUT the MinConstTemp attribute."
       PICS: PCC.S.A000b
       command: "readAttribute"
       attribute: "MinConstTemp"
@@ -151,7 +153,7 @@ tests:
               minValue: -32768
               maxValue: 32767
 
-    - label: "Step 14: Read the optional attribute: MaxConstTemp"
+    - label: "Step 14: TH reads from the DUT the MaxConstTemp attribute."
       PICS: PCC.S.A000c
       command: "readAttribute"
       attribute: "MaxConstTemp"
@@ -161,7 +163,7 @@ tests:
               minValue: -32768
               maxValue: 32767
 
-    - label: "Step 15: Read the optional attribute: PumpStatus"
+    - label: "Step 15: TH reads from the DUT the PumpStatus attribute."
       PICS: PCC.S.A0010
       command: "readAttribute"
       attribute: "PumpStatus"
@@ -171,7 +173,8 @@ tests:
               minValue: 0
               maxValue: 8
 
-    - label: "Step 16: Read attribute: EffectiveOperationMode"
+    - label:
+          "Step 16: TH reads from the DUT the EffectiveOperationMode attribute."
       PICS: PCC.S.A0011
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
@@ -181,7 +184,8 @@ tests:
               minValue: 0
               maxValue: 3
 
-    - label: "Step 17: Read attribute: EffectiveControlMode"
+    - label:
+          "Step 17: TH reads from the DUT the EffectiveControlMode attribute."
       PICS: PCC.S.A0012
       command: "readAttribute"
       attribute: "EffectiveControlMode"
@@ -191,7 +195,7 @@ tests:
               minValue: 0
               maxValue: 7
 
-    - label: "Step 18: Read attribute: Capacity"
+    - label: "Step 18: TH reads from the DUT the Capacity attribute."
       PICS: PCC.S.A0013
       command: "readAttribute"
       attribute: "Capacity"
@@ -201,7 +205,7 @@ tests:
               minValue: -32768
               maxValue: 32767
 
-    - label: "Step 19: Read the optional attribute: Speed"
+    - label: "Step 19: TH reads from the DUT the Speed attribute."
       PICS: PCC.S.A0014
       command: "readAttribute"
       attribute: "Speed"
@@ -211,7 +215,8 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 20: Read the optional attribute: LifetimeRunningHours"
+    - label:
+          "Step 20: TH reads from the DUT the LifetimeRunningHours attribute."
       PICS: PCC.S.A0015
       command: "readAttribute"
       attribute: "LifetimeRunningHours"
@@ -221,7 +226,7 @@ tests:
               minValue: 0
               maxValue: 16777215
 
-    - label: "Step 21: Read the optional attribute: Power"
+    - label: "Step 21: TH reads from the DUT the Power attribute."
       PICS: PCC.S.A0016
       command: "readAttribute"
       attribute: "Power"
@@ -231,7 +236,8 @@ tests:
               minValue: 0
               maxValue: 16777215
 
-    - label: "Step 22: Read the optional attribute: LifetimeEnergyConsumed"
+    - label:
+          "Step 22: TH reads from the DUT the LifetimeEnergyConsumed attribute."
       PICS: PCC.S.A0017
       command: "readAttribute"
       attribute: "LifetimeEnergyConsumed"
@@ -241,7 +247,7 @@ tests:
               minValue: 0
               maxValue: 4294967295
 
-    - label: "Step 23: Read optional attribute: OperationMode"
+    - label: "Step 23: TH reads from the DUT the OperationMode attribute."
       PICS: PCC.S.A0020
       command: "readAttribute"
       attribute: "OperationMode"
@@ -251,7 +257,7 @@ tests:
               minValue: 0
               maxValue: 3
 
-    - label: "Step 24: Read optional attribute: ControlMode"
+    - label: "Step 24: TH reads from the DUT the ControlMode attribute."
       PICS: PCC.S.A0021
       command: "readAttribute"
       attribute: "ControlMode"

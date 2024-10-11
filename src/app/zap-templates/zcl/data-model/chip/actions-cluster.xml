@@ -90,8 +90,8 @@ limitations under the License.
     <define>ACTIONS_CLUSTER</define>
     <description>This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information.</description>
 
-    <attribute side="server" code="0x0000" define="ACTION_LIST" type="ARRAY" entryType="ActionStruct" length="256" writable="false" optional="false">ActionList</attribute>
-    <attribute side="server" code="0x0001" define="ENDPOINT_LIST" type="ARRAY" entryType="EndpointListStruct" length="256" writable="false" optional="false">EndpointLists</attribute>
+    <attribute side="server" code="0x0000" define="ACTION_LIST" type="array" entryType="ActionStruct" length="256" writable="false" optional="false">ActionList</attribute>
+    <attribute side="server" code="0x0001" define="ENDPOINT_LIST" type="array" entryType="EndpointListStruct" length="256" writable="false" optional="false">EndpointLists</attribute>
     <attribute side="server" code="0x0002" define="SETUP_URL" type="LONG_CHAR_STRING" length="512" writable="false" optional="true">SetupURL</attribute>
 
     <command source="client" code="0x00" name="InstantAction" optional="true">
