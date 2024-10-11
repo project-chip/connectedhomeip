@@ -103,8 +103,6 @@ Here is the interpretation of the **required** parameters:
 --hw_version       -> Hardware Version as number
 --hw_version_str   -> Hardware Version as string
 --cert_declaration -> path to the Certification Declaration (der format) location
---dac_cert         -> path to the DAC (der format) location
---dac_key          -> path to the DAC key (der format) location
 --pai_cert         -> path to the PAI (der format) location
 --spake2p_path     -> path to the spake2p tool
 --out              -> name of the binary that will be used for storing all the generated data
@@ -113,6 +111,11 @@ Here is the interpretation of the **required** parameters:
 Here is the interpretation of the **optional** parameters:
 
 ```shell
+--dac_cert              -> path to the DAC certificate (der format) location
+--dac_key               -> path to the DAC key (der format) location
+--EL2GO_bin             -> path to the EdgeLock 2Go binary (bin format) location
+--EL2GO_DAC_KEY_ID      -> DAC key ID configured into EdgeLock 2Go as hex value
+--EL2GO_DAC_CERT_ID     -> DAC certificate ID configured into EdgeLock 2Go as hex value
 --dac_key_password      -> Password to decode DAC key
 --dac_key_use_sss_blob  -> Used when --dac_key contains a path to an encrypted blob, instead of the
                            actual DAC private key. The blob metadata size is 24, so the total length
@@ -228,6 +231,9 @@ encrypted blob.
 The user can use the DAC private in plain text instead of using the `SSS` by
 adding the following gn argument `chip_use_plain_dac_key=true`.
 
+When using EdgeLock 2Go provisioning (chip_with_factory_data=1
+    chip_enable_secure_EL2GO_factory_data=true), do not use --dac_cert and --dac_key arguments.
+
 ### 6.2 RW61X
 
 Supported platforms:
@@ -252,6 +258,12 @@ there are three implementations for factory data protection
     `examples/platform/nxp/common/factory_data/source/AppFactoryDataDefaultImpl.cpp`
     \
     `src/platform/nxp/common/factory_data/FactoryDataProviderFwkImpl.cpp`
+
+-   EdgeLock 2go DAC key and certificate provisioning (chip_with_factory_data=1
+    chip_enable_secure_EL2GO_factory_data=true )  
+    `examples/platform/nxp/rt/rw61x/factory_data/source/AppFactoryDataExample.cpp`
+    \
+    `src/platform/nxp/rt/rw61x/FactoryDataProviderEl2GoImpl.cpp`
 
 for the first one, the whole factory data is encrypted by an AES-256 key, the
 AES key can be passed through serial link when in factory production mode, and
@@ -287,3 +299,6 @@ data is encrypted by an AES key, but there are two differences:
 -   the AES key is hard-coded and not provisioned into Edge Lock
 -   the factory data should be encrypted by AES-128 key using "--aes128_key"
     option in "generate.py" script file.
+
+for the fourth, it is similar to the second one but factory data binary didn't contain DAC key and certificate. 
+They are provisioned by the EdgeLock 2Go server into a specific flash section as a blob.
