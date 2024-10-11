@@ -46,6 +46,47 @@ tests:
       response:
           value: SystemModeEnum.Sleep
 
+    - label: "Try to set SystemMode to an invalid value"
+      # Have to use WriteById, because normal write enforces valid values for enums.
+      cluster: "AnyCommands"
+      command: "WriteById"
+      attribute: "SystemMode"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: 0x0201 # Thermostat
+              - name: "AttributeId"
+                value: 0x001C # SystemMode
+              - name: "Value"
+                # Note: At some point this might become a valid value,
+                # and then this test will need to be adjusted, but that
+                # seems fairly low-probability.
+                value: 254
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Verify that WriteById would work correctly with a valid value"
+      cluster: "AnyCommands"
+      command: "WriteById"
+      attribute: "SystemMode"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: 0x0201 # Thermostat
+              - name: "AttributeId"
+                value: 0x001C # SystemMode
+              - name: "Value"
+                # Note: At some point this might become a valid value,
+                # and then this test will need to be adjusted, but that
+                # seems fairly low-probability.
+                value: 8 # SystemModeEnum.Dry
+
+    - label: "Check that the new value is set by id"
+      command: "readAttribute"
+      attribute: "SystemMode"
+      response:
+          value: SystemModeEnum.Dry
+
     - label: "reset SystemMode to original value"
       command: "writeAttribute"
       attribute: "SystemMode"
