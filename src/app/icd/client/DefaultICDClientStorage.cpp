@@ -51,6 +51,11 @@ CHIP_ERROR DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
 
     mFabricList.push_back(fabricIndex);
 
+    return StoreFabricList();
+}
+
+CHIP_ERROR DefaultICDClientStorage::StoreFabricList()
+{
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     size_t counter = mFabricList.size();
     size_t total   = kFabricIndexTlvSize * counter + kArrayOverHead;
@@ -68,7 +73,7 @@ CHIP_ERROR DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
     const auto len = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    writer.Finalize(backingBuffer);
+    ReturnErrorOnFailure(writer.Finalize(backingBuffer));
     return mpClientInfoStore->SyncSetKeyValue(DefaultStorageKeyAllocator::ICDFabricList().KeyName(), backingBuffer.Get(),
                                               static_cast<uint16_t>(len));
 }
@@ -211,6 +216,10 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
 {
     size_t count = 0;
     ReturnErrorOnFailure(LoadCounter(fabricIndex, count, clientInfoSize));
+    if (count == 0)
+    {
+        return CHIP_NO_ERROR;
+    }
     size_t len = clientInfoSize * count + kArrayOverHead;
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -344,8 +353,21 @@ CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, cons
     return writer.EndContainer(arrayType);
 }
 
+CHIP_ERROR DefaultICDClientStorage::CheckFabricExistence(FabricIndex fabricIndex)
+{
+    for (auto & fabric_idx : mFabricList)
+    {
+        if (fabric_idx == fabricIndex) 
+        {
+            return CHIP_NO_ERROR;
+        } 
+    }
+    return CHIP_ERROR_INVALID_FABRIC_INDEX;
+}
+
 CHIP_ERROR DefaultICDClientStorage::StoreEntry(const ICDClientInfo & clientInfo)
 {
+    ReturnErrorOnFailure(CheckFabricExistence(clientInfo.peer_node.GetFabricIndex()));
     std::vector<ICDClientInfo> clientInfoVector;
     size_t clientInfoSize = MaxICDClientInfoSize();
     ReturnErrorOnFailure(Load(clientInfo.peer_node.GetFabricIndex(), clientInfoVector, clientInfoSize));
@@ -359,7 +381,6 @@ CHIP_ERROR DefaultICDClientStorage::StoreEntry(const ICDClientInfo & clientInfo)
             break;
         }
     }
-
     clientInfoVector.push_back(clientInfo);
     size_t total = clientInfoSize * clientInfoVector.size() + kArrayOverHead;
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
@@ -371,7 +392,7 @@ CHIP_ERROR DefaultICDClientStorage::StoreEntry(const ICDClientInfo & clientInfo)
     const auto len = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    writer.Finalize(backingBuffer);
+    ReturnErrorOnFailure(writer.Finalize(backingBuffer));
     ReturnErrorOnFailure(mpClientInfoStore->SyncSetKeyValue(
         DefaultStorageKeyAllocator::ICDClientInfoKey(clientInfo.peer_node.GetFabricIndex()).KeyName(), backingBuffer.Get(),
         static_cast<uint16_t>(len)));
@@ -416,7 +437,7 @@ CHIP_ERROR DefaultICDClientStorage::UpdateEntryCountForFabric(FabricIndex fabric
 
     const auto len = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
-    writer.Finalize(backingBuffer);
+    ReturnErrorOnFailure(writer.Finalize(backingBuffer));
 
     return mpClientInfoStore->SyncSetKeyValue(DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricIndex).KeyName(),
                                               backingBuffer.Get(), static_cast<uint16_t>(len));
@@ -424,9 +445,18 @@ CHIP_ERROR DefaultICDClientStorage::UpdateEntryCountForFabric(FabricIndex fabric
 
 CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
 {
+    if (CheckFabricExistence(peerNode.GetFabricIndex()) != CHIP_NO_ERROR)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     size_t clientInfoSize = 0;
     std::vector<ICDClientInfo> clientInfoVector;
     ReturnErrorOnFailure(Load(peerNode.GetFabricIndex(), clientInfoVector, clientInfoSize));
+    if (clientInfoVector.size() == 0)
+    {
+        return CHIP_NO_ERROR;
+    }
 
     for (auto it = clientInfoVector.begin(); it != clientInfoVector.end(); it++)
     {
@@ -440,7 +470,6 @@ CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
 
     ReturnErrorOnFailure(
         mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(peerNode.GetFabricIndex()).KeyName()));
-
     size_t total = clientInfoSize * clientInfoVector.size() + kArrayOverHead;
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     ReturnErrorCodeIf(!backingBuffer.Calloc(total), CHIP_ERROR_NO_MEMORY);
@@ -451,7 +480,7 @@ CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
     const auto len = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    writer.Finalize(backingBuffer);
+    ReturnErrorOnFailure(writer.Finalize(backingBuffer));
     ReturnErrorOnFailure(
         mpClientInfoStore->SyncSetKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(peerNode.GetFabricIndex()).KeyName(),
                                            backingBuffer.Get(), static_cast<uint16_t>(len)));
@@ -461,6 +490,11 @@ CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
 
 CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
 {
+    if (CheckFabricExistence(fabricIndex) != CHIP_NO_ERROR)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     size_t clientInfoSize = 0;
     std::vector<ICDClientInfo> clientInfoVector;
     ReturnErrorOnFailure(Load(fabricIndex, clientInfoVector, clientInfoSize));
@@ -471,7 +505,22 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
     }
     ReturnErrorOnFailure(
         mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(fabricIndex).KeyName()));
-    return mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricIndex).KeyName());
+    ReturnErrorOnFailure(mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricIndex).KeyName()));
+
+    for (auto fabric = mFabricList.begin(); fabric != mFabricList.end(); fabric++) 
+    {
+        if (*fabric == fabricIndex) 
+        {
+            fabric = mFabricList.erase(fabric);
+            break;
+        } 
+    }
+
+    if (mFabricList.size() == 0)
+    {
+        return mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::ICDFabricList().KeyName());
+    }
+    return StoreFabricList();
 }
 
 CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo,
