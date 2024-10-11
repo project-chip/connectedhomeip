@@ -52,6 +52,14 @@ jobs:
                 platform: nxp
                 extra-submodule-parameters: --recursive
 
+            - name: Detect changed paths
+              uses: dorny/paths-filter@v3
+              id: changed_paths
+              with:
+                  filters: |
+                      nxp:
+                        - '**/nxp/**'
+
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
               if: ${{ !env.ACT }}
@@ -137,6 +145,7 @@ jobs:
                       --copy-artifacts-to out/artifacts \
                   "
             - name: Build RT1060 thermostat example app
+              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
@@ -145,6 +154,7 @@ jobs:
                       --copy-artifacts-to out/artifacts \
                   "
             - name: Build RT1060 laundry-washer example app
+              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
@@ -158,6 +168,7 @@ jobs:
               run: rm -rf ./out
 
             - name: Build RT1170 all clusters example app
+              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
@@ -175,6 +186,7 @@ jobs:
                       --copy-artifacts-to out/artifacts \
                   "
             - name: Build RT1170 laundry-washer example app
+              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
@@ -204,6 +216,7 @@ jobs:
                       --copy-artifacts-to out/artifacts \
                   "
             - name: Build RW61X laundry-washer example app
+              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
@@ -236,8 +249,15 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: nxp
-
+            - name: Detect changed paths
+              uses: dorny/paths-filter@v3
+              id: changed_paths
+              with:
+                  filters: |
+                      nxp:
+                        - '**/nxp/**'
             - name: Build NXP Zephyr examples
+              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
