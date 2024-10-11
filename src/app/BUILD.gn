@@ -305,9 +305,9 @@ static_library("interaction-model") {
     # We likely should formalize and change this with a proper DataModel::Provider that
     # is consistent instead
     sources += [
-      "dynamic_server/DynamicDispatcher.cpp",
       "${chip_root}/src/app/util/ember-global-attribute-access-interface.cpp",
       "${chip_root}/src/app/util/ember-io-storage.cpp",
+      "dynamic_server/DynamicDispatcher.cpp",
     ]
 
     public_deps += [

@@ -18,7 +18,6 @@ import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/python.gni")
 
-
 source_set("nodatamodel") {
   sources = [ "EmptyDataModelHandler.cpp" ]
 
