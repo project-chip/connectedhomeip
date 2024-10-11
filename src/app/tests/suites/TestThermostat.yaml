@@ -76,9 +76,6 @@ tests:
               - name: "AttributeId"
                 value: 0x001C # SystemMode
               - name: "Value"
-                # Note: At some point this might become a valid value,
-                # and then this test will need to be adjusted, but that
-                # seems fairly low-probability.
                 value: 8 # SystemModeEnum.Dry
 
     - label: "Check that the new value is set by id"
