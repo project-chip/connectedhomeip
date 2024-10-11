@@ -109,6 +109,11 @@ public:
     CHIP_ERROR StoreHardwareVersionString(CharSpan hardwareVersionString) override;
     CHIP_ERROR StoreSoftwareVersionString(CharSpan softwareVersionString) override;
 
+    CHIP_ERROR StoreVendorName(const char * vendorName, size_t vendorNameLen) override;
+    CHIP_ERROR StoreProductName(const char * productName, size_t productNameLen) override;
+    CHIP_ERROR StoreHardwareVersionString(const char * hardwareVersionString, size_t hardwareVersionStringLen) override;
+    CHIP_ERROR StoreSoftwareVersionString(const char * softwareVersionString, size_t softwareVersionStringLen) override;
+
 #if CHIP_CONFIG_TEST
     void RunUnitTests() override;
 #endif
