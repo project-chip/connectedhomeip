@@ -82,11 +82,11 @@ const PSOC6Config::Key PSOC6Config::kConfigKey_LockUserName       = { kConfigNam
 const PSOC6Config::Key PSOC6Config::kConfigKey_CredentialData     = { kConfigNamespace_ChipConfig, "credential-data" };
 const PSOC6Config::Key PSOC6Config::kConfigKey_UserCredentials    = { kConfigNamespace_ChipConfig, "user-credentials" };
 const PSOC6Config::Key PSOC6Config::kConfigKey_WeekDaySchedules   = { kConfigNamespace_ChipConfig, "weekday-schedules" };
-const PSOC6Config::Key PSOC6Config::kConfigKey_YearDaySchedules = { kConfigNamespace_ChipConfig, "yearday-schedules" };
-const PSOC6Config::Key PSOC6Config::kConfigKey_HolidaySchedules = { kConfigNamespace_ChipConfig, "holiday-schedules" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_YearDaySchedules   = { kConfigNamespace_ChipConfig, "yearday-schedules" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_HolidaySchedules   = { kConfigNamespace_ChipConfig, "holiday-schedules" };
 
-const PSOC6Config::Key PSOC6Config::kConfigKey_VendorName = { kConfigNamespace_ChipConfig, "vendor-name" };
-const PSOC6Config::Key PSOC6Config::kConfigKey_ProductName = { kConfigNamespace_ChipConfig, "product-name" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_VendorName            = { kConfigNamespace_ChipConfig, "vendor-name" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_ProductName           = { kConfigNamespace_ChipConfig, "product-name" };
 const PSOC6Config::Key PSOC6Config::kConfigKey_HardwareVersionString = { kConfigNamespace_ChipConfig, "hardware-version-string" };
 const PSOC6Config::Key PSOC6Config::kConfigKey_SoftwareVersionString = { kConfigNamespace_ChipConfig, "software-version-string" };
 // Keys stored in the Chip-counters namespace
