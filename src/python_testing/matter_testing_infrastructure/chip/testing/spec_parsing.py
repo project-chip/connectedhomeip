@@ -26,14 +26,14 @@ from enum import Enum, auto
 from typing import Callable, Optional
 
 import chip.clusters as Clusters
-import conformance_support
+import chip.testing.conformance as conformance_support
+from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
+                                      ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
+                                      parse_callable_from_xml, parse_device_type_callable_from_xml)
+from chip.testing.global_attribute_ids import GlobalAttributeIds
+from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
+                                         EventPathLocation, FeaturePathLocation, ProblemNotice, ProblemSeverity)
 from chip.tlv import uint
-from conformance_support import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
-                                 ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
-                                 parse_callable_from_xml, parse_device_type_callable_from_xml)
-from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                    EventPathLocation, FeaturePathLocation, ProblemNotice, ProblemSeverity)
 
 _PRIVILEGE_STR = {
     None: "N/A",
@@ -518,19 +518,36 @@ class DataModelLevel(str, Enum):
     kDeviceType = 'device_types'
 
 
-def _get_data_model_directory(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str], data_model_level: DataModelLevel) -> str:
+def _get_data_model_root() -> str:
+    """Attempts to find ${CHIP_ROOT}/data_model or equivalent."""
+
+    # Since this class is generally in a module, we have to rely on being bootstrapped or
+    # we use CWD if we cannot
+    choices = [os.getcwd()]
+
+    if 'PW_PROJECT_ROOT' in os.environ:
+        choices.insert(0, os.environ['PW_PROJECT_ROOT'])
+
+    for c in choices:
+        data_model_path = os.path.join(c, 'data_model')
+        if os.path.exists(os.path.join(data_model_path, 'master', 'scraper_version')):
+            return data_model_path
+    raise FileNotFoundError('Cannot find a CHIP_ROOT/data_model path. Tried %r as prefixes.' % choices)
+
+
+def get_data_model_directory(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str], data_model_level: DataModelLevel) -> str:
     if data_model_directory == PrebuiltDataModelDirectory.k1_3:
-        return os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', '1.3', data_model_level)
+        return os.path.join(_get_data_model_root(), '1.3', data_model_level)
     elif data_model_directory == PrebuiltDataModelDirectory.k1_4:
-        return os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', '1.4', data_model_level)
+        return os.path.join(_get_data_model_root(), '1.4', data_model_level)
     elif data_model_directory == PrebuiltDataModelDirectory.kMaster:
-        return os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'master', data_model_level)
+        return os.path.join(_get_data_model_root(), 'master', data_model_level)
     else:
         return data_model_directory
 
 
 def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
-    dir = _get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
+    dir = get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
 
     clusters: dict[int, XmlCluster] = {}
     pure_base_clusters: dict[str, XmlCluster] = {}
@@ -777,7 +794,7 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNot
 
 
 def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_4) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
-    dir = _get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
+    dir = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems = []
     for xml in glob.glob(f"{dir}/*.xml"):
