@@ -271,9 +271,9 @@ TEST_F(TestCheckInHandler, TestOnMessageReceived)
     EXPECT_EQ(clientInfo7.offset, counter - clientInfoA.start_icd_counter);
 
     // Validate IcdclientInfo is not updated when handling overlimited counter and fail to create case session
-    uint32_t old_start_icd_counter = clientInfo7.start_icd_counter;
-    uint32_t old_counter = counter;
-    counter = (1U << 31) + 100U + clientInfo7.start_icd_counter;
+    uint32_t old_start_icd_counter     = clientInfo7.start_icd_counter;
+    uint32_t old_counter               = counter;
+    counter                            = (1U << 31) + 100U + clientInfo7.start_icd_counter;
     System::PacketBufferHandle buffer8 = MessagePacketBuffer::New(chip::Protocols::SecureChannel::CheckinMessage::kMinPayloadSize);
     MutableByteSpan output8{ buffer8->Start(), buffer8->MaxDataLength() };
     EXPECT_EQ(chip::Protocols::SecureChannel::CheckinMessage::GenerateCheckinMessagePayload(
