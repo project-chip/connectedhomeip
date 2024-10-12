@@ -83,11 +83,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
     [self _updateRegistrationInfo];
 }
 
-- (void)_checkinWithContext:(NSDictionary *)context
-{
-    [self _updateRegistrationInfo];
-}
-
 - (void)removeDevice:(MTRDevice *)device
 {
     [super removeDevice:device];
@@ -252,8 +247,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 
         MTR_LOG("%@ Activating new XPC connection", self);
         [self.xpcConnection activate];
-
-        [self _checkinWithContext:[NSDictionary dictionary]];
 
         // FIXME: Trying to kick all the MTRDevices attached to this controller to re-establish connections
         //        This state needs to be stored properly and re-established at connnection time
