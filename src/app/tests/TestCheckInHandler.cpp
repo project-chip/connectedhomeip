@@ -279,7 +279,7 @@ TEST_F(TestCheckInHandler, TestOnMessageReceived)
     EXPECT_EQ(chip::Protocols::SecureChannel::CheckinMessage::GenerateCheckinMessagePayload(
                   clientInfoA.aes_key_handle, clientInfoA.hmac_key_handle, counter, ByteSpan(), output8),
               CHIP_NO_ERROR);
-    
+
     buffer8->SetDataLength(static_cast<uint16_t>(output8.size()));
     EXPECT_EQ(checkInHandler.ValidateOnMessageReceived(nullptr, payloadHeader, std::move(buffer8)), CHIP_NO_ERROR);
     ICDClientInfo clientInfo8;
