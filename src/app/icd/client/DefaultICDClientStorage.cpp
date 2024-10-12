@@ -394,7 +394,10 @@ CHIP_ERROR DefaultICDClientStorage::StoreEntry(const ICDClientInfo & clientInfo)
         DefaultStorageKeyAllocator::ICDClientInfoKey(clientInfo.peer_node.GetFabricIndex()).KeyName(), backingBuffer.Get(),
         static_cast<uint16_t>(len)));
 
-    return IncreaseEntryCountForFabric(clientInfo.peer_node.GetFabricIndex());
+    ReturnErrorOnFailure(IncreaseEntryCountForFabric(clientInfo.peer_node.GetFabricIndex()));
+    ChipLogProgress(ICD, "Store ICD entry successfully with peer nodeId " ChipLogFormatScopedNodeId " and checkin nodeId " ChipLogFormatScopedNodeId,
+                ChipLogValueScopedNodeId(clientInfo.peer_node), ChipLogValueScopedNodeId(clientInfo.check_in_node));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DefaultICDClientStorage::IncreaseEntryCountForFabric(FabricIndex fabricIndex)
@@ -475,7 +478,9 @@ CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
         mpClientInfoStore->SyncSetKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(peerNode.GetFabricIndex()).KeyName(),
                                            backingBuffer.Get(), static_cast<uint16_t>(len)));
 
-    return DecreaseEntryCountForFabric(peerNode.GetFabricIndex());
+    ReturnErrorOnFailure(DecreaseEntryCountForFabric(peerNode.GetFabricIndex()));
+    ChipLogProgress(ICD, "Remove ICD entry successfully with peer nodeId " ChipLogFormatScopedNodeId, ChipLogValueScopedNodeId(peerNode));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
@@ -508,7 +513,10 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
     {
         return mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::ICDFabricList().KeyName());
     }
-    return StoreFabricList();
+
+    ReturnErrorOnFailure(StoreFabricList());
+    ChipLogProgress(ICD, "Remove all ICD entries successfully for fabric index %u", fabricIndex);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo,
