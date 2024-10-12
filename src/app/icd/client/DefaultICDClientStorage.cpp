@@ -395,8 +395,10 @@ CHIP_ERROR DefaultICDClientStorage::StoreEntry(const ICDClientInfo & clientInfo)
         static_cast<uint16_t>(len)));
 
     ReturnErrorOnFailure(IncreaseEntryCountForFabric(clientInfo.peer_node.GetFabricIndex()));
-    ChipLogProgress(ICD, "Store ICD entry successfully with peer nodeId " ChipLogFormatScopedNodeId " and checkin nodeId " ChipLogFormatScopedNodeId,
-                ChipLogValueScopedNodeId(clientInfo.peer_node), ChipLogValueScopedNodeId(clientInfo.check_in_node));
+    ChipLogProgress(ICD,
+                    "Store ICD entry successfully with peer nodeId " ChipLogFormatScopedNodeId
+                    " and checkin nodeId " ChipLogFormatScopedNodeId,
+                    ChipLogValueScopedNodeId(clientInfo.peer_node), ChipLogValueScopedNodeId(clientInfo.check_in_node));
     return CHIP_NO_ERROR;
 }
 
@@ -479,7 +481,8 @@ CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
                                            backingBuffer.Get(), static_cast<uint16_t>(len)));
 
     ReturnErrorOnFailure(DecreaseEntryCountForFabric(peerNode.GetFabricIndex()));
-    ChipLogProgress(ICD, "Remove ICD entry successfully with peer nodeId " ChipLogFormatScopedNodeId, ChipLogValueScopedNodeId(peerNode));
+    ChipLogProgress(ICD, "Remove ICD entry successfully with peer nodeId " ChipLogFormatScopedNodeId,
+                    ChipLogValueScopedNodeId(peerNode));
     return CHIP_NO_ERROR;
 }
 
