@@ -379,6 +379,9 @@ static constexpr ClusterId Id = 0x00000510;
 namespace ZoneManagement {
 static constexpr ClusterId Id = 0x00000550;
 } // namespace ZoneManagement
+namespace CameraAvStreamManagement {
+static constexpr ClusterId Id = 0x00000551;
+} // namespace CameraAvStreamManagement
 namespace WebRTCTransportProvider {
 static constexpr ClusterId Id = 0x00000553;
 } // namespace WebRTCTransportProvider

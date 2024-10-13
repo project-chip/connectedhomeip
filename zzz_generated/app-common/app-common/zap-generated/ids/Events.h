@@ -697,6 +697,24 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace ZoneManagement
 
+namespace CameraAvStreamManagement {
+namespace Events {
+
+namespace VideoStreamChanged {
+static constexpr EventId Id = 0x00000000;
+} // namespace VideoStreamChanged
+
+namespace AudioStreamChanged {
+static constexpr EventId Id = 0x00000001;
+} // namespace AudioStreamChanged
+
+namespace SnapshotStreamChanged {
+static constexpr EventId Id = 0x00000002;
+} // namespace SnapshotStreamChanged
+
+} // namespace Events
+} // namespace CameraAvStreamManagement
+
 namespace CommissionerControl {
 namespace Events {
 
