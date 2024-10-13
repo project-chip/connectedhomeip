@@ -1833,6 +1833,80 @@ static constexpr CommandId Id = 0x00000005;
 } // namespace Commands
 } // namespace ZoneManagement
 
+namespace CameraAvStreamManagement {
+namespace Commands {
+
+namespace AudioStreamAllocate {
+static constexpr CommandId Id = 0x00000000;
+} // namespace AudioStreamAllocate
+
+namespace AudioStreamAllocateResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace AudioStreamAllocateResponse
+
+namespace AudioStreamDeallocate {
+static constexpr CommandId Id = 0x00000002;
+} // namespace AudioStreamDeallocate
+
+namespace VideoStreamAllocate {
+static constexpr CommandId Id = 0x00000003;
+} // namespace VideoStreamAllocate
+
+namespace VideoStreamAllocateResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace VideoStreamAllocateResponse
+
+namespace VideoStreamModify {
+static constexpr CommandId Id = 0x00000005;
+} // namespace VideoStreamModify
+
+namespace VideoStreamDeallocate {
+static constexpr CommandId Id = 0x00000006;
+} // namespace VideoStreamDeallocate
+
+namespace SnapshotStreamAllocate {
+static constexpr CommandId Id = 0x00000007;
+} // namespace SnapshotStreamAllocate
+
+namespace SnapshotStreamAllocateResponse {
+static constexpr CommandId Id = 0x00000008;
+} // namespace SnapshotStreamAllocateResponse
+
+namespace SnapshotStreamDeallocate {
+static constexpr CommandId Id = 0x00000009;
+} // namespace SnapshotStreamDeallocate
+
+namespace SetStreamPriorities {
+static constexpr CommandId Id = 0x0000000A;
+} // namespace SetStreamPriorities
+
+namespace CaptureSnapshot {
+static constexpr CommandId Id = 0x0000000B;
+} // namespace CaptureSnapshot
+
+namespace CaptureSnapshotResponse {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace CaptureSnapshotResponse
+
+namespace SetViewport {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace SetViewport
+
+namespace SetImageRotation {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace SetImageRotation
+
+namespace SetImageFlipHorizontal {
+static constexpr CommandId Id = 0x0000000F;
+} // namespace SetImageFlipHorizontal
+
+namespace SetImageFlipVertical {
+static constexpr CommandId Id = 0x00000010;
+} // namespace SetImageFlipVertical
+
+} // namespace Commands
+} // namespace CameraAvStreamManagement
+
 namespace WebRTCTransportProvider {
 namespace Commands {
 

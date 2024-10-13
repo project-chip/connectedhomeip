@@ -540,6 +540,47 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::Opera
     ComplexArgumentParser::Finalize(request.operationalStateLabel);
 }
 
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::detail::Structs::ViewportStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ViewportStruct.x1", "x1", value.isMember("x1")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ViewportStruct.y1", "y1", value.isMember("y1")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ViewportStruct.x2", "x2", value.isMember("x2")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ViewportStruct.y2", "y2", value.isMember("y2")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "x1");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.x1, value["x1"]));
+    valueCopy.removeMember("x1");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "y1");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.y1, value["y1"]));
+    valueCopy.removeMember("y1");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "x2");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.x2, value["x2"]));
+    valueCopy.removeMember("x2");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "y2");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.y2, value["y2"]));
+    valueCopy.removeMember("y2");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::ViewportStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.x1);
+    ComplexArgumentParser::Finalize(request.y1);
+    ComplexArgumentParser::Finalize(request.x2);
+    ComplexArgumentParser::Finalize(request.y2);
+}
+
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::detail::Structs::WebRTCSessionStruct::Type & request,
                                         Json::Value & value)
@@ -5944,6 +5985,489 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ZoneManagement::Struct
     ComplexArgumentParser::Finalize(request.augmentationDuration);
     ComplexArgumentParser::Finalize(request.maxDuration);
     ComplexArgumentParser::Finalize(request.blindDuration);
+}
+
+CHIP_ERROR
+ComplexArgumentParser::Setup(const char * label,
+                             chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type & request,
+                             Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoResolutionStruct.width", "width", value.isMember("width")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("VideoResolutionStruct.height", "height", value.isMember("height")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "width");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.width, value["width"]));
+    valueCopy.removeMember("width");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "height");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.height, value["height"]));
+    valueCopy.removeMember("height");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.width);
+    ComplexArgumentParser::Finalize(request.height);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.videoStreamID", "videoStreamID",
+                                                                  value.isMember("videoStreamID")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.streamType", "streamType", value.isMember("streamType")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.videoCodec", "videoCodec", value.isMember("videoCodec")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.minFrameRate", "minFrameRate", value.isMember("minFrameRate")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.maxFrameRate", "maxFrameRate", value.isMember("maxFrameRate")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.minResolution", "minResolution",
+                                                                  value.isMember("minResolution")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.maxResolution", "maxResolution",
+                                                                  value.isMember("maxResolution")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.minBitRate", "minBitRate", value.isMember("minBitRate")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.maxBitRate", "maxBitRate", value.isMember("maxBitRate")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.minFragmentLen", "minFragmentLen",
+                                                                  value.isMember("minFragmentLen")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.maxFragmentLen", "maxFragmentLen",
+                                                                  value.isMember("maxFragmentLen")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.referenceCount", "referenceCount",
+                                                                  value.isMember("referenceCount")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "videoStreamID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.videoStreamID, value["videoStreamID"]));
+    valueCopy.removeMember("videoStreamID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "streamType");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.streamType, value["streamType"]));
+    valueCopy.removeMember("streamType");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "videoCodec");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.videoCodec, value["videoCodec"]));
+    valueCopy.removeMember("videoCodec");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "minFrameRate");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.minFrameRate, value["minFrameRate"]));
+    valueCopy.removeMember("minFrameRate");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxFrameRate");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxFrameRate, value["maxFrameRate"]));
+    valueCopy.removeMember("maxFrameRate");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "minResolution");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.minResolution, value["minResolution"]));
+    valueCopy.removeMember("minResolution");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxResolution");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxResolution, value["maxResolution"]));
+    valueCopy.removeMember("maxResolution");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "minBitRate");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.minBitRate, value["minBitRate"]));
+    valueCopy.removeMember("minBitRate");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxBitRate");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxBitRate, value["maxBitRate"]));
+    valueCopy.removeMember("maxBitRate");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "minFragmentLen");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.minFragmentLen, value["minFragmentLen"]));
+    valueCopy.removeMember("minFragmentLen");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxFragmentLen");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxFragmentLen, value["maxFragmentLen"]));
+    valueCopy.removeMember("maxFragmentLen");
+
+    if (value.isMember("watermarkEnabled"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "watermarkEnabled");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.watermarkEnabled, value["watermarkEnabled"]));
+    }
+    valueCopy.removeMember("watermarkEnabled");
+
+    if (value.isMember("OSDEnabled"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "OSDEnabled");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.OSDEnabled, value["OSDEnabled"]));
+    }
+    valueCopy.removeMember("OSDEnabled");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "referenceCount");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.referenceCount, value["referenceCount"]));
+    valueCopy.removeMember("referenceCount");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.videoStreamID);
+    ComplexArgumentParser::Finalize(request.streamType);
+    ComplexArgumentParser::Finalize(request.videoCodec);
+    ComplexArgumentParser::Finalize(request.minFrameRate);
+    ComplexArgumentParser::Finalize(request.maxFrameRate);
+    ComplexArgumentParser::Finalize(request.minResolution);
+    ComplexArgumentParser::Finalize(request.maxResolution);
+    ComplexArgumentParser::Finalize(request.minBitRate);
+    ComplexArgumentParser::Finalize(request.maxBitRate);
+    ComplexArgumentParser::Finalize(request.minFragmentLen);
+    ComplexArgumentParser::Finalize(request.maxFragmentLen);
+    ComplexArgumentParser::Finalize(request.watermarkEnabled);
+    ComplexArgumentParser::Finalize(request.OSDEnabled);
+    ComplexArgumentParser::Finalize(request.referenceCount);
+}
+
+CHIP_ERROR
+ComplexArgumentParser::Setup(const char * label,
+                             chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotStreamStruct::Type & request,
+                             Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SnapshotStreamStruct.snapshotStreamID", "snapshotStreamID",
+                                                                  value.isMember("snapshotStreamID")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("SnapshotStreamStruct.imageCodec", "imageCodec", value.isMember("imageCodec")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("SnapshotStreamStruct.frameRate", "frameRate", value.isMember("frameRate")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("SnapshotStreamStruct.bitRate", "bitRate", value.isMember("bitRate")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SnapshotStreamStruct.minResolution", "minResolution",
+                                                                  value.isMember("minResolution")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SnapshotStreamStruct.maxResolution", "maxResolution",
+                                                                  value.isMember("maxResolution")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("SnapshotStreamStruct.quality", "quality", value.isMember("quality")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SnapshotStreamStruct.referenceCount", "referenceCount",
+                                                                  value.isMember("referenceCount")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "snapshotStreamID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.snapshotStreamID, value["snapshotStreamID"]));
+    valueCopy.removeMember("snapshotStreamID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "imageCodec");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.imageCodec, value["imageCodec"]));
+    valueCopy.removeMember("imageCodec");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "frameRate");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.frameRate, value["frameRate"]));
+    valueCopy.removeMember("frameRate");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "bitRate");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.bitRate, value["bitRate"]));
+    valueCopy.removeMember("bitRate");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "minResolution");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.minResolution, value["minResolution"]));
+    valueCopy.removeMember("minResolution");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxResolution");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxResolution, value["maxResolution"]));
+    valueCopy.removeMember("maxResolution");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "quality");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.quality, value["quality"]));
+    valueCopy.removeMember("quality");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "referenceCount");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.referenceCount, value["referenceCount"]));
+    valueCopy.removeMember("referenceCount");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotStreamStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.snapshotStreamID);
+    ComplexArgumentParser::Finalize(request.imageCodec);
+    ComplexArgumentParser::Finalize(request.frameRate);
+    ComplexArgumentParser::Finalize(request.bitRate);
+    ComplexArgumentParser::Finalize(request.minResolution);
+    ComplexArgumentParser::Finalize(request.maxResolution);
+    ComplexArgumentParser::Finalize(request.quality);
+    ComplexArgumentParser::Finalize(request.referenceCount);
+}
+
+CHIP_ERROR
+ComplexArgumentParser::Setup(const char * label,
+                             chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type & request,
+                             Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("SnapshotParamsStruct.resolution", "resolution", value.isMember("resolution")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SnapshotParamsStruct.maxFrameRate", "maxFrameRate",
+                                                                  value.isMember("maxFrameRate")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("SnapshotParamsStruct.imageCodec", "imageCodec", value.isMember("imageCodec")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "resolution");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.resolution, value["resolution"]));
+    valueCopy.removeMember("resolution");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxFrameRate");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxFrameRate, value["maxFrameRate"]));
+    valueCopy.removeMember("maxFrameRate");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "imageCodec");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.imageCodec, value["imageCodec"]));
+    valueCopy.removeMember("imageCodec");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::SnapshotParamsStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.resolution);
+    ComplexArgumentParser::Finalize(request.maxFrameRate);
+    ComplexArgumentParser::Finalize(request.imageCodec);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(
+    const char * label, chip::app::Clusters::CameraAvStreamManagement::Structs::RateDistortionTradeOffPointsStruct::Type & request,
+    Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("RateDistortionTradeOffPointsStruct.codec", "codec", value.isMember("codec")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RateDistortionTradeOffPointsStruct.resolution", "resolution",
+                                                                  value.isMember("resolution")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RateDistortionTradeOffPointsStruct.minBitRate", "minBitRate",
+                                                                  value.isMember("minBitRate")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "codec");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.codec, value["codec"]));
+    valueCopy.removeMember("codec");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "resolution");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.resolution, value["resolution"]));
+    valueCopy.removeMember("resolution");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "minBitRate");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.minBitRate, value["minBitRate"]));
+    valueCopy.removeMember("minBitRate");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(
+    chip::app::Clusters::CameraAvStreamManagement::Structs::RateDistortionTradeOffPointsStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.codec);
+    ComplexArgumentParser::Finalize(request.resolution);
+    ComplexArgumentParser::Finalize(request.minBitRate);
+}
+
+CHIP_ERROR
+ComplexArgumentParser::Setup(const char * label,
+                             chip::app::Clusters::CameraAvStreamManagement::Structs::AudioCapabilitiesStruct::Type & request,
+                             Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AudioCapabilitiesStruct.maxNumberOfChannels",
+                                                                  "maxNumberOfChannels", value.isMember("maxNumberOfChannels")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AudioCapabilitiesStruct.supportedCodecs", "supportedCodecs",
+                                                                  value.isMember("supportedCodecs")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AudioCapabilitiesStruct.supportedSampleRates",
+                                                                  "supportedSampleRates", value.isMember("supportedSampleRates")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AudioCapabilitiesStruct.supportedBitDepths",
+                                                                  "supportedBitDepths", value.isMember("supportedBitDepths")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxNumberOfChannels");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxNumberOfChannels, value["maxNumberOfChannels"]));
+    valueCopy.removeMember("maxNumberOfChannels");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "supportedCodecs");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.supportedCodecs, value["supportedCodecs"]));
+    valueCopy.removeMember("supportedCodecs");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "supportedSampleRates");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.supportedSampleRates, value["supportedSampleRates"]));
+    valueCopy.removeMember("supportedSampleRates");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "supportedBitDepths");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.supportedBitDepths, value["supportedBitDepths"]));
+    valueCopy.removeMember("supportedBitDepths");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(
+    chip::app::Clusters::CameraAvStreamManagement::Structs::AudioCapabilitiesStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.maxNumberOfChannels);
+    ComplexArgumentParser::Finalize(request.supportedCodecs);
+    ComplexArgumentParser::Finalize(request.supportedSampleRates);
+    ComplexArgumentParser::Finalize(request.supportedBitDepths);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::CameraAvStreamManagement::Structs::AudioStreamStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AudioStreamStruct.audioStreamID", "audioStreamID",
+                                                                  value.isMember("audioStreamID")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("AudioStreamStruct.streamType", "streamType", value.isMember("streamType")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("AudioStreamStruct.audioCodec", "audioCodec", value.isMember("audioCodec")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("AudioStreamStruct.channelCount", "channelCount", value.isMember("channelCount")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("AudioStreamStruct.sampleRate", "sampleRate", value.isMember("sampleRate")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("AudioStreamStruct.bitRate", "bitRate", value.isMember("bitRate")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("AudioStreamStruct.bitDepth", "bitDepth", value.isMember("bitDepth")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AudioStreamStruct.referenceCount", "referenceCount",
+                                                                  value.isMember("referenceCount")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "audioStreamID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.audioStreamID, value["audioStreamID"]));
+    valueCopy.removeMember("audioStreamID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "streamType");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.streamType, value["streamType"]));
+    valueCopy.removeMember("streamType");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "audioCodec");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.audioCodec, value["audioCodec"]));
+    valueCopy.removeMember("audioCodec");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "channelCount");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.channelCount, value["channelCount"]));
+    valueCopy.removeMember("channelCount");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "sampleRate");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.sampleRate, value["sampleRate"]));
+    valueCopy.removeMember("sampleRate");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "bitRate");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.bitRate, value["bitRate"]));
+    valueCopy.removeMember("bitRate");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "bitDepth");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.bitDepth, value["bitDepth"]));
+    valueCopy.removeMember("bitDepth");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "referenceCount");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.referenceCount, value["referenceCount"]));
+    valueCopy.removeMember("referenceCount");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::CameraAvStreamManagement::Structs::AudioStreamStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.audioStreamID);
+    ComplexArgumentParser::Finalize(request.streamType);
+    ComplexArgumentParser::Finalize(request.audioCodec);
+    ComplexArgumentParser::Finalize(request.channelCount);
+    ComplexArgumentParser::Finalize(request.sampleRate);
+    ComplexArgumentParser::Finalize(request.bitRate);
+    ComplexArgumentParser::Finalize(request.bitDepth);
+    ComplexArgumentParser::Finalize(request.referenceCount);
+}
+
+CHIP_ERROR
+ComplexArgumentParser::Setup(const char * label,
+                             chip::app::Clusters::CameraAvStreamManagement::Structs::VideoSensorParamsStruct::Type & request,
+                             Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoSensorParamsStruct.sensorWidth", "sensorWidth",
+                                                                  value.isMember("sensorWidth")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoSensorParamsStruct.sensorHeight", "sensorHeight",
+                                                                  value.isMember("sensorHeight")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("VideoSensorParamsStruct.HDRCapable", "HDRCapable", value.isMember("HDRCapable")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("VideoSensorParamsStruct.maxFPS", "maxFPS", value.isMember("maxFPS")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("VideoSensorParamsStruct.maxHDRFPS", "maxHDRFPS", value.isMember("maxHDRFPS")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "sensorWidth");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.sensorWidth, value["sensorWidth"]));
+    valueCopy.removeMember("sensorWidth");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "sensorHeight");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.sensorHeight, value["sensorHeight"]));
+    valueCopy.removeMember("sensorHeight");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "HDRCapable");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.HDRCapable, value["HDRCapable"]));
+    valueCopy.removeMember("HDRCapable");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxFPS");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxFPS, value["maxFPS"]));
+    valueCopy.removeMember("maxFPS");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxHDRFPS");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxHDRFPS, value["maxHDRFPS"]));
+    valueCopy.removeMember("maxHDRFPS");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(
+    chip::app::Clusters::CameraAvStreamManagement::Structs::VideoSensorParamsStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.sensorWidth);
+    ComplexArgumentParser::Finalize(request.sensorHeight);
+    ComplexArgumentParser::Finalize(request.HDRCapable);
+    ComplexArgumentParser::Finalize(request.maxFPS);
+    ComplexArgumentParser::Finalize(request.maxHDRFPS);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type & request,
