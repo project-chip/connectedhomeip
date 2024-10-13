@@ -3640,6 +3640,70 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ZoneManagement::ZoneUse
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(CameraAvStreamManagement::AudioCodecEnum val)
+{
+    using EnumType = CameraAvStreamManagement::AudioCodecEnum;
+    switch (val)
+    {
+    case EnumType::kOpus:
+    case EnumType::kAacLc:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(CameraAvStreamManagement::ImageCodecEnum val)
+{
+    using EnumType = CameraAvStreamManagement::ImageCodecEnum;
+    switch (val)
+    {
+    case EnumType::kJpeg:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(CameraAvStreamManagement::TriStateAutoEnum val)
+{
+    using EnumType = CameraAvStreamManagement::TriStateAutoEnum;
+    switch (val)
+    {
+    case EnumType::kOff:
+    case EnumType::kOn:
+    case EnumType::kAuto:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(CameraAvStreamManagement::TwoWayTalkSupportTypeEnum val)
+{
+    using EnumType = CameraAvStreamManagement::TwoWayTalkSupportTypeEnum;
+    switch (val)
+    {
+    case EnumType::kNotSupported:
+    case EnumType::kHalfDuplex:
+    case EnumType::kFullDuplex:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(CameraAvStreamManagement::VideoCodecEnum val)
+{
+    using EnumType = CameraAvStreamManagement::VideoCodecEnum;
+    switch (val)
+    {
+    case EnumType::kH264:
+    case EnumType::kHevc:
+    case EnumType::kVvc:
+    case EnumType::kAv1:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(UnitTesting::SimpleEnum val)
 {
     using EnumType = UnitTesting::SimpleEnum;

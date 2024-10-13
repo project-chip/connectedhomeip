@@ -17018,6 +17018,825 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::CameraAvStreamManagement;
+    switch (aAttributeId) {
+    case Attributes::MaxConcurrentVideoEncoders::Id: {
+        using TypeInfo = Attributes::MaxConcurrentVideoEncoders::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::MaxEncodedPixelRate::Id: {
+        using TypeInfo = Attributes::MaxEncodedPixelRate::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
+        return value;
+    }
+    case Attributes::VideoSensorParams::Id: {
+        using TypeInfo = Attributes::VideoSensorParams::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRCameraAVStreamManagementClusterVideoSensorParamsStruct * _Nonnull value;
+        value = [MTRCameraAVStreamManagementClusterVideoSensorParamsStruct new];
+        value.sensorWidth = [NSNumber numberWithUnsignedShort:cppValue.sensorWidth];
+        value.sensorHeight = [NSNumber numberWithUnsignedShort:cppValue.sensorHeight];
+        value.hdrCapable = [NSNumber numberWithBool:cppValue.HDRCapable];
+        value.maxFPS = [NSNumber numberWithUnsignedShort:cppValue.maxFPS];
+        value.maxHDRFPS = [NSNumber numberWithUnsignedShort:cppValue.maxHDRFPS];
+        return value;
+    }
+    case Attributes::NightVisionCapable::Id: {
+        using TypeInfo = Attributes::NightVisionCapable::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::MinViewport::Id: {
+        using TypeInfo = Attributes::MinViewport::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nonnull value;
+        value = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
+        value.width = [NSNumber numberWithUnsignedShort:cppValue.width];
+        value.height = [NSNumber numberWithUnsignedShort:cppValue.height];
+        return value;
+    }
+    case Attributes::RateDistortionTradeOffPoints::Id: {
+        using TypeInfo = Attributes::RateDistortionTradeOffPoints::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRCameraAVStreamManagementClusterRateDistortionTradeOffPointsStruct * newElement_0;
+                newElement_0 = [MTRCameraAVStreamManagementClusterRateDistortionTradeOffPointsStruct new];
+                newElement_0.codec = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.codec)];
+                newElement_0.resolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
+                newElement_0.resolution.width = [NSNumber numberWithUnsignedShort:entry_0.resolution.width];
+                newElement_0.resolution.height = [NSNumber numberWithUnsignedShort:entry_0.resolution.height];
+                newElement_0.minBitRate = [NSNumber numberWithUnsignedInt:entry_0.minBitRate];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::MaxPreRollBufferSize::Id: {
+        using TypeInfo = Attributes::MaxPreRollBufferSize::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
+        return value;
+    }
+    case Attributes::MicrophoneCapabilities::Id: {
+        using TypeInfo = Attributes::MicrophoneCapabilities::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRCameraAVStreamManagementClusterAudioCapabilitiesStruct * _Nonnull value;
+        value = [MTRCameraAVStreamManagementClusterAudioCapabilitiesStruct new];
+        value.maxNumberOfChannels = [NSNumber numberWithUnsignedChar:cppValue.maxNumberOfChannels];
+        { // Scope for our temporary variables
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = cppValue.supportedCodecs.begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                NSNumber * newElement_1;
+                newElement_1 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1)];
+                [array_1 addObject:newElement_1];
+            }
+            CHIP_ERROR err = iter_1.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value.supportedCodecs = array_1;
+        }
+        { // Scope for our temporary variables
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = cppValue.supportedSampleRates.begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                NSNumber * newElement_1;
+                newElement_1 = [NSNumber numberWithUnsignedInt:entry_1];
+                [array_1 addObject:newElement_1];
+            }
+            CHIP_ERROR err = iter_1.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value.supportedSampleRates = array_1;
+        }
+        { // Scope for our temporary variables
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = cppValue.supportedBitDepths.begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                NSNumber * newElement_1;
+                newElement_1 = [NSNumber numberWithUnsignedChar:entry_1];
+                [array_1 addObject:newElement_1];
+            }
+            CHIP_ERROR err = iter_1.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value.supportedBitDepths = array_1;
+        }
+        return value;
+    }
+    case Attributes::SpeakerCapabilities::Id: {
+        using TypeInfo = Attributes::SpeakerCapabilities::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRCameraAVStreamManagementClusterAudioCapabilitiesStruct * _Nonnull value;
+        value = [MTRCameraAVStreamManagementClusterAudioCapabilitiesStruct new];
+        value.maxNumberOfChannels = [NSNumber numberWithUnsignedChar:cppValue.maxNumberOfChannels];
+        { // Scope for our temporary variables
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = cppValue.supportedCodecs.begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                NSNumber * newElement_1;
+                newElement_1 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1)];
+                [array_1 addObject:newElement_1];
+            }
+            CHIP_ERROR err = iter_1.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value.supportedCodecs = array_1;
+        }
+        { // Scope for our temporary variables
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = cppValue.supportedSampleRates.begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                NSNumber * newElement_1;
+                newElement_1 = [NSNumber numberWithUnsignedInt:entry_1];
+                [array_1 addObject:newElement_1];
+            }
+            CHIP_ERROR err = iter_1.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value.supportedSampleRates = array_1;
+        }
+        { // Scope for our temporary variables
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = cppValue.supportedBitDepths.begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                NSNumber * newElement_1;
+                newElement_1 = [NSNumber numberWithUnsignedChar:entry_1];
+                [array_1 addObject:newElement_1];
+            }
+            CHIP_ERROR err = iter_1.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value.supportedBitDepths = array_1;
+        }
+        return value;
+    }
+    case Attributes::TwoWayTalkSupport::Id: {
+        using TypeInfo = Attributes::TwoWayTalkSupport::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    case Attributes::SupportedSnapshotParams::Id: {
+        using TypeInfo = Attributes::SupportedSnapshotParams::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRCameraAVStreamManagementClusterSnapshotParamsStruct * newElement_0;
+                newElement_0 = [MTRCameraAVStreamManagementClusterSnapshotParamsStruct new];
+                newElement_0.resolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
+                newElement_0.resolution.width = [NSNumber numberWithUnsignedShort:entry_0.resolution.width];
+                newElement_0.resolution.height = [NSNumber numberWithUnsignedShort:entry_0.resolution.height];
+                newElement_0.maxFrameRate = [NSNumber numberWithUnsignedShort:entry_0.maxFrameRate];
+                newElement_0.imageCodec = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.imageCodec)];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::MaxNetworkBandwidth::Id: {
+        using TypeInfo = Attributes::MaxNetworkBandwidth::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
+        return value;
+    }
+    case Attributes::CurrentFrameRate::Id: {
+        using TypeInfo = Attributes::CurrentFrameRate::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
+    case Attributes::HDRModeEnabled::Id: {
+        using TypeInfo = Attributes::HDRModeEnabled::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::CurrentVideoCodecs::Id: {
+        using TypeInfo = Attributes::CurrentVideoCodecs::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::CurrentSnapshotConfig::Id: {
+        using TypeInfo = Attributes::CurrentSnapshotConfig::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRCameraAVStreamManagementClusterSnapshotParamsStruct * _Nonnull value;
+        value = [MTRCameraAVStreamManagementClusterSnapshotParamsStruct new];
+        value.resolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
+        value.resolution.width = [NSNumber numberWithUnsignedShort:cppValue.resolution.width];
+        value.resolution.height = [NSNumber numberWithUnsignedShort:cppValue.resolution.height];
+        value.maxFrameRate = [NSNumber numberWithUnsignedShort:cppValue.maxFrameRate];
+        value.imageCodec = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.imageCodec)];
+        return value;
+    }
+    case Attributes::FabricsUsingCamera::Id: {
+        using TypeInfo = Attributes::FabricsUsingCamera::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::AllocatedVideoStreams::Id: {
+        using TypeInfo = Attributes::AllocatedVideoStreams::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRCameraAVStreamManagementClusterVideoStreamStruct * newElement_0;
+                newElement_0 = [MTRCameraAVStreamManagementClusterVideoStreamStruct new];
+                newElement_0.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.videoStreamID];
+                newElement_0.streamType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.streamType)];
+                newElement_0.videoCodec = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.videoCodec)];
+                newElement_0.minFrameRate = [NSNumber numberWithUnsignedShort:entry_0.minFrameRate];
+                newElement_0.maxFrameRate = [NSNumber numberWithUnsignedShort:entry_0.maxFrameRate];
+                newElement_0.minResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
+                newElement_0.minResolution.width = [NSNumber numberWithUnsignedShort:entry_0.minResolution.width];
+                newElement_0.minResolution.height = [NSNumber numberWithUnsignedShort:entry_0.minResolution.height];
+                newElement_0.maxResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
+                newElement_0.maxResolution.width = [NSNumber numberWithUnsignedShort:entry_0.maxResolution.width];
+                newElement_0.maxResolution.height = [NSNumber numberWithUnsignedShort:entry_0.maxResolution.height];
+                newElement_0.minBitRate = [NSNumber numberWithUnsignedInt:entry_0.minBitRate];
+                newElement_0.maxBitRate = [NSNumber numberWithUnsignedInt:entry_0.maxBitRate];
+                newElement_0.minFragmentLen = [NSNumber numberWithUnsignedShort:entry_0.minFragmentLen];
+                newElement_0.maxFragmentLen = [NSNumber numberWithUnsignedShort:entry_0.maxFragmentLen];
+                if (entry_0.watermarkEnabled.HasValue()) {
+                    newElement_0.watermarkEnabled = [NSNumber numberWithBool:entry_0.watermarkEnabled.Value()];
+                } else {
+                    newElement_0.watermarkEnabled = nil;
+                }
+                if (entry_0.OSDEnabled.HasValue()) {
+                    newElement_0.osdEnabled = [NSNumber numberWithBool:entry_0.OSDEnabled.Value()];
+                } else {
+                    newElement_0.osdEnabled = nil;
+                }
+                newElement_0.referenceCount = [NSNumber numberWithUnsignedChar:entry_0.referenceCount];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::AllocatedAudioStreams::Id: {
+        using TypeInfo = Attributes::AllocatedAudioStreams::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRCameraAVStreamManagementClusterAudioStreamStruct * newElement_0;
+                newElement_0 = [MTRCameraAVStreamManagementClusterAudioStreamStruct new];
+                newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID];
+                newElement_0.streamType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.streamType)];
+                newElement_0.audioCodec = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.audioCodec)];
+                newElement_0.channelCount = [NSNumber numberWithUnsignedChar:entry_0.channelCount];
+                newElement_0.sampleRate = [NSNumber numberWithUnsignedInt:entry_0.sampleRate];
+                newElement_0.bitRate = [NSNumber numberWithUnsignedInt:entry_0.bitRate];
+                newElement_0.bitDepth = [NSNumber numberWithUnsignedChar:entry_0.bitDepth];
+                newElement_0.referenceCount = [NSNumber numberWithUnsignedChar:entry_0.referenceCount];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::AllocatedSnapshotStreams::Id: {
+        using TypeInfo = Attributes::AllocatedSnapshotStreams::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRCameraAVStreamManagementClusterSnapshotStreamStruct * newElement_0;
+                newElement_0 = [MTRCameraAVStreamManagementClusterSnapshotStreamStruct new];
+                newElement_0.snapshotStreamID = [NSNumber numberWithUnsignedShort:entry_0.snapshotStreamID];
+                newElement_0.imageCodec = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.imageCodec)];
+                newElement_0.frameRate = [NSNumber numberWithUnsignedShort:entry_0.frameRate];
+                newElement_0.bitRate = [NSNumber numberWithUnsignedInt:entry_0.bitRate];
+                newElement_0.minResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
+                newElement_0.minResolution.width = [NSNumber numberWithUnsignedShort:entry_0.minResolution.width];
+                newElement_0.minResolution.height = [NSNumber numberWithUnsignedShort:entry_0.minResolution.height];
+                newElement_0.maxResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
+                newElement_0.maxResolution.width = [NSNumber numberWithUnsignedShort:entry_0.maxResolution.width];
+                newElement_0.maxResolution.height = [NSNumber numberWithUnsignedShort:entry_0.maxResolution.height];
+                newElement_0.quality = [NSNumber numberWithUnsignedChar:entry_0.quality];
+                newElement_0.referenceCount = [NSNumber numberWithUnsignedChar:entry_0.referenceCount];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::RankedVideoStreamPrioritiesList::Id: {
+        using TypeInfo = Attributes::RankedVideoStreamPrioritiesList::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::SoftRecordingPrivacyModeEnabled::Id: {
+        using TypeInfo = Attributes::SoftRecordingPrivacyModeEnabled::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::SoftLivestreamPrivacyModeEnabled::Id: {
+        using TypeInfo = Attributes::SoftLivestreamPrivacyModeEnabled::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::HardPrivacyModeOn::Id: {
+        using TypeInfo = Attributes::HardPrivacyModeOn::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::NightVision::Id: {
+        using TypeInfo = Attributes::NightVision::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    case Attributes::NightVisionIllum::Id: {
+        using TypeInfo = Attributes::NightVisionIllum::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    case Attributes::AWBEnabled::Id: {
+        using TypeInfo = Attributes::AWBEnabled::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::AutoShutterSpeedEnabled::Id: {
+        using TypeInfo = Attributes::AutoShutterSpeedEnabled::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::AutoISOEnabled::Id: {
+        using TypeInfo = Attributes::AutoISOEnabled::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::Viewport::Id: {
+        using TypeInfo = Attributes::Viewport::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRCameraAVStreamManagementClusterViewportStruct * _Nonnull value;
+        value = [MTRCameraAVStreamManagementClusterViewportStruct new];
+        value.x1 = [NSNumber numberWithUnsignedShort:cppValue.x1];
+        value.y1 = [NSNumber numberWithUnsignedShort:cppValue.y1];
+        value.x2 = [NSNumber numberWithUnsignedShort:cppValue.x2];
+        value.y2 = [NSNumber numberWithUnsignedShort:cppValue.y2];
+        return value;
+    }
+    case Attributes::SpeakerMuted::Id: {
+        using TypeInfo = Attributes::SpeakerMuted::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::SpeakerVolumeLevel::Id: {
+        using TypeInfo = Attributes::SpeakerVolumeLevel::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::SpeakerMaxLevel::Id: {
+        using TypeInfo = Attributes::SpeakerMaxLevel::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::SpeakerMinLevel::Id: {
+        using TypeInfo = Attributes::SpeakerMinLevel::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::MicrophoneMuted::Id: {
+        using TypeInfo = Attributes::MicrophoneMuted::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::MicrophoneVolumeLevel::Id: {
+        using TypeInfo = Attributes::MicrophoneVolumeLevel::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::MicrophoneMaxLevel::Id: {
+        using TypeInfo = Attributes::MicrophoneMaxLevel::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::MicrophoneMinLevel::Id: {
+        using TypeInfo = Attributes::MicrophoneMinLevel::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::MicrophoneAGCEnabled::Id: {
+        using TypeInfo = Attributes::MicrophoneAGCEnabled::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::ImageRotation::Id: {
+        using TypeInfo = Attributes::ImageRotation::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
+    case Attributes::ImageFlipHorizontal::Id: {
+        using TypeInfo = Attributes::ImageFlipHorizontal::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::ImageFlipVertical::Id: {
+        using TypeInfo = Attributes::ImageFlipVertical::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::LocalVideoRecordingEnabled::Id: {
+        using TypeInfo = Attributes::LocalVideoRecordingEnabled::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::LocalSnapshotRecordingEnabled::Id: {
+        using TypeInfo = Attributes::LocalSnapshotRecordingEnabled::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::StatusLightEnabled::Id: {
+        using TypeInfo = Attributes::StatusLightEnabled::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::StatusLightBrightness::Id: {
+        using TypeInfo = Attributes::StatusLightBrightness::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    case Attributes::DepthSensorStatus::Id: {
+        using TypeInfo = Attributes::DepthSensorStatus::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForWebRTCTransportProviderCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::WebRTCTransportProvider;
@@ -19302,6 +20121,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::ZoneManagement::Id: {
         return DecodeAttributeValueForZoneManagementCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::CameraAvStreamManagement::Id: {
+        return DecodeAttributeValueForCameraAVStreamManagementCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::WebRTCTransportProvider::Id: {
         return DecodeAttributeValueForWebRTCTransportProviderCluster(aPath.mAttributeId, aReader, aError);
