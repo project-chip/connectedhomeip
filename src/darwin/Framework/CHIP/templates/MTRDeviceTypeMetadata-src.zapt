@@ -21,9 +21,7 @@ struct DeviceTypeData {
 constexpr DeviceTypeData knownDeviceTypes[] = {
   {{#zcl_device_types}}
   {{#if class}}
-  {{! For now work around the "Dynamic Utility" thing on Aggregator by just
-      taking the last word. }}
-  { {{asHex code 8}}, DeviceTypeClass::{{asLastWord class}}, "{{caption}}" },
+  { {{asHex code 8}}, DeviceTypeClass::{{class}}, "{{caption}}" },
   {{/if}}
   {{/zcl_device_types}}
 };
