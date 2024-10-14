@@ -48,6 +48,7 @@ from mobly import asserts
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
 
+
 class TC_CADMIN_1_3_4(MatterBaseTest):
     async def CommissionAttempt(
             self, setupPinCode: int, thnum: int, th: str, fail: bool):
@@ -377,6 +378,7 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
