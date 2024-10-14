@@ -31,6 +31,7 @@ constexpr const char * kDefaultOutputGraphPath = "darwin-framework-tool.memgraph
 
 - (BOOL)runWithArguments:(NSArray<NSString *> * _Nullable)arguments
 {
+#if TARGET_OS_OSX
     pid_t pid = getpid();
     __auto_type * pidString = [NSString stringWithFormat:@"%d", pid];
 
@@ -59,6 +60,10 @@ constexpr const char * kDefaultOutputGraphPath = "darwin-framework-tool.memgraph
     NSLog(@"%@", output);
 
     return YES;
+#else
+    NSLog(@"Running leaks as a task is supported on this platform.");
+    return NO;
+#endif // TARGET_OS_OSX
 }
 
 @end
