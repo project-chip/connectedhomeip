@@ -472,8 +472,7 @@ void BrowseWithDelegateContext::OnBrowseRemove(const char * name, const char * t
 
 ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
                                const char * instanceNameToResolve, BrowseContext * browseCausingResolve,
-                               std::shared_ptr<uint32_t> && consumerCounterToUse) :
-    browseThatCausedResolve(browseCausingResolve)
+                               std::shared_ptr<uint32_t> && consumerCounterToUse) : browseThatCausedResolve(browseCausingResolve)
 {
     type            = ContextType::Resolve;
     context         = cbContext;
@@ -722,7 +721,7 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
         size_t len = *txtRecordIter;
         ++txtRecordIter;
         --remainingLen;
-        len = min(len, remainingLen);
+        len = std::min(len, remainingLen);
         chip::Span<const unsigned char> bytes(txtRecordIter, len);
         if (txtString.size() > 0)
         {

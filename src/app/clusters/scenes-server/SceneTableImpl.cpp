@@ -210,8 +210,8 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
 
     FabricSceneData(EndpointId endpoint = kInvalidEndpointId, FabricIndex fabric = kUndefinedFabricIndex,
                     uint16_t maxScenesPerFabric = kMaxScenesPerFabric, uint16_t maxScenesPerEndpoint = kMaxScenesPerEndpoint) :
-        endpoint_id(endpoint),
-        fabric_index(fabric), max_scenes_per_fabric(maxScenesPerFabric), max_scenes_per_endpoint(maxScenesPerEndpoint)
+        endpoint_id(endpoint), fabric_index(fabric), max_scenes_per_fabric(maxScenesPerFabric),
+        max_scenes_per_endpoint(maxScenesPerEndpoint)
     {}
 
     CHIP_ERROR UpdateKey(StorageKeyName & key) override
@@ -276,7 +276,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         ReturnErrorOnFailure(reader.EnterContainer(fabricSceneContainer));
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kSceneCount)));
         ReturnErrorOnFailure(reader.Get(scene_count));
-        scene_count = min(scene_count, static_cast<uint8_t>(max_scenes_per_fabric));
+        scene_count = std::min(scene_count, static_cast<uint8_t>(max_scenes_per_fabric));
         ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::ContextTag(TagScene::kStorageIDArray)));
         TLV::TLVType sceneMapContainer;
         ReturnErrorOnFailure(reader.EnterContainer(sceneMapContainer));
@@ -577,7 +577,7 @@ CHIP_ERROR DefaultSceneTableImpl::GetRemainingCapacity(FabricIndex fabric_index,
         remaining_capacity_fabric = static_cast<uint8_t>(mMaxScenesPerFabric - fabric.scene_count);
     }
 
-    capacity = min(remaining_capacity_fabric, remaining_capacity_global);
+    capacity = std::min(remaining_capacity_fabric, remaining_capacity_global);
 
     return CHIP_NO_ERROR;
 }
@@ -893,8 +893,8 @@ DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneE
 DefaultSceneTableImpl::SceneEntryIteratorImpl::SceneEntryIteratorImpl(DefaultSceneTableImpl & provider, FabricIndex fabricIdx,
                                                                       EndpointId endpoint, uint16_t maxScenesPerFabric,
                                                                       uint16_t maxScenesEndpoint) :
-    mProvider(provider),
-    mFabric(fabricIdx), mEndpoint(endpoint), mMaxScenesPerFabric(maxScenesPerFabric), mMaxScenesPerEndpoint(maxScenesEndpoint)
+    mProvider(provider), mFabric(fabricIdx), mEndpoint(endpoint), mMaxScenesPerFabric(maxScenesPerFabric),
+    mMaxScenesPerEndpoint(maxScenesEndpoint)
 {
     FabricSceneData fabric(mEndpoint, fabricIdx, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
     ReturnOnFailure(fabric.Load(provider.mStorage));

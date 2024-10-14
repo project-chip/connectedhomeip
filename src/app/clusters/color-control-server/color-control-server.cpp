@@ -1093,7 +1093,7 @@ void ColorControlServer::SetHSVRemainingTime(chip::EndpointId endpoint)
     {
         bool hsvTransitionStart = (hueTransitionState->stepsRemaining == hueTransitionState->stepsTotal) ||
             (saturationTransitionState->stepsRemaining == saturationTransitionState->stepsTotal);
-        SetQuietReportRemainingTime(endpoint, max(hueTransitionState->timeRemaining, saturationTransitionState->timeRemaining),
+        SetQuietReportRemainingTime(endpoint, std::max(hueTransitionState->timeRemaining, saturationTransitionState->timeRemaining),
                                     hsvTransitionStart);
     }
 }
@@ -2402,7 +2402,7 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
     colorYTransitionState->lowLimit       = MIN_CIE_XY_VALUE;
     colorYTransitionState->highLimit      = MAX_CIE_XY_VALUE;
 
-    SetQuietReportRemainingTime(endpoint, max(transitionTimeX, transitionTimeY), true /* isNewTransition */);
+    SetQuietReportRemainingTime(endpoint, std::max(transitionTimeX, transitionTimeY), true /* isNewTransition */);
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureXYEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
@@ -2507,7 +2507,7 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
     bool isXTransitionDone = computeNewColor16uValue(colorXTransitionState);
     bool isYTransitionDone = computeNewColor16uValue(colorYTransitionState);
 
-    SetQuietReportRemainingTime(endpoint, max(colorXTransitionState->timeRemaining, colorYTransitionState->timeRemaining));
+    SetQuietReportRemainingTime(endpoint, std::max(colorXTransitionState->timeRemaining, colorYTransitionState->timeRemaining));
 
     if (isXTransitionDone && isYTransitionDone)
     {

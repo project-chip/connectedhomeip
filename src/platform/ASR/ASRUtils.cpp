@@ -235,7 +235,7 @@ CHIP_ERROR ASRUtils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & netIn
     netInfo.NetworkId              = kWiFiStationNetworkId;
     netInfo.FieldPresent.NetworkId = true;
     memcpy(netInfo.WiFiSSID, stationConfig.wifi_ssid,
-           min(strlen(reinterpret_cast<char *>(stationConfig.wifi_ssid)) + 1, sizeof(netInfo.WiFiSSID)));
+           std::min(strlen(reinterpret_cast<char *>(stationConfig.wifi_ssid)) + 1, sizeof(netInfo.WiFiSSID)));
 
     // Enforce that netInfo wifiSSID is null terminated
     netInfo.WiFiSSID[kMaxWiFiSSIDLength] = '\0';
