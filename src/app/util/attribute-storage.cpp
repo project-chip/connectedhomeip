@@ -302,7 +302,7 @@ void emberAfSetupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, 
         // Note: we cannot struct assignment here, because cluster in EmberAfEndpointType is const due
         //   to the way static cluster code generation works. So we have to resort to memcpy as a workaround
         //   until the much more intrusive changes as suggested by the TODO above can be applied.
-        memcpy((void *) &endpointType.cluster[i], cluster, sizeof(EmberAfCluster));
+        const_cast<EmberAfCluster&>(endpointType.cluster[i]) = *cluster;
         // sum up the needed storage
         endpointType.endpointSize = (uint16_t) (endpointType.endpointSize + cluster->clusterSize);
     }
