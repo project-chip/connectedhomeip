@@ -65,12 +65,13 @@ from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
-from .global_attribute_ids import GlobalAttributeIds
-from .pics import read_pics_from_file
 from chip.tracing import TracingContext
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
+
+from .global_attribute_ids import GlobalAttributeIds
+from .pics import read_pics_from_file
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
