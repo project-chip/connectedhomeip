@@ -26,6 +26,8 @@ namespace app {
 namespace Clusters {
 namespace CommissionerControl {
 
+inline constexpr EndpointId kAggregatorEndpointId = 1;
+
 class CommissionerControlDelegate : public Delegate
 {
 public:

@@ -33,7 +33,7 @@
 #       --string-arg th_server_app_path:${ALL_CLUSTERS_APP} dut_fsa_stdin_pipe:dut-fsa-stdin
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
@@ -45,11 +45,11 @@ import tempfile
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.apps import AppServerSubprocess
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-from TC_MCORE_FS_1_1 import AppServer
 
-_DEVICE_TYPE_AGGREGGATOR = 0x000E
+_DEVICE_TYPE_AGGREGATOR = 0x000E
 
 
 class TC_ECOINFO_2_2(MatterBaseTest):
@@ -94,13 +94,15 @@ class TC_ECOINFO_2_2(MatterBaseTest):
         self.th_server_passcode = 20202021
 
         # Start the server app.
-        self.th_server = AppServer(
+        self.th_server = AppServerSubprocess(
             th_server_app,
             storage_dir=self.storage.name,
             port=self.th_server_port,
             discriminator=self.th_server_discriminator,
             passcode=self.th_server_passcode)
-        self.th_server.start()
+        self.th_server.start(
+            expected_output="Server initialization complete",
+            timeout=30)
 
     def steps_TC_ECOINFO_2_2(self) -> list[TestStep]:
         return [
@@ -147,7 +149,7 @@ class TC_ECOINFO_2_2(MatterBaseTest):
             device_type_list_read = await dev_ctrl.ReadAttribute(dut_node_id, [(endpoint, Clusters.Descriptor.Attributes.DeviceTypeList)])
             device_type_list = device_type_list_read[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
             for device_type in device_type_list:
-                if device_type.deviceType == _DEVICE_TYPE_AGGREGGATOR:
+                if device_type.deviceType == _DEVICE_TYPE_AGGREGATOR:
                     list_of_aggregator_endpoints.append(endpoint)
 
         asserts.assert_greater_equal(len(list_of_aggregator_endpoints), 1, "Did not find any Aggregator device types")

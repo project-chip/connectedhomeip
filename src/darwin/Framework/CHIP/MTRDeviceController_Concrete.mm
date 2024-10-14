@@ -418,6 +418,7 @@ using namespace chip::Tracing::DarwinFramework;
         return;
     }
     [self finalShutdown];
+    [super shutdown];
 }
 
 - (void)finalShutdown
@@ -1586,14 +1587,14 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return CHIP_NO_ERROR;
 }
 
-- (void)invalidateCASESessionForNode:(chip::NodeId)nodeID;
+- (void)invalidateCASESessionForNode:(NSNumber *)nodeID;
 {
     auto block = ^{
         auto sessionMgr = self->_cppCommissioner->SessionMgr();
         VerifyOrDie(sessionMgr != nullptr);
 
         sessionMgr->MarkSessionsAsDefunct(
-            self->_cppCommissioner->GetPeerScopedId(nodeID), chip::MakeOptional(chip::Transport::SecureSession::Type::kCASE));
+            self->_cppCommissioner->GetPeerScopedId(nodeID.unsignedLongLongValue), chip::MakeOptional(chip::Transport::SecureSession::Type::kCASE));
     };
 
     [self syncRunOnWorkQueue:block error:nil];
@@ -1678,15 +1679,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
     return nil;
 }
-
-#ifdef DEBUG
-+ (void)forceLocalhostAdvertisingOnly
-{
-    auto interfaceIndex = chip::Inet::InterfaceId::PlatformType(kDNSServiceInterfaceIndexLocalOnly);
-    auto interfaceId = chip::Inet::InterfaceId(interfaceIndex);
-    chip::app::DnssdServer::Instance().SetInterfaceId(interfaceId);
-}
-#endif // DEBUG
 
 @end
 

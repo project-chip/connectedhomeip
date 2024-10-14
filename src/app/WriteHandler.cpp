@@ -24,6 +24,7 @@
 #include <app/MessageDef/StatusIB.h>
 #include <app/StatusResponse.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
@@ -32,6 +33,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
+#include <lib/support/logging/TextOnlyLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -41,8 +43,7 @@ namespace chip {
 namespace app {
 
 using namespace Protocols::InteractionModel;
-using Status                         = Protocols::InteractionModel::Status;
-constexpr uint8_t kListAttributeType = 0x48;
+using Status = Protocols::InteractionModel::Status;
 
 CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDelegate * apWriteHandlerDelegate)
 {
@@ -77,6 +78,30 @@ void WriteHandler::Close()
     mDataModelProvider = nullptr;
 #endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     MoveToState(State::Uninitialized);
+}
+
+std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePath & path)
+{
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    VerifyOrReturnValue(mDataModelProvider != nullptr, std::nullopt,
+                        ChipLogError(DataManagement, "Null data model while checking attribute properties."));
+
+    auto info = mDataModelProvider->GetAttributeInfo(path);
+    if (!info.has_value())
+    {
+        return std::nullopt;
+    }
+
+    return info->flags.Has(DataModel::AttributeQualityFlags::kListAttribute);
+#else
+    constexpr uint8_t kListAttributeType = 0x48;
+    const auto attributeMetadata         = GetAttributeMetadata(path);
+    if (attributeMetadata == nullptr)
+    {
+        return std::nullopt;
+    }
+    return (attributeMetadata->attributeType == kListAttributeType);
+#endif
 }
 
 Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
@@ -317,10 +342,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
 
-        const auto attributeMetadata = GetAttributeMetadata(dataAttributePath);
-        bool currentAttributeIsList  = (attributeMetadata != nullptr && attributeMetadata->attributeType == kListAttributeType);
-
-        if (!dataAttributePath.IsListOperation() && currentAttributeIsList)
+        if (!dataAttributePath.IsListOperation() && IsListAttributePath(dataAttributePath).value_or(false))
         {
             dataAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
         }
@@ -446,7 +468,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             mProcessingAttributePath, mStateFlags.Has(StateBits::kProcessingAttributeIsList), dataAttributePath);
         bool shouldReportListWriteBegin = false; // This will be set below.
 
-        const EmberAfAttributeMetadata * attributeMetadata = nullptr;
+        std::optional<bool> isListAttribute = std::nullopt;
 
         while (iterator->Next(mapping))
         {
@@ -460,11 +482,11 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             // Try to get the metadata from for the attribute from one of the expanded endpoints (it doesn't really matter which
             // endpoint we pick, as long as it's valid) and update the path info according to it and recheck if we need to report
             // list write begin.
-            if (attributeMetadata == nullptr)
+            if (!isListAttribute.has_value())
             {
-                attributeMetadata = GetAttributeMetadata(dataAttributePath);
-                bool currentAttributeIsList =
-                    (attributeMetadata != nullptr && attributeMetadata->attributeType == kListAttributeType);
+                isListAttribute             = IsListAttributePath(dataAttributePath);
+                bool currentAttributeIsList = isListAttribute.value_or(false);
+
                 if (!dataAttributePath.IsListOperation() && currentAttributeIsList)
                 {
                     dataAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
