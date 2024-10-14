@@ -18,6 +18,8 @@
 
 #include "PWMDevice.h"
 
+#include <algorithm>
+
 #include "AppConfig.h"
 
 #include <lib/support/CodeUtils.h>
