@@ -264,10 +264,12 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             filter=discriminator,
         )
 
+        get_dynamic_endpoint_retries = 60
         th_fsa_bridge_endpoints_new = set(th_fsa_bridge_endpoints)
         # Try to get the dynamic endpoint number for the TH_SERVER_NO_UID on the TH_FSA_BRIDGE.
-        while th_fsa_bridge_endpoints_new == th_fsa_bridge_endpoints:
+        while th_fsa_bridge_endpoints_new == th_fsa_bridge_endpoints and get_dynamic_endpoint_retries > 0:
             await asyncio.sleep(0.5)
+            get_dynamic_endpoint_retries -= 1
             # Get the list of endpoints on the TH_FSA_BRIDGE.
             th_fsa_bridge_endpoints_new.update(await self.read_single_attribute_check_success(
                 cluster=Clusters.Descriptor,
