@@ -243,7 +243,7 @@ CHIP_ERROR ASRUtils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & netIn
     if (includeCredentials)
     {
         static_assert(sizeof(netInfo.WiFiKey) < 255, "Our min might not fit in netInfo.WiFiKeyLen");
-        netInfo.WiFiKeyLen = static_cast<uint8_t>(min(strlen((char *) stationConfig.wifi_key), sizeof(netInfo.WiFiKey)));
+        netInfo.WiFiKeyLen = static_cast<uint8_t>(std::min(strlen((char *) stationConfig.wifi_key), sizeof(netInfo.WiFiKey)));
         memcpy(netInfo.WiFiKey, stationConfig.wifi_key, netInfo.WiFiKeyLen);
     }
 
