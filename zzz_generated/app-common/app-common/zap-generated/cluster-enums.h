@@ -5528,6 +5528,88 @@ enum class Feature : uint32_t
 };
 } // namespace ZoneManagement
 
+namespace CameraAvStreamManagement {
+
+// Enum for AudioCodecEnum
+enum class AudioCodecEnum : uint8_t
+{
+    kOpus  = 0x00,
+    kAacLc = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for ImageCodecEnum
+enum class ImageCodecEnum : uint8_t
+{
+    kJpeg = 0x00,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 1,
+};
+
+using StreamTypeEnum = Clusters::detail::StreamTypeEnum;
+
+// Enum for TriStateAutoEnum
+enum class TriStateAutoEnum : uint8_t
+{
+    kOff  = 0x00,
+    kOn   = 0x01,
+    kAuto = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for TwoWayTalkSupportTypeEnum
+enum class TwoWayTalkSupportTypeEnum : uint8_t
+{
+    kNotSupported = 0x00,
+    kHalfDuplex   = 0x01,
+    kFullDuplex   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for VideoCodecEnum
+enum class VideoCodecEnum : uint8_t
+{
+    kH264 = 0x00,
+    kHevc = 0x01,
+    kVvc  = 0x02,
+    kAv1  = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kPrivacy         = 0x1,
+    kAudio           = 0x2,
+    kSpeaker         = 0x4,
+    kImageControl    = 0x8,
+    kVideo           = 0x10,
+    kSnapshot        = 0x20,
+    kWatermark       = 0x40,
+    kOnScreenDisplay = 0x80,
+    kLocalStorage    = 0x100,
+};
+} // namespace CameraAvStreamManagement
+
 namespace WebRTCTransportProvider {
 
 using StreamTypeEnum = Clusters::detail::StreamTypeEnum;
