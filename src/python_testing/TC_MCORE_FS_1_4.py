@@ -23,13 +23,21 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: examples/fabric-admin/scripts/fabric-sync-app.py
-# test-runner-run/run1/app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
-# test-runner-run/run1/factoryreset: true
-# test-runner-run/run1/script-args: --PICS src/app/tests/suites/certification/ci-pics-values --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_fsa_app_path:examples/fabric-admin/scripts/fabric-sync-app.py th_fsa_admin_path:${FABRIC_ADMIN_APP} th_fsa_bridge_path:${FABRIC_BRIDGE_APP} th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID} dut_fsa_stdin_pipe:dut-fsa-stdin --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-# test-runner-run/run1/script-start-delay: 5
-# test-runner-run/run1/quiet: true
+# test-runner-runs:
+#   run1:
+#     app: examples/fabric-admin/scripts/fabric-sync-app.py
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-ready-pattern: "Successfully opened pairing window on the device"
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234 --passcode 20202021
+#       --string-arg th_fsa_app_path:examples/fabric-admin/scripts/fabric-sync-app.py th_fsa_admin_path:${FABRIC_ADMIN_APP} th_fsa_bridge_path:${FABRIC_BRIDGE_APP} th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID} dut_fsa_stdin_pipe:dut-fsa-stdin
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -41,10 +49,10 @@ import tempfile
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
+from chip.testing.apps import AppServerSubprocess
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from chip.testing.tasks import Subprocess
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
-from TC_MCORE_FS_1_1 import AppServer
 
 
 class FabricSyncApp(Subprocess):
@@ -86,9 +94,7 @@ class FabricSyncApp(Subprocess):
         super().start(expected_output="Successfully opened pairing window on the device")
 
     def commission_on_network(self, node_id: int, setup_pin_code: int, filter_type=None, filter=None):
-        self.send(
-            f"pairing onnetwork {node_id} {setup_pin_code}",
-            expected_output=f"Commissioning complete for node ID {node_id:#018x}: success")
+        self.send(f"pairing onnetwork {node_id} {setup_pin_code}")
 
 
 class TC_MCORE_FS_1_4(MatterBaseTest):
@@ -152,9 +158,11 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             vendor_id=0xFFF1)
         self.th_fsa_controller.start()
 
-        # Get the named pipe path for the DUT_FSA app input from the user params.
-        dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe", None)
-        if dut_fsa_stdin_pipe is not None:
+        if self.is_pics_sdk_ci_only:
+            # Get the named pipe path for the DUT_FSA app input from the user params.
+            dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
+            if not dut_fsa_stdin_pipe:
+                asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
             self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
 
         self.th_server_port = 5544
@@ -162,13 +170,15 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         self.th_server_passcode = 20202022
 
         # Start the TH_SERVER_NO_UID app.
-        self.th_server = AppServer(
+        self.th_server = AppServerSubprocess(
             th_server_app,
             storage_dir=self.storage.name,
             port=self.th_server_port,
             discriminator=self.th_server_discriminator,
             passcode=self.th_server_passcode)
-        self.th_server.start()
+        self.th_server.start(
+            expected_output="Server initialization complete",
+            timeout=30)
 
     def teardown_class(self):
         if self.th_fsa_controller is not None:
@@ -195,7 +205,6 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_4(self):
-        self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
 
         # Commissioning - done
         self.step(0)
@@ -255,16 +264,19 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             filter=discriminator,
         )
 
-        # Wait some time, so the dynamic endpoint will appear on the TH_FSA_BRIDGE.
-        await asyncio.sleep(5)
-
-        # Get the list of endpoints on the TH_FSA_BRIDGE after adding the TH_SERVER_NO_UID.
-        th_fsa_bridge_endpoints_new = set(await self.read_single_attribute_check_success(
-            cluster=Clusters.Descriptor,
-            attribute=Clusters.Descriptor.Attributes.PartsList,
-            node_id=th_fsa_bridge_th_node_id,
-            endpoint=0,
-        ))
+        get_dynamic_endpoint_retries = 60
+        th_fsa_bridge_endpoints_new = set(th_fsa_bridge_endpoints)
+        # Try to get the dynamic endpoint number for the TH_SERVER_NO_UID on the TH_FSA_BRIDGE.
+        while th_fsa_bridge_endpoints_new == th_fsa_bridge_endpoints and get_dynamic_endpoint_retries > 0:
+            await asyncio.sleep(0.5)
+            get_dynamic_endpoint_retries -= 1
+            # Get the list of endpoints on the TH_FSA_BRIDGE.
+            th_fsa_bridge_endpoints_new.update(await self.read_single_attribute_check_success(
+                cluster=Clusters.Descriptor,
+                attribute=Clusters.Descriptor.Attributes.PartsList,
+                node_id=th_fsa_bridge_th_node_id,
+                endpoint=0,
+            ))
 
         # Get the endpoint number for just added TH_SERVER_NO_UID.
         logging.info("Endpoints on TH_FSA_BRIDGE: old=%s, new=%s", th_fsa_bridge_endpoints, th_fsa_bridge_endpoints_new)
@@ -298,7 +310,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         self.step(4)
 
         # Commissioning TH_FSA_BRIDGE to DUT_FSA fabric.
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input(
                 f"Commission TH_FSA's aggregator on DUT using manufacturer specified mechanism.\n"
                 f"Use the following parameters:\n"
@@ -326,7 +338,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         ))
 
         # Synchronize TH_SERVER_NO_UID from TH_FSA to DUT_FSA fabric.
-        if not self.is_ci:
+        if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input(
                 f"Synchronize endpoint from TH_FSA's aggregator to DUT using manufacturer specified mechanism.\n"
                 f"Use the following parameters:\n"

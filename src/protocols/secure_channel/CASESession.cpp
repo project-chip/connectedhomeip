@@ -872,7 +872,12 @@ CHIP_ERROR CASESession::SendSigma1()
         mState = State::kSentSigma1;
     }
 
-    ChipLogProgress(SecureChannel, "Sent Sigma1 msg to " ChipLogFormatScopedNodeId, ChipLogValueScopedNodeId(GetPeer()));
+#if CHIP_PROGRESS_LOGGING
+    const auto localMRPConfig = mLocalMRPConfig.Value();
+#endif // CHIP_PROGRESS_LOGGING
+    ChipLogProgress(SecureChannel, "Sent Sigma1 msg to " ChipLogFormatScopedNodeId " [II:%" PRIu32 "ms AI:%" PRIu32 "ms AT:%ums]",
+                    ChipLogValueScopedNodeId(GetPeer()), localMRPConfig.mIdleRetransTimeout.count(),
+                    localMRPConfig.mActiveRetransTimeout.count(), localMRPConfig.mActiveThresholdTime.count());
 
     mDelegate->OnSessionEstablishmentStarted();
 

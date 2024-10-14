@@ -220,8 +220,9 @@ std::optional<unsigned> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<
                 emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
             if (err == CHIP_NO_ERROR)
             {
-                ChipLogProgress(NotSpecified, "Added device with nodeId=0x" ChipLogFormatX64 " to dynamic endpoint %d (index=%d)",
-                                ChipLogValueX64(dev->GetNodeId()), mCurrentEndpointId, index);
+                ChipLogProgress(NotSpecified, "Added device with Id=[%d:0x" ChipLogFormatX64 "] to dynamic endpoint %d (index=%d)",
+                                dev->GetScopedNodeId().GetFabricIndex(), ChipLogValueX64(dev->GetScopedNodeId().GetNodeId()),
+                                mCurrentEndpointId, index);
                 mDevices[index] = std::move(dev);
                 return index;
             }
@@ -314,11 +315,11 @@ BridgedDevice * BridgedDeviceManager::GetDeviceByUniqueId(const std::string & id
     return nullptr;
 }
 
-BridgedDevice * BridgedDeviceManager::GetDeviceByNodeId(chip::NodeId nodeId) const
+BridgedDevice * BridgedDeviceManager::GetDeviceByScopedNodeId(chip::ScopedNodeId scopedNodeId) const
 {
     for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
-        if (mDevices[index] && mDevices[index]->GetNodeId() == nodeId)
+        if (mDevices[index] && mDevices[index]->GetScopedNodeId() == scopedNodeId)
         {
             return mDevices[index].get();
         }
@@ -326,17 +327,17 @@ BridgedDevice * BridgedDeviceManager::GetDeviceByNodeId(chip::NodeId nodeId) con
     return nullptr;
 }
 
-std::optional<unsigned> BridgedDeviceManager::RemoveDeviceByNodeId(chip::NodeId nodeId)
+std::optional<unsigned> BridgedDeviceManager::RemoveDeviceByScopedNodeId(chip::ScopedNodeId scopedNodeId)
 {
     for (unsigned index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
-        if (mDevices[index] && mDevices[index]->GetNodeId() == nodeId)
+        if (mDevices[index] && mDevices[index]->GetScopedNodeId() == scopedNodeId)
         {
             DeviceLayer::StackLock lock;
             EndpointId ep   = emberAfClearDynamicEndpoint(index);
             mDevices[index] = nullptr;
-            ChipLogProgress(NotSpecified, "Removed device with NodeId=0x" ChipLogFormatX64 " from dynamic endpoint %d (index=%d)",
-                            ChipLogValueX64(nodeId), ep, index);
+            ChipLogProgress(NotSpecified, "Removed device with Id=[%d:0x" ChipLogFormatX64 "] from dynamic endpoint %d (index=%d)",
+                            scopedNodeId.GetFabricIndex(), ChipLogValueX64(scopedNodeId.GetNodeId()), ep, index);
             return index;
         }
     }

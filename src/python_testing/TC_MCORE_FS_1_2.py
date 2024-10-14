@@ -15,10 +15,29 @@
 #    limitations under the License.
 #
 
-# TODO: add to CI. See https://github.com/project-chip/connectedhomeip/issues/34676
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: examples/fabric-admin/scripts/fabric-sync-app.py
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-ready-pattern: "Successfully opened pairing window on the device"
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP} dut_fsa_stdin_pipe:dut-fsa-stdin
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
 
+import asyncio
 import hashlib
 import logging
 import os
@@ -31,10 +50,10 @@ from dataclasses import dataclass
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
+from chip.testing.apps import AppServerSubprocess
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from ecdsa.curves import NIST256p
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
-from TC_MCORE_FS_1_1 import AppServer
 from TC_SC_3_6 import AttributeChangeAccumulator
 
 # Length of `w0s` and `w1s` elements
@@ -78,21 +97,31 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
         logging.info("Temporary storage directory: %s", self.storage.name)
 
+        if self.is_pics_sdk_ci_only:
+            # Get the named pipe path for the DUT_FSA app input from the user params.
+            dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
+            if not dut_fsa_stdin_pipe:
+                asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
+            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
+
         self.th_server_port = th_server_port
+        # These are default testing values.
         self.th_server_setup_params = _SetupParameters(
             setup_qr_code="MT:-24J0AFN00KA0648G00",
             manual_code=34970112332,
             discriminator=3840,
             passcode=20202021)
 
-        # Start the TH_SERVER_NO_UID app.
-        self.th_server = AppServer(
+        # Start the TH_SERVER app.
+        self.th_server = AppServerSubprocess(
             th_server_app,
             storage_dir=self.storage.name,
             port=self.th_server_port,
             discriminator=self.th_server_setup_params.discriminator,
             passcode=self.th_server_setup_params.passcode)
-        self.th_server.start()
+        self.th_server.start(
+            expected_output="Server initialization complete",
+            timeout=30)
 
     def teardown_class(self):
         if self._partslist_subscription is not None:
@@ -110,7 +139,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
             f"- discriminator: {setup_params.discriminator}\n"
             f"- setupPinCode: {setup_params.passcode}\n"
             f"- setupQRCode: {setup_params.setup_qr_code}\n"
-            f"- setupManualcode: {setup_params.manual_code}\n"
+            f"- setupManualCode: {setup_params.manual_code}\n"
             f"If using FabricSync Admin test app, you may type:\n"
             f">>> pairing onnetwork 111 {setup_params.passcode}")
 
@@ -132,7 +161,6 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_2(self):
-        self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
 
         min_report_interval_sec = self.user_params.get("min_report_interval_sec", 0)
         max_report_interval_sec = self.user_params.get("max_report_interval_sec", 30)
@@ -160,7 +188,14 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         asserts.assert_true(type_matches(step_1_dut_parts_list, list), "PartsList is expected to be a list")
 
         self.step(2)
-        self._ask_for_vendor_commissioning_ux_operation(self.th_server_setup_params)
+        if not self.is_pics_sdk_ci_only:
+            self._ask_for_vendor_commissioning_ux_operation(self.th_server_setup_params)
+        else:
+            self.dut_fsa_stdin.write(
+                f"pairing onnetwork 2 {self.th_server_setup_params.passcode}\n")
+            self.dut_fsa_stdin.flush()
+            # Wait for the commissioning to complete.
+            await asyncio.sleep(5)
 
         self.step(3)
         report_waiting_timeout_delay_sec = 30

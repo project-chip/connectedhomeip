@@ -19,12 +19,20 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import os
@@ -32,8 +40,10 @@ import random
 import re
 
 import chip.clusters as Clusters
-from basic_composition_support import BasicCompositionTests
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing.basic_composition import BasicCompositionTests
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, hex_from_bytes,
+                                         type_matches)
 from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.exceptions import InvalidSignature
@@ -41,7 +51,6 @@ from cryptography.hazmat._oid import ExtensionOID
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec, utils
 from ecdsa.curves import curve_by_name
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, hex_from_bytes, type_matches
 from mobly import asserts
 from pyasn1.codec.der.decoder import decode as der_decoder
 from pyasn1.error import PyAsn1Error
@@ -175,7 +184,6 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
 
     @async_test_body
     async def test_TC_DA_1_2(self):
-        is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         cd_cert_dir = self.user_params.get("cd_cert_dir", 'credentials/development/cd-certs')
         post_cert_test = self.user_params.get("post_cert_test", False)
 
@@ -311,7 +319,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(format_version, 1, "Format version is incorrect")
         self.step("6.2")
         asserts.assert_equal(vendor_id, basic_info_vendor_id, "Vendor ID is incorrect")
-        if not is_ci:
+        if not self.is_pics_sdk_ci_only:
             asserts.assert_in(vendor_id, range(1, 0xfff0), "Vendor ID is out of range")
         self.step("6.3")
         asserts.assert_true(basic_info_product_id in product_id_array, "Product ID not found in CD product array")
@@ -328,7 +336,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
         self.step("6.9")
         if post_cert_test:
             asserts.assert_equal(certification_type, 2, "Certification declaration is not marked as production.")
-        elif is_ci:
+        elif self.is_pics_sdk_ci_only:
             asserts.assert_in(certification_type, [0, 1, 2], "Certification type is out of range")
         else:
             asserts.assert_in(certification_type, [1, 2], "Certification type is out of range")

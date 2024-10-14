@@ -30,6 +30,11 @@ public:
     };
 
     /**
+     * @return The current AirQuality value.
+     */
+    AirQuality::AirQualityEnum GetAirQuality();
+
+    /**
      * @brief Get an Air Quality Manager object - this class acts as a singleton device manager for the air quality device
      * @param[in] aEndpointId    Endpoint that the air quality is on
      * @return mInstance    The AirQualitySensorManager instance, note this this could be nullptr if InitInstance has not been

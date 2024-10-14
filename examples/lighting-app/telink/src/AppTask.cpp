@@ -252,7 +252,11 @@ void AppTask::PowerOnFactoryResetTimerEvent(struct k_timer * timer)
 
 void AppTask::LinkLeds(LedManager & ledManager)
 {
-#if (!CONFIG_PWM)
-    ledManager.linkLed(LedManager::EAppLed_App0, 0);
-#endif // !CONFIG_PWM
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+    ledManager.linkLed(LedManager::EAppLed_Status, 0);
+#endif
+
+#if !CONFIG_PWM
+    ledManager.linkLed(LedManager::EAppLed_App0, 1);
+#endif /* !CONFIG_PWM */
 }

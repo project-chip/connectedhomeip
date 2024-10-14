@@ -89,6 +89,7 @@ class BouffalolabBuilder(GnBuilder):
                  enable_heap_monitoring: bool = False,
                  use_matter_openthread: bool = False,
                  enable_easyflash: bool = False,
+                 enable_littlefs: bool = False
                  ):
 
         if 'BL602' == module_type:
@@ -162,7 +163,16 @@ class BouffalolabBuilder(GnBuilder):
         self.argsOpt.append(f'chip_mdns="{chip_mdns}"')
         self.argsOpt.append(f'chip_inet_config_enable_ipv4={str(enable_ethernet or enable_wifi).lower()}')
 
-        self.argsOpt.append(f'bouffalo_sdk_component_easyflash_enabled=true')
+        if enable_easyflash and enable_littlefs:
+            raise Exception("Only one of easyflash and littlefs can be enabled.")
+
+        if not enable_easyflash and not enable_littlefs:
+            logging.fatal('*' * 80)
+            logging.fatal('littlefs is added to support for flash storage access.')
+            logging.fatal('Please consider and select one of easyflash and littlefs to use.')
+            logging.fatal('*' * 80)
+            raise Exception("None of easyflash and littlefs select to build.")
+        self.argsOpt.append(f'bouffalo_sdk_component_easyflash_enabled={"false" if enable_littlefs else "true"}')
 
         if enable_thread:
             self.argsOpt.append('chip_system_config_use_open_thread_inet_endpoints=true')

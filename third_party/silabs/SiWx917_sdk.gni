@@ -773,8 +773,12 @@ template("siwx917_sdk") {
     public_deps = [
       "${segger_rtt_root}:segger_rtt",
       "${segger_rtt_root}:segger_rtt_printf",
-      "${segger_rtt_root}:segger_rtt_syscalls",
     ]
+
+    if (!sl_uart_log_output) {
+      public_deps += [ "${segger_rtt_root}:segger_rtt_syscalls" ]
+    }
+
     if (chip_crypto == "platform") {
       if (sl_si91x_crypto_flavor == "tinycrypt") {
         public_deps += [ ":siwx917_tinycrypt" ]

@@ -63,12 +63,29 @@ private:
 
         /// Checks if the given command id exists in the given list
         bool Exists(const CommandId * list, CommandId toCheck);
+
+        void Reset() { mCurrentList = mCurrentHint = nullptr; }
     };
 
 public:
-    /// Generic model implementations
-    CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
+    /// clears out internal caching. Especially useful in unit tests,
+    /// where path caching does not really apply (the same path may result in different outcomes)
+    void Reset()
+    {
+        mAcceptedCommandsIterator.Reset();
+        mGeneratedCommandsIterator.Reset();
+        mPreviouslyFoundCluster = std::nullopt;
+    }
 
+    /// Generic model implementations
+    CHIP_ERROR Shutdown() override
+    {
+        Reset();
+        return CHIP_NO_ERROR;
+    }
+
+    bool EventPathIncludesAccessibleConcretePath(const EventPathParams & path,
+                                                 const Access::SubjectDescriptor & descriptor) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -79,6 +96,11 @@ public:
     /// attribute tree iteration
     EndpointId FirstEndpoint() override;
     EndpointId NextEndpoint(EndpointId before) override;
+    bool EndpointExists(EndpointId endpoint) override;
+
+    std::optional<DataModel::DeviceTypeEntry> FirstDeviceType(EndpointId endpoint) override;
+    std::optional<DataModel::DeviceTypeEntry> NextDeviceType(EndpointId endpoint,
+                                                             const DataModel::DeviceTypeEntry & previous) override;
 
     DataModel::ClusterEntry FirstCluster(EndpointId endpoint) override;
     DataModel::ClusterEntry NextCluster(const ConcreteClusterPath & before) override;
@@ -98,9 +120,10 @@ public:
 private:
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
-    uint16_t mEndpointIterationHint  = 0;
-    unsigned mClusterIterationHint   = 0;
-    unsigned mAttributeIterationHint = 0;
+    uint16_t mEndpointIterationHint   = 0;
+    unsigned mClusterIterationHint    = 0;
+    unsigned mAttributeIterationHint  = 0;
+    unsigned mDeviceTypeIterationHint = 0;
     EmberCommandListIterator mAcceptedCommandsIterator;
     EmberCommandListIterator mGeneratedCommandsIterator;
 

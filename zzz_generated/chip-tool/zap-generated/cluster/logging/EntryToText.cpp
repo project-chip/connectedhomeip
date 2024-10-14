@@ -259,6 +259,16 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ContentControl";
     case chip::app::Clusters::ContentAppObserver::Id:
         return "ContentAppObserver";
+    case chip::app::Clusters::ZoneManagement::Id:
+        return "ZoneManagement";
+    case chip::app::Clusters::CameraAvStreamManagement::Id:
+        return "CameraAvStreamManagement";
+    case chip::app::Clusters::WebRTCTransportProvider::Id:
+        return "WebRTCTransportProvider";
+    case chip::app::Clusters::WebRTCTransportRequestor::Id:
+        return "WebRTCTransportRequestor";
+    case chip::app::Clusters::Chime::Id:
+        return "Chime";
     case chip::app::Clusters::EcosystemInformation::Id:
         return "EcosystemInformation";
     case chip::app::Clusters::CommissionerControl::Id:
@@ -830,6 +840,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "TCAcknowledgements";
         case chip::app::Clusters::GeneralCommissioning::Attributes::TCAcknowledgementsRequired::Id:
             return "TCAcknowledgementsRequired";
+        case chip::app::Clusters::GeneralCommissioning::Attributes::TCUpdateDeadline::Id:
+            return "TCUpdateDeadline";
         case chip::app::Clusters::GeneralCommissioning::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::GeneralCommissioning::Attributes::AcceptedCommandList::Id:
@@ -4375,6 +4387,213 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ZoneManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ZoneManagement::Attributes::SupportedZoneSources::Id:
+            return "SupportedZoneSources";
+        case chip::app::Clusters::ZoneManagement::Attributes::Zones::Id:
+            return "Zones";
+        case chip::app::Clusters::ZoneManagement::Attributes::TimeControl::Id:
+            return "TimeControl";
+        case chip::app::Clusters::ZoneManagement::Attributes::Sensitivity::Id:
+            return "Sensitivity";
+        case chip::app::Clusters::ZoneManagement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ZoneManagement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ZoneManagement::Attributes::EventList::Id:
+            return "EventList";
+        case chip::app::Clusters::ZoneManagement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ZoneManagement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ZoneManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CameraAvStreamManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxConcurrentVideoEncoders::Id:
+            return "MaxConcurrentVideoEncoders";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxEncodedPixelRate::Id:
+            return "MaxEncodedPixelRate";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::VideoSensorParams::Id:
+            return "VideoSensorParams";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::NightVisionCapable::Id:
+            return "NightVisionCapable";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MinViewport::Id:
+            return "MinViewport";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::RateDistortionTradeOffPoints::Id:
+            return "RateDistortionTradeOffPoints";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxPreRollBufferSize::Id:
+            return "MaxPreRollBufferSize";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MicrophoneCapabilities::Id:
+            return "MicrophoneCapabilities";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SpeakerCapabilities::Id:
+            return "SpeakerCapabilities";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::TwoWayTalkSupport::Id:
+            return "TwoWayTalkSupport";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SupportedSnapshotParams::Id:
+            return "SupportedSnapshotParams";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxNetworkBandwidth::Id:
+            return "MaxNetworkBandwidth";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::CurrentFrameRate::Id:
+            return "CurrentFrameRate";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::HDRModeEnabled::Id:
+            return "HDRModeEnabled";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::CurrentVideoCodecs::Id:
+            return "CurrentVideoCodecs";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::CurrentSnapshotConfig::Id:
+            return "CurrentSnapshotConfig";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::FabricsUsingCamera::Id:
+            return "FabricsUsingCamera";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedVideoStreams::Id:
+            return "AllocatedVideoStreams";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedAudioStreams::Id:
+            return "AllocatedAudioStreams";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedSnapshotStreams::Id:
+            return "AllocatedSnapshotStreams";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::RankedVideoStreamPrioritiesList::Id:
+            return "RankedVideoStreamPrioritiesList";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SoftRecordingPrivacyModeEnabled::Id:
+            return "SoftRecordingPrivacyModeEnabled";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SoftLivestreamPrivacyModeEnabled::Id:
+            return "SoftLivestreamPrivacyModeEnabled";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::HardPrivacyModeOn::Id:
+            return "HardPrivacyModeOn";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::NightVision::Id:
+            return "NightVision";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::NightVisionIllum::Id:
+            return "NightVisionIllum";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::AWBEnabled::Id:
+            return "AWBEnabled";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::AutoShutterSpeedEnabled::Id:
+            return "AutoShutterSpeedEnabled";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::AutoISOEnabled::Id:
+            return "AutoISOEnabled";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::Viewport::Id:
+            return "Viewport";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SpeakerMuted::Id:
+            return "SpeakerMuted";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SpeakerVolumeLevel::Id:
+            return "SpeakerVolumeLevel";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SpeakerMaxLevel::Id:
+            return "SpeakerMaxLevel";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SpeakerMinLevel::Id:
+            return "SpeakerMinLevel";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MicrophoneMuted::Id:
+            return "MicrophoneMuted";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MicrophoneVolumeLevel::Id:
+            return "MicrophoneVolumeLevel";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MicrophoneMaxLevel::Id:
+            return "MicrophoneMaxLevel";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MicrophoneMinLevel::Id:
+            return "MicrophoneMinLevel";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MicrophoneAGCEnabled::Id:
+            return "MicrophoneAGCEnabled";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::ImageRotation::Id:
+            return "ImageRotation";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::ImageFlipHorizontal::Id:
+            return "ImageFlipHorizontal";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::ImageFlipVertical::Id:
+            return "ImageFlipVertical";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::LocalVideoRecordingEnabled::Id:
+            return "LocalVideoRecordingEnabled";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::LocalSnapshotRecordingEnabled::Id:
+            return "LocalSnapshotRecordingEnabled";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::StatusLightEnabled::Id:
+            return "StatusLightEnabled";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::StatusLightBrightness::Id:
+            return "StatusLightBrightness";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::DepthSensorStatus::Id:
+            return "DepthSensorStatus";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::EventList::Id:
+            return "EventList";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::WebRTCTransportProvider::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WebRTCTransportProvider::Attributes::CurrentSessions::Id:
+            return "CurrentSessions";
+        case chip::app::Clusters::WebRTCTransportProvider::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::WebRTCTransportProvider::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::WebRTCTransportProvider::Attributes::EventList::Id:
+            return "EventList";
+        case chip::app::Clusters::WebRTCTransportProvider::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::WebRTCTransportProvider::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::WebRTCTransportProvider::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::WebRTCTransportRequestor::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::CurrentSessions::Id:
+            return "CurrentSessions";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::EventList::Id:
+            return "EventList";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::WebRTCTransportRequestor::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::Chime::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Chime::Attributes::InstalledChimeSounds::Id:
+            return "InstalledChimeSounds";
+        case chip::app::Clusters::Chime::Attributes::ActiveChimeID::Id:
+            return "ActiveChimeID";
+        case chip::app::Clusters::Chime::Attributes::Enabled::Id:
+            return "Enabled";
+        case chip::app::Clusters::Chime::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::Chime::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::Chime::Attributes::EventList::Id:
+            return "EventList";
+        case chip::app::Clusters::Chime::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::Chime::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::Chime::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::EcosystemInformation::Id: {
         switch (id)
         {
@@ -5701,6 +5920,95 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ZoneManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ZoneManagement::Commands::CreateTwoDCartesianZone::Id:
+            return "CreateTwoDCartesianZone";
+        case chip::app::Clusters::ZoneManagement::Commands::UpdateTwoDCartesianZone::Id:
+            return "UpdateTwoDCartesianZone";
+        case chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZone::Id:
+            return "GetTwoDCartesianZone";
+        case chip::app::Clusters::ZoneManagement::Commands::RemoveZone::Id:
+            return "RemoveZone";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CameraAvStreamManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamAllocate::Id:
+            return "AudioStreamAllocate";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamDeallocate::Id:
+            return "AudioStreamDeallocate";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamAllocate::Id:
+            return "VideoStreamAllocate";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamModify::Id:
+            return "VideoStreamModify";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamDeallocate::Id:
+            return "VideoStreamDeallocate";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocate::Id:
+            return "SnapshotStreamAllocate";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamDeallocate::Id:
+            return "SnapshotStreamDeallocate";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::SetStreamPriorities::Id:
+            return "SetStreamPriorities";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::Id:
+            return "CaptureSnapshot";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::SetViewport::Id:
+            return "SetViewport";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageRotation::Id:
+            return "SetImageRotation";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipHorizontal::Id:
+            return "SetImageFlipHorizontal";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipVertical::Id:
+            return "SetImageFlipVertical";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::WebRTCTransportProvider::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Id:
+            return "SolicitOffer";
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id:
+            return "ProvideOffer";
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Id:
+            return "ProvideAnswer";
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::Id:
+            return "ProvideICECandidate";
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::EndSession::Id:
+            return "EndSession";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::WebRTCTransportRequestor::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WebRTCTransportRequestor::Commands::Offer::Id:
+            return "Offer";
+        case chip::app::Clusters::WebRTCTransportRequestor::Commands::Answer::Id:
+            return "Answer";
+        case chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::Id:
+            return "ICECandidate";
+        case chip::app::Clusters::WebRTCTransportRequestor::Commands::End::Id:
+            return "End";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::Chime::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Chime::Commands::PlayChimeSound::Id:
+            return "PlayChimeSound";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::CommissionerControl::Id: {
         switch (id)
         {
@@ -6224,6 +6532,43 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ZoneManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ZoneManagement::Commands::CreateTwoDCartesianZoneResponse::Id:
+            return "CreateTwoDCartesianZoneResponse";
+        case chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZoneResponse::Id:
+            return "GetTwoDCartesianZoneResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CameraAvStreamManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamAllocateResponse::Id:
+            return "AudioStreamAllocateResponse";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamAllocateResponse::Id:
+            return "VideoStreamAllocateResponse";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocateResponse::Id:
+            return "SnapshotStreamAllocateResponse";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshotResponse::Id:
+            return "CaptureSnapshotResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::WebRTCTransportProvider::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::SolicitOfferResponse::Id:
+            return "SolicitOfferResponse";
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOfferResponse::Id:
+            return "ProvideOfferResponse";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::CommissionerControl::Id: {
         switch (id)
         {
@@ -6303,7 +6648,7 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
     case 0x00000012:
         return "Matter OTA Requestor";
     case 0x00000013:
-        return "Matter Bridged Device";
+        return "Matter Bridged Node";
     case 0x00000014:
         return "Matter OTA Provider";
     case 0x00000015:
@@ -6311,7 +6656,7 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
     case 0x00000016:
         return "Matter Root Node";
     case 0x00000019:
-        return "Matter Secondary Network Interface Device Type";
+        return "Matter Secondary Network Interface";
     case 0x00000022:
         return "Matter Speaker";
     case 0x00000023:
@@ -6414,6 +6759,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Matter Humidity Sensor";
     case 0x0000050C:
         return "Matter EVSE";
+    case 0x0000050D:
+        return "Matter Device Energy Management";
     case 0x00000510:
         return "Matter Electrical Sensor";
     case 0x00000840:

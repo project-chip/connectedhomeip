@@ -16,13 +16,24 @@
  */
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
+#include <access/AccessControl.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/ConcreteClusterPath.h>
+#include <app/ConcreteCommandPath.h>
+#include <app/EventPathParams.h>
 #include <app/RequiredPrivilege.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/util/IMClusterCommandHandler.h>
+#include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+
+// separated out for code-reuse
+#include <app/ember_coupling/EventPathValidity.mixin.h>
 
 #include <optional>
 #include <variant>
@@ -30,6 +41,113 @@
 namespace chip {
 namespace app {
 namespace {
+
+/// Handles going through callback-based enumeration of generated/accepted commands
+/// for CommandHandlerInterface based items.
+///
+/// Offers the ability to focus on some operation for finding a given
+/// command id:
+///   - FindFirst will return the first found element
+///   - FindExact finds the element with the given id
+///   - FindNext finds the element following the given id
+class EnumeratorCommandFinder
+{
+public:
+    using HandlerCallbackFunction = CHIP_ERROR (CommandHandlerInterface::*)(const ConcreteClusterPath &,
+                                                                            CommandHandlerInterface::CommandIdCallback, void *);
+
+    enum class Operation
+    {
+        kFindFirst, // Find the first value in the list
+        kFindExact, // Find the given value
+        kFindNext   // Find the value AFTER this value
+    };
+
+    EnumeratorCommandFinder(HandlerCallbackFunction callback) :
+        mCallback(callback), mOperation(Operation::kFindFirst), mTarget(kInvalidCommandId)
+    {}
+
+    /// Find the given command ID that matches the given operation/path.
+    ///
+    /// If operation is kFindFirst, then path commandID is ignored. Otherwise it is used as a key to
+    /// kFindExact or kFindNext.
+    ///
+    /// Returns:
+    ///    - std::nullopt if no command found using the command handler interface
+    ///    - kInvalidCommandId if the find failed (but command handler interface does provide a list)
+    ///    - valid id if command handler interface usage succeeds
+    std::optional<CommandId> FindCommandId(Operation operation, const ConcreteCommandPath & path);
+
+    /// Uses FindCommandId to find the given command and loads the command entry data
+    std::optional<DataModel::CommandEntry> FindCommandEntry(Operation operation, const ConcreteCommandPath & path);
+
+private:
+    HandlerCallbackFunction mCallback;
+    Operation mOperation;
+    CommandId mTarget;
+    std::optional<CommandId> mFound = std::nullopt;
+
+    Loop HandlerCallback(CommandId id)
+    {
+        switch (mOperation)
+        {
+        case Operation::kFindFirst:
+            mFound = id;
+            return Loop::Break;
+        case Operation::kFindExact:
+            if (mTarget == id)
+            {
+                mFound = id; // found it
+                return Loop::Break;
+            }
+            break;
+        case Operation::kFindNext:
+            if (mTarget == id)
+            {
+                // Once we found the ID, get the first
+                mOperation = Operation::kFindFirst;
+            }
+            break;
+        }
+        return Loop::Continue; // keep searching
+    }
+
+    static Loop HandlerCallbackFn(CommandId id, void * context)
+    {
+        auto self = static_cast<EnumeratorCommandFinder *>(context);
+        return self->HandlerCallback(id);
+    }
+};
+
+std::optional<CommandId> EnumeratorCommandFinder::FindCommandId(Operation operation, const ConcreteCommandPath & path)
+{
+    mOperation = operation;
+    mTarget    = path.mCommandId;
+
+    CommandHandlerInterface * interface =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
+
+    if (interface == nullptr)
+    {
+        return std::nullopt; // no data: no interface
+    }
+
+    CHIP_ERROR err = (interface->*mCallback)(path, HandlerCallbackFn, this);
+    if (err == CHIP_ERROR_NOT_IMPLEMENTED)
+    {
+        return std::nullopt; // no data provided by the interface
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        // Report the error here since we lose actual error. This generally should NOT be possible as CommandHandlerInterface
+        // usually returns unimplemented or should just work for our use case (our callback never fails)
+        ChipLogError(DataManagement, "Enumerate error: %" CHIP_ERROR_FORMAT, err.Format());
+        return kInvalidCommandId;
+    }
+
+    return mFound.value_or(kInvalidCommandId);
+}
 
 /// Load the cluster information into the specified destination
 std::variant<CHIP_ERROR, DataModel::ClusterInfo> LoadClusterInfo(const ConcreteClusterPath & path, const EmberAfCluster & cluster)
@@ -160,6 +278,71 @@ DataModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clusterPath
     return entry;
 }
 
+std::optional<DataModel::CommandEntry> EnumeratorCommandFinder::FindCommandEntry(Operation operation,
+                                                                                 const ConcreteCommandPath & path)
+{
+
+    std::optional<CommandId> id = FindCommandId(operation, path);
+
+    if (!id.has_value())
+    {
+        return std::nullopt;
+    }
+
+    return (*id == kInvalidCommandId) ? DataModel::CommandEntry::kInvalid : CommandEntryFrom(path, *id);
+}
+
+// TODO: DeviceTypeEntry content is IDENTICAL to EmberAfDeviceType, so centralizing
+//       to a common type is probably better. Need to figure out dependencies since
+//       this would make ember return datamodel-provider types.
+//       See: https://github.com/project-chip/connectedhomeip/issues/35889
+DataModel::DeviceTypeEntry DeviceTypeEntryFromEmber(const EmberAfDeviceType & other)
+{
+    DataModel::DeviceTypeEntry entry;
+
+    entry.deviceTypeId      = other.deviceId;
+    entry.deviceTypeVersion = other.deviceVersion;
+
+    return entry;
+}
+
+// Explicitly compare for identical entries. note that types are different,
+// so you must do `a == b` and the `b == a` will not work.
+bool operator==(const DataModel::DeviceTypeEntry & a, const EmberAfDeviceType & b)
+{
+    return (a.deviceTypeId == b.deviceId) && (a.deviceTypeVersion == b.deviceVersion);
+}
+
+/// Find the `index` where one of the following holds:
+///    - types[index - 1] == previous OR
+///    - index == types.size()  // i.e. not found or there is no next
+///
+/// hintWherePreviousMayBe represents a search hint where previous may exist.
+unsigned FindNextDeviceTypeIndex(Span<const EmberAfDeviceType> types, const DataModel::DeviceTypeEntry & previous,
+                                 unsigned hintWherePreviousMayBe)
+{
+    if (hintWherePreviousMayBe < types.size())
+    {
+        // this is a valid hint ... see if we are lucky
+        if (previous == types[hintWherePreviousMayBe])
+        {
+            return hintWherePreviousMayBe + 1; // return the next index
+        }
+    }
+
+    // hint was not useful. We have to do a full search
+    for (unsigned idx = 0; idx < types.size(); idx++)
+    {
+        if (previous == types[idx])
+        {
+            return idx + 1;
+        }
+    }
+
+    // cast should be safe as we know we do not have that many types
+    return static_cast<unsigned>(types.size());
+}
+
 const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
 
 } // namespace
@@ -252,6 +435,11 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
     // Ember always sets the return in the handler
     DispatchSingleClusterCommand(request.path, input_arguments, handler);
     return std::nullopt;
+}
+
+bool CodegenDataModelProvider::EndpointExists(EndpointId endpoint)
+{
+    return (emberAfIndexFromEndpoint(endpoint) != kEmberInvalidEndpointIndex);
 }
 
 EndpointId CodegenDataModelProvider::FirstEndpoint()
@@ -492,6 +680,15 @@ std::optional<DataModel::AttributeInfo> CodegenDataModelProvider::GetAttributeIn
 
 DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const ConcreteClusterPath & path)
 {
+    auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
+                                     .FindCommandEntry(EnumeratorCommandFinder::Operation::kFindFirst,
+                                                       ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId));
+
+    if (handlerInterfaceValue.has_value())
+    {
+        return *handlerInterfaceValue;
+    }
+
     const EmberAfCluster * cluster = FindServerCluster(path);
 
     VerifyOrReturnValue(cluster != nullptr, DataModel::CommandEntry::kInvalid);
@@ -504,6 +701,16 @@ DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const Con
 
 DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const ConcreteCommandPath & before)
 {
+    // TODO: `Next` redirecting to a callback is slow O(n^2).
+    //       see https://github.com/project-chip/connectedhomeip/issues/35790
+    auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
+                                     .FindCommandEntry(EnumeratorCommandFinder::Operation::kFindNext, before);
+
+    if (handlerInterfaceValue.has_value())
+    {
+        return *handlerInterfaceValue;
+    }
+
     const EmberAfCluster * cluster = FindServerCluster(before);
 
     VerifyOrReturnValue(cluster != nullptr, DataModel::CommandEntry::kInvalid);
@@ -516,6 +723,14 @@ DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const Conc
 
 std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
+    auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
+                                     .FindCommandEntry(EnumeratorCommandFinder::Operation::kFindExact, path);
+
+    if (handlerInterfaceValue.has_value())
+    {
+        return handlerInterfaceValue->IsValid() ? std::make_optional(handlerInterfaceValue->info) : std::nullopt;
+    }
+
     const EmberAfCluster * cluster = FindServerCluster(path);
 
     VerifyOrReturnValue(cluster != nullptr, std::nullopt);
@@ -526,17 +741,37 @@ std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedComma
 
 ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const ConcreteClusterPath & path)
 {
-    const EmberAfCluster * cluster = FindServerCluster(path);
+    std::optional<CommandId> commandId =
+        EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateGeneratedCommands)
+            .FindCommandId(EnumeratorCommandFinder::Operation::kFindFirst,
+                           ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId));
+    if (commandId.has_value())
+    {
+        return *commandId == kInvalidCommandId ? kInvalidCommandPath
+                                               : ConcreteCommandPath(path.mEndpointId, path.mClusterId, *commandId);
+    }
 
+    const EmberAfCluster * cluster = FindServerCluster(path);
     VerifyOrReturnValue(cluster != nullptr, kInvalidCommandPath);
 
-    std::optional<CommandId> commandId = mGeneratedCommandsIterator.First(cluster->generatedCommandList);
+    commandId = mGeneratedCommandsIterator.First(cluster->generatedCommandList);
     VerifyOrReturnValue(commandId.has_value(), kInvalidCommandPath);
     return ConcreteCommandPath(path.mEndpointId, path.mClusterId, *commandId);
 }
 
 ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const ConcreteCommandPath & before)
 {
+    // TODO: `Next` redirecting to a callback is slow O(n^2).
+    //       see https://github.com/project-chip/connectedhomeip/issues/35790
+    auto nextId = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateGeneratedCommands)
+                      .FindCommandId(EnumeratorCommandFinder::Operation::kFindNext, before);
+
+    if (nextId.has_value())
+    {
+        return (*nextId == kInvalidCommandId) ? kInvalidCommandPath
+                                              : ConcreteCommandPath(before.mEndpointId, before.mClusterId, *nextId);
+    }
+
     const EmberAfCluster * cluster = FindServerCluster(before);
 
     VerifyOrReturnValue(cluster != nullptr, kInvalidCommandPath);
@@ -545,6 +780,83 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
     VerifyOrReturnValue(commandId.has_value(), kInvalidCommandPath);
 
     return ConcreteCommandPath(before.mEndpointId, before.mClusterId, *commandId);
+}
+
+std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::FirstDeviceType(EndpointId endpoint)
+{
+    // Use the `Index` version even though `emberAfDeviceTypeListFromEndpoint` would work because
+    // index finding is cached in TryFindEndpointIndex and this avoids an extra `emberAfIndexFromEndpoint`
+    // during `Next` loops. This avoids O(n^2) on number of indexes when iterating over all device types.
+    //
+    // Not actually needed for `First`, however this makes First and Next consistent.
+    std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpoint);
+    if (!endpoint_index.has_value())
+    {
+        return std::nullopt;
+    }
+
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
+    Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
+
+    if (deviceTypes.empty())
+    {
+        return std::nullopt;
+    }
+
+    // we start at the beginning
+    mDeviceTypeIterationHint = 0;
+    return DeviceTypeEntryFromEmber(deviceTypes[0]);
+}
+
+std::optional<DataModel::DeviceTypeEntry> CodegenDataModelProvider::NextDeviceType(EndpointId endpoint,
+                                                                                   const DataModel::DeviceTypeEntry & previous)
+{
+    // Use the `Index` version even though `emberAfDeviceTypeListFromEndpoint` would work because
+    // index finding is cached in TryFindEndpointIndex and this avoids an extra `emberAfIndexFromEndpoint`
+    // during `Next` loops. This avoids O(n^2) on number of indexes when iterating over all device types.
+    std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpoint);
+    if (!endpoint_index.has_value())
+    {
+        return std::nullopt;
+    }
+
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
+    Span<const EmberAfDeviceType> deviceTypes = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
+
+    unsigned idx = FindNextDeviceTypeIndex(deviceTypes, previous, mDeviceTypeIterationHint);
+
+    if (idx >= deviceTypes.size())
+    {
+        return std::nullopt;
+    }
+
+    mDeviceTypeIterationHint = idx;
+    return DeviceTypeEntryFromEmber(deviceTypes[idx]);
+}
+
+bool CodegenDataModelProvider::EventPathIncludesAccessibleConcretePath(const EventPathParams & path,
+                                                                       const Access::SubjectDescriptor & descriptor)
+{
+
+    if (!path.HasWildcardEndpointId())
+    {
+        // No need to check whether the endpoint is enabled, because
+        // emberAfFindEndpointType returns null for disabled endpoints.
+        return HasValidEventPathForEndpoint(path.mEndpointId, path, descriptor);
+    }
+
+    for (uint16_t endpointIndex = 0; endpointIndex < emberAfEndpointCount(); ++endpointIndex)
+    {
+        if (!emberAfEndpointIndexIsEnabled(endpointIndex))
+        {
+            continue;
+        }
+        if (HasValidEventPathForEndpoint(emberAfEndpointFromIndex(endpointIndex), path, descriptor))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 } // namespace app

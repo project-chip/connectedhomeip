@@ -9,6 +9,7 @@ and features.
 :hidden:
 
 *
+bouffalolab/matter_factory_data
 esp32/README
 nxp/README
 ti/ti_matter_overview
@@ -23,6 +24,7 @@ ti/ti_matter_overview
 -   [Android - Building](./android_building.md)
 -   [Apple - Testing with iPhone, iPad, macOS, Apple TV, HomePod, Watch, etc](./darwin.md)
 -   [ASR - Getting Started Guide](./asr_getting_started_guide.md)
+-   [Bouffalo Lab - Matter factory data generation](./bouffalolab/matter_factory_data.md)
 -   [Espressif (ESP32) - Getting Started Guide](./esp32/README.md)
 -   [Infineon PSoC6 - Software Update](./infineon_psoc6_software_update.md)
 -   [Linux - Simulated Devices](./simulated_device_linux.md)

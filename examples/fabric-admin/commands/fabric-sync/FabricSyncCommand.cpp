@@ -30,15 +30,6 @@
 
 using namespace ::chip;
 
-namespace {
-
-void CheckFabricBridgeSynchronizationSupport(intptr_t ignored)
-{
-    DeviceMgr().ReadSupportedDeviceCategories();
-}
-
-} // namespace
-
 void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
 {
     if (mBridgeNodeId != deviceId)
@@ -73,7 +64,7 @@ void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_E
             //
             // Note: The Fabric-Admin MUST NOT send the RequestCommissioningApproval command
             // if the remote Fabric-Bridge lacks Fabric Synchronization support.
-            DeviceLayer::PlatformMgr().ScheduleWork(CheckFabricBridgeSynchronizationSupport, 0);
+            DeviceLayer::SystemLayer().ScheduleLambda([]() { DeviceMgr().ReadSupportedDeviceCategories(); });
         }
     }
     else
@@ -94,15 +85,8 @@ CHIP_ERROR FabricSyncAddBridgeCommand::RunCommand(NodeId remoteId)
         return CHIP_NO_ERROR;
     }
 
-    PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "already-discovered"));
+    PairingManager::Instance().SetCommissioningDelegate(this);
 
-    if (pairingCommand == nullptr)
-    {
-        ChipLogError(NotSpecified, "Pairing already-discovered command is not available");
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    pairingCommand->RegisterCommissioningDelegate(this);
     mBridgeNodeId = remoteId;
 
     DeviceMgr().PairRemoteFabricBridge(remoteId, mSetupPINCode, reinterpret_cast<const char *>(mRemoteAddr.data()), mRemotePort);
@@ -146,16 +130,7 @@ CHIP_ERROR FabricSyncRemoveBridgeCommand::RunCommand()
 
     mBridgeNodeId = bridgeNodeId;
 
-    PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "unpair"));
-
-    if (pairingCommand == nullptr)
-    {
-        ChipLogError(NotSpecified, "Pairing unpair command is not available");
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    pairingCommand->RegisterPairingDelegate(this);
-
+    PairingManager::Instance().SetPairingDelegate(this);
     DeviceMgr().UnpairRemoteFabricBridge();
 
     return CHIP_NO_ERROR;
@@ -203,10 +178,7 @@ CHIP_ERROR FabricSyncAddLocalBridgeCommand::RunCommand(NodeId deviceId)
         return CHIP_NO_ERROR;
     }
 
-    PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "already-discovered"));
-    VerifyOrDie(pairingCommand != nullptr);
-
-    pairingCommand->RegisterCommissioningDelegate(this);
+    PairingManager::Instance().SetCommissioningDelegate(this);
     mLocalBridgeNodeId = deviceId;
 
     if (mSetupPINCode.HasValue())
@@ -259,16 +231,7 @@ CHIP_ERROR FabricSyncRemoveLocalBridgeCommand::RunCommand()
 
     mLocalBridgeNodeId = bridgeNodeId;
 
-    PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "unpair"));
-
-    if (pairingCommand == nullptr)
-    {
-        ChipLogError(NotSpecified, "Pairing unpair command is not available");
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    pairingCommand->RegisterPairingDelegate(this);
-
+    PairingManager::Instance().SetPairingDelegate(this);
     DeviceMgr().UnpairLocalFabricBridge();
 
     return CHIP_NO_ERROR;
@@ -287,15 +250,7 @@ void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_
         {
             NodeId nodeId = DeviceMgr().GetNextAvailableNodeId();
 
-            PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "code"));
-
-            if (pairingCommand == nullptr)
-            {
-                ChipLogError(NotSpecified, "Pairing code command is not available");
-                return;
-            }
-
-            pairingCommand->RegisterCommissioningDelegate(this);
+            PairingManager::Instance().SetCommissioningDelegate(this);
             mAssignedNodeId = nodeId;
 
             usleep(kCommissionPrepareTimeMs * 1000);
