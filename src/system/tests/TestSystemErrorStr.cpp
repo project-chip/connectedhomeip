@@ -28,34 +28,29 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <pw_unit_test/framework.h>
+
 #include <inet/InetError.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/UnitTestRegistration.h>
-
-#include <nlunit-test.h>
 
 using namespace chip;
 
 // Test input data.
-
-// clang-format off
-static const CHIP_ERROR kTestElements[] =
-{
+static const CHIP_ERROR kTestElements[] = {
     CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
     CHIP_ERROR_INVALID_ARGUMENT,
     CHIP_ERROR_INCORRECT_STATE,
     CHIP_ERROR_UNEXPECTED_EVENT,
     CHIP_ERROR_NO_MEMORY,
     CHIP_ERROR_REAL_TIME_NOT_SYNCED,
-    CHIP_ERROR_ACCESS_DENIED
+    CHIP_ERROR_ACCESS_DENIED,
 };
-// clang-format on
 
-static void CheckSystemErrorStr(nlTestSuite * inSuite, void * inContext)
+TEST(TestSystemErrorStr, CheckSystemErrorStr)
 {
     // Register the layer error formatter
-
     RegisterCHIPLayerErrorFormatter();
 
     // For each defined error...
@@ -66,45 +61,12 @@ static void CheckSystemErrorStr(nlTestSuite * inSuite, void * inContext)
 
         // Assert that the error string contains the error number in hex.
         snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, err.AsInteger());
-        NL_TEST_ASSERT(inSuite, (strstr(errStr, expectedText) != nullptr));
+        EXPECT_NE(strstr(errStr, expectedText), nullptr);
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
         // Assert that the error string contains a description, which is signaled
         // by a presence of a colon proceeding the description.
-        NL_TEST_ASSERT(inSuite, (strchr(errStr, ':') != nullptr));
+        EXPECT_NE(strchr(errStr, ':'), nullptr);
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
     }
 }
-
-/**
- *   Test Suite. It lists all the test functions.
- */
-
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("SystemErrorStr", CheckSystemErrorStr),
-
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-int TestSystemErrorStr()
-{
-    // clang-format off
-    nlTestSuite theSuite =
-	{
-        "System-Error-Strings",
-        &sTests[0],
-        nullptr,
-        nullptr
-    };
-    // clang-format on
-
-    // Run test suite against one context.
-    nlTestRunner(&theSuite, nullptr);
-
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestSystemErrorStr)

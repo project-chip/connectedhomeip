@@ -20,7 +20,6 @@
 #include <AppConfig.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -269,135 +268,131 @@ void WindowManager::Cover::Init(chip::EndpointId endpoint)
     chip::BitFlags<SafetyStatus> safetyStatus(0x00); // 0 is no issues;
 }
 
-void WindowManager::Cover::LiftStepToward(OperationalState direction)
+void WindowManager::Cover::ScheduleControlAction(ControlAction action, bool setNewTarget)
 {
-    Protocols::InteractionModel::Status status;
-    chip::Percent100ths percent100ths;
-    NPercent100ths current;
+    VerifyOrReturn(action <= ControlAction::Tilt);
+    // Allocate a CoverWorkData. It will be freed by the Worker callback
+    CoverWorkData * data = new CoverWorkData(this, setNewTarget);
+    VerifyOrDie(data != nullptr);
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    if ((status == Protocols::InteractionModel::Status::Success) && !current.IsNull())
+    AsyncWorkFunct workFunct = (action == ControlAction::Lift) ? LiftUpdateWorker : TiltUpdateWorker;
+    if (PlatformMgr().ScheduleWork(workFunct, reinterpret_cast<intptr_t>(data)) != CHIP_NO_ERROR)
     {
-        percent100ths = ComputePercent100thsStep(direction, current.Value(), LIFT_DELTA);
+        ChipLogError(AppServer, "Failed to schedule cover control action");
+        delete data;
     }
-    else
-    {
-        percent100ths = WC_PERCENT100THS_MIDDLE; // set at middle by default
-    }
-
-    LiftSchedulePositionSet(percent100ths);
 }
 
-void WindowManager::Cover::LiftUpdate(bool newTarget)
+void WindowManager::Cover::LiftUpdateWorker(intptr_t arg)
 {
+    // Use a unique_prt so it's freed when leaving this context
+    std::unique_ptr<CoverWorkData> data(reinterpret_cast<CoverWorkData *>(arg));
+    Cover * cover = data->cover;
+
     NPercent100ths current, target;
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-
-    Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, target);
-    Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
+    VerifyOrReturn(Attributes::TargetPositionLiftPercent100ths::Get(cover->mEndpoint, target) ==
+                   Protocols::InteractionModel::Status::Success);
+    VerifyOrReturn(Attributes::CurrentPositionLiftPercent100ths::Get(cover->mEndpoint, current) ==
+                   Protocols::InteractionModel::Status::Success);
 
     OperationalState opState = ComputeOperationalState(target, current);
 
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    /* If Triggered by a TARGET update */
-    if (newTarget)
+    // If Triggered by a TARGET update
+    if (data->setNewTarget)
     {
-        mLiftTimer->Stop(); // Cancel previous motion if any
-        mLiftOpState = opState;
+        cover->mLiftTimer->Stop(); // Cancel previous motion if any
+        cover->mLiftOpState = opState;
     }
 
-    if (mLiftOpState == opState)
+    if (cover->mLiftOpState == opState)
     {
-        /* Actuator still need to move, not reached/crossed Target yet */
-        LiftStepToward(mLiftOpState);
+        // Actuator still needs to move, has not reached/crossed Target yet
+        chip::Percent100ths percent100ths;
+
+        if (!current.IsNull())
+        {
+            percent100ths = ComputePercent100thsStep(cover->mLiftOpState, current.Value(), LIFT_DELTA);
+        }
+        else
+        {
+            percent100ths = WC_PERCENT100THS_MIDDLE; // set at middle by default
+        }
+
+        cover->PositionSet(cover->mEndpoint, percent100ths, ControlAction::Lift);
     }
-    else /* CURRENT reached TARGET or crossed it */
+    else // CURRENT reached TARGET or crossed it
     {
-        /* Actuator finalize the movement AND CURRENT Must be equal to TARGET at the end */
+        // Actuator finalize the movement AND CURRENT Must be equal to TARGET at the end
         if (!target.IsNull())
-            LiftSchedulePositionSet(target.Value());
+            cover->PositionSet(cover->mEndpoint, target.Value(), ControlAction::Lift);
 
-        mLiftOpState = OperationalState::Stall;
+        cover->mLiftOpState = OperationalState::Stall;
     }
 
-    LiftScheduleOperationalStateSet(mLiftOpState);
+    OperationalStateSet(cover->mEndpoint, OperationalStatus::kLift, cover->mLiftOpState);
 
-    if ((OperationalState::Stall != mLiftOpState) && mLiftTimer)
+    if ((OperationalState::Stall != cover->mLiftOpState) && cover->mLiftTimer)
     {
-        mLiftTimer->Start();
+        cover->mLiftTimer->Start();
     }
 }
 
-void WindowManager::Cover::TiltStepToward(OperationalState direction)
+void WindowManager::Cover::TiltUpdateWorker(intptr_t arg)
 {
-    Protocols::InteractionModel::Status status;
-    chip::Percent100ths percent100ths;
-    NPercent100ths current;
+    // Use a unique_prt so it's freed when leaving this context
+    std::unique_ptr<CoverWorkData> data(reinterpret_cast<CoverWorkData *>(arg));
+    Cover * cover = data->cover;
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    if ((status == Protocols::InteractionModel::Status::Success) && !current.IsNull())
-    {
-        percent100ths = ComputePercent100thsStep(direction, current.Value(), TILT_DELTA);
-    }
-    else
-    {
-        percent100ths = WC_PERCENT100THS_MIDDLE; // set at middle by default
-    }
-
-    TiltSchedulePositionSet(percent100ths);
-}
-
-void WindowManager::Cover::TiltUpdate(bool newTarget)
-{
     NPercent100ths current, target;
-
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-
-    Attributes::TargetPositionTiltPercent100ths::Get(mEndpoint, target);
-    Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
+    VerifyOrReturn(Attributes::TargetPositionTiltPercent100ths::Get(cover->mEndpoint, target) ==
+                   Protocols::InteractionModel::Status::Success);
+    VerifyOrReturn(Attributes::CurrentPositionTiltPercent100ths::Get(cover->mEndpoint, current) ==
+                   Protocols::InteractionModel::Status::Success);
 
     OperationalState opState = ComputeOperationalState(target, current);
 
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    /* If Triggered by a TARGET update */
-    if (newTarget)
+    // If Triggered by a TARGET update
+    if (data->setNewTarget)
     {
-        mTiltTimer->Stop(); // Cancel previous motion if any
-        mTiltOpState = opState;
+        cover->mTiltTimer->Stop(); // Cancel previous motion if any
+        cover->mTiltOpState = opState;
     }
 
-    if (mTiltOpState == opState)
+    if (cover->mTiltOpState == opState)
     {
-        /* Actuator still need to move, not reached/crossed Target yet */
-        TiltStepToward(mTiltOpState);
+        // Actuator still needs to move, has not reached/crossed Target yet
+        chip::Percent100ths percent100ths;
+
+        if (!current.IsNull())
+        {
+            percent100ths = ComputePercent100thsStep(cover->mTiltOpState, current.Value(), TILT_DELTA);
+        }
+        else
+        {
+            percent100ths = WC_PERCENT100THS_MIDDLE; // set at middle by default
+        }
+
+        cover->PositionSet(cover->mEndpoint, percent100ths, ControlAction::Tilt);
     }
-    else /* CURRENT reached TARGET or crossed it */
+    else // CURRENT reached TARGET or crossed it
     {
-        /* Actuator finalize the movement AND CURRENT Must be equal to TARGET at the end */
+        // Actuator finalize the movement AND CURRENT Must be equal to TARGET at the end
         if (!target.IsNull())
-            TiltSchedulePositionSet(target.Value());
+            cover->PositionSet(cover->mEndpoint, target.Value(), ControlAction::Tilt);
 
-        mTiltOpState = OperationalState::Stall;
+        cover->mTiltOpState = OperationalState::Stall;
     }
 
-    TiltScheduleOperationalStateSet(mTiltOpState);
+    OperationalStateSet(cover->mEndpoint, OperationalStatus::kTilt, cover->mTiltOpState);
 
-    if ((OperationalState::Stall != mTiltOpState) && mTiltTimer)
+    if ((OperationalState::Stall != cover->mTiltOpState) && cover->mTiltTimer)
     {
-        mTiltTimer->Start();
+        cover->mTiltTimer->Start();
     }
 }
 
-void WindowManager::Cover::UpdateTargetPosition(OperationalState direction, bool isTilt)
+void WindowManager::Cover::UpdateTargetPosition(OperationalState direction, ControlAction action)
 {
     Protocols::InteractionModel::Status status;
     NPercent100ths current;
@@ -405,7 +400,7 @@ void WindowManager::Cover::UpdateTargetPosition(OperationalState direction, bool
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    if (isTilt)
+    if (action == ControlAction::Tilt)
     {
         status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
         if ((status == Protocols::InteractionModel::Status::Success) && !current.IsNull())
@@ -474,29 +469,15 @@ void WindowManager::Cover::OnTiltTimeout(WindowManager::Timer & timer)
     }
 }
 
-void WindowManager::Cover::SchedulePositionSet(chip::Percent100ths position, bool isTilt)
+void WindowManager::Cover::PositionSet(chip::EndpointId endpointId, chip::Percent100ths position, ControlAction action)
 {
-    CoverWorkData * data = chip::Platform::New<CoverWorkData>();
-    VerifyOrReturn(data != nullptr, ChipLogProgress(Zcl, "Cover::SchedulePositionSet - Out of Memory for WorkData"));
-
-    data->mEndpointId   = mEndpoint;
-    data->percent100ths = position;
-    data->isTilt        = isTilt;
-
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(CallbackPositionSet, reinterpret_cast<intptr_t>(data));
-}
-
-void WindowManager::Cover::CallbackPositionSet(intptr_t arg)
-{
-    NPercent100ths position;
-    WindowManager::Cover::CoverWorkData * data = reinterpret_cast<WindowManager::Cover::CoverWorkData *>(arg);
-    position.SetNonNull(data->percent100ths);
-
-    if (data->isTilt)
+    NPercent100ths nullablePosition;
+    nullablePosition.SetNonNull(position);
+    if (action == ControlAction::Tilt)
     {
-        TiltPositionSet(data->mEndpointId, position);
+        TiltPositionSet(endpointId, nullablePosition);
 #ifdef DIC_ENABLE
-        uint16_t value = data->percent100ths;
+        uint16_t value = position;
         char buffer[MSG_SIZE];
         itoa(value, buffer, DECIMAL);
         dic_sendmsg("tilt/position set", (const char *) (buffer));
@@ -504,36 +485,14 @@ void WindowManager::Cover::CallbackPositionSet(intptr_t arg)
     }
     else
     {
-        LiftPositionSet(data->mEndpointId, position);
+        LiftPositionSet(endpointId, nullablePosition);
 #ifdef DIC_ENABLE
-        uint16_t value = data->percent100ths;
+        uint16_t value = position;
         char buffer[MSG_SIZE];
         itoa(value, buffer, DECIMAL);
         dic_sendmsg("lift/position set", (const char *) (buffer));
 #endif // DIC_ENABLE
     }
-    chip::Platform::Delete(data);
-}
-
-void WindowManager::Cover::ScheduleOperationalStateSet(OperationalState opState, bool isTilt)
-{
-    CoverWorkData * data = chip::Platform::New<CoverWorkData>();
-    VerifyOrReturn(data != nullptr, ChipLogProgress(Zcl, "Cover::OperationalStatusSet - Out of Memory for WorkData"));
-
-    data->mEndpointId = mEndpoint;
-    data->opState     = opState;
-    data->isTilt      = isTilt;
-
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(CallbackOperationalStateSet, reinterpret_cast<intptr_t>(data));
-}
-
-void WindowManager::Cover::CallbackOperationalStateSet(intptr_t arg)
-{
-    WindowManager::Cover::CoverWorkData * data = reinterpret_cast<WindowManager::Cover::CoverWorkData *>(arg);
-
-    OperationalStateSet(data->mEndpointId, data->isTilt ? OperationalStatus::kTilt : OperationalStatus::kLift, data->opState);
-
-    chip::Platform::Delete(data);
 }
 
 //------------------------------------------------------------------------------
@@ -552,6 +511,15 @@ WindowManager::Timer::Timer(uint32_t timeoutInMs, Callback callback, void * cont
     {
         SILABS_LOG("Timer create failed");
         appError(CHIP_ERROR_INTERNAL);
+    }
+}
+
+WindowManager::Timer::~Timer()
+{
+    if (mHandler)
+    {
+        osTimerDelete(mHandler);
+        mHandler = nullptr;
     }
 }
 
@@ -579,11 +547,7 @@ WindowManager & WindowManager::Instance()
     return WindowManager::sWindow;
 }
 
-#ifdef DISPLAY_ENABLED
-WindowManager::WindowManager() : mIconTimer(LCD_ICON_TIMEOUT, OnIconTimeout, this) {}
-#else
 WindowManager::WindowManager() {}
-#endif
 
 void WindowManager::OnIconTimeout(WindowManager::Timer & timer)
 {
@@ -597,6 +561,9 @@ CHIP_ERROR WindowManager::Init()
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
+#ifdef DISPLAY_ENABLED
+    mIconTimer = new Timer(LCD_ICON_TIMEOUT, OnIconTimeout, this);
+#endif
     // Timers
     mLongPressTimer = new Timer(LONG_PRESS_TIMEOUT, OnLongPressTimeout, this);
 
@@ -757,7 +724,8 @@ void WindowManager::GeneralEventHandler(AppEvent * aEvent)
         }
         else
         {
-            window->GetCover().UpdateTargetPosition(OperationalState::MovingUpOrOpen, window->mTiltMode);
+            window->GetCover().UpdateTargetPosition(
+                OperationalState::MovingUpOrOpen, ((window->mTiltMode) ? Cover::ControlAction::Tilt : Cover::ControlAction::Lift));
         }
         break;
 
@@ -793,7 +761,9 @@ void WindowManager::GeneralEventHandler(AppEvent * aEvent)
         }
         else
         {
-            window->GetCover().UpdateTargetPosition(OperationalState::MovingDownOrClose, window->mTiltMode);
+            window->GetCover().UpdateTargetPosition(
+                OperationalState::MovingDownOrClose,
+                ((window->mTiltMode) ? Cover::ControlAction::Tilt : Cover::ControlAction::Lift));
         }
         break;
 
@@ -806,13 +776,19 @@ void WindowManager::GeneralEventHandler(AppEvent * aEvent)
         window->UpdateLCD();
         break;
     case AppEvent::kEventType_CoverChange:
-        window->mIconTimer.Start();
+        if (window->mIconTimer != nullptr)
+        {
+            window->mIconTimer->Start();
+        }
         window->mIcon = (window->GetCover().mEndpoint == 1) ? LcdIcon::One : LcdIcon::Two;
         window->UpdateLCD();
         break;
     case AppEvent::kEventType_TiltModeChange:
         ChipLogDetail(AppServer, "App control mode changed to %s", window->mTiltMode ? "Tilt" : "Lift");
-        window->mIconTimer.Start();
+        if (window->mIconTimer != nullptr)
+        {
+            window->mIconTimer->Start();
+        }
         window->mIcon = window->mTiltMode ? LcdIcon::Tilt : LcdIcon::Lift;
         window->UpdateLCD();
         break;

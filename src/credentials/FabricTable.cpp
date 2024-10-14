@@ -71,6 +71,44 @@ constexpr size_t IndexInfoTLVMaxSize()
     return TLV::EstimateStructOverhead(sizeof(FabricIndex), CHIP_CONFIG_MAX_FABRICS * (1 + sizeof(FabricIndex)) + 1);
 }
 
+CHIP_ERROR AddNewFabricForTestInternal(FabricTable & fabricTable, bool leavePending, const ByteSpan & rootCert,
+                                       const ByteSpan & icacCert, const ByteSpan & nocCert, const ByteSpan & opKeySpan,
+                                       FabricIndex * outFabricIndex)
+{
+    VerifyOrReturnError(outFabricIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    CHIP_ERROR err = CHIP_ERROR_INTERNAL;
+
+    Crypto::P256Keypair injectedOpKey;
+    Crypto::P256SerializedKeypair injectedOpKeysSerialized;
+
+    Crypto::P256Keypair * opKey = nullptr;
+    if (!opKeySpan.empty())
+    {
+        VerifyOrReturnError(opKeySpan.size() == injectedOpKeysSerialized.Capacity(), CHIP_ERROR_INVALID_ARGUMENT);
+
+        memcpy(injectedOpKeysSerialized.Bytes(), opKeySpan.data(), opKeySpan.size());
+        SuccessOrExit(err = injectedOpKeysSerialized.SetLength(opKeySpan.size()));
+        SuccessOrExit(err = injectedOpKey.Deserialize(injectedOpKeysSerialized));
+        opKey = &injectedOpKey;
+    }
+
+    SuccessOrExit(err = fabricTable.AddNewPendingTrustedRootCert(rootCert));
+    SuccessOrExit(err =
+                      fabricTable.AddNewPendingFabricWithProvidedOpKey(nocCert, icacCert, VendorId::TestVendor1, opKey,
+                                                                       /*isExistingOpKeyExternallyOwned =*/false, outFabricIndex));
+    if (!leavePending)
+    {
+        SuccessOrExit(err = fabricTable.CommitPendingFabricData());
+    }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        fabricTable.RevertPendingFabricData();
+    }
+    return err;
+}
+
 } // anonymous namespace
 
 CHIP_ERROR FabricInfo::Init(const FabricInfo::InitParams & initParams)
@@ -695,34 +733,14 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric, FabricIndex newFabr
 CHIP_ERROR FabricTable::AddNewFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
                                             const ByteSpan & opKeySpan, FabricIndex * outFabricIndex)
 {
-    VerifyOrReturnError(outFabricIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return AddNewFabricForTestInternal(*this, /*leavePending=*/false, rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
+}
 
-    CHIP_ERROR err = CHIP_ERROR_INTERNAL;
-
-    Crypto::P256Keypair injectedOpKey;
-    Crypto::P256SerializedKeypair injectedOpKeysSerialized;
-
-    Crypto::P256Keypair * opKey = nullptr;
-    if (!opKeySpan.empty())
-    {
-        VerifyOrReturnError(opKeySpan.size() == injectedOpKeysSerialized.Capacity(), CHIP_ERROR_INVALID_ARGUMENT);
-
-        memcpy(injectedOpKeysSerialized.Bytes(), opKeySpan.data(), opKeySpan.size());
-        SuccessOrExit(err = injectedOpKeysSerialized.SetLength(opKeySpan.size()));
-        SuccessOrExit(err = injectedOpKey.Deserialize(injectedOpKeysSerialized));
-        opKey = &injectedOpKey;
-    }
-
-    SuccessOrExit(err = AddNewPendingTrustedRootCert(rootCert));
-    SuccessOrExit(err = AddNewPendingFabricWithProvidedOpKey(nocCert, icacCert, VendorId::TestVendor1, opKey,
-                                                             /*isExistingOpKeyExternallyOwned =*/false, outFabricIndex));
-    SuccessOrExit(err = CommitPendingFabricData());
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        RevertPendingFabricData();
-    }
-    return err;
+CHIP_ERROR FabricTable::AddNewUncommittedFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert,
+                                                       const ByteSpan & nocCert, const ByteSpan & opKeySpan,
+                                                       FabricIndex * outFabricIndex)
+{
+    return AddNewFabricForTestInternal(*this, /*leavePending=*/true, rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
 }
 
 /*
@@ -1546,6 +1564,16 @@ bool FabricTable::SetPendingDataFabricIndex(FabricIndex fabricIndex)
     return isLegal;
 }
 
+FabricIndex FabricTable::GetPendingNewFabricIndex() const
+{
+    if (mStateFlags.Has(StateFlags::kIsAddPending))
+    {
+        return mFabricIndexWithPendingState;
+    }
+
+    return kUndefinedFabricIndex;
+}
+
 CHIP_ERROR FabricTable::AllocatePendingOperationalKey(Optional<FabricIndex> fabricIndex, MutableByteSpan & outputCsr)
 {
     // We can only manage commissionable pending fail-safe state if we have a keystore
@@ -2121,6 +2149,31 @@ CHIP_ERROR FabricTable::PeekFabricIndexForNextAddition(FabricIndex & outIndex)
     VerifyOrReturnError(IsValidFabricIndex(index), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     outIndex = index;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FabricTable::SetFabricIndexForNextAddition(FabricIndex fabricIndex)
+{
+    VerifyOrReturnError(!mStateFlags.Has(StateFlags::kIsPendingFabricDataPresent), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    const FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
+    VerifyOrReturnError(fabricInfo == nullptr, CHIP_ERROR_FABRIC_EXISTS);
+
+    mNextAvailableFabricIndex.SetValue(fabricIndex);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FabricTable::SetShouldAdvertiseIdentity(FabricIndex fabricIndex, AdvertiseIdentity advertiseIdentity)
+{
+    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    FabricInfo * fabricInfo  = GetMutableFabricByIndex(fabricIndex);
+    bool fabricIsInitialized = (fabricInfo != nullptr) && fabricInfo->IsInitialized();
+    VerifyOrReturnError(fabricIsInitialized, CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    fabricInfo->SetShouldAdvertiseIdentity(advertiseIdentity == AdvertiseIdentity::Yes);
+
     return CHIP_NO_ERROR;
 }
 

@@ -1,8 +1,7 @@
-#include <ble/BleUUID.h>
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/Darwin/UUIDHelper.h>
+#include <platform/Darwin/MTRUUIDHelper.h>
 
 #import <CoreBluetooth/CoreBluetooth.h>
 
@@ -46,7 +45,7 @@ using ScanErrorCallback = void (*)(PyObject * context, uint32_t error);
 {
     self = [super init];
     if (self) {
-        self.shortServiceUUID = [UUIDHelper GetShortestServiceUUID:&chip::Ble::CHIP_BLE_SVC_ID];
+        self.shortServiceUUID = [MTRUUIDHelper GetShortestServiceUUID:&chip::Ble::CHIP_BLE_SVC_ID];
 
         _workQueue = dispatch_queue_create("com.chip.python.ble.work_queue", DISPATCH_QUEUE_SERIAL);
         _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _workQueue);

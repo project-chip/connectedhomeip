@@ -33,16 +33,17 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <assert.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-
-#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 /**********************************************************
  * Defines and Constants
@@ -103,6 +104,8 @@ void AppTask::AppTaskMain(void * pvParameter)
         appError(err);
     }
 
+    chip::Server::GetInstance().GetICDManager().RegisterObserver(&sAppTask);
+
 #if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
     sAppTask.StartStatusLEDTimer();
 #endif
@@ -122,7 +125,28 @@ void AppTask::AppTaskMain(void * pvParameter)
 void AppTask::ApplicationEventHandler(AppEvent * aEvent)
 {
     VerifyOrReturn(aEvent->Type == AppEvent::kEventType_Button);
-    // TODO - trigger some application event
+    VerifyOrReturn(aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed));
+
+    // Simple Application logic that toggles the BoleanState StateValue attribute.
+    // DO NOT COPY for product logic. LIT ICD app is a test app with very simple application logic to enable testing.
+    // The goal of the app is just to enable testing of LIT ICD features without impacting product sample apps.
+    PlatformMgr().ScheduleWork([](intptr_t) {
+        bool state = true;
+
+        Protocols::InteractionModel::Status status = chip::app::Clusters::BooleanState::Attributes::StateValue::Get(1, &state);
+        if (status != Protocols::InteractionModel::Status::Success)
+        {
+            // Failed to read StateValue. Default to true (open state)
+            state = true;
+            ChipLogError(NotSpecified, "ERR: reading boolean status value %x", to_underlying(status));
+        }
+
+        status = chip::app::Clusters::BooleanState::Attributes::StateValue::Set(1, !state);
+        if (status != Protocols::InteractionModel::Status::Success)
+        {
+            ChipLogError(NotSpecified, "ERR: updating boolean status value %x", to_underlying(status));
+        }
+    });
 }
 
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
@@ -141,4 +165,20 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
         button_event.Handler = BaseApplication::ButtonHandler;
         sAppTask.PostEvent(&button_event);
     }
+}
+
+// DO NOT COPY for product logic. LIT ICD app is a test app with very simple application logic to enable testing.
+void AppTask::OnEnterActiveMode()
+{
+#ifdef DISPLAY_ENABLED
+    sAppTask.GetLCD().WriteDemoUI(true);
+#endif
+}
+
+// DO NOT COPY for product logic. LIT ICD app is a test app with very simple application logic to enable testing.
+void AppTask::OnEnterIdleMode()
+{
+#ifdef DISPLAY_ENABLED
+    sAppTask.GetLCD().WriteDemoUI(false);
+#endif
 }

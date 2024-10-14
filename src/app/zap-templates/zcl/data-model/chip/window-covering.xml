@@ -33,6 +33,28 @@ limitations under the License.
     <!-- Current cluster version -->
     <globalAttribute side="either" code="0xFFFD" value="5"/>
 
+    <features>
+      <feature bit="0" code="LF" name="Lift" summary="Lift control and behavior for lifting/sliding window coverings">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="TL" name="Tilt" summary="Tilt control and behavior for tilting window coverings">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="2" code="PA_LF" name="PositionAwareLift" summary="Position aware lift control is supported.">
+        <optionalConform>
+          <feature name="LF"/>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="ABS" name="AbsolutePosition" summary="Absolute positioning is supported.">
+        <optionalConform/>
+      </feature>
+      <feature bit="4" code="PA_TL" name="PositionAwareTilt" summary="Position aware tilt control is supported.">
+        <optionalConform>
+          <feature name="TL"/>
+        </optionalConform>
+      </feature>
+    </features>
+
     <!-- Window Covering Information Attribute Set -->
     <!-- Conformance feature M -->
     <attribute side="server" writable="false" code="0x0000" define="WC_TYPE"                                      type="Type"     min="0x00"   max="0x09"   default="0x00"   optional="false">Type</attribute>
@@ -104,22 +126,22 @@ limitations under the License.
     <!-- Conformance feature [LF & ABS] - for now optional -->
     <command source="client" code="0x04" name="GoToLiftValue" optional="true" cli="zcl WindowCovering GoToLiftValue">
       <description>Go to lift value specified</description>
-      <arg name="liftValue" type="int16u"/>
+      <arg name="LiftValue" type="int16u"/>
     </command>
     <!-- Conformance feature LF & PA_LF | [LF] - for now optional -->
     <command source="client" code="0x05" name="GoToLiftPercentage" optional="true" cli="zcl WindowCovering GoToLiftPercentage">
       <description>Go to lift percentage specified</description>
-      <arg name="liftPercent100thsValue" type="percent100ths"/>
+      <arg name="LiftPercent100thsValue" type="percent100ths"/>
     </command>
     <!-- Conformance feature [TL & ABS] - for now optional -->
     <command source="client" code="0x07" name="GoToTiltValue" optional="true" cli="zcl WindowCovering GoToTiltValue">
       <description>Go to tilt value specified</description>
-      <arg name="tiltValue" type="int16u"/>
+      <arg name="TiltValue" type="int16u"/>
     </command>
     <!-- Conformance feature TL & PA_TL | [TL] - for now optional -->
     <command source="client" code="0x08" name="GoToTiltPercentage" optional="true" cli="zcl WindowCovering GoToTiltPercentage">
       <description>Go to tilt percentage specified</description>
-      <arg name="tiltPercent100thsValue" type="percent100ths"/>
+      <arg name="TiltPercent100thsValue" type="percent100ths"/>
     </command>
   </cluster>
 
@@ -211,12 +233,4 @@ limitations under the License.
     <field mask="0x0800" name="Protection"/>
   </bitmap>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0102"/>
-    <field mask="0x01" name="Lift" />
-    <field mask="0x02" name="Tilt" />
-    <field mask="0x04" name="PositionAwareLift"/>
-    <field mask="0x08" name="AbsolutePosition"/>
-    <field mask="0x10" name="PositionAwareTilt"/>
-  </bitmap>
 </configurator>

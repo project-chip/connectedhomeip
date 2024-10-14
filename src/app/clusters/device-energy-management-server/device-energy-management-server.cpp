@@ -17,6 +17,8 @@
 #include "device-energy-management-server.h"
 
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
@@ -36,16 +38,16 @@ namespace DeviceEnergyManagement {
 
 CHIP_ERROR Instance::Init()
 {
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;
 }
 
 void Instance::Shutdown()
 {
-    InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
-    unregisterAttributeAccessOverride(this);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 bool Instance::HasFeature(Feature aFeature) const
@@ -275,7 +277,7 @@ Status Instance::CheckOptOutAllowsRequest(AdjustmentCauseEnum adjustmentCause)
             return Status::Success;
         case AdjustmentCauseEnum::kLocalOptimization:
         default:
-            return Status::Failure;
+            return Status::ConstraintError;
         }
 
     case OptOutStateEnum::kGridOptOut: /* User has opted out from Grid only */
@@ -286,12 +288,12 @@ Status Instance::CheckOptOutAllowsRequest(AdjustmentCauseEnum adjustmentCause)
             return Status::Success;
         case AdjustmentCauseEnum::kGridOptimization:
         default:
-            return Status::Failure;
+            return Status::ConstraintError;
         }
 
     case OptOutStateEnum::kOptOut: /* User has opted out from both local and grid */
         ChipLogProgress(Zcl, "DEM: OptOutState = kOptOut");
-        return Status::Failure;
+        return Status::ConstraintError;
 
     default:
         ChipLogError(Zcl, "DEM: invalid optOutState %d", static_cast<int>(optOutState));
@@ -301,15 +303,21 @@ Status Instance::CheckOptOutAllowsRequest(AdjustmentCauseEnum adjustmentCause)
 
 void Instance::HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::PowerAdjustRequest::DecodableType & commandData)
 {
-    Status status;
     bool validArgs = false;
-    PowerAdjustmentCapability::TypeInfo::Type powerAdjustmentCapability;
 
     int64_t power                       = commandData.power;
     uint32_t durationSec                = commandData.duration;
     AdjustmentCauseEnum adjustmentCause = commandData.cause;
 
-    status = CheckOptOutAllowsRequest(adjustmentCause);
+    //  Notify the appliance if the appliance hardware cannot be adjusted, then return Failure
+    if (!HasFeature(DeviceEnergyManagement::Feature::kPowerAdjustment))
+    {
+        ChipLogError(Zcl, "PowerAdjust not supported");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
+    }
+
+    Status status = CheckOptOutAllowsRequest(adjustmentCause);
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "DEM: PowerAdjustRequest command rejected");
@@ -317,16 +325,24 @@ void Instance::HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::Po
         return;
     }
 
-    powerAdjustmentCapability = mDelegate.GetPowerAdjustmentCapability();
-    if (powerAdjustmentCapability.IsNull())
+    DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> powerAdjustmentCapabilityStruct =
+        mDelegate.GetPowerAdjustmentCapability();
+    if (powerAdjustmentCapabilityStruct.IsNull())
     {
-        ChipLogError(Zcl, "DEM: powerAdjustmentCapability IsNull");
+        ChipLogError(Zcl, "DEM: powerAdjustmentCapabilityStruct IsNull");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        return;
+    }
+
+    if (powerAdjustmentCapabilityStruct.Value().powerAdjustCapability.IsNull())
+    {
+        ChipLogError(Zcl, "DEM: powerAdjustmentCapabilityStruct.powerAdjustCapability IsNull");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
     /* PowerAdjustmentCapability is a list - so iterate through checking if the command is within one of the offers */
-    for (auto pas : powerAdjustmentCapability.Value())
+    for (auto pas : powerAdjustmentCapabilityStruct.Value().powerAdjustCapability.Value())
     {
         if ((power >= pas.minPower) && (durationSec >= pas.minDuration) && (power <= pas.maxPower) &&
             (durationSec <= pas.maxDuration))
@@ -357,18 +373,23 @@ void Instance::HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::Po
 void Instance::HandleCancelPowerAdjustRequest(HandlerContext & ctx,
                                               const Commands::CancelPowerAdjustRequest::DecodableType & commandData)
 {
-    Status status;
+    if (!HasFeature(DeviceEnergyManagement::Feature::kPowerAdjustment))
+    {
+        ChipLogError(Zcl, "PowerAdjust not supported");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
+    }
 
     /* Check that the ESA state is PowerAdjustActive */
     ESAStateEnum esaStatus = mDelegate.GetESAState();
     if (ESAStateEnum::kPowerAdjustActive != esaStatus)
     {
         ChipLogError(Zcl, "DEM: kPowerAdjustActive != esaStatus");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
         return;
     }
 
-    status = mDelegate.CancelPowerAdjustRequest();
+    Status status = mDelegate.CancelPowerAdjustRequest();
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
@@ -491,6 +512,13 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
     CHIP_ERROR err                                              = CHIP_NO_ERROR;
     DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate.GetForecast();
 
+    if (!HasFeature(DeviceEnergyManagement::Feature::kPausable))
+    {
+        ChipLogError(AppServer, "Pause not supported");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
+    }
+
     uint32_t duration                   = commandData.duration;
     AdjustmentCauseEnum adjustmentCause = commandData.cause;
 
@@ -529,10 +557,10 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
         return;
     }
 
-    /* We expect that there should be a slotIsPauseable entry (but it is optional) */
-    if (!forecast.Value().slots[activeSlotNumber].slotIsPauseable.HasValue())
+    /* We expect that there should be a slotIsPausable entry (but it is optional) */
+    if (!forecast.Value().slots[activeSlotNumber].slotIsPausable.HasValue())
     {
-        ChipLogError(Zcl, "DEM: activeSlotNumber %d does not include slotIsPauseable.", activeSlotNumber);
+        ChipLogError(Zcl, "DEM: activeSlotNumber %d does not include slotIsPausable.", activeSlotNumber);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
@@ -551,14 +579,14 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
         return;
     }
 
-    if (!forecast.Value().slots[activeSlotNumber].slotIsPauseable.Value())
+    if (!forecast.Value().slots[activeSlotNumber].slotIsPausable.Value())
     {
-        ChipLogError(Zcl, "DEM: activeSlotNumber %d is NOT pauseable.", activeSlotNumber);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        ChipLogError(Zcl, "DEM: activeSlotNumber %d is NOT pausable.", activeSlotNumber);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 
-    if ((duration < forecast.Value().slots[activeSlotNumber].minPauseDuration.Value()) &&
+    if ((duration < forecast.Value().slots[activeSlotNumber].minPauseDuration.Value()) ||
         (duration > forecast.Value().slots[activeSlotNumber].maxPauseDuration.Value()))
     {
         ChipLogError(Zcl, "DEM: out of range pause duration %ld", static_cast<long unsigned int>(duration));
@@ -579,22 +607,28 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "DEM: PauseRequest(%ld) FAILURE", static_cast<long unsigned int>(duration));
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
 }
 
 void Instance::HandleResumeRequest(HandlerContext & ctx, const Commands::ResumeRequest::DecodableType & commandData)
 {
-    Status status;
-
-    if (ESAStateEnum::kPaused != mDelegate.GetESAState())
+    if (!HasFeature(DeviceEnergyManagement::Feature::kPausable))
     {
-        ChipLogError(Zcl, "DEM: ESAState not Paused.");
+        ChipLogError(AppServer, "Pause not supported");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 
-    status = mDelegate.ResumeRequest();
+    if (ESAStateEnum::kPaused != mDelegate.GetESAState())
+    {
+        ChipLogError(Zcl, "DEM: ESAState not Paused.");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
+        return;
+    }
+
+    Status status = mDelegate.ResumeRequest();
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
@@ -605,10 +639,17 @@ void Instance::HandleResumeRequest(HandlerContext & ctx, const Commands::ResumeR
 
 void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands::ModifyForecastRequest::DecodableType & commandData)
 {
+    if (!HasFeature(DeviceEnergyManagement::Feature::kForecastAdjustment))
+    {
+        ChipLogError(Zcl, "ModifyForecast not supported");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
+    }
+
     Status status;
     DataModel::Nullable<Structs::ForecastStruct::Type> forecast;
 
-    uint32_t forecastId                                                           = commandData.forecastId;
+    uint32_t forecastID                                                           = commandData.forecastID;
     DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> slotAdjustments = commandData.slotAdjustments;
     AdjustmentCauseEnum adjustmentCause                                           = commandData.cause;
 
@@ -628,11 +669,65 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
         return;
     }
 
-    status = mDelegate.ModifyForecastRequest(forecastId, slotAdjustments, adjustmentCause);
+    // Check the various values in the slot structures
+    auto iterator = slotAdjustments.begin();
+    while (iterator.Next())
+    {
+        const Structs::SlotAdjustmentStruct::Type & slotAdjustment = iterator.GetValue();
+
+        // Check for an invalid slotIndex
+        if (slotAdjustment.slotIndex >= forecast.Value().slots.size())
+        {
+            ChipLogError(Zcl, "DEM: Bad slot index %d", slotAdjustment.slotIndex);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+            return;
+        }
+
+        // Check to see if trying to modify a slot which has already been run
+        if (!forecast.Value().activeSlotNumber.IsNull() && slotAdjustment.slotIndex < forecast.Value().activeSlotNumber.Value())
+        {
+            ChipLogError(Zcl, "DEM: Modifying already run slot index %d", slotAdjustment.slotIndex);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            return;
+        }
+
+        const Structs::SlotStruct::Type & slot = forecast.Value().slots[slotAdjustment.slotIndex];
+
+        // NominalPower is only relevant if PFR is supported
+        if (HasFeature(Feature::kPowerForecastReporting))
+        {
+            if (!slotAdjustment.nominalPower.HasValue() || !slot.minPowerAdjustment.HasValue() ||
+                !slot.maxPowerAdjustment.HasValue() || slotAdjustment.nominalPower.Value() < slot.minPowerAdjustment.Value() ||
+                slotAdjustment.nominalPower.Value() > slot.maxPowerAdjustment.Value())
+            {
+                ChipLogError(Zcl, "DEM: Bad nominalPower");
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+                return;
+            }
+        }
+
+        if (!slot.minDurationAdjustment.HasValue() || !slot.maxDurationAdjustment.HasValue() ||
+            slotAdjustment.duration < slot.minDurationAdjustment.Value() ||
+            slotAdjustment.duration > slot.maxDurationAdjustment.Value())
+        {
+            ChipLogError(Zcl, "DEM: Bad min/max duration");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            return;
+        }
+    }
+
+    if (iterator.GetStatus() != CHIP_NO_ERROR)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        return;
+    }
+
+    status = mDelegate.ModifyForecastRequest(forecastID, slotAdjustments, adjustmentCause);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "DEM: ModifyForecastRequest FAILURE");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 }
@@ -640,7 +735,14 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
 void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
                                                     const Commands::RequestConstraintBasedForecast::DecodableType & commandData)
 {
-    Status status;
+    if (!HasFeature(DeviceEnergyManagement::Feature::kConstraintBasedAdjustment))
+    {
+        ChipLogError(AppServer, "RequestConstraintBasedForecast CON not supported");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
+    }
+
+    Status status = Status::Success;
 
     DataModel::DecodableList<Structs::ConstraintsStruct::DecodableType> constraints = commandData.constraints;
     AdjustmentCauseEnum adjustmentCause                                             = commandData.cause;
@@ -651,6 +753,115 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
         ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast command rejected");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
+    }
+
+    uint32_t currentUtcTime = 0;
+    status                  = GetMatterEpochTimeFromUnixTime(currentUtcTime);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "DEM: Failed to get UTC time");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
+
+    // Check for invalid power levels and whether the constraint time/duration is in the past
+    {
+        auto iterator = constraints.begin();
+        if (iterator.Next())
+        {
+            const Structs::ConstraintsStruct::DecodableType & constraint = iterator.GetValue();
+
+            // Check to see if this constraint is in the past
+            if (constraint.startTime < currentUtcTime)
+            {
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+                return;
+            }
+
+            if (HasFeature(Feature::kPowerForecastReporting))
+            {
+                if (!constraint.nominalPower.HasValue())
+                {
+                    ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast no nominalPower");
+                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+                    return;
+                }
+
+                if (constraint.nominalPower.Value() < mDelegate.GetAbsMinPower() ||
+                    constraint.nominalPower.Value() > mDelegate.GetAbsMaxPower())
+                {
+                    ChipLogError(Zcl,
+                                 "DEM: RequestConstraintBasedForecast nominalPower " ChipLogFormatX64
+                                 " out of range [" ChipLogFormatX64 ", " ChipLogFormatX64 "]",
+                                 ChipLogValueX64(constraint.nominalPower.Value()), ChipLogValueX64(mDelegate.GetAbsMinPower()),
+                                 ChipLogValueX64(mDelegate.GetAbsMaxPower()));
+
+                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+                    return;
+                }
+
+                if (!constraint.maximumEnergy.HasValue())
+                {
+                    ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast no value for maximumEnergy");
+                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+                    return;
+                }
+            }
+
+            if (HasFeature(Feature::kStateForecastReporting))
+            {
+                if (!constraint.loadControl.HasValue())
+                {
+                    ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast no loadControl");
+                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+                    return;
+                }
+
+                if (constraint.loadControl.Value() < -100 || constraint.loadControl.Value() > 100)
+                {
+                    ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast bad loadControl %d", constraint.loadControl.Value());
+                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+                    return;
+                }
+            }
+        }
+
+        if (iterator.GetStatus() != CHIP_NO_ERROR)
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+            return;
+        }
+    }
+
+    // Check for overlappping elements
+    {
+        auto iterator = constraints.begin();
+        if (iterator.Next())
+        {
+            // Get the first constraint
+            Structs::ConstraintsStruct::DecodableType prevConstraint = iterator.GetValue();
+
+            // Start comparing next vs prev constraints
+            while (iterator.Next())
+            {
+                const Structs::ConstraintsStruct::DecodableType & constraint = iterator.GetValue();
+                if (constraint.startTime < prevConstraint.startTime ||
+                    prevConstraint.startTime + prevConstraint.duration >= constraint.startTime)
+                {
+                    ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast overlapping constraint times");
+                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+                    return;
+                }
+
+                prevConstraint = constraint;
+            }
+        }
+
+        if (iterator.GetStatus() != CHIP_NO_ERROR)
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+            return;
+        }
     }
 
     status = mDelegate.RequestConstraintBasedForecast(constraints, adjustmentCause);
@@ -664,15 +875,47 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
 
 void Instance::HandleCancelRequest(HandlerContext & ctx, const Commands::CancelRequest::DecodableType & commandData)
 {
-    Status status;
+    Status status                                               = Status::Failure;
+    DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate.GetForecast();
 
-    status = mDelegate.CancelRequest();
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-    if (status != Status::Success)
+    if (forecast.IsNull())
     {
-        ChipLogError(Zcl, "DEM: CancelRequest FAILURE");
-        return;
+        ChipLogDetail(AppServer, "Cancelling on a Null forecast!");
+        status = Status::Failure;
     }
+    else if (forecast.Value().forecastUpdateReason == ForecastUpdateReasonEnum::kInternalOptimization)
+    {
+        ChipLogDetail(AppServer, "Bad Cancel when ESA ForecastUpdateReason was already Internal Optimization!");
+        status = Status::InvalidInState;
+    }
+    else
+    {
+        status = mDelegate.CancelRequest();
+    }
+
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+}
+
+Status Instance::GetMatterEpochTimeFromUnixTime(uint32_t & currentUtcTime) const
+{
+    currentUtcTime = 0;
+    System::Clock::Milliseconds64 cTMs;
+
+    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "DEM: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
+
+    auto unixEpoch = std::chrono::duration_cast<System::Clock::Seconds32>(cTMs).count();
+    if (!UnixEpochToChipEpochTime(unixEpoch, currentUtcTime))
+    {
+        ChipLogError(Zcl, "DEM: unable to convert Unix Epoch time to Matter Epoch Time");
+        return Status::Failure;
+    }
+
+    return Status::Success;
 }
 
 } // namespace DeviceEnergyManagement

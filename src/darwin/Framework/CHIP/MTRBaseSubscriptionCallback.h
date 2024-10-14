@@ -22,6 +22,7 @@
 #include <app/BufferedReadCallback.h>
 #include <app/ClusterStateCache.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/EventHeader.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/ReadClient.h>
@@ -93,15 +94,18 @@ public:
 
     chip::app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
 
+    // Methods to clear state from our cluster state cache.  Must be called on
+    // the Matter queue.
+    void ClearCachedAttributeState(chip::EndpointId aEndpoint);
+    void ClearCachedAttributeState(const chip::app::ConcreteClusterPath & aCluster);
+    void ClearCachedAttributeState(const chip::app::ConcreteAttributePath & aAttribute);
+
     // We need to exist to get a ReadClient, so can't take this as a constructor argument.
     void AdoptReadClient(std::unique_ptr<chip::app::ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
     void AdoptClusterStateCache(std::unique_ptr<chip::app::ClusterStateCache> aClusterStateCache)
     {
         mClusterStateCache = std::move(aClusterStateCache);
     }
-
-    // Used to reset Resubscription backoff on events that indicate likely availability of device to come back online
-    void ResetResubscriptionBackoff() { mResubscriptionNumRetries = 0; }
 
 protected:
     // Report an error, which may be due to issues in our own internal state or
@@ -147,6 +151,8 @@ protected:
     NSMutableArray * _Nullable mAttributeReports = nil;
     NSMutableArray * _Nullable mEventReports = nil;
 
+    void CallResubscriptionScheduledHandler(NSError * error, NSNumber * resubscriptionDelay);
+
 private:
     DataReportCallback _Nullable mAttributeReportCallback = nil;
     DataReportCallback _Nullable mEventReportCallback = nil;
@@ -181,10 +187,6 @@ private:
     bool mHaveQueuedDeletion = false;
     OnDoneHandler _Nullable mOnDoneHandler = nil;
     dispatch_block_t mInterimReportBlock = nil;
-
-    // Copied from ReadClient and customized for
-    uint32_t ComputeTimeTillNextSubscription();
-    uint32_t mResubscriptionNumRetries = 0;
 };
 
 NS_ASSUME_NONNULL_END

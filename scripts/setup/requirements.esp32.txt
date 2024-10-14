@@ -9,8 +9,9 @@ reedsolo>=1.5.3,<=1.5.4
 bitarray==2.6.0
 bitstring>=3.1.6,<4
 ecdsa>=0.16.0
-construct==2.10.54
+construct>=2.10.70
 python-socketio<5
 itsdangerous<2.1 ; python_version < "3.11"
 esp_idf_monitor==1.1.1
 esp-idf-kconfig==1.2.0
+esp_idf_nvs_partition_gen==0.1.2

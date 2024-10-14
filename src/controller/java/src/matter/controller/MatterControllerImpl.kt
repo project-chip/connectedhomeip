@@ -204,6 +204,9 @@ class MatterControllerImpl(params: ControllerParams) : MatterController {
             reportHandler,
             resubscriptionAttemptHandler
           )
+
+        val fabricIndex = getFabricIndex(devicePtr)
+        val deviceId = getRemoteDeviceId(devicePtr)
         subscribe(
           deviceControllerPtr,
           reportCallbackJni.getJniHandle(),
@@ -214,7 +217,8 @@ class MatterControllerImpl(params: ControllerParams) : MatterController {
           request.maxInterval.seconds.toInt(),
           request.keepSubscriptions,
           request.fabricFiltered,
-          CHIP_IM_TIMEOUT_MS
+          CHIP_IM_TIMEOUT_MS,
+          MatterICDClientImpl.isPeerICDClient(fabricIndex, deviceId)
         )
 
         awaitClose { logger.log(Level.FINE, "Closing flow") }
@@ -232,7 +236,8 @@ class MatterControllerImpl(params: ControllerParams) : MatterController {
     maxInterval: Int,
     keepSubscriptions: Boolean,
     isFabricFiltered: Boolean,
-    imTimeoutMs: Int
+    imTimeoutMs: Int,
+    isPeerLIT: Boolean
   )
 
   override suspend fun read(request: ReadRequest): ReadResponse {
@@ -450,6 +455,10 @@ class MatterControllerImpl(params: ControllerParams) : MatterController {
     imTimeoutMs: Int
   )
 
+  external fun getRemoteDeviceId(devicePtr: Long): Long
+
+  external fun getFabricIndex(devicePtr: Long): Int
+
   override fun close() {
     logger.log(Level.INFO, "MatterController is closed")
     deviceController.shutdownCommissioning()
@@ -476,65 +485,6 @@ class MatterControllerImpl(params: ControllerParams) : MatterController {
       )
     }
   }
-
-  // private fun ChipAttributePath.wrap(): AttributePath {
-  //   return AttributePath(
-  //     endpointId.getId().toUShort(),
-  //     clusterId.getId().toUInt(),
-  //     attributeId.getId().toUInt()
-  //   )
-  // }
-
-  // private fun ChipEventPath.wrap(): EventPath {
-  //   return EventPath(
-  //     endpointId.getId().toUShort(),
-  //     clusterId.getId().toUInt(),
-  //     eventId.getId().toUInt()
-  //   )
-  // }
-
-  // private fun chip.devicecontroller.model.NodeState.wrap(): NodeState {
-  //   return NodeState(
-  //     endpoints = endpointStates.mapValues { (id, value) -> value.wrap(id) }.toMutableMap(),
-  //   )
-  // }
-
-  // private fun chip.devicecontroller.model.EndpointState.wrap(id: Int): EndpointState {
-  //   return EndpointState(
-  //     id,
-  //     clusterStates.mapValues { (id, value) -> value.wrap(id) }.toMutableMap()
-  //   )
-  // }
-
-  // private fun chip.devicecontroller.model.ClusterState.wrap(id: Long): ClusterState {
-  //   return ClusterState(
-  //     id,
-  //     attributeStates.mapValues { (id, value) -> value.wrap(id) }.toMutableMap(),
-  //     eventStates
-  //       .mapValues { (id, value) ->
-  //         value.map { eventState -> eventState.wrap(id) }.toMutableList()
-  //       }
-  //       .toMutableMap()
-  //   )
-  // }
-
-  // private fun chip.devicecontroller.model.AttributeState.wrap(id: Long): AttributeState {
-  //   return AttributeState(id, tlv, json.toString(), AttributePath(0U, 0U, id.toUInt()), value)
-  // }
-
-  // private fun chip.devicecontroller.model.EventState.wrap(id: Long): EventState {
-  //   return EventState(
-  //     id,
-  //     eventNumber,
-  //     priorityLevel,
-  //     timestampType,
-  //     timestampValue,
-  //     tlv,
-  //     EventPath(0U, 0U, id.toUInt()),
-  //     json.toString(),
-  //     value
-  //   )
-  // }
 
   init {
     val config: OperationalKeyConfig? = params.operationalKeyConfig

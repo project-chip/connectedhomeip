@@ -15,12 +15,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/util/af.h>
-#include <iostream>
+#include <app/util/config.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #ifdef MATTER_DM_PLUGIN_DOOR_LOCK_SERVER
 #include "chef-lock-manager.h"
+
+#include <algorithm>
+#include <iostream>
 
 using chip::to_underlying;
 

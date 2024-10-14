@@ -24,7 +24,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     build_linux_fuzzing:
         name: Build on Linux
@@ -33,7 +33,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:41
+            image: ghcr.io/project-chip/chip-build:81
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -68,7 +68,7 @@ jobs:
 
     build_darwin_fuzzing:
         name: Build on Darwin
-        runs-on: macos-latest
+        runs-on: macos-13
         if: github.actor != 'restyled-io[bot]'
 
         steps:

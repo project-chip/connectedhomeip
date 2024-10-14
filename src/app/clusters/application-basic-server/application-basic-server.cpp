@@ -26,6 +26,7 @@
 #include <app/clusters/application-basic-server/application-basic-server.h>
 
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
@@ -36,6 +37,7 @@
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 #include <list>
+#include <string>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -244,5 +246,5 @@ CHIP_ERROR ApplicationBasicAttrAccess::ReadAllowedVendorListAttribute(app::Attri
 
 void MatterApplicationBasicPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gApplicationBasicAttrAccess);
+    app::AttributeAccessInterfaceRegistry::Instance().Register(&gApplicationBasicAttrAccess);
 }

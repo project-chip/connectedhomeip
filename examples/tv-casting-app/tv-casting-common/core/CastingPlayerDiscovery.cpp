@@ -25,7 +25,6 @@ namespace core {
 using namespace chip::System;
 using namespace chip::Controller;
 using namespace chip::Dnssd;
-using namespace std;
 
 CastingPlayerDiscovery * CastingPlayerDiscovery::_castingPlayerDiscovery = nullptr;
 
@@ -63,17 +62,52 @@ CHIP_ERROR CastingPlayerDiscovery::StartDiscovery(uint32_t deviceTypeFilter)
 
 CHIP_ERROR CastingPlayerDiscovery::StopDiscovery()
 {
-    ChipLogProgress(Discovery, "CastingPlayerDiscovery::StopDiscovery() called");
+    ChipLogProgress(Discovery, "CastingPlayerDiscovery::StopDiscovery() mCastingPlayers: %u, mCastingPlayersInternal: %u",
+                    static_cast<unsigned int>(mCastingPlayers.size()), static_cast<unsigned int>(mCastingPlayersInternal.size()));
     VerifyOrReturnError(mState == DISCOVERY_RUNNING, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mCommissionableNodeController.StopDiscovery());
 
+    // Copy mCastingPlayers to mCastingPlayersInternal
+    mCastingPlayersInternal = std::vector<memory::Strong<CastingPlayer>>(mCastingPlayers);
+
+    // Clear mCastingPlayers of all CastingPlayers
     mCastingPlayers.clear();
     mState = DISCOVERY_READY;
 
     return CHIP_NO_ERROR;
 }
 
-void DeviceDiscoveryDelegateImpl::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
+void CastingPlayerDiscovery::ClearDisconnectedCastingPlayersInternal()
+{
+    ChipLogProgress(Discovery, "CastingPlayerDiscovery::ClearDisconnectedCastingPlayersInternal() mCastingPlayersInternal: %u",
+                    static_cast<unsigned int>(mCastingPlayersInternal.size()));
+    // Only clear the CastingPlayers in mCastingPlayersInternal with ConnectionState == CASTING_PLAYER_NOT_CONNECTED
+    for (auto it = mCastingPlayersInternal.begin(); it != mCastingPlayersInternal.end();)
+    {
+        auto & player = *it;
+        if (player->GetConnectionState() == CASTING_PLAYER_NOT_CONNECTED)
+        {
+            ChipLogProgress(
+                Discovery,
+                "CastingPlayerDiscovery::ClearDisconnectedCastingPlayersInternal() Removing disconnected CastingPlayer: %s "
+                "with reference count: %lu",
+                player->GetDeviceName(), player.use_count());
+            it = mCastingPlayersInternal.erase(it);
+        }
+        else
+        {
+            ++it; // Move to the next element if the current one is not removed
+        }
+    }
+}
+
+void CastingPlayerDiscovery::ClearCastingPlayersInternal()
+{
+    ChipLogProgress(Discovery, "CastingPlayerDiscovery::ClearCastingPlayersInternal()");
+    mCastingPlayersInternal.clear();
+}
+
+void DeviceDiscoveryDelegateImpl::OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData)
 {
     ChipLogProgress(Discovery, "DeviceDiscoveryDelegateImpl::OnDiscoveredDevice() called");
     VerifyOrReturn(mClientDelegate != nullptr,
@@ -81,23 +115,23 @@ void DeviceDiscoveryDelegateImpl::OnDiscoveredDevice(const chip::Dnssd::Discover
 
     // convert nodeData to CastingPlayer
     CastingPlayerAttributes attributes;
-    snprintf(attributes.id, kIdMaxLength + 1, "%s%u", nodeData.resolutionData.hostName, nodeData.resolutionData.port);
+    snprintf(attributes.id, kIdMaxLength + 1, "%s%u", nodeData.hostName, nodeData.port);
 
-    chip::Platform::CopyString(attributes.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1, nodeData.commissionData.deviceName);
-    chip::Platform::CopyString(attributes.hostName, chip::Dnssd::kHostNameMaxLength + 1, nodeData.resolutionData.hostName);
-    chip::Platform::CopyString(attributes.instanceName, chip::Dnssd::Commission::kInstanceNameMaxLength + 1,
-                               nodeData.commissionData.instanceName);
+    chip::Platform::CopyString(attributes.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1, nodeData.deviceName);
+    chip::Platform::CopyString(attributes.hostName, chip::Dnssd::kHostNameMaxLength + 1, nodeData.hostName);
+    chip::Platform::CopyString(attributes.instanceName, chip::Dnssd::Commission::kInstanceNameMaxLength + 1, nodeData.instanceName);
 
-    attributes.numIPs = (unsigned int) nodeData.resolutionData.numIPs;
+    attributes.numIPs = (unsigned int) nodeData.numIPs;
     for (unsigned j = 0; j < attributes.numIPs; j++)
     {
-        attributes.ipAddresses[j] = nodeData.resolutionData.ipAddress[j];
+        attributes.ipAddresses[j] = nodeData.ipAddress[j];
     }
-    attributes.interfaceId = nodeData.resolutionData.interfaceId;
-    attributes.port        = nodeData.resolutionData.port;
-    attributes.productId   = nodeData.commissionData.productId;
-    attributes.vendorId    = nodeData.commissionData.vendorId;
-    attributes.deviceType  = nodeData.commissionData.deviceType;
+    attributes.interfaceId                           = nodeData.interfaceId;
+    attributes.port                                  = nodeData.port;
+    attributes.productId                             = nodeData.productId;
+    attributes.vendorId                              = nodeData.vendorId;
+    attributes.deviceType                            = nodeData.deviceType;
+    attributes.supportsCommissionerGeneratedPasscode = nodeData.supportsCommissionerGeneratedPasscode;
 
     memory::Strong<CastingPlayer> player = std::make_shared<CastingPlayer>(attributes);
 

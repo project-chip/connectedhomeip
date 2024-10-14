@@ -23,6 +23,8 @@
 
 #include <net/if.h>
 
+#include <string>
+
 using namespace chip::Dnssd;
 using namespace chip::Dnssd::Internal;
 
@@ -133,7 +135,8 @@ CHIP_ERROR GenericContext::FinalizeInternal(const char * errorStr, CHIP_ERROR er
     }
     else
     {
-        chip::Platform::Delete(this);
+        // Ensure that we clean up our service ref, if any, correctly.
+        MdnsContexts::GetInstance().Delete(this);
     }
 
     return err;
@@ -159,33 +162,22 @@ MdnsContexts::~MdnsContexts()
     }
 }
 
-CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
+CHIP_ERROR MdnsContexts::Add(GenericContext * context)
 {
-    VerifyOrReturnError(context != nullptr || sdRef != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (context == nullptr)
+    VerifyOrReturnError(context != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    if (!context->serviceRef)
     {
-        DNSServiceRefDeallocate(sdRef);
+        Delete(context);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (sdRef == nullptr)
-    {
-        chip::Platform::Delete(context);
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    auto err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
+    auto err = DNSServiceSetDispatchQueue(context->serviceRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
     if (kDNSServiceErr_NoError != err)
     {
-        // We can't just use our Delete to deallocate the service ref here,
-        // because our context may not have its serviceRef set yet.
-        DNSServiceRefDeallocate(sdRef);
-        chip::Platform::Delete(context);
+        Delete(context);
         return Error::ToChipError(err);
     }
 
-    context->serviceRef = sdRef;
     mContexts.push_back(context);
 
     return CHIP_NO_ERROR;
@@ -240,11 +232,14 @@ CHIP_ERROR MdnsContexts::RemoveAllOfType(ContextType type)
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
+// TODO: Perhaps this cleanup code should just move into ~GenericContext, and
+// the places that call this method should just Platform::Delete() the context?
 void MdnsContexts::Delete(GenericContext * context)
 {
     if (context->serviceRef != nullptr)
     {
         DNSServiceRefDeallocate(context->serviceRef);
+        context->serviceRef = nullptr;
     }
     chip::Platform::Delete(context);
 }
@@ -348,7 +343,17 @@ BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServ
 
 void BrowseContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 {
-    ChipLogError(Discovery, "Mdns: Browse failure (%s)", errorStr);
+    if (err == CHIP_ERROR_CANCELLED && dispatchedSuccessOnce)
+    {
+        // We've been canceled after finding some devices.  Treat this as a
+        // success, because maybe (common case, in fact) those were the devices
+        // our consumer was looking for.
+        ChipLogProgress(Discovery, "Mdns: Browse canceled");
+    }
+    else
+    {
+        ChipLogError(Discovery, "Mdns: Browse failure (%s)", errorStr);
+    }
     callback(context, nullptr, 0, true, err);
     MdnsContexts::GetInstance().Remove(this);
 }
@@ -374,6 +379,8 @@ void BrowseContext::DispatchPartialSuccess()
     sDispatchedServices        = nullptr;
     sContextDispatchingSuccess = nullptr;
     services.clear();
+
+    dispatchedSuccessOnce = true;
 }
 
 void BrowseContext::OnBrowse(DNSServiceFlags flags, const char * name, const char * type, const char * domain, uint32_t interfaceId)
@@ -476,7 +483,7 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
     consumerCounter = std::move(consumerCounterToUse);
 }
 
-ResolveContext::ResolveContext(CommissioningResolveDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
+ResolveContext::ResolveContext(DiscoverNodeDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
                                const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse) :
     browseThatCausedResolve(nullptr)
 {
@@ -490,10 +497,7 @@ ResolveContext::ResolveContext(CommissioningResolveDelegate * delegate, chip::In
 
 ResolveContext::~ResolveContext()
 {
-    if (isSRPTimerRunning)
-    {
-        CancelSRPTimer();
-    }
+    CancelSRPTimerIfRunning();
 }
 
 void ResolveContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
@@ -524,6 +528,26 @@ void ResolveContext::DispatchSuccess()
     // ChipDnssdResolveNoLongerNeeded don't find us and try to also remove us.
     bool needDelete = MdnsContexts::GetInstance().RemoveWithoutDeleting(this);
 
+    class AutoSelfDeleter
+    {
+    public:
+        AutoSelfDeleter(bool needDelete, ResolveContext * self) : mNeedDelete(needDelete), mSelf(self) {}
+
+        ~AutoSelfDeleter()
+        {
+            if (mNeedDelete)
+            {
+                MdnsContexts::GetInstance().Delete(mSelf);
+            }
+        }
+
+    private:
+        bool mNeedDelete;
+        ResolveContext * mSelf;
+    };
+
+    AutoSelfDeleter selfDeleter(needDelete, this);
+
 #if TARGET_OS_TV
     // On tvOS, prioritize results from en0, en1, ir0 in that order, if those
     // interfaces are present, since those will generally have more up-to-date
@@ -540,96 +564,98 @@ void ResolveContext::DispatchSuccess()
     };
 #endif // TARGET_OS_TV
 
-    for (auto interfaceIndex : priorityInterfaceIndices)
+    std::vector<InterfaceKey> interfacesOrder;
+    for (auto priorityInterfaceIndex : priorityInterfaceIndices)
     {
-        if (TryReportingResultsForInterfaceIndex(static_cast<uint32_t>(interfaceIndex)))
+        if (priorityInterfaceIndex == 0)
         {
-            if (needDelete)
+            // Not actually an interface we have, since if_nametoindex
+            // returned 0.
+            continue;
+        }
+
+        for (auto & interface : interfaces)
+        {
+            if (interface.second.HasAddresses() && priorityInterfaceIndex == interface.first.interfaceId)
             {
-                MdnsContexts::GetInstance().Delete(this);
+                interfacesOrder.push_back(interface.first);
             }
-            return;
         }
     }
 
     for (auto & interface : interfaces)
     {
-        if (TryReportingResultsForInterfaceIndex(interface.first.interfaceId, interface.first.hostname,
-                                                 interface.first.isSRPResult))
+        // Skip interfaces that have already been prioritized to avoid duplicate results
+        auto interfaceKey = std::find(std::begin(interfacesOrder), std::end(interfacesOrder), interface.first);
+        if (interfaceKey != std::end(interfacesOrder))
         {
-            break;
+            continue;
         }
-    }
 
-    if (needDelete)
-    {
-        MdnsContexts::GetInstance().Delete(this);
-    }
-}
-
-bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, const std::string & hostname, bool isSRPResult)
-{
-    if (interfaceIndex == 0)
-    {
-        // Not actually an interface we have.
-        return false;
-    }
-
-    InterfaceKey interfaceKey = { interfaceIndex, hostname, isSRPResult };
-    auto & interface          = interfaces[interfaceKey];
-    auto & ips                = interface.addresses;
-
-    // Some interface may not have any ips, just ignore them.
-    if (ips.size() == 0)
-    {
-        return false;
-    }
-
-    ChipLogProgress(Discovery, "Mdns: Resolve success on interface %" PRIu32, interfaceIndex);
-
-    auto & service = interface.service;
-    auto addresses = Span<Inet::IPAddress>(ips.data(), ips.size());
-    if (nullptr == callback)
-    {
-        auto delegate = static_cast<CommissioningResolveDelegate *>(context);
-        DiscoveredNodeData nodeData;
-        service.ToDiscoveredNodeData(addresses, nodeData);
-        delegate->OnNodeDiscovered(nodeData);
-    }
-    else
-    {
-        callback(context, &service, addresses, CHIP_NO_ERROR);
-    }
-
-    return true;
-}
-
-bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex)
-{
-    for (auto & interface : interfaces)
-    {
-        if (interface.first.interfaceId == interfaceIndex)
+        // Some interface may not have any ips, just ignore them.
+        if (!interface.second.HasAddresses())
         {
-            if (TryReportingResultsForInterfaceIndex(interface.first.interfaceId, interface.first.hostname,
-                                                     interface.first.isSRPResult))
+            continue;
+        }
+
+        interfacesOrder.push_back(interface.first);
+    }
+
+    for (auto & interfaceKey : interfacesOrder)
+    {
+        auto & interfaceInfo = interfaces[interfaceKey];
+        auto & service       = interfaceInfo.service;
+        auto & ips           = interfaceInfo.addresses;
+        auto addresses       = Span<Inet::IPAddress>(ips.data(), ips.size());
+
+        ChipLogProgress(Discovery, "Mdns: Resolve success on interface %" PRIu32, interfaceKey.interfaceId);
+
+        if (nullptr == callback)
+        {
+            auto delegate = static_cast<DiscoverNodeDelegate *>(context);
+            DiscoveredNodeData nodeData;
+
+            // Check whether mType (service name) exactly matches with operational service name
+            if (strcmp(service.mType, kOperationalServiceName) == 0)
             {
-                return true;
+                service.ToDiscoveredOperationalNodeBrowseData(nodeData);
             }
+            else
+            {
+                service.ToDiscoveredCommissionNodeData(addresses, nodeData);
+            }
+            delegate->OnNodeDiscovered(nodeData);
+        }
+        else
+        {
+            CHIP_ERROR error = &interfaceKey == &interfacesOrder.back() ? CHIP_NO_ERROR : CHIP_ERROR_IN_PROGRESS;
+            callback(context, &service, addresses, error);
         }
     }
-    return false;
+
+    VerifyOrDo(interfacesOrder.size(),
+               ChipLogError(Discovery, "Successfully finalizing resolve for %s without finding any actual IP addresses.",
+                            instanceName.c_str()));
 }
 
 void ResolveContext::SRPTimerExpiredCallback(chip::System::Layer * systemLayer, void * callbackContext)
 {
     auto sdCtx = static_cast<ResolveContext *>(callbackContext);
     VerifyOrDie(sdCtx != nullptr);
+    sdCtx->isSRPTimerRunning = false;
+
+    ChipLogProgress(Discovery, "SRP resolve timer for %s expired; completing resolve", sdCtx->instanceName.c_str());
     sdCtx->Finalize();
 }
 
-void ResolveContext::CancelSRPTimer()
+void ResolveContext::CancelSRPTimerIfRunning()
 {
-    DeviceLayer::SystemLayer().CancelTimer(SRPTimerExpiredCallback, static_cast<void *>(this));
+    if (isSRPTimerRunning)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(SRPTimerExpiredCallback, static_cast<void *>(this));
+        ChipLogProgress(Discovery, "SRP resolve timer for %s cancelled; resolve timed out", instanceName.c_str());
+        isSRPTimerRunning = false;
+    }
 }
 
 CHIP_ERROR ResolveContext::OnNewAddress(const InterfaceKey & interfaceKey, const struct sockaddr * address)
@@ -653,7 +679,8 @@ CHIP_ERROR ResolveContext::OnNewAddress(const InterfaceKey & interfaceKey, const
 #ifdef CHIP_PROGRESS_LOGGING
     char addrStr[INET6_ADDRSTRLEN];
     ip.ToString(addrStr, sizeof(addrStr));
-    ChipLogProgress(Discovery, "Mdns: %s interface: %" PRIu32 " ip:%s", __func__, interfaceId, addrStr);
+    ChipLogProgress(Discovery, "Mdns: %s instance: %s interface: %" PRIu32 " ip: %s", __func__, instanceName.c_str(), interfaceId,
+                    addrStr);
 #endif // CHIP_PROGRESS_LOGGING
 
     if (ip.IsIPv6LinkLocal() && interfaceId == kDNSServiceInterfaceIndexLocalOnly)

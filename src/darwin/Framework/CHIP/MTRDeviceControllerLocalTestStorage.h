@@ -18,8 +18,6 @@
 #import <Foundation/Foundation.h>
 #import <Matter/Matter.h>
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
-
 NS_ASSUME_NONNULL_BEGIN
 
 MTR_EXTERN MTR_EXPORT @interface MTRDeviceControllerLocalTestStorage : NSObject<MTRDeviceControllerStorageDelegate>
@@ -33,5 +31,3 @@ MTR_EXTERN MTR_EXPORT @interface MTRDeviceControllerLocalTestStorage : NSObject<
 @end
 
 NS_ASSUME_NONNULL_END
-
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED

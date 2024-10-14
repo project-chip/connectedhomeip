@@ -24,12 +24,12 @@
 #include <platform/ESP32/ScopedNvsHandle.h>
 #include <platform/KeyValueStoreManager.h>
 
-#include <algorithm>
 #include <string.h>
 
 #include "nvs.h"
 #include "nvs_flash.h"
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 
@@ -68,7 +68,7 @@ KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes)
 {
-    VerifyOrReturnError(value, CHIP_ERROR_INVALID_ARGUMENT);
+    // value may be NULL when checking whether the key exists
 
     // Offset and partial reads are not supported in nvs, for now just return NOT_IMPLEMENTED. Support can be added in the
     // future if this is needed.

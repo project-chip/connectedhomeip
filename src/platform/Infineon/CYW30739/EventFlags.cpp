@@ -44,15 +44,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR EventFlags::Set(uint32_t flags)
+__attribute__((section(".text_in_ram"))) CHIP_ERROR EventFlags::Set(uint32_t flags)
 {
     assert(!wiced_rtos_check_for_stack_overflow());
 
-    if (wiced_rtos_set_event_flags(mFlags, flags) != WICED_SUCCESS)
-    {
-        ChipLogError(DeviceLayer, "wiced_rtos_set_event_flags %08lx", flags);
-        return CHIP_ERROR_INTERNAL;
-    }
+    assert(wiced_rtos_set_event_flags(mFlags, flags) == WICED_SUCCESS);
+
     return CHIP_NO_ERROR;
 }
 

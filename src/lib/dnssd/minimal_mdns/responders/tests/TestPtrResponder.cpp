@@ -18,11 +18,11 @@
 
 #include <vector>
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
-#include <lib/support/UnitTestRegistration.h>
-
-#include <nlunit-test.h>
 
 namespace {
 
@@ -39,13 +39,13 @@ const QNamePart kTargetNames[] = { "point", "to", "this" };
 class PtrResponseAccumulator : public ResponderDelegate
 {
 public:
-    PtrResponseAccumulator(nlTestSuite * suite, const uint32_t expectedTtl) : mSuite(suite), mExpectedTtl(expectedTtl) {}
+    PtrResponseAccumulator(const uint32_t expectedTtl) : mExpectedTtl(expectedTtl) {}
     void AddResponse(const ResourceRecord & record) override
     {
 
-        NL_TEST_ASSERT(mSuite, record.GetType() == QType::PTR);
-        NL_TEST_ASSERT(mSuite, record.GetClass() == QClass::IN);
-        NL_TEST_ASSERT(mSuite, record.GetName() == kNames);
+        EXPECT_EQ(record.GetType(), QType::PTR);
+        EXPECT_EQ(record.GetClass(), QClass::IN);
+        EXPECT_EQ(record.GetName(), kNames);
 
         if (record.GetType() == QType::PTR)
         {
@@ -58,44 +58,43 @@ public:
             HeaderRef hdr(headerBuffer);
             hdr.Clear();
 
-            NL_TEST_ASSERT(mSuite, record.Append(hdr, ResourceType::kAnswer, writer));
+            EXPECT_TRUE(record.Append(hdr, ResourceType::kAnswer, writer));
 
             ResourceData data;
             SerializedQNameIterator target;
             const uint8_t * start = buffer;
 
-            NL_TEST_ASSERT(mSuite, out.Fit());
+            EXPECT_TRUE(out.Fit());
 
             BytesRange validDataRange(buffer, buffer + out.Needed());
 
-            NL_TEST_ASSERT(mSuite, data.Parse(validDataRange, &start));
-            NL_TEST_ASSERT(mSuite, start == (buffer + out.Needed()));
-            NL_TEST_ASSERT(mSuite, data.GetName() == FullQName(kNames));
-            NL_TEST_ASSERT(mSuite, data.GetType() == QType::PTR);
-            NL_TEST_ASSERT(mSuite, data.GetTtlSeconds() == mExpectedTtl);
+            EXPECT_TRUE(data.Parse(validDataRange, &start));
+            EXPECT_EQ(start, (buffer + out.Needed()));
+            EXPECT_EQ(data.GetName(), FullQName(kNames));
+            EXPECT_EQ(data.GetType(), QType::PTR);
+            EXPECT_EQ(data.GetTtlSeconds(), mExpectedTtl);
 
-            NL_TEST_ASSERT(mSuite, ParsePtrRecord(data.GetData(), validDataRange, &target));
-            NL_TEST_ASSERT(mSuite, target == FullQName(kTargetNames));
+            EXPECT_TRUE(ParsePtrRecord(data.GetData(), validDataRange, &target));
+            EXPECT_EQ(target, FullQName(kTargetNames));
         }
     }
 
 private:
-    nlTestSuite * mSuite;
     const uint32_t mExpectedTtl;
 };
 
-void TestPtrResponse(nlTestSuite * inSuite, void * inContext)
+TEST(TestPtrResponder, TestPtrResponse)
 {
     IPAddress ipAddress;
-    NL_TEST_ASSERT(inSuite, IPAddress::FromString("2607:f8b0:4005:804::200e", ipAddress));
+    EXPECT_TRUE(IPAddress::FromString("2607:f8b0:4005:804::200e", ipAddress));
 
     PtrResponder responder(kNames, kTargetNames);
 
-    NL_TEST_ASSERT(inSuite, responder.GetQClass() == QClass::IN);
-    NL_TEST_ASSERT(inSuite, responder.GetQType() == QType::PTR);
-    NL_TEST_ASSERT(inSuite, responder.GetQName() == kNames);
+    EXPECT_EQ(responder.GetQClass(), QClass::IN);
+    EXPECT_EQ(responder.GetQType(), QType::PTR);
+    EXPECT_EQ(responder.GetQName(), kNames);
 
-    PtrResponseAccumulator acc(inSuite, ResourceRecord::kDefaultTtl);
+    PtrResponseAccumulator acc(ResourceRecord::kDefaultTtl);
     chip::Inet::IPPacketInfo packetInfo;
 
     packetInfo.SrcAddress  = ipAddress;
@@ -107,18 +106,18 @@ void TestPtrResponse(nlTestSuite * inSuite, void * inContext)
     responder.AddAllResponses(&packetInfo, &acc, ResponseConfiguration());
 }
 
-void TestPtrResponseOverrideTtl(nlTestSuite * inSuite, void * inContext)
+TEST(TestPtrResponder, TestPtrResponseOverrideTtl)
 {
     IPAddress ipAddress;
-    NL_TEST_ASSERT(inSuite, IPAddress::FromString("2607:f8b0:4005:804::200e", ipAddress));
+    EXPECT_TRUE(IPAddress::FromString("2607:f8b0:4005:804::200e", ipAddress));
 
     PtrResponder responder(kNames, kTargetNames);
 
-    NL_TEST_ASSERT(inSuite, responder.GetQClass() == QClass::IN);
-    NL_TEST_ASSERT(inSuite, responder.GetQType() == QType::PTR);
-    NL_TEST_ASSERT(inSuite, responder.GetQName() == kNames);
+    EXPECT_EQ(responder.GetQClass(), QClass::IN);
+    EXPECT_EQ(responder.GetQType(), QType::PTR);
+    EXPECT_EQ(responder.GetQName(), kNames);
 
-    PtrResponseAccumulator acc(inSuite, 123);
+    PtrResponseAccumulator acc(123);
     chip::Inet::IPPacketInfo packetInfo;
 
     packetInfo.SrcAddress  = ipAddress;
@@ -129,20 +128,4 @@ void TestPtrResponseOverrideTtl(nlTestSuite * inSuite, void * inContext)
 
     responder.AddAllResponses(&packetInfo, &acc, ResponseConfiguration().SetTtlSecondsOverride(123));
 }
-
-const nlTest sTests[] = {
-    NL_TEST_DEF("TestPtrResponse", TestPtrResponse),                       //
-    NL_TEST_DEF("TestPtrResponseOverrideTtl", TestPtrResponseOverrideTtl), //
-    NL_TEST_SENTINEL()                                                     //
-};
-
 } // namespace
-
-int TestPtr()
-{
-    nlTestSuite theSuite = { "IP", sTests, nullptr, nullptr };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestPtr)

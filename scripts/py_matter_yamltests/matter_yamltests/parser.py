@@ -21,7 +21,7 @@ from enum import Enum, auto
 from typing import Optional
 
 from . import fixes
-from .constraints import get_constraints, is_typed_constraint
+from .constraints import get_constraints, is_typed_constraint, is_variable_aware_constraint
 from .definitions import SpecDefinitions
 from .errors import (TestStepEnumError, TestStepEnumSpecifierNotUnknownError, TestStepEnumSpecifierWrongError, TestStepError,
                      TestStepKeyError, TestStepValueNameError)
@@ -1157,7 +1157,7 @@ class TestStep:
 
             for constraint in constraints:
                 try:
-                    constraint.validate(received_value, response_type_name)
+                    constraint.validate(received_value, response_type_name, self._runtime_config_variable_storage)
                     result.success(check_type, error_success)
                 except TestStepError as e:
                     e.update_context(expected_response, self.step_index)
@@ -1204,6 +1204,8 @@ class TestStep:
 
                 if 'constraints' in item:
                     for constraint, constraint_value in item['constraints'].items():
+                        if is_variable_aware_constraint(constraint):
+                            continue
                         values[idx]['constraints'][constraint] = self._config_variable_substitution(
                             constraint_value)
 
@@ -1223,7 +1225,8 @@ class TestStep:
             # But some other tests were relying on the fact that the expression was put 'as if' in
             # the generated code and was resolved before being sent over the wire. For such
             # expressions (e.g 'myVar + 1') we need to compute it before sending it over the wire.
-            tokens = value.split()
+            delimiter_regex = "(\ |\(|\)|\+|\-|\*|\/|\%)"
+            tokens = re.split(delimiter_regex, value)
             if len(tokens) == 0:
                 return value
 
@@ -1240,7 +1243,7 @@ class TestStep:
                 return tokens[0]
 
             tokens = [str(token) for token in tokens]
-            value = ' '.join(tokens)
+            value = ''.join(tokens)
             # TODO we should move away from eval. That will mean that we will need to do extra
             # parsing, but it would be safer then just blindly running eval.
             return value if not substitution_occured else eval(value)

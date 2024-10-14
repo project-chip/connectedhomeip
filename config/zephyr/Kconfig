@@ -22,7 +22,7 @@ menuconfig CHIP
 	imply REQUIRES_FULL_LIBC
 	imply NEWLIB_LIBC_NANO
 	imply CBPRINTF_LIBC_SUBSTS
-	imply POSIX_API if !ARCH_POSIX && !CHIP_NRF_PLATFORM && !CHIP_NXP_PLATFORM
+	imply POSIX_API if !ARCH_POSIX && !CHIP_NRF_PLATFORM
 	imply EVENTFD if !ARCH_POSIX
 	imply REBOOT
 	imply ENTROPY_GENERATOR
@@ -30,7 +30,7 @@ menuconfig CHIP
 	imply NET_IPV6
 	imply NET_CONFIG_NEED_IPV6
 	imply NET_SOCKETS
-	imply NET_SOCKETS_POSIX_NAMES if !ARCH_POSIX && (CHIP_NRF_PLATFORM || CHIP_NXP_PLATFORM)
+	imply NET_SOCKETS_POSIX_NAMES if !ARCH_POSIX && CHIP_NRF_PLATFORM
 	imply NETWORKING
 	imply HWINFO
 	imply FLASH
@@ -41,6 +41,15 @@ menuconfig CHIP
 	  Enables Matter libraries required for the Matter protocol stack to work.
 
 if CHIP
+
+config CHIP_APP_LOG_LEVEL
+	int "Logging level in application"
+	default LOG_DEFAULT_LEVEL
+	depends on LOG
+	help
+	  Sets the logging level in the Matter application. Use this configuration
+	  option only within the application. To set the logging level for the
+	  Matter stack, use the MATTER_LOG_LEVEL configuration option.
 
 # Device and firmware identifers
 
@@ -95,6 +104,7 @@ config CHIP_DEVICE_HARDWARE_VERSION_STRING
 	  hardware version string is exposed as an attribute of the Basic
 	  Information cluster.
 
+if "$(APPVERSION)"=""
 config CHIP_DEVICE_SOFTWARE_VERSION
 	int "Software version"
 	default 0
@@ -116,6 +126,7 @@ config CHIP_DEVICE_SOFTWARE_VERSION_STRING
 	  software version string is exposed as an attribute of the Basic
 	  Information cluster, and included in the header of the generated Matter
 	  over-the-air (OTA) update image.
+endif
 
 config CHIP_DEVICE_MANUFACTURING_DATE
 	string "Manufacturing date (ISO 8601 format)"
@@ -309,7 +320,8 @@ config CHIP_PROJECT_CONFIG
 
 config CHIP_ENABLE_DNSSD_SRP
 	bool "OpenThread Service Registration Protocol"
-	default y if NET_L2_OPENTHREAD
+	default y
+	depends on NET_L2_OPENTHREAD
 	imply OPENTHREAD_ECDSA
 	imply OPENTHREAD_SRP_CLIENT
 	help
@@ -318,7 +330,8 @@ config CHIP_ENABLE_DNSSD_SRP
 
 config CHIP_ENABLE_DNS_CLIENT
 	bool "OpenThread DNS client"
-	default y if NET_L2_OPENTHREAD
+	default y
+	depends on NET_L2_OPENTHREAD
 	imply OPENTHREAD_DNS_CLIENT
 	help
 	  Enables using the OpenThread DNS client for the Matter service discovery.
@@ -340,6 +353,15 @@ config CHIP_ICD_SLOW_POLL_INTERVAL
 	  Provides the Intermittently Connected Device slow polling interval in milliseconds while the
 	  device is in the idle mode. It determines the fastest frequency at which the device will be able
 	  to receive the messages in the idle mode.
+
+config CHIP_ICD_SIT_SLOW_POLL_LIMIT
+	int "Intermittently Connected Device slow polling interval limit for device in SIT mode (ms)"
+	default 15000
+	range 0 15000
+	help
+	  Provides the limit for Intermittently Connected Device slow polling interval in milliseconds while the
+	  device is in the SIT mode. By spec, this value cannot exceed 15 s (spec 9.16.1.5). This value can be
+	  used for the LIT device, to limit the slow poll interval used while temporarily working in the SIT mode.
 
 config CHIP_ICD_FAST_POLLING_INTERVAL
 	int "Intermittently Connected Device fast polling interval (ms)"
@@ -376,7 +398,7 @@ config CHIP_ICD_ACTIVE_MODE_THRESHOLD
 	  For LIT devices it cannot be set to a value smaller than 5000 ms.
 
 config CHIP_ICD_LIT_SUPPORT
-	bool "Intermittenly Connected Device Long Idle Time support"
+	bool "Intermittently Connected Device Long Idle Time support"
 	imply CHIP_ICD_CHECK_IN_SUPPORT
 	imply CHIP_ICD_UAT_SUPPORT
 	help
@@ -384,16 +406,23 @@ config CHIP_ICD_LIT_SUPPORT
 	  It also implies the ICD Check-In and UAT features support that are mandatory for LIT device.
 
 config CHIP_ICD_CHECK_IN_SUPPORT
-	bool "Intermittenly Connected Device Check-In protocol support"
+	bool "Intermittently Connected Device Check-In protocol support"
 	help
 	  Enables the Check-In protocol support in Matter. It allows an ICD device to notify the registered
 	  ICD clients that it is available for communication.
 
 config CHIP_ICD_UAT_SUPPORT
-	bool "Intermittenly Connected Device User Active Mode Trigger support"
+	bool "Intermittently Connected Device User Active Mode Trigger support"
 	help
 	  Enables the User Active Mode Trigger (UAT) support in Matter. It allows the User to use application specific
 	  means (e.g. button press) to trigger an ICD device to enter the active mode and become responsive.
+
+config CHIP_ICD_DSLS_SUPPORT
+	bool "Intermittenttly Connected Device Dynamic SIT LIT support"
+	depends on CHIP_ICD_LIT_SUPPORT
+	help
+	  Enables the Dynamic SIT LIT support in Matter. It allows the application to dynamically switch between
+	  SIT and LIT modes, as long as the requirements for these modes are met (e.g. device has at least one active ICD client).
 
 config CHIP_ICD_CLIENTS_PER_FABRIC
 	int "Intermittently Connected Device number of clients per fabric"
@@ -413,6 +442,7 @@ config CHIP_THREAD_SSED
 
 config CHIP_OPENTHREAD_CONFIG
 	string "Custom OpenThread configuration file"
+	depends on NET_L2_OPENTHREAD
 	help
 	  Provides a path to an OpenThread configuration file. The path can be
 	  either absolute or relative to the application directory. When this option
@@ -532,5 +562,30 @@ config CHIP_OTA_IMAGE_EXTRA_ARGS
 	  building Matter OTA image.
 
 endif
+
+config CHIP_BLE_EXT_ADVERTISING
+	bool "Bluetooth LE extended advertising"
+	help
+	  Enable Bluetooth LE extended advertising, which allows the device to advertise
+	  Matter service over Bluetooth LE for a period of time longer than 15 minutes.
+	  If this config is true, 
+	  CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS define can be set up to 172800 seconds (48h).
+
+config CHIP_BLE_ADVERTISING_DURATION
+	int "Bluetooth LE advertising duration in minutes"
+	range 15 2880 if CHIP_BLE_EXT_ADVERTISING
+	range 0 15
+	default 15
+	help
+	  Specify how long the device will advertise Matter service over Bluetooth LE in minutes.
+	  If CHIP_BLE_EXT_ADVERTISING is set to false, the maximum duration time is 15 minutes, 
+	  else the maximum duration time can be extended to 2880 minutes (48h).
+
+config USE_CHIP_DATA_MODEL_INTERFACE
+    bool "Use a DataModel::Provider interface for data access"
+    help
+      This enables a level of indiraction in the CHIP interaction model engine in 
+      accessing underlying data and executing operations such as 
+      wildcard-expansion, read, write and invoke.
 
 endif

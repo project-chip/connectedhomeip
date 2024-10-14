@@ -128,7 +128,7 @@ CHIP_ERROR AmebaWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLe
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     bool connected;
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     // If device is already connected to WiFi, then disconnect the WiFi,
     chip::DeviceLayer::Internal::AmebaUtils::IsStationConnected(connected);
     if (connected)
@@ -159,7 +159,7 @@ CHIP_ERROR AmebaWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLe
         ConnectivityMgrImpl().ChangeWiFiStationState(state);
         chip::DeviceLayer::Internal::AmebaUtils::WiFiConnect(ssid, key);
     });
-
+#endif
     return err;
 }
 

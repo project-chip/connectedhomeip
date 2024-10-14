@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2023 Project CHIP Authors
+#   Copyright (c) 2023-2024 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -20,6 +20,10 @@
 
 if CHIP
 
+config CHIP_PROJECT_CONFIG
+    string "Project configuration file for Matter"
+    default "include/CHIPProjectConfig.h"
+
 config LOG
     default y
 
@@ -30,11 +34,11 @@ choice LOG_MODE
 endchoice
 
 choice MATTER_LOG_LEVEL_CHOICE
-    default MATTER_LOG_LEVEL_INF
+    default MATTER_LOG_LEVEL_DBG
 endchoice
 
 config CHIP_APP_LOG_LEVEL
-    default 3 # info
+    default 4 # debug
 
 config LOG_DEFAULT_LEVEL
     default 1 # error
@@ -106,6 +110,8 @@ config GPIO
 config BT
     default y
 
+if BT
+
 config BT_PERIPHERAL
     default y
 
@@ -131,10 +137,12 @@ config BT_BUF_ACL_TX_SIZE
     default 251
 
 config BT_RX_STACK_SIZE
-    default 810
+    default 810 if BT_B9X
+    default 2048 if BT_W91
 
 config BT_HCI_TX_STACK_SIZE
-    default 640
+    default 640 if BT_B9X
+    default 2048 if BT_W91
 
 config BT_DEVICE_NAME_GATT_WRITABLE
     bool
@@ -157,12 +165,14 @@ choice B9X_BLE_CTRL_MAC_TYPE
     default B9X_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
 endchoice
 
+endif
+
 # Board retention config
-if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9258A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION 
-config BOARD_TLSR9X_NON_RETENTION_RAM_CODE
+if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9258A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
+config SOC_SERIES_RISCV_TELINK_B9X_NON_RETENTION_RAM_CODE
     default y if PM
 
-config TELINK_B9x_MATTER_RETENTION_LAYOUT
+config TELINK_B9X_MATTER_RETENTION_LAYOUT
     default y if PM
 
 config PWM
@@ -170,7 +180,8 @@ config PWM
 endif
 
 # Board non-retention config
-if BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D
+if  BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1 || \
+    BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D
 config PWM
     default y
 endif
@@ -181,6 +192,10 @@ config DYNAMIC_INTERRUPTS
 
 config CHIP_OTA_REQUESTOR
     default y
+
+config MCUBOOT_SIGNATURE_KEY_FILE
+	default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D
+	depends on BOOTLOADER_MCUBOOT
 
 # In current config/zephyr/Kconfig
 # next deprecated values are selected
@@ -195,7 +210,7 @@ config WARN_DEPRECATED
     default n
 
 # Reboot system when fault happened
-config TELINK_B9X_REBOOT_ON_FAULT
+config TELINK_SOC_REBOOT_ON_FAULT
     default y
 
 config NVS_LOOKUP_CACHE
@@ -209,14 +224,15 @@ config NVS_LOOKUP_CACHE_SIZE
 config SETTINGS_NVS_SECTOR_SIZE_MULT
     default 1
 
-# Set sector counter of NVS
-config SETTINGS_NVS_SECTOR_COUNT
-    default 12
-
 # Enable OpenThread
-
 config NET_L2_OPENTHREAD
-    default y
+    default y if !WIFI
+
+if NET_L2_OPENTHREAD
+
+config CHIP_OPENTHREAD_CONFIG
+    string "Custom OpenThread configuration file"
+    default "../../platform/telink/project_include/OpenThreadConfig.h"
 
 choice CHIP_THREAD_DEVICE_ROLE
     prompt "Thread network device role"
@@ -256,6 +272,8 @@ config OPENTHREAD_DEFAULT_TX_POWER
     default 3 if PM
     default 9
 
+endif # NET_L2_OPENTHREAD
+
 config NET_TX_STACK_SIZE
     default 554 if PM
 
@@ -268,21 +286,113 @@ config NET_IPV6_NBR_CACHE
     default n
 
 config NET_MAX_CONN
-    default 1
+    default 1 if !WIFI
 
 config NET_MAX_CONTEXTS
-    default 1
+    default 1 if !WIFI
 
 config NET_CONFIG_INIT_TIMEOUT
     default 0
 
-# mbedTLS tweaks
+
+config CHIP_WIFI
+	bool "Enable Telink Wi-Fi support"
+	default y if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
+	select WIFI_W91
+	select WIFI
+	select NET_STATISTICS
+	select NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
+	select NET_IPV6_NBR_CACHE
+	select NET_STATISTICS_USER_API
+
+if CHIP_WIFI
+
+config DEFAULT_WIFI_SSID
+	string "Default WiFi SSID"
+	depends on CHIP_WIFI
+	default ""
+	help
+	  The SSID of network to connect to if no WiFi station configuration exists in NV storage
+	  at the time the device boots.
+	  This option is for testing only and should be disabled in production releases
+
+config DEFAULT_WIFI_PASSWORD
+	string "Default WiFi Password"
+	depends on CHIP_WIFI
+	default ""
+	help
+	  The password for the default WiFi network.
+	  This option is for testing only and should be disabled in production releases.
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
+	int "Define the minimum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 500
+	help
+	  Specifies the minimum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL
+	int "Define the maximum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 3600000 # 1 hour
+	help
+	  Specifies the maximum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAX_RETRIES_NUMBER
+	int "Define the maximum amount of connection recovery occurrences"
+	depends on CHIP_WIFI
+	default 0
+	help
+	  Specifies the maximum number of connection recovery attempts.
+	  If set to 0, no limitation is applied and attempts
+	  to recover the connection are performed indefinitely.
+
+config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
+	int "Define the connection recovery jitter in milliseconds"
+	depends on CHIP_WIFI
+	default 2000
+	help
+	  Specifies the maximum connection recovery jitter interval (in milliseconds).
+	  Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
+	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
+	  within range [-JITTER; +JITTER].
+
+endif # CHIP_WIFI
+
+config CHIP_ENABLE_PAIRING_AUTOSTART
+    bool "Open commissioning window on boot"
+    default y
+    help
+        Opens the commissioning window automatically at application boot time if
+        the node is not yet commissioned.
+
+# Configure MBEDTLS lib
+config MBEDTLS
+	default y
+
 config MBEDTLS_USER_CONFIG_ENABLE
     default y
 
 config MBEDTLS_USER_CONFIG_FILE
     default "telink-mbedtls-config.h"
 
+config MBEDTLS_CIPHER_CCM_ENABLED
+	default y
+
+config MBEDTLS_PK_WRITE_C
+    default y
+
+config MBEDTLS_ECP_C
+	default y
+
+config MBEDTLS_ECP_DP_SECP256R1_ENABLED
+	default y
+
+config MBEDTLS_ECDH_C
+	default y
+
+config MBEDTLS_ECDSA_C
+	default y
 
 # getopt version
 config GETOPT_LONG

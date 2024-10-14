@@ -27,7 +27,7 @@
 #define GENERIC_CONFIGURATION_MANAGER_IMPL_CPP
 
 #include <FirmwareBuildTime.h>
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/RandUtils.h>
 #include <inttypes.h>

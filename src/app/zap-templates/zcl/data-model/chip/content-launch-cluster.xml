@@ -178,10 +178,11 @@ limitations under the License.
 
   <bitmap name="Feature" type="bitmap32">
     <cluster code="0x050a"/>
-    <field name="ContentSearch" mask="0x1"/>
-    <field name="URLPlayback" mask="0x2"/>
-    <field name="AdvancedSeek" mask="0x3"/>
-    <field name="TextTracks" mask="0x4"/>
-    <field name="AudioTracks" mask="0x5"/>
+    <field name="ContentSearch" mask="0x01"/>
+    <field name="URLPlayback" mask="0x02"/>
+    <field name="AdvancedSeek" mask="0x04"/>
+    <field name="TextTracks" mask="0x08"/>
+    <field name="AudioTracks" mask="0x10"/>
   </bitmap>
+
 </configurator>

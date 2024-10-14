@@ -29,80 +29,94 @@
 
 #ifdef ENABLE_CHIP_SHELL
 #include <lib/shell/Engine.h>
-
+#include <map>
 using namespace chip::Shell;
+#define MATTER_CLI_LOG(message) (streamer_printf(streamer_get(), message))
 #endif /* ENABLE_CHIP_SHELL */
 
 using namespace chip;
 using namespace chip::app::Clusters;
 
+/*
+ * Enable temperature level delegate of temperature control cluster
+ */
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
-
-CHIP_ERROR cliOpState(int argc, char * argv[])
+void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
 {
+    TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+}
+
+#ifdef ENABLE_CHIP_SHELL
+const static std::map<std::string, uint8_t> map_cmd_errstate{
+    { "no_error", (uint8_t) OperationalState::ErrorStateEnum::kNoError },
+    { "unable_to_start_or_resume", (uint8_t) OperationalState::ErrorStateEnum::kUnableToStartOrResume },
+    { "unable_to_complete_operation", (uint8_t) OperationalState::ErrorStateEnum::kUnableToCompleteOperation },
+    { "command_invalid_in_state", (uint8_t) OperationalState::ErrorStateEnum::kCommandInvalidInState }
+};
+
+const static std::map<std::string, uint8_t> map_cmd_opstate{ { "stop", (uint8_t) OperationalState::OperationalStateEnum::kStopped },
+                                                             { "run", (uint8_t) OperationalState::OperationalStateEnum::kRunning },
+                                                             { "pause", (uint8_t) OperationalState::OperationalStateEnum::kPaused },
+                                                             { "error",
+                                                               (uint8_t) OperationalState::OperationalStateEnum::kError } };
+
+static void InvalidStateHandler(void)
+{
+    ChipLogError(Shell, "Invalid State/Error to set");
+    MATTER_CLI_LOG("Invalid. Supported commands are:\n");
+    for (auto const & it : map_cmd_opstate)
+    {
+        MATTER_CLI_LOG(("\t opstate " + it.first + "\n").c_str());
+    }
+    for (auto const & it : map_cmd_errstate)
+    {
+        MATTER_CLI_LOG(("\t opstate error " + it.first + "\n").c_str());
+    }
+}
+
+static CHIP_ERROR cliOpState(int argc, char * argv[])
+{
+    bool inputErr = false;
     if ((argc != 1) && (argc != 2))
     {
-        ChipLogError(Shell, "Target State is missing");
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        inputErr = true;
+        goto exit;
     }
-    if (!strcmp(argv[0], "stop"))
+
+    if (map_cmd_opstate.find(argv[0]) != map_cmd_opstate.end())
     {
+        OperationalState::GetOperationalStateInstance()->SetOperationalState(map_cmd_opstate.at(argv[0]));
         ChipLogDetail(Shell, "OpSState : Set to %s state", argv[0]);
-        OperationalState::GetOperationalStateInstance()->SetOperationalState(
-            to_underlying(OperationalState::OperationalStateEnum::kStopped));
-    }
-    else if (!strcmp(argv[0], "run"))
-    {
-        ChipLogDetail(Shell, "OpSState : Set to %s state", argv[0]);
-        OperationalState::GetOperationalStateInstance()->SetOperationalState(
-            to_underlying(OperationalState::OperationalStateEnum::kRunning));
-    }
-    else if (!strcmp(argv[0], "pause"))
-    {
-        ChipLogDetail(Shell, "OpSState : Set to %s state", argv[0]);
-        OperationalState::GetOperationalStateInstance()->SetOperationalState(
-            to_underlying(OperationalState::OperationalStateEnum::kPaused));
-    }
-    else if (!strcmp(argv[0], "error"))
-    {
-        OperationalState::Structs::ErrorStateStruct::Type err;
-        ChipLogDetail(Shell, "OpSState : Set to %s state", argv[0]);
-        if (!strcmp(argv[1], "no_error"))
+        if (!strcmp(argv[0], "error") && argc == 2)
         {
-            ChipLogDetail(Shell, "OpSState_error : Error: %s state", argv[1]);
-            err.errorStateID = (uint8_t) OperationalState::ErrorStateEnum::kNoError;
+            OperationalState::Structs::ErrorStateStruct::Type err;
+            if (map_cmd_errstate.find(argv[1]) != map_cmd_errstate.end())
+            {
+                ChipLogDetail(Shell, "OpSState_error : Set to %s state", argv[1]);
+                err.errorStateID = map_cmd_errstate.at(argv[1]);
+                OperationalState::GetOperationalStateInstance()->OnOperationalErrorDetected(err);
+            }
+            else
+            {
+                inputErr = true;
+                goto exit;
+            }
         }
-        else if (!strcmp(argv[1], "unable_to_start_or_resume"))
-        {
-            ChipLogDetail(Shell, "OpSState_error : Error: %s state", argv[1]);
-            err.errorStateID = (uint8_t) OperationalState::ErrorStateEnum::kUnableToStartOrResume;
-        }
-        else if (!strcmp(argv[1], "unable_to_complete_operation"))
-        {
-            ChipLogDetail(Shell, "OpSState_error : Error: %s state", argv[1]);
-            err.errorStateID = (uint8_t) OperationalState::ErrorStateEnum::kUnableToCompleteOperation;
-        }
-        else if (!strcmp(argv[1], "command_invalid_in_state"))
-        {
-            ChipLogDetail(Shell, "OpSState_error : Error: %s state", argv[1]);
-            err.errorStateID = (uint8_t) OperationalState::ErrorStateEnum::kCommandInvalidInState;
-        }
-        else
-        {
-            ChipLogError(Shell, "Invalid Error State to set");
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        OperationalState::GetOperationalStateInstance()->OnOperationalErrorDetected(err);
-        OperationalState::GetOperationalStateInstance()->SetOperationalState(
-            to_underlying(OperationalState::OperationalStateEnum::kError));
     }
     else
     {
-        ChipLogError(Shell, "Invalid State to set");
+        inputErr = true;
+    }
+exit:
+    if (inputErr)
+    {
+        InvalidStateHandler();
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
     return CHIP_NO_ERROR;
 }
+#endif /* ENABLE_CHIP_SHELL */
 
 void LaundryWasherApp::AppTask::PreInitMatterStack()
 {
@@ -112,8 +126,6 @@ void LaundryWasherApp::AppTask::PreInitMatterStack()
 void LaundryWasherApp::AppTask::PostInitMatterStack()
 {
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&chip::NXP::App::GetICDUtil());
-
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 void LaundryWasherApp::AppTask::AppMatter_RegisterCustomCliCommands()
@@ -121,7 +133,9 @@ void LaundryWasherApp::AppTask::AppMatter_RegisterCustomCliCommands()
 #ifdef ENABLE_CHIP_SHELL
     /* Register application commands */
     static const shell_command_t kCommands[] = {
-        { .cmd_func = cliOpState, .cmd_name = "opstate", .cmd_help = "Set the Operational State" },
+        { .cmd_func = cliOpState,
+          .cmd_name = "opstate",
+          .cmd_help = "Set the Operational State. Usage:[stop|run|pause|dock|error 'state'] " },
     };
     Engine::Root().RegisterCommands(kCommands, sizeof(kCommands) / sizeof(kCommands[0]));
 #endif

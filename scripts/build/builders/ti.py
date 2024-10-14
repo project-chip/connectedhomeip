@@ -16,6 +16,7 @@ import os
 from enum import Enum, auto
 from typing import Optional
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -23,8 +24,6 @@ class TIApp(Enum):
     LOCK = auto()
     PUMP = auto()
     PUMP_CONTROLLER = auto()
-    ALL_CLUSTERS = auto()
-    ALL_CLUSTERS_MINIMAL = auto()
     LIGHTING = auto()
     SHELL = auto()
 
@@ -35,10 +34,6 @@ class TIApp(Enum):
             return 'pump-app'
         elif self == TIApp.PUMP_CONTROLLER:
             return 'pump-controller-app'
-        elif self == TIApp.ALL_CLUSTERS:
-            return 'all-clusters-app'
-        elif self == TIApp.ALL_CLUSTERS_MINIMAL:
-            return 'all-clusters-minimal-app'
         elif self == TIApp.LIGHTING:
             return 'lighting-app'
         elif self == TIApp.SHELL:
@@ -53,10 +48,6 @@ class TIApp(Enum):
             return f'chip-{board.BoardName()}-pump-example'
         elif self == TIApp.PUMP_CONTROLLER:
             return f'chip-{board.BoardName()}-pump-controller-example'
-        elif self == TIApp.ALL_CLUSTERS:
-            return f'chip-{board.BoardName()}-all-clusters-example'
-        elif self == TIApp.ALL_CLUSTERS_MINIMAL:
-            return f'chip-{board.BoardName()}-all-clusters-minimal-example'
         elif self == TIApp.LIGHTING:
             return f'chip-{board.BoardName()}-lighting-example'
         elif self == TIApp.SHELL:
@@ -69,21 +60,16 @@ class TIApp(Enum):
 
 
 class TIBoard(Enum):
-    LP_CC2652R7 = auto()
     LP_EM_CC1354P10_6 = auto()
 
     def BoardName(self):
-        if self == TIBoard.LP_CC2652R7:
-            return 'LP_CC2652R7'
-        elif self == TIBoard.LP_EM_CC1354P10_6:
+        if self == TIBoard.LP_EM_CC1354P10_6:
             return 'LP_EM_CC1354P10_6'
         else:
             raise Exception('Unknown board type: %r' % self)
 
     def FamilyName(self):
-        if self == TIBoard.LP_CC2652R7:
-            return 'cc13x2x7_26x2x7'
-        elif self == TIBoard.LP_EM_CC1354P10_6:
+        if self == TIBoard.LP_EM_CC1354P10_6:
             return 'cc13x4_26x4'
         else:
             raise Exception('Unknown board type: %r' % self)
@@ -94,7 +80,7 @@ class TIBuilder(GnBuilder):
     def __init__(self,
                  root,
                  runner,
-                 board=TIBoard.LP_CC2652R7,
+                 board=TIBoard.LP_EM_CC1354P10_6,
                  app: TIApp = TIApp.LOCK,
                  openthread_ftd: Optional[bool] = None):
         super(TIBuilder, self).__init__(
@@ -109,6 +95,9 @@ class TIBuilder(GnBuilder):
         args = [
             'ti_sysconfig_root="%s"' % os.environ['TI_SYSCONFIG_ROOT'],
             'ti_simplelink_board="%s"' % self.board.BoardName(),
+            # FIXME: It seems that TI SDK expects link map file to be present.
+            #        In order to make it optional, SDK fix is needed.
+            'chip_generate_link_map_file=true',
         ]
 
         if self.openthread_ftd:
@@ -120,21 +109,18 @@ class TIBuilder(GnBuilder):
         return args
 
     def build_outputs(self):
-        items = {}
-        if (self.board == TIBoard.LP_CC2652R7):
-            if (self.app == TIApp.LOCK
-                    or self.app == TIApp.PUMP
-                    or self.app == TIApp.PUMP_CONTROLLER):
-                extensions = [".out", ".bin", ".out.map", "-bim.hex"]
-
+        if self.board == TIBoard.LP_EM_CC1354P10_6:
+            if self.app in [TIApp.LOCK,
+                            TIApp.LIGHTING,
+                            TIApp.PUMP,
+                            TIApp.PUMP_CONTROLLER]:
+                suffixes = [".out", "-mcuboot.hex"]
             else:
-                extensions = [".out", ".out.map"]
-
+                suffixes = [".out"]
         else:
-            extensions = [".out", ".out.map"]
-
-        for extension in extensions:
-            name = '%s%s' % (self.app.AppNamePrefix(self.board), extension)
-            items[name] = os.path.join(self.output_dir, name)
-
-        return items
+            suffixes = [".out"]
+        if self.options.enable_link_map_file:
+            suffixes.append(".out.map")
+        for suffix in suffixes:
+            name = f"{self.app.AppNamePrefix(self.board)}{suffix}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)

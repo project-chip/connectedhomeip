@@ -103,7 +103,7 @@ MTR{{cluster}}Cluster{{command}}Params
             (isSupported "" globalAttribute=(asUpperCamelCase label preserveAcronyms=true)))
         (or (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))
             (and (isSupported (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
-                 (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name)))))}}
+                 (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name)))))}}
 {{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (NSDictionary<NSString *, id> * _Nullable)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
@@ -143,7 +143,7 @@ MTR{{cluster}}Cluster{{command}}Params
 {{/if}}
 {{/unless}}
 
-{{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name))
+{{#if (and (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping name))
            (isSupported (compatClusterNameRemapping name)))}}
 @implementation MTRCluster{{compatClusterNameRemapping name}} (Deprecated)
 
@@ -156,7 +156,7 @@ MTR{{cluster}}Cluster{{command}}Params
 {{#if (is_str_equal source 'client')}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandImpl"}}
-{{#if (and (wasIntroducedBeforeRelease "First major API revamp" cluster command=command)
+{{#if (and (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" cluster command=command)
            (isSupported cluster command=command))}}
 - (void){{asLowerCamelCase command}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
 {

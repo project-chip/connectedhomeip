@@ -37,7 +37,7 @@
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <crypto/RawKeySessionKeystore.h>
 
-#pragma once
+#include <string>
 
 inline constexpr char kIdentityAlpha[] = "alpha";
 inline constexpr char kIdentityBeta[]  = "beta";
@@ -86,6 +86,10 @@ public:
         AddArgument("only-allow-trusted-cd-keys", 0, 1, &mOnlyAllowTrustedCdKeys,
                     "Only allow trusted CD verifying keys (disallow test keys). If not provided or 0 (\"false\"), untrusted CD "
                     "verifying keys are allowed. If 1 (\"true\"), test keys are disallowed.");
+        AddArgument("dac-revocation-set-path", &mDacRevocationSetPath,
+                    "Path to JSON file containing the device attestation revocation set. "
+                    "This argument caches the path to the revocation set. Once set, this will be used by all commands in "
+                    "interactive mode.");
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
@@ -222,10 +226,15 @@ private:
     chip::Optional<char *> mCDTrustStorePath;
     chip::Optional<bool> mUseMaxSizedCerts;
     chip::Optional<bool> mOnlyAllowTrustedCdKeys;
+    chip::Optional<char *> mDacRevocationSetPath;
 
     // Cached trust store so commands other than the original startup command
     // can spin up commissioners as needed.
     static const chip::Credentials::AttestationTrustStore * sTrustStore;
+
+    // Cached DAC revocation delegate, this can be set using "--dac-revocation-set-path" argument
+    // Once set this will be used by all commands.
+    static chip::Credentials::DeviceAttestationRevocationDelegate * sRevocationDelegate;
 
     static void RunQueuedCommand(intptr_t commandArg);
     typedef decltype(RunQueuedCommand) MatterWorkCallback;

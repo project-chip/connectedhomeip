@@ -156,12 +156,12 @@ exit:
 CHIP_ERROR PacketHeader::DecodeFixed(const System::PacketBufferHandle & buf)
 {
     const uint8_t * const data = buf->Start();
-    uint16_t size              = buf->DataLength();
+    size_t size                = buf->DataLength();
     LittleEndian::Reader reader(data, size);
     return DecodeFixedCommon(reader);
 }
 
-CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint16_t * decode_len)
+CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, size_t size, uint16_t * decode_len)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     LittleEndian::Reader reader(data, size);
@@ -247,7 +247,7 @@ CHIP_ERROR PacketHeader::DecodeAndConsume(const System::PacketBufferHandle & buf
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint16_t * decode_len)
+CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, size_t size, uint16_t * decode_len)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     LittleEndian::Reader reader(data, size);
@@ -312,7 +312,7 @@ CHIP_ERROR PayloadHeader::DecodeAndConsume(const System::PacketBufferHandle & bu
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode_size) const
+CHIP_ERROR PacketHeader::Encode(uint8_t * data, size_t size, uint16_t * encode_size) const
 {
     VerifyOrReturnError(size >= EncodeSizeBytes(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!(mDestinationNodeId.HasValue() && mDestinationGroupId.HasValue()), CHIP_ERROR_INTERNAL);
@@ -364,7 +364,7 @@ CHIP_ERROR PacketHeader::EncodeBeforeData(const System::PacketBufferHandle & buf
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode_size) const
+CHIP_ERROR PayloadHeader::Encode(uint8_t * data, size_t size, uint16_t * encode_size) const
 {
     VerifyOrReturnError(size >= EncodeSizeBytes(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -404,7 +404,7 @@ CHIP_ERROR PayloadHeader::EncodeBeforeData(const System::PacketBufferHandle & bu
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MessageAuthenticationCode::Decode(const PacketHeader & packetHeader, const uint8_t * const data, uint16_t size,
+CHIP_ERROR MessageAuthenticationCode::Decode(const PacketHeader & packetHeader, const uint8_t * const data, size_t size,
                                              uint16_t * decode_len)
 {
     const uint16_t taglen = packetHeader.MICTagLength();
@@ -419,7 +419,7 @@ CHIP_ERROR MessageAuthenticationCode::Decode(const PacketHeader & packetHeader, 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MessageAuthenticationCode::Encode(const PacketHeader & packetHeader, uint8_t * data, uint16_t size,
+CHIP_ERROR MessageAuthenticationCode::Encode(const PacketHeader & packetHeader, uint8_t * data, size_t size,
                                              uint16_t * encode_size) const
 {
     uint8_t * p           = data;

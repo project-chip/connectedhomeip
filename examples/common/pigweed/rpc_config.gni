@@ -31,7 +31,7 @@ rpc_sources = [
 ]
 
 rpc_deps = [
-  "$dir_pw_hdlc:pw_rpc",
+  "$dir_pw_hdlc:default_addresses",
   "$dir_pw_hdlc:rpc_channel_output",
   "$dir_pw_log",
   "$dir_pw_rpc:server",

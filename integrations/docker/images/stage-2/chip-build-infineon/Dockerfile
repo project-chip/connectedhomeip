@@ -4,24 +4,36 @@ LABEL org.opencontainers.image.source https://github.com/project-chip/connectedh
 
 # ------------------------------------------------------------------------------
 # Install prerequisites
-RUN apt update -y \
-    && apt install -y curl git make file libglib2.0-0 libusb-1.0-0 libncurses5 sudo \
-    && apt clean
+RUN set -x \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing --no-install-recommends \
+    curl \
+    git \
+    make \
+    file \
+    libglib2.0-0 \
+    libusb-1.0-0 sudo \
+    libxcb-xinerama0 \
+    libxcb-icccm4 \
+    libxcb-image0 \
+    libxcb-keysyms1 \
+    libxcb-render-util0 \
+    libxkbcommon-x11-0 \
+    && rm -rf /var/lib/apt/lists/ \
+    && : # last line
 
 # ------------------------------------------------------------------------------
-# Download and extract ModusToolbox 2.3
-RUN curl --fail --location --silent --show-error https://itoolspriv.infineon.com/itbhs/api/packages/com.ifx.tb.tool.modustoolbox/Versions/2.4.0.5972-public/artifacts/ModusToolbox_2.4.0.5972-linux-install.tar.gz/download?noredirect -o /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz \
-    && tar -C /opt -zxf /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz \
-    && rm /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz
+# Download ModusToolbox 3.2
+RUN curl --fail --location --silent --show-error https://itoolspriv.infineon.com/itbhs/api/packages/com.ifx.tb.tool.modustoolbox/Versions/3.2.0.16028-public/artifacts/ModusToolbox_3.2.0.16028-linux-install.deb/download?noredirect -o /tmp/ModusToolbox_3.2.0.16028-linux-install.deb
 
 # ------------------------------------------------------------------------------
-# Execute post-build scripts
-RUN /opt/ModusToolbox/tools_2.4/modus-shell/postinstall
-
-# NOTE: udev rules are NOT installed:
-#   /opt/ModusToolbox/tools_2.4/fw-loader/udev_rules/install_rules.sh
-# because docker containers do not support udev
+# Install ModusToolbox 3.2
+RUN apt install /tmp/ModusToolbox_3.2.0.16028-linux-install.deb
 
 # ------------------------------------------------------------------------------
-# Set environment variable required by ModusToolbox application makefiles
-ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"
+# Remove ModusToolbox deb file
+RUN rm /tmp/ModusToolbox_3.2.0.16028-linux-install.deb
+
+# ------------------------------------------------------------------------------
+# Run below command to Initialize the CY_TOOLS_PATHS environment variable defined in the /etc/profile.d/modustoolbox_3.2.sh file
+RUN bash --login

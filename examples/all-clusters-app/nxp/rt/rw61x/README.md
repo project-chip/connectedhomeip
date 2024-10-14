@@ -16,6 +16,7 @@ commissioning and different cluster control.
 -   [Testing the example](#testing-the-example)
 -   [Matter Shell](#testing-the-all-clusters-application-with-matter-cli-enabled)
 -   [OTA Software Update](#ota-software-update)
+-   [Thread Border Router overview](#thread-border-router-overview)
 
 <hr>
 
@@ -37,52 +38,70 @@ The example supports:
 
 For Matter over Thread configuration :
 
--   [`NXP RD-RW612-BGA`] board
--   BLE/15.4 antenna (to plug in Ant1)
+-   For [`NXP RD-RW612-BGA`] board: BLE/15.4 antenna (to plug in Ant1)
+-   For [`NXP FRDM-RW612`] board: no external antenna needed (embedded PCB
+    antenna)
 
 For Matter over WiFi configuration :
 
--   [`NXP RD-RW612-BGA`] or [`NXP RD-RW610-BGA`] board
--   BLE antenna (to plug in Ant1)
--   Wi-Fi antenna (to plug in Ant2)
+-   For [`NXP RD-RW612-BGA`] or [`NXP RD-RW610-BGA`] board: BLE antenna (to plug
+    in Ant1) + Wi-Fi antenna (to plug in Ant2)
+-   For [`NXP FRDM-RW612`] board: no external antenna needed (embedded PCB
+    antenna)
 
 For Matter over Wi-Fi with OpenThread Border Router :
 
--   [`NXP RD-RW612-BGA`] board
--   BLE/15.4 antenna (to plug in Ant1)
--   Wi-Fi antenna (to plug in Ant2)
+-   For [`NXP RD-RW612-BGA`] board: BLE/15.4 antenna (to plug in Ant1) + Wi-Fi
+    antenna (to plug in Ant2)
+-   For [`NXP FRDM-RW612`] board: no external antenna needed (embedded PCB
+    antenna)
 
 <a name="building"></a>
 
 ## Building
 
 In order to build the Project CHIP example, we recommend using a Linux
-distribution (the demo-application was compiled on Ubuntu 20.04).
+distribution (supported Operating Systems are listed in
+[BUILDING.md](../../../../../docs/guides/BUILDING.md#prerequisites)).
 
--   Follow instruction in [BUILDING.md](../../../../../docs/guides/BUILDING.md)
-    to setup the environment to be able to build Matter.
-
--   Download
-    [RD-RW612 SDK for Project CHIP](https://mcuxpresso.nxp.com/en/select).
-    Creating an nxp.com account is required before being able to download the
-    SDK. Once the account is created, login and follow the steps for downloading
-    SDK. The SDK Builder UI selection should be similar with the one from the
-    image below.
-
-    ![MCUXpresso SDK Download](../../../../platform/nxp/rt/rw61x/doc/images/mcux-sdk-download.PNG)
-
-    (Note: All SDK components should be selected. If size is an issue Azure RTOS
-    component can be omitted.)
-
-    Please refer to Matter release notes for getting the latest released SDK.
-
--   Start building the application.
+-   Make sure that below prerequisites are correctly installed (as described in
+    [BUILDING.md](../../../../../docs/guides/BUILDING.md#prerequisites)))
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_SDK_ROOT=/home/user/Desktop/SDK_RW612/
+sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
+     libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
+     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
+```
+
+-   Step 1: checkout NXP specific submodules only
+
+```
 user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
-user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/bootstrap.sh
-user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
+```
+
+-   Step 2: activate local environment
+
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/activate.sh
+```
+
+If the script says the environment is out of date, you can update it by running
+the following command:
+
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/bootstrap.sh
+```
+
+-   Step 3: Init NXP SDK(s)
+
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ third_party/nxp/nxp_matter_support/scripts/update_nxp_sdk.py --platform common
+```
+
+Note: By default update_nxp_sdk.py will try to initialize all NXP SDKs. Arg "--
+help" could be used to view all available options.
+
+```
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-clusters-app/nxp/rt/rw61x/
 ```
 
@@ -91,7 +110,7 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-clusters-app/nxp/rt/r
 -   Build Matter-over-Wifi configuration with BLE commissioning (ble-wifi) :
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ gn gen --args="chip_enable_wifi=true is_sdk_package=true" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ gn gen --args="chip_enable_wifi=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ ninja -C out/debug
 ```
 
@@ -100,20 +119,25 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x
 -   Build Matter-over-Thread configuration with BLE commissioning.
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ gn gen --args="chip_enable_openthread=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true is_sdk_package=true" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ gn gen --args="chip_enable_openthread=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ ninja -C out/debug
 ```
 
 #### Building with Matter over Wifi + OpenThread Border Router configuration on RW612
 
-This configuration requires enabling the Matter CLI in order to control the
-Thread network on the Border Router.
+This configuration supports the Thread Border Router management cluster to
+provision the Thread credentials. Enabling the Matter CLI in order to control
+the Thread network on the Border Router is optional but recommended for other
+features like the Thread credential sharing.
+
+Note that the Thread Border Router management cluster is only supported on the
+thermostat application for now.
 
 -   Build Matter with Border Router configuration with BLE commissioning
     (ble-wifi) :
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ gn gen --args="chip_enable_wifi=true chip_enable_openthread=true chip_enable_matter_cli=true is_sdk_package=true openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread-br\"" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ gn gen --args="chip_enable_wifi=true chip_enable_openthread=true chip_enable_matter_cli=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ ninja -C out/debug
 ```
 
@@ -125,30 +149,34 @@ out/debug/chip-rw61x-all-cluster-example.
 Optional GN options that can be added when building an application:
 
 -   To enable the
+    [secondary network commissioning interface](../../../../../docs/guides/nxp/nxp_otbr_guide.md#using-the-secondary-network-commissioning-interface),
+    the arguments `chip_enable_secondary_nwk_if=true` and
+    `chip_device_config_thread_network_endpoint_id=2` must be added to the _gn
+    gen_ command. Note that this is only supported when building the Matter over
+    Wifi + OpenThread Border Router configuration. Note that is only supported
+    on the on the thermostat application for now.
+-   To enable the
     [matter CLI](README.md#testing-the-all-clusters-application-with-matter-cli-enabled),
     the argument `chip_enable_matter_cli=true` must be added to the _gn gen_
     command.
--   To switch the SDK type used, the argument `is_<sdk_type>=true` must be added
-    to the _gn gen_ command (with <sdk_type> being either sdk_package or
-    sdk_internal).
--   By default, the RW612 A1 board revision will be chosen. To switch to an A2
-    revision, the argument `board_version=\"A2\"` must be added to the _gn gen_
-    command.
+-   By default, the `NXP RD-RW612-BGA` board revision will be chosen. To switch
+    to `NXP FRDM-RW612` board revision, the argument `board_version=\"frdm\"`
+    must be added to the _gn gen_ command.
 -   To build the application in debug mode, the argument
     `is_debug=true optimize_debug=false` must be added to the _gn gen_ command.
 -   To build with the option to have Matter certificates/keys pre-loaded in a
     specific flash area the argument `chip_with_factory_data=1` must be added to
     the _gn gen_ command. (for more information see
-    [Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md).
+    [Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp/nxp_manufacturing_flow.md).
 -   To build the application with the OTA Requestor enabled, the arguments
     `chip_enable_ota_requestor=true no_mcuboot=false` must be added to the _gn
     gen_ command. (More information about the OTA Requestor feature in
-    [OTA Requestor README](../../../../../docs/guides/nxp_rw61x_ota_software_update.md)
+    [OTA Requestor README](../../../../../docs/guides/nxp/nxp_rw61x_ota_software_update.md)
 
 ## Manufacturing data
 
 See
-[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md)
+[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp/nxp_manufacturing_flow.md)
 
 Other comments:
 
@@ -215,9 +243,6 @@ Right click on the Project -> C/C++ Build-> Tool Chain Editor -> NXP MCU Tools -
 Right click on the Project -> Debug -> As->SEGGER JLink probes -> OK -> Select elf file
 ```
 
-(Note : if SDK package is used, a simpler way could be duplicating the debug
-configuration from the SDK Hello World example after importing it.)
-
 -   Debug using the newly created configuration file.
 
 <a name="testing-the-example"></a>
@@ -253,13 +278,19 @@ The "ble-thread" pairing method can be used in order to commission the device.
 
 #### Matter over wifi with openthread border router configuration :
 
-In order to create or join a Thread network on the Matter Border Router, the
-`otcli` commands from the matter CLI can be used. For more information about
-using the matter shell, follow instructions from
+In order to create or join a Thread network on the Matter Border Router, the TBR
+management cluster or the `otcli` commands from the matter CLI can be used. For
+more information about using the TBR management cluster follow instructions from
+['Using the TBR management cluster'](../../../../../docs/guides/nxp/nxp_otbr_guide.md#using-the-thread-border-router-management-cluster).
+For more information about using the matter shell, follow instructions from
 ['Testing the all-clusters application with Matter CLI'](#testing-the-all-clusters-application-with-matter-cli-enabled).
 
 In this configuration, the device can be commissioned over Wi-Fi with the
 'ble-wifi' pairing method.
+
+### NVM
+
+By default the file system used by the application is NVS.
 
 ### Testing the all-clusters application without Matter CLI:
 
@@ -319,8 +350,10 @@ Here are described steps to use the all-cluster-app with the Matter CLI enabled
 
 3. The All-cluster example uses UART2 (`FlexComm0`) to print logs while running
    the server. To view raw UART output, a pin should be plugged to an USB to
-   UART adapter (connector `HD2 pin 03`), then start a terminal emulator like
-   PuTTY and connect to the used COM port with the following UART settings:
+   UART adapter (connector `HD2 pin 03` for [`NXP RD-RW612-BGA`] board and
+   `J5 pin 4` (`mikroBUS`: TX) for [`NXP FRDM-RW612`] board), then start a
+   terminal emulator like PuTTY and connect to the used COM port with the
+   following UART settings:
 
     - Baud rate: 115200
     - 8 data bits
@@ -374,4 +407,14 @@ Done
 Over-The-Air software updates are supported with the RW61x all-clusters example.
 The process to follow in order to perform a software update is described in the
 dedicated guide
-['Matter Over-The-Air Software Update with NXP RW61x example applications'](../../../../../docs/guides/nxp_rw61x_ota_software_update.md).
+['Matter Over-The-Air Software Update with NXP RW61x example applications'](../../../../../docs/guides/nxp/nxp_rw61x_ota_software_update.md).
+
+<a name="thread-border-router-overview"></a>
+
+## Thread Border Router overview
+
+To enable Thread Border Router support see the [build](README.md#building)
+section.
+
+The complete Border Router guide is located
+[here](../../../../../docs/guides/nxp/nxp_otbr_guide.md).

@@ -21,13 +21,13 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <pw_unit_test/framework.h>
+
 #include <inet/IPAddress.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/PeerId.h>
-#include <lib/support/UnitTestRegistration.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <transport/raw/PeerAddress.h>
-
-#include <nlunit-test.h>
 
 namespace {
 
@@ -39,27 +39,27 @@ using chip::Transport::PeerAddress;
 /**
  *  Test correct identification of IPv6 multicast addresses.
  */
-void TestPeerAddressMulticast(nlTestSuite * inSuite, void * inContext)
+TEST(TestPeerAddress, TestPeerAddressMulticast)
 {
     constexpr chip::FabricId fabric = 0xa1a2a4a8b1b2b4b8;
     constexpr chip::GroupId group   = 0xe10f;
     PeerAddress addr                = PeerAddress::Multicast(fabric, group);
-    NL_TEST_ASSERT(inSuite, chip::Transport::Type::kUdp == addr.GetTransportType());
-    NL_TEST_ASSERT(inSuite, addr.IsMulticast());
+    EXPECT_EQ(chip::Transport::Type::kUdp, addr.GetTransportType());
+    EXPECT_TRUE(addr.IsMulticast());
 
     const Inet::IPAddress & ip = addr.GetIPAddress();
-    NL_TEST_ASSERT(inSuite, ip.IsIPv6Multicast());
-    NL_TEST_ASSERT(inSuite, chip::Inet::IPAddressType::kIPv6 == ip.Type());
+    EXPECT_TRUE(ip.IsIPv6Multicast());
+    EXPECT_EQ(chip::Inet::IPAddressType::kIPv6, ip.Type());
 
     constexpr uint8_t expected[NL_INET_IPV6_ADDR_LEN_IN_BYTES] = { 0xff, 0x35, 0x00, 0x40, 0xfd, 0xa1, 0xa2, 0xa4,
                                                                    0xa8, 0xb1, 0xb2, 0xb4, 0xb8, 0x00, 0xe1, 0x0f };
     uint8_t result[NL_INET_IPV6_ADDR_LEN_IN_BYTES];
     uint8_t * p = result;
     ip.WriteAddress(p);
-    NL_TEST_ASSERT(inSuite, !memcmp(expected, result, NL_INET_IPV6_ADDR_LEN_IN_BYTES));
+    EXPECT_EQ(0, memcmp(expected, result, NL_INET_IPV6_ADDR_LEN_IN_BYTES));
 }
 
-void TestToString(nlTestSuite * inSuite, void * inContext)
+TEST(TestPeerAddress, TestToString)
 {
     char buff[PeerAddress::kMaxToStringSize];
     IPAddress ip;
@@ -67,19 +67,19 @@ void TestToString(nlTestSuite * inSuite, void * inContext)
         IPAddress::FromString("::1", ip);
         PeerAddress::UDP(ip, 1122).ToString(buff);
 
-        NL_TEST_ASSERT(inSuite, !strcmp(buff, "UDP:[::1]:1122"));
+        EXPECT_STREQ(buff, "UDP:[::1]:1122");
     }
 
     {
         IPAddress::FromString("::1", ip);
         PeerAddress::TCP(ip, 1122).ToString(buff);
 
-        NL_TEST_ASSERT(inSuite, !strcmp(buff, "TCP:[::1]:1122"));
+        EXPECT_STREQ(buff, "TCP:[::1]:1122");
     }
 
     {
         PeerAddress::BLE().ToString(buff);
-        NL_TEST_ASSERT(inSuite, !strcmp(buff, "BLE"));
+        EXPECT_STREQ(buff, "BLE");
     }
 
     {
@@ -89,7 +89,7 @@ void TestToString(nlTestSuite * inSuite, void * inContext)
         int res1 = strcmp(buff, "UDP:[1223::3456:789a]:8080");
         int res2 = strcmp(buff, "UDP:[1223::3456:789A]:8080");
 
-        NL_TEST_ASSERT(inSuite, (!res1 || !res2));
+        EXPECT_TRUE(!res1 || !res2);
     }
 
     {
@@ -97,41 +97,8 @@ void TestToString(nlTestSuite * inSuite, void * inContext)
         PeerAddress udp = PeerAddress(Transport::Type::kUdp);
         udp.SetPort(5840);
         udp.ToString(buff);
-        NL_TEST_ASSERT(inSuite, !strcmp(buff, "UDP:[::]:5840"));
+        EXPECT_STREQ(buff, "UDP:[::]:5840");
     }
 }
 
-/**
- *   Test Suite. It lists all the test functions.
- */
-
-// clang-format off
-const nlTest sTests[] =
-{
-    NL_TEST_DEF("PeerAddress Multicast", TestPeerAddressMulticast),
-    NL_TEST_DEF("ToString", TestToString),
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
 } // namespace
-
-int TestPeerAddress()
-{
-    // clang-format off
-    nlTestSuite theSuite =
-	{
-        "PeerAddress",
-        &sTests[0],
-        nullptr,
-        nullptr
-    };
-    // clang-format on
-
-    // Run test suite against one context.
-    nlTestRunner(&theSuite, nullptr);
-
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestPeerAddress)

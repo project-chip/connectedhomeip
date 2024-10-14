@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster {{name}}
  *    {{description}}
  */
-{{availability (asUpperCamelCase name preserveAcronyms=true)}}
+{{availability (asUpperCamelCase name preserveAcronyms=true) deprecationMessage=(concat (asUpperCamelCase name preserveAcronyms=true) " is deprecated and will be removed")}}
 @interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRGenericCluster
 
 {{#zcl_commands}}
@@ -24,20 +24,20 @@ NS_ASSUME_NONNULL_BEGIN
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandDecl"}}
 {{#if (isSupported cluster command=command)}}
-- (void){{asLowerCamelCase name}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion {{availability cluster command=command minimalRelease="First major API revamp"}};
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion {{availability cluster command=command minimalRelease="267F4B03-3256-4056-A62D-5237640FDCFE" deprecationMessage="This command is deprecated"}};
 {{#unless commandHasRequiredField}}
 - (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {{! KeySetReadAllIndices grew this params-less API later _after_ it had already been shipped, so it needs to be special-cased here }}
 {{#if (and (isStrEqual command "KeySetReadAllIndices")
            (isStrEqual cluster "GroupKeyManagement"))}}
-{{availability cluster command=command minimalRelease="Fall 2023"}};
+{{availability cluster command=command minimalRelease="3C23F160-13CE-4397-BC65-122B61E4D691" deprecationMessage="This command is deprecated"}};
 {{else}}
 {{#if (isInConfigList
        (concat (asUpperCamelCase cluster preserveAcronyms=true) "::" (asUpperCamelCase command preserveAcronyms=true))
        "LegacyCommandsWithOnlyOptionalArguments")}}
-{{availability cluster command=command minimalRelease="Early 2024"}};
+{{availability cluster command=command minimalRelease="ADDB2DC1-4701-4696-87EB-87CD1123BE1A" deprecationMessage="This command is deprecated"}};
 {{else}}
-{{availability cluster command=command minimalRelease="First major API revamp"}};
+{{availability cluster command=command minimalRelease="267F4B03-3256-4056-A62D-5237640FDCFE" deprecationMessage="This command is deprecated"}};
 {{/if}}
 {{/if}}
 {{/unless}}
@@ -54,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
            (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true)))}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 {{#*inline "availability"}}
-{{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true)}}
+{{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true) deprecationMessage="This attribute is deprecated"}}
 {{/inline}}
 - (NSDictionary<NSString *, id> * _Nullable)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {{> availability}};
 {{#if (or isWritableAttribute
@@ -85,7 +85,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
-                                   queue:(dispatch_queue_t)queue {{availability (asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
+                                   queue:(dispatch_queue_t)queue {{availability (asUpperCamelCase name preserveAcronyms=true) minimalRelease="267F4B03-3256-4056-A62D-5237640FDCFE" deprecationMessage=(concat (asUpperCamelCase name preserveAcronyms=true) " is deprecated and will be removed")}};
 
 @end
 
@@ -104,21 +104,21 @@ NS_ASSUME_NONNULL_BEGIN
 {{/zcl_clusters}}
 
 {{#zcl_clusters}}
-{{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name))
+{{#if (and (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping name))
            (isSupported (compatClusterNameRemapping name)))}}
 @interface MTRCluster{{compatClusterNameRemapping name}} (Deprecated)
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                                endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue {{availability (compatClusterNameRemapping name) deprecatedRelease="First major API revamp" deprecationMessage="Please use initWithDevice:endpoindID:queue:"}};
+                                  queue:(dispatch_queue_t)queue {{availability (compatClusterNameRemapping name) deprecatedRelease="267F4B03-3256-4056-A62D-5237640FDCFE" deprecationMessage="Please use initWithDevice:endpoindID:queue:"}};
 
 {{#zcl_commands}}
 {{#if (is_str_equal source 'client')}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandDecl"}}
-{{#if (and (wasIntroducedBeforeRelease "First major API revamp" cluster command=command)
+{{#if (and (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" cluster command=command)
            (isSupported cluster command=command))}}
-- (void){{asLowerCamelCase command}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler {{availability cluster command=command deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithParams:expectedValues:expectedValueInterval:completion:")}};
+- (void){{asLowerCamelCase command}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler {{availability cluster command=command deprecatedRelease="267F4B03-3256-4056-A62D-5237640FDCFE" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithParams:expectedValues:expectedValueInterval:completion:")}};
 {{#unless commandHasRequiredField}}
 {{! No need for these backwards-compat APIs for commands that never shipped them. }}
 {{#unless (isInConfigList
@@ -127,7 +127,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{! KeySetReadAllIndices grew this params-less API later _after_ it had already been shipped, so it needs to be special-cased here }}
 {{#unless (and (isStrEqual cluster "GroupKeyManagement")
                (isStrEqual command "KeySetReadAllIndices"))}}
-- (void){{asLowerCamelCase command}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler {{availability cluster command=command deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithExpectedValues:expectedValueInterval:completion:")}};
+- (void){{asLowerCamelCase command}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler {{availability cluster command=command deprecatedRelease="267F4B03-3256-4056-A62D-5237640FDCFE" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithExpectedValues:expectedValueInterval:completion:")}};
 {{/unless}}
 {{/unless}}
 {{/unless}}
@@ -140,7 +140,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{~#zcl_attributes_server}}
 {{~#*inline "attributeDecls"}}
 {{#unless (isStrEqual attribute (asUpperCamelCase name preserveAcronyms=true))}}
-- (NSDictionary<NSString *, id> *)readAttribute{{attribute}}WithParams:(MTRReadParams * _Nullable)params {{availability cluster attribute=attribute deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use readAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithParams on MTRCluster" (asUpperCamelCase parent.name preserveAcronyms=true))}};
+- (NSDictionary<NSString *, id> *)readAttribute{{attribute}}WithParams:(MTRReadParams * _Nullable)params {{availability cluster attribute=attribute deprecatedRelease="267F4B03-3256-4056-A62D-5237640FDCFE" deprecationMessage=(concat "Please use readAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithParams on MTRCluster" (asUpperCamelCase parent.name preserveAcronyms=true))}};
 {{#if (or isWritableAttribute
       (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)writeAttribute{{attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs {{availability cluster attribute=attribute deprecationMessage=(concat "Please use writeAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithValue on MTRCluster" (asUpperCamelCase parent.name preserveAcronyms=true))}};

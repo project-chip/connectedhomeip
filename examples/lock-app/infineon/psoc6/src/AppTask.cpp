@@ -45,6 +45,10 @@
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 
+#if ENABLE_DEVICE_ATTESTATION
+#include <DeviceAttestationCredsExampleTrustM.h>
+#endif
+
 /* OTA related includes */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
@@ -157,7 +161,12 @@ static void InitServer(intptr_t context)
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     // Initialize device attestation config
+#if ENABLE_DEVICE_ATTESTATION
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleTrustMDACProvider());
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     GetAppTask().InitOTARequestor();
 #endif
@@ -170,7 +179,7 @@ CHIP_ERROR AppTask::StartAppTask()
     sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
     if (sAppEventQueue == NULL)
     {
-        P6_LOG("Failed to allocate app event queue");
+        PSOC6_LOG("Failed to allocate app event queue");
         appError(APP_ERROR_EVENT_QUEUE_FAILED);
     }
 
@@ -184,7 +193,7 @@ void AppTask::lockMgr_Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     NetWorkCommissioningInstInit();
-    P6_LOG("Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    PSOC6_LOG("Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
     // Initial lock state
     chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;
     chip::EndpointId endpointId{ 1 };
@@ -249,7 +258,7 @@ void AppTask::lockMgr_Init()
                              .GetLockParam());
     if (err != CHIP_NO_ERROR)
     {
-        P6_LOG("LockMgr().Init() failed");
+        PSOC6_LOG("LockMgr().Init() failed");
         appError(err);
     }
 
@@ -278,10 +287,10 @@ void AppTask::lockMgr_Init()
 void AppTask::Init()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    int rc = boot_set_confirmed();
+    int rc = flash_area_boot_set_confirmed();
     if (rc != 0)
     {
-        P6_LOG("boot_set_confirmed failed");
+        PSOC6_LOG("flash_area_boot_set_confirmed failed");
         appError(CHIP_ERROR_UNINITIALIZED);
     }
 #endif
@@ -297,7 +306,7 @@ void AppTask::Init()
     );
     if (sFunctionTimer == NULL)
     {
-        P6_LOG("funct timer create failed");
+        PSOC6_LOG("funct timer create failed");
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
@@ -324,7 +333,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     AppEvent event;
 
     sAppTask.Init();
-    P6_LOG("App Task started");
+    PSOC6_LOG("App Task started");
 
     while (true)
     {
@@ -394,11 +403,11 @@ void AppTask::LockActionEventHandler(AppEvent * event)
 
     case AppEvent::kEventType_Button: {
 
-        P6_LOG("%s [Action: %d]", __FUNCTION__, event->ButtonEvent.Action);
+        PSOC6_LOG("%s [Action: %d]", __FUNCTION__, event->ButtonEvent.Action);
 
         if (event->ButtonEvent.Action == APP_BUTTON_LONG_PRESS)
         {
-            P6_LOG("Sending a lock jammed event");
+            PSOC6_LOG("Sending a lock jammed event");
 
             /* Generating Door Lock Jammed event */
             DoorLockServer::Instance().SendLockAlarmEvent(1 /* Endpoint Id */, AlarmCodeEnum::kLockJammed);
@@ -427,7 +436,7 @@ void AppTask::LockActionEventHandler(AppEvent * event)
 
     if (!LockMgr().InitiateAction(actor, action))
     {
-        P6_LOG("Action is already in progress or active.");
+        PSOC6_LOG("Action is already in progress or active.");
     }
 }
 
@@ -490,7 +499,8 @@ void AppTask::FunctionHandler(AppEvent * event)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kNoneSelected)
         {
-            P6_LOG("Factory Reset Triggered. Press button again within %us to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT / 1000);
+            PSOC6_LOG("Factory Reset Triggered. Press button again within %us to cancel.",
+                      FACTORY_RESET_CANCEL_WINDOW_TIMEOUT / 1000);
             // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
             // cancel, if required.
             sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
@@ -516,7 +526,7 @@ void AppTask::FunctionHandler(AppEvent * event)
             // canceled.
             sAppTask.mFunction = Function::kNoneSelected;
 
-            P6_LOG("Factory Reset has been Canceled");
+            PSOC6_LOG("Factory Reset has been Canceled");
         }
     }
 }
@@ -525,7 +535,7 @@ void AppTask::CancelTimer()
 {
     if (xTimerStop(sFunctionTimer, 0) == pdFAIL)
     {
-        P6_LOG("app timer stop() failed");
+        PSOC6_LOG("app timer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 
@@ -536,7 +546,7 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
 {
     if (xTimerIsTimerActive(sFunctionTimer))
     {
-        P6_LOG("app timer already started!");
+        PSOC6_LOG("app timer already started!");
         CancelTimer();
     }
 
@@ -545,7 +555,7 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     // cannot immediately be sent to the timer command queue.
     if (xTimerChangePeriod(sFunctionTimer, aTimeoutInMs / portTICK_PERIOD_MS, 100) != pdPASS)
     {
-        P6_LOG("app timer start() failed");
+        PSOC6_LOG("app timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 
@@ -558,11 +568,11 @@ void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
     // and start flashing the LEDs rapidly to indicate action initiation.
     if (aAction == LockManager::LOCK_ACTION)
     {
-        P6_LOG("Lock Action has been initiated");
+        PSOC6_LOG("Lock Action has been initiated");
     }
     else if (aAction == LockManager::UNLOCK_ACTION)
     {
-        P6_LOG("Unlock Action has been initiated");
+        PSOC6_LOG("Unlock Action has been initiated");
     }
 
     if (aActor == AppEvent::kEventType_Button)
@@ -580,13 +590,13 @@ void AppTask::ActionCompleted(LockManager::Action_t aAction)
     // Turn off the lock LED if in an UNLOCKED state.
     if (aAction == LockManager::LOCK_ACTION)
     {
-        P6_LOG("Lock Action has been completed");
+        PSOC6_LOG("Lock Action has been completed");
 
         sLockLED.Set(true);
     }
     else if (aAction == LockManager::UNLOCK_ACTION)
     {
-        P6_LOG("Unlock Action has been completed");
+        PSOC6_LOG("Unlock Action has been completed");
 
         sLockLED.Set(false);
     }
@@ -632,11 +642,11 @@ void AppTask::PostEvent(const AppEvent * event)
         }
 
         if (!status)
-            P6_LOG("Failed to post event to app task event queue");
+            PSOC6_LOG("Failed to post event to app task event queue");
     }
     else
     {
-        P6_LOG("Event Queue is NULL should never happen");
+        PSOC6_LOG("Event Queue is NULL should never happen");
     }
 }
 
@@ -648,7 +658,7 @@ void AppTask::DispatchEvent(AppEvent * event)
     }
     else
     {
-        P6_LOG("Event received with no handler. Dropping event.");
+        PSOC6_LOG("Event received with no handler. Dropping event.");
     }
 }
 
@@ -665,7 +675,7 @@ void AppTask::UpdateCluster(intptr_t context)
         : Protocols::InteractionModel::Status::Failure;
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        P6_LOG("ERR: updating lock state %x", to_underlying(status));
+        PSOC6_LOG("ERR: updating lock state %x", to_underlying(status));
     }
 }
 
@@ -696,7 +706,7 @@ void AppTask::InitOTARequestor()
 
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-    P6_LOG("Current Software Version: %u", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
-    P6_LOG("Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+    PSOC6_LOG("Current Software Version: %u", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    PSOC6_LOG("Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 }
 #endif

@@ -40,15 +40,10 @@ declare_args() {
   #default Wifi Password
   chip_default_wifi_psk = ""
 
-  # Enable TestEventTrigger in GeneralDiagnostics cluster
-  silabs_test_event_trigger_enabled = false
-
   # The EnableKey in hex string format used by TestEventTrigger command in
-  # GeneralDiagnostics cluster. The length of the string should be 32.
-  silabs_test_event_trigger_enable_key = "00112233445566778899aabbccddeeff"
+  # GeneralDiagnostics cluster. The length of the string should be 16 bytes.
+  sl_test_event_trigger_enable_key = "00112233445566778899AABBCCDDEEFF"
 }
-
-silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 import("${silabs_common_plat_dir}/args.gni")
 
@@ -76,13 +71,8 @@ config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
 
   # Link options that provide a replacement for dynamic memory operations in standard
-  # library with the FreeRTOS malloc in platform code.
+  # library with the sl_memory_manager in platform code.
   ldflags = [
-    # memory allocation -- these must be re-entrant and do locking
-    "-Wl,--wrap=malloc",
-    "-Wl,--wrap=free",
-    "-Wl,--wrap=realloc",
-    "-Wl,--wrap=calloc",
     "-Wl,--wrap=MemoryAlloc",
 
     # Wrap these in case internal newlib call them (e.g. strdup will)
@@ -91,6 +81,29 @@ config("chip_examples_project_config") {
     "-Wl,--wrap=_realloc_r",
     "-Wl,--wrap=_free_r",
     "-Wl,--wrap=_calloc_r",
+  ]
+}
+
+config("test-event-trigger-config") {
+  defines = [ "SL_MATTER_TEST_EVENT_TRIGGER_ENABLED" ]
+
+  if (is_debug) {
+    defines += [ "SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY=\"${sl_test_event_trigger_enable_key}\"" ]
+  }
+}
+
+source_set("test-event-trigger") {
+  sources = [
+    "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.cpp",
+    "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.h",
+  ]
+
+  deps = [ "${chip_root}/src/platform/silabs/provision:provision-headers" ]
+  public_configs = [ ":test-event-trigger-config" ]
+  public_deps = [
+    "${chip_root}/src/app:test-event-trigger",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
   ]
 }
 
@@ -126,37 +139,6 @@ source_set("efr-matter-shell") {
       "${chip_root}/src/lib/shell:shell_core",
     ]
   }
-}
-
-config("attestation-credentials-config") {
-  include_dirs = [ "${chip_root}" ]
-}
-
-source_set("efr32-attestation-credentials") {
-  sources = [
-    "${silabs_common_plat_dir}/SilabsDeviceAttestationCreds.cpp",
-    "${silabs_common_plat_dir}/SilabsDeviceAttestationCreds.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/credentials",
-    "${chip_root}/src/platform:platform_base",
-  ]
-
-  public_configs = [ ":attestation-credentials-config" ]
-}
-
-source_set("silabs-factory-data-provider") {
-  sources = [
-    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.cpp",
-    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/credentials",
-    "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/setup_payload",
-  ]
 }
 
 config("efr32-common-config") {
@@ -206,6 +188,7 @@ config("silabs-wifi-config") {
   if (sl_wfx_config_softap) {
     defines += [ "SL_WFX_CONFIG_SOFTAP" ]
   }
+
   if (sl_wfx_config_scan) {
     defines += [ "SL_WFX_CONFIG_SCAN" ]
   }
@@ -213,6 +196,7 @@ config("silabs-wifi-config") {
   if (chip_enable_wifi_ipv4) {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
   }
+
   if (rs91x_wpa3_transition) {
     # TODO: Change this macro once WF200 support is provided
     defines += [ "WIFI_ENABLE_SECURITY_WPA3_TRANSITION=1" ]
@@ -220,7 +204,7 @@ config("silabs-wifi-config") {
 }
 
 source_set("efr32-common") {
-  deps = []
+  deps = [ "${silabs_common_plat_dir}/provision:storage" ]
   defines = []
   public_deps = []
   public_configs = [
@@ -249,13 +233,12 @@ source_set("efr32-common") {
     "${silabs_common_plat_dir}/LEDWidget.cpp",
     "${silabs_common_plat_dir}/MatterConfig.cpp",
     "${silabs_common_plat_dir}/SoftwareFaultReports.cpp",
-    "${silabs_common_plat_dir}/heap_4_silabs.c",
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
   ]
 
   if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
-    sources += [ "uart.cpp" ]
+    sources += [ "${silabs_common_plat_dir}/uart.cpp" ]
   }
 
   if (chip_enable_ota_requestor) {
@@ -314,29 +297,23 @@ source_set("efr32-common") {
     deps += [ ":efr-matter-shell" ]
   }
 
-  # Attestation Credentials
-  public_deps += [ ":efr32-attestation-credentials" ]
-
-  # Factory Data Provider
-  if (use_efr32_factory_data_provider) {
-    public_deps += [ ":silabs-factory-data-provider" ]
-  }
-
-  if (silabs_test_event_trigger_enabled) {
-    sources +=
-        [ "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.cpp" ]
-    defines += [
-      "SILABS_TEST_EVENT_TRIGGER_ENABLED=true",
-      "SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY=\"${silabs_test_event_trigger_enable_key}\"",
-    ]
-  }
-
   public_deps += [
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]
+
+  if (sl_enable_test_event_trigger) {
+    public_deps += [ ":test-event-trigger" ]
+  }
+
+  if (sl_enable_si70xx_sensor) {
+    sources += [
+      "${silabs_common_plat_dir}/Si70xxSensor.cpp",
+      "${silabs_common_plat_dir}/Si70xxSensor.h",
+    ]
+  }
 
   if (app_data_model != "") {
     public_deps += [ app_data_model ]

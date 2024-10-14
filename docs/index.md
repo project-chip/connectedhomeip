@@ -5,23 +5,25 @@
 :caption: Contents
 :hidden:
 
-QUICK_START
 PROJECT_FLOW
 VSCODE_DEVELOPMENT
-api/index
 ci-cd/index
-discussion/index
 getting_started/index
 cluster_and_device_type_dev/index
 guides/index
 style/index
 examples/index
+product_considerations/index
 testing/index
+tips_and_troubleshooting/index
 tools/index
 BUG_REPORT
 code_generation
-clusters
+zap_clusters
+spec_clusters
+upgrading
 ERROR_CODES
+
 ```
 
 ```{include} README.md

@@ -1,0 +1,287 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${efr32_sdk_build_root}/silabs_executable.gni")
+
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/third_party/silabs/silabs_board.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+}
+
+assert(current_os == "freertos")
+
+silabs_project_dir = "${chip_root}/examples/energy-management-app/silabs"
+examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
+
+if (wifi_soc) {
+  import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
+  examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
+} else {
+  import("${efr32_sdk_build_root}/efr32_sdk.gni")
+  examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+}
+
+import("${examples_common_plat_dir}/args.gni")
+
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = false
+
+  # Enable test event triggers by default: Disable these in production devices
+  sl_enable_energy_evse_trigger = true
+  sl_enable_energy_reporting_trigger = true
+  sl_enable_water_heater_management_trigger = true
+  sl_enable_device_energy_management_trigger = true
+
+  # Device Energy Management feature support - only one of these can be true
+  # or both can be disabled if forecasting is not supported
+  sl_dem_support_power_forecast_reporting = true
+  sl_dem_support_state_forecast_reporting = false
+
+  # Only one of these examples should be enabled
+  sl_enable_example_evse_device = true
+  sl_enable_example_water_heater_device = false
+}
+
+if (slc_generate) {
+  # Generate Project Specific config (Board, hardware used etc..)
+  print(exec_script("${chip_root}/third_party/silabs/slc_gen/run_slc.py",
+                    [
+                      rebase_path(chip_root),
+                      "${silabs_board}",
+                      "${disable_lcd}",
+                      "${use_wstk_buttons}",
+                      "${use_wstk_leds}",
+                      "${use_external_flash}",
+                      "${silabs_mcu}",
+                      rebase_path(slc_gen_path),
+                    ],
+                    "list lines"))
+}
+
+if (wifi_soc) {
+  siwx917_sdk("sdk") {
+    sources = [
+      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${silabs_project_dir}/include/CHIPProjectConfig.h",
+    ]
+
+    include_dirs = [
+      "${chip_root}/src/platform/silabs/SiWx917",
+      "${silabs_project_dir}/include",
+      "${examples_plat_dir}",
+      "${chip_root}/src/lib",
+      "${examples_common_plat_dir}",
+    ]
+
+    defines = []
+    if (chip_enable_pw_rpc) {
+      defines += [
+        "HAL_VCOM_ENABLE=1",
+        "PW_RPC_ENABLED",
+      ]
+    }
+  }
+} else {
+  efr32_sdk("sdk") {
+    sources = [
+      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${silabs_project_dir}/include/CHIPProjectConfig.h",
+    ]
+
+    include_dirs = [
+      "${chip_root}/src/platform/silabs/efr32",
+      "${silabs_project_dir}/include",
+      "${examples_plat_dir}",
+      "${chip_root}/src/lib",
+      "${examples_common_plat_dir}",
+      "${chip_root}/examples/energy-management-app/energy-management-common/common/include",
+      "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/include",
+      "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/include",
+      "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/include",
+      "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/include",
+    ]
+
+    if (use_wf200) {
+      # TODO efr32_sdk should not need a header from this location
+      include_dirs += [ "${examples_plat_dir}/wf200" ]
+    }
+
+    if (chip_enable_ble_rs911x) {
+      # TODO efr32_sdk should not need a header from this location
+      include_dirs += [
+        "${examples_plat_dir}/rs911x",
+        "${examples_plat_dir}/rs911x/hal",
+      ]
+    }
+
+    defines = []
+    if (chip_enable_pw_rpc) {
+      defines += [
+        "HAL_VCOM_ENABLE=1",
+        "PW_RPC_ENABLED",
+      ]
+    }
+  }
+}
+silabs_executable("energy-management-app") {
+  output_name = "matter-silabs-energy-management-example.out"
+  include_dirs = [ "include" ]
+  defines = []
+
+  defines += [
+    "SL_MATTER_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER=${sl_enable_energy_evse_trigger}",
+    "SL_MATTER_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER=${sl_enable_energy_reporting_trigger}",
+    "SL_MATTER_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER=${sl_enable_water_heater_management_trigger}",
+    "SL_MATTER_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER=${sl_enable_device_energy_management_trigger}",
+    "SL_MATTER_CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING=${sl_dem_support_power_forecast_reporting}",
+    "SL_MATTER_CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING=${sl_dem_support_state_forecast_reporting}",
+    "SL_MATTER_CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE=${sl_enable_example_evse_device}",
+    "SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE=${sl_enable_example_water_heater_device}",
+  ]
+
+  if (silabs_board == "BRD2704A") {
+    defines += [ "SL_STATUS_LED=0" ]
+  }
+
+  sources = [
+    "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DEMTestEventTriggers.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/device-energy-management-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/ChargingTargetsMemMgr.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EVSEManufacturerImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseEventTriggers.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseMain.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseTargetsStore.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/energy-evse-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/EnergyReportingEventTriggers.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/FakeReadings.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/PowerTopologyDelegate.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WaterHeaterMain.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmInstance.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmMain.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmManufacturer.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/water-heater-mode.cpp",
+    "${examples_common_plat_dir}/main.cpp",
+    "src/AppTask.cpp",
+  ]
+
+  deps = [
+    ":sdk",
+    app_data_model,
+  ]
+
+  if (wifi_soc) {
+    deps += [ "${examples_plat_dir}:siwx917-common" ]
+  } else {
+    deps += [ "${examples_plat_dir}:efr32-common" ]
+  }
+
+  if (chip_enable_pw_rpc) {
+    defines += [
+      "PW_RPC_ENABLED",
+      "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DESCRIPTOR_SERVICE=1",
+      "PW_RPC_DEVICE_SERVICE=1",
+      "PW_RPC_LIGHTING_SERVICE=1",
+      "PW_RPC_OTCLI_SERVICE=1",
+      "PW_RPC_THREAD_SERVICE=1",
+      "PW_RPC_TRACING_SERVICE=1",
+    ]
+
+    sources += [
+      "${chip_root}/examples/common/pigweed/RpcService.cpp",
+      "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
+      "${examples_common_plat_dir}/PigweedLogger.cpp",
+      "${examples_common_plat_dir}/Rpc.cpp",
+    ]
+
+    deps += [
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_stream:sys_io_stream",
+      "$dir_pw_trace",
+      "$dir_pw_trace_tokenized",
+      "$dir_pw_trace_tokenized:trace_rpc_service",
+      "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
+    ]
+
+    if (wifi_soc) {
+      deps += [ "${examples_plat_dir}/pw_sys_io:pw_sys_io_siwx917" ]
+    } else {
+      deps += [ "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs" ]
+    }
+
+    deps += pw_build_LINK_DEPS
+
+    include_dirs += [
+      "${chip_root}/examples/common",
+      "${chip_root}/examples/common/pigweed/efr32",
+    ]
+  }
+
+  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  if (chip_print_memory_usage) {
+    ldflags += [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+
+  # WiFi Settings
+  if (chip_enable_wifi) {
+    ldflags += [
+      "-Wl,--defsym",
+      "-Wl,SILABS_WIFI=1",
+    ]
+  }
+
+  output_dir = root_out_dir
+}
+
+group("silabs") {
+  deps = [ ":energy-management-app" ]
+}
+
+group("default") {
+  deps = [ ":silabs" ]
+}

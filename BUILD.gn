@@ -16,7 +16,6 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/nlassert.gni")
-import("//build_overrides/nlunit_test.gni")
 import("//build_overrides/pigweed.gni")
 
 import("//src/lwip/lwip.gni")
@@ -45,7 +44,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     chip_enable_python_modules =
         (current_os == "mac" || current_os == "linux") &&
         (host_cpu == "x64" || host_cpu == "arm64" || host_cpu == "arm")
-    enable_pylib = false
 
     # Build the Linux all clusters app example with default group
     chip_build_all_clusters_app = false
@@ -54,10 +52,25 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   if (enable_fuzz_test_targets) {
     group("fuzz_tests") {
       deps = [
+        "${chip_root}/examples/all-clusters-app/linux:fuzz-chip-all-clusters-app",
         "${chip_root}/src/credentials/tests:fuzz-chip-cert",
         "${chip_root}/src/lib/core/tests:fuzz-tlv-reader",
         "${chip_root}/src/lib/dnssd/minimal_mdns/tests:fuzz-minmdns-packet-parsing",
         "${chip_root}/src/lib/format/tests:fuzz-payload-decoder",
+        "${chip_root}/src/setup_payload/tests:fuzz-setup-payload-base38",
+        "${chip_root}/src/setup_payload/tests:fuzz-setup-payload-base38-decode",
+      ]
+    }
+  }
+
+  if (pw_enable_fuzz_test_targets) {
+    group("pw_fuzz_tests") {
+      deps = [
+        "${chip_root}/src/credentials/tests:fuzz-chip-cert-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/lib/core/tests:fuzz-tlv-reader-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/lib/dnssd/minimal_mdns/tests:fuzz-minmdns-packet-parsing-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/lib/format/tests:fuzz-payload-decoder-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/setup_payload/tests:fuzz-setup-payload-base38-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
       ]
     }
   }
@@ -68,6 +81,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     "//examples/common/pigweed/rpc_console/py:chip_rpc",
     "//integrations/mobly:chip_mobly",
     "//scripts/py_matter_yamltests:matter_yamltests",
+    "//src/python_testing/matter_testing_infrastructure:chip-testing",
   ]
 
   pw_python_venv("matter_build_venv") {
@@ -108,10 +122,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps = [
         "${chip_root}/scripts:matter_yamltests_distribution.wheel",
         "${chip_root}/src/controller/python:chip-repl",
+        "${chip_root}/src/python_testing/matter_testing_infrastructure:chip-testing.wheel",
       ]
-      if (enable_pylib) {
-        deps += [ "${chip_root}/src/pybindings/pycontroller" ]
-      }
     }
   }
 
@@ -135,11 +147,14 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       "${chip_root}/src/system",
       "${chip_root}/src/transport",
       "${nlassert_root}:nlassert",
-      "${nlunit_test_root}:nlunit-test",
     ]
 
     if (enable_fuzz_test_targets) {
       deps += [ "//:fuzz_tests" ]
+    }
+
+    if (pw_enable_fuzz_test_targets) {
+      deps += [ "//:pw_fuzz_tests" ]
     }
 
     if (chip_device_platform != "none") {
@@ -148,6 +163,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     if (chip_build_tests) {
       deps += [ "//src:tests" ]
+      deps += [ "//examples:example_tests" ]
+
       if (current_os == "android" && current_toolchain == default_toolchain) {
         deps += [ "${chip_root}/build/chip/java/tests:java_build_test" ]
       }
@@ -163,6 +180,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/examples/shell/standalone:chip-shell",
         "${chip_root}/src/app/tests/integration:chip-im-initiator",
         "${chip_root}/src/app/tests/integration:chip-im-responder",
+        "${chip_root}/src/inet/tests:inet-layer-test-tool",
         "${chip_root}/src/lib/address_resolve:address-resolve-tool",
         "${chip_root}/src/messaging/tests/echo:chip-echo-requester",
         "${chip_root}/src/messaging/tests/echo:chip-echo-responder",
@@ -209,9 +227,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       data_deps = [ "${chip_root}/examples/chip-tool" ]
 
       if (chip_enable_python_modules) {
-        if (enable_pylib) {
-          data_deps += [ "${chip_root}/src/pybindings/pycontroller" ]
-        }
         data_deps += [ "${chip_root}/src/controller/python:chip-repl" ]
       }
 
@@ -234,6 +249,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "//scripts/py_matter_idl:matter_idl.tests",
         "//scripts/py_matter_yamltests:matter_yamltests.tests",
         "//src:tests_run",
+        "//src/python_testing/matter_testing_infrastructure:chip-testing.tests",
       ]
 
       if (current_os == "linux" || current_os == "mac") {
@@ -683,7 +699,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   if (enable_k32w_lighting_app_build) {
     group("k32w_lighting_app") {
-      deps = [ "${chip_root}/examples/lighting-app/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lighting_app)" ]
+      deps = [ "${chip_root}/examples/lighting-app/nxp/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lighting_app)" ]
     }
 
     extra_build_deps += [ ":k32w_lighting_app" ]
@@ -691,7 +707,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   if (enable_k32w_lock_app_build) {
     group("k32w_lock_app") {
-      deps = [ "${chip_root}/examples/lock-app/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lock_app)" ]
+      deps = [ "${chip_root}/examples/lock-app/nxp/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lock_app)" ]
     }
 
     extra_build_deps += [ ":k32w_lock_app" ]
@@ -699,7 +715,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   if (enable_k32w_shell_app_build) {
     group("k32w_shell_app") {
-      deps = [ "${chip_root}/examples/shell/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_shell_app)" ]
+      deps = [ "${chip_root}/examples/shell/nxp/k32w0/(${chip_root}/config/k32w/toolchain:k32w_shell_app)" ]
     }
 
     extra_build_deps += [ ":k32w_shell_app" ]

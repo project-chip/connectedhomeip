@@ -16,6 +16,9 @@ name: Build example - Tizen
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
 
@@ -34,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-tizen:41
+            image: ghcr.io/project-chip/chip-build-tizen:81
             options: --user root
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
@@ -48,6 +51,12 @@ jobs:
               with:
                 platform: tizen
 
+            - name: Set up environment for size reports
+              uses: ./.github/actions/setup-size-reports
+              if: ${{ !env.ACT }}
+              with:
+                gh-context: ${{ toJson(github) }}
+
             - name: Build Tizen examples
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -59,3 +68,20 @@ jobs:
                           build \
                           --copy-artifacts-to out/artifacts \
                       "
+
+            - name: Bloat report - chip-tool
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    tizen arm chip-tool-ubsan out/tizen-arm-chip-tool-ubsan/chip-tool \
+                    /tmp/bloat_reports/
+            - name: Bloat report - all-clusters-app
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    tizen arm all-clusters-app out/tizen-arm-all-clusters/chip-all-clusters-app \
+                    /tmp/bloat_reports/
+
+            - name: Uploading Size Reports
+              uses: ./.github/actions/upload-size-reports
+              if: ${{ !env.ACT }}
+              with:
+                platform-name: Tizen

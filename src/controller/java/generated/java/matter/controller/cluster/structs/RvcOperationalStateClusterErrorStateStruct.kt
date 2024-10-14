@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class RvcOperationalStateClusterErrorStateStruct(
   val errorStateID: UByte,
   val errorStateLabel: Optional<String>,
-  val errorStateDetails: Optional<String>
+  val errorStateDetails: Optional<String>,
 ) {
   override fun toString(): String = buildString {
     append("RvcOperationalStateClusterErrorStateStruct {\n")
@@ -39,7 +39,7 @@ class RvcOperationalStateClusterErrorStateStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_ERROR_STATE_I_D), errorStateID)
+      put(ContextSpecificTag(TAG_ERROR_STATE_ID), errorStateID)
       if (errorStateLabel.isPresent) {
         val opterrorStateLabel = errorStateLabel.get()
         put(ContextSpecificTag(TAG_ERROR_STATE_LABEL), opterrorStateLabel)
@@ -53,13 +53,13 @@ class RvcOperationalStateClusterErrorStateStruct(
   }
 
   companion object {
-    private const val TAG_ERROR_STATE_I_D = 0
+    private const val TAG_ERROR_STATE_ID = 0
     private const val TAG_ERROR_STATE_LABEL = 1
     private const val TAG_ERROR_STATE_DETAILS = 2
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): RvcOperationalStateClusterErrorStateStruct {
       tlvReader.enterStructure(tlvTag)
-      val errorStateID = tlvReader.getUByte(ContextSpecificTag(TAG_ERROR_STATE_I_D))
+      val errorStateID = tlvReader.getUByte(ContextSpecificTag(TAG_ERROR_STATE_ID))
       val errorStateLabel =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_STATE_LABEL))) {
           Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ERROR_STATE_LABEL)))
@@ -78,7 +78,7 @@ class RvcOperationalStateClusterErrorStateStruct(
       return RvcOperationalStateClusterErrorStateStruct(
         errorStateID,
         errorStateLabel,
-        errorStateDetails
+        errorStateDetails,
       )
     }
   }

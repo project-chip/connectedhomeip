@@ -29,6 +29,9 @@
 #include <json/json.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/JniReferences.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+#include <string>
 
 namespace chip {
 namespace AppPlatform {
@@ -73,6 +76,7 @@ public:
     LaunchResponseType FormatContentLauncherResponse(Json::Value value, Status & status);
     NavigateTargetResponseType FormatNavigateTargetResponse(Json::Value value, Status & status);
     PlaybackResponseType FormatMediaPlaybackResponse(Json::Value value, Status & status);
+    Status FormatStatusResponse(Json::Value value);
 
 private:
     void InitializeJNIObjects(jobject manager)

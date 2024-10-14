@@ -154,7 +154,7 @@ class SelectActionFragment : Fragment() {
     /** Notifies listener of a click to manually input the CHIP device address. */
     fun onShowDeviceAddressInput()
 
-    fun SetNetworkType(type: ProvisionNetworkType)
+    fun setNetworkType(type: ProvisionNetworkType?)
   }
 
   private fun showFragment(fragment: Fragment, showOnBack: Boolean = true) {
@@ -172,6 +172,7 @@ class SelectActionFragment : Fragment() {
 
   /** Notifies listener of Scan QR code button click. */
   private fun handleScanQrCodeClicked() {
+    getCallback()?.setNetworkType(null)
     showFragment(BarcodeFragment.newInstance())
   }
 
@@ -226,13 +227,13 @@ class SelectActionFragment : Fragment() {
 
   /** Notifies listener of provision-WiFi-credentials button click. */
   private fun handleProvisionWiFiCredentialsClicked() {
-    getCallback()?.SetNetworkType(ProvisionNetworkType.WIFI)
+    getCallback()?.setNetworkType(ProvisionNetworkType.WIFI)
     showFragment(BarcodeFragment.newInstance())
   }
 
   /** Notifies listener of provision-Thread-credentials button click. */
   private fun handleProvisionThreadCredentialsClicked() {
-    getCallback()?.SetNetworkType(ProvisionNetworkType.THREAD)
+    getCallback()?.setNetworkType(ProvisionNetworkType.THREAD)
     showFragment(BarcodeFragment.newInstance())
   }
 

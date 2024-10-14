@@ -16,6 +16,9 @@ name: Build example - stm32
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
 
@@ -38,7 +41,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:41
+            image: ghcr.io/project-chip/chip-build:81
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -48,7 +51,7 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: stm32
-
+                extra-submodule-parameters: --recursive
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
               if: ${{ !env.ACT }}

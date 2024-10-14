@@ -21,45 +21,87 @@
 
 #include <cinttypes>
 #include <lib/dnssd/ServiceNaming.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/LockTracker.h>
 
 namespace {
-constexpr char kLocalDot[] = "local.";
+constexpr const char * kBrowseDomains[] = {
+    "default.service.arpa.", // SRP
+    "local.",
+};
 constexpr char kOperationalType[] = "_matter._tcp";
-constexpr DNSServiceFlags kBrowseFlags = 0;
 }
 
 MTROperationalBrowser::MTROperationalBrowser(MTRDeviceControllerFactory * aFactory, dispatch_queue_t aQueue)
     : mDeviceControllerFactory(aFactory)
     , mQueue(aQueue)
 {
-    // If we fail to start a browse, there's nothing our consumer would do
-    // differently, so we might as well do this in the constructor.
-    TryToStartBrowse();
 }
 
-void MTROperationalBrowser::TryToStartBrowse()
+void MTROperationalBrowser::ControllerActivated()
 {
     assertChipStackLockedByCurrentThread();
 
-    ChipLogProgress(Controller, "Trying to start operational browse");
+    if (mActiveControllerCount == 0) {
+        EnsureBrowse();
+    }
+    ++mActiveControllerCount;
+}
 
-    auto err
-        = DNSServiceBrowse(&mBrowseRef, kBrowseFlags, kDNSServiceInterfaceIndexAny, kOperationalType, kLocalDot, OnBrowse, this);
+void MTROperationalBrowser::ControllerDeactivated()
+{
+    assertChipStackLockedByCurrentThread();
+
+    if (mActiveControllerCount == 1) {
+        StopBrowse();
+    }
+
+    --mActiveControllerCount;
+}
+
+void MTROperationalBrowser::EnsureBrowse()
+{
+    assertChipStackLockedByCurrentThread();
+
+    if (mInitialized) {
+        ChipLogProgress(Controller, "%p already has a persistent operational browse running", this);
+        return;
+    }
+
+    ChipLogProgress(Controller, "%p trying to start persistent operational browse", this);
+
+    auto err = DNSServiceCreateConnection(&mBrowseRef);
     if (err != kDNSServiceErr_NoError) {
-        ChipLogError(Controller, "Failed to start operational browse: %" PRId32, err);
+        ChipLogError(Controller, "%p failed to create connection for persistent operational browse: %" PRId32, this, err);
         return;
     }
 
     err = DNSServiceSetDispatchQueue(mBrowseRef, mQueue);
     if (err != kDNSServiceErr_NoError) {
-        ChipLogError(Controller, "Failed to set up dispatch queue properly");
+        ChipLogError(Controller, "%p failed to set up dispatch queue properly for persistent operational browse: %" PRId32, this, err);
         DNSServiceRefDeallocate(mBrowseRef);
         return;
     }
 
     mInitialized = true;
+
+    for (auto domain : kBrowseDomains) {
+        auto browseRef = mBrowseRef; // Mandatory copy because of kDNSServiceFlagsShareConnection.
+        err = DNSServiceBrowse(&browseRef, kDNSServiceFlagsShareConnection, kDNSServiceInterfaceIndexAny, kOperationalType, domain, OnBrowse, this);
+        if (err != kDNSServiceErr_NoError) {
+            ChipLogError(Controller, "%p failed to start persistent operational browse for \"%s\" domain: %" PRId32, this, StringOrNullMarker(domain), err);
+        }
+    }
+}
+
+void MTROperationalBrowser::StopBrowse()
+{
+    ChipLogProgress(Controller, "%p stopping persistent operational browse", this);
+    if (mInitialized) {
+        DNSServiceRefDeallocate(mBrowseRef);
+        mInitialized = false;
+    }
 }
 
 void MTROperationalBrowser::OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags aFlags, uint32_t aInterfaceId,
@@ -72,14 +114,13 @@ void MTROperationalBrowser::OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags 
     // We only expect to get notified about our type/domain.
     if (aError != kDNSServiceErr_NoError) {
         ChipLogError(Controller, "Operational browse failure: %" PRId32, aError);
-        DNSServiceRefDeallocate(self->mBrowseRef);
-        self->mInitialized = false;
+        self->StopBrowse();
 
         // We shouldn't really get callbacks under our destructor, but guard
         // against it just in case.
         if (!self->mIsDestroying) {
             // Try to start a new browse, so we have one going.
-            self->TryToStartBrowse();
+            self->EnsureBrowse();
         }
         return;
     }
@@ -106,7 +147,5 @@ MTROperationalBrowser::~MTROperationalBrowser()
 
     mIsDestroying = true;
 
-    if (mInitialized) {
-        DNSServiceRefDeallocate(mBrowseRef);
-    }
+    StopBrowse();
 }

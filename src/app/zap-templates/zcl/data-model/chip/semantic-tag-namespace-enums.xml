@@ -1,0 +1,229 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2024 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+
+<configurator>
+  <enum name="PositionTag" type="enum8">
+    <item value="0x00" name="Left"/>
+    <item value="0x01" name="Right"/>
+    <item value="0x02" name="Top"/>
+    <item value="0x03" name="Bottom"/>
+    <item value="0x04" name="Middle"/>
+    <item value="0x05" name="Row"/>
+    <item value="0x06" name="Column"/>
+  </enum>
+
+  <enum name="RelativePositionTag" type="enum8">
+    <item value="0x00" name="Under"/>
+    <item value="0x01" name="Next To"/>
+    <item value="0x02" name="Around"/>
+    <item value="0x03" name="On"/>
+    <item value="0x04" name="Above"/>
+    <item value="0x05" name="Front Of"/>
+    <item value="0x06" name="Behind"/>
+  </enum>
+
+  <enum name="AreaTypeTag" type="enum8">
+    <item value="0x00" name="Aisle"/>
+    <item value="0x01" name="Attic"/>
+    <item value="0x02" name="Back Door"/>
+    <item value="0x03" name="Back Yard"/>
+    <item value="0x04" name="Balcony"/>
+    <item value="0x05" name="Ballroom"/>
+    <item value="0x06" name="Bathroom"/>
+    <item value="0x07" name="Bedroom"/>
+    <item value="0x08" name="Border"/>
+    <item value="0x09" name="Boxroom"/>
+    <item value="0x0A" name="Breakfast Room"/>
+    <item value="0x0B" name="Carport"/>
+    <item value="0x0C" name="Cellar"/>
+    <item value="0x0D" name="Cloakroom"/>
+    <item value="0x0E" name="Closet"/>
+    <item value="0x0F" name="Conservatory"/>
+
+    <item value="0x10" name="Corridor"/>
+    <item value="0x11" name="Craft Room"/>
+    <item value="0x12" name="Cupboard"/>
+    <item value="0x13" name="Deck"/>
+    <item value="0x14" name="Den"/>
+    <item value="0x15" name="Dining"/>
+    <item value="0x16" name="Drawing Room"/>
+    <item value="0x17" name="Dressing Room"/>
+    <item value="0x18" name="Driveway"/>
+    <item value="0x19" name="Elevator"/>
+    <item value="0x1A" name="Ensuite"/>
+    <item value="0x1B" name="Entrance"/>
+    <item value="0x1C" name="Entryway"/>
+    <item value="0x1D" name="Family Room"/>
+    <item value="0x1E" name="Foyer"/>
+    <item value="0x1F" name="Front Door"/>
+
+    <item value="0x20" name="Front Yard"/>
+    <item value="0x21" name="Game Room"/>
+    <item value="0x22" name="Garage"/>
+    <item value="0x23" name="Garage Door"/>
+    <item value="0x24" name="Garden"/>
+    <item value="0x25" name="Garden Door"/>
+    <item value="0x26" name="Guest Bathroom"/>
+    <item value="0x27" name="Guest Bedroom"/>
+    <item value="0x28" name="Guest Restroom"/>
+    <item value="0x29" name="Guest Room"/>
+    <item value="0x2A" name="Gym"/>
+    <item value="0x2B" name="Hallway"/>
+    <item value="0x2C" name="Hearth Room"/>
+    <item value="0x2D" name="Kids Room"/>
+    <item value="0x2E" name="Kids Bedroom"/>
+    <item value="0x2F" name="Kitchen"/>
+
+    <item value="0x30" name="Larder"/>
+    <item value="0x31" name="Laundry Room"/>
+    <item value="0x32" name="Lawn"/>
+    <item value="0x33" name="Library"/>
+    <item value="0x34" name="Living Room"/>
+    <item value="0x35" name="Lounge"/>
+    <item value="0x36" name="Media/TV Room"/>
+    <item value="0x37" name="Mud Room"/>
+    <item value="0x38" name="Music Room"/>
+    <item value="0x39" name="Nursery"/>
+    <item value="0x3A" name="Office"/>
+    <item value="0x3B" name="Outdoor Kitchen"/>
+    <item value="0x3C" name="Outside"/>
+    <item value="0x3D" name="Pantry"/>
+    <item value="0x3E" name="Parking Lot"/>
+    <item value="0x3F" name="Parlor"/>
+
+    <item value="0x40" name="Patio"/>
+    <item value="0x41" name="Play Room"/>
+    <item value="0x42" name="Pool Room"/>
+    <item value="0x43" name="Porch"/>
+    <item value="0x44" name="Primary Bathroom"/>
+    <item value="0x45" name="Primary Bedroom"/>
+    <item value="0x46" name="Ramp"/>
+    <item value="0x47" name="Reception Room"/>
+    <item value="0x48" name="Recreation Room"/>
+    <item value="0x49" name="Restroom"/>
+    <item value="0x4A" name="Roof"/>
+    <item value="0x4B" name="Sauna"/>
+    <item value="0x4C" name="Scullery"/>
+    <item value="0x4D" name="Sewing Room"/>
+    <item value="0x4E" name="Shed"/>
+    <item value="0x4F" name="Side Door"/>
+
+    <item value="0x50" name="Side Yard"/>
+    <item value="0x51" name="Sitting Room"/>
+    <item value="0x52" name="Snug"/>
+    <item value="0x53" name="Spa"/>
+    <item value="0x54" name="Staircase"/>
+    <item value="0x55" name="Steam Room"/>
+    <item value="0x56" name="Storage Room"/>
+    <item value="0x57" name="Studio"/>
+    <item value="0x58" name="Study"/>
+    <item value="0x59" name="Sun Room"/>
+    <item value="0x5A" name="Swimming Pool"/>
+    <item value="0x5B" name="Terrace"/>
+    <item value="0x5C" name="Utility Room"/>
+    <item value="0x5D" name="Ward"/>
+    <item value="0x5E" name="Workshop"/>
+  </enum>
+
+  <enum name="LandmarkTag" type="enum8">
+    <item value="0x00" name="Air Conditioner"/>
+    <item value="0x01" name="Air Purifier"/>
+    <item value="0x02" name="Back Door"/>
+    <item value="0x03" name="Bar Stool"/>
+    <item value="0x04" name="Bath Mat"/>
+    <item value="0x05" name="Bathtub"/>
+    <item value="0x06" name="Bed"/>
+    <item value="0x07" name="Bookshelf"/>
+    <item value="0x08" name="Chair"/>
+    <item value="0x09" name="Christmas Tree"/>
+    <item value="0x0A" name="Coat Rack"/>
+    <item value="0x0B" name="Coffee Table"/>
+    <item value="0x0C" name="Cooking Range"/>
+    <item value="0x0D" name="Couch"/>
+    <item value="0x0E" name="Countertop"/>
+    <item value="0x0F" name="Cradle"/>
+    
+    <item value="0x10" name="Crib"/>
+    <item value="0x11" name="Desk"/>
+    <item value="0x12" name="Dining Table"/>
+    <item value="0x13" name="Dishwasher"/>
+    <item value="0x14" name="Door"/>
+    <item value="0x15" name="Dresser"/>
+    <item value="0x16" name="Laundry Dryer"/>
+    <item value="0x17" name="Fan"/>
+    <item value="0x18" name="Fireplace"/>
+    <item value="0x19" name="Freezer"/>
+    <item value="0x1A" name="Front Door"/>
+    <item value="0x1B" name="High Chair"/>
+    <item value="0x1C" name="Kitchen Island"/>
+    <item value="0x1D" name="Lamp"/>
+    <item value="0x1E" name="Litter Box"/>
+    <item value="0x1F" name="Mirror"/>
+    
+    <item value="0x20" name="Nightstand"/>
+    <item value="0x21" name="Oven"/>
+    <item value="0x22" name="Pet Bed"/>
+    <item value="0x23" name="Pet Bowl"/>
+    <item value="0x24" name="Pet Crate"/>
+    <item value="0x25" name="Refrigerator"/>
+    <item value="0x26" name="Scratching Post"/>
+    <item value="0x27" name="Shoe Rack"/>
+    <item value="0x28" name="Shower"/>
+    <item value="0x29" name="Side Door"/>
+    <item value="0x2A" name="Sink"/>
+    <item value="0x2B" name="Sofa"/>
+    <item value="0x2C" name="Stove"/>
+    <item value="0x2D" name="Table"/>
+    <item value="0x2E" name="Toilet"/>
+    <item value="0x2F" name="Trash Can"/>
+    
+    <item value="0x30" name="Laundry Washer"/>
+    <item value="0x31" name="Window"/>
+    <item value="0x32" name="Wine Cooler"/>
+  </enum>
+
+  <enum name="FloorSurfaceTag" type="enum8">
+    <item value="0x00" name="Carpet"/>
+    <item value="0x01" name="Ceramic"/>
+    <item value="0x02" name="Concrete"/>
+    <item value="0x03" name="Cork"/>
+    <item value="0x04" name="Deep Carpet"/>
+    <item value="0x05" name="Dirt"/>
+    <item value="0x06" name="Engineered Wood"/>
+    <item value="0x07" name="Glass"/>
+    <item value="0x08" name="Grass"/>
+    <item value="0x09" name="Hardwood"/>
+    <item value="0x0A" name="Laminate"/>
+    <item value="0x0B" name="Linoleum"/>
+    <item value="0x0C" name="Mat"/>
+    <item value="0x0D" name="Metal"/>
+    <item value="0x0E" name="Plastic"/>
+    <item value="0x0F" name="Polished Concrete"/>
+    
+    <item value="0x10" name="Rubber"/>
+    <item value="0x11" name="Rug"/>
+    <item value="0x12" name="Sand"/>
+    <item value="0x13" name="Stone"/>
+    <item value="0x14" name="Tatami"/>
+    <item value="0x15" name="Terrazzo"/>
+    <item value="0x16" name="Tile"/>
+    <item value="0x17" name="Vinyl"/>
+  </enum>
+
+
+</configurator>

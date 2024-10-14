@@ -13,17 +13,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+
+# If external SDK is used, do not import ${nxp_sdk_name}.gni
+if (!nxp_external_sdk) {
+  import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+}
+
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
 assert(chip_device_platform == "nxp")
 
+source_set("nxp_factory_data") {
+}
+source_set("nxp_ota") {
+}
+
 config("nxp_platform_config") {
-  defines = [ "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/common/ble_zephyr/BLEManagerImpl.h\"" ]
+  defines = [
+    "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/common/ble_zephyr/BLEManagerImpl.h\"",
+    "CONFIG_BOOT_REASON_SDK_SUPPORT=1",
+  ]
   include_dirs = [
     ".",
     "../../common",
@@ -38,19 +52,34 @@ config("nxp_platform_config") {
       "CONFIG_CHIP_ENCRYPTED_FACTORY_DATA=1",
     ]
 
-    if (chip_enable_secure_dac_private_key_storage == 1) {
+    if (chip_enable_secure_dac_private_key_storage) {
+      assert(chip_enable_secure_dac_private_key_storage &&
+                 !chip_enable_secure_whole_factory_data,
+             "please select only one protection solution")
       defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderImpl.h\"" ]
+    } else if (chip_enable_secure_whole_factory_data) {
+      assert(chip_enable_secure_whole_factory_data &&
+                 !chip_enable_secure_dac_private_key_storage,
+             "please select only one protection solution")
+      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderEncImpl.h\"" ]
     } else {
       defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/FactoryDataProviderFwkImpl.h\"" ]
     }
   }
-  if (chip_enable_wifi && chip_enable_openthread) {
-    # Disable thread nwk commissioning instance on endpoint 0, when OTBR is enabled
-    defines += [ "_NO_NETWORK_COMMISSIONING_DRIVER_" ]
+
+  # When OTBR is enabled Thread network commissioning cluster is enabled using chip_enable_secondary_nwk_if
+  if (chip_enable_wifi && chip_enable_openthread &&
+      !chip_enable_secondary_nwk_if) {
+    defines += [ "_NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_" ]
   }
 }
 
 static_library("nxp_platform") {
+  output_name = "libCHIP_NXP_Port_RW61x"
+  cflags = [
+    "-Wno-conversion",
+    "-Wno-sign-compare",
+  ]
   deps = []
   defines = []
   sources = [
@@ -65,7 +94,6 @@ static_library("nxp_platform") {
     "../../common/DiagnosticDataProviderImpl.h",
     "../../common/KeyValueStoreManagerImpl.cpp",
     "../../common/KeyValueStoreManagerImpl.h",
-    "../../common/Logging.cpp",
     "../../common/NXPConfig.h",
     "../../common/NetworkProvisioningServerImpl.h",
     "../../common/PlatformManagerImpl.h",
@@ -74,36 +102,41 @@ static_library("nxp_platform") {
     "PlatformManagerImpl.cpp",
   ]
 
-  if (rt_nvm_component == "nvm_fwk" || rt_nvm_component == "littlefs") {
+  if (nxp_nvm_component == "nvm_fwk" || nxp_nvm_component == "littlefs") {
     sources += [
       "../../common/NXPConfig.cpp",
       "../../common/ram_storage.c",
       "../../common/ram_storage.h",
     ]
-  } else if (rt_nvm_component == "key_storage") {
+  } else if (nxp_nvm_component == "key_storage") {
     sources += [ "../../common/NXPConfigKS.cpp" ]
+  } else if (nxp_nvm_component == "nvs") {
+    sources += [ "../../common/NXPConfigNVS.cpp" ]
   }
-
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
-
-  deps += [ "${chip_root}/src/platform/logging:headers" ]
 
   if (chip_enable_ble) {
     sources += [
       # Adding random file which defines the function sys_csrand_get which is called by BLEManagerImpl from Zephyr
-      "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/zephyr/random/random.cpp",
-      "../../../Zephyr/BLEAdvertisingArbiter.cpp",
-      "../../../Zephyr/BLEManagerImpl.cpp",
+      "${nxp_sdk_build_root}/rt_sdk/sdk_hook/zephyr/random/random.cpp",
+      "../../common/ble_zephyr/BLEAdvertisingArbiter.cpp",
+      "../../common/ble_zephyr/BLEManagerImpl.cpp",
       "../../common/ble_zephyr/BLEManagerImpl.h",
     ]
   }
 
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  deps += [
+    "${chip_root}/src/lib/dnssd:constants",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+
   # define CHIP_PLAT_NVM_SUPPORT - See NXPConfig.cpp for definition
-  if (rt_nvm_component == "nvm_fwk") {
+  if (nxp_nvm_component == "nvm_fwk") {
     defines += [ "CHIP_PLAT_NVM_SUPPORT=1" ]
-  } else if (rt_nvm_component == "littlefs") {
+  } else if (nxp_nvm_component == "littlefs") {
     defines += [ "CHIP_PLAT_NVM_SUPPORT=2" ]
-  } else if (rt_nvm_component == "key_storage") {
+  } else if (nxp_nvm_component == "key_storage") {
     defines += [ "CHIP_PLAT_NVM_SUPPORT=3" ]
   }
 
@@ -126,17 +159,33 @@ static_library("nxp_platform") {
 
   if (chip_enable_openthread) {
     sources += [
+      # Temporary fix, to be revert once PR #34662 is merged, build issue when using GN check argument
+      "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
+      "../../../OpenThread/GenericThreadBorderRouterDelegate.cpp",
+      "../../../OpenThread/GenericThreadBorderRouterDelegate.h",
       "../../../OpenThread/OpenThreadUtils.cpp",
       "../../common/ThreadStackManagerImpl.cpp",
       "../../common/ThreadStackManagerImpl.h",
     ]
 
-    deps += [ "${chip_root}/third_party/openthread:openthread" ]
-    public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
+    deps += [ "${chip_root}/src/app/common:ids" ]
+
+    if (!nxp_build_matter_standalone_lib) {
+      deps += [ "${chip_root}/third_party/openthread:openthread" ]
+      public_deps +=
+          [ "${chip_root}/third_party/openthread:openthread-platform" ]
+    }
 
     if (chip_mdns == "platform") {
       if (chip_enable_wifi) {
-        sources += [ "../../common/DnssdImpl.cpp" ]
+        sources += [
+          "../../../OpenThread/DnssdImpl.cpp",
+          "../../../OpenThread/OpenThreadDnssdImpl.cpp",
+          "../../../OpenThread/OpenThreadDnssdImpl.h",
+          "../../common/DnssdImpl.cpp",
+          "../../common/DnssdImplBr.cpp",
+          "../../common/DnssdImplBr.h",
+        ]
       } else {
         sources += [
           "../../../OpenThread/DnssdImpl.cpp",
@@ -153,13 +202,15 @@ static_library("nxp_platform") {
       "../../common/factory_data/FactoryDataProvider.cpp",
       "../../common/factory_data/FactoryDataProvider.h",
     ]
-    if (chip_enable_secure_dac_private_key_storage == 1) {
+    if (chip_enable_secure_dac_private_key_storage) {
       sources += [
-        # TO BE MOVED TO THE SDK
-        "ELSFactoryData.c",
-        "ELSFactoryData.h",
         "FactoryDataProviderImpl.cpp",
         "FactoryDataProviderImpl.h",
+      ]
+    } else if (chip_enable_secure_whole_factory_data) {
+      sources += [
+        "FactoryDataProviderEncImpl.cpp",
+        "FactoryDataProviderEncImpl.h",
       ]
     } else {
       sources += [
@@ -169,10 +220,6 @@ static_library("nxp_platform") {
     }
 
     deps += [ "${chip_root}/src/credentials:credentials_header" ]
-  }
-
-  if (chip_convert_dac_private_key == 1) {
-    defines += [ "CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY=1" ]
   }
 
   deps += [ "${nxp_sdk_build_root}:nxp_sdk" ]

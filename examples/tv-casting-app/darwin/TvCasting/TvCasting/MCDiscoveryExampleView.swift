@@ -25,25 +25,29 @@ extension MCCastingPlayer : Identifiable {
 
 struct MCDiscoveryExampleView: View {
     @StateObject var viewModel = MCDiscoveryExampleViewModel()
+    @State private var selectedCastingPlayer: MCCastingPlayer?
+    // Enable navigating to the MCConnectionExampleView with or without the use
+    // Commissioner-Generated Passcode (CGP) flag.
+    @State private var navigateWithUseCGP = false
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .center, spacing: 16) {
             Button("Start Discovery", action: viewModel.startDiscovery)
-                .frame(width: 350, height: 30, alignment: .center)
+                .frame(width: 350, height: 30)
                 .border(Color.black, width: 1)
                 .background(Color.blue)
                 .foregroundColor(Color.white)
                 .padding(1)
 
             Button("Stop Discovery", action: viewModel.stopDiscovery)
-                .frame(width: 350, height: 30, alignment: .center)
+                .frame(width: 350, height: 30)
                 .border(Color.black, width: 1)
                 .background(Color.blue)
                 .foregroundColor(Color.white)
                 .padding(1)
 
             Button("Clear Results", action: viewModel.clearResults)
-                .frame(width: 350, height: 30, alignment: .center)
+                .frame(width: 350, height: 30)
                 .border(Color.black, width: 1)
                 .background(Color.blue)
                 .foregroundColor(Color.white)
@@ -55,26 +59,57 @@ struct MCDiscoveryExampleView: View {
             }
             else if(!viewModel.displayedCastingPlayers.isEmpty)
             {
-                Text("Select a Casting player...")
+                Text("Select a Casting player:")
                 ForEach(viewModel.displayedCastingPlayers) { castingPlayer in
-                    NavigationLink(
-                        destination: {
-                            MCConnectionExampleView(_selectedCastingPlayer: castingPlayer)
-                        },
-                        label: {
-                            Text(castingPlayer.description)
-                        }
-                    )
-                    .frame(width: 350, height: 50, alignment: .center)
-                    .border(Color.black, width: 1)
-                    .background(Color.blue)
-                    .foregroundColor(Color.white)
+                    ZStack {
+                        NavigationLink(
+                            destination: MCConnectionExampleView(
+                                _selectedCastingPlayer: selectedCastingPlayer,
+                                _useCommissionerGeneratedPasscode: navigateWithUseCGP
+                            ),
+                            isActive: Binding(
+                                get: { selectedCastingPlayer?.id == castingPlayer.id },
+                                set: { newValue in
+                                    if newValue {
+                                        selectedCastingPlayer = castingPlayer
+                                        navigateWithUseCGP = false
+                                    } else {
+                                        selectedCastingPlayer = nil
+                                        navigateWithUseCGP = false
+                                    }
+                                }
+                            ),
+                            label: { EmptyView() }
+                        )
+                        Text(castingPlayer.description)
+                            .frame(minHeight: 50)
+                            .multilineTextAlignment(.center)
+                            .padding(10)
+                            .background(Color.blue)
+                            .foregroundColor(Color.white)
+                            .border(Color.black, width: 1)
+                            .onTapGesture {
+                                selectedCastingPlayer = castingPlayer
+                                navigateWithUseCGP = false
+                            }
+                            .gesture(
+                                LongPressGesture()
+                                    .onEnded { _ in
+                                        selectedCastingPlayer = castingPlayer
+                                        navigateWithUseCGP = true
+                                    }
+                            )
+                    }
+                    .frame(width: 350)
                     .padding(1)
                 }
             }
+            Spacer()
+            Text("Long click on a Casting Player to connect using CastingPlayer/Commissioner-Generated passcode commissioning flow (if supported).").font(.system(size: 12)).padding(1)
         }
         .navigationTitle("Casting Player Discovery")
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
+        .multilineTextAlignment(.center)
     }        
 }
 

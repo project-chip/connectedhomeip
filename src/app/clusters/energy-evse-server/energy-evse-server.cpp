@@ -17,6 +17,8 @@
 #include "energy-evse-server.h"
 
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
@@ -36,16 +38,16 @@ namespace EnergyEvse {
 
 CHIP_ERROR Instance::Init()
 {
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;
 }
 
 void Instance::Shutdown()
 {
-    InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
-    unregisterAttributeAccessOverride(this);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 bool Instance::HasFeature(Feature aFeature) const
@@ -307,13 +309,13 @@ void Instance::HandleEnableCharging(HandlerContext & ctx, const Commands::Enable
     auto & minimumChargeCurrent = commandData.minimumChargeCurrent;
     auto & maximumChargeCurrent = commandData.maximumChargeCurrent;
 
-    if ((minimumChargeCurrent < kMinimumChargeCurrent) || (minimumChargeCurrent > kMaximumChargeCurrent))
+    if (minimumChargeCurrent < kMinimumChargeCurrent)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
-    if ((maximumChargeCurrent < kMinimumChargeCurrent) || (maximumChargeCurrent > kMaximumChargeCurrent))
+    if (maximumChargeCurrent < kMinimumChargeCurrent)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
@@ -337,7 +339,7 @@ void Instance::HandleEnableDischarging(HandlerContext & ctx, const Commands::Ena
     auto & dischargingEnabledUntil = commandData.dischargingEnabledUntil;
     auto & maximumDischargeCurrent = commandData.maximumDischargeCurrent;
 
-    if ((maximumDischargeCurrent < kMinimumChargeCurrent) || (maximumDischargeCurrent > kMaximumChargeCurrent))
+    if (maximumDischargeCurrent < kMinimumChargeCurrent)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
@@ -360,27 +362,136 @@ void Instance::HandleStartDiagnostics(HandlerContext & ctx, const Commands::Star
 void Instance::HandleSetTargets(HandlerContext & ctx, const Commands::SetTargets::DecodableType & commandData)
 {
     // Call the delegate
-    // TODO
-    // Status status = mDelegate.SetTargets();
-    Status status = Status::UnsupportedCommand;
+    auto & chargingTargetSchedules = commandData.chargingTargetSchedules;
+
+    Status status = ValidateTargets(chargingTargetSchedules);
+    if (status != Status::Success)
+    {
+        ChipLogError(AppServer, "SetTargets contained invalid data - Rejecting");
+    }
+    else
+    {
+        status = mDelegate.SetTargets(chargingTargetSchedules);
+    }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
+
+Status Instance::ValidateTargets(
+    const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules)
+{
+    /* A) check that the targets are valid
+     *  1) each target must be within valid range (TargetTimeMinutesPastMidnight < 1440)
+     *  2) each target must be within valid range (TargetSoC percent 0 - 100)
+     *      If SOC feature not supported then this MUST be 100 or not present
+     *  3) each target must be within valid range (AddedEnergy >= 0)
+     * B) Day of Week is only allowed to be included once
+     */
+
+    uint8_t dayOfWeekBitmap = 0;
+
+    auto iter = chargingTargetSchedules.begin();
+    while (iter.Next())
+    {
+        auto & entry    = iter.GetValue();
+        uint8_t bitmask = entry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
+        ChipLogProgress(AppServer, "DayOfWeekForSequence = 0x%02x", bitmask);
+
+        if ((dayOfWeekBitmap & bitmask) != 0)
+        {
+            // A bit has already been set - Return ConstraintError
+            ChipLogError(AppServer, "DayOfWeekForSequence has a bit set which has already been set in another entry.");
+            return Status::ConstraintError;
+        }
+        dayOfWeekBitmap |= bitmask; // add this day Of week to the previously seen days
+
+        auto iterInner   = entry.chargingTargets.begin();
+        uint8_t innerIdx = 0;
+        while (iterInner.Next())
+        {
+            auto & targetStruct          = iterInner.GetValue();
+            uint16_t minutesPastMidnight = targetStruct.targetTimeMinutesPastMidnight;
+            ChipLogProgress(AppServer, "[%d] MinutesPastMidnight : %d", innerIdx,
+                            static_cast<short unsigned int>(minutesPastMidnight));
+
+            if (minutesPastMidnight > 1439)
+            {
+                ChipLogError(AppServer, "MinutesPastMidnight has invalid value (%d)", static_cast<int>(minutesPastMidnight));
+                return Status::ConstraintError;
+            }
+
+            // If SocReporting is supported, targetSoc must have a value in the range [0, 100]
+            if (HasFeature(Feature::kSoCReporting))
+            {
+                if (!targetStruct.targetSoC.HasValue())
+                {
+                    ChipLogError(AppServer, "kSoCReporting is supported but TargetSoC does not have a value");
+                    return Status::Failure;
+                }
+
+                if (targetStruct.targetSoC.Value() > 100)
+                {
+                    ChipLogError(AppServer, "TargetSoC has invalid value (%d)", static_cast<int>(targetStruct.targetSoC.Value()));
+                    return Status::ConstraintError;
+                }
+            }
+            else if (targetStruct.targetSoC.HasValue() && targetStruct.targetSoC.Value() != 100)
+            {
+                // If SocReporting is not supported but targetSoc has a value, it must be 100
+                ChipLogError(AppServer, "TargetSoC has can only be 100%% if SOC feature is not supported");
+                return Status::ConstraintError;
+            }
+
+            // One or both of targetSoc and addedEnergy must be specified
+            if (!(targetStruct.targetSoC.HasValue()) && !(targetStruct.addedEnergy.HasValue()))
+            {
+                ChipLogError(AppServer, "Must have one of AddedEnergy or TargetSoC");
+                return Status::Failure;
+            }
+
+            // Validate the value of addedEnergy, if specified is >= 0
+            if (targetStruct.addedEnergy.HasValue() && targetStruct.addedEnergy.Value() < 0)
+            {
+                ChipLogError(AppServer, "AddedEnergy has invalid value (%ld)",
+                             static_cast<signed long int>(targetStruct.addedEnergy.Value()));
+                return Status::ConstraintError;
+            }
+            innerIdx++;
+        }
+
+        if (iterInner.GetStatus() != CHIP_NO_ERROR)
+        {
+            return Status::InvalidCommand;
+        }
+    }
+
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        return Status::InvalidCommand;
+    }
+
+    return Status::Success;
+}
+
 void Instance::HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets::DecodableType & commandData)
 {
-    // Call the delegate
-    // TODO
-    // Status status = mDelegate.GetTargets();
-    Status status = Status::UnsupportedCommand;
+    Commands::GetTargetsResponse::Type response;
 
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    Status status = mDelegate.GetTargets(response.chargingTargetSchedules);
+    if (status != Status::Success)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
+
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }
+
 void Instance::HandleClearTargets(HandlerContext & ctx, const Commands::ClearTargets::DecodableType & commandData)
 {
     // Call the delegate
-    // TODO
-    // Status status = mDelegate.ClearTargets();
-    Status status = Status::UnsupportedCommand;
+    Status status = mDelegate.ClearTargets();
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }

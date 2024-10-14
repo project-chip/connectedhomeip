@@ -20,7 +20,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandResponseHelper.h>
-#include <app/util/af.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 

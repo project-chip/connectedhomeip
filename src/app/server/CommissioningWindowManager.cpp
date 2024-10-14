@@ -72,6 +72,12 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         // If in NonConcurrentConnection, this will already have been completed
         mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
+        args.enable  = false;
+        args.ExtCmds = nullptr;
+        DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(args);
+#endif
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
@@ -84,8 +90,15 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
-        app::DnssdServer::Instance().AdvertiseOperational();
-        ChipLogProgress(AppServer, "Operational advertising enabled");
+        CHIP_ERROR err = app::DnssdServer::Instance().AdvertiseOperational();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Operational advertising failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        else
+        {
+            ChipLogProgress(AppServer, "Operational advertising enabled");
+        }
     }
 #if CONFIG_NETWORK_LAYER_BLE
     else if (event->Type == DeviceLayer::DeviceEventType::kCloseAllBleConnections)
@@ -98,6 +111,8 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
 
 void CommissioningWindowManager::Shutdown()
 {
+    VerifyOrReturn(nullptr != mServer);
+
     StopAdvertisement(/* aShuttingDown = */ true);
 
     ResetState();
@@ -208,7 +223,8 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
     }
     else
     {
-        err = failSafeContext.ArmFailSafe(kUndefinedFabricIndex, System::Clock::Seconds16(60));
+        err = failSafeContext.ArmFailSafe(kUndefinedFabricIndex,
+                                          System::Clock::Seconds16(CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Error arming failsafe on PASE session establishment completion");
@@ -228,7 +244,7 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
     }
 }
 
-CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds16 commissioningTimeout)
+CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds32 commissioningTimeout)
 {
     VerifyOrReturnError(commissioningTimeout <= MaxCommissioningTimeout() && commissioningTimeout >= MinCommissioningTimeout(),
                         CHIP_ERROR_INVALID_ARGUMENT);
@@ -288,7 +304,21 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds16 commissioningTimeout,
+System::Clock::Seconds32 CommissioningWindowManager::MaxCommissioningTimeout() const
+{
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
+    /* Allow for extended announcement only if the device is uncomissioned. */
+    if (mServer->GetFabricTable().FabricCount() == 0)
+    {
+        // Specification section 2.3.1 - Extended Announcement Duration up to 48h
+        return System::Clock::Seconds32(60 * 60 * 48);
+    }
+#endif
+    // Specification section 5.4.2.3. Announcement Duration says 15 minutes.
+    return System::Clock::Seconds32(15 * 60);
+}
+
+CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds32 commissioningTimeout,
                                                                     CommissioningWindowAdvertisement advertisementMode)
 {
     RestoreDiscriminator();
@@ -316,7 +346,7 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds16 co
 
 CHIP_ERROR
 CommissioningWindowManager::OpenBasicCommissioningWindowForAdministratorCommissioningCluster(
-    System::Clock::Seconds16 commissioningTimeout, FabricIndex fabricIndex, VendorId vendorId)
+    System::Clock::Seconds32 commissioningTimeout, FabricIndex fabricIndex, VendorId vendorId)
 {
     ReturnErrorOnFailure(OpenBasicCommissioningWindow(commissioningTimeout, CommissioningWindowAdvertisement::kDnssdOnly));
 
@@ -326,7 +356,7 @@ CommissioningWindowManager::OpenBasicCommissioningWindowForAdministratorCommissi
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(Seconds16 commissioningTimeout, uint16_t discriminator,
+CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(Seconds32 commissioningTimeout, uint16_t discriminator,
                                                                        Spake2pVerifier & verifier, uint32_t iterations,
                                                                        ByteSpan salt, FabricIndex fabricIndex, VendorId vendorId)
 {

@@ -14,88 +14,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This file is constructed using the below method.
-# 1. running bluetoothd
-# 2. running two Bluetooth adapter with LE capability and create ble connection with Gatt servie and Gatt Char.
-#    For the purposes of XML generation we use btvirt emulator with the LE only capability.
-# Assume the LE chip is on hci 0
-# we get the bluez XML via:
-# sudo gdbus introspect -s -d org.bluez -r -o /org/bluez -x
-# sudo gdbus introspect -s -d org.bluez -r -o /org/bluez/hci0 -x
-# sudo gdbus introspect -s -d org.bluez -r -o /org/bluez/hci0/dev_00_AA_01_01_00_24 -x
-# sudo gdbus introspect -s -d org.bluez -r -o /org/bluez/hci0/dev_00_AA_01_01_00_24/service0006 -x
-# sudo gdbus introspect -s -d org.bluez -r -o /org/bluez/hci0/dev_00_AA_01_01_00_24/service0006/char0007 -x
-# sudo gdbus introspect -s -d org.bluez -r -o /org/bluez/hci0/dev_00_AA_01_01_00_24/service0006/char0007/desc0009 -x
-# sudo gdbus introspect -s -d org.bluez -r -o / -x
+# This file is constructed based on the BlueZ D-Bus API documentation
+# available at: https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc
+#
+# It does not contain all exported interfaces, but only those that are
+# relevant for the Matter GATT service and advertisement management. Also,
+# some properties and methods not used by Matter are omitted in order to
+# decrease the size of Matter SDK library.
+#
 -->
 
 <node>
+
   <interface name="org.bluez.Adapter1">
     <method name="StartDiscovery" />
+    <method name="StopDiscovery" />
     <method name="SetDiscoveryFilter">
       <arg name="properties" type="a{sv}" direction="in" />
     </method>
-    <method name="StopDiscovery" />
     <method name="RemoveDevice">
       <arg name="device" type="o" direction="in" />
     </method>
-    <method name="GetDiscoveryFilters">
-      <arg name="filters" type="as" direction="out" />
-    </method>
-    <method name="ConnectDevice">
-      <arg name="properties" type="a{sv}" direction="in" />
-    </method>
-
     <property name="Address" type="s" access="read" />
-    <property name="AddressType" type="s" access="read" />
     <property name="Name" type="s" access="read" />
     <property name="Alias" type="s" access="readwrite" />
     <property name="Class" type="u" access="read" />
     <property name="Powered" type="b" access="readwrite" />
     <property name="Discoverable" type="b" access="readwrite" />
-    <property name="DiscoverableTimeout" type="u" access="readwrite" />
-    <property name="Pairable" type="b" access="readwrite" />
-    <property name="PairableTimeout" type="u" access="readwrite" />
-    <property name="Discovering" type="b" access="read" />
-    <property name="UUIDs" type="as" access="read" />
-    <property name="Modalias" type="s" access="read" />
-    <property name="Roles" type="as" access="read" />
   </interface>
 
   <interface name="org.bluez.Device1">
     <method name="Disconnect" />
     <method name="Connect" />
-    <method name="ConnectProfile">
-      <arg name="UUID" type="s" direction="in" />
-    </method>
-    <method name="DisconnectProfile">
-      <arg name="UUID" type="s" direction="in" />
-    </method>
-    <method name="Pair" />
-    <method name="CancelPairing" />
     <property name="Address" type="s" access="read" />
-    <property name="AddressType" type="s" access="read" />
-    <property name="Name" type="s" access="read" />
-    <property name="Alias" type="s" access="readwrite" />
-    <property name="Class" type="u" access="read" />
-    <property name="Appearance" type="q" access="read" />
-    <property name="Icon" type="s" access="read" />
-    <property name="Paired" type="b" access="read" />
-    <property name="Trusted" type="b" access="readwrite" />
-    <property name="Blocked" type="b" access="readwrite" />
-    <property name="LegacyPairing" type="b" access="read" />
-    <property name="RSSI" type="n" access="read" />
     <property name="Connected" type="b" access="read" />
-    <property name="UUIDs" type="as" access="read" />
-    <property name="Modalias" type="s" access="read" />
     <property name="Adapter" type="o" access="read" />
-    <property name="ManufacturerData" type="a{qv}" access="read" />
     <property name="ServiceData" type="a{sv}" access="read" />
-    <property name="TxPower" type="n" access="read" />
     <property name="ServicesResolved" type="b" access="read" />
-    <property name="AdvertisingFlags" type="ay" access="read" />
-    <property name="AdvertisingData" type="a{yv}" access="read" />
-    <property name="WakeAllowed" type="b" access="readwrite" />
   </interface>
 
   <interface name="org.bluez.GattManager1">
@@ -137,11 +92,13 @@
       <arg name="options" type="a{sv}" direction="in"/>
     </method>
     <method name="AcquireWrite">
+      <annotation name="org.gtk.GDBus.C.UnixFD" value="true" />
       <arg name="options" type="a{sv}" direction="in" />
       <arg name="fd" type="h" direction="out" />
       <arg name="mtu" type="q" direction="out" />
     </method>
     <method name="AcquireNotify">
+      <annotation name="org.gtk.GDBus.C.UnixFD" value="true" />
       <arg name="options" type="a{sv}" direction="in" />
       <arg name="fd" type="h" direction="out" />
       <arg name="mtu" type="q" direction="out" />
@@ -238,56 +195,6 @@
     <method name="UnregisterAdvertisement">
       <arg name="service" type="o" direction="in" />
     </method>
-    <property name="ActiveInstances" type="y" access="read" />
-    <property name="SupportedInstances" type="y" access="read" />
-    <property name="SupportedIncludes" type="as" access="read" />
-    <property name="SupportedSecondaryChannels" type="as" access="read" />
   </interface>
 
-  <interface name="org.freedesktop.DBus.Properties">
-    <method name="Get">
-      <arg name="interface" type="s" direction="in" />
-      <arg name="name" type="s" direction="in" />
-      <arg name="value" type="v" direction="out" />
-    </method>
-    <method name="Set">
-      <arg name="interface" type="s" direction="in" />
-      <arg name="name" type="s" direction="in" />
-      <arg name="value" type="v" direction="in" />
-    </method>
-    <method name="GetAll">
-      <arg name="interface" type="s" direction="in" />
-      <arg name="properties" type="a{sv}" direction="out" />
-    </method>
-    <signal name="PropertiesChanged">
-      <arg name="interface" type="s" />
-      <arg name="changed_properties" type="a{sv}" />
-      <arg name="invalidated_properties" type="as" />
-    </signal>
-  </interface>
-
-  <interface name="org.bluez.ProfileManager1">
-    <method name="RegisterProfile">
-      <arg name="profile" type="o" direction="in" />
-      <arg name="UUID" type="s" direction="in" />
-      <arg name="options" type="a{sv}" direction="in" />
-    </method>
-    <method name="UnregisterProfile">
-      <arg name="profile" type="o" direction="in" />
-    </method>
-  </interface>
-
-  <interface name="org.freedesktop.DBus.ObjectManager">
-    <method name="GetManagedObjects">
-      <arg name="objects" type="a{oa{sa{sv}}}" direction="out" />
-    </method>
-    <signal name="InterfacesAdded">
-      <arg name="object" type="o" />
-      <arg name="interfaces" type="a{sa{sv}}" />
-    </signal>
-    <signal name="InterfacesRemoved">
-      <arg name="object" type="o" />
-      <arg name="interfaces" type="as" />
-    </signal>
-  </interface>
 </node>

@@ -96,7 +96,7 @@ The list of platforms supported here (as of writing this) are:
 
 ```
 m5stack
-brd4161a
+brd4187c
 nrf52840dk
 linux_x86
 ```
@@ -105,7 +105,7 @@ For example, here are some valid names:
 
 ```
 m5stack_rootnode_humiditysensor_pv0comNKyT
-brd4161a_rootnode_humiditysensor_pv0comNKyT
+brd4187c_rootnode_humiditysensor_pv0comNKyT
 nrf52840dk_rootnode_humiditysensor_pv0comNKyT
 linux_x86_rootnode_humiditysensor_pv0comNKyT
 ```

@@ -76,7 +76,7 @@ extern uint32_t SystemCoreClock;
 #define configUSE_RECURSIVE_MUTEXES 1
 #define configUSE_COUNTING_SEMAPHORES 1
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 0
-#define configUSE_TICKLESS_IDLE 0
+#define configUSE_TICKLESS_IDLE 2
 /* USER CODE BEGIN MESSAGE_BUFFER_LENGTH_TYPE */
 /* Defaults to size_t for backward compatibility, but can be changed
    if lengths will always be less than the number of bytes in a size_t. */
@@ -172,19 +172,20 @@ standard names. */
 /* USER CODE BEGIN Defines */
 /* Section where parameter definitions can be added (for instance, to override default ones in FreeRTOS.h) */
 // #define configOVERRIDE_DEFAULT_TICK_CONFIGURATION 1  /* required only for Keil but does not hurt otherwise */
-#define configGENERATE_RUN_TIME_STATS 1
+/*#define configGENERATE_RUN_TIME_STATS             1
 
-#if (configGENERATE_RUN_TIME_STATS == 1)
+#if( configGENERATE_RUN_TIME_STATS == 1 )
 
-extern void RTOS_AppConfigureTimerForRuntimeStats();
+  extern void RTOS_AppConfigureTimerForRuntimeStats();
 
-extern uint32_t RTOS_AppGetRuntimeCounterValueFromISR();
+  extern uint32_t RTOS_AppGetRuntimeCounterValueFromISR();
 
-#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() RTOS_AppConfigureTimerForRuntimeStats()
+  #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()    RTOS_AppConfigureTimerForRuntimeStats()
 
-#define portGET_RUN_TIME_COUNTER_VALUE() RTOS_AppGetRuntimeCounterValueFromISR()
+  #define portGET_RUN_TIME_COUNTER_VALUE()            RTOS_AppGetRuntimeCounterValueFromISR()
 
 #endif
+*/
 
 /* USER CODE END Defines */
 

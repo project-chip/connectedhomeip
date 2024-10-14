@@ -17,13 +17,13 @@
  */
 
 #include <inttypes.h>
-#include <nlunit-test.h>
+
+#include <pw_unit_test/framework.h>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/UnitTestRegistration.h>
-
 #include <transport/CryptoContext.h>
 
 using namespace chip;
@@ -48,7 +48,14 @@ struct PrivacyNonceTestEntry thePrivacyNonceTestVector[] = {
     },
 };
 
-void TestBuildPrivacyNonce(nlTestSuite * apSuite, void * apContext)
+class TestGroupCryptoContext : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestGroupCryptoContext, TestBuildPrivacyNonce)
 {
     for (const auto & testVector : thePrivacyNonceTestVector)
     {
@@ -60,47 +67,9 @@ void TestBuildPrivacyNonce(nlTestSuite * apSuite, void * apContext)
 
         mic.SetTag(nullptr, testVector.mic, MIC_LENGTH);
 
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == chip::CryptoContext::BuildPrivacyNonce(privacyNonce, sessionId, mic));
-        NL_TEST_ASSERT(apSuite, 0 == memcmp(privacyNonceView.data(), expectedPrivacyNonce.data(), NONCE_LENGTH));
+        EXPECT_EQ(CHIP_NO_ERROR, chip::CryptoContext::BuildPrivacyNonce(privacyNonce, sessionId, mic));
+        EXPECT_EQ(0, memcmp(privacyNonceView.data(), expectedPrivacyNonce.data(), NONCE_LENGTH));
     }
 }
 
-/**
- *   Test Suite. It lists all the test functions.
- */
-const nlTest sTests[] = { NL_TEST_DEF("TestBuildPrivacyNonce", TestBuildPrivacyNonce), NL_TEST_SENTINEL() };
-
-/**
- *  Set up the test suite.
- */
-int Test_Setup(void * inContext)
-{
-    CHIP_ERROR error = chip::Platform::MemoryInit();
-    VerifyOrReturnError(error == CHIP_NO_ERROR, FAILURE);
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-int Test_Teardown(void * inContext)
-{
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-
 } // namespace
-
-/**
- *  Main
- */
-int TestGroupCryptoContext()
-{
-    nlTestSuite theSuite = { "TestGroupCryptoContext", &sTests[0], Test_Setup, Test_Teardown };
-
-    // Run test suite againt one context.
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestGroupCryptoContext)

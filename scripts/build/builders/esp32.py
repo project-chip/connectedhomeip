@@ -16,8 +16,9 @@ import logging
 import os
 import shlex
 from enum import Enum, auto
+from typing import Optional
 
-from .builder import Builder
+from .builder import Builder, BuilderOutput
 
 
 class Esp32Board(Enum):
@@ -139,7 +140,7 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
         else:
             return 'sdkconfig{}.defaults'.format(rpc)
     elif board == Esp32Board.C3DevKit:
-        return 'sdkconfig_c3devkit{}.defaults'.format(rpc)
+        return 'sdkconfig{}.defaults.esp32c3'.format(rpc)
     else:
         raise Exception('Unknown board type')
 
@@ -153,7 +154,8 @@ class Esp32Builder(Builder):
                  app: Esp32App = Esp32App.ALL_CLUSTERS,
                  enable_rpcs: bool = False,
                  enable_ipv4: bool = True,
-                 enable_insights_trace: bool = False
+                 enable_insights_trace: bool = False,
+                 data_model_interface: Optional[str] = None,
                  ):
         super(Esp32Builder, self).__init__(root, runner)
         self.board = board
@@ -161,6 +163,7 @@ class Esp32Builder(Builder):
         self.enable_rpcs = enable_rpcs
         self.enable_ipv4 = enable_ipv4
         self.enable_insights_trace = enable_insights_trace
+        self.data_model_interface = data_model_interface
 
         if not app.IsCompatible(board):
             raise Exception(
@@ -197,6 +200,8 @@ class Esp32Builder(Builder):
         if not self.enable_ipv4:
             self._Execute(
                 ['bash', '-c', 'echo -e "\\nCONFIG_DISABLE_IPV4=y\\n" >>%s' % shlex.quote(defaults_out)])
+            self._Execute(
+                ['bash', '-c', 'echo -e "\\nCONFIG_LWIP_IPV4=n\\n" >>%s' % shlex.quote(defaults_out)])
 
         if self.enable_insights_trace:
             insights_flag = 'y'
@@ -212,6 +217,9 @@ class Esp32Builder(Builder):
         if self.options.pregen_dir:
             cmake_flags.append(
                 f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
+
+        if self.data_model_interface:
+            cmake_flags.append(f'-DCHIP_DATA_MODEL_INTERFACE={self.data_model_interface}')
 
         cmake_args = ['-C', self.ExamplePath, '-B',
                       shlex.quote(self.output_dir)] + cmake_flags
@@ -248,26 +256,21 @@ class Esp32Builder(Builder):
     def build_outputs(self):
         if self.app == Esp32App.TESTS:
             # Include the runnable image names as artifacts
-            result = dict()
             with open(os.path.join(self.output_dir, 'test_images.txt'), 'rt') as f:
-                for name in f.readlines():
-                    name = name.strip()
-                    result[name] = os.path.join(self.output_dir, name)
+                for name in filter(None, [x.strip() for x in f.readlines()]):
+                    yield BuilderOutput(os.path.join(self.output_dir, name), name)
+            return
 
-            return result
+        extensions = ["elf"]
+        if self.options.enable_link_map_file:
+            extensions.append("map")
+        for ext in extensions:
+            name = f"{self.app.AppNamePrefix}.{ext}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
-        return {
-            self.app.AppNamePrefix + '.elf':
-                os.path.join(self.output_dir, self.app.AppNamePrefix + '.elf'),
-            self.app.AppNamePrefix + '.map':
-                os.path.join(self.output_dir, self.app.AppNamePrefix + '.map'),
-        }
-
-    def flashbundle(self):
+    def bundle_outputs(self):
         if not self.app.FlashBundleName:
-            return {}
-
-        with open(os.path.join(self.output_dir, self.app.FlashBundleName), 'r') as fp:
-            return {
-                line.strip(): os.path.join(self.output_dir, line.strip()) for line in fp.readlines() if line.strip()
-            }
+            return
+        with open(os.path.join(self.output_dir, self.app.FlashBundleName)) as f:
+            for line in filter(None, [x.strip() for x in f.readlines()]):
+                yield BuilderOutput(os.path.join(self.output_dir, line), line)

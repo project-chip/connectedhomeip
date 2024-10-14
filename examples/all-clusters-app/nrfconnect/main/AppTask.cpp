@@ -31,9 +31,11 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <static-supported-modes-manager.h>
 #include <static-supported-temperature-levels.h>
 
 #ifdef CONFIG_CHIP_WIFI
@@ -94,6 +96,7 @@ bool sIsNetworkEnabled     = false;
 bool sHaveBLEConnections   = false;
 
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 
 #ifdef CONFIG_CHIP_CRYPTO_PSA
 chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
@@ -256,6 +259,7 @@ CHIP_ERROR AppTask::Init()
     }
 
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
     return err;
 }
 

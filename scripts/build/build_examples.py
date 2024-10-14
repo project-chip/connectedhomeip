@@ -83,14 +83,17 @@ def ValidateTargetNames(context, parameter, values):
     default=[],
     multiple=True,
     callback=ValidateTargetNames,
-    help='Build target(s)'
-)
+    help='Build target(s)')
+@click.option(
+    '--enable-link-map-file',
+    default=False,
+    is_flag=True,
+    help='Enable generation of link map files.')
 @click.option(
     '--enable-flashbundle',
     default=False,
     is_flag=True,
-    help='Also generate the flashbundles for the app.'
-)
+    help='Also generate the flashbundles for the app.')
 @click.option(
     '--repo',
     default='.',
@@ -101,6 +104,13 @@ def ValidateTargetNames(context, parameter, values):
     default='./out',
     type=click.Path(file_okay=False, resolve_path=True),
     help='Prefix for the generated file output.')
+@click.option(
+    '--ninja-jobs',
+    type=int,
+    is_flag=False,
+    flag_value=0,
+    default=None,
+    help='Number of ninja jobs')
 @click.option(
     '--pregen-dir',
     default=None,
@@ -132,9 +142,9 @@ def ValidateTargetNames(context, parameter, values):
         'Set pigweed command launcher. E.g.: "--pw-command-launcher=ccache" '
         'for using ccache when building examples.'))
 @click.pass_context
-def main(context, log_level, target, repo,
-         out_prefix, pregen_dir, clean, dry_run, dry_run_output, enable_flashbundle,
-         no_log_timestamps, pw_command_launcher):
+def main(context, log_level, target, enable_link_map_file, repo,
+         out_prefix, ninja_jobs, pregen_dir, clean, dry_run, dry_run_output,
+         enable_flashbundle, no_log_timestamps, pw_command_launcher):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -158,8 +168,9 @@ before running this script.
     logging.info('Building targets: %s', CommaSeparate(requested_targets))
 
     context.obj = build.Context(
-        repository_path=repo, output_prefix=out_prefix, runner=runner)
+        repository_path=repo, output_prefix=out_prefix, ninja_jobs=ninja_jobs, runner=runner)
     context.obj.SetupBuilders(targets=requested_targets, options=BuilderOptions(
+        enable_link_map_file=enable_link_map_file,
         enable_flashbundle=enable_flashbundle,
         pw_command_launcher=pw_command_launcher,
         pregen_dir=pregen_dir,

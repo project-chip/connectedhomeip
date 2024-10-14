@@ -28,16 +28,17 @@ from os.path import exists
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import load_der_private_key
+from nrfconnect_generate_partition import PartitionCreator
 
 try:
     import qrcode
-    from generate_setup_payload import CommissioningFlow, SetupPayload
+    from SetupPayload import CommissioningFlow, SetupPayload
 except ImportError:
     SDK_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
     sys.path.append(os.path.join(SDK_ROOT, "src/setup_payload/python"))
     try:
         import qrcode
-        from generate_setup_payload import CommissioningFlow, SetupPayload
+        from SetupPayload import CommissioningFlow, SetupPayload
     except ModuleNotFoundError or ImportError:
         no_onboarding_modules = True
     else:
@@ -228,6 +229,10 @@ class FactoryDataGenerator:
         self._factory_data = list()
         self._user_data = dict()
 
+        # If .json extension is included in the output path, remove it, as script adds it automatically.
+        if self._args.output.endswith(".json"):
+            self._args.output = self._args.output[:-len(".json")]
+
         try:
             self._validate_args()
         except AssertionError as e:
@@ -244,8 +249,6 @@ class FactoryDataGenerator:
             "Cannot find Spake2+ verifier, to generate a new one please provide passcode (--passcode)"
         assert ((self._args.gen_certs and self._args.chip_cert_path) or (self._args.dac_cert and self._args.pai_cert and self._args.dac_key)), \
             "Cannot find paths to DAC or PAI certificates .der files. To generate a new ones please provide a path to chip-cert executable (--chip_cert_path) and add --gen_certs argument"
-        assert self._args.output.endswith(".json"), \
-            "Output path doesn't contain .json file path. ({})".format(self._args.output)
         assert self._args.passcode not in INVALID_PASSCODES, \
             "Provided invalid passcode!"
 
@@ -310,9 +313,9 @@ class FactoryDataGenerator:
             sys.exit(-1)
 
         try:
-            json_file = open(self._args.output, "w+")
+            json_file = open(self._args.output+".json", "w+")
         except FileNotFoundError:
-            print("Cannot create JSON file in this location: {}".format(self._args.output))
+            print("Cannot create JSON file in this location: {}".format(self._args.output+".json"))
             sys.exit(-1)
         with json_file:
             # serialize data
@@ -422,15 +425,15 @@ class FactoryDataGenerator:
                                      flow=CommissioningFlow.Standard,
                                      vid=self._args.vendor_id,
                                      pid=self._args.product_id)
-        with open(self._args.output[:-len(".json")] + ".txt", "w") as manual_code_file:
+        with open(self._args.output + ".txt", "w") as manual_code_file:
             manual_code_file.write("Manualcode : " + setup_payload.generate_manualcode() + "\n")
             manual_code_file.write("QRCode : " + setup_payload.generate_qrcode())
         qr = qrcode.make(setup_payload.generate_qrcode())
-        qr.save(self._args.output[:-len(".json")] + ".png")
+        qr.save(self._args.output + ".png")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="NrfConnect Factory Data NVS generator tool")
+    parser = argparse.ArgumentParser(description="nRF Connect Factory Data generator tool")
 
     def allow_any_int(i): return int(i, 0)
     def base64_str(s): return base64.b64decode(s)
@@ -441,7 +444,10 @@ def main():
     parser.add_argument("-s", "--schema", type=str,
                         help="JSON schema file to validate JSON output data")
     parser.add_argument("-o", "--output", type=str, required=True,
-                        help="Output path to store .json file, e.g. my_dir/output.json")
+                        help="Output path to store .json file, e.g. my_dir/output."
+                             "The .json extension will be automatically added by the script and does not need to be provided."
+                             "If provided, an extension will not be added."
+                             "If optional --size and --offset arguments are provided, the script also generates .hex file with factory data.")
     parser.add_argument("-v", "--verbose", action="store_true",
                         help="Run this script with DEBUG logging level")
     parser.add_argument("--include_passcode", action="store_true",
@@ -543,6 +549,10 @@ def main():
                                     help="[string] Provide one of the product finishes")
     optional_arguments.add_argument("--product_color", type=str, choices=PRODUCT_COLOR_ENUM.keys(),
                                     help="[string] Provide one of the product colors.")
+    optional_arguments.add_argument("--offset", type=allow_any_int,
+                                    help="Partition offset - an address in device's NVM memory, where factory data will be stored.")
+    optional_arguments.add_argument("--size", type=allow_any_int,
+                                    help="The maximum partition size.")
     args = parser.parse_args()
 
     if args.verbose:
@@ -551,26 +561,33 @@ def main():
         log.basicConfig(format='[%(levelname)s] %(message)s', level=log.INFO)
 
     # check if json file already exist
-    if (exists(args.output) and not args.overwrite):
+    if (exists(args.output + ".json") and not args.overwrite):
         log.error(("Output file: {} already exist, to create a new one add argument '--overwrite'. "
-                  "By default overwriting is disabled").format(args.output))
-        return
+                  "By default overwriting is disabled").format(args.output+".json"))
+        sys.exit(1)
 
     if args.schema and no_jsonschema_module:
         log.error(("Requested verification of the JSON file using jsonschema, but the module is not installed. \n"
                   "Install only the module by invoking: pip3 install jsonschema \n"
                    "Alternatively, install it with all dependencies for Matter by invoking: pip3 install "
                    "-r ./scripts/setup/requirements.nrfconnect.txt from the Matter root directory."))
-        return
+        sys.exit(1)
 
     if args.generate_onboarding and no_onboarding_modules:
         log.error(("Requested generation of onboarding codes, but the some modules are not installed. \n"
                   "Install all dependencies for Matter by invoking: pip3 install "
                    "-r ./scripts/setup/requirements.nrfconnect.txt from the Matter root directory."))
-        return
+        sys.exit(1)
 
     generator = FactoryDataGenerator(args)
     generator.generate_json()
+
+    # If optional partition's offset and size were provided, generate factory data output .hex file.
+    if args.offset and args.size:
+        partition_creator = PartitionCreator(args.offset, args.size, args.output + ".json", args.output)
+        cbor_data = partition_creator.generate_cbor()
+        partition_creator.create_hex(cbor_data)
+        partition_creator.create_bin()
 
 
 if __name__ == "__main__":

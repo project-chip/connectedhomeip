@@ -29,20 +29,16 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <CHIPVersion.h>
+#include <pw_unit_test/framework.h>
 
+#include <CHIPVersion.h>
 #include <inet/IPPrefix.h>
 #include <inet/InetError.h>
-
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/UnitTestContext.h>
-#include <lib/support/UnitTestRegistration.h>
-
 #include <system/SystemError.h>
-
-#include <nlunit-test.h>
 
 #include "TestInetCommon.h"
 #include "TestSetupSignalling.h"
@@ -75,8 +71,24 @@ void HandleTimer(Layer * aLayer, void * aAppState)
     printf("    timer handler\n");
 }
 
+class TestInetEndPoint : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite()
+    {
+        SetSIGUSR1Handler();
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+    }
+    static void TearDownTestSuite()
+    {
+        ShutdownNetwork();
+        ShutdownSystemLayer();
+        chip::Platform::MemoryShutdown();
+    }
+};
+
 // Test before init network, Inet is not initialized
-static void TestInetPre(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestInetEndPoint, TestInetPre)
 {
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
     UDPEndPoint * testUDPEP = nullptr;
@@ -95,32 +107,32 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
     err = gUDP.NewEndPoint(&testUDPEP);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     err = gTCP.NewEndPoint(&testTCPEP);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     err = gSystemLayer.StartTimer(10_ms32, HandleTimer, nullptr);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
 
     // then init network
     InitSystemLayer();
     InitNetwork();
 }
 
-static void TestInetError(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestInetEndPoint, TestInetError)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = CHIP_ERROR_POSIX(EPERM);
-    NL_TEST_ASSERT(inSuite, DescribeErrorPOSIX(err));
-    NL_TEST_ASSERT(inSuite, err.IsRange(ChipError::Range::kPOSIX));
+    EXPECT_TRUE(DescribeErrorPOSIX(err));
+    EXPECT_TRUE(err.IsRange(ChipError::Range::kPOSIX));
 }
 
-static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestInetEndPoint, TestInetInterface)
 {
     InterfaceIterator intIterator;
     InterfaceAddressIterator addrIterator;
@@ -138,29 +150,30 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
 #ifndef __MBED__
     // Mbed interface name has different format
     err = InterfaceId::InterfaceNameToId("0", intId);
-    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+    EXPECT_NE(err, CHIP_NO_ERROR);
 #endif
 
     err = InterfaceId::Null().GetInterfaceName(intName, 0);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
+    EXPECT_EQ(err, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     err = InterfaceId::Null().GetInterfaceName(intName, sizeof(intName));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR && intName[0] == '\0');
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(intName[0], '\0');
 
     intId = InterfaceId::FromIPAddress(addr);
-    NL_TEST_ASSERT(inSuite, !intId.IsPresent());
+    EXPECT_FALSE(intId.IsPresent());
 
     err = intId.GetLinkLocalAddr(nullptr);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 
     printf("    Interfaces:\n");
     for (; intIterator.HasCurrent(); intIterator.Next())
     {
         intId = intIterator.GetInterfaceId();
-        NL_TEST_ASSERT(inSuite, intId.IsPresent());
+        EXPECT_TRUE(intId.IsPresent());
         memset(intName, 42, sizeof(intName));
         err = intIterator.GetInterfaceName(intName, sizeof(intName));
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
         printf("     interface id: 0x%" PRIxPTR ", interface name: %s, interface state: %s, %s multicast, %s broadcast addr\n",
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
                reinterpret_cast<uintptr_t>(intId.GetPlatformInterface()),
@@ -175,47 +188,44 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
 
         // Not all platforms support getting interface type and hardware address
         err = intIterator.GetInterfaceType(intType);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_IMPLEMENTED);
+        EXPECT_TRUE(err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_IMPLEMENTED);
 
         err = intIterator.GetHardwareAddress(intHwAddress, intHwAddressSize, sizeof(intHwAddress));
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_IMPLEMENTED);
+        EXPECT_TRUE(err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_IMPLEMENTED);
         if (err == CHIP_NO_ERROR)
         {
-            NL_TEST_ASSERT(inSuite, intHwAddressSize == 6 || intHwAddressSize == 8);
-            NL_TEST_ASSERT(inSuite,
-                           intIterator.GetHardwareAddress(nullptr, intHwAddressSize, sizeof(intHwAddress)) ==
-                               CHIP_ERROR_INVALID_ARGUMENT);
-            NL_TEST_ASSERT(inSuite,
-                           intIterator.GetHardwareAddress(intHwAddress, intHwAddressSize, 4) == CHIP_ERROR_BUFFER_TOO_SMALL);
+            EXPECT_TRUE(intHwAddressSize == 6 || intHwAddressSize == 8);
+            EXPECT_EQ(intIterator.GetHardwareAddress(nullptr, intHwAddressSize, sizeof(intHwAddress)), CHIP_ERROR_INVALID_ARGUMENT);
+            EXPECT_EQ(intIterator.GetHardwareAddress(intHwAddress, intHwAddressSize, 4), CHIP_ERROR_BUFFER_TOO_SMALL);
         }
     }
 
-    NL_TEST_ASSERT(inSuite, !intIterator.Next());
-    NL_TEST_ASSERT(inSuite, intIterator.GetInterfaceId() == InterfaceId::Null());
-    NL_TEST_ASSERT(inSuite, intIterator.GetInterfaceName(intName, sizeof(intName)) == CHIP_ERROR_INCORRECT_STATE);
-    NL_TEST_ASSERT(inSuite, !intIterator.SupportsMulticast());
-    NL_TEST_ASSERT(inSuite, !intIterator.HasBroadcastAddress());
+    EXPECT_FALSE(intIterator.Next());
+    EXPECT_EQ(intIterator.GetInterfaceId(), InterfaceId::Null());
+    EXPECT_EQ(intIterator.GetInterfaceName(intName, sizeof(intName)), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_FALSE(intIterator.SupportsMulticast());
+    EXPECT_FALSE(intIterator.HasBroadcastAddress());
 
     // Not all platforms support getting interface type and hardware address
     err = intIterator.GetInterfaceType(intType);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE || err == CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_TRUE(err == CHIP_ERROR_INCORRECT_STATE || err == CHIP_ERROR_NOT_IMPLEMENTED);
     err = intIterator.GetHardwareAddress(intHwAddress, intHwAddressSize, sizeof(intHwAddress));
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE || err == CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_TRUE(err == CHIP_ERROR_INCORRECT_STATE || err == CHIP_ERROR_NOT_IMPLEMENTED);
 
     printf("    Addresses:\n");
     for (; addrIterator.HasCurrent(); addrIterator.Next())
     {
         err = addrIterator.GetAddress(addr);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
         IPPrefix addrWithPrefix(addr, addrIterator.GetPrefixLength());
         char addrStr[80];
         addrWithPrefix.IPAddr.ToString(addrStr);
         intId = addrIterator.GetInterfaceId();
-        NL_TEST_ASSERT(inSuite, intId.IsPresent());
+        EXPECT_TRUE(intId.IsPresent());
         memset(intName, 42, sizeof(intName));
         err = addrIterator.GetInterfaceName(intName, sizeof(intName));
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, intName[0] != '\0' && memchr(intName, '\0', sizeof(intName)) != nullptr);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_TRUE(intName[0] != '\0' && memchr(intName, '\0', sizeof(intName)) != nullptr);
         printf("     %s/%d, interface id: 0x%" PRIxPTR
                ", interface name: %s, interface state: %s, %s multicast, %s broadcast addr\n",
                addrStr, addrWithPrefix.Length,
@@ -227,15 +237,15 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
                intName, addrIterator.IsUp() ? "UP" : "DOWN", addrIterator.SupportsMulticast() ? "supports" : "no",
                addrIterator.HasBroadcastAddress() ? "has" : "no");
     }
-    NL_TEST_ASSERT(inSuite, !addrIterator.Next());
-    NL_TEST_ASSERT(inSuite, addrIterator.GetAddress(addr) == CHIP_ERROR_SENTINEL);
-    NL_TEST_ASSERT(inSuite, addrIterator.GetInterfaceId() == InterfaceId::Null());
-    NL_TEST_ASSERT(inSuite, addrIterator.GetInterfaceName(intName, sizeof(intName)) == CHIP_ERROR_INCORRECT_STATE);
-    NL_TEST_ASSERT(inSuite, !addrIterator.SupportsMulticast());
-    NL_TEST_ASSERT(inSuite, !addrIterator.HasBroadcastAddress());
+    EXPECT_FALSE(addrIterator.Next());
+    EXPECT_EQ(addrIterator.GetAddress(addr), CHIP_ERROR_SENTINEL);
+    EXPECT_EQ(addrIterator.GetInterfaceId(), InterfaceId::Null());
+    EXPECT_EQ(addrIterator.GetInterfaceName(intName, sizeof(intName)), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_FALSE(addrIterator.SupportsMulticast());
+    EXPECT_FALSE(addrIterator.HasBroadcastAddress());
 }
 
-static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestInetEndPoint, TestInetEndPointInternal)
 {
     CHIP_ERROR err;
     IPAddress addr_any = IPAddress::Any;
@@ -246,123 +256,128 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     InterfaceId intId;
 
     // EndPoint
-    UDPEndPoint * testUDPEP  = nullptr;
+    UDPEndPoint * testUDPEP = nullptr;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     TCPEndPoint * testTCPEP1 = nullptr;
-    PacketBufferHandle buf   = PacketBufferHandle::New(PacketBuffer::kMaxSize);
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+    PacketBufferHandle buf = PacketBufferHandle::New(PacketBuffer::kMaxSize);
 
     // init all the EndPoints
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumUDPEps);
     err = gUDP.NewEndPoint(&testUDPEP);
-    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumTCPEps);
     err = gTCP.NewEndPoint(&testTCPEP1);
-    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, 1));
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     err = InterfaceId::Null().GetLinkLocalAddr(&addr);
 
     // We should skip the following checks if the interface does not have the Link local address
-    if (err == INET_ERROR_ADDRESS_NOT_FOUND)
-    {
-        return;
-    }
+    ASSERT_NE(err, INET_ERROR_ADDRESS_NOT_FOUND);
 
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
     intId = InterfaceId::FromIPAddress(addr);
-    NL_TEST_ASSERT(inSuite, intId.IsPresent());
+    EXPECT_TRUE(intId.IsPresent());
 
 #if INET_CONFIG_ENABLE_IPV4
-    NL_TEST_ASSERT(inSuite, IPAddress::FromString("10.0.0.1", addr_v4));
+    EXPECT_TRUE(IPAddress::FromString("10.0.0.1", addr_v4));
 #endif // INET_CONFIG_ENABLE_IPV4
 
     // UdpEndPoint special cases to cover the error branch
     err = testUDPEP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
     err = testUDPEP->Bind(IPAddressType::kUnknown, addr_any, 3000);
-    NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
+    EXPECT_EQ(err, INET_ERROR_WRONG_ADDRESS_TYPE);
     err = testUDPEP->Bind(IPAddressType::kUnknown, addr, 3000);
-    NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
+    EXPECT_EQ(err, INET_ERROR_WRONG_ADDRESS_TYPE);
 #if INET_CONFIG_ENABLE_IPV4
     err = testUDPEP->Bind(IPAddressType::kIPv4, addr, 3000);
-    NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
+    EXPECT_EQ(err, INET_ERROR_WRONG_ADDRESS_TYPE);
 #endif // INET_CONFIG_ENABLE_IPV4
 
     err            = testUDPEP->Bind(IPAddressType::kIPv6, addr, 3000, intId);
     err            = testUDPEP->BindInterface(IPAddressType::kIPv6, intId);
     InterfaceId id = testUDPEP->GetBoundInterface();
-    NL_TEST_ASSERT(inSuite, id == intId);
+    EXPECT_EQ(id, intId);
 
     err = testUDPEP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
     err = testUDPEP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
     err = testUDPEP->Bind(IPAddressType::kIPv6, addr, 3000, intId);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
     err = testUDPEP->BindInterface(IPAddressType::kIPv6, intId);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
     testUDPEP->Free();
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 0));
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, 1));
+    EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 0));
+    EXPECT_TRUE(SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, 1));
 
     err = gUDP.NewEndPoint(&testUDPEP);
-    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
 #if INET_CONFIG_ENABLE_IPV4
     err = testUDPEP->Bind(IPAddressType::kIPv4, addr_v4, 3000, intId);
-    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+    EXPECT_NE(err, CHIP_NO_ERROR);
     buf = PacketBufferHandle::New(PacketBuffer::kMaxSize);
     err = testUDPEP->SendTo(addr_v4, 3000, std::move(buf));
 #endif // INET_CONFIG_ENABLE_IPV4
     testUDPEP->Free();
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 0));
+    EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 0));
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // TcpEndPoint special cases to cover the error branch
     err = testTCPEP1->GetPeerInfo(nullptr, nullptr);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
     buf = PacketBufferHandle::New(PacketBuffer::kMaxSize);
     err = testTCPEP1->Send(std::move(buf), false);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
     err = testTCPEP1->EnableKeepAlive(10, 100);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
     err = testTCPEP1->DisableKeepAlive();
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
     err = testTCPEP1->AckReceive(10);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
-    NL_TEST_ASSERT(inSuite, !testTCPEP1->PendingReceiveLength());
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_FALSE(testTCPEP1->PendingReceiveLength());
     err = testTCPEP1->Listen(4);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
     err = testTCPEP1->GetLocalInfo(nullptr, nullptr);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
 
     err = testTCPEP1->Bind(IPAddressType::kUnknown, addr_any, 3000, true);
-    NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
+    EXPECT_EQ(err, INET_ERROR_WRONG_ADDRESS_TYPE);
 #if INET_CONFIG_ENABLE_IPV4
     err = testTCPEP1->Bind(IPAddressType::kIPv4, addr, 3000, true);
-    NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
+    EXPECT_EQ(err, INET_ERROR_WRONG_ADDRESS_TYPE);
 #endif // INET_CONFIG_ENABLE_IPV4
     err = testTCPEP1->Bind(IPAddressType::kUnknown, addr, 3000, true);
-    NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
+    EXPECT_EQ(err, INET_ERROR_WRONG_ADDRESS_TYPE);
 
     err = testTCPEP1->Bind(IPAddressType::kIPv6, addr_any, 3000, true);
     err = testTCPEP1->Bind(IPAddressType::kIPv6, addr_any, 3000, true);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
     err = testTCPEP1->Listen(4);
 #if INET_CONFIG_ENABLE_IPV4
     err = testTCPEP1->Connect(addr_v4, 4000, intId);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_IPV4
 
     testTCPEP1->Free();
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, 0));
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, 1));
+    EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, 0));
+    EXPECT_TRUE(SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, 1));
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 }
 
 #if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 // Test the Inet resource limitations.
-static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestInetEndPoint, TestInetEndPointLimit)
 {
     UDPEndPoint * testUDPEP[INET_CONFIG_NUM_UDP_ENDPOINTS + 1] = { nullptr };
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     TCPEndPoint * testTCPEP[INET_CONFIG_NUM_TCP_ENDPOINTS + 1] = { nullptr };
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -371,43 +386,45 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
     for (int i = INET_CONFIG_NUM_UDP_ENDPOINTS; i >= 0; --i)
     {
         err = gUDP.NewEndPoint(&testUDPEP[i]);
-        NL_TEST_ASSERT(inSuite, err == (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
+        EXPECT_EQ(err, (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
         if (err == CHIP_NO_ERROR)
         {
             ++udpCount;
-            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, udpCount));
+            EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, udpCount));
         }
     }
     const int udpHighWaterMark = udpCount;
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, udpHighWaterMark));
+    EXPECT_TRUE(SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, udpHighWaterMark));
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     int tcpCount = 0;
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumTCPEps);
     for (int i = INET_CONFIG_NUM_TCP_ENDPOINTS; i >= 0; --i)
     {
         err = gTCP.NewEndPoint(&testTCPEP[i]);
-        NL_TEST_ASSERT(inSuite, err == (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
+        EXPECT_EQ(err, (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
         if (err == CHIP_NO_ERROR)
         {
             ++tcpCount;
-            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, tcpCount));
+            EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, tcpCount));
         }
     }
     const int tcpHighWaterMark = tcpCount;
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, tcpHighWaterMark));
+    EXPECT_TRUE(SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, tcpHighWaterMark));
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if CHIP_SYSTEM_CONFIG_NUM_TIMERS
     // Verify same aComplete and aAppState args do not exhaust timer pool
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
     {
         err = gSystemLayer.StartTimer(10_ms32, HandleTimer, nullptr);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
     }
 
     char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
         err = gSystemLayer.StartTimer(10_ms32, HandleTimer, &numTimersTest[i]);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(err, CHIP_ERROR_NO_MEMORY);
 #endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS
 
     // Release UDP endpoints
@@ -417,10 +434,10 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         {
             testUDPEP[i]->Free();
             --udpCount;
-            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, udpCount));
+            EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, udpCount));
         }
     }
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, udpHighWaterMark));
+    EXPECT_TRUE(SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, udpHighWaterMark));
 
     // Release TCP endpoints
     for (int i = 0; i <= INET_CONFIG_NUM_TCP_ENDPOINTS; i++)
@@ -429,84 +446,12 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         {
             testTCPEP[i]->Free();
             --tcpCount;
-            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, tcpCount));
+            EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, tcpCount));
         }
     }
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, tcpHighWaterMark));
+    EXPECT_TRUE(SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, tcpHighWaterMark));
 
     ShutdownNetwork();
     ShutdownSystemLayer();
 }
-#endif
-
-// Test Suite
-
-/**
- *   Test Suite. It lists all the test functions.
- */
-static const nlTest sTests[] = { NL_TEST_DEF("InetEndPoint::PreTest", TestInetPre),
-                                 NL_TEST_DEF("InetEndPoint::TestInetError", TestInetError),
-                                 NL_TEST_DEF("InetEndPoint::TestInetInterface", TestInetInterface),
-                                 NL_TEST_DEF("InetEndPoint::TestInetEndPoint", TestInetEndPointInternal),
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-                                 NL_TEST_DEF("InetEndPoint::TestEndPointLimit", TestInetEndPointLimit),
-#endif
-                                 NL_TEST_SENTINEL() };
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-/**
- *  Set up the test suite.
- */
-static int TestSetup(void * inContext)
-{
-    CHIP_ERROR error = chip::Platform::MemoryInit();
-    if (error != CHIP_NO_ERROR)
-        return FAILURE;
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-static int TestTeardown(void * inContext)
-{
-    ShutdownNetwork();
-    ShutdownSystemLayer();
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-int TestInetEndPointInternal()
-{
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    // clang-format off
-    nlTestSuite theSuite =
-    {
-        "inet-endpoint",
-        &sTests[0],
-        TestSetup,
-        TestTeardown
-    };
-    // clang-format on
-
-    // Run test suite against one context.
-    nlTestRunner(&theSuite, nullptr);
-
-    return nlTestRunnerStats(&theSuite);
-#else  // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    return (0);
-#endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
-}
-
-CHIP_REGISTER_TEST_SUITE(TestInetEndPointInternal)
-
-int TestInetEndPoint()
-{
-    SetSIGUSR1Handler();
-
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-    return (TestInetEndPointInternal());
-}
+#endif // !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP

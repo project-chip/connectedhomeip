@@ -26,6 +26,8 @@
 #include <jni.h>
 #include <lib/support/CodeUtils.h>
 
+#include <string>
+
 // This is just a sample function to demonstrate end-to-end calling in/out of CHIP stack
 // is working.
 std::string base38Encode(void)

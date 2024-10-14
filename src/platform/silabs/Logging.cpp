@@ -15,13 +15,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifndef BRD4325A
-
-#ifdef RAIL_ASSERT_DEBUG_STRING
-#include "rail_assert_error_codes.h"
-#endif
-#endif // BRD4325A
-
 #ifdef PW_RPC_ENABLED
 #include "PigweedLogger.h"
 #endif
@@ -136,9 +129,10 @@ static void PrintLog(const char * msg)
 
 #if SILABS_LOG_OUT_UART
         uartLogWrite(msg, sz);
-#elif PW_RPC_ENABLED
-        PigweedLogger::putString(msg, sz);
 #else
+#if PW_RPC_ENABLED
+        PigweedLogger::putString(msg, sz);
+#endif // PW_RPC_ENABLED
         SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, msg, sz);
 #endif // SILABS_LOG_OUT_UART
 
@@ -147,9 +141,8 @@ static void PrintLog(const char * msg)
         sz                   = strlen(newline);
 #if PW_RPC_ENABLED
         PigweedLogger::putString(newline, sz);
-#else
-        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, sz);
 #endif // PW_RPC_ENABLED
+        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, sz);
 #endif
     }
 }
@@ -300,13 +293,6 @@ extern "C" void LwIPLog(const char * aFormat, ...)
     }
 
     PrintLog(formattedMsg);
-
-#if configCHECK_FOR_STACK_OVERFLOW
-    // Force a stack overflow check.
-    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
-        taskYIELD();
-#endif
-
     // Let the application know that a log message has been emitted.
     chip::DeviceLayer::OnLogOutput();
 #endif // SILABS_LOG_ENABLED
@@ -355,12 +341,6 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
         }
 
         PrintLog(formattedMsg);
-
-#if configCHECK_FOR_STACK_OVERFLOW
-        // Force a stack overflow check.
-        if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
-            taskYIELD();
-#endif
     }
 
     // Let the application know that a log message has been emitted.

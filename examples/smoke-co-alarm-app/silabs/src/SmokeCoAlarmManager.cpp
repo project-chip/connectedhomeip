@@ -117,7 +117,7 @@ void SmokeCoAlarmManager::EndSelfTestingEventHandler(AppEvent * aEvent)
     SILABS_LOG("End self-testing!");
 }
 
-bool emberAfHandleEventTrigger(uint64_t eventTrigger)
+CHIP_ERROR SmokeCoAlarmManager::HandleEventTrigger(uint64_t eventTrigger)
 {
     SmokeCOTrigger trigger = static_cast<SmokeCOTrigger>(eventTrigger);
 
@@ -125,32 +125,32 @@ bool emberAfHandleEventTrigger(uint64_t eventTrigger)
     {
     case SmokeCOTrigger::kForceSmokeCritical:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force smoke (critical)");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kCritical), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kCritical), CHIP_NO_ERROR);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kForceSmokeWarning:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force smoke (warning)");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kWarning), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kWarning), CHIP_NO_ERROR);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kForceSmokeInterconnect:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force smoke interconnect (warning)");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(1, AlarmStateEnum::kWarning), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(1, AlarmStateEnum::kWarning), CHIP_NO_ERROR);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kForceCOCritical:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force CO (critical)");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kCritical), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kCritical), CHIP_NO_ERROR);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kForceCOWarning:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force CO (warning)");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kWarning), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kWarning), CHIP_NO_ERROR);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kForceCOInterconnect:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force CO (warning)");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(1, AlarmStateEnum::kWarning), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(1, AlarmStateEnum::kWarning), CHIP_NO_ERROR);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kForceSmokeContaminationHigh:
@@ -171,22 +171,22 @@ bool emberAfHandleEventTrigger(uint64_t eventTrigger)
         break;
     case SmokeCOTrigger::kForceMalfunction:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force malfunction");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, true), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, true), CHIP_NO_ERROR);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kForceLowBatteryWarning:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force low battery (warning)");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kWarning), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kWarning), CHIP_NO_ERROR);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kForceLowBatteryCritical:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force low battery (critical)");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kCritical), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kCritical), CHIP_NO_ERROR);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kForceEndOfLife:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force end-of-life");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, EndOfServiceEnum::kExpired), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, EndOfServiceEnum::kExpired), CHIP_NO_ERROR);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kForceSilence:
@@ -195,32 +195,32 @@ bool emberAfHandleEventTrigger(uint64_t eventTrigger)
         break;
     case SmokeCOTrigger::kClearSmoke:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear smoke");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kNormal), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kNormal), CHIP_NO_ERROR);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kClearCO:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear CO");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kNormal), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetCOState(1, AlarmStateEnum::kNormal), CHIP_NO_ERROR);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kClearSmokeInterconnect:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear smoke interconnect");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(1, AlarmStateEnum::kNormal), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(1, AlarmStateEnum::kNormal), CHIP_NO_ERROR);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kClearCOInterconnect:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear CO interconnect");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(1, AlarmStateEnum::kNormal), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(1, AlarmStateEnum::kNormal), CHIP_NO_ERROR);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kClearMalfunction:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear malfunction");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, false), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, false), CHIP_NO_ERROR);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kClearEndOfLife:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear end-of-life");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, EndOfServiceEnum::kNormal), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, EndOfServiceEnum::kNormal), CHIP_NO_ERROR);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kClearSilence:
@@ -229,7 +229,7 @@ bool emberAfHandleEventTrigger(uint64_t eventTrigger)
         break;
     case SmokeCOTrigger::kClearBatteryLevelLow:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear low battery");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kNormal), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kNormal), CHIP_NO_ERROR);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kClearContamination:
@@ -242,8 +242,8 @@ bool emberAfHandleEventTrigger(uint64_t eventTrigger)
         break;
     default:
 
-        return false;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    return true;
+    return CHIP_NO_ERROR;
 }

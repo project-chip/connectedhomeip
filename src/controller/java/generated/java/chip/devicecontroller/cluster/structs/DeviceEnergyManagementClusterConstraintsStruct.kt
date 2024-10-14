@@ -28,7 +28,7 @@ class DeviceEnergyManagementClusterConstraintsStruct(
   val duration: ULong,
   val nominalPower: Optional<Long>,
   val maximumEnergy: Optional<Long>,
-  val loadControl: Optional<Int>
+  val loadControl: Optional<Int>,
 ) {
   override fun toString(): String = buildString {
     append("DeviceEnergyManagementClusterConstraintsStruct {\n")
@@ -98,7 +98,7 @@ class DeviceEnergyManagementClusterConstraintsStruct(
         duration,
         nominalPower,
         maximumEnergy,
-        loadControl
+        loadControl,
       )
     }
   }

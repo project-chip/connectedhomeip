@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2023 Project CHIP Authors
+ *    Copyright (c) 2021-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,11 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/telink/wifi/TelinkWiFiDriver.h>
+#endif
+
 #include <zephyr/kernel.h>
 
 #ifdef CONFIG_USB_DEVICE_STACK
@@ -36,6 +41,10 @@ LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+app::Clusters::NetworkCommissioning::Instance sWiFiCommissioningInstance(0, &(NetworkCommissioning::TelinkWiFiDriver::Instance()));
+#endif
 
 #ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
 static constexpr uint32_t kFactoryResetOnBootMaxCnt       = 5;
@@ -128,9 +137,12 @@ int main(void)
         LOG_ERR("StartEventLoopTask fail");
         goto exit;
     }
+
 #ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
     FactoryResetOnBoot();
 #endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     err = ThreadStackMgr().InitThreadStack();
     if (err != CHIP_NO_ERROR)
     {
@@ -152,6 +164,12 @@ int main(void)
         LOG_ERR("SetThreadDeviceType fail");
         goto exit;
     }
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    sWiFiCommissioningInstance.Init();
+#else
+    err = CHIP_ERROR_INTERNAL;
+    goto exit;
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 
     err = GetAppTask().StartApp();
 

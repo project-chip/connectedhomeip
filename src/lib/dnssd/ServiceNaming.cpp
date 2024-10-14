@@ -162,6 +162,10 @@ CHIP_ERROR MakeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter 
         {
             requiredSize = snprintf(buffer, bufferLen, kCommissionerServiceName);
         }
+        else if (type == DiscoveryType::kOperational)
+        {
+            requiredSize = snprintf(buffer, bufferLen, kOperationalServiceName);
+        }
         else
         {
             return CHIP_ERROR_NOT_IMPLEMENTED;

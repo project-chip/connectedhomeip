@@ -14,10 +14,10 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
+import("${chip_root}/src/inet/inet.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
-
 static_library("helpers") {
   output_name = "libNetworkTestHelpers"
   output_dir = "${root_out_dir}/lib"
@@ -35,26 +35,30 @@ static_library("helpers") {
   ]
 }
 
-chip_test_suite_using_nltest("tests") {
+chip_test_suite("tests") {
   output_name = "libRawTransportTests"
 
   test_sources = [
     "TestMessageHeader.cpp",
     "TestPeerAddress.cpp",
-    "TestTCP.cpp",
     "TestUDP.cpp",
   ]
+
+  if (chip_inet_config_enable_tcp_endpoint) {
+    test_sources += [ "TestTCP.cpp" ]
+  }
+
+  sources = [ "TCPBaseTestAccess.h" ]
 
   public_deps = [
     ":helpers",
     "${chip_root}/src/inet/tests:helpers",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/support:test_utils",
-    "${chip_root}/src/lib/support:testing_nlunit",
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/raw",
-    "${nlunit_test_root}:nlunit-test",
   ]
 
   cflags = [ "-Wconversion" ]

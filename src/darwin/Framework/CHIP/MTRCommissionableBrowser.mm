@@ -53,7 +53,7 @@ using namespace chip::Tracing::DarwinFramework;
 @implementation MTRCommissionableBrowserResult
 @end
 
-class CommissionableBrowserInternal : public CommissioningResolveDelegate,
+class CommissionableBrowserInternal : public DiscoverNodeDelegate,
                                       public DnssdBrowseDelegate
 #if CONFIG_NETWORK_LAYER_BLE
     ,
@@ -61,6 +61,10 @@ class CommissionableBrowserInternal : public CommissioningResolveDelegate,
 #endif // CONFIG_NETWORK_LAYER_BLE
 {
 public:
+#if CONFIG_NETWORK_LAYER_BLE
+    id mBleScannerDelegateOwner;
+#endif // CONFIG_NETWORK_LAYER_BLE
+
     CHIP_ERROR Start(id<MTRCommissionableBrowserDelegate> delegate, MTRDeviceController * controller, dispatch_queue_t queue)
     {
         assertChipStackLockedByCurrentThread();
@@ -90,7 +94,7 @@ public:
             chip::Inet::InterfaceId::Null(), this);
     }
 
-    CHIP_ERROR Stop()
+    CHIP_ERROR Stop(id owner)
     {
         assertChipStackLockedByCurrentThread();
 
@@ -109,7 +113,10 @@ public:
         mDiscoveredResults = nil;
 
 #if CONFIG_NETWORK_LAYER_BLE
-        ReturnErrorOnFailure(PlatformMgrImpl().StopBleScan());
+        mBleScannerDelegateOwner = owner; // retain the owner until OnBleScanStopped is called
+        PlatformMgrImpl().StopBleScan(); // doesn't actually fail, and if it did we'd want to carry on regardless
+#else
+        (void) owner;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
         return ChipDnssdStopBrowse(this);
@@ -156,12 +163,17 @@ public:
         mDiscoveredResults = discoveredResultsCopy;
     }
 
-    /////////// CommissioningResolveDelegate Interface /////////
+    /////////// DiscoverNodeDelegate Interface /////////
     void OnNodeDiscovered(const DiscoveredNodeData & nodeData) override
     {
         assertChipStackLockedByCurrentThread();
 
-        auto & commissionData = nodeData.commissionData;
+        if (!nodeData.Is<CommissionNodeData>()) {
+            // not commissionable/commissioners node
+            return;
+        }
+
+        auto & commissionData = nodeData.Get<CommissionNodeData>();
         auto key = [NSString stringWithUTF8String:commissionData.instanceName];
         if ([mDiscoveredResults objectForKey:key] == nil) {
             // It should not happens.
@@ -175,7 +187,7 @@ public:
         result.discriminator = @(commissionData.longDiscriminator);
         result.commissioningMode = commissionData.commissioningMode != 0;
 
-        auto & resolutionData = nodeData.resolutionData;
+        const CommonResolutionData & resolutionData = commissionData;
         auto * interfaces = result.interfaces;
         interfaces[@(resolutionData.interfaceId.GetPlatformInterface())].resolutionData = chip::MakeOptional(resolutionData);
 
@@ -256,9 +268,14 @@ public:
         // If there is nothing else to resolve for the given instance name, just remove it
         // too and informs the delegate that it is gone.
         if ([interfaces count] == 0) {
-            dispatch_async(mDispatchQueue, ^{
-                [mDelegate controller:mController didRemoveCommissionableDevice:result];
-            });
+            // If result.instanceName is nil, that means we never notified our
+            // delegate about this result (because we did not get that far in
+            // resolving it), so don't bother notifying about the removal either.
+            if (result.instanceName != nil) {
+                dispatch_async(mDispatchQueue, ^{
+                    [mDelegate controller:mController didRemoveCommissionableDevice:result];
+                });
+            }
 
             mDiscoveredResults[key] = nil;
         }
@@ -276,6 +293,7 @@ public:
     void OnBleScanAdd(BLE_CONNECTION_OBJECT connObj, const ChipBLEDeviceIdentificationInfo & info) override
     {
         assertChipStackLockedByCurrentThread();
+        VerifyOrReturn(mDelegate != nil);
 
         auto result = [[MTRCommissionableBrowserResult alloc] init];
         result.instanceName = [NSString stringWithUTF8String:kBleKey];
@@ -298,6 +316,7 @@ public:
     void OnBleScanRemove(BLE_CONNECTION_OBJECT connObj) override
     {
         assertChipStackLockedByCurrentThread();
+        VerifyOrReturn(mDelegate != nil);
 
         auto key = [NSString stringWithFormat:@"%@", connObj];
         if ([mDiscoveredResults objectForKey:key] == nil) {
@@ -311,9 +330,15 @@ public:
         MATTER_LOG_METRIC(kMetricBLEDevicesRemoved, ++mBLEDevicesRemoved);
 
         dispatch_async(mDispatchQueue, ^{
-            [mDelegate controller:mController didFindCommissionableDevice:result];
+            [mDelegate controller:mController didRemoveCommissionableDevice:result];
         });
     }
+
+    void OnBleScanStopped() override
+    {
+        mBleScannerDelegateOwner = nil;
+    }
+
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 private:
@@ -355,7 +380,7 @@ private:
 
 - (BOOL)stop
 {
-    VerifyOrReturnValue(CHIP_NO_ERROR == _browser.Stop(), NO);
+    VerifyOrReturnValue(CHIP_NO_ERROR == _browser.Stop(self), NO);
     _delegate = nil;
     _controller = nil;
     _queue = nil;

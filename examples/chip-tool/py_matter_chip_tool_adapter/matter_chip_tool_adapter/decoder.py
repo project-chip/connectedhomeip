@@ -155,6 +155,7 @@ class Converter():
     def __init__(self, specifications):
         self.__specs = specifications
         self.__converters = [
+            DarwinAnyFormatConverter(),
             StructFieldsNameConverter(),
             FloatConverter(),
             OctetStringConverter()
@@ -252,6 +253,43 @@ class BaseConverter:
         return value
 
 
+class DarwinAnyFormatConverter(BaseConverter):
+    """
+    Darwin payloads format for *ById commands is different from the base
+    format used for other commands.
+    """
+
+    def run(self, specs, value, cluster_name: str, typename: str, array: bool):
+        if isinstance(value, list) and len(value) >= 1 and isinstance(value[0], dict) and value[0].get('data') is not None:
+            value = [self.__convert(item_value) for item_value in value]
+        return value
+
+    def __convert(self, value):
+        if not isinstance(value, dict):
+            return value
+
+        data = value.get('data')
+        if not isinstance(data, dict):
+            return value
+
+        value = data.get('value')
+        if not isinstance(value, list):
+            return value
+
+        value_type = data.get('type')
+
+        if value_type == 'Structure':
+            struct = {}
+            for field in value:
+                context_tag = field.get('contextTag')
+                struct[str(context_tag)] = self.__convert(field)
+            value = struct
+        elif value_type == 'Array':
+            value = [self.__convert(item_value) for item_value in value]
+
+        return value
+
+
 class FloatConverter(BaseConverter):
     """
     Jsoncpp stores floats as double.
@@ -322,7 +360,7 @@ class StructFieldsNameConverter():
                     provided_field_name = provided_field_name[0].lower(
                     ) + provided_field_name[1:]
 
-                if provided_field_name in value and provided_field_name != field_name:
+                if provided_field_name in value:
                     value[field_name] = self.run(
                         specs,
                         value[provided_field_name],
@@ -330,7 +368,8 @@ class StructFieldsNameConverter():
                         field_type,
                         field_array
                     )
-                    del value[provided_field_name]
+                    if provided_field_name != field_name:
+                        del value[provided_field_name]
 
             if specs.is_fabric_scoped(struct):
                 if _FABRIC_INDEX_FIELD_CODE in value:
@@ -347,7 +386,7 @@ class StructFieldsNameConverter():
                 del value[key_name]
 
         elif isinstance(value, list) and array:
-            value = [self.run(specs, v, cluster_name, typename, False)
+            value = [self.run(specs, v, cluster_name, typename, isinstance(v, list))
                      for v in value]
 
         return value

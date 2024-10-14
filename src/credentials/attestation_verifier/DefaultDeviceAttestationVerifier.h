@@ -59,6 +59,10 @@ class DefaultDACVerifier : public DeviceAttestationVerifier
 public:
     DefaultDACVerifier(const AttestationTrustStore * paaRootStore) : mAttestationTrustStore(paaRootStore) {}
 
+    DefaultDACVerifier(const AttestationTrustStore * paaRootStore, DeviceAttestationRevocationDelegate * revocationDelegate) :
+        mAttestationTrustStore(paaRootStore), mRevocationDelegate(revocationDelegate)
+    {}
+
     void VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion) override;
 
@@ -74,13 +78,22 @@ public:
                                                    const ByteSpan & attestationSignatureBuffer,
                                                    const Crypto::P256PublicKey & dacPublicKey, const ByteSpan & csrNonce) override;
 
+    void CheckForRevokedDACChain(const AttestationInfo & info,
+                                 Callback::Callback<OnAttestationInformationVerification> * onCompletion) override;
+
     CsaCdKeysTrustStore * GetCertificationDeclarationTrustStore() override { return &mCdKeysTrustStore; }
+
+    void SetRevocationDelegate(DeviceAttestationRevocationDelegate * revocationDelegate)
+    {
+        mRevocationDelegate = revocationDelegate;
+    }
 
 protected:
     DefaultDACVerifier() {}
 
     CsaCdKeysTrustStore mCdKeysTrustStore;
     const AttestationTrustStore * mAttestationTrustStore;
+    DeviceAttestationRevocationDelegate * mRevocationDelegate = nullptr;
 };
 
 /**
@@ -109,7 +122,8 @@ const AttestationTrustStore * GetTestAttestationTrustStore();
  *          process lifetime.  In particular, after the first call it's not
  *          possible to change which AttestationTrustStore is used by this verifier.
  */
-DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore);
+DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore,
+                                                  DeviceAttestationRevocationDelegate * revocationDelegate = nullptr);
 
 } // namespace Credentials
 } // namespace chip

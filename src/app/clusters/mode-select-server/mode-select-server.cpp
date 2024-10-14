@@ -20,10 +20,10 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/mode-select-server/supported-modes-manager.h>
-#include <app/util/af.h>
 #include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
@@ -37,7 +37,6 @@
 #include <app/clusters/on-off-server/on-off-server.h>
 #endif // MATTER_DM_PLUGIN_ON_OFF
 
-using namespace std;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -49,6 +48,17 @@ using BootReasonType = GeneralDiagnostics::BootReasonEnum;
 
 static InteractionModel::Status verifyModeValue(const EndpointId endpointId, const uint8_t newMode);
 
+static ModeSelect::SupportedModesManager * sSupportedModesManager = nullptr;
+
+const SupportedModesManager * ModeSelect::getSupportedModesManager()
+{
+    return sSupportedModesManager;
+}
+
+void ModeSelect::setSupportedModesManager(ModeSelect::SupportedModesManager * aSupportedModesManager)
+{
+    sSupportedModesManager = aSupportedModesManager;
+}
 namespace {
 
 inline bool areStartUpModeAndCurrentModeNonVolatile(EndpointId endpoint);
@@ -71,6 +81,12 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 
     if (ModeSelect::Attributes::SupportedModes::Id == aPath.mAttributeId)
     {
+        if (gSupportedModeManager == nullptr)
+        {
+            ChipLogError(Zcl, "ModeSelect: SupportedModesManager is NULL");
+            aEncoder.EncodeEmptyList();
+            return CHIP_NO_ERROR;
+        }
         const ModeSelect::SupportedModesManager::ModeOptionsProvider modeOptionsProvider =
             gSupportedModeManager->getModeOptionsProvider(aPath.mEndpointId);
         if (modeOptionsProvider.begin() == nullptr)
@@ -104,8 +120,14 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
     uint8_t newMode       = commandData.newMode;
     // Check that the newMode matches one of the supported options
     const ModeSelect::Structs::ModeOptionStruct::Type * modeOptionPtr;
-    Status checkSupportedModeStatus =
-        ModeSelect::getSupportedModesManager()->getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
+    const ModeSelect::SupportedModesManager * gSupportedModeManager = ModeSelect::getSupportedModesManager();
+    if (gSupportedModeManager == nullptr)
+    {
+        ChipLogError(Zcl, "ModeSelect: SupportedModesManager is NULL");
+        commandHandler->AddStatus(commandPath, Status::Failure);
+        return true;
+    }
+    Status checkSupportedModeStatus = gSupportedModeManager->getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
     if (Status::Success != checkSupportedModeStatus)
     {
         ChipLogProgress(Zcl, "ModeSelect: Failed to find the option with mode %u", newMode);
@@ -219,7 +241,7 @@ inline bool areStartUpModeAndCurrentModeNonVolatile(EndpointId endpointId)
 
 void MatterModeSelectPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gModeSelectAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gModeSelectAttrAccess);
 }
 
 /**
@@ -265,5 +287,11 @@ static InteractionModel::Status verifyModeValue(const EndpointId endpointId, con
         return InteractionModel::Status::Success;
     }
     const ModeSelect::Structs::ModeOptionStruct::Type * modeOptionPtr;
-    return ModeSelect::getSupportedModesManager()->getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
+    const ModeSelect::SupportedModesManager * gSupportedModeManager = ModeSelect::getSupportedModesManager();
+    if (gSupportedModeManager == nullptr)
+    {
+        ChipLogError(Zcl, "ModeSelect: SupportedModesManager is NULL");
+        return Status::Failure;
+    }
+    return gSupportedModeManager->getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
 }

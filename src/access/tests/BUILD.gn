@@ -14,21 +14,24 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
+import("${chip_root}/src/access/access.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
-chip_test_suite_using_nltest("tests") {
+chip_test_suite("tests") {
   output_name = "libaccesstest"
-
   test_sources = [ "TestAccessControl.cpp" ]
 
   cflags = [ "-Wconversion" ]
-
   public_deps = [
     "${chip_root}/src/access",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support:test_utils",
-    "${chip_root}/src/lib/support:testing_nlunit",
-    "${nlunit_test_root}:nlunit-test",
+    "${dir_pw_unit_test}",
   ]
+
+  if (chip_enable_access_restrictions) {
+    test_sources += [ "TestAccessRestrictionProvider.cpp" ]
+  }
 }

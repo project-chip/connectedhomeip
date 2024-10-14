@@ -36,7 +36,9 @@
 #include "spidrv.h"
 #include "task.h"
 
+#ifdef SL_BOARD_NAME
 #include "sl_board_control.h"
+#endif // SL_BOARD_NAME
 
 #include "sl_device_init_clocks.h"
 #include "sl_device_init_hfxo.h"
@@ -88,9 +90,6 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
     {
         SPIDRV_SetBaudrate(SL_SPIDRV_LCD_BITRATE);
     }
-#if SL_SPICTRL_MUX
-    xSemaphoreGive(spi_sem_sync_hdl);
-#endif // SL_SPICTRL_MUX
     return status;
 }
 
@@ -122,7 +121,6 @@ void SPIDRV_SetBaudrate(uint32_t baudrate)
         USART_InitSync(SPI_USART, &usartInit);
     }
 }
-
 /********************************************************
  * @fn   spi_board_init(void)
  * @brief

@@ -22,44 +22,44 @@
 
 enum class PairingMode
 {
-    None,
+    Unpair,
     Code,
     Ble,
     AlreadyDiscoveredByIndex,
 };
 
-enum class PairingNetworkType
+enum class CommissioningType
 {
-    None,
-    WiFi,
-    Thread,
-    Ethernet,
+    None,           // establish PASE only
+    WithoutNetwork, // commission but don't configure network
+    WithWiFi,       // commission and configure WiFi
+    WithThread,     // commission and configure Thread
 };
 
 class PairingCommandBridge : public CHIPCommandBridge
 {
 public:
-    PairingCommandBridge(const char * commandName, PairingMode mode, PairingNetworkType networkType) :
-        CHIPCommandBridge(commandName), mPairingMode(mode), mNetworkType(networkType)
+    PairingCommandBridge(const char * commandName, PairingMode mode, CommissioningType commissioningType) :
+        CHIPCommandBridge(commandName), mPairingMode(mode), mCommissioningType(commissioningType)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
-        switch (networkType)
+        switch (commissioningType)
         {
-        case PairingNetworkType::None:
-        case PairingNetworkType::Ethernet:
+        case CommissioningType::None:
+        case CommissioningType::WithoutNetwork:
             break;
-        case PairingNetworkType::WiFi:
+        case CommissioningType::WithWiFi:
             AddArgument("ssid", &mSSID);
             AddArgument("password", &mPassword);
             break;
-        case PairingNetworkType::Thread:
+        case CommissioningType::WithThread:
             AddArgument("operationalDataset", &mOperationalDataset);
             break;
         }
 
         switch (mode)
         {
-        case PairingMode::None:
+        case PairingMode::Unpair:
             break;
         case PairingMode::Code:
             AddArgument("payload", &mOnboardingPayload);
@@ -74,17 +74,16 @@ public:
             break;
         }
 
-        if (mode != PairingMode::None)
+        if (commissioningType != CommissioningType::None)
         {
             AddArgument("country-code", &mCountryCode,
                         "Country code to use to set the Basic Information cluster's Location attribute");
+            AddArgument("use-device-attestation-delegate", 0, 1, &mUseDeviceAttestationDelegate,
+                        "If true, use a device attestation delegate that always wants to be notified about attestation results.  "
+                        "Defaults to false.");
+            AddArgument("device-attestation-failsafe-time", 0, UINT16_MAX, &mDeviceAttestationFailsafeTime,
+                        "If set, the time to extend the failsafe to before calling the device attestation delegate");
         }
-
-        AddArgument("use-device-attestation-delegate", 0, 1, &mUseDeviceAttestationDelegate,
-                    "If true, use a device attestation delegate that always wants to be notified about attestation results.  "
-                    "Defaults to false.");
-        AddArgument("device-attestation-failsafe-time", 0, UINT16_MAX, &mDeviceAttestationFailsafeTime,
-                    "If set, the time to extend the failsafe to before calling the device attestation delegate");
     }
 
     /////////// CHIPCommandBridge Interface /////////
@@ -99,7 +98,7 @@ private:
     void SetUpDeviceControllerDelegate();
 
     const PairingMode mPairingMode;
-    const PairingNetworkType mNetworkType;
+    const CommissioningType mCommissioningType;
     chip::ByteSpan mOperationalDataset;
     chip::ByteSpan mSSID;
     chip::ByteSpan mPassword;

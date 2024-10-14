@@ -16,9 +16,10 @@
  *    limitations under the License.
  */
 
-#include "lib/support/CHIPMem.h"
+#include <lib/core/StringBuilderAdapters.h>
+#include <pw_unit_test/framework.h>
+
 #include <access/examples/PermissiveAccessControlDelegate.h>
-#include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/InteractionModelEngine.h>
@@ -26,6 +27,7 @@
 #include <app/MessageDef/EventDataIB.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
+#include <app/tests/test-interaction-model-api.h>
 #include <app/util/basic-types.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
@@ -35,23 +37,31 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPCounter.h>
-#include <lib/support/UnitTestContext.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
-#include <nlunit-test.h>
 #include <protocols/interaction_model/Constants.h>
-
-#include <type_traits>
 
 namespace {
 using namespace chip;
 using namespace chip::Access;
+using namespace chip::Test;
 
-chip::ClusterId kTestClusterId        = 1;
-chip::ClusterId kTestDeniedClusterId1 = 1000;
-chip::ClusterId kTestDeniedClusterId2 = 3;
-chip::EndpointId kTestEndpointId      = 4;
+const MockNodeConfig & TestMockNodeConfig()
+{
+    using namespace chip::app;
+    using namespace chip::app::Clusters::Globals::Attributes;
+
+    // clang-format off
+    static const MockNodeConfig config({
+        MockEndpointConfig(kTestEndpointId, {
+            MockClusterConfig(kTestClusterId, {
+                ClusterRevision::Id, FeatureMap::Id, 1, 2
+            }),
+        }),
+    });
+    // clang-format on
+    return config;
+}
 
 class TestAccessControlDelegate : public AccessControl::Delegate
 {
@@ -59,7 +69,7 @@ public:
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const chip::Access::RequestPath & requestPath,
                      Privilege requestPrivilege) override
     {
-        if (requestPath.cluster == kTestDeniedClusterId2)
+        if (requestPath.cluster == chip::Test::kTestDeniedClusterId2)
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
@@ -78,19 +88,6 @@ class TestDeviceTypeResolver : public AccessControl::DeviceTypeResolver
 public:
     bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return false; }
 } gDeviceTypeResolver;
-
-class TestAccessContext : public chip::Test::AppContext
-{
-public:
-    // Performs setup for each individual test in the test suite
-    CHIP_ERROR SetUp() override
-    {
-        ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
-        Access::GetAccessControl().Finish();
-        Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);
-        return CHIP_NO_ERROR;
-    }
-};
 
 class MockInteractionModelApp : public chip::app::ReadClient::Callback
 {
@@ -128,151 +125,122 @@ public:
 namespace chip {
 namespace app {
 
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
-{
-    return aPath.mClusterId != kTestDeniedClusterId1;
-}
-
-Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
-{
-    if (aPath.mClusterId == kTestDeniedClusterId1)
-    {
-        return Protocols::InteractionModel::Status::UnsupportedCluster;
-    }
-
-    return Protocols::InteractionModel::Status::Success;
-}
-
-class TestAclAttribute
+class TestAclAttribute : public Test::AppContext
 {
 public:
-    static void TestACLDeniedAttribute(nlTestSuite * apSuite, void * apContext);
+    void SetUp() override
+    {
+        AppContext::SetUp();
+
+        Access::GetAccessControl().Finish();
+        Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+    }
+
+    void TearDown() override
+    {
+        chip::Test::ResetMockNodeConfig();
+        AppContext::TearDown();
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+    }
+
+private:
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
 // Read Client sends a malformed subscribe request, interaction model engine fails to parse the request and generates a status
 // report to client, and client is closed.
-void TestAclAttribute::TestACLDeniedAttribute(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestAclAttribute, TestACLDeniedAttribute)
 {
-    TestAccessContext & ctx = *static_cast<TestAccessContext *>(apContext);
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-
-    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
-    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     {
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
         chip::app::AttributePathParams attributePathParams[2];
-        attributePathParams[0].mEndpointId  = kTestEndpointId;
-        attributePathParams[0].mClusterId   = kTestDeniedClusterId1;
+        attributePathParams[0].mEndpointId  = chip::Test::kTestEndpointId;
+        attributePathParams[0].mClusterId   = chip::Test::kTestDeniedClusterId1;
         attributePathParams[0].mAttributeId = 1;
 
-        attributePathParams[1].mEndpointId  = kTestEndpointId;
-        attributePathParams[1].mClusterId   = kTestDeniedClusterId1;
+        attributePathParams[1].mEndpointId  = chip::Test::kTestEndpointId;
+        attributePathParams[1].mClusterId   = chip::Test::kTestDeniedClusterId1;
         attributePathParams[1].mAttributeId = 2;
 
-        ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = 2;
 
-        err = readClient.SendRequest(readPrepareParams);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
-        NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
-        NL_TEST_ASSERT(apSuite, !delegate.mGotReport);
+        DrainAndServiceIO();
+        EXPECT_EQ(delegate.mError, CHIP_IM_GLOBAL_STATUS(InvalidAction));
+        EXPECT_FALSE(delegate.mGotReport);
         delegate.mError     = CHIP_NO_ERROR;
         delegate.mGotReport = false;
     }
 
     {
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
         chip::app::AttributePathParams attributePathParams[2];
 
-        attributePathParams[0].mClusterId   = kTestDeniedClusterId2;
+        attributePathParams[0].mClusterId   = chip::Test::kTestDeniedClusterId2;
         attributePathParams[0].mAttributeId = 1;
 
-        attributePathParams[1].mClusterId   = kTestDeniedClusterId2;
+        attributePathParams[1].mClusterId   = chip::Test::kTestDeniedClusterId2;
         attributePathParams[1].mAttributeId = 2;
 
-        ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = 2;
 
-        err = readClient.SendRequest(readPrepareParams);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
-        NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
-        NL_TEST_ASSERT(apSuite, !delegate.mGotReport);
+        DrainAndServiceIO();
+        EXPECT_EQ(delegate.mError, CHIP_IM_GLOBAL_STATUS(InvalidAction));
+        EXPECT_FALSE(delegate.mGotReport);
         delegate.mError     = CHIP_NO_ERROR;
         delegate.mGotReport = false;
     }
 
     {
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
         chip::app::AttributePathParams attributePathParams[2];
-        attributePathParams[0].mEndpointId  = kTestEndpointId;
-        attributePathParams[0].mClusterId   = kTestDeniedClusterId1;
+        attributePathParams[0].mEndpointId  = chip::Test::kTestEndpointId;
+        attributePathParams[0].mClusterId   = chip::Test::kTestDeniedClusterId1;
         attributePathParams[0].mAttributeId = 1;
 
-        attributePathParams[1].mEndpointId  = kTestEndpointId;
-        attributePathParams[1].mClusterId   = kTestClusterId;
+        attributePathParams[1].mEndpointId  = chip::Test::kTestEndpointId;
+        attributePathParams[1].mClusterId   = chip::Test::kTestClusterId;
         attributePathParams[1].mAttributeId = 2;
 
-        ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = 2;
 
-        err = readClient.SendRequest(readPrepareParams);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
-        NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, delegate.mGotReport);
-        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
+        DrainAndServiceIO();
+        EXPECT_EQ(delegate.mError, CHIP_NO_ERROR);
+        EXPECT_TRUE(delegate.mGotReport);
+        EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 1u);
         delegate.mError     = CHIP_NO_ERROR;
         delegate.mGotReport = false;
     }
 
-    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
     engine->Shutdown();
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 } // namespace app
 } // namespace chip
-
-namespace {
-
-const nlTest sTests[] = {
-    NL_TEST_DEF("TestACLDeniedAttribute", chip::app::TestAclAttribute::TestACLDeniedAttribute),
-    NL_TEST_SENTINEL(),
-};
-
-nlTestSuite sSuite = {
-    "TestAclAttribute",
-    &sTests[0],
-    TestAccessContext::nlTestSetUpTestSuite,
-    TestAccessContext::nlTestTearDownTestSuite,
-    TestAccessContext::nlTestSetUp,
-    TestAccessContext::nlTestTearDown,
-};
-
-} // namespace
-
-int TestAclAttribute()
-{
-    return chip::ExecuteTestsWithContext<TestAccessContext>(&sSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestAclAttribute)

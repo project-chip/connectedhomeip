@@ -14,6 +14,8 @@
 
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/src/app/codegen-data-model-provider/model.gni")
+
 config("mock_include") {
   include_dirs = [ "include" ]
 }
@@ -25,6 +27,7 @@ source_set("mock_ember") {
     "MockNodeConfig.cpp",
     "MockNodeConfig.h",
     "attribute-storage.cpp",
+    "privilege-storage.cpp",
   ]
 
   public_deps = [
@@ -32,10 +35,25 @@ source_set("mock_ember") {
     "${chip_root}/src/app/common:attribute-type",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/lib/support:testing_nlunit",
   ]
 
   public_configs = [ ":mock_include" ]
 
   cflags = [ "-Wconversion" ]
+}
+
+# Include a runnable codegen data model that is based on the mocks
+# defined in mock_ember.
+source_set("mock_codegen_data_model") {
+  sources = codegen_data_model_SOURCES
+  public_deps = codegen_data_model_PUBLIC_DEPS
+
+  sources += [
+    "${chip_root}/src/app/util/ember-global-attribute-access-interface.cpp",
+    "${chip_root}/src/app/util/ember-io-storage.cpp",
+    "CodegenEmberMocks.cpp",
+  ]
+
+  public_configs = [ ":mock_include" ]
+  public_deps += [ ":mock_ember" ]
 }

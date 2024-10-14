@@ -23,6 +23,7 @@
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <lib/support/BitFlags.h>
 
 using namespace chip;
@@ -32,7 +33,6 @@ using namespace chip::app::Clusters::DishwasherAlarm;
 using namespace chip::app::Clusters::DishwasherAlarm::Attributes;
 using namespace chip::DeviceLayer;
 using chip::Protocols::InteractionModel::Status;
-using namespace std;
 
 static constexpr size_t kDishwasherAlarmDelegateTableSize =
     MATTER_DM_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
@@ -128,12 +128,13 @@ Status DishwasherAlarmServer::GetSupportedValue(EndpointId endpoint, BitMask<Ala
 Status DishwasherAlarmServer::SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported)
 {
     Status status = Status::Success;
-    ;
+
     if ((status = Attributes::Supported::Set(endpoint, supported)) != Status::Success)
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: writing supported, err:0x%x", to_underlying(status));
         return status;
     }
+
     // Whenever there is change in Supported attribute, Latch should change accordingly (if possible).
     BitMask<AlarmMap> latch;
     if (GetLatchValue(endpoint, &latch) == Status::Success && !supported.HasAll(latch))

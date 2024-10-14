@@ -40,7 +40,6 @@ tests:
       attribute: "ServerList"
       response:
           value: [
-                  0x0003, # Identify
                   0x0004, # Groups
                   0x001D, # Descriptor
                   0x001E, # Binding
@@ -58,7 +57,7 @@ tests:
                   0x0033, # General Diagnostics
                   0x0034, # Software Diagnostics
                   0x0035, # Thread Network Diagnostiscs
-                  0x0036, # WiFi Network Diagnostics
+                  0x0036, # Wi-Fi Network Diagnostics
                   0x0037, # Ethernet Network Diagnostics
                   0x0038, # Time Synchronization
                   0x003C, # Administrator Commissioning
@@ -82,7 +81,7 @@ tests:
       command: "readAttribute"
       attribute: "PartsList"
       response:
-          value: [1, 2]
+          value: [1, 2, 3, 4]
 
     - label: "Read attribute ClusterRevision"
       command: "readAttribute"

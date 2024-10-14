@@ -25,6 +25,18 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <features>
+      <feature bit="0" code="CON" name="Condition" summary="Supports monitoring the condition of the resource in percentage">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="WRN" name="Warning" summary="Supports warning indication">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="REP" name="Replacement Product List" summary="Supports specifying the list of replacement products">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <!-- Attributes -->
     <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
     <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
@@ -48,6 +60,18 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <features>
+      <feature bit="0" code="CON" name="Condition" summary="Supports monitoring the condition of the resource in percentage">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="WRN" name="Warning" summary="Supports warning indication">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="REP" name="Replacement Product List" summary="Supports specifying the list of replacement products">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <!-- Attributes -->
     <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
     <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
@@ -62,14 +86,6 @@ limitations under the License.
     </command>
   </cluster>
 
-  <!-- Feature Map -->
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0071" />
-    <cluster code="0x0072" />
-    <field name="Condition" mask="0x01" />
-    <field name="Warning" mask="0x02" />
-    <field name="ReplacementProductList" mask="0x04" />
-  </bitmap>
 
   <!-- Cluster Data Types -->
   <enum name="DegradationDirectionEnum" type="enum8">

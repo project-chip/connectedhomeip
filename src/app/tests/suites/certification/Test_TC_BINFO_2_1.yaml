@@ -86,19 +86,15 @@ tests:
                 value: "y"
 
     - label: "Step 2: TH reads DataModelRevision from the DUT."
-      PICS: BINFO.S.A0000
       command: "readAttribute"
       attribute: "DataModelRevision"
       response:
-          value: 17
+          value: 18
           saveAs: DataModelRevisionValue
           constraints:
               type: int16u
-              minValue: 0
-              maxValue: 65534
 
     - label: "Step 3: TH writes DataModelRevision as '0x1124' "
-      PICS: BINFO.S.A0000
       command: "writeAttribute"
       attribute: "DataModelRevision"
       arguments:
@@ -107,7 +103,6 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 4: TH reads DataModelRevision from the DUT."
-      PICS: BINFO.S.A0000
       command: "readAttribute"
       attribute: "DataModelRevision"
       response:
@@ -720,48 +715,21 @@ tests:
       response:
           value: ProductAppearancevalue
 
-    - label: "Step 62: TH reads SpecificationVersion from the DUT."
-      PICS: BINFO.S.A0015
+    - label:
+          "Step 62: SpecificationVersion value should in the inclusive range of
+          (0x01040000 to 0x0104FF00) and the lower 8 bits are set to zero."
       command: "readAttribute"
       attribute: "SpecificationVersion"
       response:
           saveAs: SpecificationVersionValue
-
-    - label:
-          "Step 62: If the SpecificationVersion value is absent or zero this
-          step cannot be verified, move on to the next step"
-      PICS: BINFO.S.A0015
-      cluster: "EqualityCommands"
-      command: "UnsignedNumberEquals"
-      arguments:
-          values:
-              - name: "Value1"
-                value: SpecificationVersionValue
-              - name: "Value2"
-                value: null
-      response:
-          - values:
-                - name: "Equals"
-                  saveAs: IsExpectedValue
-
-    - label:
-          "Step 62: SpecificationVersion value should in the inclusive range of
-          (0 to 4294967295) and the initial 7 bits are set to zero."
-      runIf: "!IsExpectedValue"
-      PICS: BINFO.S.A0015
-      command: "readAttribute"
-      attribute: "SpecificationVersion"
-      response:
-          value: SpecificationVersionValue
           constraints:
-              minValue: 0
-              maxValue: 4294967295
-              hasMasksClear: [0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40]
+              minValue: 0x01040000
+              maxValue: 0x0104FF00
+              hasMasksClear: [0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80]
 
     - label:
           "Step 63: TH sends Write request message to DUT to change the value of
           SpecificationVersion to '0x0103AAF1'."
-      PICS: BINFO.S.A0015
       command: "writeAttribute"
       attribute: "SpecificationVersion"
       arguments:
@@ -770,7 +738,6 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 64: TH reads SpecificationVersion attribute from DUT"
-      PICS: BINFO.S.A0015
       command: "readAttribute"
       attribute: "SpecificationVersion"
       response:

@@ -14,14 +14,14 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
-chip_test_suite_using_nltest("tests") {
+chip_test_suite("tests") {
   output_name = "libSystemLayerTests"
 
   test_sources = [
+    "TestEventLoopHandler.cpp",
     "TestSystemClock.cpp",
     "TestSystemErrorStr.cpp",
     "TestSystemPacketBuffer.cpp",
@@ -47,9 +47,9 @@ chip_test_suite_using_nltest("tests") {
 
   public_deps = [
     "${chip_root}/src/inet",
-    "${chip_root}/src/lib/support:testing_nlunit",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support/tests:pw-test-macros",
     "${chip_root}/src/platform",
     "${chip_root}/src/system",
-    "${nlunit_test_root}:nlunit-test",
   ]
 }

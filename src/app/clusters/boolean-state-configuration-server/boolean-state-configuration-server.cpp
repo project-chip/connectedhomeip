@@ -23,12 +23,14 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -451,5 +453,5 @@ exit:
 
 void MatterBooleanStateConfigurationPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }

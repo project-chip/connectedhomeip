@@ -16,6 +16,9 @@ name: Build example - Infineon
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
     workflow_dispatch:
@@ -26,7 +29,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     infineon:
         name: Infineon examples building
@@ -35,7 +38,10 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-infineon:41
+            image: ghcr.io/project-chip/chip-build-infineon:81
+            env:
+               # TODO: this should probably be part of the dockerfile itself
+               CY_TOOLS_PATHS: /opt/Tools/ModusToolbox/tools_3.2
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -105,41 +111,115 @@ jobs:
                       out/artifacts/infineon-psoc6-light/chip-psoc6-lighting-example.out \
                       /tmp/bloat_reports/
 
-            - name: Build example CYW30739 Apps
+            - name: Build CYW30739 Lighting App
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py \
-                      --target cyw30739-cyw930739m2evb_01-light \
-                      --target cyw30739-cyw930739m2evb_01-lock \
-                      --target cyw30739-cyw930739m2evb_01-ota-requestor \
-                      --target cyw30739-cyw930739m2evb_01-switch \
+                      --target cyw30739-cyw30739b2_p5_evk_01-light \
+                      --target cyw30739-cyw30739b2_p5_evk_02-light \
+                      --target cyw30739-cyw30739b2_p5_evk_03-light \
+                      --target cyw30739-cyw930739m2evb_02-light \
                       build \
                       --copy-artifacts-to out/artifacts \
                     "
             - name: Get light size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    cyw30739 cyw930739m2evb_01 light \
-                    out/artifacts/cyw30739-cyw930739m2evb_01-light/chip-cyw30739-lighting-example.elf \
+                    cyw30739 CYW30739B2-P5-EVK-01 light \
+                    out/artifacts/cyw30739-cyw30739b2_p5_evk_01-light/lighting_app-CYW30739B2-P5-EVK-01.elf \
                     /tmp/bloat_reports/
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cyw30739 CYW30739B2-P5-EVK-02 light \
+                    out/artifacts/cyw30739-cyw30739b2_p5_evk_02-light/lighting_app-CYW30739B2-P5-EVK-02.elf \
+                    /tmp/bloat_reports/
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cyw30739 CYW30739B2-P5-EVK-03 light \
+                    out/artifacts/cyw30739-cyw30739b2_p5_evk_03-light/lighting_app-CYW30739B2-P5-EVK-03.elf \
+                    /tmp/bloat_reports/
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cyw30739 CYW930739M2EVB-02 light \
+                    out/artifacts/cyw30739-cyw930739m2evb_02-light/lighting_app-CYW930739M2EVB-02.elf \
+                    /tmp/bloat_reports/
+            - name: Clean out build output
+              run: rm -rf ./out
+            - name: Build CYW30739 Light Switch App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py \
+                      --target cyw30739-cyw30739b2_p5_evk_01-light-switch \
+                      --target cyw30739-cyw30739b2_p5_evk_02-light-switch \
+                      --target cyw30739-cyw30739b2_p5_evk_03-light-switch \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                    "
+            - name: Get light-switch size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cyw30739 CYW30739B2-P5-EVK-01 light-switch \
+                    out/artifacts/cyw30739-cyw30739b2_p5_evk_01-light-switch/light_switch_app-CYW30739B2-P5-EVK-01.elf \
+                    /tmp/bloat_reports/
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cyw30739 CYW30739B2-P5-EVK-02 light-switch \
+                    out/artifacts/cyw30739-cyw30739b2_p5_evk_02-light-switch/light_switch_app-CYW30739B2-P5-EVK-02.elf \
+                    /tmp/bloat_reports/
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cyw30739 CYW30739B2-P5-EVK-03 light-switch \
+                    out/artifacts/cyw30739-cyw30739b2_p5_evk_03-light-switch/light_switch_app-CYW30739B2-P5-EVK-03.elf \
+                    /tmp/bloat_reports/
+            - name: Clean out build output
+              run: rm -rf ./out
+            - name: Build CYW30739 Lock App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py \
+                      --target cyw30739-cyw30739b2_p5_evk_01-lock \
+                      --target cyw30739-cyw30739b2_p5_evk_02-lock \
+                      --target cyw30739-cyw30739b2_p5_evk_03-lock \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                    "
             - name: Get lock size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    cyw30739 cyw930739m2evb_01 lock \
-                    out/artifacts/cyw30739-cyw930739m2evb_01-lock/chip-cyw30739-lock-example.elf \
+                    cyw30739 CYW30739B2-P5-EVK-01 lock \
+                    out/artifacts/cyw30739-cyw30739b2_p5_evk_01-lock/lock_app-CYW30739B2-P5-EVK-01.elf \
                     /tmp/bloat_reports/
-            - name: Get ota-requestor size stats
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cyw30739 CYW30739B2-P5-EVK-02 lock \
+                    out/artifacts/cyw30739-cyw30739b2_p5_evk_02-lock/lock_app-CYW30739B2-P5-EVK-02.elf \
+                    /tmp/bloat_reports/
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cyw30739 CYW30739B2-P5-EVK-03 lock \
+                    out/artifacts/cyw30739-cyw30739b2_p5_evk_03-lock/lock_app-CYW30739B2-P5-EVK-03.elf \
+                    /tmp/bloat_reports/
+            - name: Clean out build output
+              run: rm -rf ./out
+            - name: Build CYW30739 Thermostat App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py \
+                      --target cyw30739-cyw30739b2_p5_evk_01-thermostat \
+                      --target cyw30739-cyw30739b2_p5_evk_02-thermostat \
+                      --target cyw30739-cyw30739b2_p5_evk_03-thermostat \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                    "
+            - name: Get thermostat size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    cyw30739 cyw930739m2evb_01 ota-requestor \
-                    out/artifacts/cyw30739-cyw930739m2evb_01-ota-requestor/chip-cyw30739-ota-requestor-example.elf \
+                    cyw30739 CYW30739B2-P5-EVK-01 thermostat \
+                    out/artifacts/cyw30739-cyw30739b2_p5_evk_01-thermostat/thermostat-CYW30739B2-P5-EVK-01.elf \
                     /tmp/bloat_reports/
-            - name: Get switch size stats
-              run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    cyw30739 cyw930739m2evb_01 switch \
-                    out/artifacts/cyw30739-cyw930739m2evb_01-switch/chip-cyw30739-light-switch-example.elf \
+                    cyw30739 CYW30739B2-P5-EVK-02 thermostat \
+                    out/artifacts/cyw30739-cyw30739b2_p5_evk_02-thermostat/thermostat-CYW30739B2-P5-EVK-02.elf \
                     /tmp/bloat_reports/
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cyw30739 CYW30739B2-P5-EVK-03 thermostat \
+                    out/artifacts/cyw30739-cyw30739b2_p5_evk_03-thermostat/thermostat-CYW30739B2-P5-EVK-03.elf \
+                    /tmp/bloat_reports/
+            - name: Clean out build output
+              run: rm -rf ./out
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}

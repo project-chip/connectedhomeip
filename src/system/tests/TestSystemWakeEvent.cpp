@@ -21,13 +21,12 @@
  *
  */
 
-#include <system/SystemConfig.h>
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/UnitTestContext.h>
-#include <lib/support/UnitTestRegistration.h>
-#include <nlunit-test.h>
+#include <system/SystemConfig.h>
 #include <system/SystemError.h>
 #include <system/SystemLayerImpl.h>
 
@@ -51,24 +50,26 @@ public:
 
 namespace {
 
-struct TestContext
+class TestSystemWakeEvent : public ::testing::Test
 {
+public:
+    void SetUp()
+    {
+        mSystemLayer.Init();
+        mWakeEvent.Open(mSystemLayer);
+    }
+
+    void TearDown()
+    {
+        mWakeEvent.Close(mSystemLayer);
+        mSystemLayer.Shutdown();
+    }
+
     ::chip::System::LayerImpl mSystemLayer;
     WakeEvent mWakeEvent;
     fd_set mReadSet;
     fd_set mWriteSet;
     fd_set mErrorSet;
-
-    TestContext()
-    {
-        mSystemLayer.Init();
-        mWakeEvent.Open(mSystemLayer);
-    }
-    ~TestContext()
-    {
-        mWakeEvent.Close(mSystemLayer);
-        mSystemLayer.Shutdown();
-    }
 
     int SelectWakeEvent(timeval timeout = {})
     {
@@ -85,108 +86,69 @@ struct TestContext
     }
 };
 
-void TestOpen(nlTestSuite * inSuite, void * aContext)
+TEST_F(TestSystemWakeEvent, TestOpen)
 {
-    TestContext & lContext = *static_cast<TestContext *>(aContext);
-    NL_TEST_ASSERT(inSuite, WakeEventTest::GetReadFD(lContext.mWakeEvent) >= 0);
-    NL_TEST_ASSERT(inSuite, lContext.SelectWakeEvent() == 0);
+    EXPECT_GE(WakeEventTest::GetReadFD(mWakeEvent), 0);
+    EXPECT_EQ(SelectWakeEvent(), 0);
 }
 
-void TestNotify(nlTestSuite * inSuite, void * aContext)
+TEST_F(TestSystemWakeEvent, TestNotify)
 {
-    TestContext & lContext = *static_cast<TestContext *>(aContext);
-    NL_TEST_ASSERT(inSuite, lContext.SelectWakeEvent() == 0);
+    EXPECT_EQ(SelectWakeEvent(), 0);
 
     // Check that select() succeeds after Notify() has been called
-    lContext.mWakeEvent.Notify();
-    NL_TEST_ASSERT(inSuite, lContext.SelectWakeEvent() == 1);
-    NL_TEST_ASSERT(inSuite, FD_ISSET(WakeEventTest::GetReadFD(lContext.mWakeEvent), &lContext.mReadSet));
+    mWakeEvent.Notify();
+    EXPECT_EQ(SelectWakeEvent(), 1);
+    EXPECT_TRUE(FD_ISSET(WakeEventTest::GetReadFD(mWakeEvent), &mReadSet));
 
     // ...and state of the event is not cleared automatically
-    NL_TEST_ASSERT(inSuite, lContext.SelectWakeEvent() == 1);
-    NL_TEST_ASSERT(inSuite, FD_ISSET(WakeEventTest::GetReadFD(lContext.mWakeEvent), &lContext.mReadSet));
+    EXPECT_EQ(SelectWakeEvent(), 1);
+    EXPECT_TRUE(FD_ISSET(WakeEventTest::GetReadFD(mWakeEvent), &mReadSet));
 }
 
-void TestConfirm(nlTestSuite * inSuite, void * aContext)
+TEST_F(TestSystemWakeEvent, TestConfirm)
 {
-    TestContext & lContext = *static_cast<TestContext *>(aContext);
-
     // Check that select() succeeds after Notify() has been called
-    lContext.mWakeEvent.Notify();
-    NL_TEST_ASSERT(inSuite, lContext.SelectWakeEvent() == 1);
-    NL_TEST_ASSERT(inSuite, FD_ISSET(WakeEventTest::GetReadFD(lContext.mWakeEvent), &lContext.mReadSet));
+    mWakeEvent.Notify();
+    EXPECT_EQ(SelectWakeEvent(), 1);
+    EXPECT_TRUE(FD_ISSET(WakeEventTest::GetReadFD(mWakeEvent), &mReadSet));
 
     // Check that Confirm() clears state of the event
-    lContext.mWakeEvent.Confirm();
-    NL_TEST_ASSERT(inSuite, lContext.SelectWakeEvent() == 0);
+    mWakeEvent.Confirm();
+    EXPECT_EQ(SelectWakeEvent(), 0);
 }
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 void * WaitForEvent(void * aContext)
 {
-    TestContext & lContext = *static_cast<TestContext *>(aContext);
     // wait 5 seconds
-    return reinterpret_cast<void *>(lContext.SelectWakeEvent(timeval{ 5, 0 }));
+    auto * context = static_cast<TestSystemWakeEvent *>(aContext);
+    return reinterpret_cast<void *>(context->SelectWakeEvent(timeval{ 5, 0 }));
 }
 
-void TestBlockingSelect(nlTestSuite * inSuite, void * aContext)
+TEST_F(TestSystemWakeEvent, TestBlockingSelect)
 {
-    TestContext & lContext = *static_cast<TestContext *>(aContext);
-
     // Spawn a thread waiting for the event
     pthread_t tid = 0;
-    NL_TEST_ASSERT(inSuite, 0 == pthread_create(&tid, nullptr, WaitForEvent, aContext));
+    EXPECT_EQ(0, pthread_create(&tid, nullptr, WaitForEvent, this));
 
-    lContext.mWakeEvent.Notify();
+    mWakeEvent.Notify();
     void * selectResult = nullptr;
-    NL_TEST_ASSERT(inSuite, 0 == pthread_join(tid, &selectResult));
-    NL_TEST_ASSERT(inSuite, selectResult == reinterpret_cast<void *>(1));
+    EXPECT_EQ(0, pthread_join(tid, &selectResult));
+    EXPECT_EQ(selectResult, reinterpret_cast<void *>(1));
 }
-#else  // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-void TestBlockingSelect(nlTestSuite *, void *) {}
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-void TestClose(nlTestSuite * inSuite, void * aContext)
+TEST_F(TestSystemWakeEvent, TestClose)
 {
-    TestContext & lContext = *static_cast<TestContext *>(aContext);
-    lContext.mWakeEvent.Close(lContext.mSystemLayer);
+    mWakeEvent.Close(mSystemLayer);
 
-    const auto notifFD = WakeEventTest::GetReadFD(lContext.mWakeEvent);
+    const auto notifFD = WakeEventTest::GetReadFD(mWakeEvent);
 
     // Check that Close() has cleaned up itself and reopen is possible
-    NL_TEST_ASSERT(inSuite, lContext.mWakeEvent.Open(lContext.mSystemLayer) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, notifFD < 0);
+    EXPECT_EQ(mWakeEvent.Open(mSystemLayer), CHIP_NO_ERROR);
+    EXPECT_LT(notifFD, 0);
 }
 } // namespace
 
-// Test Suite
-
-/**
- *   Test Suite. It lists all the test functions.
- */
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("WakeEvent::TestOpen",              TestOpen),
-    NL_TEST_DEF("WakeEvent::TestNotify",            TestNotify),
-    NL_TEST_DEF("WakeEvent::TestConfirm",           TestConfirm),
-    NL_TEST_DEF("WakeEvent::TestBlockingSelect",    TestBlockingSelect),
-    NL_TEST_DEF("WakeEvent::TestClose",             TestClose),
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-static nlTestSuite kTheSuite = { "chip-system-wake-event", sTests };
-
-int TestSystemWakeEvent()
-{
-    return chip::ExecuteTestsWithContext<TestContext>(&kTheSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestSystemWakeEvent)
-#else  // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-int TestSystemWakeEvent(void)
-{
-    return SUCCESS;
-}
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS

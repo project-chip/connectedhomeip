@@ -44,13 +44,9 @@ Following data can be added to the manufacturing partition using
     -   Serial Number
     -   Unique identifier
 
--   Device information
-    -   Fixed Labels
-    -   Supported locales
-    -   Supported calendar types
-    -   Supported modes
-        -   Note: As per spec at max size of label should be 64 and `\0` will be
-            added at the end.
+-   Supported modes
+    -   Note: As per spec at max size of label should be 64 and `\0` will be
+        added at the end.
 
 ### Configuration Options
 

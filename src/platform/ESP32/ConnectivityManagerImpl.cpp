@@ -39,21 +39,34 @@
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 #endif
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <esp_wifi.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/internal/BLEManager.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
-using namespace ::chip::TLV;
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
 namespace chip {
 namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_WIFI_NETWORK_DRIVER
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(CONFIG_WIFI_NETWORK_ENDPOINT_ID /* Endpoint Id */,
+                                      &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET && CHIP_DEVICE_CONFIG_ETHERNET_NETWORK_DRIVER
+app::Clusters::NetworkCommissioning::Instance
+    sEthernetNetworkCommissioningInstance(CONFIG_ETHERNET_NETWORK_ENDPOINT_ID /* Endpoint Id */,
+                                          &(NetworkCommissioning::ESPEthernetDriver::GetInstance()));
+#endif
 // ==================== ConnectivityManager Platform Internal Methods ====================
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
@@ -63,10 +76,30 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     InitWiFi();
+#if CHIP_DEVICE_CONFIG_WIFI_NETWORK_DRIVER
+    sWiFiNetworkCommissioningInstance.Init();
+#endif // CHIP_DEVICE_CONFIG_WIFI_NETWORK_DRIVER
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
     InitEthernet();
+#if CHIP_DEVICE_CONFIG_ETHERNET_NETWORK_DRIVER
+    sEthernetNetworkCommissioningInstance.Init();
+#endif // CHIP_DEVICE_CONFIG_ETHERNET_NETWORK_DRIVER
 #endif
+
+#if defined(CONFIG_WIFI_NETWORK_ENDPOINT_ID) && defined(CONFIG_THREAD_NETWORK_ENDPOINT_ID)
+    static_assert(CONFIG_WIFI_NETWORK_ENDPOINT_ID != CONFIG_THREAD_NETWORK_ENDPOINT_ID,
+                  "Wi-Fi network endpoint id and Thread network endpoint id should not be the same.");
+#endif
+#if defined(CONFIG_WIFI_NETWORK_ENDPOINT_ID) && defined(CONFIG_ETHERNET_NETWORK_ENDPOINT_ID)
+    static_assert(CONFIG_WIFI_NETWORK_ENDPOINT_ID != CONFIG_ETHERNET_NETWORK_ENDPOINT_ID,
+                  "Wi-Fi network endpoint id and Ethernet network endpoint id should not be the same.");
+#endif
+#if defined(CONFIG_THREAD_NETWORK_ENDPOINT_ID) && defined(CONFIG_ETHERNET_NETWORK_ENDPOINT_ID)
+    static_assert(CONFIG_THREAD_NETWORK_ENDPOINT_ID != CONFIG_ETHERNET_NETWORK_ENDPOINT_ID,
+                  "Thread network endpoint id and Ethernet network endpoint id should not be the same.");
+#endif
+
     return CHIP_NO_ERROR;
 }
 

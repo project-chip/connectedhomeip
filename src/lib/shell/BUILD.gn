@@ -20,9 +20,13 @@ import("${chip_root}/src/platform/device.gni")
 
 source_set("shell_core") {
   sources = [
+    "Command.h",
+    "CommandSet.cpp",
+    "CommandSet.h",
     "Commands.h",
     "Engine.cpp",
     "Engine.h",
+    "SubShellCommand.h",
     "streamer.cpp",
     "streamer.h",
   ]
@@ -89,8 +93,7 @@ static_library("shell") {
       "MainLoopDefault.cpp",
       "streamer_bouffalolab.cpp",
     ]
-  } else if (chip_device_platform == "cc13x2_26x2" ||
-             chip_device_platform == "cc13x4_26x4") {
+  } else if (chip_device_platform == "cc13x4_26x4") {
     sources += [
       "MainLoopDefault.cpp",
       "streamer_cc13x4_26x4.cpp",

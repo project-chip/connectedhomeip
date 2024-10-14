@@ -24,13 +24,15 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 
+#include <optional>
+
 namespace chip {
 namespace app {
 
 struct CommandPathRegistryEntry
 {
     ConcreteCommandPath requestPath = ConcreteCommandPath(0, 0, 0);
-    Optional<uint16_t> ref;
+    std::optional<uint16_t> ref;
 };
 
 class CommandPathRegistry
@@ -38,11 +40,11 @@ class CommandPathRegistry
 public:
     virtual ~CommandPathRegistry() = default;
 
-    virtual Optional<CommandPathRegistryEntry> Find(const ConcreteCommandPath & requestPath) const  = 0;
-    virtual Optional<CommandPathRegistryEntry> GetFirstEntry() const                                = 0;
-    virtual CHIP_ERROR Add(const ConcreteCommandPath & requestPath, const Optional<uint16_t> & ref) = 0;
-    virtual size_t Count() const                                                                    = 0;
-    virtual size_t MaxSize() const                                                                  = 0;
+    virtual std::optional<CommandPathRegistryEntry> Find(const ConcreteCommandPath & requestPath) const  = 0;
+    virtual std::optional<CommandPathRegistryEntry> GetFirstEntry() const                                = 0;
+    virtual CHIP_ERROR Add(const ConcreteCommandPath & requestPath, const std::optional<uint16_t> & ref) = 0;
+    virtual size_t Count() const                                                                         = 0;
+    virtual size_t MaxSize() const                                                                       = 0;
 };
 
 /**
@@ -59,28 +61,28 @@ template <size_t N>
 class BasicCommandPathRegistry : public CommandPathRegistry
 {
 public:
-    Optional<CommandPathRegistryEntry> Find(const ConcreteCommandPath & requestPath) const override
+    std::optional<CommandPathRegistryEntry> Find(const ConcreteCommandPath & requestPath) const override
     {
         for (size_t i = 0; i < mCount; i++)
         {
             if (mTable[i].requestPath == requestPath)
             {
-                return MakeOptional(mTable[i]);
+                return std::make_optional(mTable[i]);
             }
         }
-        return NullOptional;
+        return std::nullopt;
     }
 
-    Optional<CommandPathRegistryEntry> GetFirstEntry() const override
+    std::optional<CommandPathRegistryEntry> GetFirstEntry() const override
     {
         if (mCount > 0)
         {
-            return MakeOptional(mTable[0]);
+            return std::make_optional(mTable[0]);
         }
-        return NullOptional;
+        return std::nullopt;
     }
 
-    CHIP_ERROR Add(const ConcreteCommandPath & requestPath, const Optional<uint16_t> & ref) override
+    CHIP_ERROR Add(const ConcreteCommandPath & requestPath, const std::optional<uint16_t> & ref) override
     {
         if (mCount >= N)
         {

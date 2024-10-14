@@ -165,7 +165,14 @@ tests:
           "Step 4a: TH configures AC1 on DUT for all implemented application
           clusters supporting scenes."
       verification: |
-          Is DUT configured with AC1?
+          ./chip-tool levelcontrol move-to-level-with-on-off 100 0 0 0 1 1
+
+          DUT is configured with AC1 for application clusters which is implemented and supporting scenes
+
+          [1705040301.476123][6423:6425] CHIP:DMG:                                 StatusIB =
+          [1705040301.476139][6423:6425] CHIP:DMG:                                 {
+          [1705040301.476152][6423:6425] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1705040301.476164][6423:6425] CHIP:DMG:                                 },
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -237,7 +244,14 @@ tests:
           "Step 5a: TH configures AC2 on DUT for all implemented application
           clusters supporting scenes."
       verification: |
-          Is DUT configured with AC2?
+          ./chip-tool levelcontrol move-to-level-with-on-off 200 0 0 0 1 1
+
+          DUT is configured with AC2 for application clusters which is implemented,  supporting scenes and different from AC1
+
+          [1705040820.918043][6555:6557] CHIP:DMG:                                 StatusIB =
+          [1705040820.918056][6555:6557] CHIP:DMG:                                 {
+          [1705040820.918068][6555:6557] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1705040820.918080][6555:6557] CHIP:DMG:                                 },
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -282,7 +296,19 @@ tests:
 
     - label: "DUT transitions to AC1 over 20s."
       verification: |
-          Is the transition done over 20s?
+          DUT transitions to AC1 over 20s.
+
+          TH confirm the DUT reached AC1 (on level control cluster) after 20s
+
+          Read CurrentLevel attribute from level control cluster
+
+          ./chip-tool levelcontrol read current-level 1 1
+
+          Verify CurrentLevel attribute value on TH(chip-tool)
+
+          [1708072116.730389][7757:7759] CHIP:DMG: }
+          [1708072116.730518][7757:7759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0000 DataVersion: 2359286215
+          [1708072116.730552][7757:7759] CHIP:TOO:   CurrentLevel: 100
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -314,7 +340,14 @@ tests:
           "Step 6a: TH configures AC2 on DUT for all implemented application
           clusters supporting scenes."
       verification: |
-          Is DUT configured with AC2?
+          ./chip-tool levelcontrol move-to-level-with-on-off 200 0 0 0 1 1
+
+          DUT is configured with AC2 for application clusters which is implemented,  supporting scenes and different from AC1
+
+          [1705040820.918043][6555:6557] CHIP:DMG:                                 StatusIB =
+          [1705040820.918056][6555:6557] CHIP:DMG:                                 {
+          [1705040820.918068][6555:6557] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1705040820.918080][6555:6557] CHIP:DMG:                                 },
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: S.S.C05.Rsp && PICS_SKIP_SAMPLE_APP
@@ -362,7 +395,19 @@ tests:
 
     - label: "DUT transitions to AC1 over 5."
       verification: |
-          Is the transition done over 5s?
+          DUT transitions to AC1 over 5s.
+
+          TH confirm the DUT reached AC1 (on level control cluster) after 5s
+
+          Read CurrentLevel attribute from level control cluster
+
+          ./chip-tool levelcontrol read current-level 1 1
+
+          Verify CurrentLevel attribute value on TH(chip-tool)
+
+          [1708072116.730389][7757:7759] CHIP:DMG: }
+          [1708072116.730518][7757:7759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0000 DataVersion: 2359286215
+          [1708072116.730552][7757:7759] CHIP:TOO:   CurrentLevel: 100
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -394,7 +439,14 @@ tests:
           "Step 7a: TH configures AC2 on DUT for all implemented application
           clusters supporting scenes."
       verification: |
-          Is DUT configured with AC2?
+          ./chip-tool levelcontrol move-to-level-with-on-off 200 0 0 0 1 1
+
+          DUT is configured with AC2 for application clusters which is implemented,  supporting scenes and different from AC1
+
+          [1705040820.918043][6555:6557] CHIP:DMG:                                 StatusIB =
+          [1705040820.918056][6555:6557] CHIP:DMG:                                 {
+          [1705040820.918068][6555:6557] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1705040820.918080][6555:6557] CHIP:DMG:                                 },
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -440,16 +492,28 @@ tests:
       response:
           value: 100
 
-    - label: "DUT transitions to AC2 over 20."
+    - label: "DUT transitions to AC1 over 20s."
       verification: |
-          Is the transition done over 20s?
+          DUT transitions to AC1 over 20s.
+
+          TH confirm the DUT reached AC1 (on level control cluster) after 20s
+
+          Read CurrentLevel attribute from level control cluster
+
+          ./chip-tool levelcontrol read current-level 1 1
+
+          Verify CurrentLevel attribute value on TH(chip-tool)
+
+          [1708072116.730389][7757:7759] CHIP:DMG: }
+          [1708072116.730518][7757:7759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0000 DataVersion: 2359286215
+          [1708072116.730552][7757:7759] CHIP:TOO:   CurrentLevel: 100
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"
-                value: "Please confirm that transition to AC2 was made over 5s"
+                value: "Please confirm that transition to AC1 was made over 20s"
               - name: "expectedValue"
                 value: "y"
 

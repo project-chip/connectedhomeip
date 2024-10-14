@@ -15,11 +15,32 @@
 #    limitations under the License.
 #
 
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --enable-key 000102030405060708090a0b0c0d0e0f
+#       --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --hex-arg PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY:000102030405060708090a0b0c0d0e0f
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
 import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 sensorTrigger = 0x0080_0000_0000_0000

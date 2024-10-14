@@ -16,13 +16,16 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/ble/ble.gni")
 
 declare_args() {
-  # Device platform layer: cc13x2_26x2, cc13x4_26x4, cc32xx, darwin, efr32, esp32, external, freertos, linux, nrfconnect, nxp, qpg, tizen, cyw30739, bl602, mw320, zephyr, beken, openiotsdk, none.
+  # Device platform layer: cc13x4_26x4, cc32xx, darwin, efr32, esp32, external, freertos, linux, nrfconnect, nxp, qpg, tizen, cyw30739, bl602, mw320, zephyr, beken, openiotsdk, none.
 
   chip_device_platform = "auto"
   chip_platform_target = ""
 
   # Substitute fake platform when building with chip_device_platform=auto.
   chip_fake_platform = false
+
+  # Include wifi-paf to commission the device or not
+  chip_device_config_enable_wifipaf = false
 }
 
 if (chip_device_platform == "auto") {
@@ -40,6 +43,8 @@ if (chip_device_platform == "auto") {
     chip_device_platform = "webos"
   } else if (current_os == "zephyr") {
     chip_device_platform = "zephyr"
+  } else if (current_os == "nuttx") {
+    chip_device_platform = "nuttx"
   } else {
     chip_device_platform = "none"
   }
@@ -49,7 +54,6 @@ declare_args() {
   # Enable openthread support.
   chip_enable_openthread =
       chip_device_platform == "linux" || chip_device_platform == "qpg" ||
-      chip_device_platform == "cc13x2_26x2" ||
       chip_device_platform == "cc13x4_26x4" ||
       chip_device_platform == "tizen" || chip_device_platform == "stm32" ||
       chip_device_platform == "webos"
@@ -93,10 +97,10 @@ declare_args() {
       chip_device_platform == "ameba" || chip_device_platform == "webos" ||
       chip_device_platform == "cc32xx" || chip_device_platform == "mw320" ||
       chip_device_platform == "beken" || chip_device_platform == "mt793x" ||
-      chip_device_platform == "asr" || chip_device_platform == "openiotsdk") {
+      chip_device_platform == "asr" || chip_device_platform == "openiotsdk" ||
+      chip_device_platform == "nuttx") {
     chip_mdns = "minimal"
   } else if (chip_device_platform == "darwin" ||
-             chip_device_platform == "cc13x2_26x2" ||
              chip_device_platform == "cc13x4_26x4" || current_os == "android" ||
              chip_device_platform == "fake" ||
              chip_device_platform == "tizen") {
@@ -108,7 +112,7 @@ declare_args() {
   # Enable Subscription persistence / resumption for CI and supported platforms
   if (chip_device_platform == "darwin" || chip_device_platform == "linux" ||
       chip_device_platform == "fake" || chip_device_platform == "efr32" ||
-      chip_device_platform == "SiWx917") {
+      chip_device_platform == "SiWx917" || chip_device_platform == "nuttx") {
     chip_persist_subscriptions = true
   } else {
     chip_persist_subscriptions = false
@@ -126,10 +130,14 @@ if (chip_device_platform == "nxp" && chip_enable_openthread) {
   chip_mdns = "minimal"
 }
 
+declare_args() {
+  # Select DNS-SD components to build
+  chip_mdns_minimal = chip_mdns == "minimal"
+  chip_mdns_platform = chip_mdns == "platform"
+}
+
 _chip_device_layer = "none"
-if (chip_device_platform == "cc13x2_26x2") {
-  _chip_device_layer = "cc13xx_26xx/cc13x2_26x2"
-} else if (chip_device_platform == "cc13x4_26x4") {
+if (chip_device_platform == "cc13x4_26x4") {
   _chip_device_layer = "cc13xx_26xx/cc13x4_26x4"
 } else if (chip_device_platform == "cc32xx") {
   _chip_device_layer = "cc32xx"
@@ -187,6 +195,8 @@ if (chip_device_platform == "cc13x2_26x2") {
   _chip_device_layer = "openiotsdk"
 } else if (chip_device_platform == "asr") {
   _chip_device_layer = "ASR"
+} else if (chip_device_platform == "nuttx") {
+  _chip_device_layer = "NuttX"
 } else if (chip_device_platform == "stm32") {
   _chip_device_layer = "stm32"
 }
@@ -243,7 +253,6 @@ declare_args() {
 assert(
     (current_os != "freertos" && chip_device_platform == "none") ||
         chip_device_platform == "fake" ||
-        chip_device_platform == "cc13x2_26x2" ||
         chip_device_platform == "cc13x4_26x4" ||
         chip_device_platform == "cc32xx" || chip_device_platform == "darwin" ||
         chip_device_platform == "efr32" || chip_device_platform == "esp32" ||
@@ -260,5 +269,5 @@ assert(
         chip_device_platform == "bl702l" || chip_device_platform == "mt793x" ||
         chip_device_platform == "SiWx917" ||
         chip_device_platform == "openiotsdk" || chip_device_platform == "asr" ||
-        chip_device_platform == "stm32",
+        chip_device_platform == "stm32" || chip_device_platform == "nuttx",
     "Please select a valid value for chip_device_platform")

@@ -2,8 +2,14 @@
 
 #include "rvc-mode-delegates.h"
 #include "rvc-operational-state-delegate.h"
+#include "rvc-service-area-delegate.h"
+#include "rvc-service-area-storage-delegate.h"
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
+#include <app/clusters/service-area-server/service-area-delegate.h>
+#include <app/clusters/service-area-server/service-area-server.h>
+
+#include <string>
 
 namespace chip {
 namespace app {
@@ -21,6 +27,10 @@ private:
     RvcOperationalState::RvcOperationalStateDelegate mOperationalStateDelegate;
     RvcOperationalState::Instance mOperationalStateInstance;
 
+    ServiceArea::RvcServiceAreaDelegate mServiceAreaDelegate;
+    ServiceArea::RvcServiceAreaStorageDelegate mStorageDelegate;
+    ServiceArea::Instance mServiceAreaInstance;
+
     bool mDocked   = false;
     bool mCharging = false;
 
@@ -35,7 +45,9 @@ public:
     explicit RvcDevice(EndpointId aRvcClustersEndpoint) :
         mRunModeDelegate(), mRunModeInstance(&mRunModeDelegate, aRvcClustersEndpoint, RvcRunMode::Id, 0), mCleanModeDelegate(),
         mCleanModeInstance(&mCleanModeDelegate, aRvcClustersEndpoint, RvcCleanMode::Id, 0), mOperationalStateDelegate(),
-        mOperationalStateInstance(&mOperationalStateDelegate, aRvcClustersEndpoint)
+        mOperationalStateInstance(&mOperationalStateDelegate, aRvcClustersEndpoint), mServiceAreaDelegate(),
+        mServiceAreaInstance(&mStorageDelegate, &mServiceAreaDelegate, aRvcClustersEndpoint,
+                             BitMask<ServiceArea::Feature>(ServiceArea::Feature::kMaps, ServiceArea::Feature::kProgressReporting))
     {
         // set the current-mode at start-up
         mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
@@ -49,6 +61,11 @@ public:
         mOperationalStateDelegate.SetPauseCallback(&RvcDevice::HandleOpStatePauseCallback, this);
         mOperationalStateDelegate.SetResumeCallback(&RvcDevice::HandleOpStateResumeCallback, this);
         mOperationalStateDelegate.SetGoHomeCallback(&RvcDevice::HandleOpStateGoHomeCallback, this);
+
+        mServiceAreaDelegate.SetIsSetSelectedAreasAllowedCallback(&RvcDevice::SaIsSetSelectedAreasAllowed, this);
+        mServiceAreaDelegate.SetHandleSkipAreaCallback(&RvcDevice::SaHandleSkipArea, this);
+        mServiceAreaDelegate.SetIsSupportedAreasChangeAllowedCallback(&RvcDevice::SaIsSupportedAreasChangeAllowed, this);
+        mServiceAreaDelegate.SetIsSupportedMapChangeAllowedCallback(&RvcDevice::SaIsSupportedMapChangeAllowed, this);
     }
 
     /**
@@ -87,6 +104,14 @@ public:
      */
     void HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericOperationalError & err);
 
+    bool SaIsSetSelectedAreasAllowed(MutableCharSpan & statusText);
+
+    bool SaHandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText);
+
+    bool SaIsSupportedAreasChangeAllowed();
+
+    bool SaIsSupportedMapChangeAllowed();
+
     /**
      * Updates the state machine when the device becomes fully-charged.
      */
@@ -102,6 +127,16 @@ public:
 
     void HandleActivityCompleteEvent();
 
+    void HandleAreaCompletedEvent();
+
+    void HandleAddServiceAreaMap(uint32_t mapId, const CharSpan & mapName);
+
+    void HandleAddServiceAreaArea(ServiceArea::AreaStructureWrapper & area);
+
+    void HandleRemoveServiceAreaMap(uint32_t mapId);
+
+    void HandleRemoveServiceAreaArea(uint32_t areaId);
+
     /**
      * Sets the device to an error state with the error state ID matching the error name given.
      * @param error The error name. Could be one of UnableToStartOrResume, UnableToCompleteOperation, CommandInvalidInState,
@@ -113,6 +148,12 @@ public:
     void HandleClearErrorMessage();
 
     void HandleResetMessage();
+
+    /**
+     * Updates the Service area progress elements when an activity has ended.
+     * Sets any remaining Operating or Pending states to Skipped.
+     */
+    void UpdateServiceAreaProgressOnExit();
 };
 
 } // namespace Clusters

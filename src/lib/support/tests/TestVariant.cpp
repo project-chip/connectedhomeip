@@ -18,10 +18,10 @@
 
 #include <functional>
 
-#include <lib/support/UnitTestRegistration.h>
-#include <lib/support/Variant.h>
+#include <pw_unit_test/framework.h>
 
-#include <nlunit-test.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/Variant.h>
 
 namespace {
 
@@ -73,159 +73,159 @@ int Count::destroyed = 0;
 
 using namespace chip;
 
-void TestVariantSimple(nlTestSuite * inSuite, void * inContext)
+TEST(TestVariant, TestVariantSimple)
 {
     Variant<Simple, Pod> v;
-    NL_TEST_ASSERT(inSuite, !v.Valid());
+    EXPECT_FALSE(v.Valid());
     v.Set<Pod>(5, 10);
-    NL_TEST_ASSERT(inSuite, v.Valid());
-    NL_TEST_ASSERT(inSuite, v.Is<Pod>());
-    NL_TEST_ASSERT(inSuite, v.Get<Pod>().m1 == 5);
-    NL_TEST_ASSERT(inSuite, v.Get<Pod>().m2 == 10);
+    EXPECT_TRUE(v.Valid());
+    EXPECT_TRUE(v.Is<Pod>());
+    EXPECT_EQ(v.Get<Pod>().m1, 5);
+    EXPECT_EQ(v.Get<Pod>().m2, 10);
 }
 
-void TestVariantMovable(nlTestSuite * inSuite, void * inContext)
+TEST(TestVariant, TestVariantMovable)
 {
     Variant<Simple, Movable> v;
     v.Set<Simple>();
     v.Set<Movable>(Movable{ 5, 10 });
-    NL_TEST_ASSERT(inSuite, v.Get<Movable>().m1 == 5);
-    NL_TEST_ASSERT(inSuite, v.Get<Movable>().m2 == 10);
+    EXPECT_EQ(v.Get<Movable>().m1, 5);
+    EXPECT_EQ(v.Get<Movable>().m2, 10);
     auto & m = v.Get<Movable>();
-    NL_TEST_ASSERT(inSuite, m.m1 == 5);
-    NL_TEST_ASSERT(inSuite, m.m2 == 10);
+    EXPECT_EQ(m.m1, 5);
+    EXPECT_EQ(m.m2, 10);
     v.Set<Simple>();
 }
 
-void TestVariantCtorDtor(nlTestSuite * inSuite, void * inContext)
+TEST(TestVariant, TestVariantCtorDtor)
 {
     {
         Variant<Simple, Count> v;
-        NL_TEST_ASSERT(inSuite, Count::created == 0);
+        EXPECT_EQ(Count::created, 0);
         v.Set<Simple>();
-        NL_TEST_ASSERT(inSuite, Count::created == 0);
+        EXPECT_EQ(Count::created, 0);
         v.Get<Simple>();
-        NL_TEST_ASSERT(inSuite, Count::created == 0);
+        EXPECT_EQ(Count::created, 0);
     }
     {
         Variant<Simple, Count> v;
-        NL_TEST_ASSERT(inSuite, Count::created == 0);
+        EXPECT_EQ(Count::created, 0);
         v.Set<Simple>();
-        NL_TEST_ASSERT(inSuite, Count::created == 0);
+        EXPECT_EQ(Count::created, 0);
         v.Set<Count>();
-        NL_TEST_ASSERT(inSuite, Count::created == 1);
-        NL_TEST_ASSERT(inSuite, Count::destroyed == 0);
+        EXPECT_EQ(Count::created, 1);
+        EXPECT_EQ(Count::destroyed, 0);
         v.Get<Count>();
-        NL_TEST_ASSERT(inSuite, Count::created == 1);
-        NL_TEST_ASSERT(inSuite, Count::destroyed == 0);
+        EXPECT_EQ(Count::created, 1);
+        EXPECT_EQ(Count::destroyed, 0);
         v.Set<Simple>();
-        NL_TEST_ASSERT(inSuite, Count::created == 1);
-        NL_TEST_ASSERT(inSuite, Count::destroyed == 1);
+        EXPECT_EQ(Count::created, 1);
+        EXPECT_EQ(Count::destroyed, 1);
         v.Set<Count>();
-        NL_TEST_ASSERT(inSuite, Count::created == 2);
-        NL_TEST_ASSERT(inSuite, Count::destroyed == 1);
+        EXPECT_EQ(Count::created, 2);
+        EXPECT_EQ(Count::destroyed, 1);
     }
-    NL_TEST_ASSERT(inSuite, Count::destroyed == 2);
+    EXPECT_EQ(Count::destroyed, 2);
 
     {
         Variant<Simple, Count> v1;
         v1.Set<Count>();
         Variant<Simple, Count> v2(v1);
     }
-    NL_TEST_ASSERT(inSuite, Count::created == 4);
-    NL_TEST_ASSERT(inSuite, Count::destroyed == 4);
+    EXPECT_EQ(Count::created, 4);
+    EXPECT_EQ(Count::destroyed, 4);
 
     {
         Variant<Simple, Count> v1;
         v1.Set<Count>();
         Variant<Simple, Count> v2(std::move(v1));
     }
-    NL_TEST_ASSERT(inSuite, Count::created == 6);
-    NL_TEST_ASSERT(inSuite, Count::destroyed == 6);
+    EXPECT_EQ(Count::created, 6);
+    EXPECT_EQ(Count::destroyed, 6);
 
     {
         Variant<Simple, Count> v1, v2;
         v1.Set<Count>();
         v2 = v1;
     }
-    NL_TEST_ASSERT(inSuite, Count::created == 8);
-    NL_TEST_ASSERT(inSuite, Count::destroyed == 8);
+    EXPECT_EQ(Count::created, 8);
+    EXPECT_EQ(Count::destroyed, 8);
 
     {
         Variant<Simple, Count> v1, v2;
         v1.Set<Count>();
         v2 = std::move(v1);
     }
-    NL_TEST_ASSERT(inSuite, Count::created == 10);
-    NL_TEST_ASSERT(inSuite, Count::destroyed == 10);
+    EXPECT_EQ(Count::created, 10);
+    EXPECT_EQ(Count::destroyed, 10);
 }
 
-void TestVariantCopy(nlTestSuite * inSuite, void * inContext)
+TEST(TestVariant, TestVariantCopy)
 {
     Variant<Simple, Pod> v1;
     v1.Set<Pod>(5, 10);
     Variant<Simple, Pod> v2 = v1;
-    NL_TEST_ASSERT(inSuite, v1.Valid());
-    NL_TEST_ASSERT(inSuite, v1.Get<Pod>().m1 == 5);
-    NL_TEST_ASSERT(inSuite, v1.Get<Pod>().m2 == 10);
-    NL_TEST_ASSERT(inSuite, v2.Valid());
-    NL_TEST_ASSERT(inSuite, v2.Get<Pod>().m1 == 5);
-    NL_TEST_ASSERT(inSuite, v2.Get<Pod>().m2 == 10);
+    EXPECT_TRUE(v1.Valid());
+    EXPECT_EQ(v1.Get<Pod>().m1, 5);
+    EXPECT_EQ(v1.Get<Pod>().m2, 10);
+    EXPECT_TRUE(v2.Valid());
+    EXPECT_EQ(v2.Get<Pod>().m1, 5);
+    EXPECT_EQ(v2.Get<Pod>().m2, 10);
 }
 
-void TestVariantMove(nlTestSuite * inSuite, void * inContext)
+TEST(TestVariant, TestVariantMove)
 {
     Variant<Simple, Movable> v1;
     v1.Set<Movable>(5, 10);
     Variant<Simple, Movable> v2 = std::move(v1);
-    NL_TEST_ASSERT(inSuite, !v1.Valid()); // NOLINT(bugprone-use-after-move)
-    NL_TEST_ASSERT(inSuite, v2.Valid());
-    NL_TEST_ASSERT(inSuite, v2.Get<Movable>().m1 == 5);
-    NL_TEST_ASSERT(inSuite, v2.Get<Movable>().m2 == 10);
+    EXPECT_FALSE(v1.Valid()); // NOLINT(bugprone-use-after-move)
+    EXPECT_TRUE(v2.Valid());
+    EXPECT_EQ(v2.Get<Movable>().m1, 5);
+    EXPECT_EQ(v2.Get<Movable>().m2, 10);
 }
 
-void TestVariantCopyAssign(nlTestSuite * inSuite, void * inContext)
+TEST(TestVariant, TestVariantCopyAssign)
 {
     Variant<Simple, Pod> v1;
     Variant<Simple, Pod> v2;
     v1.Set<Pod>(5, 10);
     v2 = v1;
-    NL_TEST_ASSERT(inSuite, v1.Valid());
-    NL_TEST_ASSERT(inSuite, v1.Get<Pod>().m1 == 5);
-    NL_TEST_ASSERT(inSuite, v1.Get<Pod>().m2 == 10);
-    NL_TEST_ASSERT(inSuite, v2.Valid());
-    NL_TEST_ASSERT(inSuite, v2.Get<Pod>().m1 == 5);
-    NL_TEST_ASSERT(inSuite, v2.Get<Pod>().m2 == 10);
+    EXPECT_TRUE(v1.Valid());
+    EXPECT_EQ(v1.Get<Pod>().m1, 5);
+    EXPECT_EQ(v1.Get<Pod>().m2, 10);
+    EXPECT_TRUE(v2.Valid());
+    EXPECT_EQ(v2.Get<Pod>().m1, 5);
+    EXPECT_EQ(v2.Get<Pod>().m2, 10);
 }
 
-void TestVariantMoveAssign(nlTestSuite * inSuite, void * inContext)
+TEST(TestVariant, TestVariantMoveAssign)
 {
     Variant<Simple, Pod> v1;
     Variant<Simple, Pod> v2;
     v1.Set<Pod>(5, 10);
     v2 = std::move(v1);
-    NL_TEST_ASSERT(inSuite, !v1.Valid()); // NOLINT(bugprone-use-after-move)
-    NL_TEST_ASSERT(inSuite, v2.Valid());
-    NL_TEST_ASSERT(inSuite, v2.Get<Pod>().m1 == 5);
-    NL_TEST_ASSERT(inSuite, v2.Get<Pod>().m2 == 10);
+    EXPECT_FALSE(v1.Valid()); // NOLINT(bugprone-use-after-move)
+    EXPECT_TRUE(v2.Valid());
+    EXPECT_EQ(v2.Get<Pod>().m1, 5);
+    EXPECT_EQ(v2.Get<Pod>().m2, 10);
 }
 
-void TestVariantInPlace(nlTestSuite * inSuite, void * inContext)
+TEST(TestVariant, TestVariantInPlace)
 {
     int i = 0;
 
     Variant<std::reference_wrapper<int>> v1 = Variant<std::reference_wrapper<int>>(InPlaceTemplate<std::reference_wrapper<int>>, i);
-    NL_TEST_ASSERT(inSuite, v1.Valid());
-    NL_TEST_ASSERT(inSuite, v1.Is<std::reference_wrapper<int>>());
-    NL_TEST_ASSERT(inSuite, &v1.Get<std::reference_wrapper<int>>().get() == &i);
+    EXPECT_TRUE(v1.Valid());
+    EXPECT_TRUE(v1.Is<std::reference_wrapper<int>>());
+    EXPECT_EQ(&v1.Get<std::reference_wrapper<int>>().get(), &i);
 
     Variant<std::reference_wrapper<int>> v2 = Variant<std::reference_wrapper<int>>::Create<std::reference_wrapper<int>>(i);
-    NL_TEST_ASSERT(inSuite, v2.Valid());
-    NL_TEST_ASSERT(inSuite, v2.Is<std::reference_wrapper<int>>());
-    NL_TEST_ASSERT(inSuite, &v2.Get<std::reference_wrapper<int>>().get() == &i);
+    EXPECT_TRUE(v2.Valid());
+    EXPECT_TRUE(v2.Is<std::reference_wrapper<int>>());
+    EXPECT_EQ(&v2.Get<std::reference_wrapper<int>>().get(), &i);
 }
 
-void TestVariantCompare(nlTestSuite * inSuite, void * inContext)
+TEST(TestVariant, TestVariantCompare)
 {
     Variant<Simple, Pod> v0;
     Variant<Simple, Pod> v1;
@@ -238,66 +238,35 @@ void TestVariantCompare(nlTestSuite * inSuite, void * inContext)
     v3.Set<Pod>(5, 10);
     v4.Set<Pod>(5, 11);
 
-    NL_TEST_ASSERT(inSuite, (v0 == v0));
-    NL_TEST_ASSERT(inSuite, !(v0 == v1));
-    NL_TEST_ASSERT(inSuite, !(v0 == v2));
-    NL_TEST_ASSERT(inSuite, !(v0 == v3));
-    NL_TEST_ASSERT(inSuite, !(v0 == v4));
+    EXPECT_TRUE(v0 == v0);
+    EXPECT_FALSE(v0 == v1);
+    EXPECT_FALSE(v0 == v2);
+    EXPECT_FALSE(v0 == v3);
+    EXPECT_FALSE(v0 == v4);
 
-    NL_TEST_ASSERT(inSuite, !(v1 == v0));
-    NL_TEST_ASSERT(inSuite, (v1 == v1));
-    NL_TEST_ASSERT(inSuite, !(v1 == v2));
-    NL_TEST_ASSERT(inSuite, !(v1 == v3));
-    NL_TEST_ASSERT(inSuite, !(v1 == v4));
+    EXPECT_FALSE(v1 == v0);
+    EXPECT_TRUE(v1 == v1);
+    EXPECT_FALSE(v1 == v2);
+    EXPECT_FALSE(v1 == v3);
+    EXPECT_FALSE(v1 == v4);
 
-    NL_TEST_ASSERT(inSuite, !(v2 == v0));
-    NL_TEST_ASSERT(inSuite, !(v2 == v1));
-    NL_TEST_ASSERT(inSuite, (v2 == v2));
-    NL_TEST_ASSERT(inSuite, (v2 == v3));
-    NL_TEST_ASSERT(inSuite, !(v2 == v4));
+    EXPECT_FALSE(v2 == v0);
+    EXPECT_FALSE(v2 == v1);
+    EXPECT_TRUE(v2 == v2);
+    EXPECT_TRUE(v2 == v3);
+    EXPECT_FALSE(v2 == v4);
 
-    NL_TEST_ASSERT(inSuite, !(v3 == v0));
-    NL_TEST_ASSERT(inSuite, !(v3 == v1));
-    NL_TEST_ASSERT(inSuite, (v3 == v2));
-    NL_TEST_ASSERT(inSuite, (v3 == v3));
-    NL_TEST_ASSERT(inSuite, !(v3 == v4));
+    EXPECT_FALSE(v3 == v0);
+    EXPECT_FALSE(v3 == v1);
+    EXPECT_TRUE(v3 == v2);
+    EXPECT_TRUE(v3 == v3);
+    EXPECT_FALSE(v3 == v4);
 
-    NL_TEST_ASSERT(inSuite, !(v4 == v0));
-    NL_TEST_ASSERT(inSuite, !(v4 == v1));
-    NL_TEST_ASSERT(inSuite, !(v4 == v2));
-    NL_TEST_ASSERT(inSuite, !(v4 == v3));
-    NL_TEST_ASSERT(inSuite, (v4 == v4));
-}
-
-int Setup(void * inContext)
-{
-    return SUCCESS;
-}
-
-int Teardown(void * inContext)
-{
-    return SUCCESS;
+    EXPECT_FALSE(v4 == v0);
+    EXPECT_FALSE(v4 == v1);
+    EXPECT_FALSE(v4 == v2);
+    EXPECT_FALSE(v4 == v3);
+    EXPECT_TRUE(v4 == v4);
 }
 
 } // namespace
-
-#define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
-/**
- *   Test Suite. It lists all the test functions.
- */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestVariantSimple),     NL_TEST_DEF_FN(TestVariantMovable),
-                                 NL_TEST_DEF_FN(TestVariantCtorDtor),   NL_TEST_DEF_FN(TestVariantCopy),
-                                 NL_TEST_DEF_FN(TestVariantMove),       NL_TEST_DEF_FN(TestVariantCopyAssign),
-                                 NL_TEST_DEF_FN(TestVariantMoveAssign), NL_TEST_DEF_FN(TestVariantInPlace),
-                                 NL_TEST_DEF_FN(TestVariantCompare),    NL_TEST_SENTINEL() };
-
-int TestVariant()
-{
-    nlTestSuite theSuite = { "CHIP Variant tests", &sTests[0], Setup, Teardown };
-
-    // Run test suite against one context.
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestVariant);

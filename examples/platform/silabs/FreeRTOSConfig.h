@@ -106,16 +106,20 @@ extern "C" {
 #include <CHIPProjectConfig.h>
 
 #include <stdint.h>
+#include <stdio.h>
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "si91x_device.h"
 extern uint32_t SystemCoreClock;
-#else // For EFR32
+#if SL_ICD_ENABLED
+#include "sl_si91x_m4_ps.h"
+#endif // SL_ICD_ENABLED
+#else  // For EFR32
 #include "RTE_Components.h"
 #include CMSIS_device_header
 
-#include "em_assert.h"
 #include "em_device.h"
+#include "sl_assert.h"
 #endif
 
 #if defined(SL_COMPONENT_CATALOG_PRESENT)
@@ -141,11 +145,18 @@ extern uint32_t SystemCoreClock;
 /* Energy saving modes. */
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #define configUSE_TICKLESS_IDLE 1
+#elif (SLI_SI91X_MCU_INTERFACE && SL_ICD_ENABLED)
+#define configUSE_TICKLESS_IDLE 1
+#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP 70
+#define configPRE_SLEEP_PROCESSING(x)
+#define configPOST_SLEEP_PROCESSING(x)
+#define configPRE_SUPPRESS_TICKS_AND_SLEEP_PROCESSING(x)
 #else
 #define configUSE_TICKLESS_IDLE 0
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
 
 #define configTICK_RATE_HZ (1024)
+
 /* Definition used by Keil to replace default system clock source. */
 #define configOVERRIDE_DEFAULT_TICK_CONFIGURATION 1
 
@@ -165,7 +176,11 @@ extern uint32_t SystemCoreClock;
 
 /* Software timer related definitions. */
 #define configUSE_TIMERS (1)
+#ifdef SLI_SI917
+#define configTIMER_TASK_PRIORITY (55) /* Highest priority */
+#else
 #define configTIMER_TASK_PRIORITY (40) /* Highest priority */
+#endif                                 // SLI_SI917
 #define configTIMER_QUEUE_LENGTH (10)
 #define configTIMER_TASK_STACK_DEPTH (1024)
 
@@ -187,7 +202,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 48
 #endif // SLI_SI91X_MCU_INTERFACE
 
-#define configENABLE_FPU 0
+#define configENABLE_FPU 1
 #define configENABLE_MPU 0
 /* FreeRTOS Secure Side Only and TrustZone Security Extension */
 #define configRUN_FREERTOS_SECURE_ONLY 1

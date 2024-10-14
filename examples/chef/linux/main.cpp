@@ -29,10 +29,6 @@ using namespace chip::Shell;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-void ApplicationInit() {}
-
-void ApplicationShutdown() {}
-
 int main(int argc, char * argv[])
 {
     if (ChipLinuxAppInit(argc, argv) != 0)

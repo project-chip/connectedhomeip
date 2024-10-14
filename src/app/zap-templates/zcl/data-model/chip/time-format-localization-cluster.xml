@@ -23,11 +23,6 @@ limitations under the License.
     <item name="UseActiveLocale" value="0xFF"/>                   
   </enum>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x002c"/>
-    <field name="CalendarFormat" mask="0x1"/>
-  </bitmap>
-
   <enum name="CalendarTypeEnum" type="enum8">
     <cluster code="0x002c"/>
     <item name="Buddhist" value="0x00"/>
@@ -55,6 +50,13 @@ limitations under the License.
       may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
       or audibly convey time information need a mechanism by which they can be configured to use a
       user’s preferred format.</description>
+
+      <features>
+        <feature bit="0" code="CALFMT" name="CalendarFormat" summary="The Node can be configured to use different calendar formats when conveying values to a user.">
+          <optionalConform/>
+        </feature>
+      </features>
+
     <!-- Base data types -->
     <attribute side="server" code="0x00" define="HOUR_FORMAT" type="HourFormatEnum" writable="true" optional="false">
         <description>HourFormat</description>

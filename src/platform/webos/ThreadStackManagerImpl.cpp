@@ -18,7 +18,6 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
-#include <app/AttributeAccessInterface.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
@@ -526,13 +525,14 @@ CHIP_ERROR ThreadStackManagerImpl::_GetExternalIPv6Address(chip::Inet::IPAddress
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
+CHIP_ERROR ThreadStackManagerImpl::_GetThreadVersion(uint16_t & version)
 {
-    // TODO: Remove Weave legacy APIs
+    // TODO https://github.com/project-chip/connectedhomeip/issues/30602
+    // Needs to be implemented with DBUS io.openthread.BorderRouter Thread API
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
+CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
 {
     // TODO: Remove Weave legacy APIs
     return CHIP_ERROR_NOT_IMPLEMENTED;

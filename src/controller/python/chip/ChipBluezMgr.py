@@ -33,18 +33,18 @@ import traceback
 import uuid
 from ctypes import CFUNCTYPE, PYFUNCTYPE, c_int, c_void_p, cast, pythonapi
 
-import dbus
-import dbus.mainloop.glib
-import dbus.service
+import dbus  # type: ignore
+import dbus.mainloop.glib  # type: ignore
+import dbus.service  # type: ignore
 
 from .ChipBleBase import ChipBleBase
 from .ChipBleUtility import BLE_ERROR_REMOTE_DEVICE_DISCONNECTED, BleDisconnectEvent, ParseServiceData
 
 try:
-    from gi.repository import GObject
+    from gi.repository import GObject  # type: ignore
 except Exception:
     logging.exception("Unable to find GObject from gi.repository")
-    from pgi.repository import GObject
+    from pgi.repository import GObject  # type: ignore
 
 chip_service = uuid.UUID("0000FFF6-0000-1000-8000-00805F9B34FB")
 chip_tx = uuid.UUID("18EE2EF5-263D-4559-959F-4F9C429F9D11")
@@ -807,7 +807,6 @@ class BluezManager(ChipBleBase):
         self.rx = None
         self.setInputHook(self.readlineCB)
         self.devMgr = devMgr
-        self.devMgr.SetBlockingCB(self.devMgrCB)
 
     def __del__(self):
         self.disconnect()

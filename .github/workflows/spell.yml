@@ -16,6 +16,9 @@ name: Run misspell
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'
         paths:
             - "**.md"
             - ".github/.wordlist.txt"

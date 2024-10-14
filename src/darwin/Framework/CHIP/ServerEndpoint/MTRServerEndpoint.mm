@@ -187,12 +187,8 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 {
     MTRDeviceController * existingController = _deviceController;
     if (existingController != nil) {
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
         MTR_LOG_ERROR("Cannot associate MTRServerEndpoint with controller %@; already associated with controller %@",
             controller.uniqueIdentifier, existingController.uniqueIdentifier);
-#else
-        MTR_LOG_ERROR("Cannot associate MTRServerEndpoint with controller; already associated with a different controller");
-#endif
         return NO;
     }
 
@@ -315,8 +311,8 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
     _deviceController = controller;
 
-    MTR_LOG_DEFAULT("Associated %@, cluster count %llu, with controller",
-        self, static_cast<unsigned long long>(clusterCount));
+    MTR_LOG("Associated %@, cluster count %llu, with controller %@",
+        self, static_cast<unsigned long long>(clusterCount), controller);
 
     return YES;
 }

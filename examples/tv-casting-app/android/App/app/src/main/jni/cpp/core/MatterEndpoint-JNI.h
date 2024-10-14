@@ -18,8 +18,11 @@
 
 #pragma once
 
+#include "../support/Converters-JNI.h"
+#include "../support/MatterCallback-JNI.h"
 #include "core/Endpoint.h" // from tv-casting-common
 
+#include <app/DeviceProxy.h>
 #include <jni.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
@@ -30,6 +33,15 @@ namespace core {
 
 class MatterEndpointJNI
 {
+public:
+    MatterEndpointJNI() :
+        mGetDeviceProxySuccessHandler([](chip::DeviceProxy * device) -> jobject {
+            return support::convertLongFromCppToJava(reinterpret_cast<jlong>(device));
+        })
+    {}
+    support::MatterCallbackJNI<chip::DeviceProxy *> mGetDeviceProxySuccessHandler;
+    support::MatterFailureCallbackJNI mGetDeviceProxyFailureHandler;
+
 private:
     friend MatterEndpointJNI & MatterEndpointJNIMgr();
     static MatterEndpointJNI sInstance;

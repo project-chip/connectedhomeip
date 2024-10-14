@@ -36,7 +36,7 @@
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #endif // CONFIG_NETWORK_BLE
 
 #include <controller/DeviceDiscoveryDelegate.h>
@@ -77,7 +77,7 @@ class DLL_EXPORT SetUpCodePairer : public DevicePairingDelegate
 {
 public:
     SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
-    virtual ~SetUpCodePairer() {}
+    ~SetUpCodePairer();
 
     CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode,
                           SetupCodePairerBehaviour connectionType              = SetupCodePairerBehaviour::kCommission,
@@ -111,6 +111,8 @@ private:
     CHIP_ERROR StopConnectOverIP();
     CHIP_ERROR StartDiscoverOverSoftAP(SetupPayload & payload);
     CHIP_ERROR StopConnectOverSoftAP();
+    CHIP_ERROR StartDiscoverOverWiFiPAF(SetupPayload & payload);
+    CHIP_ERROR StopConnectOverWiFiPAF();
 
     // Returns whether we have kicked off a new connection attempt.
     bool ConnectToDiscoveredDevice();
@@ -150,6 +152,7 @@ private:
         kBLETransport = 0,
         kIPTransport,
         kSoftAPTransport,
+        kWiFiPAFTransport,
         kTransportTypeCount,
     };
 
@@ -165,6 +168,12 @@ private:
     static void OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_CONNECTION_OBJECT connObj);
     static void OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err);
 #endif // CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    void OnDiscoveredDeviceOverWifiPAF();
+    void OnWifiPAFDiscoveryError(CHIP_ERROR err);
+    static void OnWiFiPAFSubscribeComplete(void * appState);
+    static void OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err);
+#endif
 
     bool NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData) const;
     static bool IdIsPresent(uint16_t vendorOrProductID);

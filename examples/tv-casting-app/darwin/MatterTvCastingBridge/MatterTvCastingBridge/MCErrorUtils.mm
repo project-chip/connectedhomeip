@@ -38,4 +38,8 @@
     return matterError == MATTER_NO_ERROR ? nil : [NSError errorWithDomain:@"com.matter.casting" code:matterError.code userInfo:@{ NSUnderlyingErrorKey : matterError.message }];
 }
 
++ (MatterError * _Nonnull)MatterErrorFromNsError:(NSError * _Nonnull)nsError
+{
+    return nsError == nil ? MATTER_NO_ERROR : [[MatterError alloc] initWithCode:static_cast<uint32_t>(nsError.code) message:nsError.userInfo[NSUnderlyingErrorKey]];
+}
 @end

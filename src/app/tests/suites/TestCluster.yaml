@@ -2896,7 +2896,7 @@ tests:
           constraints:
               notValue: nullableOctetStrTestValue
 
-    # Tests for Char String attribute
+    # Tests for Nullable Char String attribute
 
     - label: "Read attribute NULLABLE_CHAR_STRING Default Value"
       command: "readAttribute"
@@ -2967,6 +2967,18 @@ tests:
       attribute: "list_int8u"
       response:
           error: UNSUPPORTED_CLUSTER
+
+    - label: "Write attribute NULLABLE_CHAR_STRING - Value starting with null"
+      command: "writeAttribute"
+      attribute: "nullable_char_string"
+      arguments:
+          value: "nulla"
+
+    - label: "Read attribute NULLABLE_CHAR_STRING"
+      command: "readAttribute"
+      attribute: "nullable_char_string"
+      response:
+          value: "nulla"
 
     # Tests for command with optional arguments
     - label:
@@ -3899,6 +3911,8 @@ tests:
                   21,
                   22,
                   23,
+                  24,
+                  25,
                   4294049962,
               ]
 
@@ -3906,7 +3920,7 @@ tests:
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: [0, 1, 4, 5, 6, 8, 9, 10, 11, 12, 4294049979]
+          value: [0, 1, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 4294049979]
 
     - label: "Validate presence of MEI attribute"
       command: "readAttribute"
@@ -3947,3 +3961,75 @@ tests:
                   g: 1.5,
                   h: 3.14159265358979,
               }
+
+    # Globals testing
+    - label: "Write global-struct-typed attribute"
+      command: "writeAttribute"
+      attribute: "global_struct"
+      arguments:
+          value:
+              {
+                  Name: "",
+                  MyBitmap: 0x02,
+                  MyEnum: TestGlobalEnum.SomeOtherValue,
+              }
+
+    - label: "Read global-struct-typed attribute"
+      command: "readAttribute"
+      attribute: "global_struct"
+      response:
+          value: {
+                  # Purposefully using non-symbolic values to make sure things work right.
+                  Name: "",
+                  MyBitmap: 0x02,
+                  MyEnum: 1,
+              }
+
+    - label: "Write nullable global-struct-typed attribute"
+      command: "writeAttribute"
+      attribute: "nullable_global_struct"
+      arguments:
+          value: { Name: "", MyBitmap: 0x01, MyEnum: TestGlobalEnum.SomeValue }
+
+    - label: "Read nullable global-struct-typed attribute"
+      command: "readAttribute"
+      attribute: "nullable_global_struct"
+      response:
+          value: { Name: "", MyBitmap: 0x01, MyEnum: 0 }
+
+    - label: "Write nullable global-struct-typed attribute as null"
+      command: "writeAttribute"
+      attribute: "nullable_global_struct"
+      arguments:
+          value: null
+
+    - label: "Read nullable global-struct-typed attribute a second time"
+      command: "readAttribute"
+      attribute: "nullable_global_struct"
+      response:
+          value: null
+
+    - label: "Send a command with global types"
+      command: "GlobalEchoRequest"
+      arguments:
+          values:
+              - name: "field1"
+                value:
+                    {
+                        Name: "",
+                        MyBitmap: 0x02,
+                        MyEnum: TestGlobalEnum.FinalValue,
+                    }
+              - name: "field2"
+                value: TestGlobalEnum.SomeOtherValue
+      response:
+          values:
+              - name: "field1"
+                value:
+                    {
+                        Name: "",
+                        MyBitmap: 0x02,
+                        MyEnum: TestGlobalEnum.FinalValue,
+                    }
+              - name: "field2"
+                value: TestGlobalEnum.SomeOtherValue

@@ -23,6 +23,8 @@
 #include <json/json.h>
 #include <platform/DiagnosticDataProvider.h>
 
+#include <string>
+
 class AllClustersAppCommandHandler
 {
 public:
@@ -103,6 +105,22 @@ private:
      * Should be called when it is necessary to change the operational state as a manual operation.
      */
     void OnOperationalStateChange(std::string device, std::string operation, Json::Value param);
+
+    /**
+     * Should be called when it is necessary to change the operational state as a manual operation.
+     */
+    void OnGenericOperationalStateChange(std::string device, std::string operation, Json::Value param);
+
+    /**
+     * Should be called when it is necessary to change the operational state as a manual operation.
+     */
+    void OnOvenOperationalStateChange(std::string device, std::string operation, Json::Value param);
+
+    /**
+     * Should be called when it is necessary to change the Occupancy attribute.
+     */
+    void HandleSetOccupancyChange(chip::EndpointId endpointId, uint8_t occupancyValue);
+    static void OccupancyPresentTimerHandler(chip::System::Layer * systemLayer, void * appState);
 };
 
 class AllClustersCommandDelegate : public NamedPipeCommandDelegate

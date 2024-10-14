@@ -23,53 +23,46 @@
 
 #include "NetworkTestHelpers.h"
 
-#include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPEncoding.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/UnitTestContext.h>
-#include <lib/support/UnitTestRegistration.h>
-#include <lib/support/UnitTestUtils.h>
-#include <system/SystemLayer.h>
-#include <transport/TransportMgr.h>
-#include <transport/raw/TCP.h>
-
-#include <nlunit-test.h>
-
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <utility>
 
+#include <pw_unit_test/framework.h>
+
+#include <crypto/RandUtils.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestUtils.h>
+#include <system/SystemLayer.h>
+#include <transport/TransportMgr.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <transport/raw/TCP.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <transport/raw/tests/TCPBaseTestAccess.h>
+
 using namespace chip;
+using namespace chip::Test;
 using namespace chip::Inet;
-
-static int Initialize(void * aContext);
-static int Finalize(void * aContext);
-
-namespace chip {
-namespace Transport {
-class TCPTest
-{
-public:
-    static void CheckProcessReceivedBuffer(nlTestSuite * inSuite, void * inContext);
-};
-} // namespace Transport
-} // namespace chip
 
 namespace {
 
 constexpr size_t kMaxTcpActiveConnectionCount = 4;
 constexpr size_t kMaxTcpPendingPackets        = 4;
-constexpr uint16_t kPacketSizeBytes           = static_cast<uint16_t>(sizeof(uint16_t));
+constexpr size_t kPacketSizeBytes             = sizeof(uint32_t);
+uint16_t gChipTCPPort                         = static_cast<uint16_t>(CHIP_PORT + chip::Crypto::GetRandU16() % 100);
+chip::Transport::AppTCPConnectionCallbackCtxt gAppTCPConnCbCtxt;
+chip::Transport::ActiveTCPConnectionState * gActiveTCPConnState = nullptr;
 
-using TCPImpl = Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
+using TCPImpl    = Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
+using TestAccess = Transport::TCPBaseTestAccess<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
 
 constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
 constexpr uint32_t kMessageCounter  = 18;
-
-using TestContext = chip::Test::IOContext;
 
 const char PAYLOAD[] = "Hello!";
 
@@ -78,9 +71,7 @@ class MockTransportMgrDelegate : public chip::TransportMgrDelegate
 public:
     typedef int (*MessageReceivedCallback)(const uint8_t * message, size_t length, int count, void * data);
 
-    MockTransportMgrDelegate(nlTestSuite * inSuite, TestContext & inContext) :
-        mSuite(inSuite), mContext(inContext), mCallback(nullptr), mCallbackData(nullptr)
-    {}
+    MockTransportMgrDelegate(IOContext * inContext) : mIOContext(inContext), mCallback(nullptr), mCallbackData(nullptr) {}
     ~MockTransportMgrDelegate() override {}
 
     void SetCallback(MessageReceivedCallback callback = nullptr, void * callback_data = nullptr)
@@ -88,25 +79,66 @@ public:
         mCallback     = callback;
         mCallbackData = callback_data;
     }
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
+                           Transport::MessageTransportContext * transCtxt = nullptr) override
     {
         PacketHeader packetHeader;
 
-        CHIP_ERROR error = packetHeader.DecodeAndConsume(msgBuf);
-        NL_TEST_ASSERT(mSuite, error == CHIP_NO_ERROR);
+        EXPECT_EQ(packetHeader.DecodeAndConsume(msgBuf), CHIP_NO_ERROR);
 
         if (mCallback)
         {
-            int err = mCallback(msgBuf->Start(), msgBuf->DataLength(), mReceiveHandlerCallCount, mCallbackData);
-            NL_TEST_ASSERT(mSuite, err == 0);
+            EXPECT_EQ(mCallback(msgBuf->Start(), msgBuf->DataLength(), mReceiveHandlerCallCount, mCallbackData), 0);
         }
+
+        ChipLogProgress(Inet, "Message Receive Handler called");
 
         mReceiveHandlerCallCount++;
     }
 
+    void HandleConnectionAttemptComplete(chip::Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr) override
+    {
+        chip::Transport::AppTCPConnectionCallbackCtxt * appConnCbCtxt = nullptr;
+        VerifyOrReturn(conn != nullptr);
+
+        mHandleConnectionCompleteCalled = true;
+        appConnCbCtxt                   = conn->mAppState;
+        VerifyOrReturn(appConnCbCtxt != nullptr);
+
+        if (appConnCbCtxt->connCompleteCb != nullptr)
+        {
+            appConnCbCtxt->connCompleteCb(conn, conErr);
+        }
+        else
+        {
+            ChipLogProgress(Inet, "Connection established. App callback missing.");
+        }
+    }
+
+    void HandleConnectionClosed(chip::Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr) override
+    {
+        chip::Transport::AppTCPConnectionCallbackCtxt * appConnCbCtxt = nullptr;
+        VerifyOrReturn(conn != nullptr);
+
+        mHandleConnectionCloseCalled = true;
+        appConnCbCtxt                = conn->mAppState;
+        VerifyOrReturn(appConnCbCtxt != nullptr);
+
+        if (appConnCbCtxt->connClosedCb != nullptr)
+        {
+            appConnCbCtxt->connClosedCb(conn, conErr);
+        }
+        else
+        {
+            ChipLogProgress(Inet, "Connection Closed. App callback missing.");
+        }
+    }
+
     void InitializeMessageTest(TCPImpl & tcp, const IPAddress & addr)
     {
-        CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(mContext.GetTCPEndPointManager()).SetAddressType(addr.Type()));
+        CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager())
+                                      .SetAddressType(addr.Type())
+                                      .SetListenPort(gChipTCPPort));
 
         // retry a few times in case the port is somehow in use.
         // this is a WORKAROUND for flaky testing if we run tests very fast after each other.
@@ -125,21 +157,30 @@ public:
         {
             ChipLogProgress(NotSpecified, "RETRYING tcp initialization");
             chip::test_utils::SleepMillis(100);
-            err = tcp.Init(Transport::TcpListenParameters(mContext.GetTCPEndPointManager()).SetAddressType(addr.Type()));
+            err = tcp.Init(Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager())
+                               .SetAddressType(addr.Type())
+                               .SetListenPort(gChipTCPPort));
         }
 
-        NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
         mTransportMgrBase.SetSessionManager(this);
         mTransportMgrBase.Init(&tcp);
 
-        mReceiveHandlerCallCount = 0;
+        mReceiveHandlerCallCount        = 0;
+        mHandleConnectionCompleteCalled = false;
+        mHandleConnectionCloseCalled    = false;
+
+        gAppTCPConnCbCtxt.appContext     = nullptr;
+        gAppTCPConnCbCtxt.connReceivedCb = nullptr;
+        gAppTCPConnCbCtxt.connCompleteCb = nullptr;
+        gAppTCPConnCbCtxt.connClosedCb   = nullptr;
     }
 
     void SingleMessageTest(TCPImpl & tcp, const IPAddress & addr)
     {
         chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::NewWithData(PAYLOAD, sizeof(PAYLOAD));
-        NL_TEST_ASSERT(mSuite, !buffer.IsNull());
+        ASSERT_FALSE(buffer.IsNull());
 
         PacketHeader header;
         header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageCounter(kMessageCounter);
@@ -148,88 +189,107 @@ public:
                     const_cast<void *>(static_cast<const void *>(PAYLOAD)));
 
         CHIP_ERROR err = header.EncodeBeforeData(buffer);
-        NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
         // Should be able to send a message to itself by just calling send.
-        err = tcp.SendMessage(Transport::PeerAddress::TCP(addr), std::move(buffer));
-        NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
+        err = tcp.SendMessage(Transport::PeerAddress::TCP(addr, gChipTCPPort), std::move(buffer));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
-        mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mReceiveHandlerCallCount != 0; });
-        NL_TEST_ASSERT(mSuite, mReceiveHandlerCallCount == 1);
+        mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mReceiveHandlerCallCount != 0; });
+        EXPECT_EQ(mReceiveHandlerCallCount, 1);
 
         SetCallback(nullptr);
     }
 
-    void FinalizeMessageTest(TCPImpl & tcp, const IPAddress & addr)
+    void ConnectTest(TCPImpl & tcp, const IPAddress & addr)
+    {
+        // Connect and wait for seeing active connection
+        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, gChipTCPPort), &gAppTCPConnCbCtxt, &gActiveTCPConnState);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return tcp.HasActiveConnections(); });
+        EXPECT_EQ(tcp.HasActiveConnections(), true);
+    }
+
+    void HandleConnectCompleteCbCalledTest(TCPImpl & tcp, const IPAddress & addr)
+    {
+        // Connect and wait for seeing active connection and connection complete
+        // handler being called.
+        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, gChipTCPPort), &gAppTCPConnCbCtxt, &gActiveTCPConnState);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mHandleConnectionCompleteCalled; });
+        EXPECT_EQ(mHandleConnectionCompleteCalled, true);
+    }
+
+    void HandleConnectCloseCbCalledTest(TCPImpl & tcp, const IPAddress & addr)
+    {
+        // Connect and wait for seeing active connection and connection complete
+        // handler being called.
+        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, gChipTCPPort), &gAppTCPConnCbCtxt, &gActiveTCPConnState);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mHandleConnectionCompleteCalled; });
+        EXPECT_EQ(mHandleConnectionCompleteCalled, true);
+
+        tcp.TCPDisconnect(Transport::PeerAddress::TCP(addr, gChipTCPPort));
+        mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return !tcp.HasActiveConnections(); });
+        EXPECT_EQ(mHandleConnectionCloseCalled, true);
+    }
+
+    void DisconnectTest(TCPImpl & tcp, chip::Transport::ActiveTCPConnectionState * conn)
     {
         // Disconnect and wait for seeing peer close
-        tcp.Disconnect(Transport::PeerAddress::TCP(addr));
-        mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return !tcp.HasActiveConnections(); });
+        tcp.TCPDisconnect(conn, true);
+        mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return !tcp.HasActiveConnections(); });
+        EXPECT_EQ(tcp.HasActiveConnections(), false);
+    }
+
+    void DisconnectTest(TCPImpl & tcp, const IPAddress & addr)
+    {
+        // Disconnect and wait for seeing peer close
+        tcp.TCPDisconnect(Transport::PeerAddress::TCP(addr, gChipTCPPort));
+        mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return !tcp.HasActiveConnections(); });
+        EXPECT_EQ(tcp.HasActiveConnections(), false);
+    }
+
+    CHIP_ERROR TCPConnect(const Transport::PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,
+                          Transport::ActiveTCPConnectionState ** peerConnState)
+    {
+        return mTransportMgrBase.TCPConnect(peerAddress, appState, peerConnState);
+    }
+
+    using OnTCPConnectionReceivedCallback = void (*)(void * context, chip::Transport::ActiveTCPConnectionState * conn);
+
+    using OnTCPConnectionCompleteCallback = void (*)(void * context, chip::Transport::ActiveTCPConnectionState * conn,
+                                                     CHIP_ERROR conErr);
+
+    using OnTCPConnectionClosedCallback = void (*)(void * context, chip::Transport::ActiveTCPConnectionState * conn,
+                                                   CHIP_ERROR conErr);
+
+    void SetConnectionCallbacks(OnTCPConnectionCompleteCallback connCompleteCb, OnTCPConnectionClosedCallback connClosedCb,
+                                OnTCPConnectionReceivedCallback connReceivedCb)
+    {
+        mConnCompleteCb = connCompleteCb;
+        mConnClosedCb   = connClosedCb;
+        mConnReceivedCb = connReceivedCb;
     }
 
     int mReceiveHandlerCallCount = 0;
 
+    bool mHandleConnectionCompleteCalled = false;
+
+    bool mHandleConnectionCloseCalled = false;
+
 private:
-    nlTestSuite * mSuite;
-    TestContext & mContext;
+    IOContext * mIOContext;
     MessageReceivedCallback mCallback;
     void * mCallbackData;
     TransportMgrBase mTransportMgrBase;
+    OnTCPConnectionCompleteCallback mConnCompleteCb = nullptr;
+    OnTCPConnectionClosedCallback mConnClosedCb     = nullptr;
+    OnTCPConnectionReceivedCallback mConnReceivedCb = nullptr;
 };
-
-/////////////////////////// Init test
-
-void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddressType type)
-{
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    TCPImpl tcp;
-
-    CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(ctx.GetTCPEndPointManager()).SetAddressType(type));
-
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-}
-
-#if INET_CONFIG_ENABLE_IPV4
-void CheckSimpleInitTest4(nlTestSuite * inSuite, void * inContext)
-{
-    CheckSimpleInitTest(inSuite, inContext, IPAddressType::kIPv4);
-}
-#endif
-
-void CheckSimpleInitTest6(nlTestSuite * inSuite, void * inContext)
-{
-    CheckSimpleInitTest(inSuite, inContext, IPAddressType::kIPv6);
-}
-
-/////////////////////////// Messaging test
-
-void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress & addr)
-{
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    TCPImpl tcp;
-
-    MockTransportMgrDelegate gMockTransportMgrDelegate(inSuite, ctx);
-    gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
-    gMockTransportMgrDelegate.SingleMessageTest(tcp, addr);
-    gMockTransportMgrDelegate.FinalizeMessageTest(tcp, addr);
-}
-
-#if INET_CONFIG_ENABLE_IPV4
-void CheckMessageTest4(nlTestSuite * inSuite, void * inContext)
-{
-    IPAddress addr;
-    IPAddress::FromString("127.0.0.1", addr);
-    CheckMessageTest(inSuite, inContext, addr);
-}
-#endif // INET_CONFIG_ENABLE_IPV4
-
-void CheckMessageTest6(nlTestSuite * inSuite, void * inContext)
-{
-    IPAddress addr;
-    IPAddress::FromString("::1", addr);
-    CheckMessageTest(inSuite, inContext, addr);
-}
 
 // Generates a packet buffer or a chain of packet buffers for a single message.
 struct TestData
@@ -239,7 +299,7 @@ struct TestData
     // the last buffer will be made larger.
     TestData() : mPayload(nullptr), mTotalLength(0), mMessageLength(0), mMessageOffset(0) {}
     ~TestData() { Free(); }
-    bool Init(const uint16_t sizes[]);
+    bool Init(const uint32_t sizes[]);
     void Free();
     bool IsValid() { return !mHandle.IsNull() && (mPayload != nullptr); }
 
@@ -250,7 +310,7 @@ struct TestData
     size_t mMessageOffset;
 };
 
-bool TestData::Init(const uint16_t sizes[])
+bool TestData::Init(const uint32_t sizes[])
 {
     Free();
 
@@ -266,17 +326,17 @@ bool TestData::Init(const uint16_t sizes[])
         mTotalLength += sizes[bufferCount];
     }
     --bufferCount;
-    uint16_t additionalLength = 0;
+    uint32_t additionalLength = 0;
     if (headerLength + kPacketSizeBytes > mTotalLength)
     {
-        additionalLength = static_cast<uint16_t>((headerLength + kPacketSizeBytes) - mTotalLength);
+        additionalLength = static_cast<uint32_t>((headerLength + kPacketSizeBytes) - mTotalLength);
         mTotalLength += additionalLength;
     }
-    if (mTotalLength > UINT16_MAX)
+    if (mTotalLength > UINT32_MAX)
     {
         return false;
     }
-    uint16_t messageLength = static_cast<uint16_t>(mTotalLength - kPacketSizeBytes);
+    uint32_t messageLength = static_cast<uint32_t>(mTotalLength - kPacketSizeBytes);
 
     // Build the test payload.
     uint8_t * payload = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(1, mTotalLength));
@@ -284,7 +344,7 @@ bool TestData::Init(const uint16_t sizes[])
     {
         return false;
     }
-    chip::Encoding::LittleEndian::Put16(payload, messageLength);
+    chip::Encoding::LittleEndian::Put32(payload, messageLength);
     uint16_t headerSize;
     CHIP_ERROR err = header.Encode(payload + kPacketSizeBytes, messageLength, &headerSize);
     if (err != CHIP_NO_ERROR)
@@ -304,10 +364,10 @@ bool TestData::Init(const uint16_t sizes[])
     System::PacketBufferHandle head = chip::System::PacketBufferHandle::New(sizes[0], 0 /* reserve */);
     for (int i = 1; i <= bufferCount; ++i)
     {
-        uint16_t size = sizes[i];
+        size_t size = sizes[i];
         if (i == bufferCount)
         {
-            size = static_cast<uint16_t>(size + additionalLength);
+            size = size + additionalLength;
         }
         chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::New(size, 0 /* reserve */);
         if (buffer.IsNull())
@@ -336,7 +396,7 @@ bool TestData::Init(const uint16_t sizes[])
         if (lToWriteToCurrentBuf != 0)
         {
             memcpy(iterator->Start(), writePayload, lToWriteToCurrentBuf);
-            iterator->SetDataLength(static_cast<uint16_t>(iterator->DataLength() + lToWriteToCurrentBuf), head);
+            iterator->SetDataLength(iterator->DataLength() + lToWriteToCurrentBuf, head);
             writePayload += lToWriteToCurrentBuf;
             writeLength -= lToWriteToCurrentBuf;
         }
@@ -358,50 +418,216 @@ void TestData::Free()
     mMessageOffset = 0;
 }
 
-int TestDataCallbackCheck(const uint8_t * message, size_t length, int count, void * data)
+class TestTCP : public ::testing::Test
 {
-    if (data == nullptr)
+public:
+    static void SetUpTestSuite()
     {
-        return -1;
+        if (mIOContext == nullptr)
+        {
+            mIOContext = new IOContext();
+            ASSERT_NE(mIOContext, nullptr);
+        }
+        ASSERT_EQ(mIOContext->Init(), CHIP_NO_ERROR);
     }
-    TestData * currentData = static_cast<TestData *>(data) + count;
-    if (currentData->mPayload == nullptr)
+    static void TearDownTestSuite()
     {
-        return -2;
+        if (mIOContext != nullptr)
+        {
+            mIOContext->Shutdown();
+            delete mIOContext;
+            mIOContext = nullptr;
+        }
     }
-    if (currentData->mMessageLength != length)
+
+protected:
+    static IOContext * mIOContext;
+
+    /////////////////////////// Init test
+    void CheckSimpleInitTest(IPAddressType type)
     {
-        return -3;
+        TCPImpl tcp;
+
+        CHIP_ERROR err = tcp.Init(
+            Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager()).SetAddressType(type).SetListenPort(gChipTCPPort));
+
+        EXPECT_EQ(err, CHIP_NO_ERROR);
     }
-    if (memcmp(currentData->mPayload + currentData->mMessageOffset, message, length) != 0)
+
+    /////////////////////////// Messaging test
+    void CheckMessageTest(const IPAddress & addr)
     {
-        return -4;
+        TCPImpl tcp;
+
+        MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+        gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
+        gMockTransportMgrDelegate.SingleMessageTest(tcp, addr);
+        gMockTransportMgrDelegate.DisconnectTest(tcp, addr);
     }
-    return 0;
+
+    void ConnectToSelfTest(const IPAddress & addr)
+    {
+        TCPImpl tcp;
+
+        MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+        gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
+        gMockTransportMgrDelegate.ConnectTest(tcp, addr);
+        gMockTransportMgrDelegate.DisconnectTest(tcp, addr);
+    }
+
+    void ConnectSendMessageThenCloseTest(const IPAddress & addr)
+    {
+        TCPImpl tcp;
+
+        MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+        gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
+        gMockTransportMgrDelegate.ConnectTest(tcp, addr);
+        gMockTransportMgrDelegate.SingleMessageTest(tcp, addr);
+        gMockTransportMgrDelegate.DisconnectTest(tcp, addr);
+    }
+
+    void HandleConnCompleteTest(const IPAddress & addr)
+    {
+        TCPImpl tcp;
+
+        MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+        gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
+        gMockTransportMgrDelegate.HandleConnectCompleteCbCalledTest(tcp, addr);
+        gMockTransportMgrDelegate.DisconnectTest(tcp, addr);
+    }
+
+    void HandleConnCloseTest(const IPAddress & addr)
+    {
+        TCPImpl tcp;
+
+        MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+        gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
+        gMockTransportMgrDelegate.HandleConnectCloseCbCalledTest(tcp, addr);
+        gMockTransportMgrDelegate.DisconnectTest(tcp, addr);
+    }
+
+    // Callback used by CheckProcessReceivedBuffer.
+    static int TestDataCallbackCheck(const uint8_t * message, size_t length, int count, void * data)
+    {
+        if (data == nullptr)
+        {
+            return -1;
+        }
+        TestData * currentData = static_cast<TestData *>(data) + count;
+        if (currentData->mPayload == nullptr)
+        {
+            return -2;
+        }
+        if (currentData->mMessageLength != length)
+        {
+            return -3;
+        }
+        if (memcmp(currentData->mPayload + currentData->mMessageOffset, message, length) != 0)
+        {
+            return -4;
+        }
+        return 0;
+    }
+};
+
+IOContext * TestTCP::mIOContext = nullptr;
+
+#if INET_CONFIG_ENABLE_IPV4
+TEST_F(TestTCP, CheckSimpleInitTest4)
+{
+    CheckSimpleInitTest(IPAddressType::kIPv4);
 }
 
-} // namespace
-
-void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestTCP, CheckMessageTest4)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    CheckMessageTest(addr);
+}
+#endif
+
+TEST_F(TestTCP, CheckSimpleInitTest6)
+{
+    CheckSimpleInitTest(IPAddressType::kIPv6);
+}
+
+TEST_F(TestTCP, CheckMessageTest6)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    CheckMessageTest(addr);
+}
+
+#if INET_CONFIG_ENABLE_IPV4
+TEST_F(TestTCP, ConnectToSelfTest4)
+{
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    ConnectToSelfTest(addr);
+}
+
+TEST_F(TestTCP, ConnectSendMessageThenCloseTest4)
+{
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    ConnectSendMessageThenCloseTest(addr);
+}
+
+TEST_F(TestTCP, HandleConnCompleteCalledTest4)
+{
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    HandleConnCompleteTest(addr);
+}
+#endif // INET_CONFIG_ENABLE_IPV4
+
+TEST_F(TestTCP, ConnectToSelfTest6)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    ConnectToSelfTest(addr);
+}
+
+TEST_F(TestTCP, ConnectSendMessageThenCloseTest6)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    ConnectSendMessageThenCloseTest(addr);
+}
+
+TEST_F(TestTCP, HandleConnCompleteCalledTest6)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    HandleConnCompleteTest(addr);
+}
+
+TEST_F(TestTCP, HandleConnCloseCalledTest6)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    HandleConnCloseTest(addr);
+}
+
+TEST_F(TestTCP, CheckProcessReceivedBuffer)
+{
     TCPImpl tcp;
 
     IPAddress addr;
     IPAddress::FromString("::1", addr);
 
-    MockTransportMgrDelegate gMockTransportMgrDelegate(inSuite, ctx);
+    MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
     gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
 
     // Send a packet to get TCP going, so that we can find a TCPEndPoint to pass to ProcessReceivedBuffer.
     // (The current TCPEndPoint implementation is not effectively mockable.)
     gMockTransportMgrDelegate.SingleMessageTest(tcp, addr);
 
-    Transport::PeerAddress lPeerAddress    = Transport::PeerAddress::TCP(addr);
-    TCPBase::ActiveConnectionState * state = tcp.FindActiveConnection(lPeerAddress);
-    NL_TEST_ASSERT(inSuite, state != nullptr);
-    Inet::TCPEndPoint * lEndPoint = state->mEndPoint;
-    NL_TEST_ASSERT(inSuite, lEndPoint != nullptr);
+    Transport::PeerAddress lPeerAddress = Transport::PeerAddress::TCP(addr, gChipTCPPort);
+    void * state                        = TestAccess::FindActiveConnection(tcp, lPeerAddress);
+    ASSERT_NE(state, nullptr);
+    TCPEndPoint * lEndPoint = TestAccess::GetEndpoint(state);
+    ASSERT_NE(lEndPoint, nullptr);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestData testData[2];
@@ -409,100 +635,57 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
 
     // Test a single packet buffer.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
-    NL_TEST_ASSERT(inSuite, testData[0].Init((const uint16_t[]){ 111, 0 }));
-    err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 1);
+    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ 111, 0 }));
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
 
     // Test a message in a chain of three packet buffers. The message length is split across buffers.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
-    NL_TEST_ASSERT(inSuite, testData[0].Init((const uint16_t[]){ 1, 122, 123, 0 }));
-    err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 1);
+    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ 1, 122, 123, 0 }));
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
 
     // Test two messages in a chain.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
-    NL_TEST_ASSERT(inSuite, testData[0].Init((const uint16_t[]){ 131, 0 }));
-    NL_TEST_ASSERT(inSuite, testData[1].Init((const uint16_t[]){ 132, 0 }));
+    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ 131, 0 }));
+    EXPECT_TRUE(testData[1].Init((const uint32_t[]){ 132, 0 }));
     testData[0].mHandle->AddToEnd(std::move(testData[1].mHandle));
-    err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 2);
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 2);
 
     // Test a chain of two messages, each a chain.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
-    NL_TEST_ASSERT(inSuite, testData[0].Init((const uint16_t[]){ 141, 142, 0 }));
-    NL_TEST_ASSERT(inSuite, testData[1].Init((const uint16_t[]){ 143, 144, 0 }));
+    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ 141, 142, 0 }));
+    EXPECT_TRUE(testData[1].Init((const uint32_t[]){ 143, 144, 0 }));
     testData[0].mHandle->AddToEnd(std::move(testData[1].mHandle));
-    err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 2);
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 2);
+
+    // Test a single packet buffer that is larger than
+    // kMaxSizeWithoutReserve but less than CHIP_CONFIG_MAX_LARGE_PAYLOAD_SIZE_BYTES.
+    gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
+    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ System::PacketBuffer::kMaxSizeWithoutReserve + 1, 0 }));
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
 
     // Test a message that is too large to coalesce into a single packet buffer.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
     gMockTransportMgrDelegate.SetCallback(TestDataCallbackCheck, &testData[1]);
-    NL_TEST_ASSERT(inSuite, testData[0].Init((const uint16_t[]){ 51, System::PacketBuffer::kMaxSizeWithoutReserve, 0 }));
+    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ 51, CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES, 0 }));
     // Sending only the first buffer of the long chain. This should be enough to trigger the error.
     System::PacketBufferHandle head = testData[0].mHandle.PopHead();
-    err                             = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(head));
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_MESSAGE_TOO_LONG);
-    NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 0);
+    err                             = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(head));
+    EXPECT_EQ(err, CHIP_ERROR_MESSAGE_TOO_LONG);
+    EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 0);
 
-    gMockTransportMgrDelegate.FinalizeMessageTest(tcp, addr);
+    // The receipt of a message exceeding the allowed size should have
+    // closed the connection.
+    EXPECT_EQ(TestAccess::GetEndpoint(state), nullptr);
 }
 
-// Test Suite
-/**
- *  Test Suite that lists all the test functions.
- */
-// clang-format off
-static const nlTest sTests[] =
-{
-#if INET_CONFIG_ENABLE_IPV4
-    NL_TEST_DEF("Simple Init Test IPV4",        CheckSimpleInitTest4),
-    NL_TEST_DEF("Message Self Test IPV4",       CheckMessageTest4),
-#endif
-
-    NL_TEST_DEF("Simple Init Test IPV6",        CheckSimpleInitTest6),
-    NL_TEST_DEF("Message Self Test IPV6",       CheckMessageTest6),
-    NL_TEST_DEF("ProcessReceivedBuffer Test",   chip::Transport::TCPTest::CheckProcessReceivedBuffer),
-
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-// clang-format off
-static nlTestSuite sSuite =
-{
-    "Test-CHIP-Tcp",
-    &sTests[0],
-    Initialize,
-    Finalize
-};
-// clang-format on
-
-/**
- *  Initialize the test suite.
- */
-static int Initialize(void * aContext)
-{
-    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Init();
-    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
-}
-
-/**
- *  Finalize the test suite.
- */
-static int Finalize(void * aContext)
-{
-    reinterpret_cast<TestContext *>(aContext)->Shutdown();
-    return SUCCESS;
-}
-
-int TestTCP()
-{
-    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestTCP);
+} // namespace

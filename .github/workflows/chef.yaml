@@ -16,6 +16,9 @@ name: Build Chef CI examples on all platforms
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
 
@@ -25,7 +28,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     chef_linux:
         name: Chef - Linux CI Examples
@@ -33,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:41
+            image: ghcr.io/project-chip/chip-build:81
             options: --user root
 
         steps:
@@ -54,7 +57,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:41
+            image: ghcr.io/project-chip/chip-build-esp32:81
             options: --user root
 
         steps:
@@ -75,7 +78,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:41
+            image: ghcr.io/project-chip/chip-build-nrf-platform:81
             options: --user root
 
         steps:
@@ -96,7 +99,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:41
+            image: ghcr.io/project-chip/chip-build-telink:81
             options: --user root
 
         steps:
@@ -108,7 +111,7 @@ jobs:
                 platform: telink
             # - name: Update Zephyr to specific revision (for developers purpose)
             #   shell: bash
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py b5c8028ec94f3efa69decff3a09f0d6f8a21fd6d"
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 3ed7686a9378de6be1368c912f9a42f998bbfb18"
             - name: CI Examples Telink
               shell: bash
               run: |

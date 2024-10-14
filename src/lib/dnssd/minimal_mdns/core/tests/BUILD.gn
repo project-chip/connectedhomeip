@@ -14,7 +14,6 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
@@ -27,7 +26,7 @@ source_set("support") {
   ]
 }
 
-chip_test_suite_using_nltest("tests") {
+chip_test_suite("tests") {
   output_name = "libMinimalMdnsCoreTests"
 
   test_sources = [
@@ -42,8 +41,7 @@ chip_test_suite_using_nltest("tests") {
   public_deps = [
     ":support",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/dnssd/minimal_mdns/core",
-    "${chip_root}/src/lib/support:testing_nlunit",
-    "${nlunit_test_root}:nlunit-test",
   ]
 }

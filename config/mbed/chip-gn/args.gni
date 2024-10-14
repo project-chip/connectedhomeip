@@ -21,7 +21,7 @@ chip_system_project_config_include = ""
 chip_device_project_config_include = ""
 
 chip_inet_config_enable_udp_endpoint = true
-chip_inet_config_enable_tcp_endpoint = true
+chip_inet_config_enable_tcp_endpoint = false
 
 custom_toolchain = "${chip_root}/config/mbed/chip-gn/toolchain:mbed"
 mbedtls_target = "${chip_root}/config/mbed/chip-gn/mbedtls:mbedtls"

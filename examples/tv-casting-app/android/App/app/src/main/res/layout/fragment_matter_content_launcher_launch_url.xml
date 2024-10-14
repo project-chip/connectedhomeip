@@ -67,7 +67,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
             <Button
                 android:id="@+id/launchUrlButton"
@@ -78,8 +78,8 @@
                 android:layout_marginRight="10sp" />
 
             <TextView
-                android:id="@+id/launchUrlStatus"
-                android:layout_width="200dp"
+                android:id="@+id/launcherResult"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
         </LinearLayout>

@@ -28,7 +28,55 @@ Two types of switch devices are supported: latching switch (e.g. rocker switch) 
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade.</description>
 
     <globalAttribute side="server" code="0xFFFC" value="0" />
-    <globalAttribute side="either" code="0xFFFD" value="1" />
+    <globalAttribute side="either" code="0xFFFD" value="2" />
+
+    <features>
+      <feature bit="0" code="LS" name="LatchingSwitch" summary="Switch is latching">
+        <optionalConform choice="a"/>
+      </feature>
+      <feature bit="1" code="MS" name="MomentarySwitch" summary="Switch is momentary">
+        <optionalConform choice="a"/>
+      </feature>
+      <feature bit="2" code="MSR" name="MomentarySwitchRelease" summary="Switch supports release events generation">
+        <optionalConform>
+          <andTerm>
+            <feature name="MS"/>
+            <notTerm>
+              <feature name="AS"/>
+            </notTerm>
+          </andTerm>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="MSL" name="MomentarySwitchLongPress" summary="Switch supports long press detection">
+        <optionalConform>
+          <andTerm>
+            <feature name="MS"/>
+            <orTerm>
+              <feature name="MSR"/>
+              <feature name="AS"/>
+            </orTerm>
+          </andTerm>
+        </optionalConform>
+      </feature>
+      <feature bit="4" code="MSM" name="MomentarySwitchMultiPress" summary="Switch supports multi-press detection">
+        <otherwiseConform>
+          <mandatoryConform>
+            <feature name="AS"/>
+          </mandatoryConform>
+          <optionalConform>
+            <andTerm>
+              <feature name="MS"/>
+              <feature name="MSR"/>
+            </andTerm>
+          </optionalConform>
+        </otherwiseConform>
+      </feature>
+      <feature bit="5" code="AS" name="ActionSwitch" apiMaturity="provisional" summary="Switch is momentary, targeted at specific user actions (focus on multi-press and optionally long press) with a reduced event generation scheme">
+        <optionalConform>
+          <feature name="MS"/>
+        </optionalConform>
+      </feature>
+    </features>
 
     <attribute side="server" code="0x0000" define="NUMBER_OF_POSITIONS" type="int8u" writable="false" optional="false" default="2" min="2">NumberOfPositions</attribute>
     <attribute side="server" code="0x0001" define="CURRENT_POSITION" type="int8u" writable="false" reportable="true" optional="false">CurrentPosition</attribute>
@@ -65,14 +113,5 @@ Interactions with the switch device are exposed as attributes (for the latching 
     </event>
 
   </cluster>
-
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x003B" />
-    <field name="Latching Switch" mask="0x1" />
-    <field name="Momentary Switch" mask="0x2" />
-    <field name="Momentary Switch Release" mask="0x4" />
-    <field name="Momentary Switch LongPress" mask="0x8" />
-    <field name="Momentary Switch MultiPress" mask="0x10" />
-  </bitmap>
 
 </configurator>

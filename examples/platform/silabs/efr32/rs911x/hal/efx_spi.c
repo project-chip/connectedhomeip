@@ -35,7 +35,6 @@
 #include "em_gpio.h"
 #include "em_ldma.h"
 #include "gpiointerrupt.h"
-#include "sl_board_control.h"
 #include "sl_device_init_clocks.h"
 #include "sl_device_init_hfxo.h"
 #include "sl_spidrv_instances.h"
@@ -46,6 +45,10 @@
 #include "spi_multiplex.h"
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
+
+#ifdef SL_BOARD_NAME
+#include "sl_board_control.h"
+#endif // SL_BOARD_NAME
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #include "sl_power_manager.h"
@@ -65,22 +68,12 @@
 #include "sl_mx25_flash_shutdown_usart_config.h"
 #endif // SL_MX25CTRL_MUX
 
-#if defined(EFR32MG12)
-#include "em_usart.h"
-#include "sl_spidrv_exp_config.h"
-#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
-#elif defined(EFR32MG24)
 #include "em_eusart.h"
 #include "sl_spidrv_eusart_exp_config.h"
 #include "spi_multiplex.h"
-#else
-#error "Unknown platform"
-#endif
 
-#if defined(EFR32MG24)
 #define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
 #define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED SL_SPIDRV_EUSART_EXP_BITRATE
-#endif
 
 #define CONCAT(A, B) (A##B)
 #define SPI_CLOCK(N) CONCAT(cmuClock_USART, N)
@@ -117,10 +110,8 @@ void sl_wfx_host_gpio_init(void)
     // Enable GPIO clock.
     CMU_ClockEnable(cmuClock_GPIO, true);
 
-#if defined(EFR32MG24)
     // Set CS pin to high/inactive
     GPIO_PinModeSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN, gpioModePushPull, PINOUT_SET);
-#endif // EFR32MG24
 
     GPIO_PinModeSet(WFX_RESET_PIN.port, WFX_RESET_PIN.pin, gpioModePushPull, PINOUT_SET);
     GPIO_PinModeSet(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin, gpioModePushPull, PINOUT_CLEAR);
@@ -183,7 +174,7 @@ void rsi_hal_board_init(void)
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif /* SL_SPICTRL_MUX */
 
-    /* GPIO INIT of MG12 & MG24 : Reset, Wakeup, Interrupt */
+    /* GPIO INIT of MG24 : Reset, Wakeup, Interrupt */
     sl_wfx_host_gpio_init();
 
     /* Reset of Wifi chip */
@@ -199,9 +190,7 @@ sl_status_t sl_wfx_host_spi_cs_assert(void)
     if (!spi_enabled) // Reduce sl_spidrv_init_instances
     {
         sl_spidrv_init_instances();
-#if defined(EFR32MG24)
         GPIO_PinOutClear(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
-#endif // EFR32MG24
         spi_enabled = true;
     }
     return SL_STATUS_OK;
@@ -215,11 +204,9 @@ sl_status_t sl_wfx_host_spi_cs_deassert(void)
         status = SPIDRV_DeInit(SL_SPIDRV_HANDLE);
         if (SL_STATUS_OK == status)
         {
-#if defined(EFR32MG24)
             GPIO_PinOutSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
             GPIO->EUSARTROUTE[SL_SPIDRV_EUSART_EXP_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
-#endif // EFR32MG24
-            spi_enabled = false;
+            spi_enabled                                                   = false;
         }
     }
 #if SL_SPICTRL_MUX
@@ -374,7 +361,7 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     }
 
     (void) mode; // currently not used;
-    error_t rsiError = RSI_ERROR_NONE;
+    int16_t rsiError = RSI_ERROR_NONE;
 
     xSemaphoreTake(spiTransferLock, portMAX_DELAY);
 

@@ -21,6 +21,8 @@ limitations under the License.
 The generic enum values for the StatusCode and ModeTag enums are defined within the ModeBase namespace
 in the mode-base-server source code. See mode-base-cluster-objects.h.
 This is because zap does not currently support generating code for clusters that do not have a cluster ID.
+
+Each of these enum values is also listed/copied in the derived clusters.
 -->
 
   <struct name="ModeTagStruct">
@@ -32,6 +34,7 @@ This is because zap does not currently support generating code for clusters that
     <cluster code="0x005E"/> <!-- Microwave Oven Mode -->
     <cluster code="0x0049"/> <!-- Oven Mode -->
     <cluster code="0x009D"/> <!-- Energy EVSE Mode -->
+    <cluster code="0x009E"/> <!-- Water Heater Mode -->
     <cluster code="0x009F"/> <!-- Device Energy Management Mode -->
     <!-- MfgCode has been deprecated -->
     <item name="MfgCode" type="vendor_id" optional="true"/>
@@ -47,6 +50,7 @@ This is because zap does not currently support generating code for clusters that
     <cluster code="0x005E"/> <!-- Microwave Oven Mode -->
     <cluster code="0x0049"/> <!-- Oven Mode -->
     <cluster code="0x009D"/> <!-- Energy EVSE Mode -->
+    <cluster code="0x009E"/> <!-- Water Heater Mode -->
     <cluster code="0x009F"/> <!-- Device Energy Management Mode -->
     <item name="Label"    type="char_string"                length="64" optional="false"/>
     <item name="Mode"     type="int8u"                                  optional="false"/>
@@ -86,17 +90,5 @@ This is because zap does not currently support generating code for clusters that
 <!--    </command>-->
 <!--  </cluster>-->
 
-  <bitmap name="Feature" type="bitmap32">
-<!--    <cluster code="0x..."/>-->
-    <cluster code="0x0051"/> <!-- Laundry Washer Mode -->
-    <cluster code="0x0052"/> <!-- Refrigerator and temperature controlled cabinet Mode -->
-    <!-- <cluster code="0x0054"/> RVC Run Mode. This feature map is implemented in rvc-run-mode-cluster.xml -->
-    <!-- <cluster code="0x0055"/> RVC Clean Mode. This feature map is implemented in rvc-clean-mode-cluster.xml -->
-    <cluster code="0x0059"/> <!-- Dishwasher Mode -->
-    <cluster code="0x005E"/> <!-- Microwave Oven Mode -->
-    <cluster code="0x0049"/> <!-- Oven Mode -->
-    <cluster code="0x009D"/> <!-- Energy EVSE Mode -->
-    <cluster code="0x009F"/> <!-- Device Energy Management Mode -->
-    <field name="OnOff" mask="0x1"/>
-  </bitmap>
+
 </configurator>

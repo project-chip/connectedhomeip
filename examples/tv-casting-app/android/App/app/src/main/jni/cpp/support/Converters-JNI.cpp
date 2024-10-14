@@ -25,6 +25,41 @@ namespace support {
 
 using namespace chip;
 
+extern "C" {
+
+JNIEXPORT jshort JNICALL
+Java_com_matter_casting_support_IdentificationDeclarationOptions_getChipDeviceConfigUdcMaxTargetApps(JNIEnv *, jclass clazz)
+{
+    ChipLogProgress(AppServer, "Converters-JNI::getChipDeviceConfigUdcMaxTargetApps(), CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS: %d",
+                    CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS);
+    return CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS;
+}
+}
+
+jobject convertLongFromCppToJava(jlong value)
+{
+    ChipLogProgress(AppServer, "convertLongFromCppToJava called");
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, nullptr, ChipLogError(AppServer, "Could not get JNIEnv for current thread"));
+
+    jclass responseTypeClass = env->FindClass("java/lang/Long");
+    if (responseTypeClass == nullptr)
+    {
+        ChipLogError(AppServer, "ConvertToJObject: Class for Response Type not found!");
+        env->ExceptionClear();
+        return nullptr;
+    }
+
+    jmethodID constructor = env->GetMethodID(responseTypeClass, "<init>", "(J)V");
+    if (constructor == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to access Long constructor");
+        env->ExceptionClear();
+        return nullptr;
+    }
+    return env->NewObject(responseTypeClass, constructor, value);
+}
+
 jobject convertMatterErrorFromCppToJava(CHIP_ERROR inErr)
 {
     ChipLogProgress(AppServer, "convertMatterErrorFromCppToJava() called");
@@ -127,7 +162,7 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
     // Get the constructor for the com/matter/casting/core/MatterCastingPlayer Java class
     jmethodID constructor =
         env->GetMethodID(matterCastingPlayerJavaClass, "<init>",
-                         "(ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;IIIJ)V");
+                         "(ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;IIIJZ)V");
     if (constructor == nullptr)
     {
         ChipLogError(AppServer, "convertCastingPlayerFromCppToJava() could not locate MatterCastingPlayer Java class constructor");
@@ -162,7 +197,8 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
                                           env->NewStringUTF(player->GetId()), env->NewStringUTF(player->GetHostName()),
                                           env->NewStringUTF(player->GetDeviceName()), env->NewStringUTF(player->GetInstanceName()),
                                           jIpAddressList, (jint) (player->GetPort()), (jint) (player->GetProductId()),
-                                          (jint) (player->GetVendorId()), (jlong) (player->GetDeviceType()));
+                                          (jint) (player->GetVendorId()), (jlong) (player->GetDeviceType()),
+                                          static_cast<jboolean>(player->GetSupportsCommissionerGeneratedPasscode()));
     if (jMatterCastingPlayer == nullptr)
     {
         ChipLogError(AppServer, "convertCastingPlayerFromCppToJava(): Could not create MatterCastingPlayer Java object");
@@ -339,6 +375,172 @@ jobject convertLongFromCppToJava(uint64_t responseData)
 
     jmethodID constructor = env->GetMethodID(responseTypeClass, "<init>", "(J)V");
     return env->NewObject(responseTypeClass, constructor, responseData);
+}
+
+chip::Protocols::UserDirectedCommissioning::TargetAppInfo * convertTargetAppInfoFromJavaToCpp(jobject jTargetAppInfo)
+{
+    ChipLogProgress(AppServer, "convertTargetAppInfoFromJavaToCpp() called");
+
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, nullptr,
+                        ChipLogError(AppServer, "convertTargetAppInfoFromJavaToCpp() Could not get JNIEnv for current thread"));
+    jclass targetAppInfoClass = env->GetObjectClass(jTargetAppInfo);
+    VerifyOrReturnValue(targetAppInfoClass != nullptr, nullptr,
+                        ChipLogError(AppServer, "convertTargetAppInfoFromJavaToCpp() TargetAppInfo class not found!"));
+
+    jfieldID vendorIdField  = env->GetFieldID(targetAppInfoClass, "vendorId", "Ljava/lang/Integer;");
+    jfieldID productIdField = env->GetFieldID(targetAppInfoClass, "productId", "Ljava/lang/Integer;");
+    VerifyOrReturnValue(vendorIdField != nullptr, nullptr,
+                        ChipLogError(AppServer, "convertTargetAppInfoFromJavaToCpp() vendorIdField not found!"));
+    VerifyOrReturnValue(productIdField != nullptr, nullptr,
+                        ChipLogError(AppServer, "convertTargetAppInfoFromJavaToCpp() productIdField not found!"));
+
+    jobject jVendorIdObject  = env->GetObjectField(jTargetAppInfo, vendorIdField);
+    jobject jProductIdObject = env->GetObjectField(jTargetAppInfo, productIdField);
+
+    jclass integerClass      = env->FindClass("java/lang/Integer");
+    jmethodID intValueMethod = env->GetMethodID(integerClass, "intValue", "()I");
+
+    jint vendorId  = 0;
+    jint productId = 0;
+    if (jVendorIdObject != nullptr)
+    {
+        vendorId = env->CallIntMethod(jVendorIdObject, intValueMethod);
+    }
+    if (jProductIdObject != nullptr)
+    {
+        productId = env->CallIntMethod(jProductIdObject, intValueMethod);
+    }
+
+    chip::Protocols::UserDirectedCommissioning::TargetAppInfo * cppTargetAppInfo =
+        new chip::Protocols::UserDirectedCommissioning::TargetAppInfo();
+
+    cppTargetAppInfo->vendorId  = static_cast<uint16_t>(vendorId);
+    cppTargetAppInfo->productId = static_cast<uint16_t>(productId);
+
+    env->DeleteLocalRef(targetAppInfoClass);
+    env->DeleteLocalRef(jVendorIdObject);
+    env->DeleteLocalRef(jProductIdObject);
+    env->DeleteLocalRef(integerClass);
+
+    return reinterpret_cast<chip::Protocols::UserDirectedCommissioning::TargetAppInfo *>(cppTargetAppInfo);
+}
+
+matter::casting::core::IdentificationDeclarationOptions * convertIdentificationDeclarationOptionsFromJavaToCpp(jobject jIdOptions)
+{
+    ChipLogProgress(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() called");
+
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(
+        env != nullptr, nullptr,
+        ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() Could not get JNIEnv for current thread"));
+
+    jclass idOptionsClass = env->GetObjectClass(jIdOptions);
+    VerifyOrReturnValue(
+        idOptionsClass != nullptr, nullptr,
+        ChipLogError(AppServer,
+                     "convertIdentificationDeclarationOptionsFromJavaToCpp() IdentificationDeclarationOptions class not found!"));
+
+    jfieldID noPasscodeField                = env->GetFieldID(idOptionsClass, "noPasscode", "Z");
+    jfieldID cdUponPasscodeDialogField      = env->GetFieldID(idOptionsClass, "cdUponPasscodeDialog", "Z");
+    jfieldID commissionerPasscodeField      = env->GetFieldID(idOptionsClass, "commissionerPasscode", "Z");
+    jfieldID commissionerPasscodeReadyField = env->GetFieldID(idOptionsClass, "commissionerPasscodeReady", "Z");
+    jfieldID cancelPasscodeField            = env->GetFieldID(idOptionsClass, "cancelPasscode", "Z");
+    jfieldID targetAppInfosField            = env->GetFieldID(idOptionsClass, "targetAppInfos", "Ljava/util/List;");
+    VerifyOrReturnValue(
+        noPasscodeField != nullptr, nullptr,
+        ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() noPasscodeField not found!"));
+    VerifyOrReturnValue(
+        cdUponPasscodeDialogField != nullptr, nullptr,
+        ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() cdUponPasscodeDialogField not found!"));
+    VerifyOrReturnValue(
+        commissionerPasscodeField != nullptr, nullptr,
+        ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() commissionerPasscodeField not found!"));
+    VerifyOrReturnValue(
+        commissionerPasscodeReadyField != nullptr, nullptr,
+        ChipLogError(AppServer,
+                     "convertIdentificationDeclarationOptionsFromJavaToCpp() commissionerPasscodeReadyField not found!"));
+    VerifyOrReturnValue(
+        cancelPasscodeField != nullptr, nullptr,
+        ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() cancelPasscodeField not found!"));
+    VerifyOrReturnValue(
+        targetAppInfosField != nullptr, nullptr,
+        ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() targetAppInfosField not found!"));
+
+    matter::casting::core::IdentificationDeclarationOptions * cppIdOptions =
+        new matter::casting::core::IdentificationDeclarationOptions();
+
+    cppIdOptions->mNoPasscode                = env->GetBooleanField(jIdOptions, noPasscodeField);
+    cppIdOptions->mCdUponPasscodeDialog      = env->GetBooleanField(jIdOptions, cdUponPasscodeDialogField);
+    cppIdOptions->mCommissionerPasscode      = env->GetBooleanField(jIdOptions, commissionerPasscodeField);
+    cppIdOptions->mCommissionerPasscodeReady = env->GetBooleanField(jIdOptions, commissionerPasscodeReadyField);
+    cppIdOptions->mCancelPasscode            = env->GetBooleanField(jIdOptions, cancelPasscodeField);
+
+    jobject targetAppInfosList = env->GetObjectField(jIdOptions, targetAppInfosField);
+    VerifyOrReturnValue(
+        targetAppInfosList != nullptr, nullptr,
+        ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() targetAppInfosList not found!"));
+    jclass listClass     = env->FindClass("java/util/List");
+    jmethodID sizeMethod = env->GetMethodID(listClass, "size", "()I");
+    jmethodID getMethod  = env->GetMethodID(listClass, "get", "(I)Ljava/lang/Object;");
+
+    jint size = env->CallIntMethod(targetAppInfosList, sizeMethod);
+
+    for (jint i = 0; i < size; i++)
+    {
+        jobject jTargetAppInfo = env->CallObjectMethod(targetAppInfosList, getMethod, i);
+
+        chip::Protocols::UserDirectedCommissioning::TargetAppInfo * cppTargetAppInfo =
+            convertTargetAppInfoFromJavaToCpp(jTargetAppInfo);
+        VerifyOrReturnValue(
+            cppTargetAppInfo != nullptr, nullptr,
+            ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() Could not convert jTargetAppInfo"));
+
+        CHIP_ERROR err = cppIdOptions->addTargetAppInfo(*cppTargetAppInfo);
+
+        env->DeleteLocalRef(jTargetAppInfo);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogError(AppServer,
+                                         "convertIdentificationDeclarationOptionsFromJavaToCpp() failed to addTargetAppInfo, due "
+                                         "to err: %" CHIP_ERROR_FORMAT,
+                                         err.Format()));
+    }
+
+    env->DeleteLocalRef(targetAppInfosList);
+    env->DeleteLocalRef(listClass);
+    env->DeleteLocalRef(idOptionsClass);
+
+    return reinterpret_cast<matter::casting::core::IdentificationDeclarationOptions *>(cppIdOptions);
+}
+
+jobject
+convertCommissionerDeclarationFromCppToJava(const chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration & cppCd)
+{
+    ChipLogProgress(AppServer, "convertCommissionerDeclarationFromCppToJava() called");
+
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(
+        env != nullptr, nullptr,
+        ChipLogError(AppServer, "convertCommissionerDeclarationFromCppToJava() Could not get JNIEnv for current thread"));
+
+    jclass jCommissionerDeclarationClass;
+    CHIP_ERROR err = chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/matter/casting/support/CommissionerDeclaration",
+                                                                         jCommissionerDeclarationClass);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr);
+
+    jmethodID jCommissionerDeclarationConstructor = env->GetMethodID(jCommissionerDeclarationClass, "<init>", "(IZZZZZZ)V");
+    if (jCommissionerDeclarationConstructor == nullptr)
+    {
+        ChipLogError(AppServer,
+                     "convertCommissionerDeclarationFromCppToJava() Failed to access Java CommissionerDeclaration constructor");
+        env->ExceptionClear();
+        return nullptr;
+    }
+
+    return env->NewObject(jCommissionerDeclarationClass, jCommissionerDeclarationConstructor,
+                          static_cast<jint>(cppCd.GetErrorCode()), cppCd.GetNeedsPasscode(), cppCd.GetNoAppsFound(),
+                          cppCd.GetPasscodeDialogDisplayed(), cppCd.GetCommissionerPasscode(), cppCd.GetQRCodeDisplayed(),
+                          cppCd.GetCancelPasscode());
 }
 
 }; // namespace support

@@ -144,12 +144,9 @@ Status NXPWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDeb
 {
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
-    VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
-
     // Use empty ssid for representing invalid network
     mStagingNetwork.ssidLen = 0;
-    memset(mStagingNetwork.ssid, 0, DeviceLayer::Internal::kMaxWiFiSSIDLength);
-    memset(mStagingNetwork.credentials, 0, DeviceLayer::Internal::kMaxWiFiKeyLength);
+
     return Status::kSuccess;
 }
 
@@ -238,29 +235,6 @@ exit:
     }
 }
 
-int NXPWiFiDriver::DisconnectNetwork(void)
-{
-    int ret = 0;
-
-    if (ConnectivityMgrImpl().IsWiFiStationConnected())
-    {
-        ChipLogProgress(NetworkProvisioning, "Disconnecting from WiFi network.");
-
-        ret = wlan_disconnect();
-
-        if (ret != WM_SUCCESS)
-        {
-            ChipLogError(NetworkProvisioning, "Failed to disconnect from network with error: %u", (uint8_t) ret);
-        }
-    }
-    else
-    {
-        ChipLogError(NetworkProvisioning, "Error: WiFi not connected!");
-    }
-
-    return ret;
-}
-
 CHIP_ERROR NXPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
     wlan_scan_params_v2_t wlan_scan_param;
@@ -268,7 +242,7 @@ CHIP_ERROR NXPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     ChipLogProgress(DeviceLayer, "Scan for WiFi network(s) requested");
 
     (void) memset(&wlan_scan_param, 0, sizeof(wlan_scan_params_v2_t));
-    wlan_scan_param.cb = &NXPWiFiDriver::OnScanWiFiNetworkDone;
+    wlan_scan_param.cb = &NXPWiFiDriver::_OnScanWiFiNetworkDoneCallBack;
 
     if ((ssid.size() > 0) && (ssid.size() < MLAN_MAX_SSID_LENGTH))
     {
@@ -289,8 +263,23 @@ CHIP_ERROR NXPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     return CHIP_NO_ERROR;
 }
 
-// TODO should be modified to do it in the context of the Matter stack
-int NXPWiFiDriver::OnScanWiFiNetworkDone(unsigned int count)
+int NXPWiFiDriver::_OnScanWiFiNetworkDoneCallBack(unsigned int count)
+{
+    ChipDeviceEvent event;
+    event.Type                          = DeviceEventType::kPlatformNxpScanWiFiNetworkDoneEvent;
+    event.Platform.ScanWiFiNetworkCount = count;
+    CHIP_ERROR err                      = PlatformMgr().PostEvent(&event);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to schedule work: %" CHIP_ERROR_FORMAT, err.Format());
+        return WM_FAIL;
+    }
+    return WM_SUCCESS;
+}
+
+// The processing of the scan callback should be done in the context of the Matter stack, as the scan callback will call Matter
+// stack APIs
+int NXPWiFiDriver::ScanWiFINetworkDoneFromMatterTaskContext(unsigned int count)
 {
     ChipLogProgress(DeviceLayer, "Scan for WiFi network(s) done, found: %u", count);
 

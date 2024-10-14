@@ -18,3 +18,5 @@ example on ESP32 series of SoCs
 -   [Matter OTA](ota.md)
 -   [Generating and Using ESP Secure Cert Partition](secure_cert_partition.md)
 -   [BLE Settings](ble_settings.md)
+-   [Providers](providers.md)
+-   [Configuration Options](config_options.md)

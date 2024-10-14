@@ -20,7 +20,7 @@ limitations under the License.
   <enum name="AccessControlEntryPrivilegeEnum" type="enum8">
     <cluster code="0x001F"/>
     <item name="View" value="0x01"/>
-    <item name="Proxy View" value="0x02"/>
+    <item name="ProxyView" value="0x02"/>
     <item name="Operate" value="0x03"/>
     <item name="Manage" value="0x04"/>
     <item name="Administer" value="0x05"/>
@@ -31,6 +31,14 @@ limitations under the License.
     <item name="PASE" value="0x01"/>
     <item name="CASE" value="0x02"/>
     <item name="Group" value="0x03"/>
+  </enum>
+
+  <enum name="AccessRestrictionTypeEnum" type="enum8">
+    <cluster code="0x001F"/>
+    <item name="AttributeAccessForbidden" value="0x00"/>
+    <item name="AttributeWriteForbidden" value="0x01"/>
+    <item name="CommandForbidden" value="0x02"/>
+    <item name="EventForbidden" value="0x03"/>
   </enum>
 
   <enum name="ChangeTypeEnum" type="enum8">
@@ -49,8 +57,8 @@ limitations under the License.
 
   <struct name="AccessControlEntryStruct" isFabricScoped="true">
     <cluster code="0x001F"/>
-    <item fieldId="1" name="Privilege" type="AccessControlEntryPrivilegeEnum" isFabricSensitive="true"/>
-    <item fieldId="2" name="AuthMode" type="AccessControlEntryAuthModeEnum" isFabricSensitive="true"/>
+    <item fieldId="1" name="Privilege" type="AccessControlEntryPrivilegeEnum" isFabricSensitive="true" min="0x00" max="0x05"/>
+    <item fieldId="2" name="AuthMode" type="AccessControlEntryAuthModeEnum" isFabricSensitive="true" min="0x00" max="0x03"/>
     <item fieldId="3" name="Subjects" type="int64u" isNullable="true" array="true" isFabricSensitive="true"/>
     <item fieldId="4" name="Targets" type="AccessControlTargetStruct" isNullable="true" array="true" isFabricSensitive="true"/>
   </struct>
@@ -60,16 +68,45 @@ limitations under the License.
     <item fieldId="1" name="Data" type="octet_string" length="128" isFabricSensitive="true"/>
   </struct>
 
+  <struct name="AccessRestrictionEntryStruct" apiMaturity="provisional" isFabricScoped="true">
+    <cluster code="0x001F"/>
+    <item fieldId="0" name="Endpoint" type="endpoint_no" isFabricSensitive="true"/>
+    <item fieldId="1" name="Cluster" type="cluster_id" isFabricSensitive="true"/>
+    <item fieldId="2" name="Restrictions" array="true" type="AccessRestrictionStruct" minLength="1" isFabricSensitive="true"/>
+  </struct>
+
+  <struct name="AccessRestrictionStruct" apiMaturity="provisional">
+    <cluster code="0x001F"/>
+    <item fieldId="0" name="Type" type="AccessRestrictionTypeEnum" min="0x00" max="0x03"/>
+    <item fieldId="1" name="ID" type="int32u" isNullable="true"/>
+  </struct>
+
+  <struct name="CommissioningAccessRestrictionEntryStruct" apiMaturity="provisional">
+    <cluster code="0x001F"/>
+    <item fieldId="0" name="Endpoint" type="endpoint_no"/>
+    <item fieldId="1" name="Cluster" type="cluster_id"/>
+    <item fieldId="2" name="Restrictions" array="true" type="AccessRestrictionStruct" minLength="1"/>
+  </struct>
+
   <cluster>
     <domain>General</domain>
     <name>Access Control</name>
     <code>0x001F</code>
     <define>ACCESS_CONTROL_CLUSTER</define>
     <client init="false" tick="false">true</client>
+    <features>
+      <feature bit="0" code="EXTS" name="Extension" summary="Device provides ACL Extension attribute">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="MNGD" name="Managed Device" summary="Device is managed">
+        <optionalConform/>
+      </feature>
+    </features>
     <server init="false" tick="false">true</server>
+    <globalAttribute code="0xFFFD" side="either" value="2"/>
     <description>The Access Control Cluster exposes a data model view of a
-      Node's Access Control List (ACL), which codifies the rules used to manage
-      and enforce Access Control for the Node's endpoints and their associated
+      Node&apos;s Access Control List (ACL), which codifies the rules used to manage
+      and enforce Access Control for the Node&apos;s endpoints and their associated
       cluster instances.</description>
 
     <attribute side="server" code="0x0000" define="ACL" type="array" entryType="AccessControlEntryStruct" writable="true">
@@ -84,35 +121,46 @@ limitations under the License.
       <access op="write" privilege="administer"/>
     </attribute>
 
-    <attribute side="server" code="0x0002" define="SUBJECTS_PER_ACCESS_CONTROL_ENTRY" type="int16u" writable="false">
-      <description>SubjectsPerAccessControlEntry</description>
-      <access op="read" privilege="view"/>
-    </attribute>
+    <attribute side="server" code="0x0002" define="SUBJECTS_PER_ACCESS_CONTROL_ENTRY" type="int16u" min="4" default="4">SubjectsPerAccessControlEntry</attribute>
+    <attribute side="server" code="0x0003" define="TARGETS_PER_ACCESS_CONTROL_ENTRY" type="int16u" min="3" default="3">TargetsPerAccessControlEntry</attribute>
+    <attribute side="server" code="0x0004" define="ACCESS_CONTROL_ENTRIES_PER_FABRIC" type="int16u" min="4" default="4">AccessControlEntriesPerFabric</attribute>
+    <attribute code="0x0005" side="server" define="COMMISSIONING_ARL" type="array" entryType="CommissioningAccessRestrictionEntryStruct" optional="true">CommissioningARL</attribute>
+    <attribute code="0x0006" side="server" define="ARL" type="array" entryType="AccessRestrictionEntryStruct" optional="true">ARL</attribute>
 
-    <attribute side="server" code="0x0003" define="TARGETS_PER_ACCESS_CONTROL_ENTRY" type="int16u" writable="false">
-      <description>TargetsPerAccessControlEntry</description>
-      <access op="read" privilege="view"/>
-    </attribute>
+    <command code="0x00" source="client" name="ReviewFabricRestrictions" isFabricScoped="true" optional="true" response="ReviewFabricRestrictionsResponse">
+      <description>This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric.</description>
+       <access op="invoke" privilege="administer"/>
+      <arg id="0" name="ARL" array="true" type="CommissioningAccessRestrictionEntryStruct"/>
+     </command>
 
-    <attribute side="server" code="0x0004" define="ACCESS_CONTROL_ENTRIES_PER_FABRIC" type="int16u" writable="false">
-      <description>AccessControlEntriesPerFabric</description>
-      <access op="read" privilege="view"/>
-    </attribute>
+    <command code="0x01" source="server" name="ReviewFabricRestrictionsResponse" optional="true" disableDefaultResponse="true">
+      <description>Returns the review token for the request, which can be used to correlate with a FabricRestrictionReviewUpdate event.</description>
+      <arg id="0" name="Token" type="int64u"/>
+    </command>
 
-    <event side="server" code="0x0000" name="AccessControlEntryChanged" priority="info" isFabricSensitive="true" optional="false">
+    <event side="server" code="0x0000" name="AccessControlEntryChanged" priority="info" isFabricSensitive="true">
       <description>The cluster SHALL send AccessControlEntryChanged events whenever its ACL attribute data is changed by an Administrator.</description>
       <field id="1" name="AdminNodeID" type="node_id" isNullable="true"/>
       <field id="2" name="AdminPasscodeID" type="int16u" isNullable="true"/>
-      <field id="3" name="ChangeType" type="ChangeTypeEnum"/>
+      <field id="3" name="ChangeType" type="ChangeTypeEnum" min="0x00" max="0x02"/>
       <field id="4" name="LatestValue" type="AccessControlEntryStruct" isNullable="true"/>
       <access op="read" privilege="administer"/>
     </event>
-    <event side="server" code="0x0001" name="AccessControlExtensionChanged" priority="info" isFabricSensitive="true" optional="false">
+
+    <event side="server" code="0x0001" name="AccessControlExtensionChanged" priority="info" isFabricSensitive="true" optional="true">
       <description>The cluster SHALL send AccessControlExtensionChanged events whenever its extension attribute data is changed by an Administrator.</description>
       <field id="1" name="AdminNodeID" type="node_id" isNullable="true"/>
       <field id="2" name="AdminPasscodeID" type="int16u" isNullable="true"/>
-      <field id="3" name="ChangeType" type="ChangeTypeEnum"/>
+      <field id="3" name="ChangeType" type="ChangeTypeEnum" min="0x00" max="0x02"/>
       <field id="4" name="LatestValue" type="AccessControlExtensionStruct" isNullable="true"/>
+      <access op="read" privilege="administer"/>
+    </event>
+
+    <event side="server" code="0x0002" name="FabricRestrictionReviewUpdate" priority="info" isFabricSensitive="true" optional="true">
+      <description>The cluster SHALL send FabricRestrictionReviewUpdate events to indicate completion of a fabric restriction review.</description>
+      <field id="0" name="Token" type="int64u"/>
+      <field id="1" name="Instruction" type="long_char_string" optional="true" length="512"/>
+      <field id="2" name="ARLRequestFlowUrl" type="long_char_string" optional="true" length="256"/>
       <access op="read" privilege="administer"/>
     </event>
   </cluster>

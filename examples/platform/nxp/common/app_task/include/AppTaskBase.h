@@ -27,9 +27,8 @@
 #include <app/server/Server.h>
 #include <platform/NetworkCommissioning.h>
 
-namespace chip {
-namespace NXP {
-namespace App {
+namespace chip::NXP::App {
+
 class AppTaskBase
 {
 public:
@@ -98,6 +97,44 @@ public:
     virtual void AppMatter_RegisterCustomCliCommands(void){};
 
     /**
+     * \brief Disallow entering low power mode.
+     *
+     * This function can be overridden in order to implement a specific disallow mechanism.
+     *
+     */
+    virtual void AppMatter_DisallowDeviceToSleep(void) {}
+
+    /**
+     * \brief Allow entering low power mode.
+     *
+     * This function can be overridden in order to implement a specific allow mechanism.
+     *
+     */
+    virtual void AppMatter_AllowDeviceToSleep(void) {}
+
+    /**
+     * \brief Print onboarding information.
+     *
+     * It can be overwritten by derived classes for custom information,
+     * such as setting the commissioning flow to kUserActionRequired.
+     *
+     */
+    virtual void PrintOnboardingInfo();
+
+    /**
+     * \brief Print current software version string and software version.
+     *
+     * It uses the ConfigurationManager API to extract the information.
+     */
+    virtual void PrintCurrentVersion();
+
+    /**
+     * \brief Send event to the event queue.
+     *
+     */
+    virtual void PostEvent(const AppEvent & event){};
+
+    /**
      * \brief This function could be overridden in order to dispatch event.
      *
      * Example of usage: FreeRtos dispatch event using the event handler.
@@ -112,6 +149,8 @@ public:
      */
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
     virtual chip::DeviceLayer::NetworkCommissioning::WiFiDriver * GetWifiDriverInstance(void) = 0;
+#elif CONFIG_CHIP_ETHERNET
+    virtual chip::DeviceLayer::NetworkCommissioning::EthernetDriver * GetEthernetDriverInstance(void) = 0;
 #endif
 
     /**
@@ -130,14 +169,41 @@ public:
      */
     static void InitServer(intptr_t arg);
 
-    /* Commissioning handlers */
-    virtual void StartCommissioningHandler(void){};
-    virtual void StopCommissioningHandler(void){};
-    virtual void SwitchCommissioningStateHandler(void){};
-    virtual void FactoryResetHandler(void){};
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+    /**
+     * \brief Initialize the Thread Border Router management cluster.
+     *
+     * Called when the border router function is up and running. This cluster stays disabled
+     * when the application is used as a Matter over Thread device.
+     *
+     */
+    void EnableTbrManagementCluster();
+#endif
+
+    /**
+     * Commissioning handlers
+     * Generic implementation is provided within this class
+     * Can be overridden by a child class
+     */
+    virtual void StartCommissioningHandler(void);
+    virtual void StopCommissioningHandler(void);
+    virtual void SwitchCommissioningStateHandler(void);
+    virtual void FactoryResetHandler(void);
+
+    /**
+     * Cluster-handling functions
+     * Must be overridden by a child class per cluster configuration
+     */
+    virtual bool CheckStateClusterHandler(void) { return false; }
+    virtual CHIP_ERROR ProcessSetStateClusterHandler(void) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
 private:
     inline static chip::CommonCaseDeviceServerInitParams initParams;
+
+    /* Functions used by the public commisioning handlers */
+    static void StartCommissioning(intptr_t arg);
+    static void StopCommissioning(intptr_t arg);
+    static void SwitchCommissioningState(intptr_t arg);
 };
 
 /**
@@ -146,6 +212,5 @@ private:
  * Applications can use this to gain access to features of the AppTaskBase.
  */
 extern AppTaskBase & GetAppTask();
-} // namespace App
-} // namespace NXP
-} // namespace chip
+
+} // namespace chip::NXP::App

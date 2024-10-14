@@ -89,6 +89,12 @@ public:
      */
     void OnICDModeChange() override{};
 
+    /**
+     * @brief This implementation does not attempt any synchronization on this ICD event, therefore no action is needed on
+     * ICDEnterIdleMode()
+     */
+    void OnEnterIdleMode() override{};
+
     // ReadHandlerObserver
 
     /**

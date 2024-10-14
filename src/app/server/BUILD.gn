@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/access/access.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/app/icd/icd.gni")
 
@@ -52,6 +53,7 @@ static_library("server") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/icd/server:observer",
     "${chip_root}/src/lib/address_resolve",
@@ -71,5 +73,10 @@ static_library("server") {
 
   if (chip_enable_icd_server) {
     public_deps += [ "${chip_root}/src/app/icd/server:notifier" ]
+
+    if (chip_enable_icd_checkin) {
+      public_deps +=
+          [ "${chip_root}/src/app/icd/server:default-check-in-back-off" ]
+    }
   }
 }

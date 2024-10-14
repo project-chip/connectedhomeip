@@ -15,8 +15,10 @@
  *    limitations under the License.
  */
 
+#include "platform/ESP32/OpenthreadLauncher.h"
 #include "driver/uart.h"
 #include "esp_event.h"
+#include "esp_log.h"
 #include "esp_netif.h"
 #include "esp_netif_types.h"
 #include "esp_openthread.h"
@@ -33,6 +35,10 @@
 #include "openthread/tasklet.h"
 #include <lib/core/CHIPError.h>
 #include <memory>
+
+#ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
+#include <esp_openthread_border_router.h>
+#endif
 
 static esp_netif_t * openthread_netif                       = NULL;
 static esp_openthread_platform_config_t * s_platform_config = NULL;
@@ -132,6 +138,60 @@ static void ot_task_worker(void * context)
     vTaskDelete(NULL);
 }
 
+#if defined(CONFIG_OPENTHREAD_BORDER_ROUTER) && defined(CONFIG_AUTO_UPDATE_RCP)
+
+static constexpr size_t kRcpVersionMaxSize = 100;
+static const char * TAG                    = "RCP_UPDATE";
+
+static void update_rcp(void)
+{
+    // Deinit uart to transfer UART to the serial loader
+    esp_openthread_rcp_deinit();
+    if (esp_rcp_update() == ESP_OK)
+    {
+        esp_rcp_mark_image_verified(true);
+    }
+    else
+    {
+        esp_rcp_mark_image_verified(false);
+    }
+    esp_restart();
+}
+
+static void try_update_ot_rcp(const esp_openthread_platform_config_t * config)
+{
+    char internal_rcp_version[kRcpVersionMaxSize];
+    const char * running_rcp_version = otPlatRadioGetVersionString(esp_openthread_get_instance());
+
+    if (esp_rcp_load_version_in_storage(internal_rcp_version, sizeof(internal_rcp_version)) == ESP_OK)
+    {
+        ESP_LOGI(TAG, "Internal RCP Version: %s", internal_rcp_version);
+        ESP_LOGI(TAG, "Running  RCP Version: %s", running_rcp_version);
+        if (strcmp(internal_rcp_version, running_rcp_version) == 0)
+        {
+            esp_rcp_mark_image_verified(true);
+        }
+        else
+        {
+            update_rcp();
+        }
+    }
+    else
+    {
+        ESP_LOGI(TAG, "RCP firmware not found in storage, will reboot to try next image");
+        esp_rcp_mark_image_verified(false);
+        esp_restart();
+    }
+}
+
+static void rcp_failure_handler(void)
+{
+    esp_rcp_mark_image_unusable();
+    try_update_ot_rcp(s_platform_config);
+    esp_rcp_reset();
+}
+#endif // CONFIG_OPENTHREAD_BORDER_ROUTER && CONFIG_AUTO_UPDATE_RCP
+
 esp_err_t set_openthread_platform_config(esp_openthread_platform_config_t * config)
 {
     if (!s_platform_config)
@@ -145,6 +205,19 @@ esp_err_t set_openthread_platform_config(esp_openthread_platform_config_t * conf
     memcpy(s_platform_config, config, sizeof(esp_openthread_platform_config_t));
     return ESP_OK;
 }
+
+#if defined(CONFIG_OPENTHREAD_BORDER_ROUTER) && defined(CONFIG_AUTO_UPDATE_RCP)
+esp_err_t openthread_init_br_rcp(const esp_rcp_update_config_t * update_config)
+{
+    esp_err_t err = ESP_OK;
+    if (update_config)
+    {
+        err = esp_rcp_update_init(update_config);
+    }
+    esp_openthread_register_rcp_failure_handler(rcp_failure_handler);
+    return err;
+}
+#endif // CONFIG_OPENTHREAD_BORDER_ROUTER && CONFIG_AUTO_UPDATE_RCP
 
 esp_err_t openthread_init_stack(void)
 {
@@ -161,14 +234,15 @@ esp_err_t openthread_init_stack(void)
     assert(s_platform_config);
     // Initialize the OpenThread stack
     ESP_ERROR_CHECK(esp_openthread_init(s_platform_config));
-#if CONFIG_OPENTHREAD_CLI
+#if defined(CONFIG_OPENTHREAD_BORDER_ROUTER) && defined(CONFIG_AUTO_UPDATE_RCP)
+    try_update_ot_rcp(s_platform_config);
+#endif // CONFIG_OPENTHREAD_BORDER_ROUTER && CONFIG_AUTO_UPDATE_RCP
+#ifdef CONFIG_OPENTHREAD_CLI
     esp_openthread_matter_cli_init();
     cli_command_transmit_task();
 #endif
     // Initialize the esp_netif bindings
     openthread_netif = init_openthread_netif(s_platform_config);
-    free(s_platform_config);
-    s_platform_config = NULL;
     return ESP_OK;
 }
 

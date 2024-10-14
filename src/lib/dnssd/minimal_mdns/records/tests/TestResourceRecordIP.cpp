@@ -15,10 +15,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/dnssd/minimal_mdns/records/IP.h>
-#include <lib/support/UnitTestRegistration.h>
 
-#include <nlunit-test.h>
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/dnssd/minimal_mdns/records/IP.h>
 
 namespace {
 
@@ -30,11 +31,11 @@ using namespace chip::Encoding::BigEndian;
 const QNamePart kNames[] = { "some", "test", "local" };
 
 #if INET_CONFIG_ENABLE_IPV4
-void WriteIPv4(nlTestSuite * inSuite, void * inContext)
+TEST(TestResourceRecordIP, WriteIPv4)
 {
     IPAddress ipAddress;
 
-    NL_TEST_ASSERT(inSuite, IPAddress::FromString("10.20.30.40", ipAddress));
+    EXPECT_TRUE(IPAddress::FromString("10.20.30.40", ipAddress));
 
     uint8_t headerBuffer[HeaderRef::kSizeBytes];
     uint8_t dataBuffer[128];
@@ -63,12 +64,12 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
             10, 20,  30,  40             // IP Address
         };
 
-        NL_TEST_ASSERT(inSuite, ipResourceRecord.Append(header, ResourceType::kAnswer, writer));
-        NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 1);
-        NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
-        NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
-        NL_TEST_ASSERT(inSuite, output.Needed() == sizeof(expectedOutput));
-        NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
+        EXPECT_TRUE(ipResourceRecord.Append(header, ResourceType::kAnswer, writer));
+        EXPECT_EQ(header.GetAnswerCount(), 1);
+        EXPECT_EQ(header.GetAuthorityCount(), 0);
+        EXPECT_EQ(header.GetAdditionalCount(), 0);
+        EXPECT_EQ(output.Needed(), sizeof(expectedOutput));
+        EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
     }
 
     {
@@ -93,12 +94,12 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
             10, 20,  30,  40             // IP Address
         };
 
-        NL_TEST_ASSERT(inSuite, ipResourceRecord.Append(header, ResourceType::kAuthority, writer));
-        NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 0);
-        NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 1);
-        NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
-        NL_TEST_ASSERT(inSuite, output.Needed() == sizeof(expectedOutput));
-        NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
+        EXPECT_TRUE(ipResourceRecord.Append(header, ResourceType::kAuthority, writer));
+        EXPECT_EQ(header.GetAnswerCount(), 0);
+        EXPECT_EQ(header.GetAuthorityCount(), 1);
+        EXPECT_EQ(header.GetAdditionalCount(), 0);
+        EXPECT_EQ(output.Needed(), sizeof(expectedOutput));
+        EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
     }
 
     {
@@ -123,21 +124,21 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
             10, 20,  30,   40              // IP Address
         };
 
-        NL_TEST_ASSERT(inSuite, ipResourceRecord.Append(header, ResourceType::kAdditional, writer));
-        NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 0);
-        NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
-        NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 1);
-        NL_TEST_ASSERT(inSuite, output.Needed() == sizeof(expectedOutput));
-        NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
+        EXPECT_TRUE(ipResourceRecord.Append(header, ResourceType::kAdditional, writer));
+        EXPECT_EQ(header.GetAnswerCount(), 0);
+        EXPECT_EQ(header.GetAuthorityCount(), 0);
+        EXPECT_EQ(header.GetAdditionalCount(), 1);
+        EXPECT_EQ(output.Needed(), sizeof(expectedOutput));
+        EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
     }
 }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-void WriteIPv6(nlTestSuite * inSuite, void * inContext)
+TEST(TestResourceRecordIP, WriteIPv6)
 {
     IPAddress ipAddress;
 
-    NL_TEST_ASSERT(inSuite, IPAddress::FromString("fe80::224:32ff:fe19:359b", ipAddress));
+    EXPECT_TRUE(IPAddress::FromString("fe80::224:32ff:fe19:359b", ipAddress));
 
     uint8_t headerBuffer[HeaderRef::kSizeBytes];
     uint8_t dataBuffer[128];
@@ -167,31 +168,11 @@ void WriteIPv6(nlTestSuite * inSuite, void * inContext)
                                        0xfe, 0x19, 0x35, 0x9b
     };
 
-    NL_TEST_ASSERT(inSuite, ipResourceRecord.Append(header, ResourceType::kAnswer, writer));
-    NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 1);
-    NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
-    NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
-    NL_TEST_ASSERT(inSuite, output.Needed() == sizeof(expectedOutput));
-    NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
+    EXPECT_TRUE(ipResourceRecord.Append(header, ResourceType::kAnswer, writer));
+    EXPECT_EQ(header.GetAnswerCount(), 1);
+    EXPECT_EQ(header.GetAuthorityCount(), 0);
+    EXPECT_EQ(header.GetAdditionalCount(), 0);
+    EXPECT_EQ(output.Needed(), sizeof(expectedOutput));
+    EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
 }
-
-const nlTest sTests[] = {
-#if INET_CONFIG_ENABLE_IPV4
-    NL_TEST_DEF("IPV4", WriteIPv4), //
-#endif                              // INET_CONFIG_ENABLE_IPV4
-    NL_TEST_DEF("IPV6", WriteIPv6), //
-    NL_TEST_SENTINEL()              //
-};
-
 } // namespace
-
-int TestIPResourceRecord()
-{
-
-    nlTestSuite theSuite = { "IPResourceRecord", sTests, nullptr, nullptr };
-    nlTestRunner(&theSuite, nullptr);
-
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestIPResourceRecord)

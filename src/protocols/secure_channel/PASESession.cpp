@@ -139,10 +139,7 @@ CHIP_ERROR PASESession::GeneratePASEVerifier(Spake2pVerifier & verifier, uint32_
 
     if (useRandomPIN)
     {
-        ReturnErrorOnFailure(DRBG_get_bytes(reinterpret_cast<uint8_t *>(&setupPINCode), sizeof(setupPINCode)));
-
-        // Passcodes shall be restricted to the values 00000001 to 99999998 in decimal, see 5.1.1.6
-        setupPINCode = (setupPINCode % kSetupPINCodeMaximumValue) + 1;
+        ReturnErrorOnFailure(SetupPayload::generateRandomSetupPin(setupPINCode));
     }
 
     return verifier.Generate(pbkdf2IterCount, salt, setupPINCode);
@@ -195,7 +192,7 @@ CHIP_ERROR PASESession::WaitForPairing(SessionManager & sessionManager, const Sp
     mIterationCount = pbkdf2IterCount;
     mNextExpectedMsg.SetValue(MsgType::PBKDFParamRequest);
     mPairingComplete = false;
-    mLocalMRPConfig  = mrpLocalConfig.ValueOr(GetDefaultMRPConfig());
+    mLocalMRPConfig  = MakeOptional(mrpLocalConfig.ValueOr(GetDefaultMRPConfig()));
 
     ChipLogDetail(SecureChannel, "Waiting for PBKDF param request");
 
@@ -225,7 +222,7 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
 
     mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedLowProcessingTime);
 
-    mLocalMRPConfig = mrpLocalConfig.ValueOr(GetDefaultMRPConfig());
+    mLocalMRPConfig = MakeOptional(mrpLocalConfig.ValueOr(GetDefaultMRPConfig()));
 
     err = SendPBKDFParamRequest();
     SuccessOrExit(err);
@@ -258,7 +255,7 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
     NotifySessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
-CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session) const
+CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session)
 {
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
 
@@ -300,7 +297,8 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), kDefaultCommissioningPasscodeId));
     ReturnErrorOnFailure(tlvWriter.PutBoolean(TLV::ContextTag(4), mHavePBKDFParameters));
 
-    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig, tlvWriter));
+    VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriter));
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&req));
@@ -313,7 +311,12 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
 
     mNextExpectedMsg.SetValue(MsgType::PBKDFParamResponse);
 
-    ChipLogDetail(SecureChannel, "Sent PBKDF param request");
+#if CHIP_PROGRESS_LOGGING
+    const auto localMRPConfig = mLocalMRPConfig.Value();
+#endif // CHIP_PROGRESS_LOGGING
+    ChipLogProgress(SecureChannel, "Sent PBKDF param request [II:%" PRIu32 "ms AI:%" PRIu32 "ms AT:%ums)",
+                    localMRPConfig.mIdleRetransTimeout.count(), localMRPConfig.mActiveRetransTimeout.count(),
+                    localMRPConfig.mActiveThresholdTime.count());
 
     return CHIP_NO_ERROR;
 }
@@ -420,7 +423,8 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
         ReturnErrorOnFailure(tlvWriter.EndContainer(pbkdfParamContainer));
     }
 
-    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig, tlvWriter));
+    VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriter));
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&resp));

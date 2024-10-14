@@ -26,6 +26,7 @@ import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 
 config("openthread_rw61x_config") {
+  defines = []
   include_dirs = [
     "${openthread_nxp_root}/src/common",
     "${openthread_nxp_root}/src/common/br",
@@ -33,26 +34,43 @@ config("openthread_rw61x_config") {
     "${openthread_nxp_root}/third_party/mbedtls/configs",
     "${openthread_root}/third_party/mbedtls",
     "${openthread_root}/examples/platforms",
+    "${openthread_nxp_root}/examples/utils/cli_addons",
+    "${openthread_nxp_root}/examples/utils/cli_addons/ephemeral_key",
+    "${openthread_nxp_root}/examples/utils/cli_addons/lwip",
   ]
   if (spinel_interface_rpmsg) {
     include_dirs += [ "${openthread_nxp_root}/src/common/spinel" ]
   }
   if (chip_enable_wifi && chip_enable_openthread) {
-    defines = [
+    defines += [
       "OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE=1",
       "OPENTHREAD_CONFIG_COMMISSIONER_ENABLE=1",
       "OPENTHREAD_CONFIG_BORDER_ROUTING_ENABLE=1",
-      "OPENTHREAD_CONFIG_MDNS_SERVER_ENABLE=1",
       "OPENTHREAD_CONFIG_PLATFORM_UDP_ENABLE=1",
       "OPENTHREAD_CONFIG_BACKBONE_ROUTER_ENABLE=1",
       "OPENTHREAD_CONFIG_MAX_STATECHANGE_HANDLERS=3",
       "OPENTHREAD_CONFIG_BORDER_AGENT_ENABLE=1",
       "OPENTHREAD_CONFIG_BORDER_AGENT_ID_ENABLE=1",
       "OPENTHREAD_CONFIG_BORDER_ROUTING_DHCP6_PD_ENABLE=1",
-      "OT_APP_BR_LWIP_HOOKS_EN=1",
       "OPENTHREAD_CONFIG_GENERIC_TASKLET_ENABLE=1",
+      "OPENTHREAD_CONFIG_SRP_SERVER_ADVERTISING_PROXY_ENABLE=1",
+      "OPENTHREAD_CONFIG_DNSSD_DISCOVERY_PROXY_ENABLE=1",
+      "OPENTHREAD_CONFIG_MULTICAST_DNS_ENABLE=1",
+      "OPENTHREAD_CONFIG_MULTICAST_DNS_PUBLIC_API_ENABLE=1",
+      "OT_APP_BR_LWIP_HOOKS_EN=1",
     ]
+
+    if (chip_enable_matter_cli) {
+      defines += [
+        "OPENTHREAD_CONFIG_BORDER_AGENT_EPHEMERAL_KEY_ENABLE=1",
+        "OT_APP_CLI_EPHEMERAL_KEY_ADDON=1",
+        "OT_APP_CLI_LWIP_ADDON=1",
+      ]
+    }
   }
+
+  # ot cli configs
+  defines += [ "OPENTHREAD_CONFIG_PING_SENDER_ENABLE=1" ]
 }
 
 #Config used by the openthread stack to get the path to OpenthreadConfig.h
@@ -65,9 +83,9 @@ source_set("libopenthread-rw61x") {
   deps = []
   sources = [
     "${openthread_nxp_root}/src/common/alarm_freertos.c",
+    "${openthread_nxp_root}/src/common/diag.c",
+    "${openthread_nxp_root}/src/common/entropy.c",
     "${openthread_nxp_root}/src/common/logging.c",
-    "${openthread_nxp_root}/src/rw/rw612/platform/diag.c",
-    "${openthread_nxp_root}/src/rw/rw612/platform/entropy.c",
   ]
 
   if (chip_enable_wifi && chip_enable_openthread) {
@@ -77,8 +95,19 @@ source_set("libopenthread-rw61x") {
       "${openthread_nxp_root}/src/common/br/infra_if.c",
       "${openthread_nxp_root}/src/common/br/lwip_hooks.c",
       "${openthread_nxp_root}/src/common/br/lwip_mcast.c",
+      "${openthread_nxp_root}/src/common/br/mdns_socket.c",
       "${openthread_nxp_root}/src/common/br/udp_plat.c",
+      "${openthread_nxp_root}/src/common/br/utils.c",
     ]
+
+    if (chip_enable_matter_cli) {
+      sources += [
+        "${openthread_nxp_root}/examples/utils/cli_addons/addons_cli.c",
+        "${openthread_nxp_root}/examples/utils/cli_addons/ephemeral_key/ephemeral_key_cli.c",
+        "${openthread_nxp_root}/examples/utils/cli_addons/lwip/lwip_cli.c",
+      ]
+    }
+
     deps += [ "${nxp_sdk_build_root}:nxp_lwip" ]
   }
   if (spinel_interface_rpmsg) {
@@ -88,6 +117,7 @@ source_set("libopenthread-rw61x") {
       "${openthread_nxp_root}/src/common/spinel/spinel_hdlc.cpp",
       "${openthread_nxp_root}/src/common/spinel/system.c",
       "${openthread_root}/src/lib/hdlc/hdlc.cpp",
+      "${openthread_root}/src/lib/url/url.cpp",
     ]
   } else {
     sources += [
@@ -97,12 +127,14 @@ source_set("libopenthread-rw61x") {
     ]
   }
 
-  if (rt_nvm_component == "nvm_fwk") {
+  if (nxp_nvm_component == "nvm_fwk") {
     sources += [ "${openthread_nxp_root}/src/common/flash_nvm.c" ]
-  } else if (rt_nvm_component == "littlefs") {
+  } else if (nxp_nvm_component == "littlefs") {
     sources += [ "${openthread_nxp_root}/src/common/flash_littlefs.c" ]
-  } else if (rt_nvm_component == "key_storage") {
+  } else if (nxp_nvm_component == "key_storage") {
     sources += [ "${openthread_nxp_root}/src/common/flash_fsa.c" ]
+  } else if (nxp_nvm_component == "nvs") {
+    sources += [ "${openthread_nxp_root}/src/common/flash_nvs.c" ]
   }
 
   defines = [

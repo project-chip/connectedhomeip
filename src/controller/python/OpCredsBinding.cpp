@@ -26,6 +26,7 @@
 #include "controller/python/chip/crypto/p256keypair.h"
 #include "controller/python/chip/interaction_model/Delegate.h"
 
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
@@ -104,6 +105,7 @@ private:
 
 extern chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 extern chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
+extern chip::app::DefaultICDClientStorage sICDClientStorage;
 
 class TestCommissioner : public chip::Controller::AutoCommissioner
 {
@@ -257,6 +259,7 @@ public:
         mPrematureCompleteAfter = chip::Controller::CommissioningStage::kError;
         mReadCommissioningInfo  = chip::Controller::ReadCommissioningInfo();
         mNeedsDST               = false;
+        mCompletionError        = CHIP_NO_ERROR;
     }
     bool GetTestCommissionerUsed() { return mTestCommissionerUsed; }
     void OnCommissioningSuccess(chip::PeerId peerId) { mReceivedCommissioningSuccess = true; }
@@ -331,6 +334,8 @@ private:
             return mNeedsDST && mParams.GetDSTOffsets().HasValue();
         case chip::Controller::CommissioningStage::kError:
         case chip::Controller::CommissioningStage::kSecurePairing:
+        // "not valid" because attestation verification always fails after entering revocation check step
+        case chip::Controller::CommissioningStage::kAttestationVerification:
             return false;
         default:
             return true;
@@ -402,12 +407,11 @@ void pychip_OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::C
  * TODO(#25214): Need clean up API
  *
  */
-PyChipError pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(chip::Controller::DeviceCommissioner ** outDevCtrl,
-                                                                        chip::python::pychip_P256Keypair * operationalKey,
-                                                                        uint8_t * noc, uint32_t nocLen, uint8_t * icac,
-                                                                        uint32_t icacLen, uint8_t * rcac, uint32_t rcacLen,
-                                                                        const uint8_t * ipk, uint32_t ipkLen,
-                                                                        chip::VendorId adminVendorId, bool enableServerInteractions)
+PyChipError pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(
+    chip::Controller::DeviceCommissioner ** outDevCtrl, chip::Controller::ScriptDevicePairingDelegate ** outPairingDelegate,
+    chip::python::pychip_P256Keypair * operationalKey, uint8_t * noc, uint32_t nocLen, uint8_t * icac, uint32_t icacLen,
+    uint8_t * rcac, uint32_t rcacLen, const uint8_t * ipk, uint32_t ipkLen, chip::VendorId adminVendorId,
+    bool enableServerInteractions)
 {
     ReturnErrorCodeIf(nocLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
     ReturnErrorCodeIf(icacLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
@@ -415,11 +419,13 @@ PyChipError pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(chip::Co
 
     ChipLogDetail(Controller, "Creating New Device Controller");
 
+    auto pairingDelegate = std::make_unique<chip::Controller::ScriptDevicePairingDelegate>();
+    VerifyOrReturnError(pairingDelegate != nullptr, ToPyChipError(CHIP_ERROR_NO_MEMORY));
     auto devCtrl = std::make_unique<chip::Controller::DeviceCommissioner>();
     VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_NO_MEMORY));
 
     Controller::SetupParams initParams;
-    initParams.pairingDelegate                      = &sPairingDelegate;
+    initParams.pairingDelegate                      = pairingDelegate.get();
     initParams.operationalCredentialsDelegate       = &sPlaceholderOperationalCredentialsIssuer;
     initParams.operationalKeypair                   = operationalKey;
     initParams.controllerRCAC                       = ByteSpan(rcac, rcacLen);
@@ -450,13 +456,15 @@ PyChipError pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(chip::Co
         chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), fabricIpk, compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
 
-    *outDevCtrl = devCtrl.release();
+    *outDevCtrl         = devCtrl.release();
+    *outPairingDelegate = pairingDelegate.release();
 
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
 // TODO(#25214): Need clean up API
 PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Controller::DeviceCommissioner ** outDevCtrl,
+                                              chip::Controller::ScriptDevicePairingDelegate ** outPairingDelegate,
                                               FabricId fabricId, chip::NodeId nodeId, chip::VendorId adminVendorId,
                                               const char * paaTrustStorePath, bool useTestCommissioner,
                                               bool enableServerInteractions, CASEAuthTag * caseAuthTags, uint32_t caseAuthTagLen,
@@ -468,6 +476,8 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
 
     VerifyOrReturnError(context != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
+    auto pairingDelegate = std::make_unique<chip::Controller::ScriptDevicePairingDelegate>();
+    VerifyOrReturnError(pairingDelegate != nullptr, ToPyChipError(CHIP_ERROR_NO_MEMORY));
     auto devCtrl = std::make_unique<chip::Controller::DeviceCommissioner>();
     VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_NO_MEMORY));
 
@@ -524,7 +534,7 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
 
     Controller::SetupParams initParams;
-    initParams.pairingDelegate                      = &sPairingDelegate;
+    initParams.pairingDelegate                      = pairingDelegate.get();
     initParams.operationalCredentialsDelegate       = context->mAdapter.get();
     initParams.operationalKeypair                   = controllerKeyPair;
     initParams.controllerRCAC                       = rcacSpan;
@@ -538,9 +548,9 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     if (useTestCommissioner)
     {
         initParams.defaultCommissioner = &sTestCommissioner;
-        sPairingDelegate.SetCommissioningSuccessCallback(pychip_OnCommissioningSuccess);
-        sPairingDelegate.SetCommissioningFailureCallback(pychip_OnCommissioningFailure);
-        sPairingDelegate.SetCommissioningStatusUpdateCallback(pychip_OnCommissioningStatusUpdate);
+        pairingDelegate->SetCommissioningSuccessCallback(pychip_OnCommissioningSuccess);
+        pairingDelegate->SetCommissioningFailureCallback(pychip_OnCommissioningFailure);
+        pairingDelegate->SetCommissioningStatusUpdateCallback(pychip_OnCommissioningStatusUpdate);
     }
 
     err = Controller::DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, *devCtrl);
@@ -562,7 +572,11 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
         chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), defaultIpk, compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
 
-    *outDevCtrl = devCtrl.release();
+    sICDClientStorage.UpdateFabricList(devCtrl->GetFabricIndex());
+    pairingDelegate->SetFabricIndex(devCtrl->GetFabricIndex());
+
+    *outDevCtrl         = devCtrl.release();
+    *outPairingDelegate = pairingDelegate.release();
 
     return ToPyChipError(CHIP_NO_ERROR);
 }
@@ -596,12 +610,18 @@ void pychip_OpCreds_FreeDelegate(OpCredsContext * context)
     Platform::Delete(context);
 }
 
-PyChipError pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl)
+PyChipError pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl,
+                                                           chip::Controller::ScriptDevicePairingDelegate * pairingDelegate)
 {
     if (devCtrl != nullptr)
     {
         devCtrl->Shutdown();
         delete devCtrl;
+    }
+
+    if (pairingDelegate != nullptr)
+    {
+        delete pairingDelegate;
     }
 
     return ToPyChipError(CHIP_NO_ERROR);

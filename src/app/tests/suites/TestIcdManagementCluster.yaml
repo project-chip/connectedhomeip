@@ -87,7 +87,10 @@ tests:
       command: "readAttribute"
       attribute: "ICDCounter"
       response:
-          value: beforeRebootICDCounter + 101
+          constraints:
+              # It is possible ICD hasn't had time to send a Check-In message after reboot
+              minValue: beforeRebootICDCounter + 100
+              maxValue: beforeRebootICDCounter + 101
 
     - label: "Verify the ICD is operating as a LIT ICD"
       command: "readAttribute"
@@ -112,7 +115,7 @@ tests:
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 0x07
+          value: 0x0F
 
     - label: "Read IdleModeDuration"
       command: "readAttribute"
@@ -138,7 +141,7 @@ tests:
       response:
           constraints:
               type: bitmap32
-          value: 0x110D
+          value: 0x111D
 
     - label: "Read UserActiveModeTriggerInstruction"
       command: "readAttribute"
@@ -192,6 +195,8 @@ tests:
                 value: 1001
               - name: "Key"
                 value: "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e"
+              - name: "ClientType"
+                value: ClientTypeEnum.Permanent
       response:
           error: CONSTRAINT_ERROR
 
@@ -205,10 +210,12 @@ tests:
                 value: 1001
               - name: "Key"
                 value: "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\xff"
+              - name: "ClientType"
+                value: ClientTypeEnum.Permanent
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "Register 1.1"
+    - label: "Register 1.1 - Invalid ClientType"
       command: "RegisterClient"
       arguments:
           values:
@@ -218,6 +225,23 @@ tests:
                 value: 1001
               - name: "Key"
                 value: "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
+              - name: "ClientType"
+                value: ClientTypeEnum.UnknownEnumValue
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Register 1.2"
+      command: "RegisterClient"
+      arguments:
+          values:
+              - name: "CheckInNodeID"
+                value: 101
+              - name: "MonitoredSubject"
+                value: 1001
+              - name: "Key"
+                value: "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
+              - name: "ClientType"
+                value: ClientTypeEnum.Permanent
       response:
           values:
               - name: "ICDCounter"
@@ -237,6 +261,8 @@ tests:
               - name: "Key"
                 value:
                     "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
+              - name: "ClientType"
+                value: ClientTypeEnum.Ephemeral
       response:
           values:
               - name: "ICDCounter"
@@ -255,6 +281,8 @@ tests:
                 value: 3001
               - name: "Key"
                 value: "\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f"
+              - name: "ClientType"
+                value: ClientTypeEnum.Permanent
       response:
           error: RESOURCE_EXHAUSTED
 
@@ -264,8 +292,16 @@ tests:
       response:
           value:
               [
-                  { CheckInNodeID: 101, MonitoredSubject: 1001 },
-                  { CheckInNodeID: 201, MonitoredSubject: 2001 },
+                  {
+                      CheckInNodeID: 101,
+                      MonitoredSubject: 1001,
+                      ClientType: ClientTypeEnum.Permanent,
+                  },
+                  {
+                      CheckInNodeID: 201,
+                      MonitoredSubject: 2001,
+                      ClientType: ClientTypeEnum.Ephemeral,
+                  },
               ]
 
     - label: "Register 1.1 (update)"
@@ -278,6 +314,8 @@ tests:
                 value: 1002
               - name: "Key"
                 value: "\x01\x11\x21\x31\x41\x51\x61\x71\x81\x91\xa1\xb1\xc1\xd1\xe1\xf1"
+              - name: "ClientType"
+                value: ClientTypeEnum.Ephemeral
       response:
           values:
               - name: "ICDCounter"
@@ -292,8 +330,16 @@ tests:
       response:
           value:
               [
-                  { CheckInNodeID: 101, MonitoredSubject: 1002 },
-                  { CheckInNodeID: 201, MonitoredSubject: 2001 },
+                  {
+                      CheckInNodeID: 101,
+                      MonitoredSubject: 1002,
+                      ClientType: ClientTypeEnum.Ephemeral,
+                  },
+                  {
+                      CheckInNodeID: 201,
+                      MonitoredSubject: 2001,
+                      ClientType: ClientTypeEnum.Ephemeral,
+                  },
               ]
 
     - label: "Register 2.2 (wrong verification key)"
@@ -309,6 +355,8 @@ tests:
               - name: "VerificationKey"
                 value:
                     "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2f\x2f"
+              - name: "ClientType"
+                value: ClientTypeEnum.Permanent
       response:
           values:
               - name: "ICDCounter"
@@ -323,8 +371,16 @@ tests:
       response:
           value:
               [
-                  { CheckInNodeID: 101, MonitoredSubject: 1002 },
-                  { CheckInNodeID: 201, MonitoredSubject: 2002 },
+                  {
+                      CheckInNodeID: 101,
+                      MonitoredSubject: 1002,
+                      ClientType: ClientTypeEnum.Ephemeral,
+                  },
+                  {
+                      CheckInNodeID: 201,
+                      MonitoredSubject: 2002,
+                      ClientType: ClientTypeEnum.Permanent,
+                  },
               ]
 
     - label: "Unregister 1.1 (wrong key)"

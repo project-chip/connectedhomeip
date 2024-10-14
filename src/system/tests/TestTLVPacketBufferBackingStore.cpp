@@ -18,13 +18,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <system/TLVPacketBufferBackingStore.h>
-
-#include <nlunit-test.h>
 
 using ::chip::Platform::ScopedMemoryBuffer;
 using ::chip::System::PacketBuffer;
@@ -33,49 +33,27 @@ using ::chip::System::PacketBufferTLVReader;
 using ::chip::System::PacketBufferTLVWriter;
 using namespace ::chip;
 
-namespace {
-
-void WriteUntilRemainingLessThan(nlTestSuite * inSuite, PacketBufferTLVWriter & writer, const uint32_t remainingSize)
-{
-    uint32_t lengthRemaining = writer.GetRemainingFreeLength();
-    while (lengthRemaining >= remainingSize)
-    {
-        NL_TEST_ASSERT(inSuite, writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(7)) == CHIP_NO_ERROR);
-        lengthRemaining = writer.GetRemainingFreeLength();
-    }
-}
-
-class TLVPacketBufferBackingStoreTest
+class TestTLVPacketBufferBackingStore : public ::testing::Test
 {
 public:
-    static int TestSetup(void * inContext);
-    static int TestTeardown(void * inContext);
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    static void BasicEncodeDecode(nlTestSuite * inSuite, void * inContext);
-    static void MultiBufferEncode(nlTestSuite * inSuite, void * inContext);
-    static void NonChainedBufferCanReserve(nlTestSuite * inSuite, void * inContext);
-    static void TestWriterReserveUnreserveDoesNotOverflow(nlTestSuite * inSuite, void * inContext);
-    static void TestWriterReserve(nlTestSuite * inSuite, void * inContext);
+    void WriteUntilRemainingLessThan(PacketBufferTLVWriter & writer, const uint32_t remainingSize)
+    {
+        uint32_t lengthRemaining = writer.GetRemainingFreeLength();
+        while (lengthRemaining >= remainingSize)
+        {
+            EXPECT_EQ(writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(7)), CHIP_NO_ERROR);
+            lengthRemaining = writer.GetRemainingFreeLength();
+        }
+    }
 };
-
-int TLVPacketBufferBackingStoreTest::TestSetup(void * inContext)
-{
-    chip::Platform::MemoryInit();
-
-    return SUCCESS;
-}
-
-int TLVPacketBufferBackingStoreTest::TestTeardown(void * inContext)
-{
-    chip::Platform::MemoryShutdown();
-
-    return SUCCESS;
-}
 
 /**
  * Test that we can do a basic encode to TLV followed by decode.
  */
-void TLVPacketBufferBackingStoreTest::BasicEncodeDecode(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestTLVPacketBufferBackingStore, BasicEncodeDecode)
 {
     auto buffer = PacketBufferHandle::New(PacketBuffer::kMaxSizeWithoutReserve, 0);
 
@@ -84,74 +62,74 @@ void TLVPacketBufferBackingStoreTest::BasicEncodeDecode(nlTestSuite * inSuite, v
 
     TLV::TLVType outerContainerType;
     CHIP_ERROR error = writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerContainerType);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(7));
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(8));
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(9));
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = writer.EndContainer(outerContainerType);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = writer.Finalize(&buffer);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     // Array start/end is 2 bytes.  Each entry is also 2 bytes: control +
     // value.  So 8 bytes total.
-    NL_TEST_ASSERT(inSuite, !buffer->HasChainedBuffer());
-    NL_TEST_ASSERT(inSuite, buffer->TotalLength() == 8);
-    NL_TEST_ASSERT(inSuite, buffer->DataLength() == 8);
+    EXPECT_FALSE(buffer->HasChainedBuffer());
+    EXPECT_EQ(buffer->TotalLength(), static_cast<size_t>(8));
+    EXPECT_EQ(buffer->DataLength(), static_cast<size_t>(8));
 
     PacketBufferTLVReader reader;
     reader.Init(std::move(buffer));
 
     error = reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag());
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = reader.EnterContainer(outerContainerType);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = reader.Next(TLV::kTLVType_UnsignedInteger, TLV::AnonymousTag());
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     uint8_t value;
     error = reader.Get(value);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, value == 7);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
+    EXPECT_EQ(value, 7);
 
     error = reader.Next(TLV::kTLVType_UnsignedInteger, TLV::AnonymousTag());
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = reader.Get(value);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, value == 8);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
+    EXPECT_EQ(value, 8);
 
     error = reader.Next(TLV::kTLVType_UnsignedInteger, TLV::AnonymousTag());
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = reader.Get(value);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, value == 9);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
+    EXPECT_EQ(value, 9);
 
     error = reader.Next();
-    NL_TEST_ASSERT(inSuite, error == CHIP_END_OF_TLV);
+    EXPECT_EQ(error, CHIP_END_OF_TLV);
 
     error = reader.ExitContainer(outerContainerType);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = reader.Next();
-    NL_TEST_ASSERT(inSuite, error == CHIP_END_OF_TLV);
+    EXPECT_EQ(error, CHIP_END_OF_TLV);
 }
 
 /**
  * Test that we can do an encode that's going to split across multiple buffers correctly.
  */
-void TLVPacketBufferBackingStoreTest::MultiBufferEncode(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestTLVPacketBufferBackingStore, MultiBufferEncode)
 {
     // Start with a too-small buffer.
     auto buffer = PacketBufferHandle::New(2, 0);
@@ -161,97 +139,108 @@ void TLVPacketBufferBackingStoreTest::MultiBufferEncode(nlTestSuite * inSuite, v
 
     TLV::TLVType outerContainerType;
     CHIP_ERROR error = writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerContainerType);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(7));
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(8));
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     // Something to make sure we have 3 buffers.
     uint8_t bytes[2000] = { 0 };
     error               = writer.Put(TLV::AnonymousTag(), ByteSpan(bytes));
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = writer.EndContainer(outerContainerType);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = writer.Finalize(&buffer);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     // Array start/end is 2 bytes.  First two entries are 2 bytes each.
     // Third entry is 1 control byte, 2 length bytes, 2000 bytes of data,
     // for a total of 2009 bytes.
     constexpr size_t totalSize = 2009;
-    NL_TEST_ASSERT(inSuite, buffer->HasChainedBuffer());
-    NL_TEST_ASSERT(inSuite, buffer->TotalLength() == totalSize);
-    NL_TEST_ASSERT(inSuite, buffer->DataLength() == 2);
-    auto nextBuffer = buffer->Next();
-    NL_TEST_ASSERT(inSuite, nextBuffer->HasChainedBuffer());
-    NL_TEST_ASSERT(inSuite, nextBuffer->TotalLength() == totalSize - 2);
-    NL_TEST_ASSERT(inSuite, nextBuffer->DataLength() == PacketBuffer::kMaxSizeWithoutReserve);
-    nextBuffer = nextBuffer->Next();
-    NL_TEST_ASSERT(inSuite, !nextBuffer->HasChainedBuffer());
-    NL_TEST_ASSERT(inSuite, nextBuffer->TotalLength() == nextBuffer->DataLength());
-    NL_TEST_ASSERT(inSuite, nextBuffer->DataLength() == totalSize - 2 - PacketBuffer::kMaxSizeWithoutReserve);
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_STANDARD_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
+    // In case of pool allocation, the buffer size is always the maximum size.
+    constexpr size_t bufferSizes[] = { PacketBuffer::kMaxSizeWithoutReserve, totalSize - PacketBuffer::kMaxSizeWithoutReserve };
+#elif CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
+    constexpr size_t bufferSizes[] = { 2, PacketBuffer::kMaxSizeWithoutReserve,
+                                       totalSize - 2 - PacketBuffer::kMaxSizeWithoutReserve };
+#else
+    // Skipping the test for other configurations because the allocation method is unknown.
+    GTEST_SKIP();
+#endif
+    size_t checkedSize = 0;
+    auto bufferTmp     = buffer.Retain();
+    for (const auto size : bufferSizes)
+    {
+        ASSERT_FALSE(bufferTmp.IsNull());
+        EXPECT_EQ(bufferTmp->TotalLength(), totalSize - checkedSize);
+        EXPECT_EQ(bufferTmp->DataLength(), size);
+        bufferTmp = bufferTmp->Next();
+        checkedSize += size;
+    }
+    // There should be no more buffers.
+    ASSERT_TRUE(bufferTmp.IsNull());
 
     // PacketBufferTLVReader cannot handle non-contiguous buffers, and our
     // buffers are too big to stick into a single packet buffer.
     ScopedMemoryBuffer<uint8_t> buf;
-    NL_TEST_ASSERT(inSuite, buf.Calloc(totalSize));
+    EXPECT_TRUE(buf.Calloc(totalSize));
     size_t offset = 0;
     while (!buffer.IsNull())
     {
         memcpy(buf.Get() + offset, buffer->Start(), buffer->DataLength());
         offset += buffer->DataLength();
         buffer.Advance();
-        NL_TEST_ASSERT(inSuite, offset < totalSize || (offset == totalSize && buffer.IsNull()));
+        EXPECT_TRUE(offset < totalSize || (offset == totalSize && buffer.IsNull()));
     }
 
     TLV::TLVReader reader;
     reader.Init(buf.Get(), totalSize);
 
     error = reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag());
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = reader.EnterContainer(outerContainerType);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = reader.Next(TLV::kTLVType_UnsignedInteger, TLV::AnonymousTag());
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     uint8_t value;
     error = reader.Get(value);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, value == 7);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
+    EXPECT_EQ(value, 7);
 
     error = reader.Next(TLV::kTLVType_UnsignedInteger, TLV::AnonymousTag());
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = reader.Get(value);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, value == 8);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
+    EXPECT_EQ(value, 8);
 
     error = reader.Next(TLV::kTLVType_ByteString, TLV::AnonymousTag());
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     ByteSpan byteValue;
     error = reader.Get(byteValue);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, byteValue.size() == sizeof(bytes));
+    EXPECT_EQ(error, CHIP_NO_ERROR);
+    EXPECT_EQ(byteValue.size(), sizeof(bytes));
 
     error = reader.Next();
-    NL_TEST_ASSERT(inSuite, error == CHIP_END_OF_TLV);
+    EXPECT_EQ(error, CHIP_END_OF_TLV);
 
     error = reader.ExitContainer(outerContainerType);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = reader.Next();
-    NL_TEST_ASSERT(inSuite, error == CHIP_END_OF_TLV);
+    EXPECT_EQ(error, CHIP_END_OF_TLV);
 }
 
-void TLVPacketBufferBackingStoreTest::NonChainedBufferCanReserve(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestTLVPacketBufferBackingStore, NonChainedBufferCanReserve)
 {
     // Start with a too-small buffer.
     uint32_t smallSize             = 5;
@@ -263,12 +252,12 @@ void TLVPacketBufferBackingStoreTest::NonChainedBufferCanReserve(nlTestSuite * i
     writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
 
     CHIP_ERROR error = writer.ReserveBuffer(smallerSizeToReserver);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 }
 
 // This test previously was created to show that there was an overflow bug, now this test mainly
 // just checks that you cannot reserve this type of TLVBackingStorage buffer.
-void TLVPacketBufferBackingStoreTest::TestWriterReserveUnreserveDoesNotOverflow(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestTLVPacketBufferBackingStore, TestWriterReserveUnreserveDoesNotOverflow)
 {
     // Start with a too-small buffer.
     uint32_t smallSize             = 100;
@@ -283,29 +272,29 @@ void TLVPacketBufferBackingStoreTest::TestWriterReserveUnreserveDoesNotOverflow(
     if (error == CHIP_NO_ERROR)
     {
         uint32_t lengthRemaining = writer.GetRemainingFreeLength();
-        NL_TEST_ASSERT(inSuite, lengthRemaining == 1);
+        EXPECT_EQ(lengthRemaining, 1U);
         // Lets try to overflow by getting next buffer in the chain,
         // unreserving then writing until the end of the current buffer.
         error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(7));
-        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+        EXPECT_EQ(error, CHIP_NO_ERROR);
 
         lengthRemaining = writer.GetRemainingFreeLength();
-        NL_TEST_ASSERT(inSuite, lengthRemaining > smallerSizeToReserver);
+        EXPECT_GT(lengthRemaining, smallerSizeToReserver);
 
-        WriteUntilRemainingLessThan(inSuite, writer, 2);
+        WriteUntilRemainingLessThan(writer, 2);
 
         lengthRemaining = writer.GetRemainingFreeLength();
-        NL_TEST_ASSERT(inSuite, lengthRemaining != 0);
-        NL_TEST_ASSERT(inSuite, lengthRemaining < smallerSizeToReserver);
+        EXPECT_NE(lengthRemaining, 0U);
+        EXPECT_LT(lengthRemaining, smallerSizeToReserver);
 
         error = writer.UnreserveBuffer(smallerSizeToReserver);
-        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+        EXPECT_EQ(error, CHIP_NO_ERROR);
 
         lengthRemaining = writer.GetRemainingFreeLength();
-        NL_TEST_ASSERT(inSuite, lengthRemaining > smallerSizeToReserver);
+        EXPECT_GT(lengthRemaining, smallerSizeToReserver);
 
         // This is where we get overflow.
-        WriteUntilRemainingLessThan(inSuite, writer, 2);
+        WriteUntilRemainingLessThan(writer, 2);
 
         // If we get here then the overflow condition we were expecting did not happen. If that is the case,
         // either we have fixed reservation for chained buffers, or expected failure didn't hit on this
@@ -314,14 +303,15 @@ void TLVPacketBufferBackingStoreTest::TestWriterReserveUnreserveDoesNotOverflow(
         // If there is a fix please add reservation for chained buffers, please make sure you account for
         // what happens if TLVWriter::WriteData fails to get a new buffer but we are not at max size, do
         // you actually have space for what was supposed to be reserved.
-        NL_TEST_ASSERT(inSuite, false);
+        FAIL();
     }
 
     // We no longer allow non-contigous buffers to be reserved.
-    NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(error, CHIP_ERROR_INCORRECT_STATE);
 }
 
-void TLVPacketBufferBackingStoreTest::TestWriterReserve(nlTestSuite * inSuite, void * inContext)
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
+TEST_F(TestTLVPacketBufferBackingStore, TestWriterReserve)
 {
     // Start with a too-small buffer.
     uint32_t smallSize             = 5;
@@ -333,51 +323,15 @@ void TLVPacketBufferBackingStoreTest::TestWriterReserve(nlTestSuite * inSuite, v
     writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
 
     CHIP_ERROR error = writer.ReserveBuffer(smallerSizeToReserver);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(7));
-    NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(error, CHIP_ERROR_NO_MEMORY);
 
     error = writer.UnreserveBuffer(smallerSizeToReserver);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 
     error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(7));
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    EXPECT_EQ(error, CHIP_NO_ERROR);
 }
-
-/**
- *   Test Suite. It lists all the test functions.
- */
-// clang-format off
-const nlTest sTests[] =
-{
-    NL_TEST_DEF("BasicEncodeDecode",                         TLVPacketBufferBackingStoreTest::BasicEncodeDecode),
-    NL_TEST_DEF("MultiBufferEncode",                         TLVPacketBufferBackingStoreTest::MultiBufferEncode),
-    NL_TEST_DEF("NonChainedBufferCanReserve",                TLVPacketBufferBackingStoreTest::NonChainedBufferCanReserve),
-    NL_TEST_DEF("TestWriterReserveUnreserveDoesNotOverflow", TLVPacketBufferBackingStoreTest::TestWriterReserveUnreserveDoesNotOverflow),
-    NL_TEST_DEF("TestWriterReserve",                         TLVPacketBufferBackingStoreTest::TestWriterReserve),
-
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-} // anonymous namespace
-
-int TestTLVPacketBufferBackingStore()
-{
-    // clang-format off
-    nlTestSuite theSuite = {
-        .name ="chip-tlv-packet-buffer-backing-store",
-        .tests = &sTests[0],
-        .setup = TLVPacketBufferBackingStoreTest::TestSetup,
-        .tear_down = TLVPacketBufferBackingStoreTest::TestTeardown,
-    };
-    // clang-format on
-
-    // Run test suite.
-    nlTestRunner(&theSuite, nullptr);
-
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestTLVPacketBufferBackingStore)
+#endif

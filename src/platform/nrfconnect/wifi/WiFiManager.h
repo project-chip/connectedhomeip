@@ -88,6 +88,12 @@ private:
 class WiFiManager
 {
 public:
+    /* No copy, nor move. */
+    WiFiManager(const WiFiManager &)             = delete;
+    WiFiManager & operator=(const WiFiManager &) = delete;
+    WiFiManager(WiFiManager &&)                  = delete;
+    WiFiManager & operator=(WiFiManager &&)      = delete;
+
     using ScanDoneStatus     = decltype(wifi_status::status);
     using ScanResultCallback = void (*)(const NetworkCommissioning::WiFiScanResponse &);
     using ScanDoneCallback   = void (*)(const ScanDoneStatus &);
@@ -179,9 +185,14 @@ public:
     CHIP_ERROR GetNetworkStatistics(NetworkStatistics & stats) const;
     void AbortConnectionRecovery();
     CHIP_ERROR SetLowPowerMode(bool onoff);
+    void SetLastDisconnectReason(uint16_t reason);
+    uint16_t GetLastDisconnectReason();
 
 private:
-    using NetEventHandler = void (*)(Platform::UniquePtr<uint8_t>);
+    using NetEventHandler = void (*)(Platform::UniquePtr<uint8_t>, size_t);
+
+    WiFiManager()  = default;
+    ~WiFiManager() = default;
 
     struct ConnectionParams
     {
@@ -197,10 +208,10 @@ private:
     // Event handling
     static void WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface);
     static void IPv6MgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface);
-    static void ScanResultHandler(Platform::UniquePtr<uint8_t> data);
-    static void ScanDoneHandler(Platform::UniquePtr<uint8_t> data);
-    static void ConnectHandler(Platform::UniquePtr<uint8_t> data);
-    static void DisconnectHandler(Platform::UniquePtr<uint8_t> data);
+    static void ScanResultHandler(Platform::UniquePtr<uint8_t> data, size_t length);
+    static void ScanDoneHandler(Platform::UniquePtr<uint8_t> data, size_t length);
+    static void ConnectHandler(Platform::UniquePtr<uint8_t> data, size_t length);
+    static void DisconnectHandler(Platform::UniquePtr<uint8_t> data, size_t length);
     static void PostConnectivityStatusChange(ConnectivityChange changeType);
     static void SendRouterSolicitation(System::Layer * layer, void * param);
     static void IPv6AddressChangeHandler(const void * data);
@@ -220,7 +231,9 @@ private:
 
     net_if * mNetIf{ nullptr };
     ConnectionParams mWiFiParams{};
-    ConnectionHandling mHandling;
+    ConnectionHandling mHandling{};
+    wifi_scan_params mScanParams{};
+    char mScanSsidBuffer[DeviceLayer::Internal::kMaxWiFiSSIDLength + 1] = { 0 };
     wifi_iface_state mWiFiState;
     wifi_iface_state mCachedWiFiState;
     net_mgmt_event_callback mWiFiMgmtClbk{};
@@ -234,6 +247,7 @@ private:
     uint32_t mConnectionRecoveryCounter{ 0 };
     uint32_t mConnectionRecoveryTimeMs{ kConnectionRecoveryMinIntervalMs };
     bool mApplicationDisconnectRequested{ false };
+    uint16_t mLastDisconnectedReason = WLAN_REASON_UNSPECIFIED;
 
     static const Map<wifi_iface_state, StationStatus, 10> sStatusMap;
     static const Map<uint32_t, NetEventHandler, 5> sEventHandlerMap;

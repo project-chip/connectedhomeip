@@ -37,6 +37,12 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <features>
+      <feature bit="0" code="RESET" name="Reset" summary="Supports the ability to reset alarms">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="MASK"      type="AlarmBitmap" default="0" writable="false" optional="false">Mask</attribute>
     <attribute side="server" code="0x0001" define="LATCH"     type="AlarmBitmap" default="0" writable="false" optional="true">Latch</attribute>
     <attribute side="server" code="0x0002" define="STATE"     type="AlarmBitmap" default="0" writable="false" optional="false">State</attribute>
@@ -60,9 +66,4 @@ limitations under the License.
         <field id="3" name="Mask" type="AlarmBitmap" />
     </event>
   </cluster>
-
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x005D" />
-    <field name="Reset" mask="0x01" />
-  </bitmap>
 </configurator>

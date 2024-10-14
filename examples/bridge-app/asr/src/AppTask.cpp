@@ -26,6 +26,7 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <assert.h>
 #include <platform/ASR/NetworkCommissioningDriver.h>
 #include <platform/CHIPDeviceLayer.h>

@@ -16,6 +16,9 @@ name: QEMU
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
 
@@ -25,7 +28,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
 
     qemu-esp32:
@@ -35,10 +38,10 @@ jobs:
             BUILD_TYPE: esp32-qemu
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && github.repository_owner == 'espressif'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32-qemu:41
+            image: ghcr.io/project-chip/chip-build-esp32-qemu:81
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -58,8 +61,6 @@ jobs:
                       build                             \
                   "
             - name: Run all tests
-              # Disabled being tracked here: https://github.com/project-chip/connectedhomeip/issues/32587
-              if: false
               run: |
                   src/test_driver/esp32/run_qemu_image.py \
                     --verbose                             \
@@ -78,7 +79,8 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-tizen-qemu:41
+            image: ghcr.io/project-chip/chip-build-tizen-qemu:81
+            options: --user root
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 

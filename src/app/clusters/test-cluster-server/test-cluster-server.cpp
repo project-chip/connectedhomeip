@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
@@ -100,8 +101,12 @@ private:
                                                              AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadStructAttribute(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteStructAttribute(AttributeValueDecoder & aDecoder);
+    CHIP_ERROR ReadGlobalStruct(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteGlobalStruct(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadNullableStruct(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteNullableStruct(AttributeValueDecoder & aDecoder);
+    CHIP_ERROR ReadNullableGlobalStruct(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteNullableGlobalStruct(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadListFabricScopedAttribute(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteListFabricScopedAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 };
@@ -125,7 +130,9 @@ size_t gListLongOctetStringLen = kAttributeListLength;
 Structs::TestListStructOctet::Type listStructOctetStringData[kAttributeListLength];
 OctetStringData gStructAttributeByteSpanData;
 Structs::SimpleStruct::Type gStructAttributeValue;
+Globals::Structs::TestGlobalStruct::Type gGlobalStructAttributeValue;
 NullableStruct::TypeInfo::Type gNullableStructAttributeValue;
+DataModel::Nullable<Globals::Structs::TestGlobalStruct::Type> gNullableGlobalStructAttributeValue;
 
 chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::Type gListFabricScopedAttributeValue[kAttributeListLength];
 uint8_t gListFabricScoped_fabricSensitiveInt8uList[kAttributeListLength][kFabricSensitiveIntListLength];
@@ -197,6 +204,9 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     case StructAttr::Id: {
         return ReadStructAttribute(aEncoder);
     }
+    case GlobalStruct::Id: {
+        return ReadGlobalStruct(aEncoder);
+    }
     case ListLongOctetString::Id: {
         return ReadListLongOctetStringAttribute(aEncoder);
     }
@@ -205,6 +215,9 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     }
     case NullableStruct::Id: {
         return ReadNullableStruct(aEncoder);
+    }
+    case NullableGlobalStruct::Id: {
+        return ReadNullableGlobalStruct(aEncoder);
     }
     case GeneralErrorBoolean::Id: {
         return StatusIB(Protocols::InteractionModel::Status::InvalidDataType).ToChipError();
@@ -248,8 +261,14 @@ CHIP_ERROR TestAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attrib
     case StructAttr::Id: {
         return WriteStructAttribute(aDecoder);
     }
+    case GlobalStruct::Id: {
+        return WriteGlobalStruct(aDecoder);
+    }
     case NullableStruct::Id: {
         return WriteNullableStruct(aDecoder);
+    }
+    case NullableGlobalStruct::Id: {
+        return WriteNullableGlobalStruct(aDecoder);
     }
     case GeneralErrorBoolean::Id: {
         return StatusIB(Protocols::InteractionModel::Status::InvalidDataType).ToChipError();
@@ -273,6 +292,26 @@ CHIP_ERROR TestAttrAccess::ReadNullableStruct(AttributeValueEncoder & aEncoder)
 CHIP_ERROR TestAttrAccess::WriteNullableStruct(AttributeValueDecoder & aDecoder)
 {
     return aDecoder.Decode(gNullableStructAttributeValue);
+}
+
+CHIP_ERROR TestAttrAccess::ReadNullableGlobalStruct(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(gNullableGlobalStructAttributeValue);
+}
+
+CHIP_ERROR TestAttrAccess::WriteNullableGlobalStruct(AttributeValueDecoder & aDecoder)
+{
+    Attributes::NullableGlobalStruct::TypeInfo::DecodableType temp;
+    ReturnErrorOnFailure(aDecoder.Decode(temp));
+
+    if (!temp.IsNull())
+    {
+        // We don't support a nonempty charspan here for now.
+        VerifyOrReturnError(temp.Value().name.empty(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+
+    gNullableGlobalStructAttributeValue = temp;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TestAttrAccess::ReadListInt8uAttribute(AttributeValueEncoder & aEncoder)
@@ -584,6 +623,23 @@ CHIP_ERROR TestAttrAccess::WriteStructAttribute(AttributeValueDecoder & aDecoder
     memcpy(gStructAttributeByteSpanData.Data(), temp.d.data(), octet_size);
     gStructAttributeByteSpanData.SetLength(octet_size);
     gStructAttributeValue.d = gStructAttributeByteSpanData.AsSpan();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TestAttrAccess::ReadGlobalStruct(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(gGlobalStructAttributeValue);
+}
+
+CHIP_ERROR TestAttrAccess::WriteGlobalStruct(AttributeValueDecoder & aDecoder)
+{
+    // We don't support a nonempty charspan here for now.
+    Attributes::GlobalStruct::TypeInfo::DecodableType temp;
+    ReturnErrorOnFailure(aDecoder.Decode(temp));
+
+    VerifyOrReturnError(temp.name.empty(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    gGlobalStructAttributeValue = temp;
     return CHIP_NO_ERROR;
 }
 
@@ -1040,6 +1096,16 @@ bool emberAfUnitTestingClusterSimpleStructEchoRequestCallback(CommandHandler * c
     return true;
 }
 
+bool emberAfUnitTestingClusterStringEchoRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                        const Commands::StringEchoRequest::DecodableType & commandData)
+{
+    Commands::StringEchoResponse::Type response;
+    response.payload = commandData.payload;
+
+    commandObj->AddResponse(commandPath, response);
+    return true;
+}
+
 bool emberAfUnitTestingClusterTimedInvokeRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                          const Commands::TimedInvokeRequest::DecodableType & commandData)
 {
@@ -1103,10 +1169,21 @@ bool emberAfUnitTestingClusterTestSecondBatchHelperRequestCallback(
                                  commandData.fillCharacter);
 }
 
+bool emberAfUnitTestingClusterGlobalEchoRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                        const Commands::GlobalEchoRequest::DecodableType & commandData)
+{
+    Commands::GlobalEchoResponse::Type response;
+    response.field1 = commandData.field1;
+    response.field2 = commandData.field2;
+
+    commandObj->AddResponse(commandPath, response);
+    return true;
+}
+
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
 void MatterUnitTestingPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }

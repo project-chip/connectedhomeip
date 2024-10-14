@@ -36,11 +36,9 @@ types in the SDK.
     -   XML defines conformance
     -   [src/app/zap-templates/zcl/data-model/chip/matter-devices.xml](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap-templates/zcl/data-model/chip/matter-devices.xml)
 
-The following wiki page has a detailed description of how and where to add
-cluster and device type definitions so they are picked up properly by ZAP/ember
-and the SDK.
-
-[https://groups.csa-iot.org/wg/matter-tsg/wiki/howto-add-a-new-device-type](https://groups.csa-iot.org/wg/matter-tsg/wiki/howto-add-a-new-device-type)
+See [How To Add New Device Types & Clusters](how_to_add_new_dts_and_clusters.md)
+for a detailed description of how and where to add cluster and device type
+definitions so they are picked up properly by ZAP/ember and the SDK.
 
 Note that the output should also be verified against the spec using the
 [.matter parser tools](https://project-chip.github.io/connectedhomeip-doc/guides/matter_idl_tooling.html).
@@ -109,9 +107,9 @@ ending in the cluster initialization code.
 EmberAfInitializeAttributes - ember attribute storage - for all attributes
 marked as “RAM” in the zap, sets defaults in the storage
 Matter<Cluster>PluginServerCallback - .h is a generated file, .cpp impl is done
-in the server cluster code. Use this to setup the cluster and do attribute
-overrides registerAttributeAccessOverride - use this if you want to handle
-attribute reads and writes externally
+in the server cluster code. Use this to setup the cluster and setup overrides in
+chip::app::AttributeAccessInterfaceRegistry::Instance().Register - use this if
+you want to handle attribute reads and writes externally
 
 Blue sections can be overridden.
 

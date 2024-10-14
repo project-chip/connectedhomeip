@@ -33,6 +33,10 @@
 
 #include "fsl_device_registers.h"
 
+#if CONFIG_BOOT_REASON_SDK_SUPPORT
+#include "fsl_power.h"
+#endif
+
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
 #include "FactoryDataProvider.h"
 #endif
@@ -54,11 +58,59 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
+#if CONFIG_BOOT_REASON_SDK_SUPPORT
+CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint8_t rebootCause)
+{
+    /*
+    With current implementation kBrownOutReset couldn't be catched
+    */
+    BootReasonType bootReason = BootReasonType::kUnspecified;
+
+    if (rebootCause == 0)
+    {
+        bootReason = BootReasonType::kPowerOnReboot;
+    }
+
+    else if (rebootCause == kPOWER_ResetCauseWdt)
+    {
+        /* Reboot can be due to hardware or software watchdog */
+        bootReason = BootReasonType::kHardwareWatchdogReset;
+    }
+    else if (rebootCause == kPOWER_ResetCauseSysResetReq)
+    {
+        /*
+        kConfigKey_SoftwareUpdateCompleted not supported for now
+        if (NXPConfig::ConfigValueExists(NXPConfig::kConfigKey_SoftwareUpdateCompleted))
+        {
+            bootReason = BootReasonType::kSoftwareUpdateCompleted;
+        }
+        else
+        {
+            bootReason = BootReasonType::kSoftwareReset;
+        }
+        */
+        bootReason = BootReasonType::kSoftwareReset;
+    }
+
+    return StoreBootReason(to_underlying(bootReason));
+}
+#endif
+
+CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareUpdateCompleted()
+{
+    /* Empty implementation*/
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     uint32_t rebootCount = 0;
-    bool failSafeArmed;
+
+#if CONFIG_BOOT_REASON_SDK_SUPPORT
+    uint8_t rebootCause = POWER_GetResetCause();
+    POWER_ClearResetCause(rebootCause);
+#endif
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<NXPConfig>::Init();
@@ -84,12 +136,15 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         err = StoreTotalOperationalHours(0);
         SuccessOrExit(err);
     }
-
+#if CONFIG_BOOT_REASON_SDK_SUPPORT
+    SuccessOrExit(err = DetermineBootReason(rebootCause));
+#else
     if (!NXPConfig::ConfigValueExists(NXPConfig::kCounterKey_BootReason))
     {
         err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
         SuccessOrExit(err);
     }
+#endif
 
     // TODO: Initialize the global GroupKeyStore object here
 

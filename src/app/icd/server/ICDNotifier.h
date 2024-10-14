@@ -39,11 +39,12 @@ class ICDListener
 public:
     enum class KeepActiveFlagsValues : uint8_t
     {
-        kCommissioningWindowOpen = 0x01,
-        kFailSafeArmed           = 0x02,
-        kExchangeContextOpen     = 0x04,
-        kCheckInInProgress       = 0x08,
-        kInvalidFlag             = 0x10, // Move up when adding more flags
+        kCommissioningWindowOpen    = 0x01,
+        kFailSafeArmed              = 0x02,
+        kExchangeContextOpen        = 0x04,
+        kCheckInInProgress          = 0x08,
+        kTestEventTriggerActiveMode = 0x10,
+        kInvalidFlag                = 0x20, // Move up when adding more flags
     };
 
     enum class ICDManagementEvents : uint8_t
@@ -69,6 +70,20 @@ public:
      * @param request : Identity the request source
      */
     virtual void OnKeepActiveRequest(KeepActiveFlags request) = 0;
+
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+    /**
+     * @brief This function is called for all subscribers of the ICDNotifier when it calls NotifySITModeRequestNotification.
+     * It informs the subscriber that the ICD must be kept in SIT mode.
+     */
+    virtual void OnSITModeRequest() = 0;
+
+    /**
+     * @brief This function is called for all subscribers of the ICDNotifier when it calls NotifySITModeRequestWithdrawal.
+     * It informs the subscriber that a previous request no longer needs ICD to be kept in SIT mode.
+     */
+    virtual void OnSITModeRequestWithdrawal() = 0;
+#endif // CHIP_CONFIG_ENABLE_ICD_DSLS
 
     /**
      * @brief This function is called for all subscribers of the ICDNotifier when it calls NotifyActiveRequestWithdrawal.
@@ -108,6 +123,10 @@ public:
     void NotifyNetworkActivityNotification();
     void NotifyActiveRequestNotification(ICDListener::KeepActiveFlags request);
     void NotifyActiveRequestWithdrawal(ICDListener::KeepActiveFlags request);
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+    void NotifySITModeRequestNotification();
+    void NotifySITModeRequestWithdrawal();
+#endif // CHIP_CONFIG_ENABLE_ICD_DSLS
     void NotifyICDManagementEvent(ICDListener::ICDManagementEvents event);
     void NotifySubscriptionReport();
 

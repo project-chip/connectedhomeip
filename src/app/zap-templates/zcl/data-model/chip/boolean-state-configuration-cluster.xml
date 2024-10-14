@@ -17,14 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0080"/>
-    <field name="Visual" mask="0x1"/>
-    <field name="Audible" mask="0x2"/>
-    <field name="AlarmSuppress" mask="0x4"/>
-    <field name="SensitivityLevel" mask="0x8"/>
-  </bitmap>
-
   <bitmap name="AlarmModeBitmap" type="bitmap8">
     <cluster code="0x0080"/>
     <field name="Visual" mask="0x1"/>
@@ -36,7 +28,7 @@ limitations under the License.
     <field name="GeneralFault" mask="0x1"/>
   </bitmap>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <domain>General</domain>
     <name>Boolean State Configuration</name>
     <code>0x0080</code>
@@ -45,6 +37,26 @@ limitations under the License.
     <server tick="false" init="false">true</server>
     <description>This cluster is used to configure a boolean sensor.</description>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
+
+    <features>
+      <feature bit="0" code="VIS" name="Visual" summary="Supports visual alarms">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="AUD" name="Audible" summary="Supports audible alarms">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="SPRS" name="AlarmSuppress" summary="Supports ability to suppress or acknowledge alarms">
+        <optionalConform>
+          <orTerm>
+            <feature name="VIS"/>
+            <feature name="AUD"/>
+          </orTerm>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="SENSLVL" name="SensitivityLevel" summary="Supports ability to set sensor sensitivity">
+        <optionalConform/>
+      </feature>
+    </features>
 
     <attribute side="server" code="0x0000" define="CURRENT_SENSITIVITY_LEVEL" type="int8u" isNullable="false" writable="true" optional="true">CurrentSensitivityLevel</attribute>
     <attribute side="server" code="0x0001" define="SUPPORTED_SENSITIVITY_LEVELS" type="int8u" isNullable="false" min="2" max="10" writable="false" optional="true">SupportedSensitivityLevels</attribute>

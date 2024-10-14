@@ -168,6 +168,7 @@ class CodeGenerator:
         if self.dry_run:
             return
 
+        logging.info(f"Template path: {template_path}, CWD: {os.getcwd()}")
         rendered = self.jinja_env.get_template(template_path).render(vars)
 
         # Report regardless if it has changed or not. This is because even if

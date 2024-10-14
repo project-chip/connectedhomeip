@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 100,
+  "featureLevel": 103,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -29,6 +29,7 @@
       "pathRelativity": "relativeToZap",
       "path": "../../../src/app/zap-templates/app-templates.json",
       "type": "gen-templates-json",
+      "category": "matter",
       "version": "chip-v1"
     }
   ],
@@ -768,24 +769,6 @@
               "source": "client",
               "isIncoming": 0,
               "isEnabled": 1
-            }
-          ],
-          "attributes": [
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x0001",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
             }
           ]
         },
@@ -2316,13 +2299,21 @@
           "profileId": 259,
           "label": "MA-contactsensor",
           "name": "MA-contactsensor"
+        },
+        {
+          "code": 17,
+          "profileId": 259,
+          "label": "MA-powersource",
+          "name": "MA-powersource"
         }
       ],
       "deviceVersions": [
+        1,
         1
       ],
       "deviceIdentifiers": [
-        21
+        21,
+        17
       ],
       "deviceTypeName": "MA-contactsensor",
       "deviceTypeCode": 21,
@@ -2339,6 +2330,14 @@
             {
               "name": "Identify",
               "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "TriggerEffect",
+              "code": 64,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
@@ -2397,6 +2396,22 @@
             {
               "name": "AcceptedCommandList",
               "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "EventList",
+              "code": 65530,
               "mfgCode": null,
               "side": "server",
               "type": "array",
@@ -2632,7 +2647,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2645,10 +2660,10 @@
               "side": "server",
               "type": "int8u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "NVM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2664,7 +2679,167 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "Primary Battery",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatVoltage",
+              "code": 11,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int32u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "4100",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatPercentRemaining",
+              "code": 12,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "95",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatTimeRemaining",
+              "code": 13,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int32u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "5184000",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatChargeLevel",
+              "code": 14,
+              "mfgCode": null,
+              "side": "server",
+              "type": "BatChargeLevelEnum",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatReplacementNeeded",
+              "code": 15,
+              "mfgCode": null,
+              "side": "server",
+              "type": "boolean",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatReplaceability",
+              "code": 16,
+              "mfgCode": null,
+              "side": "server",
+              "type": "BatReplaceabilityEnum",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatPresent",
+              "code": 17,
+              "mfgCode": null,
+              "side": "server",
+              "type": "boolean",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatCapacity",
+              "code": 24,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int32u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "350",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatChargeState",
+              "code": 26,
+              "mfgCode": null,
+              "side": "server",
+              "type": "BatChargeStateEnum",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "4",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "BatFunctionalWhileCharging",
+              "code": 28,
+              "mfgCode": null,
+              "side": "server",
+              "type": "boolean",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2760,7 +2935,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "0x06",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3060,6 +3235,14 @@
               "isEnabled": 1
             },
             {
+              "name": "GlobalEchoResponse",
+              "code": 14,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
               "name": "TestNullableOptionalRequest",
               "code": 15,
               "mfgCode": null,
@@ -3118,6 +3301,14 @@
             {
               "name": "TestSecondBatchHelperRequest",
               "code": 23,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "GlobalEchoRequest",
+              "code": 25,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
@@ -3894,6 +4085,38 @@
               "reportableChange": 0
             },
             {
+              "name": "global_enum",
+              "code": 51,
+              "mfgCode": null,
+              "side": "server",
+              "type": "TestGlobalEnum",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "global_struct",
+              "code": 52,
+              "mfgCode": null,
+              "side": "server",
+              "type": "TestGlobalStruct",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "nullable_boolean",
               "code": 16384,
               "mfgCode": null,
@@ -4438,6 +4661,38 @@
               "reportableChange": 0
             },
             {
+              "name": "nullable_global_enum",
+              "code": 16435,
+              "mfgCode": null,
+              "side": "server",
+              "type": "TestGlobalEnum",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "nullable_global_struct",
+              "code": 16436,
+              "mfgCode": null,
+              "side": "server",
+              "type": "TestGlobalStruct",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "FeatureMap",
               "code": 65532,
               "mfgCode": null,
@@ -4525,7 +4780,7 @@
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 1,
-      "profileId": 260,
+      "profileId": 259,
       "endpointId": 1,
       "networkId": 0,
       "parentEndpointIdentifier": null

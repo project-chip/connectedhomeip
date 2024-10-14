@@ -20,12 +20,16 @@
  * @brief Implementation for the Operational State Server Cluster
  ***************************************************************************/
 #include "operational-state-server.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -40,14 +44,17 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
     mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId)
 {
     mDelegate->SetInstance(this);
+    mCountdownTime.policy()
+        .Set(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement)
+        .Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
 }
 
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId) : Instance(aDelegate, aEndpointId, OperationalState::Id) {}
 
 Instance::~Instance()
 {
-    InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
-    unregisterAttributeAccessOverride(this);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 CHIP_ERROR Instance::Init()
@@ -59,9 +66,9 @@ CHIP_ERROR Instance::Init()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
 
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;
 }
@@ -81,6 +88,7 @@ CHIP_ERROR Instance::SetCurrentPhase(const DataModel::Nullable<uint8_t> & aPhase
     if (mCurrentPhase != oldPhase)
     {
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::CurrentPhase::Id);
+        UpdateCountdownTimeFromClusterLogic();
     }
     return CHIP_NO_ERROR;
 }
@@ -93,9 +101,11 @@ CHIP_ERROR Instance::SetOperationalState(uint8_t aOpState)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    bool countdownTimeUpdateNeeded = false;
     if (mOperationalError.errorStateID != to_underlying(ErrorStateEnum::kNoError))
     {
         mOperationalError.Set(to_underlying(ErrorStateEnum::kNoError));
+        countdownTimeUpdateNeeded = true;
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OperationalError::Id);
     }
 
@@ -104,6 +114,12 @@ CHIP_ERROR Instance::SetOperationalState(uint8_t aOpState)
     if (mOperationalState != oldState)
     {
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OperationalState::Id);
+        countdownTimeUpdateNeeded = true;
+    }
+
+    if (countdownTimeUpdateNeeded)
+    {
+        UpdateCountdownTimeFromClusterLogic();
     }
     return CHIP_NO_ERROR;
 }
@@ -140,6 +156,8 @@ void Instance::OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type 
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OperationalError::Id);
     }
 
+    UpdateCountdownTimeFromClusterLogic();
+
     // Generate an ErrorDetected event
     GenericErrorEvent event(mClusterId, aError);
     EventNumber eventNumber;
@@ -153,7 +171,7 @@ void Instance::OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type 
 
 void Instance::OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
                                              const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime,
-                                             const Optional<DataModel::Nullable<uint32_t>> & aPausedTime) const
+                                             const Optional<DataModel::Nullable<uint32_t>> & aPausedTime)
 {
     ChipLogDetail(Zcl, "OperationalStateServer: OnOperationCompletionDetected");
 
@@ -166,6 +184,8 @@ void Instance::OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
         ChipLogError(Zcl, "OperationalStateServer: Failed to record OperationCompletion event: %" CHIP_ERROR_FORMAT,
                      error.Format());
     }
+
+    UpdateCountdownTimeFromClusterLogic();
 }
 
 void Instance::ReportOperationalStateListChange()
@@ -176,6 +196,43 @@ void Instance::ReportOperationalStateListChange()
 void Instance::ReportPhaseListChange()
 {
     MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::PhaseList::Id));
+    UpdateCountdownTimeFromClusterLogic();
+}
+
+void Instance::UpdateCountdownTime(bool fromDelegate)
+{
+    app::DataModel::Nullable<uint32_t> newCountdownTime = mDelegate->GetCountdownTime();
+    auto now                                            = System::SystemClock().GetMonotonicTimestamp();
+
+    bool markDirty = false;
+
+    if (fromDelegate)
+    {
+        // Updates from delegate are reduce-reported to every 10s max (choice of this implementation), in addition
+        // to default change-from-null, change-from-zero and increment policy.
+        auto predicate = [](const decltype(mCountdownTime)::SufficientChangePredicateCandidate & candidate) -> bool {
+            if (candidate.lastDirtyValue.IsNull() || candidate.newValue.IsNull())
+            {
+                return false;
+            }
+
+            uint32_t lastDirtyValue           = candidate.lastDirtyValue.Value();
+            uint32_t newValue                 = candidate.newValue.Value();
+            uint32_t kNumSecondsDeltaToReport = 10;
+            return (newValue < lastDirtyValue) && ((lastDirtyValue - newValue) > kNumSecondsDeltaToReport);
+        };
+        markDirty = (mCountdownTime.SetValue(newCountdownTime, now, predicate) == AttributeDirtyState::kMustReport);
+    }
+    else
+    {
+        auto predicate = [](const decltype(mCountdownTime)::SufficientChangePredicateCandidate &) -> bool { return true; };
+        markDirty      = (mCountdownTime.SetValue(newCountdownTime, now, predicate) == AttributeDirtyState::kMustReport);
+    }
+
+    if (markDirty)
+    {
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::CountdownTime::Id);
+    }
 }
 
 bool Instance::IsSupportedPhase(uint8_t aPhase)
@@ -267,6 +324,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         ChipLogDetail(Zcl, "OperationalState: Entering handling derived cluster commands");
 
         InvokeDerivedClusterCommand(handlerContext);
+        break;
     }
 }
 
@@ -291,18 +349,18 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
             }
             return err;
         });
+        break;
     }
-    break;
 
     case OperationalState::Attributes::OperationalState::Id: {
         ReturnErrorOnFailure(aEncoder.Encode(GetCurrentOperationalState()));
+        break;
     }
-    break;
 
     case OperationalState::Attributes::OperationalError::Id: {
         ReturnErrorOnFailure(aEncoder.Encode(mOperationalError));
+        break;
     }
-    break;
 
     case OperationalState::Attributes::PhaseList::Id: {
 
@@ -329,18 +387,19 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
                 ReturnErrorOnFailure(encoder.Encode(phase2));
             }
         });
+        break;
     }
-    break;
 
     case OperationalState::Attributes::CurrentPhase::Id: {
         ReturnErrorOnFailure(aEncoder.Encode(GetCurrentPhase()));
+        break;
     }
-    break;
 
     case OperationalState::Attributes::CountdownTime::Id: {
+        // Read through to get value closest to reality.
         ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetCountdownTime()));
+        break;
     }
-    break;
     }
     return CHIP_NO_ERROR;
 }

@@ -13,11 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/support/UnitTestRegistration.h>
+
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <tracing/backend.h>
 #include <tracing/metric_event.h>
-
-#include <nlunit-test.h>
 
 #include <algorithm>
 #include <string>
@@ -74,56 +75,56 @@ private:
     std::vector<MetricEvent> mMetricEvents;
 };
 
-void TestBasicMetricEvent(nlTestSuite * inSuite, void * inContext)
+TEST(TestMetricEvents, TestBasicMetricEvent)
 {
 
     {
         MetricEvent event(MetricEvent::Type::kInstantEvent, "instant_event");
-        NL_TEST_ASSERT(inSuite, event.type() == MetricEvent::Type::kInstantEvent);
-        NL_TEST_ASSERT(inSuite, std::string(event.key()) == std::string("instant_event"));
-        NL_TEST_ASSERT(inSuite, event.ValueType() == MetricEvent::Value::Type::kUndefined);
+        EXPECT_EQ(event.type(), MetricEvent::Type::kInstantEvent);
+        EXPECT_EQ(std::string(event.key()), std::string("instant_event"));
+        EXPECT_EQ(event.ValueType(), MetricEvent::Value::Type::kUndefined);
     }
 
     {
         MetricEvent event(MetricEvent::Type::kBeginEvent, "begin_event");
-        NL_TEST_ASSERT(inSuite, event.type() == MetricEvent::Type::kBeginEvent);
-        NL_TEST_ASSERT(inSuite, std::string(event.key()) == std::string("begin_event"));
-        NL_TEST_ASSERT(inSuite, event.ValueType() == MetricEvent::Value::Type::kUndefined);
+        EXPECT_EQ(event.type(), MetricEvent::Type::kBeginEvent);
+        EXPECT_EQ(std::string(event.key()), std::string("begin_event"));
+        EXPECT_EQ(event.ValueType(), MetricEvent::Value::Type::kUndefined);
     }
 
     {
         MetricEvent event(MetricEvent::Type::kEndEvent, "end_event");
-        NL_TEST_ASSERT(inSuite, event.type() == MetricEvent::Type::kEndEvent);
-        NL_TEST_ASSERT(inSuite, std::string(event.key()) == std::string("end_event"));
-        NL_TEST_ASSERT(inSuite, event.ValueType() == MetricEvent::Value::Type::kUndefined);
+        EXPECT_EQ(event.type(), MetricEvent::Type::kEndEvent);
+        EXPECT_EQ(std::string(event.key()), std::string("end_event"));
+        EXPECT_EQ(event.ValueType(), MetricEvent::Value::Type::kUndefined);
     }
 
     {
         MetricEvent event(MetricEvent::Type::kEndEvent, "end_event_with_int32_value", int32_t(42));
-        NL_TEST_ASSERT(inSuite, event.type() == MetricEvent::Type::kEndEvent);
-        NL_TEST_ASSERT(inSuite, std::string(event.key()) == std::string("end_event_with_int32_value"));
-        NL_TEST_ASSERT(inSuite, event.ValueType() == MetricEvent::Value::Type::kInt32);
-        NL_TEST_ASSERT(inSuite, event.ValueInt32() == 42);
+        EXPECT_EQ(event.type(), MetricEvent::Type::kEndEvent);
+        EXPECT_EQ(std::string(event.key()), std::string("end_event_with_int32_value"));
+        EXPECT_EQ(event.ValueType(), MetricEvent::Value::Type::kInt32);
+        EXPECT_EQ(event.ValueInt32(), 42);
     }
 
     {
         MetricEvent event(MetricEvent::Type::kEndEvent, "end_event_with_uint32_value", uint32_t(42));
-        NL_TEST_ASSERT(inSuite, event.type() == MetricEvent::Type::kEndEvent);
-        NL_TEST_ASSERT(inSuite, std::string(event.key()) == std::string("end_event_with_uint32_value"));
-        NL_TEST_ASSERT(inSuite, event.ValueType() == MetricEvent::Value::Type::kUInt32);
-        NL_TEST_ASSERT(inSuite, event.ValueUInt32() == 42u);
+        EXPECT_EQ(event.type(), MetricEvent::Type::kEndEvent);
+        EXPECT_EQ(std::string(event.key()), std::string("end_event_with_uint32_value"));
+        EXPECT_EQ(event.ValueType(), MetricEvent::Value::Type::kUInt32);
+        EXPECT_EQ(event.ValueUInt32(), 42u);
     }
 
     {
         MetricEvent event(MetricEvent::Type::kEndEvent, "end_event_with_error_value", CHIP_ERROR_BUSY);
-        NL_TEST_ASSERT(inSuite, event.type() == MetricEvent::Type::kEndEvent);
-        NL_TEST_ASSERT(inSuite, std::string(event.key()) == std::string("end_event_with_error_value"));
-        NL_TEST_ASSERT(inSuite, event.ValueType() == MetricEvent::Value::Type::kChipErrorCode);
-        NL_TEST_ASSERT(inSuite, chip::ChipError(event.ValueErrorCode()) == CHIP_ERROR_BUSY);
+        EXPECT_EQ(event.type(), MetricEvent::Type::kEndEvent);
+        EXPECT_EQ(std::string(event.key()), std::string("end_event_with_error_value"));
+        EXPECT_EQ(event.ValueType(), MetricEvent::Value::Type::kChipErrorCode);
+        EXPECT_EQ(chip::ChipError(event.ValueErrorCode()), CHIP_ERROR_BUSY);
     }
 }
 
-void TestInstantMetricEvent(nlTestSuite * inSuite, void * inContext)
+TEST(TestMetricEvents, TestInstantMetricEvent)
 {
     MetricEventBackend backend;
 
@@ -141,12 +142,11 @@ void TestInstantMetricEvent(nlTestSuite * inSuite, void * inContext)
         MetricEvent(MetricEvent::Type::kInstantEvent, "event3"),
     };
 
-    NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
-    NL_TEST_ASSERT(
-        inSuite, std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
+    EXPECT_EQ(backend.GetMetricEvents().size(), expected.size());
+    EXPECT_TRUE(std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
-void TestBeginEndMetricEvent(nlTestSuite * inSuite, void * inContext)
+TEST(TestMetricEvents, TestBeginEndMetricEvent)
 {
     MetricEventBackend backend1;
     MetricEventBackend backend2;
@@ -168,9 +168,8 @@ void TestBeginEndMetricEvent(nlTestSuite * inSuite, void * inContext)
             MetricEvent(MetricEvent::Type::kEndEvent, "event1"),
         };
 
-        NL_TEST_ASSERT(inSuite, backend1.GetMetricEvents().size() == expected1.size());
-        NL_TEST_ASSERT(
-            inSuite,
+        EXPECT_EQ(backend1.GetMetricEvents().size(), expected1.size());
+        EXPECT_TRUE(
             std::equal(backend1.GetMetricEvents().begin(), backend1.GetMetricEvents().end(), expected1.begin(), expected1.end()));
 
         {
@@ -197,14 +196,13 @@ void TestBeginEndMetricEvent(nlTestSuite * inSuite, void * inContext)
             MetricEvent(MetricEvent::Type::kEndEvent, "event4"),
         };
 
-        NL_TEST_ASSERT(inSuite, backend2.GetMetricEvents().size() == expected2.size());
-        NL_TEST_ASSERT(
-            inSuite,
+        EXPECT_EQ(backend2.GetMetricEvents().size(), expected2.size());
+        EXPECT_TRUE(
             std::equal(backend2.GetMetricEvents().begin(), backend2.GetMetricEvents().end(), expected2.begin(), expected2.end()));
     }
 }
 
-void TestScopedMetricEvent(nlTestSuite * inSuite, void * inContext)
+TEST(TestMetricEvents, TestScopedMetricEvent)
 {
     MetricEventBackend backend1;
     MetricEventBackend backend2;
@@ -247,9 +245,8 @@ void TestScopedMetricEvent(nlTestSuite * inSuite, void * inContext)
             MetricEvent(MetricEvent::Type::kEndEvent, "event1", CHIP_ERROR_BUSY),
         };
 
-        NL_TEST_ASSERT(inSuite, backend1.GetMetricEvents().size() == expected1.size());
-        NL_TEST_ASSERT(
-            inSuite,
+        EXPECT_EQ(backend1.GetMetricEvents().size(), expected1.size());
+        EXPECT_TRUE(
             std::equal(backend1.GetMetricEvents().begin(), backend1.GetMetricEvents().end(), expected1.begin(), expected1.end()));
 
         std::vector<MetricEvent> expected2 = {
@@ -261,9 +258,8 @@ void TestScopedMetricEvent(nlTestSuite * inSuite, void * inContext)
             MetricEvent(MetricEvent::Type::kEndEvent, "event2", CHIP_ERROR_BAD_REQUEST),
         };
 
-        NL_TEST_ASSERT(inSuite, backend2.GetMetricEvents().size() == expected2.size());
-        NL_TEST_ASSERT(
-            inSuite,
+        EXPECT_EQ(backend2.GetMetricEvents().size(), expected2.size());
+        EXPECT_TRUE(
             std::equal(backend2.GetMetricEvents().begin(), backend2.GetMetricEvents().end(), expected2.begin(), expected2.end()));
 
         std::vector<MetricEvent> expected3 = {
@@ -271,9 +267,8 @@ void TestScopedMetricEvent(nlTestSuite * inSuite, void * inContext)
             MetricEvent(MetricEvent::Type::kEndEvent, "event3", CHIP_ERROR_EVENT_ID_FOUND),
         };
 
-        NL_TEST_ASSERT(inSuite, backend3.GetMetricEvents().size() == expected3.size());
-        NL_TEST_ASSERT(
-            inSuite,
+        EXPECT_EQ(backend3.GetMetricEvents().size(), expected3.size());
+        EXPECT_TRUE(
             std::equal(backend3.GetMetricEvents().begin(), backend3.GetMetricEvents().end(), expected3.begin(), expected3.end()));
     }
 }
@@ -283,7 +278,7 @@ static int DoubleOf(int input)
     return input * 2;
 }
 
-void TestVerifyOrExitWithMetric(nlTestSuite * inSuite, void * inContext)
+TEST(TestMetricEvents, TestVerifyOrExitWithMetric)
 {
     MetricEventBackend backend;
     ScopedRegistration scope(backend);
@@ -297,13 +292,12 @@ exit:
         MetricEvent(MetricEvent::Type::kInstantEvent, "event1", CHIP_ERROR_INCORRECT_STATE),
     };
 
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
-    NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
-    NL_TEST_ASSERT(
-        inSuite, std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(backend.GetMetricEvents().size(), expected.size());
+    EXPECT_TRUE(std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
-void TestSuccessOrExitWithMetric(nlTestSuite * inSuite, void * inContext)
+TEST(TestMetricEvents, TestSuccessOrExitWithMetric)
 {
     MetricEventBackend backend;
     ScopedRegistration scope(backend);
@@ -318,10 +312,9 @@ exit:
         MetricEvent(MetricEvent::Type::kInstantEvent, "event2", CHIP_ERROR_BUSY),
     };
 
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUSY);
-    NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
-    NL_TEST_ASSERT(
-        inSuite, std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
+    EXPECT_EQ(err, CHIP_ERROR_BUSY);
+    EXPECT_EQ(backend.GetMetricEvents().size(), expected.size());
+    EXPECT_TRUE(std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
 static CHIP_ERROR InvokeReturnErrorOnFailureWithMetric(MetricKey key, const CHIP_ERROR & error)
@@ -330,28 +323,27 @@ static CHIP_ERROR InvokeReturnErrorOnFailureWithMetric(MetricKey key, const CHIP
     return CHIP_NO_ERROR;
 }
 
-void TestReturnErrorOnFailureWithMetric(nlTestSuite * inSuite, void * inContext)
+TEST(TestMetricEvents, TestReturnErrorOnFailureWithMetric)
 {
     MetricEventBackend backend;
     ScopedRegistration scope(backend);
 
     CHIP_ERROR err = InvokeReturnErrorOnFailureWithMetric("event0", CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = InvokeReturnErrorOnFailureWithMetric("event1", CHIP_ERROR_INCORRECT_STATE);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
 
     err = InvokeReturnErrorOnFailureWithMetric("event2", CHIP_ERROR_BAD_REQUEST);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BAD_REQUEST);
+    EXPECT_EQ(err, CHIP_ERROR_BAD_REQUEST);
 
     std::vector<MetricEvent> expected = {
         MetricEvent(MetricEvent::Type::kInstantEvent, "event1", CHIP_ERROR_INCORRECT_STATE),
         MetricEvent(MetricEvent::Type::kInstantEvent, "event2", CHIP_ERROR_BAD_REQUEST),
     };
 
-    NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
-    NL_TEST_ASSERT(
-        inSuite, std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
+    EXPECT_EQ(backend.GetMetricEvents().size(), expected.size());
+    EXPECT_TRUE(std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
 static CHIP_ERROR InvokeReturnLogErrorOnFailureWithMetric(MetricKey key, const CHIP_ERROR & error)
@@ -360,28 +352,27 @@ static CHIP_ERROR InvokeReturnLogErrorOnFailureWithMetric(MetricKey key, const C
     return CHIP_NO_ERROR;
 }
 
-void TestReturnLogErrorOnFailureWithMetric(nlTestSuite * inSuite, void * inContext)
+TEST(TestMetricEvents, TestReturnLogErrorOnFailureWithMetric)
 {
     MetricEventBackend backend;
     ScopedRegistration scope(backend);
 
     CHIP_ERROR err = InvokeReturnLogErrorOnFailureWithMetric("event0", CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = InvokeReturnLogErrorOnFailureWithMetric("event1", CHIP_ERROR_INCORRECT_STATE);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
 
     err = InvokeReturnLogErrorOnFailureWithMetric("event2", CHIP_ERROR_BAD_REQUEST);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BAD_REQUEST);
+    EXPECT_EQ(err, CHIP_ERROR_BAD_REQUEST);
 
     std::vector<MetricEvent> expected = {
         MetricEvent(MetricEvent::Type::kInstantEvent, "event1", CHIP_ERROR_INCORRECT_STATE),
         MetricEvent(MetricEvent::Type::kInstantEvent, "event2", CHIP_ERROR_BAD_REQUEST),
     };
 
-    NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
-    NL_TEST_ASSERT(
-        inSuite, std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
+    EXPECT_EQ(backend.GetMetricEvents().size(), expected.size());
+    EXPECT_TRUE(std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
 static void InvokeReturnOnFailureWithMetric(MetricKey key, const CHIP_ERROR & error)
@@ -390,7 +381,7 @@ static void InvokeReturnOnFailureWithMetric(MetricKey key, const CHIP_ERROR & er
     return;
 }
 
-void TestReturnOnFailureWithMetric(nlTestSuite * inSuite, void * inContext)
+TEST(TestMetricEvents, TestReturnOnFailureWithMetric)
 {
     MetricEventBackend backend;
     ScopedRegistration scope(backend);
@@ -406,9 +397,8 @@ void TestReturnOnFailureWithMetric(nlTestSuite * inSuite, void * inContext)
         MetricEvent(MetricEvent::Type::kInstantEvent, "event2", CHIP_ERROR_BAD_REQUEST),
     };
 
-    NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
-    NL_TEST_ASSERT(
-        inSuite, std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
+    EXPECT_EQ(backend.GetMetricEvents().size(), expected.size());
+    EXPECT_TRUE(std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
 static void InvokeVerifyOrReturnWithMetric(MetricKey key, bool result)
@@ -417,7 +407,7 @@ static void InvokeVerifyOrReturnWithMetric(MetricKey key, bool result)
     return;
 }
 
-void TestInvokeVerifyOrReturnWithMetric(nlTestSuite * inSuite, void * inContext)
+TEST(TestMetricEvents, TestInvokeVerifyOrReturnWithMetric)
 {
     MetricEventBackend backend;
     ScopedRegistration scope(backend);
@@ -432,9 +422,8 @@ void TestInvokeVerifyOrReturnWithMetric(nlTestSuite * inSuite, void * inContext)
         MetricEvent(MetricEvent::Type::kInstantEvent, "event3", false),
     };
 
-    NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
-    NL_TEST_ASSERT(
-        inSuite, std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
+    EXPECT_EQ(backend.GetMetricEvents().size(), expected.size());
+    EXPECT_TRUE(std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
 static CHIP_ERROR InvokeVerifyOrReturnErrorWithMetric(MetricKey key, bool expr, const CHIP_ERROR & error)
@@ -443,31 +432,30 @@ static CHIP_ERROR InvokeVerifyOrReturnErrorWithMetric(MetricKey key, bool expr, 
     return CHIP_NO_ERROR;
 }
 
-void TestVerifyOrReturnErrorWithMetric(nlTestSuite * inSuite, void * inContext)
+TEST(TestMetricEvents, TestVerifyOrReturnErrorWithMetric)
 {
     MetricEventBackend backend;
     ScopedRegistration scope(backend);
 
     CHIP_ERROR err = InvokeVerifyOrReturnErrorWithMetric("event0", DoubleOf(2) == 4, CHIP_ERROR_BAD_REQUEST);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = InvokeVerifyOrReturnErrorWithMetric("event1", DoubleOf(3) == 9, CHIP_ERROR_ACCESS_DENIED);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ACCESS_DENIED);
+    EXPECT_EQ(err, CHIP_ERROR_ACCESS_DENIED);
 
     err = InvokeVerifyOrReturnErrorWithMetric("event2", DoubleOf(4) == 8, CHIP_ERROR_BUSY);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = InvokeVerifyOrReturnErrorWithMetric("event3", DoubleOf(5) == 11, CHIP_ERROR_CANCELLED);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CANCELLED);
+    EXPECT_EQ(err, CHIP_ERROR_CANCELLED);
 
     std::vector<MetricEvent> expected = {
         MetricEvent(MetricEvent::Type::kInstantEvent, "event1", CHIP_ERROR_ACCESS_DENIED),
         MetricEvent(MetricEvent::Type::kInstantEvent, "event3", CHIP_ERROR_CANCELLED),
     };
 
-    NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
-    NL_TEST_ASSERT(
-        inSuite, std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
+    EXPECT_EQ(backend.GetMetricEvents().size(), expected.size());
+    EXPECT_TRUE(std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
 template <typename return_code_type>
@@ -477,31 +465,30 @@ static return_code_type InvokeVerifyOrReturnValueWithMetric(MetricKey key, bool 
     return return_code_type();
 }
 
-void TestVerifyOrReturnValueWithMetric(nlTestSuite * inSuite, void * inContext)
+TEST(TestMetricEvents, TestVerifyOrReturnValueWithMetric)
 {
     MetricEventBackend backend;
     ScopedRegistration scope(backend);
 
     auto retval = InvokeVerifyOrReturnValueWithMetric("event0", DoubleOf(2) == 4, 0);
-    NL_TEST_ASSERT(inSuite, retval == 0);
+    EXPECT_EQ(retval, 0);
 
     auto err = InvokeVerifyOrReturnValueWithMetric("event1", DoubleOf(3) == 9, CHIP_ERROR_ACCESS_DENIED);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ACCESS_DENIED);
+    EXPECT_EQ(err, CHIP_ERROR_ACCESS_DENIED);
 
     err = InvokeVerifyOrReturnValueWithMetric("event2", DoubleOf(4) == 8, CHIP_ERROR_BAD_REQUEST);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     retval = InvokeVerifyOrReturnValueWithMetric("event3", DoubleOf(5) == 11, 16);
-    NL_TEST_ASSERT(inSuite, retval == 16);
+    EXPECT_EQ(retval, 16);
 
     std::vector<MetricEvent> expected = {
         MetricEvent(MetricEvent::Type::kInstantEvent, "event1", CHIP_ERROR_ACCESS_DENIED),
         MetricEvent(MetricEvent::Type::kInstantEvent, "event3", 16),
     };
 
-    NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
-    NL_TEST_ASSERT(
-        inSuite, std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
+    EXPECT_EQ(backend.GetMetricEvents().size(), expected.size());
+    EXPECT_TRUE(std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
 static CHIP_ERROR InvokeVerifyOrReturnLogErrorWithMetric(MetricKey key, bool expr, const CHIP_ERROR & error)
@@ -510,31 +497,30 @@ static CHIP_ERROR InvokeVerifyOrReturnLogErrorWithMetric(MetricKey key, bool exp
     return CHIP_NO_ERROR;
 }
 
-void TestVerifyOrReturnLogErrorWithMetric(nlTestSuite * inSuite, void * inContext)
+TEST(TestMetricEvents, TestVerifyOrReturnLogErrorWithMetric)
 {
     MetricEventBackend backend;
     ScopedRegistration scope(backend);
 
     auto err = InvokeVerifyOrReturnLogErrorWithMetric("event0", DoubleOf(2) == 4, CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = InvokeVerifyOrReturnLogErrorWithMetric("event1", DoubleOf(3) == 9, CHIP_ERROR_CANCELLED);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CANCELLED);
+    EXPECT_EQ(err, CHIP_ERROR_CANCELLED);
 
     err = InvokeVerifyOrReturnLogErrorWithMetric("event2", DoubleOf(4) == 8, CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = InvokeVerifyOrReturnLogErrorWithMetric("event3", DoubleOf(5) == 11, CHIP_ERROR_BAD_REQUEST);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BAD_REQUEST);
+    EXPECT_EQ(err, CHIP_ERROR_BAD_REQUEST);
 
     std::vector<MetricEvent> expected = {
         MetricEvent(MetricEvent::Type::kInstantEvent, "event1", CHIP_ERROR_CANCELLED),
         MetricEvent(MetricEvent::Type::kInstantEvent, "event3", CHIP_ERROR_BAD_REQUEST),
     };
 
-    NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
-    NL_TEST_ASSERT(
-        inSuite, std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
+    EXPECT_EQ(backend.GetMetricEvents().size(), expected.size());
+    EXPECT_TRUE(std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
 template <typename return_code_type>
@@ -544,34 +530,33 @@ static return_code_type InvokeReturnErrorCodeWithMetricIf(MetricKey key, bool ex
     return return_code_type();
 }
 
-void TestReturnErrorCodeWithMetricIf(nlTestSuite * inSuite, void * inContext)
+TEST(TestMetricEvents, TestReturnErrorCodeWithMetricIf)
 {
     MetricEventBackend backend;
     ScopedRegistration scope(backend);
 
     auto err = InvokeReturnErrorCodeWithMetricIf("event0", DoubleOf(2) == 4, CHIP_ERROR_DUPLICATE_KEY_ID);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_DUPLICATE_KEY_ID);
+    EXPECT_EQ(err, CHIP_ERROR_DUPLICATE_KEY_ID);
 
     auto retval = InvokeReturnErrorCodeWithMetricIf("event1", DoubleOf(3) == 9, 11);
-    NL_TEST_ASSERT(inSuite, retval == 0);
+    EXPECT_EQ(retval, 0);
 
     retval = InvokeReturnErrorCodeWithMetricIf("event2", DoubleOf(4) == 8, 22);
-    NL_TEST_ASSERT(inSuite, retval == 22);
+    EXPECT_EQ(retval, 22);
 
     err = InvokeReturnErrorCodeWithMetricIf("event3", DoubleOf(5) == 11, CHIP_ERROR_ACCESS_DENIED);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     std::vector<MetricEvent> expected = {
         MetricEvent(MetricEvent::Type::kInstantEvent, "event0", CHIP_ERROR_DUPLICATE_KEY_ID),
         MetricEvent(MetricEvent::Type::kInstantEvent, "event2", 22),
     };
 
-    NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
-    NL_TEST_ASSERT(
-        inSuite, std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
+    EXPECT_EQ(backend.GetMetricEvents().size(), expected.size());
+    EXPECT_TRUE(std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
-void TestExitNowWithMetric(nlTestSuite * inSuite, void * inContext)
+TEST(TestMetricEvents, TestExitNowWithMetric)
 {
     MetricEventBackend backend;
     ScopedRegistration scope(backend);
@@ -584,13 +569,12 @@ exit:
         MetricEvent(MetricEvent::Type::kInstantEvent, "event0"),
     };
 
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUSY);
-    NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
-    NL_TEST_ASSERT(
-        inSuite, std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
+    EXPECT_EQ(err, CHIP_ERROR_BUSY);
+    EXPECT_EQ(backend.GetMetricEvents().size(), expected.size());
+    EXPECT_TRUE(std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
-void TestLogErrorOnFailureWithMetric(nlTestSuite * inSuite, void * inContext)
+TEST(TestMetricEvents, TestLogErrorOnFailureWithMetric)
 {
     MetricEventBackend backend;
     ScopedRegistration scope(backend);
@@ -606,64 +590,30 @@ void TestLogErrorOnFailureWithMetric(nlTestSuite * inSuite, void * inContext)
         MetricEvent(MetricEvent::Type::kInstantEvent, "event3", CHIP_ERROR_BUSY),
     };
 
-    NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
-    NL_TEST_ASSERT(
-        inSuite, std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
+    EXPECT_EQ(backend.GetMetricEvents().size(), expected.size());
+    EXPECT_TRUE(std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
-void TestVerifyOrDoWithMetric(nlTestSuite * inSuite, void * inContext)
+TEST(TestMetricEvents, TestVerifyOrDoWithMetric)
 {
     MetricEventBackend backend;
     ScopedRegistration scope(backend);
 
-    VerifyOrDoWithMetric("event0", DoubleOf(2) == 5);
-    VerifyOrDoWithMetric("event1", DoubleOf(3) == 6);
-    VerifyOrDoWithMetric("event2", DoubleOf(4) == 7, MATTER_LOG_METRIC("event4", 10));
-    VerifyOrDoWithMetric("event3", DoubleOf(5) == 8);
-    VerifyOrDoWithMetric("event5", DoubleOf(6) == 12);
+    VerifyOrDoWithMetric("event0", DoubleOf(2) == 5, 11);
+    VerifyOrDoWithMetric("event1", DoubleOf(3) == 6, 12);
+    VerifyOrDoWithMetric("event2", DoubleOf(4) == 7, CHIP_ERROR_BAD_REQUEST, MATTER_LOG_METRIC("event4", 10));
+    VerifyOrDoWithMetric("event3", DoubleOf(5) == 8, 13);
+    VerifyOrDoWithMetric("event5", DoubleOf(6) == 12, 14);
 
     std::vector<MetricEvent> expected = {
-        MetricEvent(MetricEvent::Type::kInstantEvent, "event0", false),
-        MetricEvent(MetricEvent::Type::kInstantEvent, "event2", false),
+        MetricEvent(MetricEvent::Type::kInstantEvent, "event0", 11),
+        MetricEvent(MetricEvent::Type::kInstantEvent, "event2", CHIP_ERROR_BAD_REQUEST),
         MetricEvent(MetricEvent::Type::kInstantEvent, "event4", 10),
-        MetricEvent(MetricEvent::Type::kInstantEvent, "event3", false),
+        MetricEvent(MetricEvent::Type::kInstantEvent, "event3", 13),
     };
 
-    NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
-    NL_TEST_ASSERT(
-        inSuite, std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
+    EXPECT_EQ(backend.GetMetricEvents().size(), expected.size());
+    EXPECT_TRUE(std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
-
-static const nlTest sMetricTests[] = {
-    NL_TEST_DEF("BasicMetricEvent", TestBasicMetricEvent),                                   //
-    NL_TEST_DEF("InstantMetricEvent", TestInstantMetricEvent),                               //
-    NL_TEST_DEF("BeginEndMetricEvent", TestBeginEndMetricEvent),                             //
-    NL_TEST_DEF("ScopedMetricEvent", TestScopedMetricEvent),                                 //
-    NL_TEST_DEF("VerifyOrExitWithMetric", TestVerifyOrExitWithMetric),                       //
-    NL_TEST_DEF("SuccessOrExitWithMetric", TestSuccessOrExitWithMetric),                     //
-    NL_TEST_DEF("ReturnErrorOnFailureWithMetric", TestReturnErrorOnFailureWithMetric),       //
-    NL_TEST_DEF("ReturnLogErrorOnFailureWithMetric", TestReturnLogErrorOnFailureWithMetric), //
-    NL_TEST_DEF("ReturnOnFailureWithMetric", TestReturnOnFailureWithMetric),                 //
-    NL_TEST_DEF("VerifyOrReturnWithMetric", TestInvokeVerifyOrReturnWithMetric),             //
-    NL_TEST_DEF("VerifyOrReturnErrorWithMetric", TestVerifyOrReturnErrorWithMetric),         //
-    NL_TEST_DEF("VerifyOrReturnValueWithMetric", TestVerifyOrReturnValueWithMetric),         //
-    NL_TEST_DEF("VerifyOrReturnLogErrorWithMetric", TestVerifyOrReturnLogErrorWithMetric),   //
-    NL_TEST_DEF("ReturnErrorCodeWithMetricIf", TestReturnErrorCodeWithMetricIf),             //
-    NL_TEST_DEF("ExitNowWithMetric", TestExitNowWithMetric),                                 //
-    NL_TEST_DEF("LogErrorOnFailureWithMetric", TestLogErrorOnFailureWithMetric),             //
-    NL_TEST_DEF("VerifyOrDoWithMetric", TestVerifyOrDoWithMetric),                           //
-    NL_TEST_SENTINEL()                                                                       //
-};
 
 } // namespace
-
-int TestMetricEvents()
-{
-    nlTestSuite theSuite = { "Metric event tests", &sMetricTests[0], nullptr, nullptr };
-
-    // Run test suite against one context.
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestMetricEvents)

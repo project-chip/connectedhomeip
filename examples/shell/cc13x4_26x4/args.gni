@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/freertos.gni")
 import("${chip_root}/examples/platform/cc13x4_26x4/args.gni")
 
 ti_simplelink_sdk_target = get_label_info(":sdk", "label_no_toolchain")
@@ -29,7 +30,13 @@ chip_enable_ota_requestor = true
 
 # Disable FTD Build for all-clusters app to save Flash
 chip_openthread_ftd = false
-openthread_external_platform = "${chip_root}/third_party/openthread/platforms/cc13x4_26x4:libopenthread-cc13x4_cc26x4"
+openthread_external_platform =
+    "${chip_root}/third_party/openthread/platforms/ti:libopenthread-ti"
+
+# When using TI Certified Openthread libs set to ${chip_root}/third_party/openthread/platforms/ti:ot-ti-cert
+# For source builds, set to empty string.
+chip_openthread_target =
+    "${chip_root}/third_party/openthread/platforms/ti:ot-ti-cert"
 
 # Disable CHIP Logging
 chip_progress_logging = false
@@ -51,3 +58,15 @@ matter_software_ver = "0x0001"
 matter_software_ver_str = "1.0.1+1"
 
 custom_factory_data = true
+
+# ICD Default configurations
+chip_enable_icd_server = false
+chip_persist_subscriptions = false
+chip_subscription_timeout_resumption = false
+
+freertos_root = "//third_party/connectedhomeip/third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx/source/third_party/freertos"
+
+if (chip_openthread_target != "") {
+  openthread_root =
+      "//third_party/connectedhomeip/third_party/openthread/ot-ti/openthread"
+}

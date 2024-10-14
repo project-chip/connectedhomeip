@@ -14,10 +14,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/dnssd/minimal_mdns/QueryReplyFilter.h>
-#include <lib/support/UnitTestRegistration.h>
 
-#include <nlunit-test.h>
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/dnssd/minimal_mdns/QueryReplyFilter.h>
 
 namespace {
 
@@ -35,7 +36,7 @@ QueryData buildQueryData(QType qType, QClass qClass, const uint8_t (&query)[N])
     return QueryData(qType, qClass, false, query, BytesRange(query, query + N));
 }
 
-void TestQueryReplyFilter(nlTestSuite * inSuite, void * inContext)
+TEST(TestQueryReplyFilter, TestQueryReplyFilter)
 {
     const uint8_t query[] = {
         4, 's', 'o', 'm', 'e',      //
@@ -44,45 +45,34 @@ void TestQueryReplyFilter(nlTestSuite * inSuite, void * inContext)
     };
 
     // sanity test that the serialized qname was build correctly
-    NL_TEST_ASSERT(inSuite, SerializedQNameIterator(BytesRange(query, query + sizeof(query)), query) == FullQName(kName1));
-    NL_TEST_ASSERT(inSuite, SerializedQNameIterator(BytesRange(query, query + sizeof(query)), query) != FullQName(kName2));
-    NL_TEST_ASSERT(inSuite, SerializedQNameIterator(BytesRange(query, query + sizeof(query)), query) != FullQName(kName3));
-    NL_TEST_ASSERT(inSuite, SerializedQNameIterator(BytesRange(query, query + sizeof(query)), query) != FullQName(kName4));
+    EXPECT_EQ(SerializedQNameIterator(BytesRange(query, query + sizeof(query)), query), FullQName(kName1));
+    EXPECT_NE(SerializedQNameIterator(BytesRange(query, query + sizeof(query)), query), FullQName(kName2));
+    EXPECT_NE(SerializedQNameIterator(BytesRange(query, query + sizeof(query)), query), FullQName(kName3));
+    EXPECT_NE(SerializedQNameIterator(BytesRange(query, query + sizeof(query)), query), FullQName(kName4));
 
     // Acceptable cases
-    NL_TEST_ASSERT(
-        inSuite, QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
-    NL_TEST_ASSERT(inSuite,
-                   QueryReplyFilter(buildQueryData(QType::A, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
+    EXPECT_TRUE(QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
+    EXPECT_TRUE(QueryReplyFilter(buildQueryData(QType::A, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
 
-    NL_TEST_ASSERT(inSuite,
-                   QueryReplyFilter(buildQueryData(QType::ANY, QClass::IN, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
+    EXPECT_TRUE(QueryReplyFilter(buildQueryData(QType::ANY, QClass::IN, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
 
-    NL_TEST_ASSERT(inSuite,
-                   QueryReplyFilter(buildQueryData(QType::A, QClass::IN, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
+    EXPECT_TRUE(QueryReplyFilter(buildQueryData(QType::A, QClass::IN, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
 
     // Reject cases
-    NL_TEST_ASSERT(
-        inSuite, !QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName2)));
+    EXPECT_FALSE(QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName2)));
 
-    NL_TEST_ASSERT(
-        inSuite, !QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName3)));
+    EXPECT_FALSE(QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName3)));
 
-    NL_TEST_ASSERT(
-        inSuite, !QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName4)));
+    EXPECT_FALSE(QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName4)));
 
-    NL_TEST_ASSERT(
-        inSuite,
-        !QueryReplyFilter(buildQueryData(QType::AAAA, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
+    EXPECT_FALSE(QueryReplyFilter(buildQueryData(QType::AAAA, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
 
-    NL_TEST_ASSERT(
-        inSuite, !QueryReplyFilter(buildQueryData(QType::SRV, QClass::IN, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
+    EXPECT_FALSE(QueryReplyFilter(buildQueryData(QType::SRV, QClass::IN, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
 
-    NL_TEST_ASSERT(
-        inSuite, !QueryReplyFilter(buildQueryData(QType::PTR, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
+    EXPECT_FALSE(QueryReplyFilter(buildQueryData(QType::PTR, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
 }
 
-void TestLongerQueryPath(nlTestSuite * inSuite, void * inContext)
+TEST(TestQueryReplyFilter, TestLongerQueryPath)
 {
     const uint8_t query[] = {
         4, 'm', 'o', 'r', 'e',                     //
@@ -93,30 +83,12 @@ void TestLongerQueryPath(nlTestSuite * inSuite, void * inContext)
     };
 
     // sanity test that the serialized qname was build correctly
-    NL_TEST_ASSERT(inSuite, SerializedQNameIterator(BytesRange(query, query + sizeof(query)), query) != FullQName(kName1));
-    NL_TEST_ASSERT(inSuite, SerializedQNameIterator(BytesRange(query, query + sizeof(query)), query) != FullQName(kName2));
-    NL_TEST_ASSERT(inSuite, SerializedQNameIterator(BytesRange(query, query + sizeof(query)), query) == FullQName(kName3));
-    NL_TEST_ASSERT(inSuite, SerializedQNameIterator(BytesRange(query, query + sizeof(query)), query) != FullQName(kName4));
+    EXPECT_NE(SerializedQNameIterator(BytesRange(query, query + sizeof(query)), query), FullQName(kName1));
+    EXPECT_NE(SerializedQNameIterator(BytesRange(query, query + sizeof(query)), query), FullQName(kName2));
+    EXPECT_EQ(SerializedQNameIterator(BytesRange(query, query + sizeof(query)), query), FullQName(kName3));
+    EXPECT_NE(SerializedQNameIterator(BytesRange(query, query + sizeof(query)), query), FullQName(kName4));
 
-    NL_TEST_ASSERT(
-        inSuite, !QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
-    NL_TEST_ASSERT(
-        inSuite, QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName3)));
+    EXPECT_FALSE(QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
+    EXPECT_TRUE(QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName3)));
 }
-
-const nlTest sTests[] = {
-    NL_TEST_DEF("TestQueryReplyFilter", TestQueryReplyFilter), //
-    NL_TEST_DEF("TestLongerQueryPath", TestLongerQueryPath),   //
-    NL_TEST_SENTINEL()                                         //
-};
-
 } // namespace
-
-int TestQueryReplyFilter()
-{
-    nlTestSuite theSuite = { "QueryReplyFilter", sTests, nullptr, nullptr };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestQueryReplyFilter)

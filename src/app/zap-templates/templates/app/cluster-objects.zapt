@@ -35,6 +35,18 @@ namespace Structs {
 } // namespace detail
 
 namespace Globals {
+
+// Global structs.
+namespace Structs {
+
+{{#zcl_structs}}
+{{#if has_no_clusters}}
+{{> cluster_objects_struct header=true}}
+
+{{/if}}
+{{/zcl_structs}}
+} // namespace Structs
+
 namespace Attributes {
 {{#zcl_attributes_server}}
 {{#unless clusterRef}}

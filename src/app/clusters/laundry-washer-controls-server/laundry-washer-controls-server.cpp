@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/util/af.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 
@@ -26,7 +26,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
@@ -187,7 +187,7 @@ CHIP_ERROR LaundryWasherControlsServer::ReadSupportedRinses(const ConcreteReadAt
 void MatterLaundryWasherControlsPluginServerInitCallback()
 {
     LaundryWasherControlsServer & laundryWasherControlsServer = LaundryWasherControlsServer::Instance();
-    registerAttributeAccessOverride(&laundryWasherControlsServer);
+    AttributeAccessInterfaceRegistry::Instance().Register(&laundryWasherControlsServer);
 }
 
 Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,

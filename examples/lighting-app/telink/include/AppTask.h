@@ -19,31 +19,36 @@
 #pragma once
 
 #include "AppTaskCommon.h"
-#include "PWMDevice.h"
 
 class AppTask : public AppTaskCommon
 {
 public:
+    enum Fixture_Action : uint8_t
+    {
+        ON_ACTION = 0,
+        OFF_ACTION,
+        LEVEL_ACTION,
+        COLOR_ACTION_XY,
+        COLOR_ACTION_HSV,
+        COLOR_ACTION_CT,
+
+        INVALID_ACTION
+    };
+
 #ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
     void PowerOnFactoryReset(void);
 #endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
-    void SetInitiateAction(PWMDevice::Action_t aAction, int32_t aActor, uint8_t * value);
-    void UpdateClusterState(void);
 
-#ifdef CONFIG_WS2812_STRIP
-    WS2812Device & GetLightingDevice(void) { return mWS2812Device; }
-#else
-    PWMDevice & GetLightingDevice(void) { return mPwmRgbBlueLed; }
-#endif /* CONFIG_WS2812_STRIP */
+    bool IsTurnedOn() const;
+    void SetInitiateAction(Fixture_Action aAction, int32_t aActor, uint8_t * value);
+    void UpdateClusterState(void);
 
 private:
     friend AppTask & GetAppTask(void);
     friend class AppTaskCommon;
 
     CHIP_ERROR Init(void);
-
-    static void ActionInitiated(PWMDevice::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(PWMDevice::Action_t aAction, int32_t aActor);
+    void LinkLeds(LedManager & ledManager);
 
     static void LightingActionEventHandler(AppEvent * aEvent);
 #ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
@@ -53,16 +58,6 @@ private:
     static unsigned int sPowerOnFactoryResetTimerCnt;
     static k_timer sPowerOnFactoryResetTimer;
 #endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
-
-#ifdef CONFIG_WS2812_STRIP
-    WS2812Device mWS2812Device;
-#else
-    PWMDevice mPwmRgbBlueLed;
-#if USE_RGB_PWM
-    PWMDevice mPwmRgbGreenLed;
-    PWMDevice mPwmRgbRedLed;
-#endif
-#endif /* CONFIG_WS2812_STRIP */
 
     static AppTask sAppTask;
 };

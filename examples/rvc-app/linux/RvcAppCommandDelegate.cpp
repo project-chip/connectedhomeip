@@ -17,12 +17,15 @@
  */
 
 #include "RvcAppCommandDelegate.h"
+#include <app/data-model/Nullable.h>
 #include <platform/PlatformManager.h>
 
 #include "rvc-device.h"
+#include <string>
 #include <utility>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 
 RvcAppCommandHandler * RvcAppCommandHandler::FromJSON(const char * json)
@@ -82,6 +85,29 @@ void RvcAppCommandHandler::HandleCommand(intptr_t context)
     {
         self->OnActivityCompleteHandler();
     }
+    else if (name == "AreaComplete")
+    {
+        self->OnAreaCompleteHandler();
+    }
+    else if (name == "AddMap")
+    {
+        self->OnAddServiceAreaMap(self->mJsonValue);
+    }
+    else if (name == "AddArea")
+    {
+        VerifyOrExit(self->mJsonValue.isMember("AreaId"), ChipLogError(NotSpecified, "RVC App: AreaId key is missing"));
+        self->OnAddServiceAreaArea(self->mJsonValue);
+    }
+    else if (name == "RemoveMap")
+    {
+        VerifyOrExit(self->mJsonValue.isMember("MapId"), ChipLogError(NotSpecified, "RVC App: MapId key is missing"));
+        self->OnRemoveServiceAreaMap(self->mJsonValue["MapId"].asUInt());
+    }
+    else if (name == "RemoveArea")
+    {
+        VerifyOrExit(self->mJsonValue.isMember("AreaId"), ChipLogError(NotSpecified, "RVC App: AreaId key is missing"));
+        self->OnRemoveServiceAreaArea(self->mJsonValue["AreaId"].asUInt());
+    }
     else if (name == "ErrorEvent")
     {
         std::string error = self->mJsonValue["Error"].asString();
@@ -137,6 +163,78 @@ void RvcAppCommandHandler::OnLowChargeHandler()
 void RvcAppCommandHandler::OnActivityCompleteHandler()
 {
     mRvcDevice->HandleActivityCompleteEvent();
+}
+
+void RvcAppCommandHandler::OnAreaCompleteHandler()
+{
+    mRvcDevice->HandleAreaCompletedEvent();
+}
+
+void RvcAppCommandHandler::OnAddServiceAreaMap(Json::Value jsonValue)
+{
+    // Find if self->mJsonValue has the MapId and MapName Keys
+    if (jsonValue.isMember("MapId") && jsonValue.isMember("MapName"))
+    {
+        uint32_t mapId      = jsonValue["MapId"].asUInt();
+        std::string mapName = jsonValue["MapName"].asString();
+        mRvcDevice->HandleAddServiceAreaMap(mapId, CharSpan(mapName.data(), mapName.size()));
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "RVC App: MapId and MapName keys are missing");
+    }
+}
+
+void RvcAppCommandHandler::OnAddServiceAreaArea(Json::Value jsonValue)
+{
+    ServiceArea::AreaStructureWrapper area;
+    area.SetAreaId(jsonValue["AreaId"].asUInt());
+    if (jsonValue.isMember("MapId"))
+    {
+        area.SetMapId(jsonValue["MapId"].asUInt());
+    }
+
+    // Set the location info
+    if (jsonValue.isMember("LocationName") || jsonValue.isMember("FloorNumber") || jsonValue.isMember("AreaType"))
+    {
+        DataModel::Nullable<int16_t> floorNumber = DataModel::NullNullable;
+        if (jsonValue.isMember("FloorNumber"))
+        {
+            floorNumber = jsonValue["FloorNumber"].asInt();
+        }
+        DataModel::Nullable<Globals::AreaTypeTag> areaType = DataModel::NullNullable;
+        if (jsonValue.isMember("AreaType"))
+        {
+            areaType = Globals::AreaTypeTag(jsonValue["AreaType"].asUInt());
+        }
+        auto locationName = jsonValue["LocationName"].asString();
+
+        area.SetLocationInfo(CharSpan(locationName.data(), locationName.size()), floorNumber, areaType);
+    }
+
+    // Set landmark info
+    if (jsonValue.isMember("LandmarkTag"))
+    {
+        DataModel::Nullable<Globals::RelativePositionTag> relativePositionTag = DataModel::NullNullable;
+        if (jsonValue.isMember("RelativePositionTag"))
+        {
+            relativePositionTag = Globals::RelativePositionTag(jsonValue["RelativePositionTag"].asUInt());
+        }
+
+        area.SetLandmarkInfo(Globals::LandmarkTag(jsonValue["LandmarkTag"].asUInt()), relativePositionTag);
+    }
+
+    mRvcDevice->HandleAddServiceAreaArea(area);
+}
+
+void RvcAppCommandHandler::OnRemoveServiceAreaMap(uint32_t mapId)
+{
+    mRvcDevice->HandleRemoveServiceAreaMap(mapId);
+}
+
+void RvcAppCommandHandler::OnRemoveServiceAreaArea(uint32_t areaId)
+{
+    mRvcDevice->HandleRemoveServiceAreaArea(areaId);
 }
 
 void RvcAppCommandHandler::OnErrorEventHandler(const std::string & error)

@@ -92,6 +92,29 @@ public:
 };
 
 /**
+ * Defines the Thread Diagnostics Delegate class to notify Thread network events.
+ */
+class ThreadDiagnosticsDelegate
+{
+public:
+    virtual ~ThreadDiagnosticsDelegate() {}
+
+    /**
+     * @brief
+     *   Called when the Node’s connection status to a Thread network has changed.
+     */
+    virtual void OnConnectionStatusChanged(app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum newConnectionStatus) {}
+
+    /**
+     * @brief
+     *   Called when the Node detects change in the set of current Thread network faults.
+     */
+    virtual void OnNetworkFaultChanged(const GeneralFaults<kMaxNetworkFaults> & previous,
+                                       const GeneralFaults<kMaxNetworkFaults> & current)
+    {}
+};
+
+/**
  * Provides access to runtime and build-time configuration information for a chip device.
  */
 class DiagnosticDataProvider
@@ -99,6 +122,8 @@ class DiagnosticDataProvider
 public:
     void SetWiFiDiagnosticsDelegate(WiFiDiagnosticsDelegate * delegate) { mWiFiDiagnosticsDelegate = delegate; }
     WiFiDiagnosticsDelegate * GetWiFiDiagnosticsDelegate() const { return mWiFiDiagnosticsDelegate; }
+    void SetThreadDiagnosticsDelegate(ThreadDiagnosticsDelegate * delegate) { mThreadDiagnosticsDelegate = delegate; }
+    ThreadDiagnosticsDelegate * GetThreadDiagnosticsDelegate() const { return mThreadDiagnosticsDelegate; }
 
     /**
      * General Diagnostics methods.
@@ -209,7 +234,7 @@ public:
     virtual CHIP_ERROR ResetEthNetworkDiagnosticsCounts();
 
     /**
-     * WiFi network diagnostics methods
+     * Wi-Fi network diagnostics methods
      */
 
     /**
@@ -238,7 +263,8 @@ protected:
     virtual ~DiagnosticDataProvider() = default;
 
 private:
-    WiFiDiagnosticsDelegate * mWiFiDiagnosticsDelegate = nullptr;
+    WiFiDiagnosticsDelegate * mWiFiDiagnosticsDelegate     = nullptr;
+    ThreadDiagnosticsDelegate * mThreadDiagnosticsDelegate = nullptr;
 
     // No copy, move or assignment.
     DiagnosticDataProvider(const DiagnosticDataProvider &)             = delete;

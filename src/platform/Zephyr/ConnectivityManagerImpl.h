@@ -100,7 +100,7 @@ inline ConnectivityManager & ConnectivityMgr(void)
  * Returns the platform-specific implementation of the ConnectivityManager singleton object.
  *
  * chip applications can use this to gain access to features of the ConnectivityManager
- * that are specific to the ESP32 platform.
+ * that are specific to the Zephyr platform.
  */
 inline ConnectivityManagerImpl & ConnectivityMgrImpl(void)
 {

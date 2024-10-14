@@ -27,6 +27,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
@@ -707,5 +708,5 @@ void MatterMediaPlaybackClusterServerAttributeChangedCallback(const chip::app::C
 
 void MatterMediaPlaybackPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gMediaPlaybackAttrAccess);
+    app::AttributeAccessInterfaceRegistry::Instance().Register(&gMediaPlaybackAttrAccess);
 }

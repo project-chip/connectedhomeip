@@ -46,7 +46,6 @@ private:
     static void SensorBanForNextMeasurTimerTimeoutCallback(k_timer * timer);
 
 #ifdef USE_COLOR_TEMPERATURE_LIGHT
-    WS2812Device mWS2812Device;
     void SetColorTemperatureLight(int8_t temp);
 #endif // USE_COLOR_TEMPERATURE_LIGHT
 

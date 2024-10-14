@@ -35,7 +35,9 @@
 #include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemPacketBuffer.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/raw/TCP.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/raw/UDP.h>
 
 namespace {
@@ -43,13 +45,15 @@ namespace {
 // The EchoServer object.
 chip::Protocols::Echo::EchoServer gEchoServer;
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 chip::SessionHolder gSession;
 
 // Callback handler when a CHIP EchoRequest is received.
 void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
 {
-    printf("Echo Request, len=%u ... sending response.\n", payload->DataLength());
+    printf("Echo Request, len=%" PRIu32 "... sending response.\n", static_cast<uint32_t>(payload->DataLength()));
 }
 
 } // namespace
@@ -58,7 +62,9 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Transport::PeerAddress peer(chip::Transport::Type::kUndefined);
-    bool useTCP      = false;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    bool useTCP = false;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     bool disableEcho = false;
 
     const chip::FabricIndex gFabricIndex = 0;
@@ -69,10 +75,12 @@ int main(int argc, char * argv[])
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if ((argc == 2) && (strcmp(argv[1], "--tcp") == 0))
     {
         useTCP = true;
     }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     if ((argc == 2) && (strcmp(argv[1], "--disable") == 0))
     {
@@ -81,6 +89,7 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (useTCP)
     {
         err = gTCPManager.Init(chip::Transport::TcpListenParameters(chip::DeviceLayer::TCPEndPointManager())
@@ -92,6 +101,7 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
     }
     else
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     {
         err = gUDPManager.Init(chip::Transport::UdpListenParameters(chip::DeviceLayer::UDPEndPointManager())
                                    .SetAddressType(chip::Inet::IPAddressType::kIPv6));

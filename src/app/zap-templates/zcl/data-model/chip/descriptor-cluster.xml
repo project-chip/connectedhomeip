@@ -19,6 +19,7 @@ limitations under the License.
 
   <struct name="DeviceTypeStruct">
     <cluster code="0x001d"/>
+    <cluster code="0x0750"/>
     <item name="DeviceType" type="devtype_id"/>
     <item name="Revision" type="int16u"/>
   </struct>
@@ -31,11 +32,6 @@ limitations under the License.
     <item name="Label" type="char_string" isNullable="true" optional="true"/>
   </struct>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x001d" />
-    <field name="TagList" mask="0x01" />
-  </bitmap>
-
   <cluster>
     <domain>General</domain>
     <name>Descriptor</name>
@@ -44,6 +40,10 @@ limitations under the License.
     <description>The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters.</description>
 
     <globalAttribute side="either" code="0xFFFD" value="2"/>
+
+    <features>
+      <feature bit="0" code="TAGLIST" name="TagList" summary="The TagList attribute is present"/>
+    </features>
 
     <attribute side="server" code="0x0000" define="DEVICE_LIST" type="array" entryType="DeviceTypeStruct" writable="false" optional="false">DeviceTypeList</attribute>
     <attribute side="server" code="0x0001" define="SERVER_LIST" type="array" entryType="cluster_id" writable="false" optional="false">ServerList</attribute>

@@ -18,12 +18,20 @@
 
 #include "BdxTransferDiagnosticLog.h"
 
+#include <protocols/bdx/BdxTransferDiagnosticLogPool.h>
+
 namespace chip {
 namespace bdx {
 
 namespace {
 // Max block size for the BDX transfer.
 constexpr uint32_t kMaxBdxBlockSize = 1024;
+
+// How often we poll our transfer session.  Sadly, we get allocated on
+// unsolicited message, which makes it hard for our clients to configure this.
+// But the default poll interval is 500ms, which makes log downloads extremely
+// slow.
+constexpr System::Clock::Timeout kBdxPollInterval = System::Clock::Milliseconds32(50);
 
 // Timeout for the BDX transfer session..
 constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
@@ -95,7 +103,8 @@ CHIP_ERROR BdxTransferDiagnosticLog::OnMessageReceived(Messaging::ExchangeContex
         mTransferProxy.SetFabricIndex(fabricIndex);
         mTransferProxy.SetPeerNodeId(peerNodeId);
         auto flags(TransferControlFlags::kSenderDrive);
-        ReturnLogErrorOnFailure(Responder::PrepareForTransfer(mSystemLayer, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout));
+        ReturnLogErrorOnFailure(
+            Responder::PrepareForTransfer(mSystemLayer, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollInterval));
     }
 
     return TransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
@@ -192,6 +201,24 @@ void BdxTransferDiagnosticLog::OnExchangeClosing(Messaging::ExchangeContext * ec
     VerifyOrReturn(!mIsExchangeClosing);
     mExchangeCtx = nullptr;
     LogErrorOnFailure(OnTransferSessionEnd(CHIP_ERROR_INTERNAL));
+}
+
+bool BdxTransferDiagnosticLog::IsForFabric(FabricIndex fabricIndex) const
+{
+    if (mExchangeCtx == nullptr || !mExchangeCtx->HasSessionHandle())
+    {
+        return false;
+    }
+
+    auto session = mExchangeCtx->GetSessionHandle();
+    return session->GetFabricIndex() == fabricIndex;
+}
+
+void BdxTransferDiagnosticLog::AbortTransfer()
+{
+    // No need to mTransfer.AbortTransfer() here, since that just tries to async
+    // send a StatusReport to the other side, but we are going away here.
+    Reset();
 }
 
 } // namespace bdx

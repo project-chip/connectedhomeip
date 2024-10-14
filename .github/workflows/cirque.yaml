@@ -16,6 +16,9 @@ name: Cirque
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
     workflow_dispatch:
@@ -40,7 +43,7 @@ jobs:
         # need to run with privilege, which isn't supported by job.XXX.contaner
         #  https://github.com/actions/container-action/issues/2
         #         container:
-        #             image: ghcr.io/project-chip/chip-build-cirque:41
+        #             image: ghcr.io/project-chip/chip-build-cirque:<VERSION_HERE>
         #             volumes:
         #                 - "/tmp:/tmp"
         #                 - "/dev/pts:/dev/pts"

@@ -32,7 +32,7 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
   val enrollmentGroup: Optional<UByte>,
   val criticality: UByte,
   val startTime: UInt?,
-  val transitions: List<DemandResponseLoadControlClusterLoadControlEventTransitionStruct>
+  val transitions: List<DemandResponseLoadControlClusterLoadControlEventTransitionStruct>,
 ) {
   override fun toString(): String = buildString {
     append("DemandResponseLoadControlClusterLoadControlEventStruct {\n")
@@ -50,11 +50,11 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_EVENT_I_D), eventID)
+      put(ContextSpecificTag(TAG_EVENT_ID), eventID)
       if (programID != null) {
-        put(ContextSpecificTag(TAG_PROGRAM_I_D), programID)
+        put(ContextSpecificTag(TAG_PROGRAM_ID), programID)
       } else {
-        putNull(ContextSpecificTag(TAG_PROGRAM_I_D))
+        putNull(ContextSpecificTag(TAG_PROGRAM_ID))
       }
       put(ContextSpecificTag(TAG_CONTROL), control)
       put(ContextSpecificTag(TAG_DEVICE_CLASS), deviceClass)
@@ -78,8 +78,8 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
   }
 
   companion object {
-    private const val TAG_EVENT_I_D = 0
-    private const val TAG_PROGRAM_I_D = 1
+    private const val TAG_EVENT_ID = 0
+    private const val TAG_PROGRAM_ID = 1
     private const val TAG_CONTROL = 2
     private const val TAG_DEVICE_CLASS = 3
     private const val TAG_ENROLLMENT_GROUP = 4
@@ -89,15 +89,15 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): DemandResponseLoadControlClusterLoadControlEventStruct {
       tlvReader.enterStructure(tlvTag)
-      val eventID = tlvReader.getByteArray(ContextSpecificTag(TAG_EVENT_I_D))
+      val eventID = tlvReader.getByteArray(ContextSpecificTag(TAG_EVENT_ID))
       val programID =
         if (!tlvReader.isNull()) {
-          tlvReader.getByteArray(ContextSpecificTag(TAG_PROGRAM_I_D))
+          tlvReader.getByteArray(ContextSpecificTag(TAG_PROGRAM_ID))
         } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_PROGRAM_I_D))
+          tlvReader.getNull(ContextSpecificTag(TAG_PROGRAM_ID))
           null
         }
       val control = tlvReader.getUShort(ContextSpecificTag(TAG_CONTROL))
@@ -123,7 +123,7 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
             add(
               DemandResponseLoadControlClusterLoadControlEventTransitionStruct.fromTlv(
                 AnonymousTag,
-                tlvReader
+                tlvReader,
               )
             )
           }
@@ -140,7 +140,7 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
         enrollmentGroup,
         criticality,
         startTime,
-        transitions
+        transitions,
       )
     }
   }

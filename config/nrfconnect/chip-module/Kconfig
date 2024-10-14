@@ -34,15 +34,6 @@ config CHIP_NRF_PLATFORM
 config CHIP_DEVICE_VENDOR_NAME
 	default "Nordic Semiconductor ASA"
 
-config CHIP_APP_LOG_LEVEL
-	int "Logging level in application"
-	default LOG_DEFAULT_LEVEL
-	depends on LOG
-	help
-	  Sets the logging level in the Matter application. Use this configuration
-	  option only within the application. To set the logging level for the
-	  Matter stack, use the MATTER_LOG_LEVEL configuration option.
-
 config CHIP_NFC_COMMISSIONING
 	bool "Share onboarding payload in NFC tag"
 	default n
@@ -106,7 +97,6 @@ config CHIP_MALLOC_SYS_HEAP
 config CHIP_FACTORY_DATA
 	bool "Factory data provider"
 	select ZCBOR
-	imply FPROTECT
 	help
 	  Enables the default nRF Connect factory data provider implementation that
 	  supports reading the factory data encoded in the CBOR format from the
@@ -149,7 +139,7 @@ config CHIP_FACTORY_DATA_WRITE_PROTECT
 	bool "Enable Factory Data write protection"
 	select FPROTECT
 	depends on CHIP_FACTORY_DATA
-	default y if CHIP_FACTORY_DATA
+	default y
 	help
 		Enables the write protection of the Factory Data partition in the flash memory.
 		This is a recommended feature, but it requires the Settings partition size to be
@@ -301,5 +291,15 @@ config CHIP_FACTORY_RESET_ON_KEY_MIGRATION_FAILURE
 	help
 	  Perform factory reset of the device if the operational key for Fabric has not been migrated
 	  properly to PSA ITS storage.
+
+config CHIP_PERSISTENT_SUBSCRIPTIONS
+	default n
+	# selecting experimental for this feature since there is an issue with multiple controllers.
+	select EXPERIMENTAL
+
+config CHIP_ENABLE_BDX_LOG_TRANSFER
+	bool "Enable BDX transfer for diagnostic logs"
+	help
+	  Enables the BDX protocol for diagnostics log transfer purposes.
 
 endif # CHIP

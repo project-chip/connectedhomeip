@@ -319,7 +319,7 @@ bool IPAddress::IsIPv6GlobalUnicast() const
 // Is address an IPv6 Unique Local Address?
 bool IPAddress::IsIPv6ULA() const
 {
-    return (ntohl(Addr[0]) & 0xFF000000U) == 0xFD000000U;
+    return (ntohl(Addr[0]) & 0xFE000000U) == 0xFC000000U;
 }
 
 // Is address an IPv6 Link-local Address?

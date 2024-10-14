@@ -16,6 +16,9 @@ name: Minimal Build (Linux / configure)
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
 
@@ -24,14 +27,14 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    minimal:
+    minimal-all-clusters:
         name: Linux / configure build of all-clusters-app
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-minimal:41
+            image: ghcr.io/project-chip/chip-build-minimal:81
 
         steps:
             - name: Checkout
@@ -40,8 +43,30 @@ jobs:
             - name: Checkout submodules # but don't bootstrap!
               uses: ./.github/actions/checkout-submodules
               with:
-                platform: linux
+                  platform: linux
 
             - name: Configure and build All Clusters App
               run: |
-                  CC=gcc CXX=g++ scripts/configure --project=examples/all-clusters-app/linux && ./ninja-build
+                  CC=gcc CXX=g++ scripts/configure --project=examples/all-clusters-app/linux --enable-recommended=no && ./ninja-build
+
+    minimal-network-manager:
+        name: Linux / configure build of network-manager-app
+
+        if: github.actor != 'restyled-io[bot]'
+        runs-on: ubuntu-latest
+
+        container:
+            image: ghcr.io/project-chip/chip-build-minimal:81
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Checkout submodules # but don't bootstrap!
+              uses: ./.github/actions/checkout-submodules
+              with:
+                  platform: linux
+
+            - name: Configure and build Network Manager App
+              run: |
+                  CC=gcc CXX=g++ scripts/configure --project=examples/network-manager-app/linux --enable-recommended=no && ./ninja-build

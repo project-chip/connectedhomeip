@@ -15,6 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/build/chip/tests.gni")
@@ -48,6 +49,7 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_AUTOMATION_LOGGING=${chip_automation_logging}",
     "CHIP_PW_TOKENIZER_LOGGING=${chip_pw_tokenizer_logging}",
     "CHIP_USE_PW_LOGGING=${chip_use_pw_logging}",
+    "CHIP_EXCHANGE_NODE_ID_LOGGING=${chip_exchange_node_id_logging}",
     "CHIP_CONFIG_SHORT_ERROR_STR=${chip_config_short_error_str}",
     "CHIP_CONFIG_ENABLE_ARG_PARSER=${chip_config_enable_arg_parser}",
     "CHIP_TARGET_STYLE_UNIX=${chip_target_style_unix}",
@@ -105,6 +107,18 @@ source_set("error") {
   ]
 }
 
+source_set("string-builder-adapters") {
+  sources = [
+    "StringBuilderAdapters.cpp",
+    "StringBuilderAdapters.h",
+  ]
+
+  public_deps = [
+    ":error",
+    "$dir_pw_string",
+  ]
+}
+
 source_set("encoding") {
   sources = [ "CHIPEncoding.h" ]
   public_deps = [ "${nlio_root}:nlio" ]
@@ -143,6 +157,7 @@ static_library("core") {
     "CHIPKeyIds.h",
     "CHIPPersistentStorageDelegate.h",
     "ClusterEnums.h",
+    "GroupedCallbackList.h",
     "OTAImageHeader.cpp",
     "OTAImageHeader.h",
     "PeerId.h",

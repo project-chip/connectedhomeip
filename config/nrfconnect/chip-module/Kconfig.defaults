@@ -24,6 +24,10 @@ if CHIP
 # System configuration
 # ==============================================================================
 
+choice LIBC_IMPLEMENTATION
+    default NEWLIB_LIBC
+endchoice
+
 config ASSERT
     default y
 
@@ -34,9 +38,6 @@ config ASSERT_NO_MSG_INFO
     default y
 
 config HW_STACK_PROTECTION
-    default y
-
-config FPU
     default y
 
 config POSIX_MAX_FDS
@@ -199,14 +200,26 @@ config CHIP_QSPI_NOR
     default y if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
 
 # nRF7002DK uses SPI NOR external flash
+
+if BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP || BOARD_NRF54L15PDK_NRF54L15_CPUAPP
+
 config CHIP_SPI_NOR
-    default y if BOARD_NRF7002DK_NRF5340_CPUAPP
+    default y
+
+endif # BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP || BOARD_NRF54L15PDK_NRF54L15_CPUAPP
 
 config BOOT_IMAGE_ACCESS_HOOKS
     default y if SOC_SERIES_NRF53X
 
 config UPDATEABLE_IMAGE_NUMBER
+    default 3 if NRF_WIFI_PATCHES_EXT_FLASH_STORE
     default 2 if SOC_SERIES_NRF53X
+
+config DFU_MULTI_IMAGE_MAX_IMAGE_COUNT
+    default 3 if NRF_WIFI_PATCHES_EXT_FLASH_STORE
+
+config NRF_WIFI_FW_PATCH_DFU
+    default y if NRF_WIFI_PATCHES_EXT_FLASH_STORE
 
 # ==============================================================================
 # OpenThread configuration
@@ -298,6 +311,7 @@ config MBEDTLS_HEAP_SIZE
 
 config CHIP_CRYPTO_PSA
     default y if !CHIP_WIFI
+    imply PSA_WANT_ALG_SPAKE2P_MATTER
 
 if CHIP_CRYPTO_PSA
 
@@ -317,13 +331,13 @@ if PSA_CRYPTO_DRIVER_CC3XX && PSA_CRYPTO_DRIVER_OBERON
 config PSA_USE_CC3XX_HASH_DRIVER
     default n
 
-endif
+endif # PSA_CRYPTO_DRIVER_CC3XX && PSA_CRYPTO_DRIVER_OBERON
 
 # Spake2+ support
 config MBEDTLS_MD_C
     default y
 
-endif
+endif # CHIP_CRYPTO_PSA
 
 if !CHIP_CRYPTO_PSA
 
@@ -366,10 +380,7 @@ config MBEDTLS_ECP_C
 config MBEDTLS_ECP_DP_SECP256R1_ENABLED
     default y
 
-endif
-
-config MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG
-    default n if CHIP_WIFI
+endif # !CHIP_CRYPTO_PSA
 
 config MBEDTLS_SSL_OUT_CONTENT_LEN
     default 900 if CHIP_WIFI
@@ -405,6 +416,9 @@ config MBEDTLS_SSL_SRV_C
 
 config MBEDTLS_SSL_COOKIE_C
     default n
+
+config MBEDTLS_AES_ONLY_128_BIT_KEY_LENGTH
+    default y
 
 # ==============================================================================
 # Logging configuration
@@ -452,10 +466,10 @@ config SHELL_STACK_SIZE
     default 2616 if CHIP_WIFI
 
 config SHELL_MINIMAL
-    default y
+    default y if !CHIP_MEMORY_PROFILING
 
 config KERNEL_SHELL
-    default n
+    default n if !CHIP_MEMORY_PROFILING
 
 config SENSOR_SHELL
     default n
@@ -482,8 +496,8 @@ config HWINFO_SHELL
     default n
 
 config OPENTHREAD_SHELL
-    default n
+    default n if !CHIP_MEMORY_PROFILING
 
 endif # SHELL
 
-endif
+endif # CHIP

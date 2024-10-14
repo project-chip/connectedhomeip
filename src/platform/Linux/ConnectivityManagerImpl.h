@@ -48,6 +48,9 @@
 #include <system/SystemMutex.h>
 
 #include <mutex>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <transport/raw/WiFiPAF.h>
+#endif
 #endif
 
 #include <platform/Linux/NetworkCommissioningDriver.h>
@@ -66,25 +69,25 @@ namespace DeviceLayer {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 struct GDBusWpaSupplicant
 {
-    enum WpaState
+    enum class WpaState
     {
         INIT,
-        WPA_CONNECTING,
-        WPA_CONNECTED,
-        WPA_NOT_CONNECTED,
-        WPA_NO_INTERFACE_PATH,
-        WPA_GOT_INTERFACE_PATH,
-        WPA_INTERFACE_CONNECTED,
+        CONNECTING,
+        CONNECTED,
+        NOT_CONNECTED,
+        NO_INTERFACE_PATH,
+        GOT_INTERFACE_PATH,
+        INTERFACE_CONNECTED,
     };
 
-    enum WpaScanning
+    enum class WpaScanningState
     {
-        WIFI_SCANNING_IDLE,
-        WIFI_SCANNING,
+        IDLE,
+        SCANNING,
     };
 
-    WpaState state                          = INIT;
-    WpaScanning scanState                   = WIFI_SCANNING_IDLE;
+    WpaState state                          = WpaState::INIT;
+    WpaScanningState scanState              = WpaScanningState::IDLE;
     WpaFiW1Wpa_supplicant1 * proxy          = nullptr;
     WpaFiW1Wpa_supplicant1Interface * iface = nullptr;
     WpaFiW1Wpa_supplicant1BSS * bss         = nullptr;
@@ -137,6 +140,17 @@ public:
                                               const Crypto::P256Keypair & clientIdentityKeypair,
                                               NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    CHIP_ERROR _WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
+                               OnConnectionErrorFunct onError);
+    CHIP_ERROR _WiFiPAFCancelConnect();
+    void OnDiscoveryResult(gboolean success, GVariant * obj);
+    void OnNanReceive(GVariant * obj);
+    void OnNanSubscribeTerminated(gint term_subscribe_id, gint reason);
+    CHIP_ERROR _WiFiPAFSend(chip::System::PacketBufferHandle && msgBuf);
+    Transport::WiFiPAFBase * _GetWiFiPAF();
+    void _SetWiFiPAF(Transport::WiFiPAFBase * pWiFiPAF);
+#endif
 
     void PostNetworkConnect();
     CHIP_ERROR CommitConfig();
@@ -215,6 +229,33 @@ private:
     void _OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaBssProxyReady(GObject * sourceObject, GAsyncResult * res);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    struct wpa_dbus_discov_info
+    {
+        uint32_t subscribe_id;
+        uint32_t peer_publish_id;
+        uint8_t peer_addr[6];
+        uint32_t ssi_len;
+    };
+    uint32_t mpresubscribe_id;
+    struct wpa_dbus_discov_info mpaf_info;
+    struct wpa_dbus_nanrx_info
+    {
+        uint32_t id;
+        uint32_t peer_id;
+        uint8_t peer_addr[6];
+        uint32_t ssi_len;
+    };
+    struct wpa_dbus_nanrx_info mpaf_nanrx_info;
+
+    OnConnectionCompleteFunct mOnPafSubscribeComplete;
+    OnConnectionErrorFunct mOnPafSubscribeError;
+    Transport::WiFiPAFBase * pmWiFiPAF;
+    void * mAppState;
+    CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam & args);
+    CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
+    CHIP_ERROR _WiFiPAFCancelPublish();
+#endif
 
     bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
 

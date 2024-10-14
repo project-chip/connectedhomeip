@@ -18,16 +18,18 @@
 
 #include "CastingApp-JNI.h"
 
-#include "../JNIDACProvider.h"
 #include "../support/Converters-JNI.h"
+#include "../support/JNIDACProvider.h"
 #include "../support/RotatingDeviceIdUniqueIdProvider-JNI.h"
 
 // from tv-casting-common
 #include "core/CastingApp.h"
+#include "core/CommissionerDeclarationHandler.h"
 #include "support/ChipDeviceEventHandler.h"
 
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/server/Server.h>
+#include <app/server/java/AndroidAppServerWrapper.h>
 #include <jni.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
@@ -35,6 +37,16 @@
 using namespace chip;
 
 #define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_com_matter_casting_core_CastingApp_##METHOD_NAME
+
+jint JNI_OnLoad(JavaVM * jvm, void * reserved)
+{
+    return AndroidAppServerJNI_OnLoad(jvm, reserved);
+}
+
+void JNI_OnUnload(JavaVM * jvm, void * reserved)
+{
+    return AndroidAppServerJNI_OnUnload(jvm, reserved);
+}
 
 namespace matter {
 namespace casting {
@@ -47,7 +59,7 @@ jobject extractJAppParameter(jobject jAppParameters, const char * methodName, co
 JNI_METHOD(jobject, finishInitialization)(JNIEnv *, jobject, jobject jAppParameters)
 {
     chip::DeviceLayer::StackLock lock;
-    ChipLogProgress(AppServer, "JNI_METHOD CastingApp-JNI::finishInitialization() called");
+    ChipLogProgress(AppServer, "CastingApp-JNI::finishInitialization() called");
     VerifyOrReturnValue(jAppParameters != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT));
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -72,7 +84,7 @@ JNI_METHOD(jobject, finishInitialization)(JNIEnv *, jobject, jobject jAppParamet
     VerifyOrReturnValue(jDACProvider != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INCORRECT_STATE));
 
     // set the DACProvider
-    JNIDACProvider * dacProvider = new JNIDACProvider(jDACProvider);
+    support::JNIDACProvider * dacProvider = new support::JNIDACProvider(jDACProvider);
     chip::Credentials::SetDeviceAttestationCredentialsProvider(dacProvider);
 
     return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
@@ -81,7 +93,7 @@ JNI_METHOD(jobject, finishInitialization)(JNIEnv *, jobject, jobject jAppParamet
 JNI_METHOD(jobject, finishStartup)(JNIEnv *, jobject)
 {
     chip::DeviceLayer::StackLock lock;
-    ChipLogProgress(AppServer, "JNI_METHOD CastingAppJNI::finishStartup() called");
+    ChipLogProgress(AppServer, "CastingApp-JNI::finishStartup() called");
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     auto & server  = chip::Server::GetInstance();
@@ -102,13 +114,28 @@ JNI_METHOD(jobject, finishStartup)(JNIEnv *, jobject)
     VerifyOrReturnValue(err == CHIP_NO_ERROR, support::convertMatterErrorFromCppToJava(err),
                         ChipLogError(AppServer, "Failed to register ChipDeviceEventHandler %" CHIP_ERROR_FORMAT, err.Format()));
 
+    ChipLogProgress(AppServer,
+                    "CastingApp-JNI::finishStartup() calling "
+                    "GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler()");
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    // Set a handler for Commissioner's CommissionerDeclaration messages. This is set in
+    // connectedhomeip/src/protocols/user_directed_commissioning/UserDirectedCommissioning.h
+    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(
+        CommissionerDeclarationHandler::GetInstance());
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
     return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
 }
 
 JNI_METHOD(jobject, shutdownAllSubscriptions)(JNIEnv * env, jobject)
 {
     chip::DeviceLayer::StackLock lock;
-    ChipLogProgress(AppServer, "JNI_METHOD CastingApp-JNI::shutdownAllSubscriptions called");
+    ChipLogProgress(AppServer, "CastingApp-JNI::shutdownAllSubscriptions() called");
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    // Remove the handler previously set for Commissioner's CommissionerDeclaration messages.
+    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(nullptr);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     CHIP_ERROR err = matter::casting::core::CastingApp::GetInstance()->ShutdownAllSubscriptions();
     return support::convertMatterErrorFromCppToJava(err);
@@ -117,7 +144,7 @@ JNI_METHOD(jobject, shutdownAllSubscriptions)(JNIEnv * env, jobject)
 JNI_METHOD(jobject, clearCache)(JNIEnv * env, jobject)
 {
     chip::DeviceLayer::StackLock lock;
-    ChipLogProgress(AppServer, "JNI_METHOD CastingApp-JNI::clearCache called");
+    ChipLogProgress(AppServer, "CastingApp-JNI::clearCache called");
 
     CHIP_ERROR err = matter::casting::core::CastingApp::GetInstance()->ClearCache();
     return support::convertMatterErrorFromCppToJava(err);
@@ -125,7 +152,7 @@ JNI_METHOD(jobject, clearCache)(JNIEnv * env, jobject)
 
 jobject extractJAppParameter(jobject jAppParameters, const char * methodName, const char * methodSig)
 {
-    ChipLogProgress(AppServer, "JNI_METHOD CastingApp-JNI::extractJAppParameter() called");
+    ChipLogProgress(AppServer, "CastingApp-JNI::extractJAppParameter() called");
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jclass jAppParametersClass;

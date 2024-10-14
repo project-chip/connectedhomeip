@@ -1,5 +1,21 @@
 # Matter nRF Connect LIT ICD Example Application
 
+> **Note:** This example is intended only to perform smoke tests of a Matter
+> solution integrated with nRF Connect SDK platform. The example quality is not
+> production ready and it may contain minor bugs or use not optimal
+> configuration. It is not recommended to use this example as a basis for
+> creating a market ready product.
+>
+> For the production ready and optimized Matter samples, see
+> [nRF Connect SDK samples](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/matter.html).
+> The Matter samples in nRF Connect SDK use various additional software
+> components and provide multiple optional features that improve the developer
+> and user experience. To read more about it, see
+> [Matter support in nRF Connect SDK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/protocols/matter/index.html#ug-matter)
+> page. Using Matter samples from nRF Connect SDK allows you to get a full
+> Nordic technical support via [DevZone](https://devzone.nordicsemi.com/)
+> portal.
+
 The nRF Connect LIT ICD Example allows to test the device that utilizes Long
 Idle Time feature from the Intermittently Connected Device Management cluster.
 It uses buttons to change the device states and LEDs to show the state of these
@@ -115,8 +131,8 @@ The example supports building and running on the following devices:
 
 | Hardware platform                                                                         | Build target               | Platform image                                                                                                                                   |
 | ----------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details> |
-| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>    |
+| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk/nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details> |
+| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk/nrf5340/cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>    |
 
 <hr>
 
@@ -150,6 +166,11 @@ duration of the effect.
 **Button 1** Pressing the button for more than 3 s initiates the factory reset
 of the device. Releasing the button within the 3-second window cancels the
 factory reset procedure.
+
+**Button 2** Represents the Dynamic SIT LIT Support feature from the
+Intermittently Connected Devices Management cluster. Pressing it requests
+putting the ICD device in the SIT mode. Pressing the button again withdraws the
+previous request.
 
 **Button 3** Represents the User Active Mode Trigger feature from the
 Intermittently Connected Devices Management cluster. Pressing it puts the ICD
@@ -248,14 +269,15 @@ Complete the following steps to build the sample:
 
 2.  Run the following command to build the example, with _build-target_ replaced
     with the build target name of the Nordic Semiconductor's kit you own, for
-    example `nrf52840dk_nrf52840`:
+    example `nrf52840dk/nrf52840`:
 
-         $ west build -b build-target
+         $ west build -b build-target --sysbuild
 
     You only need to specify the build target on the first build. See
     [Requirements](#requirements) for the build target names of compatible kits.
 
-The output `zephyr.hex` file will be available in the `build/zephyr/` directory.
+The output `zephyr.hex` file will be available in the `build/nrfconnect/zephyr/`
+directory.
 
 ### Removing build artifacts
 
@@ -270,7 +292,7 @@ following command:
 To build the example with release configuration that disables the diagnostic
 features like logs and command-line interface, run the following command:
 
-    $ west build -b build-target -- -DCONF_FILE=prj_release.conf
+    $ west build -b build-target --sysbuild -- -DFILE_SUFFIX=release
 
 Remember to replace _build-target_ with the build target name of the Nordic
 Semiconductor's kit you own.
@@ -278,12 +300,6 @@ Semiconductor's kit you own.
 ### Building with Device Firmware Upgrade support
 
 Support for DFU using Matter OTA is enabled by default.
-
-To completely disable support for DFU, run the following command with
-_build-target_ replaced with the build target name of the Nordic Semiconductor
-kit you are using (for example `nrf52840dk_nrf52840`):
-
-    $ west build -b build-target -- -DCONF_FILE=prj_no_dfu.conf
 
 > **Note**:
 >
@@ -297,7 +313,7 @@ kit you are using (for example `nrf52840dk_nrf52840`):
 #### Changing bootloader configuration
 
 To change the default MCUboot configuration, edit the `prj.conf` file located in
-the `child_image/mcuboot` directory.
+the `sysbuild/mcuboot` directory.
 
 Make sure to keep the configuration consistent with changes made to the
 application configuration. This is necessary for the configuration to work, as
@@ -314,8 +330,9 @@ purposes. You can change these settings by defining
 This example uses this option to define using an external flash.
 
 To modify the flash settings of your board (that is, your _build-target_, for
-example `nrf52840dk_nrf52840`), edit the `pm_static_dfu.yml` file located in the
-`configuration/build-target/` directory.
+example `nrf52840dk/nrf52840`), edit the `pm_static_<build_target>.yml` file
+(for example `pm_static_nrf52840dk_nrf52840.yml`), located in the main
+application directory.
 
 <hr>
 
@@ -327,7 +344,7 @@ using the menuconfig utility.
 To open the menuconfig utility, run the following command from the example
 directory:
 
-    $ west build -b build-target -t menuconfig
+    $ west build -b build-target --sysbuild -t menuconfig
 
 Remember to replace _build-target_ with the build target name of the Nordic
 Semiconductor's kit you own.
@@ -357,8 +374,6 @@ depending on the selected board:
     command-line shell.
 -   release -- Release version of the application - can be used to enable only
     the necessary application functionalities to optimize its performance.
--   no_dfu -- Debug version of the application without Device Firmware Upgrade
-    feature support.
 
 For more information, see the
 [Configuring nRF Connect SDK examples](../../../docs/guides/nrfconnect_examples_configuration.md)

@@ -20,10 +20,10 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -250,7 +250,7 @@ class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
 
         for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
         {
-            // If WiFi Network Diagnostics cluster is implemented on this endpoint
+            // If Wi-Fi Network Diagnostics cluster is implemented on this endpoint
             Events::Disconnection::Type event{ reasonCode };
             EventNumber eventNumber;
 
@@ -271,7 +271,7 @@ class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
 
         for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
         {
-            // If WiFi Network Diagnostics cluster is implemented on this endpoint
+            // If Wi-Fi Network Diagnostics cluster is implemented on this endpoint
             EventNumber eventNumber;
 
             if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
@@ -290,7 +290,7 @@ class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
         Events::ConnectionStatus::Type event{ static_cast<ConnectionStatusEnum>(connectionStatus) };
         for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
         {
-            // If WiFi Network Diagnostics cluster is implemented on this endpoint
+            // If Wi-Fi Network Diagnostics cluster is implemented on this endpoint
             EventNumber eventNumber;
 
             if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
@@ -317,6 +317,6 @@ bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler
 
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
     GetDiagnosticDataProvider().SetWiFiDiagnosticsDelegate(&gDiagnosticDelegate);
 }

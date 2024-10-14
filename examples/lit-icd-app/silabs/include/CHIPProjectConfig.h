@@ -86,3 +86,10 @@
  * A size, in bytes, of the individual debug event logging buffer.
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
+
+/**
+ * @brief CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
+ *
+ * Increase default(2) by 1 to account for the AppTask registering
+ */
+#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 3

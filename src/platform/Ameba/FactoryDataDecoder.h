@@ -27,6 +27,10 @@ class FactoryDataDecoder
 public:
     CHIP_ERROR ReadFactoryData(uint8_t * buffer, uint16_t * pfactorydata_len);
     CHIP_ERROR DecodeFactoryData(uint8_t * buffer, FactoryData * fdata, uint16_t factorydata_len);
+#if CONFIG_ENABLE_AMEBA_CRYPTO
+    CHIP_ERROR GetSign(uint8_t * PublicKeyData, size_t PublicKeySize, const unsigned char * MessageData, size_t MessageSize,
+                       unsigned char * Signature);
+#endif
     static FactoryDataDecoder & GetInstance()
     {
         static FactoryDataDecoder instance;

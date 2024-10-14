@@ -16,7 +16,6 @@
  */
 
 #include <app/icd/client/DefaultCheckInDelegate.h>
-#include <app/icd/client/RefreshKeySender.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -40,12 +39,17 @@ void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
         clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
 }
 
+CHIP_ERROR DefaultCheckInDelegate::GenerateRefreshKey(RefreshKeySender::RefreshKeyBuffer & newKey)
+{
+    ReturnErrorOnFailure(Crypto::DRBG_get_bytes(newKey.Bytes(), newKey.Capacity()));
+    return newKey.SetLength(newKey.Capacity());
+}
+
 RefreshKeySender * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     RefreshKeySender::RefreshKeyBuffer newKey;
-
-    err = Crypto::DRBG_get_bytes(newKey.Bytes(), newKey.Capacity());
+    err = GenerateRefreshKey(newKey);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(ICD, "Generation of new key failed: %" CHIP_ERROR_FORMAT, err.Format());

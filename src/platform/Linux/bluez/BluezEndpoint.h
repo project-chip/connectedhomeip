@@ -52,7 +52,7 @@
 #include <gio/gio.h>
 #include <glib.h>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
@@ -100,8 +100,10 @@ private:
     BluezConnection * GetBluezConnectionViaDevice();
 
     gboolean BluezCharacteristicReadValue(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOptions);
-    gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOptions);
-    gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOptions);
+    gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GUnixFDList * aFDList,
+                                             GVariant * aOptions);
+    gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GUnixFDList * aFDList,
+                                              GVariant * aOptions);
     gboolean BluezCharacteristicConfirm(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv);
 
     void RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult);

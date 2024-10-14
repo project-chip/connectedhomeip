@@ -48,7 +48,7 @@ chip_build_tests = false
 chip_use_transitional_commissionable_data_provider = false
 
 openthread_root =
-    "${chip_root}/third_party/silabs/gecko_sdk/util/third_party/openthread"
+    "${chip_root}/third_party/silabs/simplicity_sdk/util/third_party/openthread"
 
 openthread_core_config_platform_check_file =
     "openthread-core-efr32-config-check.h"

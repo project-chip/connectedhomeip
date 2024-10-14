@@ -19,12 +19,14 @@ chip_enable_openthread = false
 import("${chip_root}/src/platform/silabs/wifi_args.gni")
 
 chip_enable_ota_requestor = true
-app_data_model = "${chip_root}/examples/lock-app/lock-common"
+app_data_model = "${chip_root}/examples/lock-app/silabs/data_model:silabs-lock"
+
+sl_enable_test_event_trigger = true
 
 # ICD Default configurations
 chip_enable_icd_server = true
 chip_subscription_timeout_resumption = false
-sl_use_subscription_synching = true
+sl_use_subscription_syncing = true
 
 # ICD Matter Configuration flags
 sl_idle_mode_duration_s = 600  # 10min Idle Mode Duration

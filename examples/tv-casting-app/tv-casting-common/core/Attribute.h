@@ -97,16 +97,19 @@ public:
                                 static_cast<ReadAttributeContext<TypeInfo> *>(__context);
                             ChipLogProgress(AppServer, "<Attribute>::Read() success");
                             Attribute<TypeInfo> * __attr = static_cast<Attribute<TypeInfo> *>(__attributeContext->mAttribute);
-                            __attr->value                = response;
                             if (__attr->hasValue)
                             {
-                                __attributeContext->mSuccessCb(__attributeContext->mClientContext,
-                                                               chip::MakeOptional(__attr->value), response);
+                                typename TypeInfo::DecodableType prevValue = __attr->value;
+                                __attr->value                              = response;
+                                __attributeContext->mSuccessCb(__attributeContext->mClientContext, chip::MakeOptional(prevValue),
+                                                               __attr->value);
                             }
                             else
                             {
                                 __attr->hasValue = true;
-                                __attributeContext->mSuccessCb(__attributeContext->mClientContext, chip::NullOptional, response);
+                                __attr->value    = response;
+                                __attributeContext->mSuccessCb(__attributeContext->mClientContext, chip::NullOptional,
+                                                               __attr->value);
                             }
                             delete __attributeContext;
                         },
@@ -269,17 +272,19 @@ public:
                                 static_cast<SubscribeAttributeContext<TypeInfo> *>(__context);
                             ChipLogProgress(AppServer, "<Attribute>::Subscribe() success");
                             Attribute<TypeInfo> * __attr = static_cast<Attribute<TypeInfo> *>(__attributeContext->mAttribute);
-                            __attr->value                = response;
-                            // TODO: Save old value and then overwrite
                             if (__attr->hasValue)
                             {
-                                __attributeContext->mSuccessCb(__attributeContext->mClientContext,
-                                                               chip::MakeOptional(__attr->value), response);
+                                typename TypeInfo::DecodableType prevValue = __attr->value;
+                                __attr->value                              = response;
+                                __attributeContext->mSuccessCb(__attributeContext->mClientContext, chip::MakeOptional(prevValue),
+                                                               __attr->value);
                             }
                             else
                             {
                                 __attr->hasValue = true;
-                                __attributeContext->mSuccessCb(__attributeContext->mClientContext, chip::NullOptional, response);
+                                __attr->value    = response;
+                                __attributeContext->mSuccessCb(__attributeContext->mClientContext, chip::NullOptional,
+                                                               __attr->value);
                             }
                             delete __attributeContext;
                         },

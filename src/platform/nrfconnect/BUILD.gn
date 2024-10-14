@@ -29,7 +29,6 @@ static_library("nrfconnect") {
     "../Zephyr/DiagnosticDataProviderImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.h",
     "../Zephyr/KeyValueStoreManagerImpl.cpp",
-    "../Zephyr/Logging.cpp",
     "../Zephyr/PlatformManagerImpl.cpp",
     "../Zephyr/SysHeapMalloc.h",
     "../Zephyr/SystemTimeSupport.cpp",
@@ -91,7 +90,7 @@ static_library("nrfconnect") {
       "ThreadStackManagerImpl.h",
     ]
 
-    if (chip_mdns == "platform") {
+    if (chip_mdns_platform) {
       sources += [
         "../OpenThread/DnssdImpl.cpp",
         "../OpenThread/OpenThreadDnssdImpl.cpp",
@@ -132,4 +131,12 @@ static_library("nrfconnect") {
   }
 
   cflags = [ "-Wconversion" ]
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "../Zephyr/Logging.cpp" ]
 }

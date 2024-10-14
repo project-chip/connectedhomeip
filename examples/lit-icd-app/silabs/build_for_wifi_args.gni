@@ -23,11 +23,12 @@ import("${chip_root}/src/platform/silabs/wifi_args.gni")
 chip_enable_ota_requestor = true
 app_data_model = "${chip_root}/examples/lit-icd-app/lit-icd-common"
 
+sl_enable_test_event_trigger = true
+
 # ICD Default configurations
 chip_enable_icd_server = true
 chip_subscription_timeout_resumption = false
-sl_use_subscription_synching = true
-icd_enforce_sit_slow_poll_limit = true
+sl_use_subscription_syncing = true
 chip_enable_icd_lit = true
 
 # ICD Matter Configuration flags

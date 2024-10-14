@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 #include "FactoryDataProvider.h"
 #include "CHIPDevicePlatformConfig.h"
 #include <crypto/CHIPCryptoPAL.h>
-
+#include <lib/support/BytesToHex.h>
 #if CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
 #include <credentials/CertificationDeclaration.h>
 #include <platform/Zephyr/ZephyrConfig.h>
@@ -329,11 +329,12 @@ template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetEnableKey(MutableByteSpan & enableKey)
 {
     ReturnErrorCodeIf(!mFactoryData.enable_key.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    ReturnErrorCodeIf(enableKey.size() < mFactoryData.enable_key.len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(enableKey.size() < mFactoryData.enable_key.len / 2, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    memcpy(enableKey.data(), mFactoryData.enable_key.data, mFactoryData.enable_key.len);
+    Encoding::HexToBytes((const char *) mFactoryData.enable_key.data, mFactoryData.enable_key.len, enableKey.data(),
+                         enableKey.size());
 
-    enableKey.reduce_size(mFactoryData.enable_key.len);
+    enableKey.reduce_size(mFactoryData.enable_key.len / 2);
 
     return CHIP_NO_ERROR;
 }

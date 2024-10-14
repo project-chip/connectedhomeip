@@ -20,7 +20,9 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
+#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -29,6 +31,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::FanControl;
 using namespace chip::app::Clusters::FanControl::Attributes;
@@ -42,37 +45,16 @@ public:
         AttributeAccessInterface(Optional<EndpointId>(aEndpointId), FanControl::Id), Delegate(aEndpointId)
     {}
 
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
 
 private:
-    CHIP_ERROR ReadPercentCurrent(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadSpeedCurrent(AttributeValueEncoder & aEncoder);
+    Nullable<uint8_t> mPercentSetting{};
+    Nullable<uint8_t> mSpeedSetting{};
 };
 
 static std::unique_ptr<ChefFanControlManager> mFanControlManager;
-
-CHIP_ERROR ChefFanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncoder)
-{
-    // Return PercentSetting attribute value for now
-    DataModel::Nullable<Percent> percentSetting;
-    Protocols::InteractionModel::Status status = PercentSetting::Get(mEndpoint, percentSetting);
-
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, CHIP_ERROR_READ_FAILED);
-
-    return aEncoder.Encode(percentSetting.ValueOr(0));
-}
-
-CHIP_ERROR ChefFanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEncoder)
-{
-    // Return SpeedCurrent attribute value for now
-    DataModel::Nullable<uint8_t> speedSetting;
-    Protocols::InteractionModel::Status status = SpeedSetting::Get(mEndpoint, speedSetting);
-
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, CHIP_ERROR_READ_FAILED);
-
-    return aEncoder.Encode(speedSetting.ValueOr(0));
-}
 
 Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff)
 {
@@ -117,6 +99,73 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
     return SpeedSetting::Set(mEndpoint, newSpeedSetting);
 }
 
+CHIP_ERROR ChefFanControlManager::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    VerifyOrDie(aPath.mClusterId == FanControl::Id);
+    VerifyOrDie(aPath.mEndpointId == mEndpoint);
+
+    switch (aPath.mAttributeId)
+    {
+    case SpeedSetting::Id: {
+        Nullable<uint8_t> newSpeedSetting;
+        ReturnErrorOnFailure(aDecoder.Decode(newSpeedSetting));
+
+        // Ensure new speed is in bounds
+        {
+            uint8_t maxSpeedSetting                    = 0;
+            Protocols::InteractionModel::Status status = SpeedMax::Get(mEndpoint, &maxSpeedSetting);
+            VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_IM_GLOBAL_STATUS(Failure));
+
+            if (!newSpeedSetting.IsNull() && newSpeedSetting.Value() > maxSpeedSetting)
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+        }
+
+        // Only act on changed.
+        if (newSpeedSetting != mSpeedSetting)
+        {
+            mSpeedSetting = newSpeedSetting;
+
+            // Mark both the setting AND the current dirty, since the current always
+            // tracks the target for our product.
+            MatterReportingAttributeChangeCallback(mEndpoint, FanControl::Id, Attributes::SpeedSetting::Id);
+            MatterReportingAttributeChangeCallback(mEndpoint, FanControl::Id, Attributes::SpeedCurrent::Id);
+        }
+
+        break;
+    }
+    case PercentSetting::Id: {
+        Nullable<uint8_t> newPercentSetting;
+        ReturnErrorOnFailure(aDecoder.Decode(newPercentSetting));
+
+        // Ensure new speed in percent is valid.
+        if (!newPercentSetting.IsNull() && newPercentSetting.Value() > 100)
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+
+        // Only act on changed.
+        if (newPercentSetting != mPercentSetting)
+        {
+            mPercentSetting = newPercentSetting;
+
+            // Mark both the setting AND the current dirty, since the current always
+            // tracks the target for our product.
+            MatterReportingAttributeChangeCallback(mEndpoint, FanControl::Id, Attributes::PercentSetting::Id);
+            MatterReportingAttributeChangeCallback(mEndpoint, FanControl::Id, Attributes::PercentCurrent::Id);
+        }
+
+        break;
+    }
+    default:
+        break;
+    }
+
+    // Fall through goes to attribute store legacy handling.
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ChefFanControlManager::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == FanControl::Id);
@@ -124,10 +173,20 @@ CHIP_ERROR ChefFanControlManager::Read(const ConcreteReadAttributePath & aPath, 
 
     switch (aPath.mAttributeId)
     {
-    case SpeedCurrent::Id:
-        return ReadSpeedCurrent(aEncoder);
-    case PercentCurrent::Id:
-        return ReadPercentCurrent(aEncoder);
+    case PercentCurrent::Id: {
+        // Current percents always tracks setting immediately in our implementation.
+        return aEncoder.Encode(mPercentSetting.ValueOr(0));
+    }
+    case PercentSetting::Id: {
+        return aEncoder.Encode(mPercentSetting);
+    }
+    case SpeedCurrent::Id: {
+        // Current speed always tracks setting immediately in our implementation.
+        return aEncoder.Encode(mSpeedSetting.ValueOr(0));
+    }
+    case SpeedSetting::Id: {
+        return aEncoder.Encode(mSpeedSetting);
+    }
     default:
         break;
     }
@@ -140,6 +199,6 @@ void emberAfFanControlClusterInitCallback(EndpointId endpoint)
 {
     VerifyOrDie(!mFanControlManager);
     mFanControlManager = std::make_unique<ChefFanControlManager>(endpoint);
-    registerAttributeAccessOverride(mFanControlManager.get());
+    AttributeAccessInterfaceRegistry::Instance().Register(mFanControlManager.get());
     FanControl::SetDefaultDelegate(endpoint, mFanControlManager.get());
 }

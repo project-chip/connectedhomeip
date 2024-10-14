@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Project CHIP Authors
+# Copyright (c) 2023-2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,3 +31,5 @@ matter_enable_tracing_support = true
 chip_enable_read_client = false
 chip_enable_energy_evse_trigger = true
 chip_enable_energy_reporting_trigger = true
+chip_enable_device_energy_management_trigger = true
+chip_enable_water_heater_management_trigger = true

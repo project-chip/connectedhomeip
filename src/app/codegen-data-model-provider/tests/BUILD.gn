@@ -1,0 +1,63 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/src/app/codegen-data-model-provider/model.gni")
+
+source_set("ember_extra_files") {
+  sources = [
+    # This IS TERRIBLE, however we want to pretend AAI exists for global
+    # items and we need a shared IO storage to reduce overhead between
+    # data-model access and ember-compatibility (we share the same buffer)
+    "${chip_root}/src/app/util/ember-global-attribute-access-interface.cpp",
+    "${chip_root}/src/app/util/ember-io-storage.cpp",
+    "EmberInvokeOverride.cpp",
+    "EmberInvokeOverride.h",
+    "EmberReadWriteOverride.cpp",
+    "EmberReadWriteOverride.h",
+    "InteractionModelTemporaryOverrides.cpp",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/data-model-provider/tests:encode-decode",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/protocols",
+  ]
+}
+
+source_set("mock_model") {
+  sources = codegen_data_model_SOURCES
+
+  public_deps = codegen_data_model_PUBLIC_DEPS
+
+  # this ties in the codegen model to an actual ember implementation
+  public_deps += [
+    ":ember_extra_files",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+  ]
+}
+
+chip_test_suite("tests") {
+  output_name = "libCodegenDataModelProviderTests"
+
+  test_sources = [ "TestCodegenModelViaMocks.cpp" ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":mock_model",
+    "${chip_root}/src/app/data-model-provider:string-builder-adapters",
+  ]
+}

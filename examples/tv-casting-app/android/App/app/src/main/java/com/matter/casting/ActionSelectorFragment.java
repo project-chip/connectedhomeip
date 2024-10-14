@@ -31,12 +31,17 @@ public class ActionSelectorFragment extends Fragment {
   private static final String TAG = ActionSelectorFragment.class.getSimpleName();
 
   private final CastingPlayer selectedCastingPlayer;
+  private final boolean useCommissionerGeneratedPasscode;
 
   private View.OnClickListener selectContentLauncherButtonClickListener;
+  private View.OnClickListener selectApplicationBasicButtonClickListener;
+  private View.OnClickListener selectMediaPlaybackButtonClickListener;
   private View.OnClickListener disconnectButtonClickListener;
 
-  public ActionSelectorFragment(CastingPlayer selectedCastingPlayer) {
+  public ActionSelectorFragment(
+      CastingPlayer selectedCastingPlayer, boolean useCommissionerGeneratedPasscode) {
     this.selectedCastingPlayer = selectedCastingPlayer;
+    this.useCommissionerGeneratedPasscode = useCommissionerGeneratedPasscode;
   }
 
   /**
@@ -44,10 +49,13 @@ public class ActionSelectorFragment extends Fragment {
    * parameters.
    *
    * @param selectedCastingPlayer CastingPlayer that the casting app connected to
+   * @param useCommissionerGeneratedPasscode Boolean indicating whether this CastingPlayer was
+   *     commissioned using the Commissioner-Generated passcode commissioning flow.
    * @return A new instance of fragment SelectActionFragment.
    */
-  public static ActionSelectorFragment newInstance(CastingPlayer selectedCastingPlayer) {
-    return new ActionSelectorFragment(selectedCastingPlayer);
+  public static ActionSelectorFragment newInstance(
+      CastingPlayer selectedCastingPlayer, boolean useCommissionerGeneratedPasscode) {
+    return new ActionSelectorFragment(selectedCastingPlayer, useCommissionerGeneratedPasscode);
   }
 
   @Override
@@ -62,7 +70,20 @@ public class ActionSelectorFragment extends Fragment {
     this.selectContentLauncherButtonClickListener =
         v -> {
           Log.d(TAG, "handle() called on selectContentLauncherButtonClickListener");
-          callback.handleContentLauncherLaunchURLSelected(selectedCastingPlayer);
+          callback.handleContentLauncherLaunchURLSelected(
+              selectedCastingPlayer, useCommissionerGeneratedPasscode);
+        };
+    this.selectApplicationBasicButtonClickListener =
+        v -> {
+          Log.d(TAG, "handle() called on selectApplicationBasicButtonClickListener");
+          callback.handleApplicationBasicReadVendorIDSelected(
+              selectedCastingPlayer, useCommissionerGeneratedPasscode);
+        };
+    this.selectMediaPlaybackButtonClickListener =
+        v -> {
+          Log.d(TAG, "handle() called on selectMediaPlaybackButtonClickListener");
+          callback.handleMediaPlaybackSubscribeToCurrentStateSelected(
+              selectedCastingPlayer, useCommissionerGeneratedPasscode);
         };
 
     this.disconnectButtonClickListener =
@@ -82,6 +103,12 @@ public class ActionSelectorFragment extends Fragment {
     getView()
         .findViewById(R.id.selectContentLauncherLaunchURLButton)
         .setOnClickListener(selectContentLauncherButtonClickListener);
+    getView()
+        .findViewById(R.id.selectApplicationBasicReadVendorIDButton)
+        .setOnClickListener(selectApplicationBasicButtonClickListener);
+    getView()
+        .findViewById(R.id.selectMediaPlaybackSubscribeToCurrentStateButton)
+        .setOnClickListener(selectMediaPlaybackButtonClickListener);
 
     getView().findViewById(R.id.disconnectButton).setOnClickListener(disconnectButtonClickListener);
   }
@@ -89,7 +116,16 @@ public class ActionSelectorFragment extends Fragment {
   /** Interface for notifying the host. */
   public interface Callback {
     /** Notifies listener to trigger transition on selection of Content Launcher cluster */
-    void handleContentLauncherLaunchURLSelected(CastingPlayer selectedCastingPlayer);
+    void handleContentLauncherLaunchURLSelected(
+        CastingPlayer selectedCastingPlayer, boolean useCommissionerGeneratedPasscode);
+
+    /** Notifies listener to trigger transition on selection of Application Basic cluster */
+    void handleApplicationBasicReadVendorIDSelected(
+        CastingPlayer selectedCastingPlayer, boolean useCommissionerGeneratedPasscode);
+
+    /** Notifies listener to trigger transition on selection of Media PLayback cluster */
+    void handleMediaPlaybackSubscribeToCurrentStateSelected(
+        CastingPlayer selectedCastingPlayer, boolean useCommissionerGeneratedPasscode);
 
     /** Notifies listener to trigger transition on click of the Disconnect button */
     void handleDisconnect();

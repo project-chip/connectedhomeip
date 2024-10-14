@@ -20,11 +20,11 @@
 #include <array>
 #include <stdio.h>
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/SortUtils.h>
 #include <lib/support/Span.h>
-
-#include <lib/support/UnitTestRegistration.h>
-#include <nlunit-test.h>
 
 using namespace chip;
 using namespace chip::Sorting;
@@ -71,7 +71,7 @@ public:
     }
 };
 
-void DoBasicSortTest(nlTestSuite * inSuite, Sorter & sorter)
+void DoBasicSortTest(Sorter & sorter)
 {
     Span<Datum> empty_to_sort;
     Span<Datum> empty_expected;
@@ -115,7 +115,7 @@ void DoBasicSortTest(nlTestSuite * inSuite, Sorter & sorter)
         const auto & expected = expected_outs[case_idx];
 
         sorter.Sort(to_sort);
-        NL_TEST_ASSERT(inSuite, to_sort.data_equal(expected));
+        EXPECT_TRUE(to_sort.data_equal(expected));
         if (!to_sort.data_equal(expected))
         {
             for (size_t idx = 0; idx < to_sort.size(); ++idx)
@@ -126,44 +126,17 @@ void DoBasicSortTest(nlTestSuite * inSuite, Sorter & sorter)
                        sorted_item.associated_data, expected_item.key, expected_item.associated_data);
             }
         }
-        NL_TEST_ASSERT(inSuite, sorter.compare_count() <= (to_sort.size() * to_sort.size()));
+        EXPECT_LE(sorter.compare_count(), (to_sort.size() * to_sort.size()));
         printf("Compare counts: %d\n", static_cast<int>(sorter.compare_count()));
         sorter.Reset();
     }
 }
 
-void TestBasicSort(nlTestSuite * inSuite, void * inContext)
+TEST(TestSorting, TestBasicSort)
 {
     printf("Testing insertion sorter.\n");
     InsertionSorter insertion_sorter;
-    DoBasicSortTest(inSuite, insertion_sorter);
+    DoBasicSortTest(insertion_sorter);
 }
-
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("Basic sort tests for custom sort utilities", TestBasicSort),
-    NL_TEST_SENTINEL()
-};
-// clang-format on
 
 } // namespace
-
-int TestSortUtils()
-{
-    // clang-format off
-    nlTestSuite theSuite =
-    {
-        "Test for SortUtils",
-        &sTests[0],
-        nullptr,
-        nullptr
-    };
-    // clang-format on
-
-    nlTestRunner(&theSuite, nullptr);
-
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestSortUtils)

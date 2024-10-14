@@ -1,19 +1,29 @@
-/**
- ******************************************************************************
- * @file    matter_config.h
- * @author  MCD Application Team
- * @brief   config file for mbedtls
- ******************************************************************************
- * @attention
+/*
+ *  Copyright (c) 2020, The OpenThread Authors.
+ *  All rights reserved.
  *
- * Copyright (c) 2019-2021 STMicroelectronics.
- * All rights reserved.
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions are met:
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. Neither the name of the copyright holder nor the
+ *     names of its contributors may be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
  *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- ******************************************************************************
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ *  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ *  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ *  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ *  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ *  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ *  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ *  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
  */
 
 #pragma once
@@ -67,10 +77,7 @@ extern "C" {
 #define MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED
 #define MBEDTLS_KEY_EXCHANGE_PSK_ENABLED
 #define MBEDTLS_MD_C
-
 #define MBEDTLS_NO_PLATFORM_ENTROPY
-#define MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
-
 #define MBEDTLS_OID_C
 #define MBEDTLS_PEM_PARSE_C
 #define MBEDTLS_PEM_WRITE_C
@@ -114,9 +121,9 @@ extern "C" {
 #define MBEDTLS_ENTROPY_MAX_SOURCES 2   /**< Maximum number of sources supported */
 
 #if OPENTHREAD_CONFIG_COAP_SECURE_API_ENABLE
-#define MBEDTLS_SSL_MAX_CONTENT_LEN 900 /**< Maxium fragment length in bytes */
+#define MBEDTLS_SSL_MAX_CONTENT_LEN 900 /**< Maximum fragment length in bytes */
 #else
-#define MBEDTLS_SSL_MAX_CONTENT_LEN 768 /**< Maxium fragment length in bytes */
+#define MBEDTLS_SSL_MAX_CONTENT_LEN 768 /**< Maximum fragment length in bytes */
 #endif
 
 #define MBEDTLS_SSL_CIPHERSUITES MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
@@ -134,6 +141,7 @@ extern "C" {
 #include "mbedtls/check_config.h"
 #include "mbedtls/config_psa.h"
 
+int mbedtls_ssl_safer_memcmp(const void * a, const void * b, size_t n);
 #ifdef __cplusplus
 }
 #endif

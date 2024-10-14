@@ -23,6 +23,7 @@
 #include "ICDUtil.h"
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;

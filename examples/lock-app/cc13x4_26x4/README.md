@@ -46,6 +46,15 @@ Instruments devices.
 | Red LED On State                                 | Lock state locked                        |
 | Red & Green LED Off State                        | Lock state unlocked                      |
 
+When the device has LIT ICD functionality enabled (`chip_enable_icd_lit` set to
+true in args.gni), the functionality of the short button presses changes as
+described below:
+
+| Action                                           | Functionality            |
+| ------------------------------------------------ | ------------------------ |
+| Left Button (`BTN-1`) Press (less than 1000 ms)  | User Active Mode Trigger |
+| Right Button (`BTN-2`) Press (less than 1000 ms) | Lock state is toggled    |
+
 ## Building
 
 ### Preparation
@@ -59,16 +68,22 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
     ```
     $ cd ~
-    $ `wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.16.2.3028/sysconfig-1.16.2_3028-setup.run`
-    $ chmod +x sysconfig-1.16.2_3028-setup.run
-    $ ./sysconfig-1.16.2_3028-setup.run
+    $ wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.18.1.3343/sysconfig-1.18.1_3343-setup.run
+    $ chmod +x sysconfig-1.18.1_3343-setup.run
+    $ ./sysconfig-1.18.1_3343-setup.run
     ```
 
 -   Run the bootstrap script to setup the build environment.
+-   Note, a recursive submodule checkout is required to utilize TI's Openthread
+    reference commit.
+-   Note, in order to build the chip-tool and ota-provider examples, a recursive
+    submodule checkout is required for the linux platform as seen in the command
+    below.
 
     ```
     $ cd ~/connectedhomeip
     $ source ./scripts/bootstrap.sh
+    $ ./scripts/checkout_submodules.py --shallow --platform cc13xx_26xx linux --recursive
 
     ```
 
@@ -88,15 +103,13 @@ Ninja to build the executable.
 -   Run the build to produce a default executable. By default on Linux both the
     TI SimpleLink SDK and Sysconfig are located in a `ti` folder in the user's
     home directory, and you must provide the absolute path to them. For example
-    `/home/username/ti/sysconfig_1.16.2`. On Windows the default directory is
+    `/home/username/ti/sysconfig_1.18.1`. On Windows the default directory is
     `C:\ti`. Take note of this install path, as it will be used in the next
     step.
 
     ```
-    $ cd ~/connectedhomeip/examples/lock-app/cc13x2x7_26x2x7
-    OR
     $ cd ~/connectedhomeip/examples/lock-app/cc13x4_26x4
-    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.16.2\""
+    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.18.1\""
     $ ninja -C out/debug
 
     ```
@@ -104,9 +117,8 @@ Ninja to build the executable.
     If you would like to define arguments on the command line you may add them
     to the GN call.
 
-
     ```
-    gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.16.2\" target_defines=[\"CC13X4_26X4_ATTESTATION_CREDENTIALS=1\"]"
+    gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.18.1\" target_defines=[\"CC13X4_26X4_ATTESTATION_CREDENTIALS=1\"] chip_generate_link_map_file=true"
     ```
 
 ## Programming

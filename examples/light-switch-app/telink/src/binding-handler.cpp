@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
  */
 
 #include "binding-handler.h"
-
 #include "AppConfig.h"
+#include "IdentifyCommand.h"
 #include "app/CommandSender.h"
 #include "app/clusters/bindings/BindingManager.h"
 #include "app/server/Server.h"
@@ -113,24 +113,46 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
     BindingCommandData * data = static_cast<BindingCommandData *>(context);
     data->isGroup             = IsGroupBound();
 
-    if (binding.type == MATTER_MULTICAST_BINDING && data->isGroup)
+    if (data->isReadAttribute)
     {
-        switch (data->clusterId)
+        // It should always enter here if isReadAttribute is true
+        if (binding.type == MATTER_UNICAST_BINDING && !data->isGroup)
         {
-        case Clusters::OnOff::Id:
-            ProcessOnOffGroupBindingCommand(data->commandId, binding);
-            break;
+            switch (data->clusterId)
+            {
+            case Clusters::Identify::Id:
+                ProcessIdentifyUnicastBindingRead(data, binding, peer_device);
+                break;
+            }
         }
     }
-    else if (binding.type == MATTER_UNICAST_BINDING && !data->isGroup)
+    else
     {
-        switch (data->clusterId)
+        if (binding.type == MATTER_MULTICAST_BINDING && data->isGroup)
         {
-        case Clusters::OnOff::Id:
-            VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
-            ProcessOnOffUnicastBindingCommand(data->commandId, binding, peer_device->GetExchangeManager(),
-                                              peer_device->GetSecureSession().Value());
-            break;
+            switch (data->clusterId)
+            {
+            case Clusters::Identify::Id:
+                ProcessIdentifyGroupBindingCommand(data, binding);
+                break;
+            case Clusters::OnOff::Id:
+                ProcessOnOffGroupBindingCommand(data->commandId, binding);
+                break;
+            }
+        }
+        else if (binding.type == MATTER_UNICAST_BINDING && !data->isGroup)
+        {
+            switch (data->clusterId)
+            {
+            case Clusters::Identify::Id:
+                ProcessIdentifyUnicastBindingCommand(data, binding, peer_device);
+                break;
+            case Clusters::OnOff::Id:
+                VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
+                ProcessOnOffUnicastBindingCommand(data->commandId, binding, peer_device->GetExchangeManager(),
+                                                  peer_device->GetSecureSession().Value());
+                break;
+            }
         }
     }
 }
@@ -243,7 +265,7 @@ CHIP_ERROR BindingGroupBindCommandHandler(int argc, char ** argv)
     entry->fabricIndex             = atoi(argv[0]);
     entry->groupId                 = atoi(argv[1]);
     entry->local                   = 1; // Hardcoded to endpoint 1 for now
-    entry->clusterId.SetValue(6);       // Hardcoded to OnOff cluster for now
+    entry->clusterId.emplace(6);        // Hardcoded to OnOff cluster for now
 
     DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
     return CHIP_NO_ERROR;
@@ -259,7 +281,7 @@ CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
     entry->nodeId                  = atoi(argv[1]);
     entry->local                   = 1; // Hardcoded to endpoint 1 for now
     entry->remote                  = atoi(argv[2]);
-    entry->clusterId.SetValue(6); // Hardcode to OnOff cluster for now
+    entry->clusterId.emplace(6); // Hardcode to OnOff cluster for now
 
     DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
     return CHIP_NO_ERROR;
@@ -346,9 +368,24 @@ static void RegisterSwitchCommands()
 {
     static const shell_command_t sSwitchSubCommands[] = {
         { &SwitchHelpHandler, "help", "Usage: switch <subcommand>" },
+        { &IdentifySwitchCommandHandler, "identify", " Usage: switch identify <subcommand>" },
         { &OnOffSwitchCommandHandler, "onoff", " Usage: switch onoff <subcommand>" },
         { &GroupsSwitchCommandHandler, "groups", "Usage: switch groups <subcommand>" },
         { &BindingSwitchCommandHandler, "binding", "Usage: switch binding <subcommand>" }
+    };
+
+    static const shell_command_t sSwitchIdentifySubCommands[] = {
+        { &IdentifyHelpHandler, "help", "Usage: switch identify <subcommand>" },
+        { &IdentifyCommandHandler, "identify", "identify Usage: switch identify identify" },
+        { &TriggerEffectSwitchCommandHandler, "triggereffect", "triggereffect Usage: switch identify triggereffect" },
+        { &IdentifyRead, "read", "Usage : switch identify read <attribute>" }
+    };
+
+    static const shell_command_t sSwitchIdentifyReadSubCommands[] = {
+        { &IdentifyReadHelpHandler, "help", "Usage : switch identify read <attribute>" },
+        { &IdentifyReadAttributeList, "attlist", "Read attribute list" },
+        { &IdentifyReadIdentifyTime, "identifytime", "Read identifytime attribute" },
+        { &IdentifyReadIdentifyType, "identifytype", "Read identifytype attribute" },
     };
 
     static const shell_command_t sSwitchOnOffSubCommands[] = {
@@ -361,6 +398,12 @@ static void RegisterSwitchCommands()
     static const shell_command_t sSwitchGroupsSubCommands[] = { { &GroupsHelpHandler, "help", "Usage: switch groups <subcommand>" },
                                                                 { &GroupsOnOffSwitchCommandHandler, "onoff",
                                                                   "Usage: switch groups onoff <subcommand>" } };
+
+    static const shell_command_t sSwitchGroupsIdentifySubCommands[] = {
+        { &GroupsIdentifyHelpHandler, "help", "Usage: switch groups onoff <subcommand>" },
+        { &GroupIdentifyCommandHandler, "identify", "Sends identify command to bound group" },
+        { &GroupTriggerEffectSwitchCommandHandler, "triggereffect", "Sends triggereffect command to group" },
+    };
 
     static const shell_command_t sSwitchGroupsOnOffSubCommands[] = {
         { &GroupsOnOffHelpHandler, "help", "Usage: switch groups onoff <subcommand>" },
@@ -378,7 +421,11 @@ static void RegisterSwitchCommands()
     static const shell_command_t sSwitchCommand = { &SwitchCommandHandler, "switch",
                                                     "Light-switch commands. Usage: switch <subcommand>" };
 
+    sShellSwitchGroupsIdentifySubCommands.RegisterCommands(sSwitchGroupsIdentifySubCommands,
+                                                           ArraySize(sSwitchGroupsIdentifySubCommands));
     sShellSwitchGroupsOnOffSubCommands.RegisterCommands(sSwitchGroupsOnOffSubCommands, ArraySize(sSwitchGroupsOnOffSubCommands));
+    sShellSwitchIdentifySubCommands.RegisterCommands(sSwitchIdentifySubCommands, ArraySize(sSwitchIdentifySubCommands));
+    sShellSwitchIdentifyReadSubCommands.RegisterCommands(sSwitchIdentifyReadSubCommands, ArraySize(sSwitchIdentifyReadSubCommands));
     sShellSwitchOnOffSubCommands.RegisterCommands(sSwitchOnOffSubCommands, ArraySize(sSwitchOnOffSubCommands));
     sShellSwitchGroupsSubCommands.RegisterCommands(sSwitchGroupsSubCommands, ArraySize(sSwitchGroupsSubCommands));
     sShellSwitchBindingSubCommands.RegisterCommands(sSwitchBindingSubCommands, ArraySize(sSwitchBindingSubCommands));

@@ -19,7 +19,6 @@
 
 #include "LightingManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/util/af.h>
 #include <app/util/att-storage.h>
 #include <stdio.h>
 
@@ -28,13 +27,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 
 LightingManager LightingManager::sLight;
-
-CHIP_ERROR LightingManager::Init()
-{
-    mState = kState_OffCompleted;
-
-    return CHIP_NO_ERROR;
-}
 
 void LightingManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB)
 {

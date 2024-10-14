@@ -90,6 +90,8 @@ public:
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new ThreadNetworkIterator(this); }
     CHIP_ERROR Init(Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback) override;
+    CHIP_ERROR SetEnabled(bool enabled) override;
+    bool GetEnabled() override;
     void Shutdown() override;
 
     // WirelessDriver
@@ -108,17 +110,22 @@ public:
     Status RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
     Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) override;
     void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    CHIP_ERROR DisconnectFromNetwork() override;
+#endif
 
     // ThreadDriver
     Status AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
     void ScanNetworks(ThreadDriver::ScanCallback * callback) override;
 
 private:
+    static constexpr const char * kInterfaceEnabled = "g/gtd/en";
     uint8_t scanNetworkTimeoutSeconds;
     uint8_t connectNetworkTimeout;
     static void OnThreadStateChangeHandler(const ChipDeviceEvent * event, intptr_t arg);
     Status MatchesNetworkId(const Thread::OperationalDataset & dataset, const ByteSpan & networkId) const;
     CHIP_ERROR BackupConfiguration();
+    void CheckInterfaceEnabled();
 
     ThreadNetworkIterator mThreadIterator      = ThreadNetworkIterator(this);
     Thread::OperationalDataset mStagingNetwork = {};

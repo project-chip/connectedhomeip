@@ -24,7 +24,6 @@
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/af.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <tracing/macros.h>

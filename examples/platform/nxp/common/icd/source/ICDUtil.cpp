@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,20 +17,21 @@
  */
 
 #include "ICDUtil.h"
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include "OTARequestorInitiator.h"
+#endif
 
 chip::NXP::App::ICDUtil chip::NXP::App::ICDUtil::sICDUtil;
 
 CHIP_ERROR chip::NXP::App::ICDUtil::OnSubscriptionRequested(chip::app::ReadHandler & aReadHandler,
                                                             chip::Transport::SecureSession & aSecureSession)
 {
-    uint16_t agreedMaxInterval    = kSubscriptionMaxIntervalPublisherLimit;
     uint16_t requestedMinInterval = 0;
     uint16_t requestedMaxInterval = 0;
     aReadHandler.GetReportingIntervals(requestedMinInterval, requestedMaxInterval);
 
-    if (requestedMaxInterval < agreedMaxInterval)
-    {
-        agreedMaxInterval = requestedMaxInterval;
-    }
-    return aReadHandler.SetMaxReportingInterval(agreedMaxInterval);
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    chip::NXP::App::OTARequestorInitiator::Instance().gImageProcessor.SetRebootDelaySec(requestedMinInterval);
+#endif
+    return CHIP_NO_ERROR;
 }

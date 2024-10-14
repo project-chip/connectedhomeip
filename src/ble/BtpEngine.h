@@ -27,19 +27,20 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <string.h>
+#ifndef _CHIP_BLE_BLE_H
+#error "Please include <ble/Ble.h> instead!"
+#endif
 
-#include <ble/BleConfig.h>
+#include <cstdint>
+#include <cstring>
 
-#include <ble/BleError.h>
-#include <lib/support/BitFlags.h>
+#include <lib/core/CHIPError.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace Ble {
 
-inline constexpr size_t kTransferProtocolHeaderFlagsSize = 1; // Size in bytes of enocded BTP fragment header flag bits
+inline constexpr size_t kTransferProtocolHeaderFlagsSize = 1; // Size in bytes of encoded BTP fragment header flag bits
 inline constexpr size_t kTransferProtocolSequenceNumSize = 1; // Size in bytes of encoded BTP sequence number
 inline constexpr size_t kTransferProtocolAckSize         = 1; // Size in bytes of encoded BTP fragment acknowledgement number
 inline constexpr size_t kTransferProtocolMsgLenSize      = 2; // Size in byte of encoded BTP total fragmented message length
@@ -56,10 +57,6 @@ using ::chip::System::PacketBufferHandle;
 typedef uint8_t SequenceNumber_t; // If type changed from uint8_t, adjust assumptions in BtpEngine::IsValidAck and
                                   // BLEEndPoint::AdjustReceiveWindow.
 
-#if CHIP_ENABLE_CHIPOBLE_TEST
-class BLEEndPoint;
-#endif
-
 // Public data members:
 typedef enum
 {
@@ -69,10 +66,6 @@ typedef enum
 
 class BtpEngine
 {
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    friend class BLEEndPoint;
-#endif
-
 public:
     // Public data members:
     typedef enum
@@ -90,9 +83,6 @@ public:
         kContinueMessage = 0x02,
         kEndMessage      = 0x04,
         kFragmentAck     = 0x08,
-#if CHIP_ENABLE_CHIPOBLE_TEST
-        kCommandMessage = 0x10,
-#endif
     };
 
     static const uint16_t sDefaultFragmentSize;
@@ -117,29 +107,6 @@ public:
 
     inline State_t RxState() { return mRxState; }
     inline State_t TxState() { return mTxState; }
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    inline PacketType_t SetTxPacketType(PacketType_t type) { return (mTxPacketType = type); }
-    inline PacketType_t SetRxPacketType(PacketType_t type) { return (mRxPacketType = type); }
-    inline PacketType_t TxPacketType() { return mTxPacketType; }
-    inline PacketType_t RxPacketType() { return mRxPacketType; }
-    inline SequenceNumber_t SetTxPacketSeq(SequenceNumber_t seq) { return (mTxPacketSeq = seq); }
-    inline SequenceNumber_t SetRxPacketSeq(SequenceNumber_t seq) { return (mRxPacketSeq = seq); }
-    inline SequenceNumber_t TxPacketSeq() { return mTxPacketSeq; }
-    inline SequenceNumber_t RxPacketSeq() { return mRxPacketSeq; }
-    static bool IsCommandPacket(const PacketBufferHandle & p);
-    inline void PushPacketTag(const PacketBufferHandle & p, PacketType_t type)
-    {
-        p->SetStart(p->Start() - sizeof(type));
-        memcpy(p->Start(), &type, sizeof(type));
-    }
-    inline PacketType_t PopPacketTag(const PacketBufferHandle & p)
-    {
-        PacketType_t type;
-        memcpy(&type, p->Start(), sizeof(type));
-        p->SetStart(p->Start() + sizeof(type));
-        return type;
-    }
-#endif // CHIP_ENABLE_CHIPOBLE_TEST
 
     bool HasUnackedData() const;
 
@@ -160,12 +127,6 @@ public:
 
 private:
     // Private data members:
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    PacketType_t mTxPacketType;
-    PacketType_t mRxPacketType;
-    SequenceNumber_t mTxPacketSeq;
-    SequenceNumber_t mRxPacketSeq;
-#endif
     State_t mRxState;
     uint16_t mRxLength;
     void * mAppState;

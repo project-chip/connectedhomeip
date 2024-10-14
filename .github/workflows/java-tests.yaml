@@ -16,6 +16,9 @@ name: Java Tests
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
     workflow_dispatch:
@@ -28,7 +31,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     java_tests_linux:
         name: Linux
@@ -40,7 +43,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-java:41
+            image: ghcr.io/project-chip/chip-build-java:81
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -99,7 +102,7 @@ jobs:
                    "./scripts/build/build_examples.py \
                       --target linux-x64-kotlin-matter-controller \
                       build \
-                   "                   
+                   "
             - name: Run Discover Commissionables Test
               run: |
                   scripts/run_in_python_env.sh out/venv \
@@ -132,7 +135,7 @@ jobs:
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
                      --factoryreset \
-                  '                    
+                  '
             - name: Run IM Extendable Invoke Test
               run: |
                   scripts/run_in_python_env.sh out/venv \
@@ -243,7 +246,7 @@ jobs:
                      --tool-cluster "pairing" \
                      --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
                      --factoryreset \
-                  '                  
+                  '
             - name: Run Kotlin IM Invoke Test
               run: |
                   scripts/run_in_python_env.sh out/venv \
@@ -287,7 +290,7 @@ jobs:
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
                      --factoryreset \
-                  '                                                  
+                  '
             - name: Uploading core files
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}

@@ -25,7 +25,6 @@
 
 #include <app/icd/server/ICDServerConfig.h>
 
-#include <app/AttributeAccessInterface.h>
 #include <app/util/basic-types.h>
 #include <inet/IPAddress.h>
 #include <lib/support/Span.h>
@@ -55,6 +54,8 @@ template <class>
 class GenericPlatformManagerImpl;
 template <class>
 class GenericConfigurationManagerImpl;
+template <class>
+class GenericPlatformManagerImpl_CMSISOS;
 template <class>
 class GenericPlatformManagerImpl_FreeRTOS;
 template <class>
@@ -106,9 +107,9 @@ public:
     CHIP_ERROR GetAndLogThreadTopologyFull();
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
     CHIP_ERROR GetExternalIPv6Address(chip::Inet::IPAddress & addr);
+    CHIP_ERROR GetThreadVersion(uint16_t & version);
     CHIP_ERROR GetPollPeriod(uint32_t & buf);
 
-    CHIP_ERROR JoinerStart();
     CHIP_ERROR SetThreadProvision(ByteSpan aDataset);
     CHIP_ERROR SetThreadEnabled(bool val);
     CHIP_ERROR AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
@@ -168,6 +169,8 @@ private:
     friend class Internal::GenericPlatformManagerImpl;
     template <class>
     friend class Internal::GenericConfigurationManagerImpl;
+    template <class>
+    friend class Internal::GenericPlatformManagerImpl_CMSISOS;
     template <class>
     friend class Internal::GenericPlatformManagerImpl_FreeRTOS;
     template <class>
@@ -446,14 +449,14 @@ inline CHIP_ERROR ThreadStackManager::GetExternalIPv6Address(chip::Inet::IPAddre
     return static_cast<ImplClass *>(this)->_GetExternalIPv6Address(addr);
 }
 
+inline CHIP_ERROR ThreadStackManager::GetThreadVersion(uint16_t & version)
+{
+    return static_cast<ImplClass *>(this)->_GetThreadVersion(version);
+}
+
 inline CHIP_ERROR ThreadStackManager::GetPollPeriod(uint32_t & buf)
 {
     return static_cast<ImplClass *>(this)->_GetPollPeriod(buf);
-}
-
-inline CHIP_ERROR ThreadStackManager::JoinerStart()
-{
-    return static_cast<ImplClass *>(this)->_JoinerStart();
 }
 
 inline void ThreadStackManager::ResetThreadNetworkDiagnosticsCounts()

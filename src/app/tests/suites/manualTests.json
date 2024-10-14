@@ -64,7 +64,6 @@
         "Test_TC_DA_1_8"
     ],
     "DishwasherAlarm": [
-        "Test_TC_DISHALM_1_1",
         "Test_TC_DISHALM_2_1",
         "Test_TC_DISHALM_3_1",
         "Test_TC_DISHALM_3_2",
@@ -74,7 +73,6 @@
         "Test_TC_DISHALM_3_6"
     ],
     "DishwasherMode": [
-        "Test_TC_DISHM_1_1",
         "Test_TC_DISHM_1_2",
         "Test_TC_DISHM_2_1",
         "Test_TC_DISHM_3_1",
@@ -119,14 +117,7 @@
     "GeneralCommissioning": ["Test_TC_CGEN_2_2"],
     "GeneralDiagnostics": ["Test_TC_DGGEN_2_2"],
     "Identify": ["Test_TC_I_3_2"],
-    "IcdManagement": [
-        "Test_TC_ICDM_2_2",
-        "Test_TC_ICDM_3_1",
-        "Test_TC_ICDM_3_2",
-        "Test_TC_ICDM_3_3",
-        "Test_TC_ICDM_4_1",
-        "Test_TC_ICDM_5_1"
-    ],
+    "IcdManagement": [],
     "IlluminanceMeasurement": [],
     "InteractionDataModel": [
         "Test_TC_IDM_1_1",
@@ -172,10 +163,8 @@
         "Test_TC_MC_11_2",
         "Test_TC_ALOGIN_12_2",
         "Test_TC_TGTNAV_8_2",
-        "Test_TC_APPOBSERVER_1_13",
         "Test_TC_APPOBSERVER_13_1",
-        "Test_TC_APPOBSERVER_13_2",
-        "Test_TC_CONCON_1_14"
+        "Test_TC_APPOBSERVER_13_2"
     ],
     "MultipleFabrics": [
         "Test_TC_CADMIN_1_1",
@@ -287,7 +276,7 @@
         "Test_TC_TCCM_1_2",
         "Test_TC_TCCM_2_1"
     ],
-    "Switch": ["Test_TC_SWTCH_2_2", "Test_TC_SWTCH_3_2"],
+    "Switch": ["Test_TC_SWTCH_3_2"],
     "TemperatureControl": [],
     "TemperatureMeasurement": ["Test_TC_TMP_2_2"],
     "Thermostat": ["Test_TC_TSTAT_3_2"],

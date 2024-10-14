@@ -60,6 +60,7 @@ private:
     static void ActionCompleted(PumpManager::Action_t aAction, int32_t aActor);
 
     void DispatchEvent(AppEvent * event);
+    void uiInit(void);
 
     static void ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events);
     static void ButtonRightEventHandler(Button_Handle handle, Button_EventMask events);

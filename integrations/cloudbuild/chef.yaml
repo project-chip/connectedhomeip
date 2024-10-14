@@ -1,24 +1,35 @@
 steps:
-    - name: "ghcr.io/project-chip/chip-build-vscode:41"
+    - name: "ghcr.io/project-chip/chip-build-vscode:81"
+      entrypoint: "bash"
+      args:
+          - "-c"
+          - |
+              git config --global --add safe.directory "*"
+              python scripts/checkout_submodules.py --shallow --recursive --platform esp32 nrfconnect silabs linux android 
+      id: Submodules
+    - name: "ghcr.io/project-chip/chip-build-vscode:81"
+      # NOTE: silabs boostrap is NOT done with the rest as it requests a conflicting
+      #       jinja2 version (asks for 3.1.3 when constraints.txt asks for 3.0.3)
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - "-c"
-          - source ./scripts/bootstrap.sh
+          - source ./scripts/bootstrap.sh -p all,esp32,nrfconnect,linux,android
       id: Bootstrap
+      waitFor:
+          - Submodules
       entrypoint: /usr/bin/bash
       volumes:
           - name: pwenv
             path: /pwenv
-      timeout: 2700s
-
-    - name: "ghcr.io/project-chip/chip-build-vscode:41"
+      timeout: 900s
+    - name: "ghcr.io/project-chip/chip-build-vscode:81"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
               perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt &&
-              ./examples/chef/chef.py --build_all --build_exclude noip\|roboticvacuumcleaner
+              ./examples/chef/chef.py --build_all --build_exclude noip
       id: CompileAll
       waitFor:
           - Bootstrap
@@ -27,7 +38,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:41"
+    - name: "ghcr.io/project-chip/chip-build-vscode:81"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:

@@ -16,13 +16,8 @@
 
 #import <Matter/MTRDefines.h>
 
-#if defined(MTR_INTERNAL_INCLUDE) && defined(MTR_INCLUDED_FROM_UMBRELLA_HEADER)
-#error Internal includes should not happen from the umbrella header
-#endif
-
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED || defined(MTR_INTERNAL_INCLUDE)
-
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
+#import <Matter/MTRDeviceStorageBehaviorConfiguration.h>
 #import <Matter/MTROTAProviderDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -32,21 +27,24 @@ NS_ASSUME_NONNULL_BEGIN
  * interfaces inheriting from this one should be used to actually do the
  * initialization.
  */
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
-MTR_NEWLY_AVAILABLE
-#endif
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRDeviceControllerAbstractParameters : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * Whether the controller should start out suspended.
+ *
+ * Defaults to NO.
+ */
+@property (nonatomic, assign) BOOL startSuspended;
 @end
 
 /**
  * Parameters that can be used to initialize an MTRDeviceController which
  * has a node identity.
  */
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
-MTR_NEWLY_AVAILABLE
-#endif
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRDeviceControllerParameters : MTRDeviceControllerAbstractParameters
 
 /**
@@ -87,11 +85,24 @@ MTR_NEWLY_AVAILABLE
  */
 - (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)otaProviderDelegate queue:(dispatch_queue_t)queue;
 
+/**
+ * Sets the maximum simultaneous subscription establishments that can be happening
+ * at one time for devices on Thread. This defaults to a large number.
+ *
+ * If this value is 0, the maximum subscription establishments allowed at a time will be set to 1.
+ */
+@property (nonatomic, assign) NSUInteger concurrentSubscriptionEstablishmentsAllowedOnThread MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+
+/**
+ * Sets the storage behavior configuration - see MTRDeviceStorageBehaviorConfiguration.h for details
+ *
+ * If this value is nil, a default storage behavior configuration will be used.
+ */
+@property (nonatomic, copy, nullable) MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration;
+
 @end
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
-MTR_NEWLY_AVAILABLE
-#endif
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRDeviceControllerExternalCertificateParameters : MTRDeviceControllerParameters
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -139,8 +150,33 @@ MTR_NEWLY_AVAILABLE
                 intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
                         rootCertificate:(MTRCertificateDERBytes)rootCertificate;
 
+/**
+ * The root certificate we were initialized with.
+ */
+@property (nonatomic, copy, readonly) MTRCertificateDERBytes rootCertificate MTR_NEWLY_AVAILABLE;
+
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRXPCDeviceControllerParameters : MTRDeviceControllerAbstractParameters
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * A controller created from this way will connect to a remote instance of an MTRDeviceController loaded in an XPC Service
+ *
+ * @param xpcConnectionBlock The XPC Connection block that will return an NSXPCConnection to the intended listener.
+ *
+ * @param uniqueIdentifier The unique id to assign to the controller.
+ *
+ */
+- (instancetype)initWithXPConnectionBlock:(NSXPCConnection * (^)(void) )xpcConnectionBlock
+                         uniqueIdentifier:(NSUUID *)uniqueIdentifier;
+
+@property (atomic, readonly, retain) NSUUID * uniqueIdentifier MTR_NEWLY_AVAILABLE;
+@property (readonly, strong, nonatomic) NSXPCConnection * (^xpcConnectionBlock)(void) MTR_NEWLY_AVAILABLE;
+
 @end
 
 NS_ASSUME_NONNULL_END
-
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED || defined(MTR_INTERNAL_INCLUDE)

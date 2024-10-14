@@ -17,16 +17,17 @@
  */
 
 #include <inttypes.h>
+#include <string>
+
+#include <pw_unit_test/framework.h>
 
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-#include <lib/support/UnitTestExtendedAssertions.h>
-#include <lib/support/UnitTestRegistration.h>
-#include <nlunit-test.h>
 
 using namespace chip;
 using namespace chip::Crypto;
@@ -128,7 +129,13 @@ private:
     FabricIndex mUsedFabricIndex = 0;
 };
 
-void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
+struct TestPersistentStorageOpKeyStore : public ::testing::Test
+{
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestPersistentStorageOpKeyStore, TestBasicLifeCycle)
 {
     TestPersistentStorageDelegate storageDelegate;
     PersistentStorageOperationalKeystore opKeystore;
@@ -139,188 +146,187 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
     // Failure before Init of ActivateOpKeypairForFabric
     P256PublicKey placeHolderPublicKey;
     CHIP_ERROR err = opKeystore.ActivateOpKeypairForFabric(kFabricIndex, placeHolderPublicKey);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
-    NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(storageDelegate.GetNumKeys(), 0u);
 
     // Failure before Init of NewOpKeypairForFabric
     uint8_t unusedCsrBuf[kMIN_CSR_Buffer_Size];
     MutableByteSpan unusedCsrSpan{ unusedCsrBuf };
     err = opKeystore.NewOpKeypairForFabric(kFabricIndex, unusedCsrSpan);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
 
     // Failure before Init of CommitOpKeypairForFabric
     err = opKeystore.CommitOpKeypairForFabric(kFabricIndex);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
 
     // Failure before Init of RemoveOpKeypairForFabric
     err = opKeystore.RemoveOpKeypairForFabric(kFabricIndex);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
 
     // Success after Init
     err = opKeystore.Init(&storageDelegate);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // Can generate a key and get a CSR
     uint8_t csrBuf[kMIN_CSR_Buffer_Size];
     MutableByteSpan csrSpan{ csrBuf };
     err = opKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == true);
-    NL_TEST_ASSERT(inSuite, opKeystore.HasOpKeypairForFabric(kFabricIndex) == false);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_TRUE(opKeystore.HasPendingOpKeypair());
+    EXPECT_FALSE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
 
     P256PublicKey csrPublicKey1;
     err = VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), csrPublicKey1);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, csrPublicKey1.Matches(csrPublicKey1));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_TRUE(csrPublicKey1.Matches(csrPublicKey1));
 
     // Can regenerate a second CSR and it has different PK
     csrSpan = MutableByteSpan{ csrBuf };
     err     = opKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == true);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_TRUE(opKeystore.HasPendingOpKeypair());
 
     // Cannot NewOpKeypair for a different fabric if one already pending
     uint8_t badCsrBuf[kMIN_CSR_Buffer_Size];
     MutableByteSpan badCsrSpan = MutableByteSpan{ badCsrBuf };
     err                        = opKeystore.NewOpKeypairForFabric(kBadFabricIndex, badCsrSpan);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_FABRIC_INDEX);
-    NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == true);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_FABRIC_INDEX);
+    EXPECT_TRUE(opKeystore.HasPendingOpKeypair());
 
     P256PublicKey csrPublicKey2;
     err = VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), csrPublicKey2);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, !csrPublicKey1.Matches(csrPublicKey2));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_FALSE(csrPublicKey1.Matches(csrPublicKey2));
 
     // Fail to generate CSR for invalid fabrics
     csrSpan = MutableByteSpan{ csrBuf };
     err     = opKeystore.NewOpKeypairForFabric(kUndefinedFabricIndex, csrSpan);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_FABRIC_INDEX);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     csrSpan = MutableByteSpan{ csrBuf };
     err     = opKeystore.NewOpKeypairForFabric(kMaxValidFabricIndex + 1, csrSpan);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_FABRIC_INDEX);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     // No storage done by NewOpKeypairForFabric
-    NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0);
-    NL_TEST_ASSERT(inSuite, opKeystore.HasOpKeypairForFabric(kFabricIndex) == false);
+    EXPECT_EQ(storageDelegate.GetNumKeys(), 0u);
+    EXPECT_FALSE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
 
     // Even after error, the previous valid pending keypair stays valid.
-    NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == true);
+    EXPECT_TRUE(opKeystore.HasPendingOpKeypair());
 
     // Activating with mismatching fabricIndex and matching public key fails
     err = opKeystore.ActivateOpKeypairForFabric(kBadFabricIndex, csrPublicKey2);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_FABRIC_INDEX);
-    NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0);
-    NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == true);
-    NL_TEST_ASSERT(inSuite, opKeystore.HasOpKeypairForFabric(kFabricIndex) == false);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_FABRIC_INDEX);
+    EXPECT_EQ(storageDelegate.GetNumKeys(), 0u);
+    EXPECT_TRUE(opKeystore.HasPendingOpKeypair());
+    EXPECT_FALSE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
 
     // Activating with matching fabricIndex and mismatching public key fails
     err = opKeystore.ActivateOpKeypairForFabric(kFabricIndex, csrPublicKey1);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_PUBLIC_KEY);
-    NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0);
-    NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == true);
-    NL_TEST_ASSERT(inSuite, opKeystore.HasOpKeypairForFabric(kFabricIndex) == false);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_PUBLIC_KEY);
+    EXPECT_EQ(storageDelegate.GetNumKeys(), 0u);
+    EXPECT_TRUE(opKeystore.HasPendingOpKeypair());
+    EXPECT_FALSE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
 
     uint8_t message[] = { 1, 2, 3, 4 };
     P256ECDSASignature sig1;
     // Before successful activation, cannot sign
     err = opKeystore.SignWithOpKeypair(kFabricIndex, ByteSpan{ message }, sig1);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_FABRIC_INDEX);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     // Activating with matching fabricIndex and matching public key succeeds
     err = opKeystore.ActivateOpKeypairForFabric(kFabricIndex, csrPublicKey2);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // Activating does not store, and keeps pending
-    NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0);
-    NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == true);
-    NL_TEST_ASSERT(inSuite, opKeystore.HasOpKeypairForFabric(kFabricIndex) == true);
-    NL_TEST_ASSERT(inSuite, opKeystore.HasOpKeypairForFabric(kBadFabricIndex) == false);
+    EXPECT_EQ(storageDelegate.GetNumKeys(), 0u);
+    EXPECT_TRUE(opKeystore.HasPendingOpKeypair());
+    EXPECT_TRUE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
+    EXPECT_FALSE(opKeystore.HasOpKeypairForFabric(kBadFabricIndex));
 
     // Can't sign for wrong fabric after activation
     P256ECDSASignature sig2;
     err = opKeystore.SignWithOpKeypair(kBadFabricIndex, ByteSpan{ message }, sig2);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_FABRIC_INDEX);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     // Can sign after activation
     err = opKeystore.SignWithOpKeypair(kFabricIndex, ByteSpan{ message }, sig2);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // Signature matches pending key
     err = csrPublicKey2.ECDSA_validate_msg_signature(message, sizeof(message), sig2);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // Signature does not match a previous pending key
     err = csrPublicKey1.ECDSA_validate_msg_signature(message, sizeof(message), sig2);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_SIGNATURE);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_SIGNATURE);
 
     // Committing with mismatching fabric fails, leaves pending
     err = opKeystore.CommitOpKeypairForFabric(kBadFabricIndex);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_FABRIC_INDEX);
-    NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0);
-    NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == true);
-    NL_TEST_ASSERT(inSuite, opKeystore.HasOpKeypairForFabric(kFabricIndex) == true);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_FABRIC_INDEX);
+    EXPECT_EQ(storageDelegate.GetNumKeys(), 0u);
+    EXPECT_TRUE(opKeystore.HasPendingOpKeypair());
+    EXPECT_TRUE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
 
     // Committing key resets pending state and adds storage
     std::string opKeyStorageKey = DefaultStorageKeyAllocator::FabricOpKey(kFabricIndex).KeyName();
     err                         = opKeystore.CommitOpKeypairForFabric(kFabricIndex);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == false);
-    NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 1);
-    NL_TEST_ASSERT(inSuite, storageDelegate.HasKey(opKeyStorageKey) == true);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_FALSE(opKeystore.HasPendingOpKeypair());
+    EXPECT_EQ(storageDelegate.GetNumKeys(), 1u);
+    EXPECT_TRUE(storageDelegate.HasKey(opKeyStorageKey));
 
     // Exporting a key
     P256SerializedKeypair serializedKeypair;
-    NL_TEST_ASSERT(inSuite, opKeystore.ExportOpKeypairForFabric(kFabricIndex, serializedKeypair) == CHIP_NO_ERROR);
+    EXPECT_EQ(opKeystore.ExportOpKeypairForFabric(kFabricIndex, serializedKeypair), CHIP_NO_ERROR);
 
     // Exporting a key from the bad fabric index
-    NL_TEST_ASSERT(inSuite,
-                   opKeystore.ExportOpKeypairForFabric(kBadFabricIndex, serializedKeypair) ==
-                       CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    EXPECT_EQ(opKeystore.ExportOpKeypairForFabric(kBadFabricIndex, serializedKeypair),
+              CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     // After committing, signing works with the key that was pending
     P256ECDSASignature sig3;
     uint8_t message2[] = { 10, 11, 12, 13 };
     err                = opKeystore.SignWithOpKeypair(kFabricIndex, ByteSpan{ message2 }, sig3);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = csrPublicKey2.ECDSA_validate_msg_signature(message2, sizeof(message2), sig3);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // Let's remove the opkey for a fabric, it disappears
     err = opKeystore.RemoveOpKeypairForFabric(kFabricIndex);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == false);
-    NL_TEST_ASSERT(inSuite, opKeystore.HasOpKeypairForFabric(kFabricIndex) == false);
-    NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0);
-    NL_TEST_ASSERT(inSuite, storageDelegate.HasKey(opKeyStorageKey) == false);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_FALSE(opKeystore.HasPendingOpKeypair());
+    EXPECT_FALSE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
+    EXPECT_EQ(storageDelegate.GetNumKeys(), 0u);
+    EXPECT_FALSE(storageDelegate.HasKey(opKeyStorageKey));
 
     opKeystore.Finish();
 }
 
-void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestPersistentStorageOpKeyStore, TestEphemeralKeys)
 {
     chip::TestPersistentStorageDelegate storage;
 
     PersistentStorageOperationalKeystore opKeyStore;
-    NL_TEST_ASSERT_SUCCESS(inSuite, opKeyStore.Init(&storage));
+    EXPECT_EQ(opKeyStore.Init(&storage), CHIP_NO_ERROR);
 
     Crypto::P256ECDSASignature sig;
     uint8_t message[] = { 'm', 's', 'g' };
 
     Crypto::P256Keypair * ephemeralKeypair = opKeyStore.AllocateEphemeralKeypairForCASE();
-    NL_TEST_ASSERT(inSuite, ephemeralKeypair != nullptr);
-    NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA));
+    ASSERT_NE(ephemeralKeypair, nullptr);
+    EXPECT_EQ(ephemeralKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig));
-    NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig));
+    EXPECT_EQ(ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig), CHIP_NO_ERROR);
+    EXPECT_EQ(ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig), CHIP_NO_ERROR);
 
     opKeyStore.ReleaseEphemeralKeypair(ephemeralKeypair);
 
     opKeyStore.Finish();
 }
 
-void TestMigrationKeys(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestPersistentStorageOpKeyStore, TestMigrationKeys)
 {
 
     chip::TestPersistentStorageDelegate storageDelegate;
@@ -332,89 +338,46 @@ void TestMigrationKeys(nlTestSuite * inSuite, void * inContext)
     opKeyStore.Init(&storageDelegate);
 
     // Failure on invalid Fabric indexes
-    NL_TEST_ASSERT(inSuite,
-                   opKeyStore.MigrateOpKeypairForFabric(kUndefinedFabricIndex, testOperationalKeystore) ==
-                       CHIP_ERROR_INVALID_FABRIC_INDEX);
-    NL_TEST_ASSERT(inSuite,
-                   opKeyStore.MigrateOpKeypairForFabric(kMaxValidFabricIndex + 1, testOperationalKeystore) ==
-                       CHIP_ERROR_INVALID_FABRIC_INDEX);
+    EXPECT_EQ(opKeyStore.MigrateOpKeypairForFabric(kUndefinedFabricIndex, testOperationalKeystore),
+              CHIP_ERROR_INVALID_FABRIC_INDEX);
+    EXPECT_EQ(opKeyStore.MigrateOpKeypairForFabric(kMaxValidFabricIndex + 1, testOperationalKeystore),
+              CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     // The key does not exists in the any of the Operational Keystores
-    NL_TEST_ASSERT(inSuite, storageDelegate.HasKey(opKeyStorageKey) == false);
-    NL_TEST_ASSERT(inSuite, testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex) == false);
-    NL_TEST_ASSERT(inSuite,
-                   opKeyStore.MigrateOpKeypairForFabric(kFabricIndex, testOperationalKeystore) ==
-                       CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    EXPECT_FALSE(storageDelegate.HasKey(opKeyStorageKey));
+    EXPECT_FALSE(testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex));
+    EXPECT_EQ(opKeyStore.MigrateOpKeypairForFabric(kFabricIndex, testOperationalKeystore),
+              CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     // Create a key in the old Operational Keystore
     uint8_t csrBuf[kMIN_CSR_Buffer_Size];
     MutableByteSpan csrSpan{ csrBuf };
-    NL_TEST_ASSERT(inSuite, testOperationalKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan) == CHIP_NO_ERROR);
+    EXPECT_EQ(testOperationalKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan), CHIP_NO_ERROR);
 
     // Migrate the key to the PersistentStorageOperationalKeystore
-    NL_TEST_ASSERT(inSuite, opKeyStore.MigrateOpKeypairForFabric(kFabricIndex, testOperationalKeystore) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 1);
-    NL_TEST_ASSERT(inSuite, storageDelegate.HasKey(opKeyStorageKey) == true);
-    NL_TEST_ASSERT(inSuite, testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex) == false);
+    EXPECT_EQ(opKeyStore.MigrateOpKeypairForFabric(kFabricIndex, testOperationalKeystore), CHIP_NO_ERROR);
+    EXPECT_EQ(storageDelegate.GetNumKeys(), 1u);
+    EXPECT_TRUE(storageDelegate.HasKey(opKeyStorageKey));
+    EXPECT_FALSE(testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex));
 
     // Verify the migration
     P256SerializedKeypair serializedKeypair;
-    NL_TEST_ASSERT(inSuite, opKeyStore.ExportOpKeypairForFabric(kFabricIndex, serializedKeypair) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, testOperationalKeystore.ValidateKeypair(serializedKeypair));
+    EXPECT_EQ(opKeyStore.ExportOpKeypairForFabric(kFabricIndex, serializedKeypair), CHIP_NO_ERROR);
+    EXPECT_TRUE(testOperationalKeystore.ValidateKeypair(serializedKeypair));
 
     // Verify that migration method returns success when there is no OpKey stored in the old keystore, but already exists in PSA
     // ITS.
-    NL_TEST_ASSERT(inSuite, opKeyStore.MigrateOpKeypairForFabric(kFabricIndex, testOperationalKeystore) == CHIP_NO_ERROR);
+    EXPECT_EQ(opKeyStore.MigrateOpKeypairForFabric(kFabricIndex, testOperationalKeystore), CHIP_NO_ERROR);
 
     // The key already exists in ITS, but there is an another attempt to migrate the new key.
     // The key should not be overwritten, but the key from the previous persistent keystore should be removed.
     MutableByteSpan csrSpan2{ csrBuf };
-    NL_TEST_ASSERT(inSuite, testOperationalKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan2) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex) == true);
-    NL_TEST_ASSERT(inSuite, opKeyStore.MigrateOpKeypairForFabric(kFabricIndex, testOperationalKeystore) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex) == false);
+    EXPECT_EQ(testOperationalKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan2), CHIP_NO_ERROR);
+    EXPECT_TRUE(testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex));
+    EXPECT_EQ(opKeyStore.MigrateOpKeypairForFabric(kFabricIndex, testOperationalKeystore), CHIP_NO_ERROR);
+    EXPECT_FALSE(testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex));
 
     opKeyStore.Finish();
 }
 
-/**
- *   Test Suite. It lists all the test functions.
- */
-static const nlTest sTests[] = { NL_TEST_DEF("Test Basic Lifecycle of PersistentStorageOperationalKeystore", TestBasicLifeCycle),
-                                 NL_TEST_DEF("Test ephemeral key management", TestEphemeralKeys),
-                                 NL_TEST_DEF("Test keys migration ", TestMigrationKeys), NL_TEST_SENTINEL() };
-
-/**
- *  Set up the test suite.
- */
-int Test_Setup(void * inContext)
-{
-    CHIP_ERROR error = chip::Platform::MemoryInit();
-    VerifyOrReturnError(error == CHIP_NO_ERROR, FAILURE);
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-int Test_Teardown(void * inContext)
-{
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-
 } // namespace
-
-/**
- *  Main
- */
-int TestPersistentStorageOperationalKeystore()
-{
-    nlTestSuite theSuite = { "PersistentStorageOperationalKeystore tests", &sTests[0], Test_Setup, Test_Teardown };
-
-    // Run test suite againt one context.
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestPersistentStorageOperationalKeystore)

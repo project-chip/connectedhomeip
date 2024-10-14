@@ -8,13 +8,13 @@
                 "mac-amd64",
                 "windows-amd64"
             ],
-            "tags": ["version:2@v2024.03.14-nightly.1"]
+            "tags": ["version:2@v2024.08.14-nightly.1"]
         },
         {
             "_comment": "Always get the amd64 version on mac until usable arm64 zap build is available",
             "path": "fuchsia/third_party/zap/mac-amd64",
             "platforms": ["mac-arm64"],
-            "tags": ["version:2@v2024.03.14-nightly.1"]
+            "tags": ["version:2@v2024.08.14-nightly.1"]
         }
     ]
 }

@@ -25,6 +25,12 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
 
+    <features>
+      <feature bit="0" code="AP" name="ApplicationPlatform" summary="Support for attributes and commands required for endpoint to support launching any application within the supported application catalogs">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="APPLICATION_LAUNCHER_LIST"        type="array" entryType="int16u" reportable="true"  writable="false" optional="true">CatalogList</attribute>
     <attribute side="server" code="0x0001" define="APPLICATION_LAUNCHER_CURRENT_APP" type="ApplicationEPStruct"      isNullable="true" writable="false"  optional="true">CurrentApp</attribute>
 
@@ -74,10 +80,8 @@ limitations under the License.
     <item name="Success" value="0x00"/>
     <item name="AppNotAvailable" value="0x01"/>
     <item name="SystemBusy" value="0x02"/>
+    <item name="PendingUserApproval" value="0x03"/>
+    <item name="Downloading" value="0x04"/>
+    <item name="Installing" value="0x05"/>
   </enum>
-
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x050c"/>
-    <field name="ApplicationPlatform" mask="0x1"/>
-  </bitmap>
 </configurator>

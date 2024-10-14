@@ -36,7 +36,10 @@ source_set("commands") {
   }
 
   if (chip_enable_wifi) {
-    sources += [ "WiFi.cpp" ]
+    sources += [
+      "WiFi.cpp",
+      "WiFi.h",
+    ]
   }
 
   if (chip_enable_ble && chip_device_platform != "none") {

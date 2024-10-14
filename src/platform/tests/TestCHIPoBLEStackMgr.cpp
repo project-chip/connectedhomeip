@@ -16,26 +16,24 @@
  */
 
 #include "platform/internal/CHIPDeviceLayerInternal.h"
-#include <assert.h>
+
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/UnitTestRegistration.h>
-#include <memory>
+#include <platform/PlatformManager.h>
+#include <platform/internal/BLEManager.h>
 
-#include "platform/PlatformManager.h"
-#include "platform/internal/BLEManager.h"
-
-void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t)
 {
-    (void) arg;
     if (event->Type == chip::DeviceLayer::DeviceEventType::kCHIPoBLEConnectionEstablished)
     {
         ChipLogProgress(DeviceLayer, "Receive kCHIPoBLEConnectionEstablished");
-        // exit(0);
     }
 }
 
-int TestCHIPoBLEStackManager()
+TEST(TestCHIPoBLEStackManager, TestCHIPoBLEStackManager)
 {
     chip::Platform::MemoryInit();
 
@@ -54,7 +52,4 @@ int TestCHIPoBLEStackManager()
     chip::DeviceLayer::PlatformMgrImpl().RunEventLoop();
     ChipLogProgress(DeviceLayer, "RunEventLoop completed");
     chip::Platform::MemoryShutdown();
-    return 0;
 }
-
-CHIP_REGISTER_TEST_SUITE(TestCHIPoBLEStackManager);

@@ -16,7 +16,6 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlfaultinjection.gni")
-import("//build_overrides/nlunit_test.gni")
 import("//build_overrides/pigweed.gni")
 
 import("$dir_pw_build/target_types.gni")
@@ -24,6 +23,7 @@ import("${chip_root}/build/chip/chip_version.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
   # Set to true to run the PersistentStorageDelegate API compliance audit
@@ -69,6 +69,7 @@ source_set("logging_constants") {
 
 source_set("attributes") {
   sources = [
+    "Compiler.h",
     "DLLUtil.h",
     "EnforceFormat.h",
   ]
@@ -133,7 +134,10 @@ source_set("text_only_logging") {
 }
 
 source_set("verifymacros") {
-  sources = [ "CodeUtils.h" ]
+  sources = [
+    "CodeUtils.h",
+    "ObjectDump.h",
+  ]
 
   public_deps = [
     ":attributes",
@@ -202,6 +206,7 @@ static_library("support") {
     "Defer.h",
     "FibonacciUtils.cpp",
     "FibonacciUtils.h",
+    "FileDescriptor.h",
     "FixedBufferAllocator.cpp",
     "FixedBufferAllocator.h",
     "Fold.h",
@@ -235,6 +240,7 @@ static_library("support") {
     "StringBuilder.cpp",
     "StringBuilder.h",
     "StringSplitter.h",
+    "TemporaryFileStream.h",
     "ThreadOperationalDataset.cpp",
     "ThreadOperationalDataset.h",
     "TimeUtils.cpp",
@@ -252,7 +258,7 @@ static_library("support") {
     "verhoeff/Verhoeff10.cpp",
   ]
 
-  if (current_os == "android" || matter_enable_java_compilation) {
+  if (chip_device_platform == "android" || matter_enable_java_compilation) {
     if (matter_enable_java_compilation) {
       include_dirs = java_matter_controller_dependent_paths
     }
@@ -298,12 +304,10 @@ static_library("support") {
     "${chip_root}/src/inet:inet_config_header",
   ]
 
-  # Android has no 'platform' that provides logging
-  if (current_os == "android") {
-    public_deps += [ "${chip_root}/src/platform/logging:android" ]
-  }
-
-  if (current_os == "mac" || current_os == "ios") {
+  # Platforms that utilize CHIP_SYSTEM_CONFIG_PLATFORM_LOG need to
+  # be pulled in here as public_deps since they hook into logging at
+  # the macro level rather than just providing a LogV implementation.
+  if (chip_device_platform == "darwin") {
     public_deps += [ "${chip_root}/src/platform/Darwin:logging" ]
   }
 
@@ -350,29 +354,11 @@ pw_static_library("pw_tests_wrapper") {
   public_deps = [
     "$dir_pw_log:impl",
     "$dir_pw_unit_test",
+    "$dir_pw_unit_test:logging",
+    "${chip_root}/src/lib/core:string-builder-adapters",
   ]
   sources = [
     "UnitTest.cpp",
     "UnitTest.h",
-  ]
-}
-
-static_library("testing_nlunit") {
-  output_name = "libSupportTesting"
-  output_dir = "${root_out_dir}/lib"
-
-  sources = [
-    "UnitTestContext.h",
-    "UnitTestExtendedAssertions.h",
-    "UnitTestRegistration.cpp",
-    "UnitTestRegistration.h",
-  ]
-
-  public_deps = [
-    ":support",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/platform",
-    "${nlassert_root}:nlassert",
-    "${nlunit_test_root}:nlunit-test",
   ]
 }

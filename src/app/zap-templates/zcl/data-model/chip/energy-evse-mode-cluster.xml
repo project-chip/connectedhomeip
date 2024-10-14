@@ -19,12 +19,27 @@ limitations under the License.
 
   <enum name="ModeTag" type="enum16">
     <cluster code="0x009D"/>
+    <!-- These are the base values (see `enum class ModeTag`
+          in src/app/clusters/mode-base-server/mode-base-cluster-objects.h for the namespace source of truth
+          until it is possible to auto-include these without duplication in codegen. -->
+    <item value="0x0000" name="Auto"/>
+    <item value="0x0001" name="Quick"/>
+    <item value="0x0002" name="Quiet"/>
+    <item value="0x0003" name="LowNoise"/>
+    <item value="0x0004" name="LowEnergy"/>
+    <item value="0x0005" name="Vacation"/>
+    <item value="0x0006" name="Min"/>
+    <item value="0x0007" name="Max"/>
+    <item value="0x0008" name="Night"/>
+    <item value="0x0009" name="Day"/>
+
+    <!-- Derived cluster-specific values -->
     <item value="0x4000" name="Manual"/>
     <item value="0x4001" name="TimeOfUse"/>
     <item value="0x4002" name="SolarCharging"/>
   </enum>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <domain>General</domain>
     <name>Energy EVSE Mode</name>
     <code>0x009D</code>
@@ -33,6 +48,13 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>Attributes and commands for selecting a mode from a list of supported options.</description>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
+
+    <features>
+      <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <!-- Base data types -->
     <attribute side="server" code="0x0000" define="SUPPORTED_MODES"  type="array" entryType="ModeOptionStruct" writable="false" optional="false" isNullable="false" length="255">SupportedModes</attribute>
     <attribute side="server" code="0x0001" define="CURRENT_MODE"     type="int8u"                              writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>

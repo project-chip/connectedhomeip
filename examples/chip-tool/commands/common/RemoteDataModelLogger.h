@@ -43,6 +43,6 @@ CHIP_ERROR LogErrorAsJSON(const CHIP_ERROR & error);
 CHIP_ERROR LogGetCommissionerNodeId(chip::NodeId value);
 CHIP_ERROR LogGetCommissionerRootCertificate(const char * value);
 CHIP_ERROR LogIssueNOCChain(const char * noc, const char * icac, const char * rcac, const char * ipk);
-CHIP_ERROR LogDiscoveredNodeData(const chip::Dnssd::DiscoveredNodeData & nodeData);
+CHIP_ERROR LogDiscoveredNodeData(const chip::Dnssd::CommissionNodeData & nodeData);
 void SetDelegate(RemoteDataModelLoggerDelegate * delegate);
 }; // namespace RemoteDataModelLogger

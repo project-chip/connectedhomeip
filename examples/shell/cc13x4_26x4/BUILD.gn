@@ -45,27 +45,13 @@ ti_sysconfig("sysconfig") {
     "ti_ble_config.h",
     "ti_dmm_application_policy.c",
     "ti_dmm_application_policy.h",
-
-    # disabled until upstream generation is aligned
-    #"tiop_config.h",
-    #"tiop_config.c",
-
-    # not traditional source files
-    #"ti_utils_build_linker.cmd.genlibs",
-    #"syscfg_c.rov.xs",
-    #"ti_utils_runtime_model.gv",
-    #"ti_utils_runtime_Makefile",
-    #"ti_ble_app_config.opt",
-    #"ti_build_config.opt",
   ]
 
   public_configs = [ ":sdk_cc13x4_26x4_dmm_config" ]
 
   cflags = [
     "-Wno-comment",
-    "@" + rebase_path("${target_gen_dir}/sysconfig/ti_ble_app_config.opt",
-                      root_build_dir),
-    "@" + rebase_path("${target_gen_dir}/sysconfig/ti_build_config.opt",
+    "@" + rebase_path("${target_gen_dir}/sysconfig/ti_utils_build_compiler.opt",
                       root_build_dir),
   ]
 }
@@ -89,17 +75,17 @@ ti_simplelink_executable("shell_app") {
     "${chip_root}/examples/shell/shell_common:shell_common",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/shell:shell",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/third_party/openthread:openthread",
   ]
-
-  if (chip_openthread_ftd) {
-    deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
-  } else {
-    deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
+  defines = []
+  if (custom_factory_data) {
+    defines += [ "CC13XX_26XX_FACTORY_DATA" ]
   }
 
-  if (custom_factory_data) {
-    defines = [ "CC13XX_26XX_FACTORY_DATA" ]
+  if (chip_enable_icd_server) {
+    defines += [ "TI_ICD_ENABLE_SERVER" ]
   }
 
   include_dirs = [

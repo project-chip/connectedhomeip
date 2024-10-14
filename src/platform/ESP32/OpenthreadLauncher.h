@@ -22,6 +22,10 @@
 #include <lib/core/CHIPError.h>
 #include <memory>
 
+#if defined(CONFIG_OPENTHREAD_BORDER_ROUTER) && defined(CONFIG_AUTO_UPDATE_RCP)
+#include <esp_rcp_update.h>
+esp_err_t openthread_init_br_rcp(const esp_rcp_update_config_t * update_config);
+#endif // CONFIG_OPENTHREAD_BORDER_ROUTER && CONFIG_AUTO_UPDATE_RCP
 esp_err_t set_openthread_platform_config(esp_openthread_platform_config_t * config);
 esp_err_t openthread_init_stack(void);
 esp_err_t openthread_launch_task(void);

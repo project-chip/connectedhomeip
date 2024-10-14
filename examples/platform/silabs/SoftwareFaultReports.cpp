@@ -17,26 +17,27 @@
  */
 
 #include "SoftwareFaultReports.h"
-#include "FreeRTOS.h"
 #include "silabs_utils.h"
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
+#include <cmsis_os2.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
 
-#ifndef BRD4325A
+#if !defined(SLI_SI91X_MCU_INTERFACE) || !defined(SLI_SI91X_ENABLE_BLE)
 #include "rail_types.h"
 
 #ifdef RAIL_ASSERT_DEBUG_STRING
 #include "rail_assert_error_codes.h"
 #endif
-#endif // BRD4325A
+#endif // !defined(SLI_SI91X_MCU_INTERFACE) || !defined(SLI_SI91X_ENABLE_BLE)
 
-#ifdef BRD4325A // For SiWx917 Platform only
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
+
 #include "core_cm4.h"
-#endif
+#endif // defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
 
 // Technically FaultRecording is an octstr up to 1024 bytes.
 // We currently only report short strings. 100 char will more than enough for now.
@@ -74,7 +75,7 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
     // Allow some time for the Fault event to be sent as the next action after exiting this function
     // is typically an assert or reboot.
     // Depending on the task at fault, it is possible the event can't be transmitted.
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    osDelay(pdMS_TO_TICKS(1000));
 #endif // MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
 }
 
@@ -89,18 +90,18 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
 extern "C" __attribute__((used)) void debugHardfault(uint32_t * sp)
 {
 #if SILABS_LOG_ENABLED
-    uint32_t cfsr  = SCB->CFSR;
-    uint32_t hfsr  = SCB->HFSR;
-    uint32_t mmfar = SCB->MMFAR;
-    uint32_t bfar  = SCB->BFAR;
-    uint32_t r0    = sp[0];
-    uint32_t r1    = sp[1];
-    uint32_t r2    = sp[2];
-    uint32_t r3    = sp[3];
-    uint32_t r12   = sp[4];
-    uint32_t lr    = sp[5];
-    uint32_t pc    = sp[6];
-    uint32_t psr   = sp[7];
+    [[maybe_unused]] uint32_t cfsr  = SCB->CFSR;
+    [[maybe_unused]] uint32_t hfsr  = SCB->HFSR;
+    [[maybe_unused]] uint32_t mmfar = SCB->MMFAR;
+    [[maybe_unused]] uint32_t bfar  = SCB->BFAR;
+    [[maybe_unused]] uint32_t r0    = sp[0];
+    [[maybe_unused]] uint32_t r1    = sp[1];
+    [[maybe_unused]] uint32_t r2    = sp[2];
+    [[maybe_unused]] uint32_t r3    = sp[3];
+    [[maybe_unused]] uint32_t r12   = sp[4];
+    [[maybe_unused]] uint32_t lr    = sp[5];
+    [[maybe_unused]] uint32_t pc    = sp[6];
+    [[maybe_unused]] uint32_t psr   = sp[7];
 
     ChipLogError(NotSpecified, "HardFault:");
     ChipLogError(NotSpecified, "SCB->CFSR   0x%08lx", cfsr);
@@ -227,7 +228,7 @@ extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBu
     *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
 }
 
-#ifndef BRD4325A
+#if !defined(SLI_SI91X_MCU_INTERFACE) || !defined(SLI_SI91X_ENABLE_BLE)
 extern "C" void RAILCb_AssertFailed(RAIL_Handle_t railHandle, uint32_t errorCode)
 {
     char faultMessage[kMaxFaultStringLen] = { 0 };
@@ -251,6 +252,5 @@ extern "C" void RAILCb_AssertFailed(RAIL_Handle_t railHandle, uint32_t errorCode
 
     chipAbort();
 }
-#endif // BRD4325A
-
+#endif // !defined(SLI_SI91X_MCU_INTERFACE) || !defined(SLI_SI91X_ENABLE_BLE)
 #endif // HARD_FAULT_LOG_ENABLE

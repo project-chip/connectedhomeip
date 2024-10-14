@@ -43,7 +43,6 @@
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
-using namespace ::chip::TLV;
 using chip::DeviceLayer::Internal::ESP32Utils;
 namespace chip {
 namespace DeviceLayer {

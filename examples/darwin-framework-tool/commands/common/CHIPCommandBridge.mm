@@ -26,6 +26,9 @@
 
 #include "MTRError_Utils.h"
 
+#include <map>
+#include <string>
+
 static CHIPToolPersistentStorageDelegate * storage = nil;
 std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
 std::map<std::string, MTRDeviceController *> CHIPCommandBridge::mControllers;
@@ -37,31 +40,40 @@ CHIPToolKeypair * gNocSigner = [[CHIPToolKeypair alloc] init];
 
 CHIP_ERROR CHIPCommandBridge::Run()
 {
-    ChipLogProgress(chipTool, "Running Command");
-    ReturnErrorOnFailure(MaybeSetUpStack());
-    SetIdentity(mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha);
+    // In interactive mode, we want to avoid memory accumulating in the main autorelease pool,
+    // so we clear it after each command.
+    @autoreleasepool {
+        ChipLogProgress(chipTool, "Running Command");
+        // Although the body of `Run` is within its own autorelease pool, this code block is further wrapped
+        // in an additional autorelease pool. This ensures that when the memory dump graph command is used directly,
+        // we can verify there’s no additional noise from the autorelease pools—a kind of sanity check.
+        @autoreleasepool {
+            ReturnErrorOnFailure(MaybeSetUpStack());
+        }
+        SetIdentity(mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha);
 
-    {
-        std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
-        mWaitingForResponse = YES;
+        {
+            std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
+            mWaitingForResponse = YES;
+        }
+
+        ReturnLogErrorOnFailure(RunCommand());
+
+        auto err = StartWaiting(GetWaitDuration());
+
+        bool deferCleanup = (IsInteractive() && DeferInteractiveCleanup());
+
+        Shutdown();
+
+        if (deferCleanup) {
+            sDeferredCleanups.insert(this);
+        } else {
+            Cleanup();
+        }
+        MaybeTearDownStack();
+
+        return err;
     }
-
-    ReturnLogErrorOnFailure(RunCommand());
-
-    auto err = StartWaiting(GetWaitDuration());
-
-    bool deferCleanup = (IsInteractive() && DeferInteractiveCleanup());
-
-    Shutdown();
-
-    if (deferCleanup) {
-        sDeferredCleanups.insert(this);
-    } else {
-        Cleanup();
-    }
-    MaybeTearDownStack();
-
-    return err;
 }
 
 CHIP_ERROR CHIPCommandBridge::GetPAACertsFromFolder(NSArray<NSData *> * __autoreleasing * paaCertsResult)
@@ -191,6 +203,14 @@ void CHIPCommandBridge::SetIdentity(const char * identity)
 MTRDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrentController; }
 
 MTRDeviceController * CHIPCommandBridge::GetCommissioner(const char * identity) { return mControllers[identity]; }
+
+MTRBaseDevice * CHIPCommandBridge::BaseDeviceWithNodeId(chip::NodeId nodeId)
+{
+    MTRDeviceController * controller = CurrentCommissioner();
+    VerifyOrReturnValue(controller != nil, nil);
+    return [controller deviceBeingCommissionedWithNodeID:@(nodeId) error:nullptr]
+        ?: [MTRBaseDevice deviceWithNodeID:@(nodeId) controller:controller];
+}
 
 void CHIPCommandBridge::StopCommissioners()
 {

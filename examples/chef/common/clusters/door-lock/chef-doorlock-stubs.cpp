@@ -17,7 +17,7 @@
  */
 
 #include <app/data-model/Nullable.h>
-#include <app/util/af.h>
+#include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
 
 #ifdef MATTER_DM_PLUGIN_DOOR_LOCK_SERVER

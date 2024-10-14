@@ -24,7 +24,7 @@
 #include <glib-object.h>
 #include <glib.h>
 
-#include <ble/BleError.h>
+#include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConfigurationManager.h>
@@ -94,6 +94,7 @@ gboolean BluezAdvertisement::BluezLEAdvertisement1Release(BluezLEAdvertisement1 
     // We can use it to update the state of the advertisement in the CHIP layer.
     ChipLogDetail(DeviceLayer, "BLE advertisement stopped by BlueZ");
     mIsAdvertising = false;
+    bluez_leadvertisement1_complete_release(aAdv, aInvocation);
     BLEManagerImpl::NotifyBLEPeripheralAdvReleased();
     return TRUE;
 }
@@ -160,7 +161,7 @@ CHIP_ERROR BluezAdvertisement::SetupServiceData(ServiceDataFlags aFlags)
     deviceInfo.SetAdditionalDataFlag(true);
 #endif
 
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
     if (aFlags & kServiceDataExtendedAnnouncement)
     {
         deviceInfo.SetExtendedAnnouncementFlag(true);

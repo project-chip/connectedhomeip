@@ -23,14 +23,10 @@ static_library("nxp_zephyr") {
   defines = []
   sources = [
     "../../SingletonConfigurationManager.cpp",
-    "../../Zephyr/BLEAdvertisingArbiter.cpp",
-    "../../Zephyr/BLEAdvertisingArbiter.h",
-    "../../Zephyr/BLEManagerImpl.cpp",
     "../../Zephyr/ConfigurationManagerImpl.cpp",
     "../../Zephyr/DiagnosticDataProviderImpl.cpp",
     "../../Zephyr/DiagnosticDataProviderImpl.h",
     "../../Zephyr/KeyValueStoreManagerImpl.cpp",
-    "../../Zephyr/Logging.cpp",
     "../../Zephyr/PlatformManagerImpl.cpp",
     "../../Zephyr/SysHeapMalloc.h",
     "../../Zephyr/SystemTimeSupport.cpp",
@@ -38,8 +34,6 @@ static_library("nxp_zephyr") {
     "../../Zephyr/ZephyrConfig.h",
     "../common/CHIPDeviceNXPPlatformDefaultConfig.h",
     "../common/CHIPNXPPlatformDefaultConfig.h",
-    "BLEManagerImpl.h",
-    "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPPlatformConfig.h",
@@ -82,11 +76,17 @@ static_library("nxp_zephyr") {
       "DeviceInstanceInfoProviderImpl.h",
     ]
   }
-
+  if (chip_config_network_layer_ble) {
+    sources += [
+      "../../Zephyr/BLEAdvertisingArbiter.cpp",
+      "../../Zephyr/BLEAdvertisingArbiter.h",
+      "../../Zephyr/BLEManagerImpl.cpp",
+      "BLEManagerImpl.h",
+      "BlePlatformConfig.h",
+    ]
+  }
   if (chip_enable_wifi) {
     sources += [
-      "../../Zephyr/InetUtils.cpp",
-      "../../Zephyr/InetUtils.h",
       "../../Zephyr/wifi/ConnectivityManagerImplWiFi.cpp",
       "../../Zephyr/wifi/ConnectivityManagerImplWiFi.h",
       "../../Zephyr/wifi/WiFiManager.cpp",
@@ -95,17 +95,39 @@ static_library("nxp_zephyr") {
       "../../Zephyr/wifi/ZephyrWifiDriver.h",
     ]
   }
-
+  if (chip_enable_ethernet) {
+    sources += [
+      "Ethernet/ConnectivityManagerImplEth.cpp",
+      "Ethernet/ConnectivityManagerImplEth.h",
+      "Ethernet/EthManager.cpp",
+      "Ethernet/EthManager.h",
+      "Ethernet/NxpEthDriver.cpp",
+      "Ethernet/NxpEthDriver.h",
+    ]
+  }
   if (chip_enable_ota_requestor) {
     sources += [
       "ota/OTAImageProcessorImpl.cpp",
       "ota/OTAImageProcessorImpl.h",
     ]
   }
-
+  if (chip_enable_wifi || chip_enable_ethernet) {
+    sources += [
+      "../../Zephyr/InetUtils.cpp",
+      "../../Zephyr/InetUtils.h",
+    ]
+  }
   if (chip_malloc_sys_heap) {
     sources += [ "../../Zephyr/SysHeapMalloc.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "../../Zephyr/Logging.cpp" ]
 }

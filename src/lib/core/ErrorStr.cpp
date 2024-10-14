@@ -41,19 +41,21 @@ static ErrorFormatter * sErrorFormatterList = nullptr;
  * describing the provided error.
  *
  * @param[in] err                      The error for format and describe.
+ * @param[in] withSourceLocation       Whether or not to include the source
+ * location in the output string. Only used if CHIP_CONFIG_ERROR_SOURCE &&
+ * !CHIP_CONFIG_SHORT_ERROR_STR. Defaults to true.
  *
  * @return A pointer to a NULL-terminated C string describing the
  *         provided error.
  */
-DLL_EXPORT const char * ErrorStr(CHIP_ERROR err)
+DLL_EXPORT const char * ErrorStr(CHIP_ERROR err, bool withSourceLocation)
 {
     char * formattedError   = sErrorStr;
     uint16_t formattedSpace = sizeof(sErrorStr);
 
 #if CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
 
-    const char * const file = err.GetFile();
-    if (file != nullptr)
+    if (const char * const file = err.GetFile(); withSourceLocation && file != nullptr)
     {
         int n = snprintf(formattedError, formattedSpace, "%s:%u: ", file, err.GetLine());
         if (n > formattedSpace)

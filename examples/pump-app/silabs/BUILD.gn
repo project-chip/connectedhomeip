@@ -141,6 +141,7 @@ silabs_executable("pump_app") {
 
   deps = [
     ":sdk",
+    "${chip_root}/src/platform/logging:default",
     app_data_model,
   ]
 

@@ -19,8 +19,14 @@ declare_args() {
 
   # Compile mbedtls externally. Only used if chip_crypto == "mbedtls"
   chip_external_mbedtls = false
+
+  # Use PSA Spake2+ implementation. Only used if chip_crypto == "psa"
+  chip_crypto_psa_spake2p = false
 }
 
 assert(
     !chip_external_mbedtls || chip_crypto == "mbedtls" || chip_crypto == "psa",
     "Use of external mbedtls requires the mbedtls or psa crypto impl")
+
+assert(!chip_crypto_psa_spake2p || chip_crypto == "psa",
+       "Use of psa spake2+ requires the psa crypto impl")

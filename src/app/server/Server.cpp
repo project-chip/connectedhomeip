@@ -19,15 +19,17 @@
 
 #include <access/examples/ExampleAccessControlDelegate.h>
 
+#include <app/AppConfig.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/EchoHandler.h>
 #include <app/util/DataModelHandler.h>
 #include <app/util/ember-compatibility-functions.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include <ble/BLEEndPoint.h>
+#include <ble/Ble.h>
 #endif
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
@@ -56,6 +58,10 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <transport/raw/WiFiPAF.h>
+#endif
+
 #if defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT) || defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
 #include <lib/support/PersistentStorageAudit.h>
 #endif // defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT) || defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
@@ -71,9 +77,39 @@ using chip::Transport::BleListenParameters;
 #endif
 using chip::Transport::PeerAddress;
 using chip::Transport::UdpListenParameters;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+using chip::Transport::TcpListenParameters;
+#endif
 
 namespace {
 
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
+{
+public:
+    bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
+    {
+        chip::app::DataModel::Provider * model = chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+
+        for (auto type = model->FirstDeviceType(endpoint); type.has_value(); type = model->NextDeviceType(endpoint, *type))
+        {
+            if (type->deviceTypeId == deviceType)
+            {
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+                VerifyOrDie(chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint));
+#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL
+                return true;
+            }
+        }
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+        VerifyOrDie(!chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint));
+#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL
+        return false;
+    }
+} sDeviceTypeResolver;
+#else // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+
+// Ember implementation of the device type resolver
 class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
 {
 public:
@@ -82,6 +118,7 @@ public:
         return chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
     }
 } sDeviceTypeResolver;
+#endif
 
 } // namespace
 
@@ -170,6 +207,13 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
     Access::SetAccessControl(mAccessControl);
 
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    if (initParams.accessRestrictionProvider != nullptr)
+    {
+        mAccessControl.SetAccessRestrictionProvider(initParams.accessRestrictionProvider);
+    }
+#endif
+
     mAclStorage = initParams.aclStorage;
     SuccessOrExit(err = mAclStorage->Init(*mDeviceStorage, mFabrics.begin(), mFabrics.end()));
 
@@ -179,6 +223,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mReportScheduler = initParams.reportScheduler;
 
     mTestEventTriggerDelegate = initParams.testEventTriggerDelegate;
+    if (mTestEventTriggerDelegate == nullptr)
+    {
+        ChipLogProgress(AppServer, "WARNING: mTestEventTriggerDelegate is null");
+    }
 
     deviceInfoprovider = DeviceLayer::GetDeviceInfoProvider();
     if (deviceInfoprovider)
@@ -201,6 +249,16 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if CONFIG_NETWORK_LAYER_BLE
                                ,
                            BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
+#endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                               ,
+                           TcpListenParameters(DeviceLayer::TCPEndPointManager())
+                               .SetAddressType(IPAddressType::kIPv6)
+                               .SetListenPort(mOperationalServicePort)
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                               ,
+                           Transport::WiFiPAFListenParameters(DeviceLayer::ConnectivityMgr().GetWiFiPAF())
 #endif
     );
 
@@ -333,6 +391,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                                  &mCASESessionManager, mSubscriptionResumptionStorage);
     SuccessOrExit(err);
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    app::InteractionModelEngine::GetInstance()->SetICDManager(&mICDManager);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
     // ICD Init needs to be after data model init and InteractionModel Init
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 
@@ -342,8 +404,23 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mICDManager.RegisterObserver(mReportScheduler);
     mICDManager.RegisterObserver(&app::DnssdServer::Instance());
 
-    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr,
-                     chip::app::InteractionModelEngine::GetInstance());
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    mICDManager.SetPersistentStorageDelegate(mDeviceStorage)
+        .SetFabricTable(&GetFabricTable())
+        .SetSymmetricKeyStore(mSessionKeystore)
+        .SetExchangeManager(&mExchangeMgr)
+        .SetSubscriptionsInfoProvider(chip::app::InteractionModelEngine::GetInstance())
+        .SetICDCheckInBackOffStrategy(initParams.icdCheckInBackOffStrategy);
+
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+    mICDManager.Init();
+
+    // Register Test Event Trigger Handler
+    if (mTestEventTriggerDelegate != nullptr)
+    {
+        mTestEventTriggerDelegate->AddHandler(&mICDManager);
+    }
+
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // This code is necessary to restart listening to existing groups after a reboot
@@ -446,12 +523,14 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
         // We trigger Check-In messages before resuming subscriptions to avoid doing both.
         if (!mFailSafeContext.IsFailSafeArmed())
         {
-            mICDManager.TriggerCheckInMessages();
+            std::function<app::ICDManager::ShouldCheckInMsgsBeSentFunction> sendCheckInMessagesOnBootUp =
+                std::bind(&Server::ShouldCheckInMsgsBeSentAtBootFunction, this, std::placeholders::_1, std::placeholders::_2);
+            mICDManager.TriggerCheckInMessages(sendCheckInMessagesOnBootUp);
         }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
         ResumeSubscriptions();
-#endif
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
         break;
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     case DeviceEventType::kThreadConnectivityChange:
@@ -519,6 +598,19 @@ void Server::RejoinExistingMulticastGroups()
     }
 }
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+bool Server::ShouldCheckInMsgsBeSentAtBootFunction(FabricIndex aFabricIndex, NodeId subjectID)
+{
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    // If at least one registration has a persisted entry, do not send Check-In message.
+    // The resumption of the persisted subscription will serve the same function a check-in would have served.
+    return !app::InteractionModelEngine::GetInstance()->SubjectHasPersistedSubscription(aFabricIndex, subjectID);
+#else
+    return true;
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
 void Server::GenerateShutDownEvent()
 {
     PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().HandleServerShuttingDown(); });
@@ -561,6 +653,15 @@ void Server::Shutdown()
 
     chip::Dnssd::Resolver::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    app::InteractionModelEngine::GetInstance()->SetICDManager(nullptr);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+    // Shut down any remaining sessions (and hence exchanges) before we do any
+    // futher teardown.  CASE handshakes have been shut down already via
+    // shutting down mCASESessionManager and mCASEServer above; shutting
+    // down mCommissioningWindowManager will shut down any PASE handshakes we
+    // have going on.
+    mSessions.ExpireAllSecureSessions();
     mCommissioningWindowManager.Shutdown();
     mMessageCounterManager.Shutdown();
     mExchangeMgr.Shutdown();
@@ -570,6 +671,11 @@ void Server::Shutdown()
     Access::ResetAccessControlToDefault();
     Credentials::SetGroupDataProvider(nullptr);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // Remove Test Event Trigger Handler
+    if (mTestEventTriggerDelegate != nullptr)
+    {
+        mTestEventTriggerDelegate->RemoveHandler(&mICDManager);
+    }
     mICDManager.Shutdown();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     mAttributePersister.Shutdown();
@@ -584,30 +690,34 @@ void Server::Shutdown()
 CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner,
                                                         Protocols::UserDirectedCommissioning::IdentificationDeclaration & id)
 {
-    ChipLogDetail(AppServer, "SendUserDirectedCommissioningRequest2");
+    ChipLogDetail(AppServer, "Server::SendUserDirectedCommissioningRequest()");
 
     CHIP_ERROR err;
 
     // only populate fields left blank by the client
     if (strlen(id.GetInstanceName()) == 0)
     {
+        ChipLogDetail(AppServer, "Server::SendUserDirectedCommissioningRequest() Instance Name not known");
         char nameBuffer[chip::Dnssd::Commission::kInstanceNameMaxLength + 1];
         err = app::DnssdServer::Instance().GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "Failed to get mdns instance name error: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(
+                AppServer,
+                "Server::SendUserDirectedCommissioningRequest() Failed to get mdns instance name error: %" CHIP_ERROR_FORMAT,
+                err.Format());
             return err;
         }
         id.SetInstanceName(nameBuffer);
+        ChipLogDetail(AppServer, "Server::SendUserDirectedCommissioningRequest() Instance Name set to %s", nameBuffer);
     }
-    ChipLogDetail(AppServer, "instanceName=%s", id.GetInstanceName());
 
     if (id.GetVendorId() == 0)
     {
         uint16_t vendorId = 0;
         if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(vendorId) != CHIP_NO_ERROR)
         {
-            ChipLogDetail(Discovery, "Vendor ID not known");
+            ChipLogDetail(AppServer, "Server::SendUserDirectedCommissioningRequest() Vendor ID not known");
         }
         else
         {
@@ -620,7 +730,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
         uint16_t productId = 0;
         if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(productId) != CHIP_NO_ERROR)
         {
-            ChipLogDetail(Discovery, "Product ID not known");
+            ChipLogDetail(AppServer, "Server::SendUserDirectedCommissioningRequest() Product ID not known");
         }
         else
         {
@@ -634,7 +744,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
         if (!chip::DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled() ||
             chip::DeviceLayer::ConfigurationMgr().GetCommissionableDeviceName(deviceName, sizeof(deviceName)) != CHIP_NO_ERROR)
         {
-            ChipLogDetail(Discovery, "Device Name not known");
+            ChipLogDetail(AppServer, "Server::SendUserDirectedCommissioningRequest() Device Name not known");
         }
         else
         {
@@ -673,11 +783,12 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
 
     if (err == CHIP_NO_ERROR)
     {
-        ChipLogDetail(AppServer, "Send UDC request success");
+        ChipLogDetail(AppServer, "Server::SendUserDirectedCommissioningRequest() Send UDC request success");
     }
     else
     {
-        ChipLogError(AppServer, "Send UDC request failed, err: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "Server::SendUserDirectedCommissioningRequest() Send UDC request failed, err: %" CHIP_ERROR_FORMAT,
+                     err.Format());
     }
     return err;
 }
@@ -711,5 +822,8 @@ app::SimpleSubscriptionResumptionStorage CommonCaseDeviceServerInitParams::sSubs
 #endif
 app::DefaultAclStorage CommonCaseDeviceServerInitParams::sAclStorage;
 Crypto::DefaultSessionKeystore CommonCaseDeviceServerInitParams::sSessionKeystore;
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+app::DefaultICDCheckInBackOffStrategy CommonCaseDeviceServerInitParams::sDefaultICDCheckInBackOffStrategy;
+#endif
 
 } // namespace chip

@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+import("${chip_root}/config/recommended.gni")
+
 declare_args() {
   # Enable logging. Shorthand for chip_error_logging, etc.
   chip_logging = true
@@ -28,13 +31,16 @@ declare_args() {
   chip_progress_logging = chip_logging
 
   # Enable detail logging.
-  chip_detail_logging = chip_logging
+  chip_detail_logging = matter_enable_recommended && chip_logging
 
   # Enable automation logging.
-  chip_automation_logging = chip_logging
+  chip_automation_logging = matter_enable_recommended && chip_logging
+}
 
+declare_args() {
   # Configure the maximum size for logged messages
-  if (current_os == "linux" || current_os == "mac" || current_os == "ios") {
+  if ((matter_enable_recommended || chip_detail_logging) &&
+      (current_os == "linux" || current_os == "mac" || current_os == "ios")) {
     # Allow base64 encoding of 1 MTU (4 * (1280 / 3) + padding
     chip_log_message_max_size = 1708
   } else {
@@ -47,10 +53,30 @@ declare_args() {
   # Configure chip logging to output through pigweed logging.
   chip_use_pw_logging = false
 
+  # Enable logging of node Id in exchange context log messages.
+  # Will cause increase in code size and is therefore disabled by default.
+  chip_exchange_node_id_logging = false
+
   # Configure chip logging to output through external logging implementation.
   # External code will need to provide implementation for CHIP log output
   # function (LogV), which is defined in "src/platform/logging/LogV.h".
+  # Same as setting chip_logging_backend = "external"
   chip_use_external_logging = false
+}
+
+declare_args() {
+  # Logging backend to use for targets that don't link a specific log
+  # backend (e.g. command line utilites usually use 'stdio'). Options:
+  #   'platform' - The default log backend of the device platform
+  #   'external' - External LogV implementation (src/platform/logging/LogV.h)
+  #   'none'     - Discard all log output
+  #   'stdio'    - Print to stdout
+  #   'syslog'   - POSIX syslog()
+  if (chip_use_external_logging) {
+    chip_logging_backend = "external"
+  } else {
+    chip_logging_backend = "platform"
+  }
 
   # Enable short error strings.
   chip_config_short_error_str = false
@@ -68,7 +94,8 @@ declare_args() {
   chip_config_memory_debug_dmalloc = false
 
   # When enabled trace messages using tansport trace hook.
-  chip_enable_transport_trace = current_os == "linux" || current_os == "mac"
+  chip_enable_transport_trace = matter_enable_recommended &&
+                                (current_os == "linux" || current_os == "mac")
 
   # When this is enabled trace messages will be sent to pw_trace.
   chip_enable_transport_pw_trace = false
@@ -112,6 +139,15 @@ if (chip_target_style == "") {
     chip_target_style = "embedded"
   }
 }
+
+assert(
+    chip_logging_backend == "platform" || chip_logging_backend == "external" ||
+        chip_logging_backend == "none" || chip_logging_backend == "stdio" ||
+        chip_logging_backend == "syslog",
+    "Please select a valid logging backend: platform, external, none, stdio, syslog")
+assert(
+    !chip_use_external_logging || chip_logging_backend == "external",
+    "Setting chip_use_external_logging = true conflicts with selected chip_logging_backend")
 
 assert(chip_target_style == "unix" || chip_target_style == "embedded",
        "Please select a valid target style: unix, embedded")

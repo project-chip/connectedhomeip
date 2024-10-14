@@ -91,7 +91,7 @@ int ExecCommandInShellThread(const struct shell * shell, size_t argc, char ** ar
     return error == CHIP_NO_ERROR ? 0 : -ENOEXEC;
 }
 
-int RegisterCommands()
+int RegisterMatterCommands()
 {
     Shell::Engine::Root().RegisterDefaultCommands();
     return 0;
@@ -99,7 +99,7 @@ int RegisterCommands()
 
 } // namespace
 
-SYS_INIT(RegisterCommands, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
+SYS_INIT(RegisterMatterCommands, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
 SHELL_CMD_ARG_REGISTER(matter, NULL, "Matter commands", ExecCommandInShellThread, 1, CHIP_SHELL_MAX_TOKENS);
 
 namespace chip {

@@ -13,6 +13,7 @@ EnumsNotUsedAsTypeInXML:
     - "RvcOperationalState::OperationalStateEnum"
     - "RvcOperationalState::ErrorStateEnum"
     - "EnergyEvseMode::ModeTag"
+    - "WaterHeaterMode::ModeTag"
     - "DeviceEnergyManagementMode::ModeTag"
 
 CommandHandlerInterfaceOnlyClusters:
@@ -23,6 +24,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Scenes Management
     - RVC Run Mode
     - RVC Clean Mode
+    - Service Area
     - Dishwasher Mode
     - Laundry Washer Mode
     - Oven Mode
@@ -40,6 +42,11 @@ CommandHandlerInterfaceOnlyClusters:
     - Device Energy Management Mode
     - Electrical Power Measurement
     - Electrical Energy Measurement
+    - Wi-Fi Network Management
+    - Thread Border Router Management
+    - Thread Network Directory
+    - Water Heater Management
+    - Water Heater Mode
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
@@ -65,6 +72,7 @@ ClustersWithAttributeChangedFunctions:
     - Pump Configuration and Control
     - Window Covering
     - Fan Control
+    - Thermostat
 
 ClustersWithShutdownFunctions:
     - Barrier Control
@@ -74,6 +82,7 @@ ClustersWithShutdownFunctions:
     - Color Control
     - Sample MEI
     - Scenes Management
+    - Thermostat
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock

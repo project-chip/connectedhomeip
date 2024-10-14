@@ -77,6 +77,9 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
 
     sessionManager->SetMessageDelegate(this);
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    sessionManager->SetConnectionDelegate(this);
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     mReliableMessageMgr.Init(sessionManager->SystemLayer());
 
     mState = State::kState_Initialized;
@@ -103,8 +106,13 @@ ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, Exc
 {
     if (!session->IsActiveSession())
     {
+#if CHIP_ERROR_LOGGING
+        const ScopedNodeId & peer = session->GetPeer();
+        ChipLogError(ExchangeManager, "NewContext failed: session %u to " ChipLogFormatScopedNodeId " is inactive",
+                     session->SessionIdForLogging(), ChipLogValueScopedNodeId(peer));
+#endif // CHIP_ERROR_LOGGING
+
         // Disallow creating exchange on an inactive session
-        ChipLogError(ExchangeManager, "NewContext failed: session inactive");
         return nullptr;
     }
     return mContextPool.CreateObject(this, mNextExchangeId++, session, isInitiator, delegate);
@@ -187,6 +195,16 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     auto * protocolName = Protocols::GetProtocolName(payloadHeader.GetProtocolID());
     auto * msgTypeName  = Protocols::GetMessageTypeName(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType());
 
+    auto destination = kUndefinedNodeId;
+    if (packetHeader.GetDestinationNodeId().HasValue())
+    {
+        destination = packetHeader.GetDestinationNodeId().Value();
+    }
+    else if (session->IsSecureSession())
+    {
+        destination = session->AsSecureSession()->GetLocalNodeId();
+    }
+
     //
     // 32-bit value maximum = 10 chars + text preamble (6) + trailer (1) + null (1) + 2 buffer = 20
     //
@@ -207,16 +225,30 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         }
     }
 
+    // Work around pigweed not allowing more than 14 format args in a log
+    // message when using tokenized logs.
+    char typeStr[4 + 1 + 2 + 1];
+    snprintf(typeStr, sizeof(typeStr), "%04X:%02X", payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType());
+
+    // More work around pigweed not allowing more than 14 format args in a log
+    // message when using tokenized logs.
+    // text(5) + fabricIndex (uint16_t, at most 5 chars) + text (1) + source (16) + text (2) + compressed fabric id (4) + text (5) +
+    // destination + null-terminator
+    char sourceDestinationStr[5 + 5 + 1 + 16 + 2 + 4 + 5 + 16 + 1];
+    snprintf(sourceDestinationStr, sizeof(sourceDestinationStr), "from %u:" ChipLogFormatX64 " [%04X] to " ChipLogFormatX64,
+             session->GetFabricIndex(), ChipLogValueX64(session->GetPeer().GetNodeId()), static_cast<uint16_t>(compressedFabricId),
+             ChipLogValueX64(destination));
+
     //
     // Legend that can be used to decode this log line can be found in README.md
     //
-    ChipLogProgress(ExchangeManager,
-                    ">>> [E:" ChipLogFormatExchangeId " S:%u M:" ChipLogFormatMessageCounter
-                    "%s] (%s) Msg RX from %u:" ChipLogFormatX64 " [%04X] --- Type %04x:%02x (%s:%s)",
-                    ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), session->SessionIdForLogging(),
-                    packetHeader.GetMessageCounter(), ackBuf, Transport::GetSessionTypeString(session), session->GetFabricIndex(),
-                    ChipLogValueX64(session->GetPeer().GetNodeId()), static_cast<uint16_t>(compressedFabricId),
-                    payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType(), protocolName, msgTypeName);
+    ChipLogProgress(
+        ExchangeManager,
+        ">>> [E:" ChipLogFormatExchangeId " S:%u M:" ChipLogFormatMessageCounter "%s] (%s) Msg RX %s --- Type %s (%s:%s) (B:%u)",
+        ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), session->SessionIdForLogging(), packetHeader.GetMessageCounter(),
+        ackBuf, Transport::GetSessionTypeString(session), sourceDestinationStr, typeStr, protocolName, msgTypeName,
+        static_cast<unsigned>(msgBuf->TotalLength() + packetHeader.EncodeSizeBytes() + packetHeader.MICTagLength() +
+                              payloadHeader.EncodeSizeBytes()));
 #endif
 
     MessageFlags msgFlags;
@@ -312,7 +344,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         ExchangeDelegate * delegate = nullptr;
 
         // Fetch delegate from the handler
-        CHIP_ERROR err = matchingUMH->Handler->OnUnsolicitedMessageReceived(payloadHeader, delegate);
+        CHIP_ERROR err = matchingUMH->Handler->OnUnsolicitedMessageReceived(payloadHeader, session, delegate);
         if (err != CHIP_NO_ERROR)
         {
             // Using same error message for all errors to reduce code size.
@@ -412,6 +444,19 @@ void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * deleg
         return Loop::Continue;
     });
 }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+void ExchangeManager::OnTCPConnectionClosed(const SessionHandle & session, CHIP_ERROR conErr)
+{
+    mContextPool.ForEachActiveObject([&](auto * ec) {
+        if (ec->HasSessionHandle() && ec->GetSessionHandle() == session)
+        {
+            ec->OnSessionConnectionClosed(conErr);
+        }
+        return Loop::Continue;
+    });
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 } // namespace Messaging
 } // namespace chip

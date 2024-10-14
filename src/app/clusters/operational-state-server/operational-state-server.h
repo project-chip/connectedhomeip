@@ -22,7 +22,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
-#include <app/util/af.h>
+#include <app/cluster-building-blocks/QuieterReporting.h>
+#include <app/data-model/Nullable.h>
 
 namespace chip {
 namespace app {
@@ -114,6 +115,12 @@ public:
      */
     void GetCurrentOperationalError(GenericOperationalError & error) const;
 
+    /**
+     * @brief Whenever application delegate wants to possibly report a new updated time,
+     *        call this method. The `GetCountdownTime()` method will be called on the delegate.
+     */
+    void UpdateCountdownTimeFromDelegate() { UpdateCountdownTime(/* fromDelegate = */ true); }
+
     // Event triggers
     /**
      * @brief Called when the Node detects a OperationalError has been raised.
@@ -130,7 +137,7 @@ public:
      */
     void OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
                                        const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = NullOptional,
-                                       const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = NullOptional) const;
+                                       const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = NullOptional);
 
     // List change reporting
     /**
@@ -193,6 +200,19 @@ protected:
      */
     virtual void InvokeDerivedClusterCommand(HandlerContext & handlerContext) { return; };
 
+    /**
+     * Causes reporting/udpating of CountdownTime attribute from driver if sufficient changes have
+     * occurred (based on Q quality definition for operational state). Calls the Delegate::GetCountdownTime() method.
+     *
+     * @param fromDelegate true if the change notice was triggered by the delegate, false if internal to cluster logic.
+     */
+    void UpdateCountdownTime(bool fromDelegate);
+
+    /**
+     * @brief Whenever the cluster logic thinks time should be updated, call this.
+     */
+    void UpdateCountdownTimeFromClusterLogic() { UpdateCountdownTime(/* fromDelegate=*/false); }
+
 private:
     Delegate * mDelegate;
 
@@ -203,6 +223,7 @@ private:
     app::DataModel::Nullable<uint8_t> mCurrentPhase;
     uint8_t mOperationalState                 = 0; // assume 0 for now.
     GenericOperationalError mOperationalError = to_underlying(ErrorStateEnum::kNoError);
+    app::QuieterReportingAttribute<uint32_t> mCountdownTime{ DataModel::NullNullable };
 
     /**
      * This method is inherited from CommandHandlerInterface.
@@ -263,9 +284,10 @@ public:
     virtual ~Delegate() = default;
 
     /**
-     * Get the countdown time.
-     * NOTE: Changes to this attribute should not be reported.
-     * From the spec: Changes to this value SHALL NOT be reported in a subscription.
+     * Get the countdown time. This will get called on many edges such as
+     * commands to change operational state, or when the delegate deals with
+     * changes. Make sure it becomes null whenever it is appropriate.
+     *
      * @return The current countdown time.
      */
     virtual app::DataModel::Nullable<uint32_t> GetCountdownTime() = 0;

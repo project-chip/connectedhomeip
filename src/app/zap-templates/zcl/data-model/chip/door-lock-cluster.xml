@@ -64,6 +64,67 @@ limitations under the License.
             <featureBit tag="ALBU" bit="14">true</featureBit> <!-- TODO: Depends on ALIRO -->
         </globalAttribute>
 
+        <features>
+            <feature bit="0" code="PIN" name="PIN Credential" summary="Lock supports PIN credentials (via keypad, or over-the-air)">
+            <optionalConform/>
+            </feature>
+            <feature bit="1" code="RID" name="RFID Credential" summary="Lock supports RFID credentials">
+            <optionalConform/>
+            </feature>
+            <feature bit="2" code="FGP" name="FingerCredentials" summary="Lock supports finger related credentials (fingerprint, finger vein)">
+            <otherwiseConform>
+                <provisionalConform/>
+                <optionalConform/>
+            </otherwiseConform>
+            </feature>
+            <feature bit="3" code="LOG" name="Logging" summary="Lock supports local/on-lock logging when Events are not supported">
+            <optionalConform/>
+            </feature>
+            <feature bit="4" code="WDSCH" name="WeekDayAccessSchedules" summary="Lock supports week day user access schedules">
+            <optionalConform/>
+            </feature>
+            <feature bit="5" code="DPS" name="DoorPositionSensor" summary="Lock supports a door position sensor that indicates door's state">
+            <optionalConform/>
+            </feature>
+            <feature bit="6" code="FACE" name="FaceCredentials" summary="Lock supports face related credentials (face, iris, retina)">
+            <otherwiseConform>
+                <provisionalConform/>
+                <optionalConform/>
+            </otherwiseConform>
+            </feature>
+            <feature bit="7" code="COTA" name="CredentialsOverTheAirAccess" summary="PIN codes over-the-air supported for lock/unlock operations">
+            <optionalConform/>
+            </feature>
+            <feature bit="8" code="USR" name="User" summary="Lock supports the user commands and database">
+            <optionalConform>
+                <orTerm>
+                <feature name="PIN"/>
+                <feature name="RID"/>
+                <feature name="FGP"/>
+                <feature name="FACE"/>
+                </orTerm>
+            </optionalConform>
+            </feature>
+            <feature bit="9" code="NOT" name="Notification" summary="Operation and Programming Notifications">
+            <optionalConform/>
+            </feature>
+            <feature bit="10" code="YDSCH" name="YearDayAccessSchedules" summary="Lock supports year day user access schedules">
+            <optionalConform/>
+            </feature>
+            <feature bit="11" code="HDSCH" name="HolidaySchedules" summary="Lock supports holiday schedules">
+            <optionalConform/>
+            </feature>
+            <feature bit="12" code="UBOLT" name="Unbolt" summary="Lock supports unbolting">
+            <optionalConform/>
+            </feature>
+            <feature bit="13" code="ALIRO" name="AliroProvisioning" summary="AliroProvisioning">
+            <optionalConform/>
+            </feature>
+            <feature bit="14" code="ALBU" name="AliroBLEUWB" summary="AliroBLEUWB">
+            <optionalConform/>
+            </feature>
+        </features>
+
         <!-- The principle behind  mandatory/optional is the following:
          1. If attribute/command is marked as mandatory it should be mandatory here.
          2. If attribute/command is marked as optional it should be optional here.
@@ -129,7 +190,7 @@ limitations under the License.
             <access op="read" role="view" />
             <access op="write" role="manage" />
         </attribute>
-        <attribute side="server" code="35" define="AUTO_RELOCK_TIME" type="int32u" reportable="true" writable="true">
+        <attribute side="server" code="35" define="AUTO_RELOCK_TIME" type="int32u" reportable="true" writable="true" optional="true">
             <description>AutoRelockTime</description>
             <access op="read" role="view" />
             <access op="write" role="manage" />
@@ -430,6 +491,7 @@ limitations under the License.
             <arg name="CreatorFabricIndex" type="fabric_idx" isNullable="true" />
             <arg name="LastModifiedFabricIndex" type="fabric_idx" isNullable="true" />
             <arg name="NextCredentialIndex" type="int16u" isNullable="true" />
+            <arg name="CredentialData" type="octet_string" isNullable="true" optional="true" />
         </command>
         <!-- Conformance feature USR - for now optional -->
         <command source="client" code="38" name="ClearCredential" mustUseTimedInvoke="true" optional="true">
@@ -785,16 +847,16 @@ limitations under the License.
     </bitmap>
 
     <!-- RemoteProgrammingEventMask attribute bit meaning set -->
-    <bitmap name="DlRemoteProgrammingEventMask" type="bitmap16">
-        <cluster code="0x0101" />
-        <field mask="0x01" name="Unknown" />
-        <field mask="0x02" name="ProgrammingPINChanged" />
-        <field mask="0x04" name="PINAdded" />
-        <field mask="0x08" name="PINCleared" />
-        <field mask="0x10" name="PINChanged" />
-        <field mask="0x20" name="RFIDCodeAdded" />
-        <field mask="0x40" name="RFIDCodeCleared" />
-    </bitmap>
+     <bitmap name="DlRemoteProgrammingEventMask" type="bitmap16">
+         <cluster code="0x0101" />
+         <field mask="0x01" name="Unknown" />
+         <field mask="0x02" name="ProgrammingPINChanged" />
+         <field mask="0x04" name="PINAdded" />
+         <field mask="0x08" name="PINCleared" />
+         <field mask="0x10" name="PINChanged" />
+         <field mask="0x20" name="RFIDCodeAdded" />
+         <field mask="0x40" name="RFIDCodeCleared" />
+     </bitmap>
 
     <!-- RFIDProgrammingEventMask attribute bit meaning set -->
     <bitmap name="DlRFIDProgrammingEventMask" type="bitmap16">
@@ -814,25 +876,6 @@ limitations under the License.
         <item value="0x89" name="ResourceExhausted" />
         <item value="0x8B" name="NotFound" />
     </enum>
-
-    <bitmap name="Feature" type="bitmap32">
-        <cluster code="0x0101" />
-        <field name="PIN Credential" mask="0x01" />
-        <field name="RFID Credential" mask="0x02" />
-        <field name="Finger Credentials" mask="0x04" />
-        <field name="Logging" mask="0x08" />
-        <field name="Week Day Access Schedules" mask="0x10" />
-        <field name="Door Position Sensor" mask="0x20" />
-        <field name="Face Credentials" mask="0x40" />
-        <field name="Credentials Over-the-Air Access" mask="0x80" />
-        <field name="User" mask="0x100" />
-        <field name="Notification" mask="0x200" />
-        <field name="Year Day Access Schedules" mask="0x400" />
-        <field name="Holiday Schedules" mask="0x800" />
-        <field name="Unbolt" mask="0x1000" />
-        <field name="AliroProvisioning" mask="0x2000" />
-        <field name="AliroBLEUWB" mask="0x4000" />
-    </bitmap>
 
     <enum name="DoorLockSetPinOrIdStatus" type="enum8">
         <cluster code="0x0101"/>

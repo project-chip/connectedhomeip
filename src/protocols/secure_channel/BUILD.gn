@@ -1,12 +1,17 @@
 import("//build_overrides/chip.gni")
 
 source_set("check-in-counter") {
-  sources = [ "CheckInCounter.h" ]
+  sources = [
+    "CheckInCounter.cpp",
+    "CheckInCounter.h",
+  ]
 
-  deps = [
-    "${chip_root}/src/crypto",
+  public_deps = [
+    "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
+
+  deps = [ "${chip_root}/src/crypto" ]
 }
 
 source_set("check-in-message") {

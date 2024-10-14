@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/EventLogging.h>
 #include <app/server/Server.h>
@@ -214,6 +215,7 @@ static bool emitTimeFailureEvent(EndpointId ep)
     // TODO: re-schedule event for after min 1hr if no time is still available
     // https://github.com/project-chip/connectedhomeip/issues/27200
     ChipLogProgress(Zcl, "Emit TimeFailure event [ep=%d]", ep);
+    GetDelegate()->NotifyTimeFailure();
     return true;
 }
 
@@ -355,6 +357,7 @@ void TimeSynchronizationServer::OnDone(ReadClient * apReadClient)
             SetUTCTime(kRootEndpointId, mTimeReadInfo->utcTime.Value(), ourGranularity, TimeSourceEnum::kNodeTimeCluster);
         if (err == CHIP_NO_ERROR)
         {
+            mTimeReadInfo = nullptr;
             return;
         }
     }
@@ -503,6 +506,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTrustedTimeSource(const DataModel::Null
     {
         AttemptToGetTime();
     }
+    GetDelegate()->TrustedTimeSourceAvailabilityChanged(!mTrustedTimeSource.IsNull(), mGranularity);
     return err;
 }
 
@@ -1286,5 +1290,5 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
 void MatterTimeSynchronizationPluginServerInitCallback()
 {
     TimeSynchronizationServer::Instance().Init();
-    registerAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }

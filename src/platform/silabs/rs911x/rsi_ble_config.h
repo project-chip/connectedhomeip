@@ -24,6 +24,10 @@
 #include <rsi_data_types.h>
 #endif
 
+#if SL_MATTER_GN_BUILD == 0
+#include "sl_matter_wifi_config.h"
+#endif // SL_MATTER_GN_BUILD
+
 /******************************************************
  * *                      Macros
  * ******************************************************/
@@ -33,15 +37,6 @@
 // failure return value
 #define RSI_FAILURE -1
 #endif
-
-#define RSI_BLE_CONN_EVENT (0x01)
-#define RSI_BLE_DISCONN_EVENT (0x02)
-#define RSI_BLE_GATT_WRITE_EVENT (0x03)
-#define RSI_BLE_MTU_EVENT (0x04)
-#define RSI_BLE_GATT_INDICATION_CONFIRMATION (0x05)
-#define RSI_BLE_RESP_ATT_VALUE (0x06)
-#define RSI_BLE_EVENT_GATT_RD (0x08)
-#define RSI_BLE_ADDR_LENGTH 6
 
 #define RSI_SSID (0x0D)
 #define RSI_SECTYPE (0x0E)
@@ -58,7 +53,6 @@
 
 #define RSI_BLE_DEV_NAME "CCP_DEVICE"
 #define RSI_BLE_SET_RAND_ADDR "00:23:A7:12:34:56"
-#define RSI_BLE_EVENT_GATT_RD (0x08)
 #define RSI_BLE_ADDR_LENGTH 6
 
 #define CLEAR_WHITELIST (0x00)
@@ -107,7 +101,7 @@
 #else
 #define RSI_BLE_MAX_NBR_ATT_REC (80)
 
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
+#if (EXP_BOARD)
 #define RSI_BLE_MAX_NBR_PERIPHERALS (3)
 #else
 #define RSI_BLE_MAX_NBR_SLAVES (3)
@@ -273,7 +267,7 @@
     (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT) //! TCP/IP feature select bitmap for selecting TCP/IP features
 #define RSI_CUSTOM_FEATURE_BIT_MAP SL_SI91X_CUSTOM_FEAT_EXTENTION_VALID //! To set custom feature select bit map
 
-#ifdef CHIP_9117
+#ifdef SLI_SI917
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION // Adding Support for WPA3 transition
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
     (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1) | SL_SI91X_RAM_LEVEL_NWP_BASIC_MCU_ADV |              \
@@ -285,7 +279,7 @@
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
 #else  // EXP_BOARD
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2))
-#endif /* CHIP_9117 */
+#endif /* SLI_SI917 */
 
 #define RSI_EXT_TCPIP_FEATURE_BITMAP 0
 #define RSI_BT_FEATURE_BITMAP (SL_SI91X_BT_RF_TYPE | SL_SI91X_ENABLE_BLE_PROTOCOL)

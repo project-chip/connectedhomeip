@@ -25,6 +25,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
@@ -32,7 +33,6 @@
 #include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
@@ -396,7 +396,7 @@ OpCredsFabricTableDelegate gFabricDelegate;
 
 void MatterOperationalCredentialsPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate);
 
@@ -703,7 +703,11 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     needRevert = false;
 
     // We might have a new operational identity, so we should start advertising it right away.
-    app::DnssdServer::Instance().AdvertiseOperational();
+    err = app::DnssdServer::Instance().AdvertiseOperational();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Operational advertising failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 
     // Notify the attributes containing fabric metadata can be read with new data
     MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,

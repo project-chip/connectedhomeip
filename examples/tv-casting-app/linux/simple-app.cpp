@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,47 +44,6 @@ using namespace matter::casting::support;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
 LinuxCommissionableDataProvider gCommissionableDataProvider;
-
-CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, LinuxDeviceOptions & options)
-{
-    chip::Optional<uint32_t> setupPasscode;
-
-    if (options.payload.setUpPINCode != 0)
-    {
-        setupPasscode.SetValue(options.payload.setUpPINCode);
-    }
-    else if (!options.spake2pVerifier.HasValue())
-    {
-        uint32_t defaultTestPasscode = 0;
-        chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
-        VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupPasscode(defaultTestPasscode) == CHIP_NO_ERROR);
-
-        ChipLogError(Support,
-                     "*** WARNING: Using temporary passcode %u due to no neither --passcode or --spake2p-verifier-base64 "
-                     "given on command line. This is temporary and will be deprecated. Please update your scripts "
-                     "to explicitly configure onboarding credentials. ***",
-                     static_cast<unsigned>(defaultTestPasscode));
-        setupPasscode.SetValue(defaultTestPasscode);
-        options.payload.setUpPINCode = defaultTestPasscode;
-    }
-    else
-    {
-        // Passcode is 0, so will be ignored, and verifier will take over. Onboarding payload
-        // printed for debug will be invalid, but if the onboarding payload had been given
-        // properly to the commissioner later, PASE will succeed.
-    }
-
-    // Default to minimum PBKDF iterations
-    uint32_t spake2pIterationCount = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
-    if (options.spake2pIterations != 0)
-    {
-        spake2pIterationCount = options.spake2pIterations;
-    }
-    ChipLogError(Support, "PASE PBKDF iterations set to %u", static_cast<unsigned>(spake2pIterationCount));
-
-    return provider.Init(options.spake2pVerifier, options.spake2pSalt, spake2pIterationCount, setupPasscode,
-                         options.payload.discriminator.GetLongValue());
-}
 
 /**
  * @brief Provides the unique ID that is used by the SDK to generate the Rotating Device ID.
@@ -130,6 +89,7 @@ public:
 
 int main(int argc, char * argv[])
 {
+    ChipLogProgress(AppServer, "chip_casting_simplified = 1"); // this file is built/run only if chip_casting_simplified = 1
     // Create AppParameters that need to be passed to CastingApp.Initialize()
     AppParameters appParameters;
     RotatingDeviceIdUniqueIdProvider rotatingDeviceIdUniqueIdProvider;

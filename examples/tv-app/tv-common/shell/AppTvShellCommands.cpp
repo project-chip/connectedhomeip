@@ -33,6 +33,8 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <string>
+
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/app-platform/ContentAppPlatform.h>
 using namespace chip::AppPlatform;
@@ -207,6 +209,10 @@ static CHIP_ERROR PrintAllCommands()
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     streamer_printf(sout, "  print-app-access     Print all ACLs for app platform fabric. Usage: app print-app-access\r\n");
     streamer_printf(sout, "  remove-app-access    Remove all ACLs for app platform fabric. Usage: app remove-app-access\r\n");
+    streamer_printf(
+        sout,
+        "  print-installed-apps   Print all installed content apps with their endpoints. Usage: app print-installed-apps\r\n");
+
     streamer_printf(sout,
                     "  commission <udc-entry>     Commission given udc-entry using given pincode from corresponding app. Usage: "
                     "app commission 0\r\n");
@@ -238,6 +244,55 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
         factory->AddAdminVendorId(vid);
 
         ChipLogProgress(DeviceLayer, "added admin-vendor");
+
+        return CHIP_NO_ERROR;
+    }
+    else if (strcmp(argv[0], "install") == 0)
+    {
+        if (argc < 2)
+        {
+            return PrintAllCommands();
+        }
+        char * eptr;
+
+        uint16_t vid = (uint16_t) strtol(argv[1], &eptr, 10);
+        uint16_t pid = 0;
+        if (argc >= 3)
+        {
+            pid = (uint16_t) strtol(argv[2], &eptr, 10);
+        }
+        ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
+        factory->InstallContentApp(vid, pid);
+
+        ChipLogProgress(DeviceLayer, "installed an app");
+
+        return CHIP_NO_ERROR;
+    }
+    else if (strcmp(argv[0], "uninstall") == 0)
+    {
+        if (argc < 2)
+        {
+            return PrintAllCommands();
+        }
+        char * eptr;
+
+        uint16_t vid = (uint16_t) strtol(argv[1], &eptr, 10);
+        uint16_t pid = 0;
+        if (argc >= 3)
+        {
+            pid = (uint16_t) strtol(argv[2], &eptr, 10);
+        }
+        ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
+        bool isAppUninstalled           = factory->UninstallContentApp(vid, pid);
+
+        if (isAppUninstalled)
+        {
+            ChipLogProgress(DeviceLayer, "uninstalled an app");
+        }
+        else
+        {
+            ChipLogProgress(DeviceLayer, "app not found.");
+        }
 
         return CHIP_NO_ERROR;
     }
@@ -383,6 +438,13 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
     else if (strcmp(argv[0], "remove-app-access") == 0)
     {
         Access::GetAccessControl().DeleteAllEntriesForFabric(GetDeviceCommissioner()->GetFabricIndex());
+        return CHIP_NO_ERROR;
+    }
+    else if (strcmp(argv[0], "print-installed-apps") == 0)
+    {
+        ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
+        factory->LogInstalledApps();
+
         return CHIP_NO_ERROR;
     }
     else if (strcmp(argv[0], "commission") == 0)

@@ -26,7 +26,6 @@
 #include <app-common/zap-generated/callback.h>
 #include <app/EventLogging.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <cinttypes>
 
 #include <app/CommandHandler.h>
@@ -240,18 +239,6 @@ emberAfPluginDoorLockGetFingerVeinCredentialLengthConstraints(chip::EndpointId e
 
 bool __attribute__((weak))
 emberAfPluginDoorLockGetFaceCredentialLengthConstraints(chip::EndpointId endpointId, uint8_t & minLen, uint8_t & maxLen)
-{
-    return false;
-}
-
-bool __attribute__((weak))
-emberAfPluginDoorLockSetAliroReaderConfig(EndpointId endpointId, const ByteSpan & signingKey, const ByteSpan & verificationKey,
-                                          const ByteSpan & groupIdentifier, const Optional<ByteSpan> groupResolvingKey)
-{
-    return false;
-}
-
-bool __attribute__((weak)) emberAfPluginDoorLockClearAliroReaderConfig(chip::EndpointId endpointId)
 {
     return false;
 }

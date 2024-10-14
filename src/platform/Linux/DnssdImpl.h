@@ -131,11 +131,11 @@ private:
         void * mContext;
         Inet::IPAddressType mAddressType;
         std::vector<DnssdService> mServices;
-        size_t mBrowseRetries;
+        bool mReceivedAllCached;
         AvahiIfIndex mInterface;
         std::string mProtocol;
-        chip::System::Clock::Timeout mNextRetryDelay = chip::System::Clock::Seconds16(1);
         std::atomic_bool mStopped{ false };
+        AvahiServiceBrowser * mBrowser;
     };
 
     struct ResolveContext
@@ -181,7 +181,7 @@ private:
     static void HandleBrowse(AvahiServiceBrowser * broswer, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event,
                              const char * name, const char * type, const char * domain, AvahiLookupResultFlags flags,
                              void * userdata);
-    static void BrowseRetryCallback(chip::System::Layer * aLayer, void * appState);
+    static void InvokeDelegateOrCleanUp(BrowseContext * context, AvahiServiceBrowser * browser);
     static void HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex interface, AvahiProtocol protocol,
                               AvahiResolverEvent event, const char * name, const char * type, const char * domain,
                               const char * host_name, const AvahiAddress * address, uint16_t port, AvahiStringList * txt,

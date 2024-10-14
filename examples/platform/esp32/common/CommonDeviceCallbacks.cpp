@@ -41,6 +41,10 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
 {
     switch (event->Type)
     {
+    case DeviceEventType::kBLEDeinitialized:
+        ESP_LOGI(TAG, "BLE is deinitialized");
+        break;
+
     case DeviceEventType::kInternetConnectivityChange:
         OnInternetConnectivityChange(event);
         break;
@@ -51,7 +55,6 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
 
     case DeviceEventType::kCHIPoBLEConnectionClosed:
         ESP_LOGI(TAG, "CHIPoBLE disconnected");
-        Esp32AppServer::DeInitBLEIfCommissioned();
         break;
 
     case DeviceEventType::kDnssdInitialized:
@@ -67,6 +70,7 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
 
     case DeviceEventType::kCommissioningComplete: {
         ESP_LOGI(TAG, "Commissioning complete");
+        Esp32AppServer::DeInitBLEIfCommissioned();
     }
     break;
 
@@ -79,6 +83,14 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
             // connectivity. MDNS still wants to refresh its listening interfaces to include the
             // newly selected address.
             chip::app::DnssdServer::Instance().StartServer();
+        }
+        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
+        {
+            appDelegate = DeviceCallbacksDelegate::Instance().GetAppDelegate();
+            if (appDelegate != nullptr)
+            {
+                appDelegate->OnIPv6ConnectivityEstablished();
+            }
         }
         break;
     }

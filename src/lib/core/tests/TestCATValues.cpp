@@ -16,14 +16,14 @@
  *    limitations under the License.
  */
 
-#include <lib/support/UnitTestRegistration.h>
-#include <nlunit-test.h>
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CASEAuthTag.h>
+#include <lib/core/StringBuilderAdapters.h>
 
 using namespace chip;
 
-void TestEqualityOperator(nlTestSuite * inSuite, void * inContext)
+TEST(TestCATValues, TestEqualityOperator)
 {
     {
         auto a                 = CATValues{ { 0x1111'0001, 0x2222'0002, 0x3333'0003 } };
@@ -37,7 +37,7 @@ void TestEqualityOperator(nlTestSuite * inSuite, void * inContext)
         {
             for (auto & inner : candidates)
             {
-                NL_TEST_ASSERT(inSuite, inner == outer);
+                EXPECT_EQ(inner, outer);
             }
         }
     }
@@ -49,7 +49,7 @@ void TestEqualityOperator(nlTestSuite * inSuite, void * inContext)
         {
             for (auto & inner : candidates)
             {
-                NL_TEST_ASSERT(inSuite, inner == outer);
+                EXPECT_EQ(inner, outer);
             }
         }
     }
@@ -65,13 +65,13 @@ void TestEqualityOperator(nlTestSuite * inSuite, void * inContext)
         {
             for (auto & inner : candidates)
             {
-                NL_TEST_ASSERT(inSuite, inner == outer);
+                EXPECT_EQ(inner, outer);
             }
         }
     }
 }
 
-void TestInequalityOperator(nlTestSuite * inSuite, void * inContext)
+TEST(TestCATValues, TestInequalityOperator)
 {
     auto a                 = CATValues{ { 0x1111'0001 } };
     auto b                 = CATValues{ { 0x1111'0001, 0x2222'0002 } };
@@ -103,12 +103,12 @@ void TestInequalityOperator(nlTestSuite * inSuite, void * inContext)
             {
                 continue;
             }
-            NL_TEST_ASSERT(inSuite, inner != outer);
+            EXPECT_NE(inner, outer);
         }
     }
 }
 
-void TestValidity(nlTestSuite * inSuite, void * inContext)
+TEST(TestCATValues, TestValidity)
 {
     {
         auto a                      = CATValues{ { 0x1111'0001, 0x2222'0002, 0x3333'0003 } };
@@ -119,7 +119,7 @@ void TestValidity(nlTestSuite * inSuite, void * inContext)
         CATValues validCandidates[] = { a, b, c, d, e };
         for (auto & candidate : validCandidates)
         {
-            NL_TEST_ASSERT(inSuite, candidate.AreValid());
+            EXPECT_TRUE(candidate.AreValid());
         }
     }
 
@@ -130,117 +130,69 @@ void TestValidity(nlTestSuite * inSuite, void * inContext)
         CATValues invalidCandidates[] = { versionZero1, versionZero2, collidingId };
         for (auto & candidate : invalidCandidates)
         {
-            NL_TEST_ASSERT(inSuite, !candidate.AreValid());
+            EXPECT_FALSE(candidate.AreValid());
         }
     }
 }
 
-void TestMembership(nlTestSuite * inSuite, void * inContext)
+TEST(TestCATValues, TestMembership)
 {
     auto a = CATValues{ { 0x1111'0001 } };
     auto b = CATValues{ { 0x1111'0001, 0x2222'0002 } };
     auto c = CATValues{ { 0x1111'0001, 0x2222'0002, 0x3333'0003 } };
 
-    NL_TEST_ASSERT(inSuite, a.Contains(0x1111'0001));
-    NL_TEST_ASSERT(inSuite, a.GetNumTagsPresent() == 1);
-    NL_TEST_ASSERT(inSuite, !a.Contains(0x1111'0002));
-    NL_TEST_ASSERT(inSuite, !a.Contains(0x2222'0002));
-    NL_TEST_ASSERT(inSuite, a.ContainsIdentifier(0x1111));
-    NL_TEST_ASSERT(inSuite, !a.ContainsIdentifier(0x2222));
-    NL_TEST_ASSERT(inSuite, a.AreValid());
+    EXPECT_TRUE(a.Contains(0x1111'0001));
+    EXPECT_EQ(a.GetNumTagsPresent(), 1u);
+    EXPECT_FALSE(a.Contains(0x1111'0002));
+    EXPECT_FALSE(a.Contains(0x2222'0002));
+    EXPECT_TRUE(a.ContainsIdentifier(0x1111));
+    EXPECT_FALSE(a.ContainsIdentifier(0x2222));
+    EXPECT_TRUE(a.AreValid());
 
-    NL_TEST_ASSERT(inSuite, b.Contains(0x1111'0001));
-    NL_TEST_ASSERT(inSuite, b.Contains(0x2222'0002));
-    NL_TEST_ASSERT(inSuite, b.GetNumTagsPresent() == 2);
-    NL_TEST_ASSERT(inSuite, b.ContainsIdentifier(0x1111));
-    NL_TEST_ASSERT(inSuite, b.ContainsIdentifier(0x2222));
-    NL_TEST_ASSERT(inSuite, b.AreValid());
+    EXPECT_TRUE(b.Contains(0x1111'0001));
+    EXPECT_TRUE(b.Contains(0x2222'0002));
+    EXPECT_EQ(b.GetNumTagsPresent(), 2u);
+    EXPECT_TRUE(b.ContainsIdentifier(0x1111));
+    EXPECT_TRUE(b.ContainsIdentifier(0x2222));
+    EXPECT_TRUE(b.AreValid());
 
-    NL_TEST_ASSERT(inSuite, c.Contains(0x1111'0001));
-    NL_TEST_ASSERT(inSuite, c.Contains(0x2222'0002));
-    NL_TEST_ASSERT(inSuite, c.Contains(0x3333'0003));
-    NL_TEST_ASSERT(inSuite, c.GetNumTagsPresent() == 3);
-    NL_TEST_ASSERT(inSuite, c.ContainsIdentifier(0x1111));
-    NL_TEST_ASSERT(inSuite, c.ContainsIdentifier(0x2222));
-    NL_TEST_ASSERT(inSuite, c.ContainsIdentifier(0x3333));
-    NL_TEST_ASSERT(inSuite, c.AreValid());
+    EXPECT_TRUE(c.Contains(0x1111'0001));
+    EXPECT_TRUE(c.Contains(0x2222'0002));
+    EXPECT_TRUE(c.Contains(0x3333'0003));
+    EXPECT_EQ(c.GetNumTagsPresent(), 3u);
+    EXPECT_TRUE(c.ContainsIdentifier(0x1111));
+    EXPECT_TRUE(c.ContainsIdentifier(0x2222));
+    EXPECT_TRUE(c.ContainsIdentifier(0x3333));
+    EXPECT_TRUE(c.AreValid());
 }
 
-void TestSubjectMatching(nlTestSuite * inSuite, void * inContext)
+TEST(TestCATValues, TestSubjectMatching)
 {
     // Check operational node IDs don't match
     auto a = CATValues{ { 0x2222'0002 } };
-    NL_TEST_ASSERT(inSuite, !a.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0x0001'0002'0003'0004ull)));
-    NL_TEST_ASSERT(inSuite, !a.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0x0001'0002'2222'0002ull)));
+    EXPECT_FALSE(a.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0x0001'0002'0003'0004ull)));
+    EXPECT_FALSE(a.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0x0001'0002'2222'0002ull)));
 
     auto b = CATValues{ { 0x1111'0001 } };
-    NL_TEST_ASSERT(inSuite, b.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'1111'0001ull)));
-    NL_TEST_ASSERT(inSuite, !b.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'1111'0002ull)));
+    EXPECT_TRUE(b.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'1111'0001ull)));
+    EXPECT_FALSE(b.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'1111'0002ull)));
 
     auto c = CATValues{ { 0x1111'0001, 0x2222'0002 } };
-    NL_TEST_ASSERT(inSuite, c.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'2222'0001ull)));
-    NL_TEST_ASSERT(inSuite, c.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'2222'0002ull)));
-    NL_TEST_ASSERT(inSuite, !c.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'2222'0003ull)));
+    EXPECT_TRUE(c.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'2222'0001ull)));
+    EXPECT_TRUE(c.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'2222'0002ull)));
+    EXPECT_FALSE(c.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'2222'0003ull)));
 
     auto d = CATValues{ { 0x1111'0001, 0x2222'0002, 0x3333'0003 } };
-    NL_TEST_ASSERT(inSuite, d.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0001ull)));
-    NL_TEST_ASSERT(inSuite, d.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0002ull)));
-    NL_TEST_ASSERT(inSuite, d.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0003ull)));
-    NL_TEST_ASSERT(inSuite, !d.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0004ull)));
-    NL_TEST_ASSERT(inSuite, !d.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'ffffull)));
+    EXPECT_TRUE(d.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0001ull)));
+    EXPECT_TRUE(d.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0002ull)));
+    EXPECT_TRUE(d.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0003ull)));
+    EXPECT_FALSE(d.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0004ull)));
+    EXPECT_FALSE(d.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'ffffull)));
 
     auto e = CATValues{ { 0x1111'0001, 0x2222'0002, 0x3333'ffff } };
-    NL_TEST_ASSERT(inSuite, e.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0001ull)));
-    NL_TEST_ASSERT(inSuite, e.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0002ull)));
-    NL_TEST_ASSERT(inSuite, e.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0003ull)));
-    NL_TEST_ASSERT(inSuite, e.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0004ull)));
-    NL_TEST_ASSERT(inSuite, e.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'ffffull)));
+    EXPECT_TRUE(e.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0001ull)));
+    EXPECT_TRUE(e.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0002ull)));
+    EXPECT_TRUE(e.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0003ull)));
+    EXPECT_TRUE(e.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0004ull)));
+    EXPECT_TRUE(e.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'ffffull)));
 }
-// Test Suite
-
-/**
- *  Test Suite that lists all the test functions.
- */
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("Equality operator", TestEqualityOperator),
-    NL_TEST_DEF("Inequality operator", TestInequalityOperator),
-    NL_TEST_DEF("Validity checks", TestValidity),
-    NL_TEST_DEF("Set operations", TestMembership),
-    NL_TEST_DEF("Subject matching for ACL", TestSubjectMatching),
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-int TestCATValues_Setup(void * inContext)
-{
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-int TestCATValues_Teardown(void * inContext)
-{
-    return SUCCESS;
-}
-
-int TestCATValues()
-{
-    // clang-format off
-    nlTestSuite theSuite =
-    {
-        "CATValues",
-        &sTests[0],
-        TestCATValues_Setup,
-        TestCATValues_Teardown,
-    };
-    // clang-format on
-
-    nlTestRunner(&theSuite, nullptr);
-
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestCATValues)

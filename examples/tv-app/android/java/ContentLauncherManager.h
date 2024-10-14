@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/clusters/content-launch-server/content-launch-server.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>

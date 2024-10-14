@@ -35,6 +35,7 @@
 
 #include <mutex>
 #include <platform/Linux/CHIPLinuxStorageIni.h>
+#include <string>
 
 #ifndef FATCONFDIR
 #define FATCONFDIR "/tmp"

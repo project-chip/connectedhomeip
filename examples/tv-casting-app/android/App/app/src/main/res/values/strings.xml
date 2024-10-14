@@ -31,10 +31,24 @@
     <string name="matter_stop_discovery_button_text">Stop Discovery"</string>
     <string name="matter_clear_results_button_text">Clear Results"</string>
     <string name="matter_discovery_message_initializing_text">Initializing</string>
-    <string name="matter_discovery_message_discovering_text">Casting Players on-network:</string>
+    <string name="matter_discovery_message_discovering_text">Discovering Casting Players on-network:</string>
     <string name="matter_discovery_message_stopped_text">Discovery Stopped</string>
+    <string name="matter_discovery_error_message_initial">Long click on a Casting Player to connect using CastingPlayer/Commissioner-Generated passcode commissioning flow (if supported).</string>
+    <string name="matter_discovery_error_message_start_error">Start discovery error. -</string>
+    <string name="matter_discovery_error_message_stop_before_starting">Start discovery error. Discovery ongoing, stop before starting. -</string>
+    <string name="matter_discovery_error_message_stop_error">Stop discovery error. -</string>
     <string name="matter_connection_next_button_text">Next</string>
+    <string name="matter_connection_input_dialog_title">Enter the Commissioner-Generated Passcode</string>
+    <string name="matter_connection_input_dialog_instructions">Input the Commissioner-Generated passcode displayed on the CastingPlayer UX, or use the default provided (12345678).</string>
     <string name="matter_action_selector_text">Select an action</string>
     <string name="matter_select_content_launcher_launch_url_button_text">Content Launcher Launch URL</string>
     <string name="matter_disconnect_text">Disconnect from Casting Player</string>
+    <string name="matter_application_basic_fragment_title">Application Basic</string>
+    <string name="vendor_id_attribute_title">VendorID attribute</string>
+    <string name="read_vendor_id_button_text">Read</string>
+    <string name="matter_media_playback_fragment_title">Media Playback</string>
+    <string name="current_state_attribute_title">Current State</string>
+    <string name="matter_select_application_basic_read_vendor_id_button_text">Application Basic Read Vendor ID</string>
+    <string name="matter_select_media_playback_subscribe_to_current_state_button_text">Media Playback Subscribe to Current State</string>
+    <string name="matter_shutdown_subscriptions_text">Shutdown subscriptions</string>
 </resources>

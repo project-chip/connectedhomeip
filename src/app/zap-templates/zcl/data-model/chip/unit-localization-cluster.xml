@@ -34,14 +34,18 @@ limitations under the License.
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit.</description>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
+
+    <features>
+      <feature bit="0" code="TEMP" name="TemperatureUnit" summary="The Node can be configured to use different units of temperature when conveying values to a user.">
+        <optionalConform/>
+      </feature>
+    </features>
+    
     <!-- Base data types -->
     <attribute side="server" code="0x00" define="TEMPERATURE_UNIT" type="TempUnitEnum" min="0" max="2" writable="true" optional="true">
         <description>TemperatureUnit</description>
         <access op="write" role="manage"/>
     </attribute>
   </cluster>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x002d"/>
-    <field name="TemperatureUnit" mask="0x1"/>
-  </bitmap>
+
 </configurator>

@@ -31,6 +31,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
@@ -276,8 +277,7 @@ Delegate * GetDefaultDelegate(EndpointId endpoint)
 
 CHIP_ERROR CloseValve(EndpointId ep)
 {
-    Delegate * delegate = GetDelegate(ep);
-    DataModel::Nullable<uint32_t> rDuration;
+    Delegate * delegate        = GetDelegate(ep);
     CHIP_ERROR attribute_error = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
 
     VerifyOrReturnError(Status::Success == TargetState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kClosed),
@@ -308,10 +308,8 @@ CHIP_ERROR CloseValve(EndpointId ep)
 
 CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> openDuration)
 {
-    Delegate * delegate     = GetDelegate(ep);
-    Optional<Status> status = Optional<Status>::Missing();
-    DataModel::Nullable<Percent> openLevel;
-    DataModel::Nullable<uint64_t> autoCloseTime;
+    Delegate * delegate        = GetDelegate(ep);
+    Optional<Status> status    = Optional<Status>::Missing();
     CHIP_ERROR attribute_error = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
 
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kTimeSync))
@@ -327,6 +325,7 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
             VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
 
             uint64_t time = openDuration.Value() * chip::kMicrosecondsPerSecond;
+            DataModel::Nullable<uint64_t> autoCloseTime;
             autoCloseTime.SetNonNull(chipEpochTime + time);
             VerifyOrReturnError(Status::Success == AutoCloseTime::Set(ep, autoCloseTime), attribute_error);
         }
@@ -515,5 +514,5 @@ bool emberAfValveConfigurationAndControlClusterCloseCallback(
 
 void MatterValveConfigurationAndControlPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }

@@ -19,7 +19,7 @@
 #include <cstdint>
 #include <memory>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>

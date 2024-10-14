@@ -18,8 +18,6 @@
 
 #include "MatterEndpoint-JNI.h"
 
-#include "../JNIDACProvider.h"
-#include "../support/Converters-JNI.h"
 #include "../support/MatterCallback-JNI.h"
 #include "../support/RotatingDeviceIdUniqueIdProvider-JNI.h"
 #include "clusters/Clusters.h"           // from tv-casting-common
@@ -84,6 +82,30 @@ JNI_METHOD(jobject, getCastingPlayer)
     VerifyOrReturnValue(endpoint != nullptr, nullptr,
                         ChipLogError(AppServer, "MatterEndpoint-JNI::getCastingPlayer() endpoint == nullptr"));
     return support::convertCastingPlayerFromCppToJava(std::shared_ptr<CastingPlayer>(endpoint->GetCastingPlayer()));
+}
+
+JNI_METHOD(void, getDeviceProxy)
+(JNIEnv * env, jobject thiz, jobject jSuccessCallback, jobject jFailureCallback)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "MatterEndpoint-JNI::getDeviceProxy() called");
+    Endpoint * endpoint = support::convertEndpointFromJavaToCpp(thiz);
+    VerifyOrReturn(endpoint != nullptr, ChipLogError(AppServer, "MatterEndpoint-JNI::getDeviceProxy() endpoint == nullptr"));
+
+    ReturnOnFailure(MatterEndpointJNIMgr().mGetDeviceProxySuccessHandler.SetUp(env, jSuccessCallback));
+    ReturnOnFailure(MatterEndpointJNIMgr().mGetDeviceProxyFailureHandler.SetUp(env, jFailureCallback));
+
+    endpoint->GetCastingPlayer()->FindOrEstablishSession(
+        nullptr,
+        [](void * context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle) {
+            ChipLogProgress(AppServer, "MatterEndpointJNI FindOrEstablishSession success");
+            OperationalDeviceProxy * device = new OperationalDeviceProxy(&exchangeMgr, sessionHandle); // TODO: delete *device
+            MatterEndpointJNIMgr().mGetDeviceProxySuccessHandler.Handle(device);
+        },
+        [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
+            ChipLogError(AppServer, "MatterEndpointJNI FindOrEstablishSession failure %" CHIP_ERROR_FORMAT, error.Format());
+            MatterEndpointJNIMgr().mGetDeviceProxyFailureHandler.Handle(error);
+        });
 }
 
 }; // namespace core

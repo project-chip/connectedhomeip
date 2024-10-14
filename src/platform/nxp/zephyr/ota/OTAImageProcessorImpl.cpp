@@ -20,7 +20,6 @@
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <platform/CHIPDeviceLayer.h>
-
 #include <zephyr/dfu/mcuboot.h>
 #include <zephyr/storage/flash_map.h>
 #include <zephyr/storage/stream_flash.h>
@@ -33,6 +32,8 @@ static struct stream_flash_ctx stream;
 #else
 #define UPDATE_TYPE BOOT_UPGRADE_TEST
 #endif
+
+static constexpr uint16_t deltaRebootDelayMs = 200;
 
 namespace chip {
 namespace DeviceLayer {
@@ -96,10 +97,16 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 #ifdef CONFIG_CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
     if (!err)
     {
+        PlatformMgr().HandleServerShuttingDown();
+        /*
+         * Restart the device in order to apply the update image.
+         * This should be done with a delay so the device has enough time to send
+         * the state-transition event when applying the update.
+         */
+        ChipLogProgress(SoftwareUpdate, "Restarting device, will reboot in %d seconds ...", mDelayBeforeRebootSec);
         return SystemLayer().StartTimer(
-            System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS),
+            System::Clock::Milliseconds32(mDelayBeforeRebootSec * 1000 + deltaRebootDelayMs),
             [](System::Layer *, void * /* context */) {
-                PlatformMgr().HandleServerShuttingDown();
                 k_msleep(CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS);
                 sys_reboot(SYS_REBOOT_WARM);
             },
@@ -176,5 +183,9 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & aBlock)
     return CHIP_NO_ERROR;
 }
 
+void OTAImageProcessorImpl::SetRebootDelaySec(uint16_t rebootDelay)
+{
+    mDelayBeforeRebootSec = rebootDelay;
+}
 } // namespace DeviceLayer
 } // namespace chip

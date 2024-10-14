@@ -53,8 +53,8 @@ static_library("efr32") {
     "${silabs_platform_dir}/InetPlatformConfig.h",
     "${silabs_platform_dir}/KeyValueStoreManagerImpl.cpp",
     "${silabs_platform_dir}/KeyValueStoreManagerImpl.h",
-    "${silabs_platform_dir}/Logging.cpp",
     "${silabs_platform_dir}/MigrationManager.cpp",
+    "${silabs_platform_dir}/PlatformManagerImpl.cpp",
     "${silabs_platform_dir}/PlatformManagerImpl.h",
     "${silabs_platform_dir}/SilabsConfig.cpp",
     "${silabs_platform_dir}/SilabsConfig.h",
@@ -64,14 +64,13 @@ static_library("efr32") {
     "${silabs_platform_dir}/platformAbstraction/SilabsPlatformBase.h",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "PlatformManagerImpl.cpp",
   ]
 
   if (chip_enable_ble_rs911x) {
     sources += [
       "../rs911x/BLEManagerImpl.cpp",
       "../rs911x/rsi_ble_config.h",
-      "../rs911x/wfx_sl_ble_init.c",
+      "../rs911x/wfx_sl_ble_init.cpp",
       "../rs911x/wfx_sl_ble_init.h",
     ]
   } else {
@@ -79,14 +78,29 @@ static_library("efr32") {
   }
 
   if (chip_enable_multi_ota_requestor) {
+    if (chip_enable_multi_ota_encryption) {
+      sources += [
+        "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKey.cpp",
+        "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKey.h",
+      ]
+    }
+
+    if (chip_enable_ota_custom_tlv_testing) {
+      sources += [
+        "${silabs_platform_dir}/multi-ota/OTACustomProcessor.cpp",
+        "${silabs_platform_dir}/multi-ota/OTACustomProcessor.h",
+      ]
+    }
     sources += [
+      "${silabs_platform_dir}/multi-ota/OTAFactoryDataProcessor.cpp",
+      "${silabs_platform_dir}/multi-ota/OTAFactoryDataProcessor.h",
+      "${silabs_platform_dir}/multi-ota/OTAFirmwareProcessor.cpp",
+      "${silabs_platform_dir}/multi-ota/OTAFirmwareProcessor.h",
+      "${silabs_platform_dir}/multi-ota/OTAHooks.cpp",
       "${silabs_platform_dir}/multi-ota/OTAMultiImageProcessorImpl.cpp",
       "${silabs_platform_dir}/multi-ota/OTAMultiImageProcessorImpl.h",
       "${silabs_platform_dir}/multi-ota/OTATlvProcessor.cpp",
       "${silabs_platform_dir}/multi-ota/OTATlvProcessor.h",
-      "${silabs_platform_dir}/multi-ota/efr32/OTAFirmwareProcessor.cpp",
-      "${silabs_platform_dir}/multi-ota/efr32/OTAFirmwareProcessor.h",
-      "${silabs_platform_dir}/multi-ota/efr32/OTAHooks.cpp",
     ]
   } else if (chip_enable_ota_requestor) {
     sources += [
@@ -95,8 +109,12 @@ static_library("efr32") {
     ]
   }
 
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  public_deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  deps = [ "${silabs_platform_dir}/provision:provision-headers" ]
+  public_configs = []
 
   # Add platform crypto implementation
   if (chip_crypto == "platform") {
@@ -134,8 +152,6 @@ static_library("efr32") {
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
-
-    public_configs = []
   }
 
   if (chip_enable_wifi) {
@@ -143,21 +159,28 @@ static_library("efr32") {
       "${silabs_platform_dir}/ConnectivityManagerImpl_WIFI.cpp",
       "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.cpp",
       "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.h",
-      "wifi/wfx_host_events.h",
+      "${silabs_platform_dir}/wifi/wfx_host_events.h",
       "wifi/wfx_msgs.h",
       "wifi/wifi_config.h",
     ]
 
     if (use_wf200 || use_rs9116 || use_SiWx917) {
       sources += [
-        "wifi/dhcp_client.cpp",
-        "wifi/dhcp_client.h",
+        "${silabs_platform_dir}/wifi/dhcp_client.cpp",
         "wifi/ethernetif.cpp",
         "wifi/ethernetif.h",
         "wifi/lwip_netif.cpp",
       ]
     }
 
-    public_configs = [ ":efr32-platform-wifi-config" ]
+    public_configs += [ ":efr32-platform-wifi-config" ]
   }
+}
+
+source_set("logging") {
+  sources = [ "${chip_root}/src/platform/silabs/Logging.cpp" ]
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
 }

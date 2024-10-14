@@ -91,7 +91,7 @@ Protocols::InteractionModel::Status chefConcentrationMeasurementWriteCallback(
         CHIP_ERROR err = clusterInstance->SetMeasuredValue(MakeNullable(newValue));
         if (CHIP_NO_ERROR == err)
         {
-            ChipLogDetail(DeviceLayer, "Updated EP:%d, Cluster: 0x%04x to MeasuredValue: %f", endpoint, clusterId, newValue);
+            ChipLogDetail(DeviceLayer, "Updated EP:%d, Cluster: 0x%04x MeasuredValue", endpoint, clusterId);
         }
         else
         {
@@ -189,17 +189,17 @@ Protocols::InteractionModel::Status chefConcentrationMeasurementReadCallback(chi
 void emberAfCarbonMonoxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
     gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
-        EndpointId(endpoint), CarbonMonoxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpb);
+        EndpointId(endpoint), CarbonMonoxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
     gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(401.0f));
-    gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(50.0f));
-    gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(1500.0f));
-    gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(511.0f));
+    gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(10.0f));
+    gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(1.0f));
+    gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(12.0f));
     gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(3600);
-    gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(MakeNullable(213.0f));
+    gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(MakeNullable(10.0f));
     gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(3600);
-    gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(10.0f);
-    gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kHigh);
+    gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(1.0f);
+    gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kMedium);
 }
 #endif
 
@@ -209,15 +209,15 @@ void emberAfCarbonDioxideConcentrationMeasurementClusterInitCallback(EndpointId 
     gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
         EndpointId(endpoint), CarbonDioxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
     gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(458.0f));
-    gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(300.0f));
-    gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(2000.0f));
+    gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(426.0f));
+    gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(1.0f));
+    gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(1000.0f));
     gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(523.0f));
     gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(3600);
     gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(MakeNullable(421.0f));
     gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(3600);
-    gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(5.0f);
-    gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kLow);
+    gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(10.0f);
+    gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kMedium);
 }
 #endif
 
@@ -227,15 +227,15 @@ void emberAfNitrogenDioxideConcentrationMeasurementClusterInitCallback(EndpointI
     gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
         EndpointId(endpoint), NitrogenDioxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpb);
     gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(3.0f));
+    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(70.0f));
     gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(1.0f));
-    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(150.0f));
-    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(3.0f));
-    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(120);
-    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(MakeNullable(3.0f));
-    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(120);
-    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(1.0f);
-    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kLow);
+    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(138.0f));
+    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(3600);
+    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(MakeNullable(97.5f));
+    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(3600);
+    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(10.0f);
+    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kMedium);
 }
 #endif
 
@@ -245,15 +245,15 @@ void emberAfOzoneConcentrationMeasurementClusterInitCallback(EndpointId endpoint
     gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
         EndpointId(endpoint), OzoneConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
     gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(10.0f));
-    gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(3.0f));
-    gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(300.0f));
-    gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(50.0f));
+    gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(60.0f));
+    gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(1.0f));
+    gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(99.0f));
     gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(3600);
-    gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(MakeNullable(20.0f));
+    gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(MakeNullable(72.0f));
     gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(3600);
-    gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(0.0f);
-    gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kLow);
+    gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(10.0f);
+    gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kMedium);
 }
 #endif
 
@@ -263,14 +263,14 @@ void emberAfPm25ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
     gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
         EndpointId(endpoint), Pm25ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kUgm3);
     gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(42.0f));
+    gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(35.0f));
     gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(1.0f));
-    gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(400.0f));
-    gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(90.0f));
+    gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(50.0f));
     gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(3600);
-    gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(MakeNullable(35.0f));
+    gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(MakeNullable(43.0f));
     gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(3600);
-    gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(4.0f);
+    gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(1.0f);
     gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kMedium);
 }
 #endif
@@ -281,14 +281,14 @@ void emberAfFormaldehydeConcentrationMeasurementClusterInitCallback(EndpointId e
     gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
         EndpointId(endpoint), FormaldehydeConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kMgm3);
     gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(10.0f));
-    gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(0.0f));
-    gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(200.0f));
-    gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(10.0f));
+    gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(40.0f));
+    gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(1.0f));
+    gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(88.0f));
     gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(7200);
-    gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(MakeNullable(2.0f));
+    gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(MakeNullable(40.0f));
     gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(7200);
-    gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(0.0f);
+    gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(1.0f);
     gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kMedium);
 }
 #endif
@@ -297,17 +297,17 @@ void emberAfFormaldehydeConcentrationMeasurementClusterInitCallback(EndpointId e
 void emberAfPm1ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
     gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
-        EndpointId(endpoint), Pm1ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kUgm3);
+        EndpointId(endpoint), Pm1ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
     gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(39.0f));
+    gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(200.0f));
     gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(1.0f));
-    gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(400.0f));
-    gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(70.0f));
+    gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(430.0f));
     gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(3600);
-    gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(MakeNullable(41.0f));
+    gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(MakeNullable(270.0f));
     gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(3600);
-    gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(4.0f);
-    gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kLow);
+    gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(10.0f);
+    gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kMedium);
 }
 #endif
 
@@ -315,17 +315,17 @@ void emberAfPm1ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 void emberAfPm10ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
     gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
-        EndpointId(endpoint), Pm10ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpt);
+        EndpointId(endpoint), Pm10ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
     gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(7.0f));
-    gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(2.0f));
-    gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(400.0f));
-    gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(49.0f));
+    gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(50.0f));
+    gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(1.0f));
+    gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(81.0f));
     gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(3600);
-    gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(MakeNullable(43.0f));
+    gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(MakeNullable(67.0f));
     gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(3600);
     gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(10.0f);
-    gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kLow);
+    gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kMedium);
 }
 #endif
 
@@ -335,15 +335,15 @@ void emberAfRadonConcentrationMeasurementClusterInitCallback(EndpointId endpoint
     gRadonConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
         EndpointId(endpoint), RadonConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
     gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(10.0f));
-    gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(5.0f));
-    gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(100.0f));
-    gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(36.0f));
+    gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(100.0f));
+    gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(1.0f));
+    gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(1000.0f));
+    gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(150.0f));
     gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(3600);
-    gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(MakeNullable(20.0f));
+    gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(MakeNullable(120.0f));
     gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(3600);
-    gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(0.0f);
-    gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kHigh);
+    gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(1.0f);
+    gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kMedium);
 }
 #endif
 

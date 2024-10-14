@@ -95,7 +95,7 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
     /**
      * The operation was cancelled.
      */
-    MTRErrorCodeCancelled MTR_NEWLY_AVAILABLE = 16,
+    MTRErrorCodeCancelled MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))= 16,
 };
 // clang-format on
 
@@ -138,8 +138,8 @@ typedef NS_ERROR_ENUM(MTRInteractionErrorDomain, MTRInteractionErrorCode){
     MTRInteractionErrorCodePathsExhausted                            = 0xc8,
     MTRInteractionErrorCodeTimedRequestMismatch                      = 0xc9,
     MTRInteractionErrorCodeFailsafeRequired                          = 0xca,
-    MTRInteractionErrorInvalidInState            MTR_NEWLY_AVAILABLE = 0xcb,
-    MTRInteractionErrorNoCommandResponse         MTR_NEWLY_AVAILABLE = 0xcc,
+    MTRInteractionErrorCodeInvalidInState        MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))= 0xcb,
+    MTRInteractionErrorCodeNoCommandResponse     MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))= 0xcc,
 };
 // clang-format on
 

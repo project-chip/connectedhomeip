@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2023 Project CHIP Authors
+#   Copyright (c) 2023-2024 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -21,15 +21,6 @@ if CHIP
 # See config/zephyr/Kconfig for full definition
 config CHIP_DEVICE_VENDOR_NAME
 	default "Telink Semiconductor"
-
-config CHIP_APP_LOG_LEVEL
-	int "Logging level in application"
-	default LOG_DEFAULT_LEVEL
-	depends on LOG
-	help
-	  Sets the logging level in the Matter application. Use this configuration
-	  option only within the application. To set the logging level for the
-	  Matter stack, use the MATTER_LOG_LEVEL configuration option.
 
 config CHIP_NFC_COMMISSIONING
 	bool "Share onboarding payload in NFC tag"
@@ -55,6 +46,7 @@ config BOOTLOADER_MCUBOOT
 	select IMG_MANAGER
 	select STREAM_FLASH
 	select STREAM_FLASH_ERASE
+	select TELINK_W91_N22_MATTER_OTA_LAYOUT if BOARD_TLSR9118BDK40D
 
 config CHIP_OTA_REQUESTOR_BUFFER_SIZE
 	int "OTA Requestor image buffer size"
@@ -132,8 +124,13 @@ config CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE
 	default y
 	help
 	  Enables merging generated factory data with the build target zephyr.bin file.
-	  As a result, output file zephyr.bin will consist of all partitions including 
+	  As a result, output file merged.bin will consist of all partitions including 
 	  factory data.
+
+config TELINK_FACTORY_DATA_PARTITION_ADDR
+	hex "factory-data partition address"
+	default $(dt_node_reg_addr_hex,$(dt_nodelabel_path,factory_partition),0)
+	depends on CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE
 
 # Use default certificates without generating or providing them
 config CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
@@ -178,8 +175,18 @@ config CHIP_LOG_SIZE_OPTIMIZATION
 	  full configuration enabled by this option in the
 	  platform/telink/CHIPPlatformConfig.h file.
 
+config CHIP_IPV4
+	bool "IPv4 support for Matter"
+	default n
+	depends on NET_IPV4
+	help
+	  If disabled, it allows to build Telink SDK application
+	  with IPv4 support independently of the Matter stack still
+	  running over IPv6.
+
 config CHIP_BUTTON_MANAGER_IRQ_MODE
 	bool "Use GPIO in an IRQ mode instead of polling the GPIO"
+	default y if BOARD_TLSR9118BDK40D
 	default PM
 	help
 	  Use GPIO in an IRQ mode to avoid button polling loop and extend the battery lifetime by waking up by GPIO event. 

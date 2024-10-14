@@ -52,7 +52,7 @@ public:
     virtual void HandleOnUpdated(memory::Strong<CastingPlayer> players) = 0;
     // virtual void HandleOnRemoved(memory::Strong<CastingPlayer> players) = 0;
 };
-
+class CastingPlayer; // Forward declaration of the CastingPlayer class
 class CastingPlayerDiscovery;
 
 /**
@@ -68,7 +68,7 @@ public:
     DeviceDiscoveryDelegateImpl() {}
     DeviceDiscoveryDelegateImpl(DiscoveryDelegate * delegate) { mClientDelegate = delegate; }
 
-    void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
+    void OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData) override;
 };
 
 /**
@@ -79,6 +79,10 @@ class CastingPlayerDiscovery
 
 private:
     std::vector<memory::Strong<CastingPlayer>> mCastingPlayers;
+    // This vector is used to store CastingPlayers that we might want to connect to. This ensures
+    // that CastingPlayers are not deleted prior to calling verify VerifyOrEstablishConnection() on
+    // the CastingPlayer we want to connect to.
+    std::vector<memory::Strong<CastingPlayer>> mCastingPlayersInternal;
     DeviceDiscoveryDelegateImpl mDelegate;
 
     CastingPlayerDiscovery();
@@ -90,8 +94,23 @@ private:
     chip::Controller::CommissionableNodeController mCommissionableNodeController;
     CastingPlayerDiscoveryState mState = DISCOVERY_NOT_READY;
 
+    /**
+     * @brief Clear CastingPlayers in mCastingPlayersInternal with ConnectionState == CASTING_PLAYER_NOT_CONNECTED
+     */
+    void ClearDisconnectedCastingPlayersInternal();
+
+    /**
+     * @brief Clear all CastingPlayers in mCastingPlayersInternal
+     */
+    void ClearCastingPlayersInternal();
+
 public:
     static CastingPlayerDiscovery * GetInstance();
+    ~CastingPlayerDiscovery()
+    {
+        mCastingPlayers.clear();
+        mCastingPlayersInternal.clear();
+    }
 
     /**
      * @brief Starts the discovery for CastingPlayers
@@ -126,6 +145,7 @@ public:
     std::vector<memory::Strong<CastingPlayer>> GetCastingPlayers() { return mCastingPlayers; }
 
     friend class DeviceDiscoveryDelegateImpl;
+    friend class CastingPlayer;
 };
 
 }; // namespace core

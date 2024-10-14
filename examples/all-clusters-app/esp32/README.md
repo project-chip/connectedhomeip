@@ -47,14 +47,20 @@ NetworkCommissioning Endpoint can be used to manage the driver of extra network
 interface.
 
 For ESP32-C6 DevKits, if `CHIP_DEVICE_CONFIG_ENABLE_WIFI` and
-`CHIP_DEVICE_CONFIG_ENABLE_THREAD` are both enabled, the NetworkCommissioning
-cluster in Endpoint 0 will be used for Thread network driver and the same
-cluster on Endpoint 65534 will be used for Wi-Fi network driver.
+`CHIP_DEVICE_CONFIG_ENABLE_THREAD` are both enabled, please set
+`CONFIG_THREAD_NETWORK_ENDPOINT_ID` to 0 and set
+`CONFIG_WIFI_NETWORK_ENDPOINT_ID` to 65534, which presents that the
+NetworkCommissioning cluster in Endpoint 0 will be used for Thread network
+driver and the same cluster on Endpoint 65534 will be used for Wi-Fi network
+driver. Or vice versa.
 
 For ESP32-Ethernet-Kits, if `CHIP_DEVICE_CONFIG_ENABLE_WIFI` and
-`CHIP_DEVICE_CONFIG_ENABLE_ETHERNET` are both enabled, the NetworkCommissioning
-cluster in Endpoint 0 will be used for Ethernet network driver and the same
-cluster on Endpoint 65534 will be used for Wi-Fi network driver.
+`CHIP_DEVICE_CONFIG_ENABLE_ETHERNET` are both enabled, please set
+`CONFIG_ETHERNET_NETWORK_ENDPOINT_ID` to 0 and set
+`CONFIG_WIFI_NETWORK_ENDPOINT_ID` to 65534, which presents that the
+NetworkCommissioning cluster in Endpoint 0 will be used for Ethernet network
+driver and the same cluster on Endpoint 65534 will be used for Wi-Fi network
+driver. Or vice versa.
 
 ---
 

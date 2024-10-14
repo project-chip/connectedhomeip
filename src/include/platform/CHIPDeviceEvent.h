@@ -245,6 +245,16 @@ enum PublicEventTypes
      * sending messages to other nodes.
      */
     kServerReady,
+
+    /**
+     * Signals that BLE is deinitialized.
+     */
+    kBLEDeinitialized,
+
+    /**
+     * Signals that secure session is established.
+     */
+    kSecureSessionEstablished,
 };
 
 /**
@@ -271,7 +281,9 @@ enum InternalEventTypes
      * This event should populate CHIPoBLEConnectionError structure.
      */
     kCHIPoBLEConnectionError,
-    kCHIPoBLENotifyConfirm
+    kCHIPoBLENotifyConfirm,
+    kCHIPoWiFiPAFWriteReceived,
+    kCHIPoWiFiPAFConnected,
 };
 
 static_assert(kEventTypeNotSet == 0, "kEventTypeNotSet must be defined as 0");
@@ -369,7 +381,7 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 #include CHIPDEVICEPLATFORMEVENT_HEADER
 #endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
-#include <ble/BleConfig.h>
+#include <ble/Ble.h>
 #include <inet/InetInterface.h>
 #include <lib/support/LambdaBridge.h>
 #include <system/SystemEvent.h>
@@ -481,6 +493,12 @@ struct ChipDeviceEvent final
         {
             BLE_CONNECTION_OBJECT ConId;
         } CHIPoBLENotifyConfirm;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        struct
+        {
+            chip::System::PacketBuffer * Data;
+        } CHIPoWiFiPAFWriteReceived;
+#endif
         struct
         {
             bool RoleChanged : 1;
@@ -528,9 +546,17 @@ struct ChipDeviceEvent final
         {
             OtaState newState;
         } OtaStateChanged;
+
+        struct
+        {
+            uint64_t PeerNodeId;
+            uint8_t FabricIndex;
+            uint8_t SecureSessionType;
+            uint8_t TransportType;
+            uint16_t LocalSessionId;
+        } SecureSessionEstablished;
     };
 
-    void Clear() { memset(this, 0, sizeof(*this)); }
     bool IsPublic() const { return DeviceEventType::IsPublic(Type); }
     bool IsInternal() const { return DeviceEventType::IsInternal(Type); }
     bool IsPlatformSpecific() const { return DeviceEventType::IsPlatformSpecific(Type); }

@@ -36,7 +36,10 @@
 #include "sl_power_manager.h"
 #endif
 
+#ifdef SL_BOARD_NAME
 #include "sl_board_control.h"
+#endif // SL_BOARD_NAME
+
 #include "sl_si91x_ncp_utility.h"
 #include "spi_multiplex.h"
 
@@ -111,6 +114,9 @@ static void efx32_spi_init(void)
     // Enable USART interface pins
     GPIO->USARTROUTE[SPI_USART_ROUTE_INDEX].ROUTEEN = GPIO_USART_ROUTEEN_RXPEN | // MISO
         GPIO_USART_ROUTEEN_TXPEN |                                               // MOSI
+#if !SL_SPICTRL_MUX
+        GPIO_USART_ROUTEEN_CSPEN |
+#endif
         GPIO_USART_ROUTEEN_CLKPEN;
 
     // Set slew rate for alternate usage pins

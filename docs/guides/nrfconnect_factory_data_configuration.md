@@ -24,7 +24,7 @@ data secure by applying hardware write protection.
 
 > **Note:** Due to hardware limitations, in the nRF Connect platform, protection
 > against writing can be applied only to the internal memory partition. The
-> [Fprotect](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/libraries/others/fprotect.html)
+> [Fprotect](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/security/bootloader/fprotect.html)
 > is the hardware flash protection driver, and we used it to ensure write
 > protection of the factory data partition in internal flash memory.
 
@@ -37,7 +37,7 @@ data secure by applying hardware write protection.
             -   [Appearance field description](#appearance-field-description)
     -   [Enabling factory data support](#enabling-factory-data-support)
     -   [Generating factory data](#generating-factory-data)
-        -   [Creating the factory data JSON file with the first script](#creating-the-factory-data-json-file-with-the-first-script)
+        -   [Creating the factory data JSON and HEX files with the first script](#creating-the-factory-data-json-and-hex-files-with-the-first-script)
         -   [How to set user data](#how-to-set-user-data)
             -   [How to handle user data](#how-to-handle-user-data)
         -   [Verifying using the JSON Schema tool](#verifying-using-the-json-schema-tool)
@@ -218,14 +218,19 @@ file written in another way. To make sure that the JSON file is correct and the
 device is able to read out parameters,
 [verify the file using the JSON schema tool](#verifying-using-the-json-schema-tool).
 
-### Creating the factory data JSON file with the first script
+You can also use only the first script to generate both JSON and HEX files, by
+providing optional `offset` and `size` arguments, which results in invoking the
+script internally. Such option is the recommended one, but invoking two scripts
+one by one is also supported to provide backward compatibility.
+
+### Creating the factory data JSON and HEX files with the first script
 
 A Matter device needs a proper factory data partition stored in the flash memory
 to read out all required parameters during startup. To simplify the factory data
 generation, you can use the
 [generate_nrfconnect_chip_factory_data.py](../../scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py)
 Python script to provide all required parameters and generate a human-readable
-JSON file.
+JSON file and save it to a HEX file.
 
 To use this script, complete the following steps:
 
@@ -245,10 +250,10 @@ To use this script, complete the following steps:
     --sn --vendor_id, --product_id, --vendor_name, --product_name, --date, --hw_ver, --hw_ver_str, --spake2_it, --spake2_salt, --discriminator
     ```
 
-    b. Add output file path:
+    b. Add output path to store .json file, e.g. my_dir/output:
 
     ```
-    -o <path_to_output_json_file>
+    -o <path_to_output_file>
     ```
 
     c. Generate SPAKE2 verifier using one of the following methods:
@@ -341,6 +346,34 @@ To use this script, complete the following steps:
     > `chip-cert` executable. See the note at the end of this section to learn
     > how to get it.
 
+    k. (optional) Partition offset that is an address in device's NVM memory,
+    where factory data will be stored.
+
+    ```
+    --offset <offset>
+    ```
+
+    > **Note:** To generate a HEX file with factory data, you need to provide
+    > both `offset` and `size` optional arguments. As a result,
+    > `factory_data.hex` and `factory_data.bin` files are created in the
+    > `output` directory. The first file contains the required memory offset.
+    > For this reason, it can be programmed directly to the device using a
+    > programmer (for example, `nrfjprog`).
+
+    l. (optional) The maximum partition size in device's NVM memory, where
+    factory data will be stored.
+
+    ```
+    --size <size>
+    ```
+
+    > **Note:** To generate a HEX file with factory data, you need to provide
+    > both `offset` and `size` optional arguments. As a result,
+    > `factory_data.hex` and `factory_data.bin` files are created in the
+    > `output` directory. The first file contains the required memory offset.
+    > For this reason, it can be programmed directly to the device using a
+    > programmer (for example, `nrfjprog`).
+
 4. Run the script using the prepared list of arguments:
 
     ```
@@ -370,8 +403,10 @@ $ python scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py \
 --passcode 20202021 \
 --product_finish "matte" \
 --product_color "black" \
---out "build.json" \
---schema "scripts/tools/nrfconnect/nrfconnect_factory_data.schema"
+--out "build" \
+--schema "scripts/tools/nrfconnect/nrfconnect_factory_data.schema" \
+--offset 0xf7000 \
+--size 0x1000
 ```
 
 As the result of the above example, a unique ID for the rotating device ID is
@@ -570,7 +605,7 @@ To generate a manual pairing code and a QR code, complete the following steps:
     ```
 
 2. Complete steps 1, 2, and 3 from the
-   [Creating the factory data JSON file with the first script](#creating-the-factory-data-json-file-with-the-first-script)
+   [Creating the factory data JSON and HEX files with the first script](#creating-the-factory-data-json-and-hex-files-with-the-first-script)
    section to prepare the final invocation of the Python script.
 
 3. Add the `--generate_onboarding` argument to the Python script final
@@ -600,7 +635,7 @@ For example, the build command for the nRF52840 DK could look like this:
 ```
 $ west build -b nrf52840dk_nrf52840 -- \
 -DCONFIG_CHIP_FACTORY_DATA=y \
--DCONFIG_CHIP_FACTORY_DATA_BUILD=y \
+-DSB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y \
 -DCONFIG_CHIP_FACTORY_DATA_GENERATE_ONBOARDING_CODES=y
 ```
 
@@ -608,7 +643,7 @@ $ west build -b nrf52840dk_nrf52840 -- \
 
 The factory data partition is an area in the device's persistent storage where a
 factory data set is stored. This area is configured using the
-[Partition Manager](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/scripts/partition_manager/partition_manager.html),
+[Partition Manager](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/scripts/partition_manager/partition_manager.html),
 within which all partitions are declared in the `pm_static.yml` file.
 
 To prepare an example that supports factory data, add a partition called
@@ -686,10 +721,15 @@ The output will look similar to the following one:
 ### Creating a factory data partition with the second script
 
 To store the factory data set in the device's persistent storage, convert the
-data from the JSON file to its binary representation in the CBOR format. To do
-this, use the
+data from the JSON file to its binary representation in the CBOR format. This is
+done by the
+[generate_nrfconnect_chip_factory_data.py](../../scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py),
+if you provide optional `offset` and `size` arguments. If you provided these
+arguments, skip the following steps of this section.
+
+You can skip these optional arguments and do this, using the
 [nrfconnect_generate_partition.py](../../scripts/tools/nrfconnect/nrfconnect_generate_partition.py)
-to generate the factory data partition:
+script, but this is obsolete solution kept only for backward compatibility:
 
 1. Navigate to the _connectedhomeip_ root directory
 2. Run the following command pattern:
@@ -720,13 +760,13 @@ $ python scripts/tools/nrfconnect/nrfconnect_generate_partition.py -h
 **Example of the command for the nRF52840 DK:**
 
 ```
-$ python scripts/tools/nrfconnect/nrfconnect_generate_partition.py -i build/zephyr/factory_data.json -o build/zephyr/factory_data --offset 0xfb000 --size 0x1000
+$ python scripts/tools/nrfconnect/nrfconnect_generate_partition.py -i build/light_bulb/zephyr/factory_data.json -o build/light_bulb/zephyr/factory_data --offset 0xfb000 --size 0x1000
 ```
 
 As a result, `factory_data.hex` and `factory_data.bin` files are created in the
-`/build/zephyr/` directory. The first file contains the memory offset. For this
-reason, it can be programmed directly to the device using a programmer (for
-example, `nrfjprog`).
+`/build/light_bulb/zephyr/` directory. The first file contains the memory
+offset. For this reason, it can be programmed directly to the device using a
+programmer (for example, `nrfjprog`).
 
 <hr>
 
@@ -743,11 +783,11 @@ directory and build the example with the following option (replace
 `nrf52840dk_nrf52840` with your board name):
 
 ```
-$ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y -DCONFIG_CHIP_FACTORY_DATA_BUILD=y
+$ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y -DSB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y
 ```
 
-Alternatively, you can also add `CONFIG_CHIP_FACTORY_DATA_BUILD=y` Kconfig
-setting to the example's `prj.conf` file.
+Alternatively, you can also add `SB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y`
+Kconfig setting to the example's `sysbuild.conf` file.
 
 Each factory data parameter has a default value. These are described in the
 [Kconfig file](../../config/nrfconnect/chip-module/Kconfig). Setting a new value
@@ -762,7 +802,7 @@ them as an additional option for the west command. For example (replace
 `nrf52840dk_nrf52840` with own board name):
 
 ```
-$ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y --DCONFIG_CHIP_FACTORY_DATA_BUILD=y --DCONFIG_CHIP_DEVICE_DISCRIMINATOR=0xF11
+$ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y --DSB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y --DCONFIG_CHIP_DEVICE_DISCRIMINATOR=0xF11
 ```
 
 Alternatively, you can add the relevant Kconfig option lines to the example's
@@ -805,7 +845,7 @@ snippet:
 
 > **Note:** To get more information about how to use the interactive Kconfig
 > interfaces, read the
-> [Kconfig documentation](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/build/kconfig/menuconfig.html).
+> [Kconfig documentation](https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/build/kconfig/menuconfig.html).
 
 ### Default Kconfig values and developing aspects
 
@@ -876,32 +916,32 @@ $ nrfjprog --family NRF52 --program factory_data.hex
 ```
 
 > Note: For more information about how to use the `nrfjprog` utility, visit
-> [Nordic Semiconductor's Infocenter](https://infocenter.nordicsemi.com/index.jsp?topic=%2Fug_nrf_cltools%2FUG%2Fcltools%2Fnrf_nrfjprogexe.html).
+> [Programming SoCs with nrfjprog](https://docs.nordicsemi.com/bundle/ug_nrf_cltools/page/UG/cltools/nrf_nrfjprogexe.html)
 
 Another way to program the factory data to a device is to use the nRF Connect
 platform build system described in
 [Building an example with factory data](#building-an-example-with-factory-data),
 and build an example with the additional option
-`-DCONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE=y`:
+`-DSB_CONFIG_MATTER_FACTORY_DATA_MERGE_WITH_FIRMWARE=y`:
 
 ```
 $ west build -b nrf52840dk_nrf52840 -- \
 -DCONFIG_CHIP_FACTORY_DATA=y \
--DCONFIG_CHIP_FACTORY_DATA_BUILD=y \
--DCONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE=y
+-DSB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y \
+-DSB_CONFIG_MATTER_FACTORY_DATA_MERGE_WITH_FIRMWARE=y
 ```
 
 You can also build an example with auto-generation of new CD, DAC and PAI
 certificates. The newly generated certificates will be added to factory data set
 automatically. To generate new certificates disable using default certificates
 by building an example with the additional option
-`-DCHIP_FACTORY_DATA_USE_DEFAULT_CERTS=n`:
+`-DCONFIG_CHIP_FACTORY_DATA_USE_DEFAULT_CERTS=n`:
 
 ```
 $ west build -b nrf52840dk_nrf52840 -- \
 -DCONFIG_CHIP_FACTORY_DATA=y \
--DCONFIG_CHIP_FACTORY_DATA_BUILD=y \
--DCONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE=y \
+-DSB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y \
+-DSB_CONFIG_MATTER_FACTORY_DATA_MERGE_WITH_FIRMWARE=y \
 -DCONFIG_CHIP_FACTORY_DATA_USE_DEFAULT_CERTS=n
 ```
 
@@ -924,14 +964,13 @@ $ west flash
 ## Using own factory data implementation
 
 The [factory data generation process](#generating-factory-data) described above
-is only an example valid for the nRF Connect platform. You can also create a HEX
-file containing all components from the
-[factory data component table](#factory-data-component-table) in any format and
-then implement a parser to read out all parameters and pass them to a provider.
-Each manufacturer can implement a factory data set on its own by implementing a
-parser and a factory data accessor inside the Matter stack. Use the
-[nRF Connect Provider](../../src/platform/nrfconnect/FactoryDataProvider.h) and
-[FactoryDataParser](../../src/platform/nrfconnect/FactoryDataParser.h) as
+is only an example valid for the nRF Connect platform. You can well create a HEX
+file containing all [factory data components](#factory-data-component-table) in
+any format and then implement a parser to read out all parameters and pass them
+to a provider. Each manufacturer can implement a factory data set on its own by
+implementing a parser and a factory data accessor inside the Matter stack. Use
+the [nRF Connect Provider](../../src/platform/nrfconnect/FactoryDataProvider.h)
+and [FactoryDataParser](../../src/platform/nrfconnect/FactoryDataParser.h) as
 examples.
 
 You can read the factory data set from the device's flash memory in different

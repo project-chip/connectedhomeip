@@ -18,7 +18,6 @@
 
 #include "CastingPlayerDiscovery-JNI.h"
 
-#include "../JNIDACProvider.h"
 #include "../support/Converters-JNI.h"
 #include "../support/RotatingDeviceIdUniqueIdProvider-JNI.h"
 #include "core/CastingApp.h"             // from tv-casting-common
@@ -73,17 +72,17 @@ public:
 
         VerifyOrReturn(castingPlayerChangeListenerJavaObject.HasValidObjectRef(),
                        ChipLogError(AppServer,
-                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnAdded() Warning: Not set, "
+                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnAdded() Not set, "
                                     "CastingPlayerChangeListener == nullptr"));
         VerifyOrReturn(onAddedCallbackJavaMethodID != nullptr,
                        ChipLogError(AppServer,
-                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnAdded() Warning: Not set, "
+                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnAdded() Not set, "
                                     "onAddedCallbackJavaMethodID == nullptr"));
 
         jobject matterCastingPlayerJavaObject = support::convertCastingPlayerFromCppToJava(player);
         VerifyOrReturn(matterCastingPlayerJavaObject != nullptr,
                        ChipLogError(AppServer,
-                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnAdded() Warning: Could not create "
+                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnAdded() Could not create "
                                     "CastingPlayer jobject"));
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -100,17 +99,17 @@ public:
 
         VerifyOrReturn(castingPlayerChangeListenerJavaObject.HasValidObjectRef(),
                        ChipLogError(AppServer,
-                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnUpdated() Warning: Not set, "
+                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnUpdated() Not set, "
                                     "CastingPlayerChangeListener == nullptr"));
         VerifyOrReturn(onChangedCallbackJavaMethodID != nullptr,
                        ChipLogError(AppServer,
-                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnUpdated() Warning: Not set, "
+                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnUpdated() Not set, "
                                     "onChangedCallbackJavaMethodID == nullptr"));
 
         jobject matterCastingPlayerJavaObject = support::convertCastingPlayerFromCppToJava(player);
         VerifyOrReturn(matterCastingPlayerJavaObject != nullptr,
                        ChipLogError(AppServer,
-                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnUpdated() Warning: Could not "
+                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnUpdated() Could not "
                                     "create CastingPlayer jobject"));
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -191,7 +190,7 @@ JNI_METHOD(jobject, addCastingPlayerChangeListener)(JNIEnv * env, jobject, jobje
     if (DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject.HasValidObjectRef())
     {
         ChipLogError(AppServer,
-                     "CastingPlayerDiscovery-JNI::addCastingPlayerChangeListener() Warning: Call removeCastingPlayerChangeListener "
+                     "CastingPlayerDiscovery-JNI::addCastingPlayerChangeListener() Call removeCastingPlayerChangeListener "
                      "before adding a new one");
         return support::convertMatterErrorFromCppToJava(CHIP_ERROR_INCORRECT_STATE);
     }
@@ -246,11 +245,18 @@ JNI_METHOD(jobject, removeCastingPlayerChangeListener)(JNIEnv * env, jobject, jo
 
         return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
     }
+    else if (!DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject.HasValidObjectRef())
+    {
+        ChipLogError(
+            AppServer,
+            "CastingPlayerDiscovery-JNI::removeCastingPlayerChangeListener() Cannot remove listener. No listener was added");
+        return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
+    }
     else
     {
         ChipLogError(AppServer,
-                     "CastingPlayerDiscovery-JNI::removeCastingPlayerChangeListener() Warning: Cannot remove listener. Received a "
-                     "different CastingPlayerChangeListener object");
+                     "CastingPlayerDiscovery-JNI::removeCastingPlayerChangeListener() Cannot remove listener. Received a different "
+                     "CastingPlayerChangeListener object");
         return support::convertMatterErrorFromCppToJava(CHIP_ERROR_INCORRECT_STATE);
     }
 }
@@ -276,8 +282,7 @@ JNI_METHOD(jobject, getCastingPlayers)(JNIEnv * env, jobject)
             jboolean added = env->CallBooleanMethod(arrayList, addMethod, matterCastingPlayerJavaObject);
             if (!((bool) added))
             {
-                ChipLogError(AppServer,
-                             "CastingPlayerDiscovery-JNI::getCastingPlayers() Warning: Unable to add CastingPlayer with ID: %s",
+                ChipLogError(AppServer, "CastingPlayerDiscovery-JNI::getCastingPlayers() Unable to add CastingPlayer with ID: %s",
                              player->GetId());
             }
         }

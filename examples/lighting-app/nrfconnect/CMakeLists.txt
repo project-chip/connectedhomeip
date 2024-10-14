@@ -22,20 +22,12 @@ get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
-# Set Kconfig root files that will be processed as a first Kconfig for used child images.
-set(mcuboot_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.mcuboot.root)
-set(multiprotocol_rpmsg_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.multiprotocol_rpmsg.root)
-set(hci_rpmsg_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.hci_rpmsg.root)
-
-if(NOT CONF_FILE STREQUAL "prj_no_dfu.conf" AND NOT BOARD STREQUAL "nrf52840dongle_nrf52840")
-    set(PM_STATIC_YML_FILE ${CMAKE_CURRENT_SOURCE_DIR}/configuration/${BOARD}/pm_static_dfu.yml)
-endif()
-
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 project(chip-nrfconnect-lighting-example)
 
+include(${CHIP_ROOT}/config/nrfconnect/app/check-sysbuild-use.cmake)
 include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
@@ -63,7 +55,6 @@ target_sources(app PRIVATE
                ${NRFCONNECT_COMMON}/util/PWMDevice.cpp)
 
 chip_configure_data_model(app
-    INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lighting-common/lighting-app.zap
 )
 

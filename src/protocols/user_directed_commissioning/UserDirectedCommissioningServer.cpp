@@ -26,6 +26,7 @@
 #include "UserDirectedCommissioning.h"
 #include <lib/core/CHIPSafeCasts.h>
 #include <system/TLVPacketBufferBackingStore.h>
+#include <transport/raw/Base.h>
 
 #include <unistd.h>
 
@@ -33,7 +34,8 @@ namespace chip {
 namespace Protocols {
 namespace UserDirectedCommissioning {
 
-void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msg)
+void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msg,
+                                                        Transport::MessageTransportContext * ctxt)
 {
     char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];
     source.ToString(addrBuffer);
@@ -52,7 +54,7 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
 
-    ChipLogProgress(AppServer, "IdentityDeclaration DataLength()=%d", msg->DataLength());
+    ChipLogProgress(AppServer, "IdentityDeclaration DataLength()=%" PRIu32, static_cast<uint32_t>(msg->DataLength()));
 
     uint8_t udcPayload[IdentificationDeclaration::kUdcTLVDataMaxBytes];
     size_t udcPayloadLength = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));
@@ -61,9 +63,25 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
     IdentificationDeclaration id;
     id.ReadPayload(udcPayload, sizeof(udcPayload));
 
-    char * instanceName = (char *) id.GetInstanceName();
+    if (id.GetCancelPasscode())
+    {
+        HandleUDCCancel(id);
+        return;
+    }
 
-    ChipLogProgress(AppServer, "UDC instance=%s ", id.GetInstanceName());
+    if (id.GetCommissionerPasscodeReady())
+    {
+        HandleUDCCommissionerPasscodeReady(id);
+        return;
+    }
+
+    HandleNewUDC(source, id);
+}
+
+void UserDirectedCommissioningServer::HandleNewUDC(const Transport::PeerAddress & source, IdentificationDeclaration & id)
+{
+    char * instanceName = (char *) id.GetInstanceName();
+    ChipLogProgress(AppServer, "HandleNewUDC instance=%s ", id.GetInstanceName());
 
     UDCClientState * client = mUdcClients.FindUDCClientState(instanceName);
     if (client == nullptr)
@@ -109,8 +127,58 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
             ChipLogError(AppServer, "UserDirectedCommissioningServer::OnMessageReceived no mInstanceNameResolver registered");
         }
     }
-
     mUdcClients.MarkUDCClientActive(client);
+}
+
+void UserDirectedCommissioningServer::HandleUDCCancel(IdentificationDeclaration & id)
+{
+    char * instanceName = (char *) id.GetInstanceName();
+    ChipLogProgress(AppServer, "HandleUDCCancel instance=%s ", id.GetInstanceName());
+
+    UDCClientState * client = mUdcClients.FindUDCClientState(instanceName);
+    if (client == nullptr)
+    {
+        ChipLogProgress(AppServer, "UDC no matching instance found");
+        return;
+    }
+    id.DebugLog();
+    mUdcClients.MarkUDCClientActive(client);
+
+    // Call the registered mUserConfirmationProvider, if any.
+    if (mUserConfirmationProvider != nullptr)
+    {
+        mUserConfirmationProvider->OnCancel(*client);
+    }
+
+    // reset this entry so that the client can try again without waiting an hour
+    client->Reset();
+}
+
+void UserDirectedCommissioningServer::HandleUDCCommissionerPasscodeReady(IdentificationDeclaration & id)
+{
+    char * instanceName = (char *) id.GetInstanceName();
+    ChipLogProgress(AppServer, "HandleUDCCommissionerPasscodeReady instance=%s ", id.GetInstanceName());
+
+    UDCClientState * client = mUdcClients.FindUDCClientState(instanceName);
+    if (client == nullptr)
+    {
+        ChipLogProgress(AppServer, "UDC no matching instance found");
+        return;
+    }
+    if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kWaitingForCommissionerPasscodeReady)
+    {
+        ChipLogProgress(AppServer, "UDC instance not in waiting for passcode ready state");
+        return;
+    }
+    id.DebugLog();
+    mUdcClients.MarkUDCClientActive(client);
+    client->SetUDCClientProcessingState(UDCClientProcessingState::kObtainingOnboardingPayload);
+
+    // Call the registered mUserConfirmationProvider, if any.
+    if (mUserConfirmationProvider != nullptr)
+    {
+        mUserConfirmationProvider->OnCommissionerPasscodeReady(*client);
+    }
 }
 
 CHIP_ERROR UserDirectedCommissioningServer::SendCDCMessage(CommissionerDeclaration cd, chip::Transport::PeerAddress peerAddress)
@@ -299,6 +367,7 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
                 {
                     ChipLogProgress(AppServer, "TLV end of array");
                     ReturnErrorOnFailure(reader.ExitContainer(listContainerType));
+                    err = CHIP_NO_ERROR;
                 }
             }
             break;
@@ -366,6 +435,8 @@ uint32_t CommissionerDeclaration::WritePayload(uint8_t * payloadBuffer, size_t p
                  LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.PutBoolean(chip::TLV::ContextTag(kQRCodeDisplayedTag), mQRCodeDisplayed)),
                  LogErrorOnFailure(err));
+    VerifyOrExit(CHIP_NO_ERROR == (err = writer.PutBoolean(chip::TLV::ContextTag(kCancelPasscodeTag), mCancelPasscode)),
+                 LogErrorOnFailure(err));
 
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.EndContainer(outerContainerType)), LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.Finalize()), LogErrorOnFailure(err));
@@ -400,22 +471,26 @@ void UserDirectedCommissioningServer::SetUDCClientProcessingState(char * instanc
     mUdcClients.MarkUDCClientActive(client);
 }
 
-void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::DiscoveredNodeData & nodeData)
+void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::DiscoveredNodeData & discNodeData)
 {
-    if (nodeData.resolutionData.numIPs == 0)
+    if (!discNodeData.Is<Dnssd::CommissionNodeData>())
     {
-        ChipLogError(AppServer, "OnCommissionableNodeFound no IP addresses returned for instance name=%s",
-                     nodeData.commissionData.instanceName);
-        return;
-    }
-    if (nodeData.resolutionData.port == 0)
-    {
-        ChipLogError(AppServer, "OnCommissionableNodeFound no port returned for instance name=%s",
-                     nodeData.commissionData.instanceName);
         return;
     }
 
-    UDCClientState * client = mUdcClients.FindUDCClientState(nodeData.commissionData.instanceName);
+    const Dnssd::CommissionNodeData & nodeData = discNodeData.Get<Dnssd::CommissionNodeData>();
+    if (nodeData.numIPs == 0)
+    {
+        ChipLogError(AppServer, "OnCommissionableNodeFound no IP addresses returned for instance name=%s", nodeData.instanceName);
+        return;
+    }
+    if (nodeData.port == 0)
+    {
+        ChipLogError(AppServer, "OnCommissionableNodeFound no port returned for instance name=%s", nodeData.instanceName);
+        return;
+    }
+
+    UDCClientState * client = mUdcClients.FindUDCClientState(nodeData.instanceName);
     if (client != nullptr && client->GetUDCClientProcessingState() == UDCClientProcessingState::kDiscoveringNode)
     {
         ChipLogDetail(AppServer, "OnCommissionableNodeFound instance: name=%s old_state=%d new_state=%d", client->GetInstanceName(),
@@ -425,50 +500,45 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
 #if INET_CONFIG_ENABLE_IPV4
         // prefer IPv4 if its an option
         bool foundV4 = false;
-        for (unsigned i = 0; i < nodeData.resolutionData.numIPs; ++i)
+        for (unsigned i = 0; i < nodeData.numIPs; ++i)
         {
-            if (nodeData.resolutionData.ipAddress[i].IsIPv4())
+            if (nodeData.ipAddress[i].IsIPv4())
             {
                 foundV4 = true;
-                client->SetPeerAddress(
-                    chip::Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[i], nodeData.resolutionData.port));
+                client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[i], nodeData.port));
                 break;
             }
         }
         // use IPv6 as last resort
         if (!foundV4)
         {
-            client->SetPeerAddress(
-                chip::Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[0], nodeData.resolutionData.port));
+            client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port));
         }
 #else  // INET_CONFIG_ENABLE_IPV4
        // if we only support V6, then try to find a v6 address
         bool foundV6 = false;
-        for (unsigned i = 0; i < nodeData.resolutionData.numIPs; ++i)
+        for (unsigned i = 0; i < nodeData.numIPs; ++i)
         {
-            if (nodeData.resolutionData.ipAddress[i].IsIPv6())
+            if (nodeData.ipAddress[i].IsIPv6())
             {
                 foundV6 = true;
-                client->SetPeerAddress(
-                    chip::Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[i], nodeData.resolutionData.port));
+                client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[i], nodeData.port));
                 break;
             }
         }
         // last resort, try with what we have
         if (!foundV6)
         {
-            ChipLogError(AppServer, "OnCommissionableNodeFound no v6 returned for instance name=%s",
-                         nodeData.commissionData.instanceName);
-            client->SetPeerAddress(
-                chip::Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[0], nodeData.resolutionData.port));
+            ChipLogError(AppServer, "OnCommissionableNodeFound no v6 returned for instance name=%s", nodeData.instanceName);
+            client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port));
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-        client->SetDeviceName(nodeData.commissionData.deviceName);
-        client->SetLongDiscriminator(nodeData.commissionData.longDiscriminator);
-        client->SetVendorId(nodeData.commissionData.vendorId);
-        client->SetProductId(nodeData.commissionData.productId);
-        client->SetRotatingId(nodeData.commissionData.rotatingId, nodeData.commissionData.rotatingIdLen);
+        client->SetDeviceName(nodeData.deviceName);
+        client->SetLongDiscriminator(nodeData.longDiscriminator);
+        client->SetVendorId(nodeData.vendorId);
+        client->SetProductId(nodeData.productId);
+        client->SetRotatingId(nodeData.rotatingId, nodeData.rotatingIdLen);
 
         // Call the registered mUserConfirmationProvider, if any.
         if (mUserConfirmationProvider != nullptr)

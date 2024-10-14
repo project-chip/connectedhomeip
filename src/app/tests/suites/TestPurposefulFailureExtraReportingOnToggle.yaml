@@ -1,0 +1,58 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    Test that "passes" if turning on On/Off cluster reports Level Control things
+
+config:
+    nodeId: 0x12344321
+    cluster: "On/Off"
+    endpoint: 1
+    # We expect our test to time out, so set a timeout that's not too long, but
+    # long enough that if the server does report the attribute change we will
+    # almost certianly see it.
+    timeout: 5
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Turn off the light"
+      command: "Off"
+
+    - label: "Subscribe LevelControl RemainingTime Attribute"
+      command: "subscribeAttribute"
+      cluster: "LevelControl"
+      attribute: "RemainingTime"
+      minInterval: 0
+      maxInterval: 5
+      response:
+          value: 0
+
+    - label: "Turn on the light to see attribute change, if any"
+      command: "On"
+
+    - label: "Check for attribute report"
+      command: "waitForReport"
+      cluster: "LevelControl"
+      attribute: "RemainingTime"
+      # This test should fail, since there should be no reporting for an
+      # attribute that did not actually change.
+      response:
+          value: 0

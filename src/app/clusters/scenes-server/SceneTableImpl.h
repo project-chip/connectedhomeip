@@ -29,7 +29,7 @@
 namespace chip {
 namespace scenes {
 
-#ifdef SCENES_MANAGEMENT_TABLE_SIZE
+#if defined(SCENES_MANAGEMENT_TABLE_SIZE) && SCENES_MANAGEMENT_TABLE_SIZE
 static constexpr uint16_t kMaxScenesPerEndpoint = SCENES_MANAGEMENT_TABLE_SIZE;
 #else
 static constexpr uint16_t kMaxScenesPerEndpoint = CHIP_CONFIG_MAX_SCENES_TABLE_SIZE;
@@ -40,7 +40,6 @@ static_assert(kMaxScenesPerEndpoint <= CHIP_CONFIG_MAX_SCENES_TABLE_SIZE,
               "CHIP_CONFIG_MAX_SCENES_TABLE_SIZE in CHIPConfig.h if you really need more scenes");
 static_assert(kMaxScenesPerEndpoint >= 16, "Per spec, kMaxScenesPerEndpoint must be at least 16");
 static constexpr uint16_t kMaxScenesPerFabric = (kMaxScenesPerEndpoint - 1) / 2;
-static constexpr uint8_t kMaxFabrics          = CHIP_CONFIG_MAX_FABRICS;
 
 /**
  * @brief Implementation of a storage in nonvolatile storage of the scene table.

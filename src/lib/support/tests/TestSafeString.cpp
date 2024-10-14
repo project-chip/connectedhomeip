@@ -22,45 +22,28 @@
  *
  */
 
-#include <lib/support/SafeString.h>
-#include <lib/support/UnitTestRegistration.h>
+#include <pw_unit_test/framework.h>
 
-#include <nlunit-test.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/SafeString.h>
 
 using namespace chip;
 
-static void TestMaxStringLength(nlTestSuite * inSuite, void * inContext)
+TEST(TestSafeString, TestMaxStringLength)
 {
     constexpr size_t len = MaxStringLength("a", "bc", "def");
-    NL_TEST_ASSERT(inSuite, len == 3);
+    EXPECT_EQ(len, 3u);
 
-    NL_TEST_ASSERT(inSuite, MaxStringLength("bc") == 2);
+    EXPECT_EQ(MaxStringLength("bc"), 2u);
 
-    NL_TEST_ASSERT(inSuite, MaxStringLength("def", "bc", "a") == 3);
+    EXPECT_EQ(MaxStringLength("def", "bc", "a"), 3u);
 
-    NL_TEST_ASSERT(inSuite, MaxStringLength("") == 0);
+    EXPECT_EQ(MaxStringLength(""), 0u);
 }
 
-static void TestTotalStringLength(nlTestSuite * inSuite, void * inContext)
+TEST(TestSafeString, TestTotalStringLength)
 {
-    NL_TEST_ASSERT(inSuite, TotalStringLength("") == 0);
-    NL_TEST_ASSERT(inSuite, TotalStringLength("a") == 1);
-    NL_TEST_ASSERT(inSuite, TotalStringLength("def", "bc", "a") == 6);
+    EXPECT_EQ(TotalStringLength(""), 0u);
+    EXPECT_EQ(TotalStringLength("a"), 1u);
+    EXPECT_EQ(TotalStringLength("def", "bc", "a"), 6u);
 }
-
-#define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
-/**
- *   Test Suite. It lists all the test functions.
- */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestMaxStringLength), NL_TEST_DEF_FN(TestTotalStringLength), NL_TEST_SENTINEL() };
-
-int TestSafeString()
-{
-    nlTestSuite theSuite = { "CHIP SafeString tests", &sTests[0], nullptr, nullptr };
-
-    // Run test suite against one context.
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestSafeString)

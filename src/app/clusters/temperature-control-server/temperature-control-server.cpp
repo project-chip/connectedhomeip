@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
 #include <app/util/attribute-storage.h>
@@ -227,5 +228,5 @@ void emberAfTemperatureControlClusterServerInitCallback(EndpointId endpoint) {}
 
 void MatterTemperatureControlPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }

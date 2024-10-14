@@ -106,6 +106,7 @@ SpacesInSquareBrackets: false
 Standard:        Cpp11
 TabWidth:        8
 UseTab:          Never
+InsertNewlineAtEOF: true
 ---
 Language: ObjC
 BasedOnStyle: WebKit

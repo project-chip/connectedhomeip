@@ -16,6 +16,9 @@ name: Build example - Linux Standalone
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
 
@@ -25,7 +28,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     linux_standalone:
         name: Linux Standalone
@@ -34,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:41
+            image: ghcr.io/project-chip/chip-build:81
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -195,6 +198,26 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug air-purifier-app \
                     out/linux-x64-air-purifier/chip-air-purifier-app \
+                    /tmp/bloat_reports/
+            - name: Build example Fabric Admin
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-fabric-admin-rpc \
+                        build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    linux debug fabric-admin \
+                    out/linux-x64-fabric-admin-rpc/fabric-admin \
+                    /tmp/bloat_reports/
+            - name: Build example Fabric Bridge App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-fabric-bridge-no-ble-rpc \
+                        build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    linux debug fabric-bridge-app \
+                    out/linux-x64-fabric-bridge-no-ble-rpc/fabric-bridge-app \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports

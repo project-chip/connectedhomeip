@@ -33,20 +33,20 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 3: TH reads from the DUT the ClusterRevision attribute."
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 1
+          value: 2
           constraints:
               type: int16u
 
     - label:
-          "Step 2a: TH reads from the DUT the FeatureMap attribute and Check
-          values of flags in this FeatureMap"
+          "Step 3: TH reads from the DUT the FeatureMap attribute and ensures no
+          invalid bits."
       PICS:
           "!SWTCH.S.F00 && !SWTCH.S.F01 && !SWTCH.S.F02 && !SWTCH.S.F03 &&
-          !SWTCH.S.F04"
+          !SWTCH.S.F04 && !SWTCH.S.F05"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -55,7 +55,7 @@ tests:
               type: bitmap32
 
     - label:
-          "Step 2b: Given SWTCH.S.F00(LS) ensure featuremap has the correct bit
+          "Step 3a: Given SWTCH.S.F00(LS) ensure featuremap has the correct bits
           set"
       PICS: SWTCH.S.F00
       command: "readAttribute"
@@ -64,11 +64,11 @@ tests:
           constraints:
               type: bitmap32
               hasMasksSet: [0x01]
-              hasMasksClear: [0x02, 0x04, 0x08, 0x10]
+              hasMasksClear: [0x02, 0x04, 0x08, 0x10, 0x20]
 
     - label:
-          "Step 2c: Given SWTCH.S.F01(MS) ensure featuremap has the correct bit
-          set"
+          "Step 3b: Given SWTCH.S.F01(MS) ensure featuremap has the correct bits
+          set: checks on !MSL when MS feature present."
       PICS: SWTCH.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -79,8 +79,8 @@ tests:
               hasMasksClear: [0x1]
 
     - label:
-          "Step 2d: Given SWTCH.S.F02(MSR) ensure featuremap has the correct bit
-          set"
+          "Step 3b: Given SWTCH.S.F02(MSR) ensure featuremap has the correct
+          bits set: checks on MS & !AS & MSR."
       PICS: SWTCH.S.F02
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -88,34 +88,68 @@ tests:
           constraints:
               type: bitmap32
               hasMasksSet: [0x2, 0x4]
-              hasMasksClear: [0x1]
+              hasMasksClear: [0x1, 0x20]
 
     - label:
-          "Step 2e: Given SWTCH.S.F03(MSL) ensure featuremap has the correct bit
-          set"
+          "Step 3b: Given SWTCH.S.F03(MSL) ensure featuremap has the correct
+          bits set: LS cannot be enabled if MSL."
       PICS: SWTCH.S.F03
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [0x2, 0x4, 0x8]
+              hasMasksSet: [0x2, 0x8]
               hasMasksClear: [0x1]
 
     - label:
-          "Step 2f: Given SWTCH.S.F04(MSM) ensure featuremap has the correct bit
-          set"
+          "Step 3b: Given SWTCH.S.F04(MSM) ensure featuremap has the correct
+          bits set: LS cannot be enabled if MSM."
       PICS: SWTCH.S.F04
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [0x2, 0x4, 0x10]
+              hasMasksSet: [0x2, 0x10]
               hasMasksClear: [0x1]
 
-    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
-      PICS: SWTCH.S.F04
+    - label:
+          "Step 3b: Given SWTCH.S.F05(AS) ensure featuremap has the correct bits
+          set: LS and MSR cannot be enabled if AS, and MSM is required by AS."
+      PICS: SWTCH.S.F05
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2, 0x10, 0x20]
+              hasMasksClear: [0x1, 0x4]
+
+    - label: "Step 3c: LS and MS are mutually exclusive (1/2)."
+      PICS: "SWTCH.S.F00"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+              hasMasksClear: [0x2]
+
+    - label: "Step 3c: LS and MS are mutually exclusive (2/2)."
+      PICS: "SWTCH.S.F01"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+              hasMasksClear: [0x1]
+
+    - label:
+          "Step 4: TH reads from the DUT the AttributeList attribute, verify
+          that attribute MultiPressMax is present with MSM feature."
+      PICS: "SWTCH.S.F04"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -123,17 +157,9 @@ tests:
               type: list
               contains: [2]
 
-    - label: "Step 4b: TH reads from the DUT the AttributeList attribute."
-      PICS: "PICS_EVENT_LIST_ENABLED && !SWTCH.S.F04"
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [0, 1, 65528, 65529, 65530, 65531, 65532, 65533]
-
-    - label: "Step 4b: TH reads from the DUT the AttributeList attribute."
-      PICS: "!PICS_EVENT_LIST_ENABLED && !SWTCH.S.F04"
+    - label:
+          "Step 4: TH reads from the DUT the AttributeList attribute, verify
+          mandatory attributes."
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -141,89 +167,7 @@ tests:
               type: list
               contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "Step 5a: TH reads from the DUT the EventList attribute."
-      PICS:
-          "!SWTCH.S.F00 && !SWTCH.S.F01 && !SWTCH.S.F02 && !SWTCH.S.F03 &&
-          !SWTCH.S.F04 "
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          value: []
-          constraints:
-              type: list
-
-    - label: "Step 5b: TH reads EventList if SWTCH.S.F00(LS)"
-      PICS: PICS_EVENT_LIST_ENABLED && SWTCH.S.F00
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [0]
-
-    - label:
-          "Step 5c: TH reads EventList if SWTCH.S.F01(MS) & !SWTCH.S.F02(MSR)"
-      PICS: PICS_EVENT_LIST_ENABLED && SWTCH.S.F01 && !SWTCH.S.F02
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [1]
-
-    - label:
-          "Step 5d: TH reads EventList if SWTCH.S.F01(MS) & SWTCH.S.F02(MSR) &
-          !SWTCH.S.F03(MSL) & !SWTCH.S.F04(MSM)"
-      PICS:
-          " PICS_EVENT_LIST_ENABLED && SWTCH.S.F01 && SWTCH.S.F02 &&
-          !SWTCH.S.F03 && !SWTCH.S.F04 "
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [1, 3]
-
-    - label:
-          "Step 5e: TH reads EventList if SWTCH.S.F01(MS) & SWTCH.S.F02(MSR) &
-          SWTCH.S.F03(MSL) & !SWTCH.S.F04(MSM)"
-      PICS:
-          " PICS_EVENT_LIST_ENABLED && SWTCH.S.F01 && SWTCH.S.F02 && SWTCH.S.F03
-          && !SWTCH.S.F04 "
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [1, 2, 3, 4]
-
-    - label:
-          "Step 5f: TH reads EventList if SWTCH.S.F01(MS) & SWTCH.S.F02(MSR) &
-          !SWTCH.S.F03(MSL) & SWTCH.S.F04(MSM) "
-      PICS:
-          " PICS_EVENT_LIST_ENABLED && SWTCH.S.F01 && SWTCH.S.F02 &&
-          !SWTCH.S.F03 && SWTCH.S.F04 "
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [1, 3, 5, 6]
-
-    - label:
-          "Step 5g: TH reads EventList if SWTCH.S.F01(MS) & SWTCH.S.F02(MSR) &
-          SWTCH.S.F03(MSL) & SWTCH.S.F04(MSM) "
-      PICS:
-          " PICS_EVENT_LIST_ENABLED && SWTCH.S.F01 && SWTCH.S.F02 && SWTCH.S.F03
-          && SWTCH.S.F04 "
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [1, 2, 3, 4, 5, 6]
-
-    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
+    - label: "Step 5: TH reads from the DUT the AcceptedCommandList attribute."
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -231,7 +175,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
+    - label: "Step 6: TH reads from the DUT the GeneratedCommandList attribute."
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

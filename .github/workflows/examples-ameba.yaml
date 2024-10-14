@@ -16,6 +16,9 @@ name: Build example - Ameba
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
 
@@ -25,7 +28,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     ameba:
         name: Ameba
@@ -36,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-ameba:41
+            image: ghcr.io/project-chip/chip-build-ameba:81
             options: --user root
 
         steps:

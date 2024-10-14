@@ -34,41 +34,29 @@ declare_args() {
   # Argument to force enable WPA3 security on rs91x
   rs91x_wpa3_transition = true
 
-  # use commissionable data for SiWx917
-  siwx917_commissionable_data = false
-
   #default WiFi SSID
   chip_default_wifi_ssid = ""
 
   #default Wifi Password
   chip_default_wifi_psk = ""
 
-  # Enable TestEventTrigger in GeneralDiagnostics cluster
-  silabs_test_event_trigger_enabled = false
-
   # The EnableKey in hex string format used by TestEventTrigger command in
-  # GeneralDiagnostics cluster. The length of the string should be 32.
-  silabs_test_event_trigger_enable_key = "00112233445566778899aabbccddeeff"
+  # GeneralDiagnostics cluster. The length of the string should be 16 bytes.
+  sl_test_event_trigger_enable_key = "00112233445566778899AABBCCDDEEFF"
 }
 
 # Sanity check
 assert(chip_enable_wifi)
-
-silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
+silabs_plat_dir = "${chip_root}/src/platform/silabs"
 silabs_plat_si91x_wifi_dir = "${chip_root}/src/platform/silabs/SiWx917/wifi"
-import("${silabs_common_plat_dir}/args.gni")
 
+import("${silabs_common_plat_dir}/args.gni")
 config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
 
   # Link options that provide a replacement for dynamic memory operations in standard
-  # library with the FreeRTOS malloc in platform code.
+  # library with the sl_memory_manager in platform code.
   ldflags = [
-    # memory allocation -- these must be re-entrant and do locking
-    "-Wl,--wrap=malloc",
-    "-Wl,--wrap=free",
-    "-Wl,--wrap=realloc",
-    "-Wl,--wrap=calloc",
     "-Wl,--wrap=MemoryAlloc",
 
     # Wrap these in case internal newlib call them (e.g. strdup will)
@@ -77,6 +65,29 @@ config("chip_examples_project_config") {
     "-Wl,--wrap=_realloc_r",
     "-Wl,--wrap=_free_r",
     "-Wl,--wrap=_calloc_r",
+  ]
+}
+
+config("test-event-trigger-config") {
+  defines = [ "SL_MATTER_TEST_EVENT_TRIGGER_ENABLED" ]
+
+  if (is_debug) {
+    defines += [ "SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY=\"${sl_test_event_trigger_enable_key}\"" ]
+  }
+}
+
+source_set("test-event-trigger") {
+  sources = [
+    "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.cpp",
+    "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.h",
+  ]
+
+  deps = [ "${chip_root}/src/platform/silabs/provision:provision-headers" ]
+  public_configs = [ ":test-event-trigger-config" ]
+  public_deps = [
+    "${chip_root}/src/app:test-event-trigger",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
   ]
 }
 
@@ -98,39 +109,6 @@ source_set("siwx917-matter-shell") {
   }
 }
 
-config("attestation-credentials-config") {
-  include_dirs = [ "${chip_root}" ]
-}
-
-source_set("siwx917-attestation-credentials") {
-  sources = [
-    "${silabs_common_plat_dir}/SilabsDeviceAttestationCreds.cpp",
-    "${silabs_common_plat_dir}/SilabsDeviceAttestationCreds.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/credentials",
-    "${chip_root}/src/platform:platform_base",
-  ]
-
-  public_configs = [ ":attestation-credentials-config" ]
-}
-
-source_set("silabs-factory-data-provider") {
-  sources = [
-    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.cpp",
-    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/credentials",
-    "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/setup_payload",
-  ]
-
-  public_configs = [ ":siwx917-common-config" ]
-}
-
 config("siwx917-common-config") {
   defines = [ "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_sec}" ]
 
@@ -150,10 +128,6 @@ config("siwx917-common-config") {
 
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]
-  }
-
-  if (siwx917_commissionable_data) {
-    defines += [ "SIWX917_USE_COMISSIONABLE_DATA=1" ]
   }
 
   ldflags = [ "-Wl,--no-warn-rwx-segment" ]
@@ -193,38 +167,40 @@ config("silabs-wifi-config") {
 }
 
 source_set("siwx917-common") {
-  deps = []
+  deps = [ "${silabs_common_plat_dir}/provision:storage" ]
   defines = []
   public_deps = []
   public_configs = [
     ":siwx917-common-config",
     "${efr32_sdk_build_root}:silabs_config",
+    ":chip_examples_project_config",
   ]
 
   include_dirs = [
     ".",
     "SiWx917/",
+    "${silabs_plat_dir}/wifi",
     "${silabs_plat_si91x_wifi_dir}",
   ]
 
+  #TO-DO Cleanup to be done for all the wifi files into common folder
   sources = [
     "${silabs_common_plat_dir}/BaseApplication.cpp",
     "${silabs_common_plat_dir}/LEDWidget.cpp",
     "${silabs_common_plat_dir}/MatterConfig.cpp",
     "${silabs_common_plat_dir}/SoftwareFaultReports.cpp",
-    "${silabs_common_plat_dir}/heap_4_silabs.c",
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
-    "${silabs_plat_si91x_wifi_dir}/dhcp_client.cpp",
+    "${silabs_common_plat_dir}/wifi/wfx_notify.cpp",
+    "${silabs_common_plat_dir}/wifi/wfx_rsi_host.cpp",
+    "${silabs_plat_dir}/wifi/dhcp_client.cpp",
     "${silabs_plat_si91x_wifi_dir}/ethernetif.cpp",
     "${silabs_plat_si91x_wifi_dir}/lwip_netif.cpp",
-    "${silabs_plat_si91x_wifi_dir}/wfx_notify.cpp",
     "SiWx917/sl_wifi_if.cpp",
-    "SiWx917/wfx_rsi_host.cpp",
   ]
 
   if (chip_enable_pw_rpc || chip_build_libshell || sl_uart_log_output) {
-    sources += [ "uart.cpp" ]
+    sources += [ "${silabs_common_plat_dir}/uart.cpp" ]
   }
 
   if (chip_enable_ota_requestor) {
@@ -266,25 +242,22 @@ source_set("siwx917-common") {
     ]
   }
 
-  # Attestation Credentials
-  deps += [ ":siwx917-attestation-credentials" ]
-
-  # Factory Data Provider
-  if (use_efr32_factory_data_provider) {
-    public_deps += [ ":silabs-factory-data-provider" ]
-  }
-
-  if (silabs_test_event_trigger_enabled) {
-    sources +=
-        [ "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.cpp" ]
-    defines += [ "SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY=\"${silabs_test_event_trigger_enable_key}\"" ]
-  }
-
   public_deps += [
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]
+
+  if (sl_enable_test_event_trigger) {
+    public_deps += [ ":test-event-trigger" ]
+  }
+
+  if (sl_enable_si70xx_sensor) {
+    sources += [
+      "${silabs_common_plat_dir}/Si70xxSensor.cpp",
+      "${silabs_common_plat_dir}/Si70xxSensor.h",
+    ]
+  }
 
   if (app_data_model != "") {
     public_deps += [ app_data_model ]

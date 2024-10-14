@@ -53,24 +53,12 @@ void ReadLine(char * buffer, size_t max)
             break;
         }
 
-#ifdef BRD4325A
-        // for 917 SoC board, we need to create a rx event before we wait for the shell activity
-        // NotifyShellProcessFromISR() is called once the buffer is filled
-        while (streamer_read(streamer_get(), buffer + read, 1) == 1)
-        {
-            // Count how many characters were read; usually one but could be copy/paste
-            read++;
-        }
-#endif
         chip::WaitForShellActivity();
-#ifndef BRD4325A
-        // for EFR32 boards
         while (streamer_read(streamer_get(), buffer + read, 1) == 1)
         {
             // Count how many characters were read; usually one but could be copy/paste
             read++;
         }
-#endif
         // Process all characters that were read until we run out or exceed max char limit
         while (line_sz < read && line_sz < max)
         {
@@ -218,10 +206,6 @@ void ProcessShellLine(intptr_t args)
         }
     }
     MemoryFree(line);
-#ifdef BRD4325A
-    // small delay for uart print
-    vTaskDelay(1);
-#endif
     streamer_printf(streamer_get(), kShellPrompt);
 }
 

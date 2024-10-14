@@ -39,7 +39,6 @@
 #include <thread.h>
 #include <tizen_error.h>
 
-#include <app/AttributeAccessInterface.h>
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -55,8 +54,11 @@
 #include <platform/NetworkCommissioning.h>
 #include <platform/PlatformManager.h>
 
+#include <platform/Tizen/ErrorUtils.h>
 #include <platform/Tizen/ThreadStackManagerImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
+using chip::DeviceLayer::Internal::TizenToChipError;
 
 namespace chip {
 namespace DeviceLayer {
@@ -515,13 +517,19 @@ CHIP_ERROR ThreadStackManagerImpl::_GetExternalIPv6Address(chip::Inet::IPAddress
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
+CHIP_ERROR ThreadStackManagerImpl::_GetThreadVersion(uint16_t & version)
 {
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
+
+    int threadErr = thread_get_version(mThreadInstance, &version);
+    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE, TizenToChipError(threadErr),
+                        ChipLogError(DeviceLayer, "FAIL: Get thread version: %s", get_error_message(threadErr)));
+
+    ChipLogProgress(DeviceLayer, "Thread version [%u]", version);
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
+CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
 {
     ChipLogError(DeviceLayer, "Not implemented");
     return CHIP_ERROR_NOT_IMPLEMENTED;

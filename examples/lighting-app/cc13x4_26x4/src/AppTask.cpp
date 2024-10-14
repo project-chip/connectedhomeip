@@ -48,8 +48,16 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
+#include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
+#include <src/platform/cc13xx_26xx/DefaultTestEventTriggerDelegate.h>
+
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+#include "app/icd/server/ICDNotifier.h"
+#endif
 
 /* syscfg */
 #include <ti_drivers_config.h>
@@ -67,6 +75,15 @@ static uint32_t identify_trigger_effect = IDENTIFY_TRIGGER_EFFECT_FINISH_STOP;
 
 #define LIGHTING_APPLICATION_IDENTIFY_ENDPOINT 1
 
+#if (CHIP_CONFIG_ENABLE_ICD_SERVER == 1)
+#define LED_ENABLE 0
+#else
+#define LED_ENABLE 1
+#endif
+#define BUTTON_ENABLE 1
+
+#define OTAREQUESTOR_INIT_TIMER_DELAY_MS 10000
+
 using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::Credentials;
@@ -74,14 +91,26 @@ using namespace ::chip::DeviceLayer;
 
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
-
+#if (LED_ENABLE == 1)
 static LED_Handle sAppRedHandle;
 static LED_Handle sAppGreenHandle;
+#endif
 static Button_Handle sAppLeftHandle;
 static Button_Handle sAppRightHandle;
 static DeviceInfoProviderImpl sExampleDeviceInfoProvider;
 
 AppTask AppTask::sAppTask;
+
+void uiTurnOn(void);
+void uiTurnedOn(void);
+void uiTurnOff(void);
+void uiTurnedOff(void);
+
+void StartTimer(uint32_t aTimeoutMs);
+void CancelTimer(void);
+
+uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 static DefaultOTARequestor sRequestorCore;
@@ -101,7 +130,16 @@ void InitializeOTARequestor(void)
     sDownloader.SetImageProcessorDelegate(&sImageProcessor);
     sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
 }
+
+TimerHandle_t sOTAInitTimer = 0;
 #endif
+
+// The OTA Init Timer is only started upon the first Thread State Change
+// detected if the device is already on a Thread Network, or during the AppTask
+// Init sequence if the device is not yet on a Thread Network. Once the timer
+// has been started once, it does not need to be started again so the flag will
+// be set to false.
+bool isAppStarting = true;
 
 ::Identify stIdentify = { LIGHTING_APPLICATION_IDENTIFY_ENDPOINT, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
                           Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, AppTask::TriggerIdentifyEffectHandler };
@@ -129,55 +167,102 @@ int AppTask::StartAppTask()
     return ret;
 }
 
-// Action initiated callback
-void uiTurnOn(void)
+// Identify take action
+void identify_TakeAction(void)
 {
-    PLAT_LOG("Light On initiated");
-    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
-    LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
+#if (LED_ENABLE == 1)
+    LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
+    LED_startBlinking(sAppGreenHandle, 1000, LED_BLINK_FOREVER);
+#endif // LED_ENABLE
 }
 
-// Action completed callback
-void uiTurnedOn(void)
+// Identify stop action
+void identify_StopAction(void)
 {
-    PLAT_LOG("Light On completed");
-    LED_stopBlinking(sAppRedHandle);
-    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+#if (LED_ENABLE == 1)
+    LED_stopBlinking(sAppGreenHandle);
+    LED_setOff(sAppGreenHandle);
+#endif // LED_ENABLE
 }
 
-// Action initiated callback
-void uiTurnOff(void)
+void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
-    PLAT_LOG("Light Off initiated");
-    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
-    LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
+    switch (event->Type)
+    {
+    case DeviceEventType::kCHIPoBLEConnectionEstablished:
+        PLAT_LOG("CHIPoBLE connection established");
+        break;
+
+    case DeviceEventType::kCHIPoBLEConnectionClosed:
+        PLAT_LOG("CHIPoBLE disconnected");
+        break;
+
+    case DeviceEventType::kCommissioningComplete:
+        PLAT_LOG("Commissioning complete");
+        break;
+    case DeviceEventType::kThreadStateChange:
+        PLAT_LOG("Thread State Change");
+        bool isThreadAttached = ThreadStackMgrImpl().IsThreadAttached();
+
+        if (isThreadAttached)
+        {
+            PLAT_LOG("Device is on the Thread Network");
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+            if (isAppStarting)
+            {
+                StartTimer(OTAREQUESTOR_INIT_TIMER_DELAY_MS);
+                isAppStarting = false;
+            }
+#endif
+        }
+        break;
+    }
 }
 
-// Action completed callback
-void uiTurnedOff(void)
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+void OTAInitTimerEventHandler(TimerHandle_t xTimer)
 {
-    PLAT_LOG("Light Off completed");
-    LED_stopBlinking(sAppRedHandle);
-    LED_setOff(sAppRedHandle);
+    InitializeOTARequestor();
 }
+#endif
 
 int AppTask::Init()
 {
-    LED_Params ledParams;
-    Button_Params buttonParams;
-
     cc13xx_26xxLogInit();
 
     // Init Chip memory management before the stack
     Platform::MemoryInit();
 
+    PLAT_LOG("Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    PLAT_LOG("Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
+
         PLAT_LOG("PlatformMgr().InitChipStack() failed");
         while (1)
             ;
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    // Create FreeRTOS sw timer for OTA timer.
+    sOTAInitTimer = xTimerCreate("OTAInitTmr",                     // Just a text name, not used by the RTOS kernel
+                                 OTAREQUESTOR_INIT_TIMER_DELAY_MS, // timer period (mS)
+                                 false,                            // no timer reload (==one-shot)
+                                 (void *) this,                    // init timer id = light obj context
+                                 OTAInitTimerEventHandler          // timer callback handler
+    );
+
+    if (sOTAInitTimer == NULL)
+    {
+        PLAT_LOG("sOTAInitTimer timer create failed");
+    }
+    else
+    {
+        PLAT_LOG("sOTAInitTimer timer created successfully ");
+    }
+#endif
 
     ret = ThreadStackMgr().InitThreadStack();
     if (ret != CHIP_NO_ERROR)
@@ -186,22 +271,18 @@ int AppTask::Init()
         while (1)
             ;
     }
+
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+#elif CHIP_CONFIG_ENABLE_ICD_SERVER
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #endif
+
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
-        while (1)
-            ;
-    }
-
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        PLAT_LOG("PlatformMgr().StartEventLoopTask() failed");
         while (1)
             ;
     }
@@ -230,6 +311,9 @@ int AppTask::Init()
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
     static CommonCaseDeviceServerInitParams initParams;
+    static DefaultTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
     // Initialize info provider
@@ -238,33 +322,17 @@ int AppTask::Init()
 
     Server::GetInstance().Init(initParams);
 
-    // Initialize LEDs
-    PLAT_LOG("Initialize LEDs");
-    LED_init();
+    ret = PlatformMgr().StartEventLoopTask();
+    if (ret != CHIP_NO_ERROR)
+    {
+        PLAT_LOG("PlatformMgr().StartEventLoopTask() failed");
+        while (1)
+            ;
+    }
 
-    LED_Params_init(&ledParams); // default PWM LED
-    sAppRedHandle = LED_open(CONFIG_LED_RED, &ledParams);
-    LED_setOff(sAppRedHandle);
+    PlatformMgr().AddEventHandler(DeviceEventCallback, reinterpret_cast<intptr_t>(nullptr));
 
-    LED_Params_init(&ledParams); // default PWM LED
-    sAppGreenHandle = LED_open(CONFIG_LED_GREEN, &ledParams);
-    LED_setOff(sAppGreenHandle);
-
-    // Initialize buttons
-    PLAT_LOG("Initialize buttons");
-    Button_init();
-
-    Button_Params_init(&buttonParams);
-    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
-    buttonParams.longPressDuration = 1000U; // ms
-    sAppLeftHandle                 = Button_open(CONFIG_BTN_LEFT, &buttonParams);
-    Button_setCallback(sAppLeftHandle, ButtonLeftEventHandler);
-
-    Button_Params_init(&buttonParams);
-    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
-    buttonParams.longPressDuration = 1000U; // ms
-    sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
-    Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
+    uiInit();
 
     ret = LightMgr().Init();
 
@@ -279,9 +347,16 @@ int AppTask::Init()
 
     ConfigurationMgr().LogDeviceConfig();
 
+    bool isThreadEnabled = ThreadStackMgrImpl().IsThreadEnabled();
+    if (!isThreadEnabled && isAppStarting)
+    {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    InitializeOTARequestor();
+        PLAT_LOG("Thread is Disabled, enable OTA Requestor");
+        StartTimer(OTAREQUESTOR_INIT_TIMER_DELAY_MS);
+        isAppStarting = false;
 #endif
+    }
+
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
 
@@ -304,45 +379,33 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
-void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events)
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+void StartTimer(uint32_t aTimeoutMs)
 {
-    AppEvent event;
-    event.Type = AppEvent::kEventType_ButtonLeft;
+    PLAT_LOG("Start OTA Init Timer")
+    if (xTimerIsTimerActive(sOTAInitTimer))
+    {
+        PLAT_LOG("app timer already started!");
+        CancelTimer();
+    }
 
-    if (events & Button_EV_CLICKED)
+    // timer is not active, change its period to required value (== restart).
+    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
+    // cannot immediately be sent to the timer command queue.
+    if (xTimerChangePeriod(sOTAInitTimer, pdMS_TO_TICKS(aTimeoutMs), 100) != pdPASS)
     {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
-    }
-    else if (events & Button_EV_LONGCLICKED)
-    {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
-    }
-    // button callbacks are in ISR context
-    if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
-    {
-        /* Failed to post the message */
+        PLAT_LOG("sOTAInitTimer timer start() failed");
     }
 }
 
-void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask events)
+void CancelTimer(void)
 {
-    AppEvent event;
-    event.Type = AppEvent::kEventType_ButtonRight;
-
-    if (events & Button_EV_CLICKED)
+    if (xTimerStop(sOTAInitTimer, 0) == pdFAIL)
     {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
-    }
-    else if (events & Button_EV_LONGCLICKED)
-    {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
-    }
-    // button callbacks are in ISR context
-    if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
-    {
-        /* Failed to post the message */
+        PLAT_LOG("sOTAInitTimer stop() failed");
     }
 }
+#endif
 
 void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {
@@ -416,8 +479,12 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+            PlatformMgr().ScheduleWork([](intptr_t) { app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
+#else
             actor = AppEvent::kEventType_ButtonLeft;
             LightMgr().InitiateAction(actor, LightingManager::ON_ACTION);
+#endif
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {
@@ -429,7 +496,12 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
             actor = AppEvent::kEventType_ButtonRight;
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+            LightMgr().IsLightOn() ? LightMgr().InitiateAction(actor, LightingManager::OFF_ACTION)
+                                   : LightMgr().InitiateAction(actor, LightingManager::ON_ACTION);
+#else
             LightMgr().InitiateAction(actor, LightingManager::OFF_ACTION);
+#endif
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {
@@ -458,16 +530,13 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         switch (identify_trigger_effect)
         {
         case IDENTIFY_TRIGGER_EFFECT_BLINK:
-            LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
-            LED_startBlinking(sAppGreenHandle, 1000, LED_BLINK_FOREVER);
+            identify_TakeAction();
             break;
         case IDENTIFY_TRIGGER_EFFECT_BREATHE:
-            LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
-            LED_startBlinking(sAppGreenHandle, 100, LED_BLINK_FOREVER);
+            identify_TakeAction();
             break;
         case IDENTIFY_TRIGGER_EFFECT_OKAY:
-            LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
-            LED_startBlinking(sAppGreenHandle, 500, LED_BLINK_FOREVER);
+            identify_TakeAction();
             break;
         default:
             break;
@@ -475,9 +544,16 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         PLAT_LOG("Identify started");
         break;
 
+    case AppEvent::kEventType_Identify:
+        // blink LED
+        PLAT_LOG("Identify cmd received, will blink green led three times now");
+#if (LED_ENABLE == 1)
+        LED_startBlinking(sAppGreenHandle, 250, 3);
+#endif
+        break;
+
     case AppEvent::kEventType_IdentifyStop:
-        LED_stopBlinking(sAppGreenHandle);
-        LED_setOff(sAppGreenHandle);
+        identify_StopAction();
         PLAT_LOG("Identify stopped");
         break;
 
@@ -543,4 +619,126 @@ void AppTask::TriggerIdentifyEffectHandler(::Identify * identify)
     default:
         PLAT_LOG("No identifier effect");
     }
+}
+
+// Action initiated callback
+void uiTurnOn(void)
+{
+    PLAT_LOG("Light On initiated");
+#if (LED_ENABLE == 1)
+    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+    LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
+#endif // LED_ENABLE
+}
+
+// Action completed callback
+void uiTurnedOn(void)
+{
+    PLAT_LOG("Light On completed");
+#if (LED_ENABLE == 1)
+    LED_stopBlinking(sAppRedHandle);
+    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+#endif // LED_ENABLE
+}
+
+// Action initiated callback
+void uiTurnOff(void)
+{
+    PLAT_LOG("Light Off initiated");
+#if (LED_ENABLE == 1)
+    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+    LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
+#endif // LED_ENABLE
+}
+
+// Action completed callback
+void uiTurnedOff(void)
+{
+    PLAT_LOG("Light Off completed");
+#if (LED_ENABLE == 1)
+    LED_stopBlinking(sAppRedHandle);
+    LED_setOff(sAppRedHandle);
+#endif // LED_ENABLE
+}
+
+#if (BUTTON_ENABLE == 1)
+void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events)
+{
+    AppEvent event;
+    event.Type = AppEvent::kEventType_ButtonLeft;
+
+    if (events & Button_EV_CLICKED)
+    {
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
+    }
+    else if (events & Button_EV_LONGCLICKED)
+    {
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
+    }
+    // button callbacks are in ISR context
+    if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
+    {
+        /* Failed to post the message */
+    }
+}
+
+void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask events)
+{
+    AppEvent event;
+    event.Type = AppEvent::kEventType_ButtonRight;
+
+    if (events & Button_EV_CLICKED)
+    {
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
+    }
+    else if (events & Button_EV_LONGCLICKED)
+    {
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
+    }
+    // button callbacks are in ISR context
+    if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
+    {
+        /* Failed to post the message */
+    }
+}
+#endif // BUTTON_ENABLE
+
+void AppTask::uiInit(void)
+{
+#if (LED_ENABLE == 1)
+
+    LED_Params ledParams;
+
+    // Initialize LEDs
+    PLAT_LOG("Initialize LEDs");
+    LED_init();
+
+    LED_Params_init(&ledParams); // default PWM LED
+    sAppRedHandle = LED_open(CONFIG_LED_RED, &ledParams);
+    LED_setOff(sAppRedHandle);
+
+    LED_Params_init(&ledParams); // default PWM LED
+    sAppGreenHandle = LED_open(CONFIG_LED_GREEN, &ledParams);
+    LED_setOff(sAppGreenHandle);
+#endif // LED ENABLE
+
+#if (BUTTON_ENABLE == 1)
+    Button_Params buttonParams;
+
+    // Initialize buttons
+    PLAT_LOG("Initialize buttons");
+    Button_init();
+
+    Button_Params_init(&buttonParams);
+    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
+    buttonParams.longPressDuration = 1000U; // ms
+    sAppLeftHandle                 = Button_open(CONFIG_BTN_LEFT, &buttonParams);
+    Button_setCallback(sAppLeftHandle, ButtonLeftEventHandler);
+
+    Button_Params_init(&buttonParams);
+    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
+    buttonParams.longPressDuration = 1000U; // ms
+    sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
+    Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
+#endif // BUTTON ENABLE
 }

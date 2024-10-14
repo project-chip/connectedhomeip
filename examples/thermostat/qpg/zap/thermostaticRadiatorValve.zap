@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 100,
+  "featureLevel": 103,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -29,6 +29,7 @@
       "pathRelativity": "relativeToZap",
       "path": "../../../../src/app/zap-templates/app-templates.json",
       "type": "gen-templates-json",
+      "category": "matter",
       "version": "chip-v1"
     }
   ],
@@ -60,90 +61,6 @@
       "deviceTypeCode": 22,
       "deviceTypeProfileId": 259,
       "clusters": [
-        {
-          "name": "Identify",
-          "code": 3,
-          "mfgCode": null,
-          "define": "IDENTIFY_CLUSTER",
-          "side": "server",
-          "enabled": 1,
-          "commands": [
-            {
-              "name": "Identify",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            }
-          ],
-          "attributes": [
-            {
-              "name": "IdentifyTime",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x0000",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "IdentifyType",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "type": "IdentifyTypeEnum",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x0",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "FeatureMap",
-              "code": 65532,
-              "mfgCode": null,
-              "side": "server",
-              "type": "bitmap32",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "4",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
         {
           "name": "Descriptor",
           "code": 29,
@@ -911,24 +828,6 @@
               "isIncoming": 0,
               "isEnabled": 1
             }
-          ],
-          "attributes": [
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "1",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
           ]
         },
         {
@@ -1494,6 +1393,38 @@
               "type": "int32s",
               "included": 1,
               "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "SupportedThreadFeatures",
+              "code": 9,
+              "mfgCode": null,
+              "side": "server",
+              "type": "ThreadCapabilitiesBitmap",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ThreadVersion",
+              "code": 10,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -3604,24 +3535,6 @@
               "isIncoming": 0,
               "isEnabled": 1
             }
-          ],
-          "attributes": [
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "4",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
           ]
         },
         {
@@ -4065,7 +3978,7 @@
               "code": 17,
               "mfgCode": null,
               "side": "server",
-              "type": "int16s",
+              "type": "temperature",
               "included": 1,
               "storageOption": "NVM",
               "singleton": 0,
@@ -4081,7 +3994,7 @@
               "code": 18,
               "mfgCode": null,
               "side": "server",
-              "type": "int16s",
+              "type": "temperature",
               "included": 1,
               "storageOption": "NVM",
               "singleton": 0,
@@ -4097,7 +4010,7 @@
               "code": 21,
               "mfgCode": null,
               "side": "server",
-              "type": "int16s",
+              "type": "temperature",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -4113,7 +4026,7 @@
               "code": 22,
               "mfgCode": null,
               "side": "server",
-              "type": "int16s",
+              "type": "temperature",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -4129,7 +4042,7 @@
               "code": 23,
               "mfgCode": null,
               "side": "server",
-              "type": "int16s",
+              "type": "temperature",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -4145,7 +4058,7 @@
               "code": 24,
               "mfgCode": null,
               "side": "server",
-              "type": "int16s",
+              "type": "temperature",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,

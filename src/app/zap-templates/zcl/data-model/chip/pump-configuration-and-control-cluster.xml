@@ -25,6 +25,31 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="3"/>
+
+    <features>
+      <feature bit="0" code="PRSCONST" name="ConstantPressure" summary="Supports operating in constant pressure mode">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="PRSCOMP" name="CompensatedPressure" summary="Supports operating in compensated pressure mode">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="2" code="FLW" name="ConstantFlow" summary="Supports operating in constant flow mode">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="3" code="SPD" name="ConstantSpeed" summary="Supports operating in constant speed mode">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="4" code="TEMP" name="ConstantTemperature" summary="Supports operating in constant temperature mode">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="5" code="AUTO" name="Automatic" summary="Supports operating in automatic mode">
+        <optionalConform/>
+      </feature>
+      <feature bit="6" code="LOCAL" name="LocalOperation" summary="Supports operating using local settings">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="MAX_PRESSURE" type="int16s" isNullable="true" min="0x8001" max="0x7FFF" writable="false" optional="false">MaxPressure</attribute>
     <attribute side="server" code="0x0001" define="MAX_SPEED" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="false">MaxSpeed</attribute>
     <attribute side="server" code="0x0002" define="MAX_FLOW" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="false">MaxFlow</attribute>
@@ -149,15 +174,5 @@ limitations under the License.
     <item name="Automatic" value="0x7"/>
   </enum>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0200"/>
-    <field mask="0x01" name="ConstantPressure" />
-    <field mask="0x02" name="CompensatedPressure" />
-    <field mask="0x04" name="ConstantFlow"/>
-    <field mask="0x08" name="ConstantSpeed"/>
-    <field mask="0x10" name="ConstantTemperature"/>
-    <field mask="0x20" name="Automatic"/>
-    <field mask="0x40" name="LocalOperation"/>
-  </bitmap>
 
 </configurator>

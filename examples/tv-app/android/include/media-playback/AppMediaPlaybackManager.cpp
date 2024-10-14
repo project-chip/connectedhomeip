@@ -26,7 +26,8 @@
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 
-using namespace std;
+#include <string>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
@@ -202,7 +203,7 @@ uint64_t AppMediaPlaybackManager::HandleMediaRequestGetAttribute(chip::Attribute
         Json::Value value;
         if (reader.parse(resStr, value))
         {
-            std::string attrId = to_string(attributeId);
+            std::string attrId = std::to_string(attributeId);
             ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleMediaRequestGetAttribute response parsing done. reading attr %s",
                             attrId.c_str());
             if (!value[attrId].empty() && value[attrId].isUInt())
@@ -248,14 +249,14 @@ CHIP_ERROR AppMediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncod
         Json::Value value;
         if (reader.parse(resStr, value))
         {
-            std::string attrId = to_string(chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::Id);
+            std::string attrId = std::to_string(chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::Id);
             ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSampledPosition response parsing done. reading attr %s",
                             attrId.c_str());
             if (!value[attrId].empty() && value[attrId].isObject())
             {
-                std::string updatedAt = to_string(
+                std::string updatedAt = std::to_string(
                     static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::Fields::kUpdatedAt));
-                std::string position = to_string(
+                std::string position = std::to_string(
                     static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::Fields::kPosition));
                 if (!value[attrId][updatedAt].empty() && !value[attrId][position].empty() && value[attrId][updatedAt].isUInt() &&
                     value[attrId][position].isUInt())

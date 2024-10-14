@@ -16,6 +16,9 @@ name: Doxygen
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'   
         paths:
             - "**.do[xc]"
             - "**.c[cs]?"
@@ -81,7 +84,7 @@ jobs:
 
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build-doxygen:41
+            image: ghcr.io/project-chip/chip-build-doxygen:81
 
         if: github.actor != 'restyled-io[bot]'
 

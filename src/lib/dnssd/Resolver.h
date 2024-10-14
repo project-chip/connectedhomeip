@@ -19,13 +19,13 @@
 
 #include <cstdint>
 #include <limits>
+#include <optional>
 #include <utility>
 
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
 #include <lib/core/ReferenceCounted.h>
 #include <lib/dnssd/Constants.h>
@@ -74,16 +74,16 @@ public:
 class DiscoveryContext : public ReferenceCounted<DiscoveryContext>
 {
 public:
-    void SetBrowseIdentifier(intptr_t identifier) { mBrowseIdentifier.Emplace(identifier); }
-    void ClearBrowseIdentifier() { mBrowseIdentifier.ClearValue(); }
-    const Optional<intptr_t> & GetBrowseIdentifier() const { return mBrowseIdentifier; }
+    void SetBrowseIdentifier(intptr_t identifier) { mBrowseIdentifier.emplace(identifier); }
+    void ClearBrowseIdentifier() { mBrowseIdentifier.reset(); }
+    const std::optional<intptr_t> & GetBrowseIdentifier() const { return mBrowseIdentifier; }
 
-    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) { mCommissioningDelegate = delegate; }
+    void SetDiscoveryDelegate(DiscoverNodeDelegate * delegate) { mDelegate = delegate; }
     void OnNodeDiscovered(const DiscoveredNodeData & nodeData)
     {
-        if (mCommissioningDelegate != nullptr)
+        if (mDelegate != nullptr)
         {
-            mCommissioningDelegate->OnNodeDiscovered(nodeData);
+            mDelegate->OnNodeDiscovered(nodeData);
         }
         else
         {
@@ -92,8 +92,8 @@ public:
     }
 
 private:
-    CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
-    Optional<intptr_t> mBrowseIdentifier;
+    DiscoverNodeDelegate * mDelegate = nullptr;
+    std::optional<intptr_t> mBrowseIdentifier;
 };
 
 /**
@@ -168,31 +168,19 @@ public:
     virtual void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) = 0;
 
     /**
-     * Finds all commissionable nodes matching the given filter.
+     * Finds all nodes of given type matching the given filter.
      *
      * Whenever a new matching node is found, the node information is passed to
-     * the `OnNodeDiscovered` method of the commissioning delegate configured
+     * the `OnNodeDiscovered` method of the discovery delegate configured
      * in the context object.
      *
      * This method is expected to increase the reference count of the context
      * object for as long as it takes to complete the discovery request.
      */
-    virtual CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context) = 0;
+    virtual CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context) = 0;
 
     /**
-     * Finds all commissioner nodes matching the given filter.
-     *
-     * Whenever a new matching node is found, the node information is passed to
-     * the `OnNodeDiscovered` method of the commissioning delegate configured
-     * in the context object.
-     *
-     * This method is expected to increase the reference count of the context
-     * object for as long as it takes to complete the discovery request.
-     */
-    virtual CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context) = 0;
-
-    /**
-     * Stop discovery (of commissionable or commissioner nodes).
+     * Stop discovery (of all node types).
      *
      * Some back ends may not support stopping discovery, so consumers should
      * not assume they will stop getting callbacks after calling this.
@@ -206,10 +194,27 @@ public:
     virtual CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) = 0;
 
     /**
-     * Provides the system-wide implementation of the service resolver
+     * Returns the system-wide implementation of the service resolver.
+     *
+     * The method returns a reference to the resolver object configured by
+     * a user using the \c Resolver::SetInstance() method, or the default
+     * resolver returned by the \c GetDefaultResolver() function.
      */
     static Resolver & Instance();
+
+    /**
+     * Overrides the default implementation of the service resolver
+     */
+    static void SetInstance(Resolver & resolver);
+
+private:
+    static Resolver * sInstance;
 };
+
+/**
+ * Returns the default implementation of the service resolver.
+ */
+extern Resolver & GetDefaultResolver();
 
 } // namespace Dnssd
 } // namespace chip

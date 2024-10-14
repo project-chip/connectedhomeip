@@ -24,20 +24,18 @@ namespace Crypto {
 
 namespace {
 
-class AesKeyAttributes
+class KeyAttributesBase
 {
 public:
-    AesKeyAttributes()
+    KeyAttributesBase(psa_key_type_t type, psa_algorithm_t algorithm, psa_key_usage_t usageFlags, size_t bits)
     {
-        constexpr psa_algorithm_t kAlgorithm = PSA_ALG_AEAD_WITH_AT_LEAST_THIS_LENGTH_TAG(PSA_ALG_CCM, 8);
-
-        psa_set_key_type(&mAttrs, PSA_KEY_TYPE_AES);
-        psa_set_key_algorithm(&mAttrs, kAlgorithm);
-        psa_set_key_usage_flags(&mAttrs, PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT);
-        psa_set_key_bits(&mAttrs, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES * 8);
+        psa_set_key_type(&mAttrs, type);
+        psa_set_key_algorithm(&mAttrs, algorithm);
+        psa_set_key_usage_flags(&mAttrs, usageFlags);
+        psa_set_key_bits(&mAttrs, bits);
     }
 
-    ~AesKeyAttributes() { psa_reset_key_attributes(&mAttrs); }
+    ~KeyAttributesBase() { psa_reset_key_attributes(&mAttrs); }
 
     const psa_key_attributes_t & Get() { return mAttrs; }
 
@@ -45,53 +43,50 @@ private:
     psa_key_attributes_t mAttrs = PSA_KEY_ATTRIBUTES_INIT;
 };
 
-class HmacKeyAttributes
+class AesKeyAttributes : public KeyAttributesBase
 {
 public:
-    HmacKeyAttributes()
-    {
-        psa_set_key_type(&mAttrs, PSA_KEY_TYPE_HMAC);
-        psa_set_key_algorithm(&mAttrs, PSA_ALG_HMAC(PSA_ALG_SHA_256));
-        psa_set_key_usage_flags(&mAttrs, PSA_KEY_USAGE_SIGN_MESSAGE);
-        psa_set_key_bits(&mAttrs, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES * 8);
-    }
-
-    ~HmacKeyAttributes() { psa_reset_key_attributes(&mAttrs); }
-
-    const psa_key_attributes_t & Get() { return mAttrs; }
-
-private:
-    psa_key_attributes_t mAttrs = PSA_KEY_ATTRIBUTES_INIT;
+    AesKeyAttributes() :
+        KeyAttributesBase(PSA_KEY_TYPE_AES, PSA_ALG_AEAD_WITH_AT_LEAST_THIS_LENGTH_TAG(PSA_ALG_CCM, 8),
+                          PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT | PSA_KEY_USAGE_COPY,
+                          CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES * 8)
+    {}
 };
 
-class HkdfKeyAttributes
+class HmacKeyAttributes : public KeyAttributesBase
 {
 public:
-    HkdfKeyAttributes()
-    {
-        psa_set_key_type(&mAttrs, PSA_KEY_TYPE_DERIVE);
-        psa_set_key_algorithm(&mAttrs, PSA_ALG_HKDF(PSA_ALG_SHA_256));
-        psa_set_key_usage_flags(&mAttrs, PSA_KEY_USAGE_DERIVE);
-    }
-
-    ~HkdfKeyAttributes() { psa_reset_key_attributes(&mAttrs); }
-
-    const psa_key_attributes_t & Get() { return mAttrs; }
-
-private:
-    psa_key_attributes_t mAttrs = PSA_KEY_ATTRIBUTES_INIT;
+    HmacKeyAttributes() :
+        KeyAttributesBase(PSA_KEY_TYPE_HMAC, PSA_ALG_HMAC(PSA_ALG_SHA_256), PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_COPY,
+                          CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES * 8)
+    {}
 };
 
+class HkdfKeyAttributes : public KeyAttributesBase
+{
+public:
+    HkdfKeyAttributes() : KeyAttributesBase(PSA_KEY_TYPE_DERIVE, PSA_ALG_HKDF(PSA_ALG_SHA_256), PSA_KEY_USAGE_DERIVE, 0) {}
+};
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+void SetKeyId(Symmetric128BitsKeyHandle & key, psa_key_id_t newKeyId)
+{
+    auto & KeyId = key.AsMutable<psa_key_id_t>();
+
+    KeyId = newKeyId;
+}
+#endif
 } // namespace
 
 CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key)
 {
     // Destroy the old key if already allocated
-    psa_destroy_key(key.As<psa_key_id_t>());
+    DestroyKey(key);
 
     AesKeyAttributes attrs;
     psa_status_t status =
         psa_import_key(&attrs.Get(), keyMaterial, sizeof(Symmetric128BitsKeyByteArray), &key.AsMutable<psa_key_id_t>());
+    LogPsaError(status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -100,12 +95,12 @@ CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & ke
 CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128KeyHandle & key)
 {
     // Destroy the old key if already allocated
-    psa_destroy_key(key.As<psa_key_id_t>());
+    DestroyKey(key);
 
     HmacKeyAttributes attrs;
     psa_status_t status =
         psa_import_key(&attrs.Get(), keyMaterial, sizeof(Symmetric128BitsKeyByteArray), &key.AsMutable<psa_key_id_t>());
-
+    LogPsaError(status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -118,7 +113,7 @@ CHIP_ERROR PSASessionKeystore::CreateKey(const ByteSpan & keyMaterial, HkdfKeyHa
 
     HkdfKeyAttributes attrs;
     psa_status_t status = psa_import_key(&attrs.Get(), keyMaterial.data(), keyMaterial.size(), &key.AsMutable<psa_key_id_t>());
-
+    LogPsaError(status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -188,8 +183,42 @@ void PSASessionKeystore::DestroyKey(HkdfKeyHandle & key)
     auto & keyId = key.AsMutable<psa_key_id_t>();
 
     psa_destroy_key(keyId);
-    keyId = 0;
+    keyId = PSA_KEY_ID_NULL;
 }
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+CHIP_ERROR PSASessionKeystore::PersistICDKey(Symmetric128BitsKeyHandle & key)
+{
+    CHIP_ERROR err;
+    psa_key_id_t newKeyId = PSA_KEY_ID_NULL;
+    psa_key_attributes_t attrs;
+
+    psa_get_key_attributes(key.As<psa_key_id_t>(), &attrs);
+
+    // Exit early if key is already persistent
+    if (psa_get_key_lifetime(&attrs) == PSA_KEY_LIFETIME_PERSISTENT)
+    {
+        psa_reset_key_attributes(&attrs);
+        return CHIP_NO_ERROR;
+    }
+
+    SuccessOrExit(err = Crypto::FindFreeKeySlotInRange(newKeyId, to_underlying(KeyIdBase::ICDKeyRangeStart), kMaxICDClientKeys));
+    psa_set_key_lifetime(&attrs, PSA_KEY_LIFETIME_PERSISTENT);
+    psa_set_key_id(&attrs, newKeyId);
+    VerifyOrExit(psa_copy_key(key.As<psa_key_id_t>(), &attrs, &newKeyId) == PSA_SUCCESS, err = CHIP_ERROR_INTERNAL);
+
+exit:
+    DestroyKey(key);
+    psa_reset_key_attributes(&attrs);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        SetKeyId(key, newKeyId);
+    }
+
+    return err;
+}
+#endif
 
 } // namespace Crypto
 } // namespace chip

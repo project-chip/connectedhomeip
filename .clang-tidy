@@ -12,6 +12,7 @@ Checks: >
   readability-redundant-string-init,
   -bugprone-assignment-in-if-condition,
   -bugprone-branch-clone,
+  -bugprone-casting-through-void, #TODO remove this after fixing issues in source code, issue 34008
   -bugprone-copy-constructor-init,
   -bugprone-easily-swappable-parameters,
   -bugprone-forward-declaration-namespace,
@@ -23,6 +24,7 @@ Checks: >
   -bugprone-multi-level-implicit-pointer-conversion,
   -bugprone-narrowing-conversions,
   -bugprone-not-null-terminated-result,
+  -bugprone-pointer-arithmetic-on-polymorphic-object,
   -bugprone-reserved-identifier,
   -bugprone-signed-char-misuse,
   -bugprone-suspicious-include,
@@ -44,6 +46,7 @@ Checks: >
   -clang-analyzer-security.insecureAPI.rand,
   -clang-analyzer-security.insecureAPI.strcpy,
   -clang-analyzer-unix.Malloc,
-  -clang-diagnostic-implicit-int-conversion
+  -clang-diagnostic-implicit-int-conversion,
+  -clang-diagnostic-missing-template-arg-list-after-template-kw
 WarningsAsErrors: '*'
 HeaderFilterRegex: '(src|examples|zzz_generated|credentials).*(?<!third_party.*repo)'

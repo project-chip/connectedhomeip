@@ -89,9 +89,9 @@ private:
     using NotificationsDelegates = std::vector<BluezObjectManagerAdapterNotificationsDelegate *>;
     NotificationsDelegates GetDeviceNotificationsDelegates(BluezDevice1 * device);
 
-    void OnObjectAdded(GDBusObjectManager * aMgr, GDBusObject * aObj);
-    void OnObjectRemoved(GDBusObjectManager * aMgr, GDBusObject * aObj);
-    void OnInterfacePropertiesChanged(GDBusObjectManagerClient * aMgr, GDBusObjectProxy * aObj, GDBusProxy * aIface,
+    void OnObjectAdded(GDBusObjectManager * aMgr, BluezObject * aObj);
+    void OnObjectRemoved(GDBusObjectManager * aMgr, BluezObject * aObj);
+    void OnInterfacePropertiesChanged(GDBusObjectManagerClient * aMgr, BluezObject * aObj, GDBusProxy * aIface,
                                       GVariant * aChangedProps, const char * const * aInvalidatedProps);
 
     GAutoPtr<GDBusConnection> mConnection;

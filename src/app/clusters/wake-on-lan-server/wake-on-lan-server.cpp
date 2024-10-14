@@ -26,6 +26,7 @@
 #include <app/clusters/wake-on-lan-server/wake-on-lan-server.h>
 
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
@@ -141,5 +142,5 @@ CHIP_ERROR WakeOnLanAttrAccess::ReadMacAddressAttribute(app::AttributeValueEncod
 
 void MatterWakeOnLanPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gWakeOnLanAttrAccess);
+    app::AttributeAccessInterfaceRegistry::Instance().Register(&gWakeOnLanAttrAccess);
 }

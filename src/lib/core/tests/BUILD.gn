@@ -14,40 +14,58 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/build/chip/fuzz_test.gni")
 
-chip_test_suite_using_nltest("tests") {
+chip_test_suite("tests") {
   output_name = "libCoreTests"
 
   test_sources = [
     "TestCATValues.cpp",
     "TestCHIPCallback.cpp",
+    "TestCHIPError.cpp",
     "TestCHIPErrorStr.cpp",
+    "TestGroupedCallbackList.cpp",
     "TestOTAImageHeader.cpp",
     "TestOptional.cpp",
     "TestReferenceCounted.cpp",
     "TestTLV.cpp",
-    "TestTLVVectorWriter.cpp",
   ]
+
+  # requires large amount of heap for multiple unfragmented 10k buffers
+  # skip for efr32 to allow flash space for other tests
+  if (chip_device_platform != "efr32") {
+    test_sources += [ "TestTLVVectorWriter.cpp" ]
+  }
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/core:vectortlv",
     "${chip_root}/src/lib/support:test_utils",
-    "${chip_root}/src/lib/support:testing_nlunit",
     "${chip_root}/src/platform",
-    "${nlunit_test_root}:nlunit-test",
   ]
 }
 
 if (enable_fuzz_test_targets) {
   chip_fuzz_target("fuzz-tlv-reader") {
     sources = [ "FuzzTlvReader.cpp" ]
-    public_deps = [ "${chip_root}/src/lib/core" ]
+    public_deps = [
+      "${chip_root}/src/lib/core",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
+}
+
+if (pw_enable_fuzz_test_targets) {
+  chip_pw_fuzz_target("fuzz-tlv-reader-pw") {
+    test_source = [ "FuzzTlvReaderPW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/lib/core",
+      "${chip_root}/src/platform/logging:default",
+    ]
   }
 }

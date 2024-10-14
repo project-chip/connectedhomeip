@@ -29,6 +29,7 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <assert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -40,6 +41,7 @@
 #include <DeviceInfoProviderImpl.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/Infineon/PSOC6/NetworkCommissioningDriver.h>
+#include <static-supported-modes-manager.h>
 #include <static-supported-temperature-levels.h>
 
 /* OTA related includes */
@@ -97,6 +99,7 @@ OTAImageProcessorImpl gImageProcessor;
 #endif
 
 chip::app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+chip::app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 } // namespace
 
 using namespace ::chip;
@@ -140,6 +143,7 @@ static void InitServer(intptr_t context)
     GetAppTask().InitOTARequestor();
 #endif
     chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    chip::app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 }
 
 CHIP_ERROR AppTask::StartAppTask()
@@ -147,7 +151,7 @@ CHIP_ERROR AppTask::StartAppTask()
     sAppEventQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
     if (sAppEventQueue == NULL)
     {
-        P6_LOG("Failed to allocate app event queue");
+        PSOC6_LOG("Failed to allocate app event queue");
         appError(APP_ERROR_EVENT_QUEUE_FAILED);
     }
     // Start App task.
@@ -159,10 +163,10 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    int rc = boot_set_confirmed();
+    int rc = flash_area_boot_set_confirmed();
     if (rc != 0)
     {
-        P6_LOG("boot_set_confirmed failed");
+        PSOC6_LOG("flash_area_boot_set_confirmed failed");
         appError(CHIP_ERROR_UNINITIALIZED);
     }
 #endif
@@ -195,11 +199,11 @@ CHIP_ERROR AppTask::Init()
     );
     if (sFunctionTimer == NULL)
     {
-        P6_LOG("funct timer create failed");
+        PSOC6_LOG("funct timer create failed");
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
     NetWorkCommissioningInstInit();
-    P6_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+    PSOC6_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
     // Initialize LEDs
     sStatusLED.Init(SYSTEM_STATE_LED);
@@ -220,11 +224,11 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        P6_LOG("AppTask.Init() failed");
+        PSOC6_LOG("AppTask.Init() failed");
         appError(err);
     }
 
-    P6_LOG("App Task started");
+    PSOC6_LOG("App Task started");
 
     while (true)
     {
@@ -300,7 +304,8 @@ void AppTask::FunctionHandler(AppEvent * event)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kNoneSelected)
         {
-            P6_LOG("Factory Reset Triggered. Press button again within %us to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT / 1000);
+            PSOC6_LOG("Factory Reset Triggered. Press button again within %us to cancel.",
+                      FACTORY_RESET_CANCEL_WINDOW_TIMEOUT / 1000);
             // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
             // cancel, if required.
             sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
@@ -324,7 +329,7 @@ void AppTask::FunctionHandler(AppEvent * event)
             // canceled.
             sAppTask.mFunction = Function::kNoneSelected;
 
-            P6_LOG("Factory Reset has been Canceled");
+            PSOC6_LOG("Factory Reset has been Canceled");
         }
     }
 }
@@ -333,7 +338,7 @@ void AppTask::CancelTimer()
 {
     if (xTimerStop(sFunctionTimer, 0) == pdFAIL)
     {
-        P6_LOG("app timer stop() failed");
+        PSOC6_LOG("app timer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 
@@ -344,7 +349,7 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
 {
     if (xTimerIsTimerActive(sFunctionTimer))
     {
-        P6_LOG("app timer already started!");
+        PSOC6_LOG("app timer already started!");
         CancelTimer();
     }
 
@@ -353,7 +358,7 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     // cannot immediately be sent to the timer command queue.
     if (xTimerChangePeriod(sFunctionTimer, aTimeoutInMs / portTICK_PERIOD_MS, 100) != pdPASS)
     {
-        P6_LOG("app timer start() failed");
+        PSOC6_LOG("app timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 
@@ -384,11 +389,11 @@ void AppTask::PostEvent(const AppEvent * event)
         }
 
         if (!status)
-            P6_LOG("Failed to post event to app task event queue");
+            PSOC6_LOG("Failed to post event to app task event queue");
     }
     else
     {
-        P6_LOG("Event Queue is NULL should never happen");
+        PSOC6_LOG("Event Queue is NULL should never happen");
     }
 }
 
@@ -400,7 +405,7 @@ void AppTask::DispatchEvent(AppEvent * event)
     }
     else
     {
-        P6_LOG("Event received with no handler. Dropping event.");
+        PSOC6_LOG("Event received with no handler. Dropping event.");
     }
 }
 
@@ -413,7 +418,7 @@ void AppTask::OnOffUpdateClusterState(intptr_t context)
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        P6_LOG("ERR: updating on/off %x", to_underlying(status));
+        PSOC6_LOG("ERR: updating on/off %x", to_underlying(status));
     }
 }
 
@@ -434,7 +439,7 @@ void AppTask::InitOTARequestor()
 
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-    P6_LOG("Current Software Version: %u", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
-    P6_LOG("Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+    PSOC6_LOG("Current Software Version: %u", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    PSOC6_LOG("Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 }
 #endif

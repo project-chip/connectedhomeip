@@ -19,14 +19,19 @@
 
 #include "Device.h"
 
+#include <crypto/RandUtils.h>
 #include <cstdio>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <string>
+
+using namespace chip;
 using namespace chip::app::Clusters::Actions;
 
 Device::Device(const char * szDeviceName, std::string szLocation)
 {
     chip::Platform::CopyString(mName, szDeviceName);
+    chip::Platform::CopyString(mUniqueId, "");
     mLocation   = szLocation;
     mReachable  = false;
     mEndpointId = 0;
@@ -72,6 +77,12 @@ void Device::SetName(const char * szName)
     }
 }
 
+void Device::SetUniqueId(const char * szDeviceUniqueId)
+{
+    chip::Platform::CopyString(mUniqueId, szDeviceUniqueId);
+    ChipLogProgress(DeviceLayer, "Device[%s]: New UniqueId=\"%s\"", mName, mUniqueId);
+}
+
 void Device::SetLocation(std::string szLocation)
 {
     bool changed = (mLocation.compare(szLocation) != 0);
@@ -84,6 +95,23 @@ void Device::SetLocation(std::string szLocation)
     {
         HandleDeviceChange(this, kChanged_Location);
     }
+}
+
+void Device::GenerateUniqueId()
+{
+    // Ensure the buffer is zeroed out
+    memset(mUniqueId, 0, kDeviceUniqueIdSize + 1);
+
+    static const char kRandCharChoices[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    // Prefix the generated value with "GEN-"
+    memcpy(mUniqueId, "GEN-", 4);
+    for (unsigned idx = 4; idx < kDeviceUniqueIdSize; idx++)
+    {
+        mUniqueId[idx] = kRandCharChoices[Crypto::GetRandU8() % (sizeof(kRandCharChoices) - 1)];
+    }
+
+    mUniqueId[kDeviceUniqueIdSize] = '\0'; // Ensure null-termination
 }
 
 DeviceOnOff::DeviceOnOff(const char * szDeviceName, std::string szLocation) : Device(szDeviceName, szLocation)

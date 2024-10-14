@@ -18,6 +18,12 @@
 
 #pragma once
 
+#include <access/AccessConfig.h>
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+#include "AccessRestrictionProvider.h"
+#endif
+
 #include "Privilege.h"
 #include "RequestPath.h"
 #include "SubjectDescriptor.h"
@@ -627,9 +633,28 @@ public:
     // Removes a listener from the listener list, if in the list.
     void RemoveEntryListener(EntryListener & listener);
 
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    // Set an optional AcceessRestriction object for MNGD feature.
+    void SetAccessRestrictionProvider(AccessRestrictionProvider * accessRestrictionProvider)
+    {
+        mAccessRestrictionProvider = accessRestrictionProvider;
+    }
+
+    AccessRestrictionProvider * GetAccessRestrictionProvider() { return mAccessRestrictionProvider; }
+#endif
+
+    /**
+     * Check whether or not Access Restriction List is supported.
+     *
+     * @retval true if Access Restriction List is supported.
+     */
+    bool IsAccessRestrictionListSupported() const;
+
     /**
      * Check whether access (by a subject descriptor, to a request path,
      * requiring a privilege) should be allowed or denied.
+     *
+     * If an AccessRestrictionProvider object is set, it will be checked for additional access restrictions.
      *
      * @retval #CHIP_ERROR_ACCESS_DENIED if denied.
      * @retval other errors should also be treated as denied.
@@ -649,12 +674,29 @@ private:
     void NotifyEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry * entry,
                             EntryListener::ChangeType changeType);
 
+    /**
+     * Check ACL for whether access (by a subject descriptor, to a request path,
+     * requiring a privilege) should be allowed or denied.
+     */
+    CHIP_ERROR CheckACL(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege);
+
+    /**
+     * Check CommissioningARL or ARL (as appropriate) for whether access (by a
+     * subject descriptor, to a request path, requiring a privilege) should
+     * be allowed or denied.
+     */
+    CHIP_ERROR CheckARL(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege);
+
 private:
     Delegate * mDelegate = nullptr;
 
     DeviceTypeResolver * mDeviceTypeResolver = nullptr;
 
     EntryListener * mEntryListener = nullptr;
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    AccessRestrictionProvider * mAccessRestrictionProvider;
+#endif
 };
 
 /**

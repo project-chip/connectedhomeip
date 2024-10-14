@@ -554,13 +554,18 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
 
     ReturnErrorOnFailure(ret);
 
-    Access::RequestPath requestPath{ .cluster = event.mClusterId, .endpoint = event.mEndpointId };
+    Access::RequestPath requestPath{ .cluster     = event.mClusterId,
+                                     .endpoint    = event.mEndpointId,
+                                     .requestType = Access::RequestType::kEventReadRequest,
+                                     .entityId    = event.mEventId };
     Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
     CHIP_ERROR accessControlError =
         Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);
     if (accessControlError != CHIP_NO_ERROR)
     {
-        ReturnErrorCodeIf(accessControlError != CHIP_ERROR_ACCESS_DENIED, accessControlError);
+        ReturnErrorCodeIf((accessControlError != CHIP_ERROR_ACCESS_DENIED) &&
+                              (accessControlError != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL),
+                          accessControlError);
         ret = CHIP_ERROR_UNEXPECTED_EVENT;
     }
 
@@ -850,6 +855,12 @@ void EventManagement::SetScheduledEventInfo(EventNumber & aEventNumber, uint32_t
     aInitialWrittenEventBytes = mBytesWritten;
 }
 
+CHIP_ERROR EventManagement::GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
+                                          EventNumber & generatedEventNumber)
+{
+    return LogEvent(eventPayloadWriter, options, generatedEventNumber);
+}
+
 void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev,
                                CircularEventBuffer * apNext, PriorityLevel aPriorityLevel)
 {
@@ -909,5 +920,6 @@ CHIP_ERROR CircularEventBufferWrapper::GetNextBuffer(TLVReader & aReader, const 
 exit:
     return err;
 }
+
 } // namespace app
 } // namespace chip
