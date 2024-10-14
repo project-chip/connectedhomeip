@@ -386,6 +386,13 @@ class StructFieldsNameConverter():
                 del value[key_name]
 
         elif isinstance(value, list) and array:
+            # Instead of using `False` for the last parameter (array), `isinstance(v, list)` is used.
+            # While the data model specification does not include lists of lists, the format returned
+            # by the Matter.framework for *ById APIs may contain them.
+            # For example, the command:
+            # darwin-framework-tool any read-by-id 29 0 0x12344321 65535
+            # returns value such as:
+            # [[{'DeviceType': 17, 'Revision': 1}, {'DeviceType': 22, 'Revision': 1}], ...]
             value = [self.run(specs, v, cluster_name, typename, isinstance(v, list))
                      for v in value]
 
