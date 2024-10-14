@@ -542,7 +542,7 @@ void BLEManagerImpl::OnChipDeviceScanned(void * device, const Ble::ChipBLEDevice
     /* Initiate Connect */
     auto params = std::make_pair(this, deviceInfo->remote_address);
     PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](typeof(params) * aParams) { return aParams->first->ConnectChipThing(aParams->second); }, &params);
+        +[](decltype(params) * aParams) { return aParams->first->ConnectChipThing(aParams->second); }, &params);
 }
 
 void BLEManagerImpl::OnScanComplete()
