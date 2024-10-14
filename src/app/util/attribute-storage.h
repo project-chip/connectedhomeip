@@ -244,8 +244,30 @@ void emberAfEndpointConfigure();
 // metadata including all attributes already exists and can be re-used this way,
 // without error prone manual duplicating with DECLARE_DYNAMIC_*
 //
-CHIP_ERROR setupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, chip::EndpointId templateEndpointId,
-                                           const chip::Span<const chip::ClusterId> & templateClusterIds);
+// templateEndpointId specifies a endpoint which is usually disabled, but containing
+// cluster definitions that should be used for instantiating active endpoints.
+//
+// templateClusterIds is a list of clusterIds to be used for the new endpoint.
+//
+// endpointType will be setup with the specified clusters and their storage size so
+// it can be used in a subsequent call to emberAfSetDynamicEndpoint instead of
+// an endpoint manually constructed with DECLARE_DYNAMIC_*.
+//
+// Note: passing invalid templateEndpointId/templateClusterIds combinations, i.e. clusters
+//   not present in the specified template endpoint, will cause the function will die with
+//   an error message as this indicates severe internal inconsistency of the setup.
+//
+// Note: function may allocate memory for the endpoint declaration.
+//   Use emberAfResetEndpointDeclaration to properly dispose of an endpoint declaration.
+void emberAfSetupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, chip::EndpointId templateEndpointId,
+                                            const chip::Span<const chip::ClusterId> & templateClusterIds);
+
+// reset an endpoint declaration that was setup with emberAfSetupDynamicEndpointDeclaration
+// to free all extra memory that might have been allocated.
+//
+// Warning: passing endpoint declarations that are not set up with
+//   emberAfSetupDynamicEndpointDeclaration is NOT allowed and likely causes undefined crashes.
+void emberAfResetDynamicEndpointDeclaration(EmberAfEndpointType & endpointType);
 
 // Register a dynamic endpoint. This involves registering descriptors that describe
 // the composition of the endpoint (encapsulated in the 'ep' argument) as well as providing

@@ -266,6 +266,8 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
     return kEmberInvalidEndpointIndex;
 }
 
+namespace {
+
 const EmberAfCluster * getClusterTypeDefinition(EndpointId endpointId, ClusterId clusterId, EmberAfClusterMask mask)
 {
     uint16_t index = emberAfIndexFromEndpointIncludingDisabledEndpoints(endpointId);
@@ -277,27 +279,44 @@ const EmberAfCluster * getClusterTypeDefinition(EndpointId endpointId, ClusterId
     return nullptr;
 }
 
-CHIP_ERROR setupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, EndpointId templateEndpointId,
-                                           const Span<const ClusterId> & templateClusterIds)
+} // anonymous namespace
+
+void emberAfSetupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, EndpointId templateEndpointId,
+                                            const Span<const ClusterId> & templateClusterIds)
 {
     // allocate cluster list
-    endpointType.clusterCount = static_cast<uint8_t>(templateClusterIds.size());
+    size_t clusterCount = templateClusterIds.size();
+    VerifyOrDieWithMsg(clusterCount <= 255, Support, "max 255 clusters per endpoint!");
+    endpointType.clusterCount = static_cast<uint8_t>(clusterCount);
     endpointType.cluster      = new EmberAfCluster[endpointType.clusterCount];
     endpointType.endpointSize = 0;
     // get the actual cluster pointers and sum up memory size
     for (size_t i = 0; i < templateClusterIds.size(); i++)
     {
-        auto cluster = getClusterTypeDefinition(templateEndpointId, templateClusterIds.data()[i], 0);
+        auto cluster = getClusterTypeDefinition(templateEndpointId, templateClusterIds[i], 0); // 0 = not filtered by a mask
         VerifyOrDieWithMsg(cluster, Support, "cluster 0x%04x template in endpoint %u does not exist",
                            (unsigned int) templateClusterIds.data()[i], (unsigned int) templateEndpointId);
         // for now, we need to copy the cluster definition, unfortunately.
         // TODO: make endpointType use a pointer to a list of EmberAfCluster* instead, so we can re-use cluster definitions
         //   instead of duplicating them here once for every instance.
+        // Note: we cannot struct assignment here, because cluster in EmberAfEndpointType is const due
+        //   to the way static cluster code generation works. So we have to resort to memcpy as a workaround
+        //   until the much more intrusive changes as suggested by the TODO above can be applied.
         memcpy((void *) &endpointType.cluster[i], cluster, sizeof(EmberAfCluster));
         // sum up the needed storage
         endpointType.endpointSize = (uint16_t) (endpointType.endpointSize + cluster->clusterSize);
     }
-    return CHIP_NO_ERROR;
+}
+
+void emberAfResetDynamicEndpointDeclaration(EmberAfEndpointType & endpointType)
+{
+    if (endpointType.cluster)
+    {
+        delete[] endpointType.cluster;
+        endpointType.cluster = nullptr;
+    }
+    endpointType.clusterCount = 0;
+    endpointType.endpointSize = 0;
 }
 
 CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
