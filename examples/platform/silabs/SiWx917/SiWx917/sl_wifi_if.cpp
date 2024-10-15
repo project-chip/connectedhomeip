@@ -94,10 +94,6 @@ bool ps_requirement_added = false;
 // TODO: Figure out why we actually need this, we are already handling failure and retries somewhere else.
 #define WIFI_SCAN_TIMEOUT_TICK 10000
 
-#if !defined(MIN)
-#define MIN(A, B) ((A) < (B) ? (A) : (B))
-#endif
-
 WfxRsi_t wfx_rsi;
 
 bool hasNotifiedIPV6 = false;
@@ -541,12 +537,12 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
         memset(&cur_scan_result, 0, sizeof(cur_scan_result));
 
         cur_scan_result.ssid_length = strnlen((char *) scan_result->scan_info[idx].ssid,
-                                              chip::min<size_t>(sizeof(scan_result->scan_info[idx].ssid), WFX_MAX_SSID_LENGTH));
+                                              std::min<size_t>(sizeof(scan_result->scan_info[idx].ssid), WFX_MAX_SSID_LENGTH));
         chip::Platform::CopyString(cur_scan_result.ssid, cur_scan_result.ssid_length, (char *) scan_result->scan_info[idx].ssid);
 
         // if user has provided ssid, then check if the current scan result ssid matches the user provided ssid
         if (wfx_rsi.scan_ssid != NULL &&
-            (strncmp(wfx_rsi.scan_ssid, cur_scan_result.ssid, MIN(strlen(wfx_rsi.scan_ssid), strlen(cur_scan_result.ssid))) ==
+            (strncmp(wfx_rsi.scan_ssid, cur_scan_result.ssid, std::min(strlen(wfx_rsi.scan_ssid), strlen(cur_scan_result.ssid))) ==
              CMP_SUCCESS))
         {
             continue;

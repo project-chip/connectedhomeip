@@ -1930,7 +1930,7 @@ uint16_t InteractionModelEngine::GetMinGuaranteedSubscriptionsPerFabric() const
     return UINT16_MAX;
 #else
     return static_cast<uint16_t>(
-        min(GetReadHandlerPoolCapacityForSubscriptions() / GetConfigMaxFabrics(), static_cast<size_t>(UINT16_MAX)));
+        std::min(GetReadHandlerPoolCapacityForSubscriptions() / GetConfigMaxFabrics(), static_cast<size_t>(UINT16_MAX)));
 #endif
 }
 
