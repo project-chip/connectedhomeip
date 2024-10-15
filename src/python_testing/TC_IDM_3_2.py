@@ -10,7 +10,6 @@ from typing import get_args, get_origin, Union
 from basic_composition_support import BasicCompositionTests
 from mobly import asserts
 from spec_parsing_support import build_xml_clusters
-import pdb
 
 class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
@@ -55,65 +54,51 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
     def pick_writable_value(self, attribute):
         attribute_type = attribute.attribute_type.Type
         types_in_union = get_args(attribute_type)
-        if uint in types_in_union:
+
+        if uint in types_in_union or attribute_type == uint:
             value = 123456
-        elif int in types_in_union:
+        elif int in types_in_union or attribute_type == int:
             value = -123456
-        elif str in types_in_union:
+        elif str in types_in_union or attribute_type == str:
             value = "Hello World"
-        elif bool in types_in_union:
+        elif bool in types_in_union or attribute_type == bool:
             value = False
-        # TODO: Fill in other data types
+        elif float in types_in_union or attribute_type == float:
+            value = 1.1
+        elif bytes in types_in_union or attribute_type == bytes:
+            value = bytes("Hello World", "utf-8")
+        elif IntFlag in types_in_union or attribute_type == IntFlag:
+            value = None # Todo: Fill in 
+        elif list in types_in_union or attribute_type == list:
+            value = [1, 2, 3, 4, 5, 6]
+        elif ClusterObjects.ClusterObjectFieldDescriptor(Type=MatterIntEnum).Type in types_in_union or attribute_type == ClusterObjects.ClusterObjectFieldDescriptor(Type=MatterIntEnum).Type:
+            value = None # Todo: Fill in
+        elif ClusterObject in types_in_union or attribute_type == ClusterObject:
+            value = None # Todo: Fill in
+        else:
+            value = None
         return value
-        # elif 
-        # value_dict = {
-        #     int: 123456,
-        #     uint: -123456,
-        #     str: "Hello World",
-        #     bool: True,
-        # }
-        return value_dict[attribute_type]
 
     async def check_attribute_write_for_type(self, desired_attribute_type: type) -> None:
-        for cluster in self.device_clusters:
-            all_types = await self.all_type_attributes_for_cluster(cluster, desired_attribute_type)
-            all_types = list(set(all_types) & self.device_attributes)
-            if all_types:
-                chosen_attribute = all_types[0]
-                cluster = Clusters.ClusterObjects.ALL_CLUSTERS[chosen_attribute.cluster_id]
-                break
-        else:
-            print(f"Attribute not found on device: {desired_attribute_type}")
-            cluster = None
-
-        endpoint = None
         for endpoint in self.endpoints:
+
             for cluster, clusterdata in self.endpoints[endpoint].items():
                 all_types = await self.all_type_attributes_for_cluster(cluster, desired_attribute_type)
+                all_types = list(set(all_types) & self.device_attributes)
                 attributes_of_type = set(all_types)
                 attributes_of_type_on_device = attributes_of_type.intersection(set(clusterdata.keys()))
+                
                 if attributes_of_type_on_device or attributes_of_type:
+                    print(f'attributes_of_type_on_device: {attributes_of_type_on_device}, attributes_of_type: {attributes_of_type}')
                     chosen_attribute = next(iter(attributes_of_type_on_device))
-
-                    output = await self.read_single_attribute_check_success(
-                        endpoint=endpoint,
-                        dev_ctrl=self.default_controller,
-                        cluster=cluster,
-                        attribute=chosen_attribute)
-
+                    value = self.pick_writable_value(chosen_attribute)
+                    output = await self.write_single_attribute(
+                        attribute_value=chosen_attribute(value=value),
+                        endpoint_id=endpoint,
+                        )
                 if attributes_of_type_on_device:
                     return True
         return False
-
-        # if cluster and (endpoint is not None):
-        #     output = await self.read_single_attribute_check_success(
-        #         endpoint=endpoint,
-        #         dev_ctrl=self.default_controller,
-        #         cluster=cluster,
-        #         attribute=chosen_attribute)
-        #     return output
-        # return
-
 
     @async_test_body
     async def test_TC_IDM_3_2(self):
@@ -207,23 +192,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
         # Verify that the DUT sends a WriteResponseMessage with any status except UNSUPPORTED_WRITE or DATA_VERSION_MISMATCH. If the Status is SUCCESS, verify the updated value by sending a ReadRequestMessage for all affected paths. If the status is SUCCESS, send a WriteRequestMessage to set the value back to `original`.
 
-        # await self.check_attribute_read_for_type(bool)
-
-
         await self.check_attribute_write_for_type(bool)
-
-        # chosen_writable_attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[chosen_writable_attribute_tuple[0]][chosen_writable_attribute_tuple[1]]
-        # chosen_writable_cluster = Clusters.ClusterObjects.ALL_CLUSTERS[chosen_writable_attribute_tuple[0]]
-        
-        # output_1 = await self.default_controller.Read(self.dut_node_id, [chosen_writable_attribute])
-        # endpoint = next(iter(output_1))
-        # value = self.pick_writable_value(chosen_writable_attribute)
-        # await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, chosen_writable_attribute(value=value))])
-        # output_2 = await self.default_controller.Read(self.dut_node_id, [chosen_writable_attribute])
-        
-        # asserts.assert_not_equal(output_1[endpoint][chosen_writable_cluster][chosen_writable_attribute],
-        #                          output_2[endpoint][chosen_writable_cluster][chosen_writable_attribute],
-        #                          "Output did not change")
 
         # Step 4
 
@@ -278,7 +247,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         # Verify that the DUT sends a WriteResponseMessage with any status except UNSUPPORTED_WRITE or DATA_VERSION_MISMATCH. If the Status is SUCCESS, verify the updated value by sending a ReadRequestMessage for all affected paths. If the status is SUCCESS, send a WriteRequestMessage to set the value back to `original`.
 
         await self.check_attribute_write_for_type(ClusterObject)
-
+# 
         # Step 10
 
         # TH selects a writeable attribute of type list that is present on at least one endpoint.
@@ -296,7 +265,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         # Verify that the DUT sends a WriteResponseMessage with any status except UNSUPPORTED_WRITE or DATA_VERSION_MISMATCH. If the Status is SUCCESS, verify the updated value by sending a ReadRequestMessage for all affected paths. If the status is SUCCESS, send a WriteRequestMessage to set the value back to `original`.
 
         await self.check_attribute_write_for_type(MatterIntEnum)
-
+# 
         # Step 12
 
         # TH selects a writeable attribute of type bitmap that is present on at least one endpoint.
@@ -310,6 +279,14 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
         # TH sends the WriteRequestMessage to the DUT to write any attribute on an unsupported Endpoint.
         # Verify on the TH that the DUT sends the status code UNSUPPORTED_ENDPOINT
+
+        supported_endpoints = set(self.endpoints.keys())
+        all_endpoints = set(range(max(supported_endpoints)+2))
+        unsupported = list(all_endpoints - supported_endpoints)
+        # result = await self.read_single_attribute_expect_error(endpoint=unsupported[0], cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.FeatureMap, error=Status.UnsupportedEndpoint)
+        chosen_writable_attribute = next(writable_attributes_iter)
+        value = self.pick_writable_value(chosen_writable_attribute)
+        result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value), endpoint_id=endpoint)
 
         # Step 14
 
@@ -328,12 +305,6 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         # If no such attribute exists, skip this step.
         # TH reads the attribute value and saves as original.
         # TH sends a WriteRequestMessage to the DUT to write to the attribute to null.
-
-        # supported_endpoints = set(self.endpoints.keys())
-        # all_endpoints = set(range(max(supported_endpoints)+2))
-        # unsupported = list(all_endpoints - supported_endpoints)
-        # # Read descriptor
-        # result = await self.read_single_attribute_expect_error(endpoint=unsupported[0], cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.FeatureMap, error=Status.UnsupportedEndpoint)
 
         # Verify that the DUT sends a WriteResponseMessage with any status except UNSUPPORTED_WRITE or DATA_VERSION_MISMATCH. If the Status is SUCCESS, verify the updated value by sending a ReadRequestMessage for all affected paths. If the status is SUCCESS, send a WriteRequestMessage to set the value back to `original`.
 
