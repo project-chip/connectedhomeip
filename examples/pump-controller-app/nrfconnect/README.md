@@ -43,7 +43,7 @@ This example is running on the nRF Connect platform, which is based on Nordic
 Semiconductor's
 [nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
 and [Zephyr RTOS](https://zephyrproject.org/). Visit CHIP's
-[nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
+[nRF Connect platform overview](../../../docs/platforms/nrf/nrfconnect_platform_overview.md)
 to read more about the platform structure and dependencies.
 
 The Matter device that runs the pump application is controlled by the Matter
@@ -214,7 +214,7 @@ by default).
 
 **SEGGER J-Link USB port** can be used to get logs from the device or
 communicate with it using the
-[command line interface](../../../docs/guides/nrfconnect_examples_cli.md).
+[command line interface](../../../docs/platforms/nrf/nrfconnect_examples_cli.md).
 
 **NFC port with antenna attached** can be used to start the
 [rendezvous](#bluetooth-le-rendezvous) by providing the commissioning
@@ -415,7 +415,7 @@ depending on the selected board:
     the necessary application functionalities to optimize its performance.
 
 For more information, see the
-[Configuring nRF Connect SDK examples](../../../docs/guides/nrfconnect_examples_configuration.md)
+[Configuring nRF Connect SDK examples](../../../docs/platforms/nrf/nrfconnect_examples_configuration.md)
 page.
 
 <hr>
@@ -439,19 +439,20 @@ directory:
 
 ## Testing the example
 
-Check the [CLI tutorial](../../../docs/guides/nrfconnect_examples_cli.md) to
-learn how to use command-line interface of the application.
+Check the [CLI tutorial](../../../docs/platforms/nrf/nrfconnect_examples_cli.md)
+to learn how to use command-line interface of the application.
 
 ### Testing using Linux CHIPTool
 
-Read the [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md) to see
-how to use [CHIP Tool for Linux or mac OS](../../chip-tool/README.md) to
+Read the
+[CHIP Tool user guide](../../../docs/development_controllers/chip-tool/chip_tool_guide.md)
+to see how to use [CHIP Tool for Linux or mac OS](../../chip-tool/README.md) to
 commission and control the application within a Matter-enabled Thread network.
 
 ### Testing using Android CHIPTool
 
 Read the
-[Android commissioning guide](../../../docs/guides/nrfconnect_android_commissioning.md)
+[Android commissioning guide](../../../docs/platforms/nrf/nrfconnect_android_commissioning.md)
 to see how to use [CHIPTool](../../../examples/android/CHIPTool/README.md) for
 Android smartphones to commission and control the application within a
 CHIP-enabled Thread network.
