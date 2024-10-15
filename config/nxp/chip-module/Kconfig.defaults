@@ -336,6 +336,9 @@ choice NXP_ENET_DRIVER
 	default ETH_NXP_ENET
 endchoice
 
+config NET_SOCKETS_POLL_MAX
+	default 7
+
 endif
 
 # Configure MBEDTLS lib
