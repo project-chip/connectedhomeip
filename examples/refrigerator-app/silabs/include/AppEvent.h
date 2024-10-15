@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,16 +16,40 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Example project configuration file for CHIP.
- *
- *          This is a place to put application or project-specific overrides
- *          to the default configuration values for general CHIP features.
- *
- */
-
 #pragma once
+#include <stdint.h>
 
-// include the CHIPProjectConfig from config/standalone
-#include <CHIPProjectConfig.h>
+struct AppEvent;
+typedef void (*EventHandler)(AppEvent *);
+
+struct AppEvent
+{
+    enum AppEventTypes
+    {
+        kEventType_Button = 0,
+        kEventType_Timer,
+        kEventType_Refrigerator,
+        kEventType_Install,
+    };
+
+    uint16_t Type;
+
+    union
+    {
+        struct
+        {
+            uint8_t Action;
+        } ButtonEvent;
+        struct
+        {
+            void * Context;
+        } TimerEvent;
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+        } RefrigeratorEvent;
+    };
+
+    EventHandler Handler;
+};

@@ -15,17 +15,16 @@
 #    limitations under the License.
 #
 
-import os
 import xml.etree.ElementTree as ElementTree
 
 import chip.clusters as Clusters
 import jinja2
-from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import MatterBaseTest, ProblemNotice, default_matter_test_main
+from chip.testing.global_attribute_ids import GlobalAttributeIds
+from chip.testing.matter_testing import MatterBaseTest, ProblemNotice, default_matter_test_main
+from chip.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, SpecParsingException, XmlCluster,
+                                       add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
+                                       combine_derived_clusters_with_base, get_data_model_directory)
 from mobly import asserts
-from spec_parsing_support import (ClusterParser, PrebuiltDataModelDirectory, SpecParsingException, XmlCluster,
-                                  add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
-                                  combine_derived_clusters_with_base)
 
 # TODO: improve the test coverage here
 # https://github.com/project-chip/connectedhomeip/issues/30958
@@ -272,10 +271,10 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_equal(set(one_four_clusters.keys())-set(tot_xml_clusters.keys()),
                              set(), "There are some 1.4 clusters that are not included in the TOT spec")
 
-        str_path = str(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                       '..', '..', 'data_model', '1.4', 'clusters'))
+        str_path = get_data_model_directory(PrebuiltDataModelDirectory.k1_4, DataModelLevel.kCluster)
         string_override_check, problems = build_xml_clusters(str_path)
-        asserts.assert_equal(string_override_check.keys(), self.spec_xml_clusters.keys(), "Mismatched cluster generation")
+
+        asserts.assert_count_equal(string_override_check.keys(), self.spec_xml_clusters.keys(), "Mismatched cluster generation")
 
         with asserts.assert_raises(SpecParsingException):
             build_xml_clusters("baddir")
