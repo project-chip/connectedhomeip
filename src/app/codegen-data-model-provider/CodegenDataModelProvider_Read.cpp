@@ -319,7 +319,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
             request.path, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId),
             encoder);
     }
-    ReturnErrorCodeIf(aai_result.has_value(), *aai_result);
+    VerifyOrReturnError(!aai_result.has_value(), *aai_result);
 
     if (!std::holds_alternative<const EmberAfAttributeMetadata *>(metadata))
     {

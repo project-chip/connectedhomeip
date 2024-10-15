@@ -1590,7 +1590,7 @@ CHIP_ERROR FabricTable::AllocatePendingOperationalKey(Optional<FabricIndex> fabr
     if (fabricIndex.HasValue())
     {
         // Check we not are trying to do an update but also change the root: forbidden
-        ReturnErrorCodeIf(mStateFlags.Has(StateFlags::kIsTrustedRootPending), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(!mStateFlags.Has(StateFlags::kIsTrustedRootPending), CHIP_ERROR_INCORRECT_STATE);
 
         // Fabric update case (e.g. UpdateNOC): we already know the fabric index
         fabricIndexToUse = fabricIndex.Value();
@@ -1621,9 +1621,7 @@ CHIP_ERROR FabricTable::AddNewPendingTrustedRootCert(const ByteSpan & rcac)
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // We should not already have pending NOC chain elements when we get here
-    ReturnErrorCodeIf(
-        mStateFlags.HasAny(StateFlags::kIsTrustedRootPending, StateFlags::kIsUpdatePending, StateFlags::kIsAddPending),
-        CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mStateFlags.HasAny(StateFlags::kIsTrustedRootPending, StateFlags::kIsUpdatePending, StateFlags::kIsAddPending), CHIP_ERROR_INCORRECT_STATE);
 
     EnsureNextAvailableFabricIndexUpdated();
     FabricIndex fabricIndexToUse = kUndefinedFabricIndex;

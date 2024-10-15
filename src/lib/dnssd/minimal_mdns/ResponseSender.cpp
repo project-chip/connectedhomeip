@@ -232,7 +232,7 @@ CHIP_ERROR ResponseSender::FlushReply()
 CHIP_ERROR ResponseSender::PrepareNewReplyPacket()
 {
     chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::New(kPacketSizeBytes);
-    ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     mResponseBuilder.Reset(std::move(buffer));
     mResponseBuilder.Header().SetMessageId(mSendState.GetMessageId());

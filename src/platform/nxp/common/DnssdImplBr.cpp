@@ -640,7 +640,7 @@ CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService * service, const otSr
             entryIndex++;
         }
 
-        ReturnErrorCodeIf(alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(!alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
         mdnsService.mTextEntries   = serviceTxtEntries.mTxtEntries;
         mdnsService.mTextEntrySize = entryIndex;

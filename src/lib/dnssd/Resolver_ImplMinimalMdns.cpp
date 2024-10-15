@@ -681,7 +681,7 @@ CHIP_ERROR MinMdnsResolver::SendAllPendingQueries()
         }
 
         System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
-        ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
 
         QueryBuilder builder(std::move(buffer));
         builder.Header().SetMessageId(0);

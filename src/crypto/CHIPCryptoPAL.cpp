@@ -926,7 +926,7 @@ CHIP_ERROR ExtractVIDPIDFromAttributeString(DNAttrType attrType, const ByteSpan 
                                             AttestationCertVidPid & vidpidFromMatterAttr, AttestationCertVidPid & vidpidFromCNAttr)
 {
     VerifyOrReturnError(attrType != DNAttrType::kUnspecified, CHIP_NO_ERROR);
-    ReturnErrorCodeIf(attr.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!attr.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     if (attrType == DNAttrType::kMatterVID || attrType == DNAttrType::kMatterPID)
     {
@@ -939,13 +939,13 @@ CHIP_ERROR ExtractVIDPIDFromAttributeString(DNAttrType attrType, const ByteSpan 
         if (attrType == DNAttrType::kMatterVID)
         {
             // Not more than one VID attribute can be present.
-            ReturnErrorCodeIf(vidpidFromMatterAttr.mVendorId.HasValue(), CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(!vidpidFromMatterAttr.mVendorId.HasValue(), CHIP_ERROR_WRONG_CERT_DN);
             vidpidFromMatterAttr.mVendorId.SetValue(static_cast<VendorId>(matterAttr));
         }
         else
         {
             // Not more than one PID attribute can be present.
-            ReturnErrorCodeIf(vidpidFromMatterAttr.mProductId.HasValue(), CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(!vidpidFromMatterAttr.mProductId.HasValue(), CHIP_ERROR_WRONG_CERT_DN);
             vidpidFromMatterAttr.mProductId.SetValue(matterAttr);
         }
     }

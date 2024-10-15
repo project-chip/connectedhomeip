@@ -160,11 +160,11 @@ CHIP_ERROR NXPConfig::Init()
     /* Initialize flash components */
     const struct flash_area * fa;
 
-    ReturnErrorCodeIf(flash_area_open(SETTINGS_PARTITION, &fa), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
-    ReturnErrorCodeIf(flash_init(fa->fa_dev), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    VerifyOrReturnError(!flash_area_open(SETTINGS_PARTITION, &fa), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    VerifyOrReturnError(!flash_init(fa->fa_dev), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
     /* End flash init */
 
-    ReturnErrorCodeIf(settings_subsys_init(), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    VerifyOrReturnError(!settings_subsys_init(), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
 #if (CHIP_DEVICE_CONFIG_KVS_WEAR_STATS == 1)
     ReturnErrorOnFailure(InitStorageWearStats());

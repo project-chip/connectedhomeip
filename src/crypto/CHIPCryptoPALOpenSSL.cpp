@@ -2297,7 +2297,7 @@ CHIP_ERROR ReplaceCertIfResignedCertFound(const ByteSpan & referenceCertificate,
     MutableByteSpan referenceSKID(referenceSKIDBuf);
     MutableByteSpan candidateSKID(candidateSKIDBuf);
 
-    ReturnErrorCodeIf(referenceCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!referenceCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     outCertificate = referenceCertificate;
 

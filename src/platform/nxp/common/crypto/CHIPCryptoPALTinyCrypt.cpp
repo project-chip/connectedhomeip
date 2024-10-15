@@ -1965,7 +1965,7 @@ CHIP_ERROR ExtractRawDNFromX509Cert(bool extractSubject, const ByteSpan & certif
     size_t len       = 0;
     mbedtls_x509_crt mbedCertificate;
 
-    ReturnErrorCodeIf(certificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!certificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     mbedtls_x509_crt_init(&mbedCertificate);
     result = mbedtls_x509_crt_parse(&mbedCertificate, Uint8::to_const_uchar(certificate.data()), certificate.size());
