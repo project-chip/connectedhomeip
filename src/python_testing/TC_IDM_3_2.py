@@ -293,11 +293,55 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         # TH sends the WriteRequestMessage to the DUT to write any attribute on an unsupported cluster.
         # Verify on the TH that the DUT sends the status code UNSUPPORTED_CLUSTER
 
+        for endpoint_id, endpoint in self.endpoints.items():
+            for cluster_type, cluster in endpoint.items():
+                if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
+                    continue
+
+                all_clusters = set(list(ClusterObjects.ALL_CLUSTERS.keys()))
+                dut_clusters = set(list(x.id for x in endpoint.keys()))
+
+                unsupported = [id for id in list(all_clusters - dut_clusters) if global_attribute_ids.attribute_id_type(id)
+                               == global_attribute_ids.AttributeIdType.kStandardNonGlobal]
+
+                if unsupported:
+                    unsupported_attribute = (ClusterObjects.ALL_ATTRIBUTES[unsupported[0]])[0]
+                    chosen_writable_attribute = next(writable_attributes_iter)
+                    value = self.pick_writable_value(chosen_writable_attribute)
+                    result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value), endpoint_id=endpoint)
+                    # result = await self.read_single_attribute_expect_error(endpoint=endpoint_id, cluster=ClusterObjects.ALL_CLUSTERS[unsupported[0]], attribute=unsupported_attribute, error=Status.UnsupportedCluster)
+                    asserts.assert_true(isinstance(result.Reason, InteractionModelError),
+                                        msg="Unexpected success writing invalid cluster")
+
         # Step 15
 
         # TH sends the WriteRequestMessage to the DUT to write an unsupported attribute
 
         # Verify on the TH that the DUT sends the status code UNSUPPORTED_ATTRIBUTE
+
+        found_unsupported = False
+        for endpoint_id, endpoint in self.endpoints.items():
+
+            if found_unsupported:
+                break
+            for cluster_type, cluster in endpoint.items():
+                if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
+                    continue
+
+                all_attrs = set(list(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].keys()))
+                dut_attrs = set(cluster[cluster_type.Attributes.AttributeList])
+
+                unsupported = [id for id in list(all_attrs - dut_attrs) if global_attribute_ids.attribute_id_type(id)
+                               == global_attribute_ids.AttributeIdType.kStandardNonGlobal]
+
+                if unsupported:
+                    chosen_writable_attribute = next(writable_attributes_iter)
+                    value = self.pick_writable_value(chosen_writable_attribute)
+                    result = await self.write_single_attribute(attribute_value=chosen_writable_attribute(value=value), endpoint_id=endpoint)
+                    asserts.assert_true(isinstance(result.Reason, InteractionModelError),
+                                        msg="Unexpected success writing invalid attribute")
+                    found_unsupported = True
+                    break
 
         # Step 16
 
