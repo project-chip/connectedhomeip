@@ -21,7 +21,7 @@ import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/silabs/wifi_args.gni")
-import("${efr32_sdk_build_root}/efr32_sdk.gni")
+import("${silabs_sdk_build_root}/efr32_sdk.gni")
 import("silabs_board.gni")
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"

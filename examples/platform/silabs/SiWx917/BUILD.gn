@@ -19,7 +19,7 @@ import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/silabs/wifi_args.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
-import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
+import("${silabs_sdk_build_root}/SiWx917_sdk.gni")
 
 declare_args() {
   enable_heap_monitoring = false
@@ -170,7 +170,7 @@ source_set("siwx917-common") {
   public_deps = []
   public_configs = [
     ":siwx917-common-config",
-    "${efr32_sdk_build_root}:silabs_config",
+    "${silabs_sdk_build_root}:silabs_config",
     ":chip_examples_project_config",
   ]
 
