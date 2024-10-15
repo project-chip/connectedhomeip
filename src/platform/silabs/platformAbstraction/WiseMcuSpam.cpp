@@ -38,6 +38,7 @@ extern "C" {
 #include "sl_si91x_button_pin_config.h"
 #include "sl_si91x_led.h"
 #include "sl_si91x_led_config.h"
+#include "sl_si91x_led_instances.h"
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
 void soc_pll_config(void);

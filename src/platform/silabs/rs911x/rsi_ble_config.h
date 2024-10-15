@@ -232,7 +232,6 @@
 
 //! Scan types
 #define SCAN_TYPE_ACTIVE (0x01)
-#define SCAN_TYPE_PASSIVE (0x00)
 
 //! Scan filters
 #define SCAN_FILTER_TYPE_ALL (0x00)
