@@ -70,8 +70,8 @@ from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 
-from .global_attribute_ids import GlobalAttributeIds
-from .pics import read_pics_from_file
+from chip.testing.global_attribute_ids import GlobalAttributeIds
+from chip.testing.pics import read_pics_from_file
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
