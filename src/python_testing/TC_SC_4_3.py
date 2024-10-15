@@ -45,7 +45,6 @@ from mobly import asserts
 from zeroconf.const import _TYPE_AAAA, _TYPES
 
 '''
-
 Purpose
 The purpose of this test case is to verify that a Matter node is discoverable
 and can advertise its services in a Matter network.
