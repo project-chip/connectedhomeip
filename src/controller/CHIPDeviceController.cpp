@@ -2745,7 +2745,7 @@ void DeviceCommissioner::OnScanNetworksResponse(void * context,
 
 CHIP_ERROR DeviceCommissioner::NetworkCredentialsReady()
 {
-    ReturnErrorCodeIf(mCommissioningStage != CommissioningStage::kNeedsNetworkCreds, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mCommissioningStage == CommissioningStage::kNeedsNetworkCreds, CHIP_ERROR_INCORRECT_STATE);
 
     // need to advance to next step
     CommissioningStageComplete(CHIP_NO_ERROR);
@@ -2755,7 +2755,7 @@ CHIP_ERROR DeviceCommissioner::NetworkCredentialsReady()
 
 CHIP_ERROR DeviceCommissioner::ICDRegistrationInfoReady()
 {
-    ReturnErrorCodeIf(mCommissioningStage != CommissioningStage::kICDGetRegistrationInfo, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mCommissioningStage == CommissioningStage::kICDGetRegistrationInfo, CHIP_ERROR_INCORRECT_STATE);
 
     // need to advance to next step
     CommissioningStageComplete(CHIP_NO_ERROR);

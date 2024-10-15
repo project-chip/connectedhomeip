@@ -108,7 +108,7 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetSerialNumber(char 
     ReturnErrorOnFailure(err);
 
     ReturnErrorCodeIf(serialNumLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(buf[serialNumLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrReturnError(buf[serialNumLen] == 0, CHIP_ERROR_INVALID_STRING_LENGTH);
 
     return err;
 }
@@ -195,7 +195,7 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetRotatingDeviceIdUn
         constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
 
         ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorCodeIf(sizeof(uniqueId) != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(sizeof(uniqueId) == ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
         uniqueIdSpan.reduce_size(sizeof(uniqueId));
     }

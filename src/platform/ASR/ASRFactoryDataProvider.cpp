@@ -546,7 +546,7 @@ CHIP_ERROR ASRFactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan &
     constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
 
     ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(sizeof(uniqueId) != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(sizeof(uniqueId) == ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
     uniqueIdSpan.reduce_size(sizeof(uniqueId));
     return CHIP_NO_ERROR;
@@ -559,7 +559,7 @@ CHIP_ERROR ASRFactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan &
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_ROTATING_UNIQUE_ID_PARTITION, buffer, buffer_len, buffer_len));
     size_t bytesLen =
         chip::Encoding::HexToBytes(Uint8::to_char(buffer), ROTATING_UNIQUE_ID_STRING_LEN, uniqueIdSpan.data(), uniqueIdSpan.size());
-    ReturnErrorCodeIf(bytesLen != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrReturnError(bytesLen == ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_INVALID_STRING_LENGTH);
     uniqueIdSpan.reduce_size(bytesLen);
     return CHIP_NO_ERROR;
 #endif // CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER

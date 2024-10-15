@@ -154,7 +154,7 @@ bool OTAImageProcessorImpl::IsFirstImageRun()
     VerifyOrReturnError(requestor != nullptr, false);
 
     uint32_t currentVersion;
-    ReturnErrorCodeIf(ConfigurationMgr().GetSoftwareVersion(currentVersion) != CHIP_NO_ERROR, false);
+    VerifyOrReturnError(ConfigurationMgr().GetSoftwareVersion(currentVersion) == CHIP_NO_ERROR, false);
 
     return requestor->GetCurrentUpdateState() == OTARequestorInterface::OTAUpdateStateEnum::kApplying &&
         requestor->GetTargetVersion() == currentVersion;

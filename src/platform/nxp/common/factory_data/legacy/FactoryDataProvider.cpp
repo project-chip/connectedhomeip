@@ -129,10 +129,10 @@ CHIP_ERROR FactoryDataProvider::Validate()
     uint8_t output[Crypto::kSHA256_Hash_Length] = { 0 };
 
     memcpy(&mHeader, (void *) mConfig.start, sizeof(Header));
-    ReturnErrorCodeIf(mHeader.hashId != kHashId, CHIP_FACTORY_DATA_HASH_ID);
+    VerifyOrReturnError(mHeader.hashId == kHashId, CHIP_FACTORY_DATA_HASH_ID);
 
     ReturnErrorOnFailure(Crypto::Hash_SHA256((uint8_t *) mConfig.payload, mHeader.size, output));
-    ReturnErrorCodeIf(memcmp(output, mHeader.hash, kHashLen) != 0, CHIP_FACTORY_DATA_SHA_CHECK);
+    VerifyOrReturnError(memcmp(output, mHeader.hash, kHashLen) == 0, CHIP_FACTORY_DATA_SHA_CHECK);
 
     return CHIP_NO_ERROR;
 }
@@ -419,7 +419,7 @@ CHIP_ERROR FactoryDataProvider::GetProductFinish(app::Clusters::BasicInformation
     uint8_t productFinish;
     uint16_t length = 0;
     auto err        = SearchForId(FactoryDataId::kProductFinish, &productFinish, sizeof(productFinish), length);
-    ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
 
     *finish = static_cast<app::Clusters::BasicInformation::ProductFinishEnum>(productFinish);
 
@@ -431,7 +431,7 @@ CHIP_ERROR FactoryDataProvider::GetProductPrimaryColor(app::Clusters::BasicInfor
     uint8_t color;
     uint16_t length = 0;
     auto err        = SearchForId(FactoryDataId::kProductPrimaryColor, &color, sizeof(color), length);
-    ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
 
     *primaryColor = static_cast<app::Clusters::BasicInformation::ColorEnum>(color);
 

@@ -386,7 +386,7 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
     }
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
-        ReturnErrorCodeIf(errStorage != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnError(errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_IM_GLOBAL_STATUS(ConstraintError));
         AccessControlCluster::Structs::AccessControlExtensionStruct::DecodableType item;
         ReturnErrorOnFailure(aDecoder.Decode(item));
         // TODO(#13590): generated code doesn't automatically handle max length so do it manually

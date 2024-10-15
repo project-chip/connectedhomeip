@@ -33,7 +33,7 @@ CHIP_ERROR OTAFirmwareProcessor::Init()
 #if OTA_ENCRYPTION_ENABLE
     mUnalignmentNum = 0;
 #endif
-    ReturnErrorCodeIf(gOtaSuccess_c != OTA_ClientInit(), CHIP_ERROR_OTA_PROCESSOR_CLIENT_INIT);
+    VerifyOrReturnError(gOtaSuccess_c == OTA_ClientInit(), CHIP_ERROR_OTA_PROCESSOR_CLIENT_INIT);
 
     auto offset = OTA_GetCurrentEepromAddressOffset();
     if (offset != 0)
@@ -42,7 +42,7 @@ CHIP_ERROR OTAFirmwareProcessor::Init()
     }
 
     VerifyOrReturnError(OTA_UTILS_IMAGE_INVALID_ADDR != OTA_SetStartEepromOffset(offset), CHIP_ERROR_OTA_PROCESSOR_EEPROM_OFFSET);
-    ReturnErrorCodeIf(gOtaSuccess_c != OTA_StartImage(mLength - sizeof(Descriptor)), CHIP_ERROR_OTA_PROCESSOR_START_IMAGE);
+    VerifyOrReturnError(gOtaSuccess_c == OTA_StartImage(mLength - sizeof(Descriptor)), CHIP_ERROR_OTA_PROCESSOR_START_IMAGE);
 
     return CHIP_NO_ERROR;
 }

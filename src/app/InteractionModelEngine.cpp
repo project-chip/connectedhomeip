@@ -756,8 +756,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             {
                 TLV::TLVReader pathReader;
                 attributePathListParser.GetReader(&pathReader);
-                ReturnErrorCodeIf(TLV::Utilities::Count(pathReader, requestedAttributePathCount, false) != CHIP_NO_ERROR,
-                                  Status::InvalidAction);
+                VerifyOrReturnError(TLV::Utilities::Count(pathReader, requestedAttributePathCount, false) == CHIP_NO_ERROR,
+                                    Status::InvalidAction);
             }
             else if (err != CHIP_ERROR_END_OF_TLV)
             {
@@ -769,8 +769,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             {
                 TLV::TLVReader pathReader;
                 eventpathListParser.GetReader(&pathReader);
-                ReturnErrorCodeIf(TLV::Utilities::Count(pathReader, requestedEventPathCount, false) != CHIP_NO_ERROR,
-                                  Status::InvalidAction);
+                VerifyOrReturnError(TLV::Utilities::Count(pathReader, requestedEventPathCount, false) == CHIP_NO_ERROR,
+                                    Status::InvalidAction);
             }
             else if (err != CHIP_ERROR_END_OF_TLV)
             {

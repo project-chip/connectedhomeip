@@ -110,7 +110,7 @@ bool OTAImageProcessorImpl::IsFirstImageRun()
     VerifyOrReturnError(requestor != nullptr, false);
 
     uint32_t currentVersion;
-    ReturnErrorCodeIf(ConfigurationMgr().GetSoftwareVersion(currentVersion) != CHIP_NO_ERROR, false);
+    VerifyOrReturnError(ConfigurationMgr().GetSoftwareVersion(currentVersion) == CHIP_NO_ERROR, false);
 
     ChipLogProgress(SoftwareUpdate, "%ld", currentVersion);
     ChipLogProgress(SoftwareUpdate, "%ld", requestor->GetTargetVersion());

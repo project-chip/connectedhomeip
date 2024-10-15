@@ -186,7 +186,7 @@ CHIP_ERROR OTAFactoryDataProcessor::Backup()
     VerifyOrReturnError(mFactoryData != nullptr, CHIP_FACTORY_DATA_NULL);
 
     auto status = PDM_eSaveRecordData(kNvmId_FactoryDataBackup, (void *) mFactoryData, FactoryProvider::kFactoryDataSize);
-    ReturnErrorCodeIf(status != PDM_E_STATUS_OK, CHIP_FACTORY_DATA_PDM_SAVE_RECORD);
+    VerifyOrReturnError(status == PDM_E_STATUS_OK, CHIP_FACTORY_DATA_PDM_SAVE_RECORD);
     // PDM save will do an encryption in place, so a restore is neeeded in order
     // to have the decrypted data back in the mFactoryData buffer.
     ReturnErrorOnFailure(Restore());
@@ -202,7 +202,7 @@ CHIP_ERROR OTAFactoryDataProcessor::Restore()
 
     auto status =
         PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void *) mFactoryData, FactoryProvider::kFactoryDataSize, &bytesRead);
-    ReturnErrorCodeIf(status != PDM_E_STATUS_OK, CHIP_FACTORY_DATA_PDM_READ_RECORD);
+    VerifyOrReturnError(status == PDM_E_STATUS_OK, CHIP_FACTORY_DATA_PDM_READ_RECORD);
 
     return CHIP_NO_ERROR;
 }

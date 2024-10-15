@@ -247,7 +247,7 @@ CHIP_ERROR PersistentStorageOpCertStore::AddNewOpCertsForFabric(FabricIndex fabr
     VerifyOrReturnError(mStateFlags.Has(StateFlags::kAddNewTrustedRootCalled), CHIP_ERROR_INCORRECT_STATE);
 
     // fabricIndex must match the current pending fabric
-    ReturnErrorCodeIf(fabricIndex != mPendingFabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
+    VerifyOrReturnError(fabricIndex == mPendingFabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     // Can't have persisted NOC/ICAC for same fabric if adding
     ReturnErrorCodeIf(StorageHasCertificate(mStorage, fabricIndex, CertChainElement::kNoc), CHIP_ERROR_INCORRECT_STATE);

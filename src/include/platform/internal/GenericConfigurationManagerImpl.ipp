@@ -517,7 +517,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetUniqueId(char * buf,
     ReturnErrorOnFailure(err);
 
     ReturnErrorCodeIf(uniqueIdLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(buf[uniqueIdLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrReturnError(buf[uniqueIdLen] == 0, CHIP_ERROR_INVALID_STRING_LENGTH);
 
     return err;
 }

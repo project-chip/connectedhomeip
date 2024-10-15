@@ -61,7 +61,7 @@ CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId)
     ReturnErrorCodeIf(name[totalLength] != '\0' && name[totalLength] != '.', CHIP_ERROR_WRONG_NODE_ID);
 
     // Check what we have a separator where we expect.
-    ReturnErrorCodeIf(name[fabricIdStringLength] != '-', CHIP_ERROR_WRONG_NODE_ID);
+    VerifyOrReturnError(name[fabricIdStringLength] == '-', CHIP_ERROR_WRONG_NODE_ID);
 
     static constexpr size_t bufferSize = max(fabricIdByteLength, nodeIdByteLength);
     uint8_t buf[bufferSize];

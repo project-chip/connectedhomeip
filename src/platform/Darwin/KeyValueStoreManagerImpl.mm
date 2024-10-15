@@ -152,7 +152,7 @@ namespace DeviceLayer {
                     return CHIP_NO_ERROR;
                 }
 
-                ReturnErrorCodeIf(gContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+                VerifyOrReturnError(gContext == nullptr, CHIP_ERROR_INCORRECT_STATE);
                 VerifyOrReturnError(fileName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
                 VerifyOrReturnError(fileName[0] != '\0', CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -221,7 +221,7 @@ namespace DeviceLayer {
         {
             @autoreleasepool {
                 VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-                ReturnErrorCodeIf(offset != 0, CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(offset == 0, CHIP_ERROR_INVALID_ARGUMENT);
                 VerifyOrReturnError(gContext != nullptr, CHIP_ERROR_UNINITIALIZED);
 
                 KeyValueItem * item = FindItemForKey([[NSString alloc] initWithUTF8String:key], nil, true);

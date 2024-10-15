@@ -436,7 +436,7 @@ CHIP_ERROR FabricTable::VerifyCredentials(const ByteSpan & noc, const ByteSpan &
         err = ExtractFabricIdFromCert(certificates.GetCertSet()[1], &icacFabricId);
         if (err == CHIP_NO_ERROR)
         {
-            ReturnErrorCodeIf(icacFabricId != outFabricId, CHIP_ERROR_FABRIC_MISMATCH_ON_ICA);
+            VerifyOrReturnError(icacFabricId == outFabricId, CHIP_ERROR_FABRIC_MISMATCH_ON_ICA);
         }
         // FabricId is optional field in ICAC and "not found" code is not treated as error.
         else if (err != CHIP_ERROR_NOT_FOUND)
@@ -449,7 +449,7 @@ CHIP_ERROR FabricTable::VerifyCredentials(const ByteSpan & noc, const ByteSpan &
     err                   = ExtractFabricIdFromCert(certificates.GetCertSet()[0], &rcacFabricId);
     if (err == CHIP_NO_ERROR)
     {
-        ReturnErrorCodeIf(rcacFabricId != outFabricId, CHIP_ERROR_WRONG_CERT_DN);
+        VerifyOrReturnError(rcacFabricId == outFabricId, CHIP_ERROR_WRONG_CERT_DN);
     }
     // FabricId is optional field in RCAC and "not found" code is not treated as error.
     else if (err != CHIP_ERROR_NOT_FOUND)
@@ -1738,7 +1738,7 @@ CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const By
     {
         FabricIndex collidingFabricIndex = kUndefinedFabricIndex;
         ReturnErrorOnFailure(FindExistingFabricByNocChaining(fabricIndexToUse, noc, collidingFabricIndex));
-        ReturnErrorCodeIf(collidingFabricIndex != kUndefinedFabricIndex, CHIP_ERROR_FABRIC_EXISTS);
+        VerifyOrReturnError(collidingFabricIndex == kUndefinedFabricIndex, CHIP_ERROR_FABRIC_EXISTS);
     }
 
     // We don't have a collision, handle the temp insert of NOC/ICAC
@@ -1798,7 +1798,7 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
     {
         FabricIndex collidingFabricIndex = kUndefinedFabricIndex;
         ReturnErrorOnFailure(FindExistingFabricByNocChaining(fabricIndex, noc, collidingFabricIndex));
-        ReturnErrorCodeIf(collidingFabricIndex != fabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
+        VerifyOrReturnError(collidingFabricIndex == fabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
     }
 
     // Handle the temp insert of NOC/ICAC

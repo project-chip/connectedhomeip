@@ -34,7 +34,7 @@ CHIP_ERROR DeviceInstanceInfoProviderImpl::GetRotatingDeviceIdUniqueId(MutableBy
                                                  ConfigurationManager::kRotatingDeviceIDUniqueIDLength * 2, uniqueIdSpan.data(),
                                                  uniqueIdSpan.size());
 
-    ReturnErrorCodeIf(bytesLen != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrReturnError(bytesLen == ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_INVALID_STRING_LENGTH);
     uniqueIdSpan.reduce_size(bytesLen);
 
     return CHIP_NO_ERROR;

@@ -174,7 +174,7 @@ CHIP_ERROR ASN1Reader::GetInteger(int64_t & val)
 CHIP_ERROR ASN1Reader::GetBoolean(bool & val)
 {
     VerifyOrReturnError(Value != nullptr, ASN1_ERROR_INVALID_STATE);
-    ReturnErrorCodeIf(ValueLen != 1, ASN1_ERROR_INVALID_ENCODING);
+    VerifyOrReturnError(ValueLen == 1, ASN1_ERROR_INVALID_ENCODING);
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);
     VerifyOrReturnError(Value[0] == 0 || Value[0] == 0xFF, ASN1_ERROR_INVALID_ENCODING);
 
@@ -276,7 +276,7 @@ CHIP_ERROR ASN1Reader::DecodeHead()
         for (; lenLen > 0; lenLen--, p++)
         {
             ReturnErrorCodeIf(p >= mBufEnd, ASN1_ERROR_UNDERRUN);
-            ReturnErrorCodeIf((ValueLen & 0xFF000000) != 0, ASN1_ERROR_LENGTH_OVERFLOW);
+            VerifyOrReturnError((ValueLen & 0xFF000000) == 0, ASN1_ERROR_LENGTH_OVERFLOW);
             ValueLen = (ValueLen << 8) | *p;
         }
         IndefiniteLen = false;

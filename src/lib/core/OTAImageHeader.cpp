@@ -116,7 +116,7 @@ CHIP_ERROR OTAImageHeaderParser::DecodeFixed()
     uint32_t fileIdentifier;
     uint64_t totalSize;
     ReturnErrorOnFailure(reader.Read32(&fileIdentifier).Read64(&totalSize).Read32(&mHeaderTlvSize).StatusCode());
-    ReturnErrorCodeIf(fileIdentifier != kOTAImageFileIdentifier, CHIP_ERROR_INVALID_FILE_IDENTIFIER);
+    VerifyOrReturnError(fileIdentifier == kOTAImageFileIdentifier, CHIP_ERROR_INVALID_FILE_IDENTIFIER);
     // Safety check against malicious headers.
     ReturnErrorCodeIf(mHeaderTlvSize > kMaxHeaderSize, CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(mBuffer.Alloc(mHeaderTlvSize), CHIP_ERROR_NO_MEMORY);

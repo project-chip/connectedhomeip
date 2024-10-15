@@ -387,7 +387,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     uint8_t ipkValue[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
     Crypto::IdentityProtectionKeySpan ipkSpan(ipkValue);
 
-    ReturnErrorCodeIf(defaultIpkSpan.size() != sizeof(ipkValue), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(defaultIpkSpan.size() == sizeof(ipkValue), CHIP_ERROR_INTERNAL);
     memcpy(&ipkValue[0], defaultIpkSpan.data(), defaultIpkSpan.size());
 
     // Callback onto commissioner.

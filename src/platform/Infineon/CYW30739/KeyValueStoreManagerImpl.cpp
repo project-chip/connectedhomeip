@@ -195,7 +195,7 @@ KeyValueStoreManagerImpl::KeyConfigIdEntry * KeyValueStoreManagerImpl::AllocateE
 {
     Optional<uint8_t> freeConfigID;
     KeyConfigIdEntry * newEntry = FindEntry(key, &freeConfigID);
-    ReturnErrorCodeIf(newEntry != nullptr, newEntry);
+    VerifyOrReturnError(newEntry == nullptr, newEntry);
     VerifyOrReturnError(freeConfigID.HasValue(), nullptr);
 
     newEntry = Platform::New<KeyConfigIdEntry>(freeConfigID.Value(), KeyStorage(key));

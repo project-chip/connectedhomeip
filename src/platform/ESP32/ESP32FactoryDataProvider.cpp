@@ -251,7 +251,7 @@ CHIP_ERROR ESP32FactoryDataProvider::GetProductFinish(app::Clusters::BasicInform
     uint32_t productFinish = 0;
 
     err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_ProductFinish, productFinish);
-    ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
 
     *finish = static_cast<app::Clusters::BasicInformation::ProductFinishEnum>(productFinish);
 
@@ -264,7 +264,7 @@ CHIP_ERROR ESP32FactoryDataProvider::GetProductPrimaryColor(app::Clusters::Basic
     uint32_t color = 0;
 
     err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_ProductColor, color);
-    ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
 
     *primaryColor = static_cast<app::Clusters::BasicInformation::ColorEnum>(color);
 
