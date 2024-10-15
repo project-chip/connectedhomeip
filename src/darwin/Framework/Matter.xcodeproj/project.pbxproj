@@ -334,6 +334,12 @@
 		B43B39EC2CB859A5006AA284 /* DumpMemoryGraphCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = B43B39E52CB859A5006AA284 /* DumpMemoryGraphCommand.h */; };
 		B43B39ED2CB859A5006AA284 /* Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = B43B39E42CB859A5006AA284 /* Commands.h */; };
 		B43B39EE2CB859A5006AA284 /* LeaksTool.h in Headers */ = {isa = PBXBuildFile; fileRef = B43B39E72CB859A5006AA284 /* LeaksTool.h */; };
+		B43B39F52CB99090006AA284 /* ControllerStorage.mm in Sources */ = {isa = PBXBuildFile; fileRef = B43B39F22CB99090006AA284 /* ControllerStorage.mm */; };
+		B43B39F62CB99090006AA284 /* CertificateIssuer.mm in Sources */ = {isa = PBXBuildFile; fileRef = B43B39F02CB99090006AA284 /* CertificateIssuer.mm */; };
+		B43B39F72CB99090006AA284 /* PreferencesStorage.mm in Sources */ = {isa = PBXBuildFile; fileRef = B43B39F42CB99090006AA284 /* PreferencesStorage.mm */; };
+		B43B39F82CB99090006AA284 /* CertificateIssuer.h in Headers */ = {isa = PBXBuildFile; fileRef = B43B39EF2CB99090006AA284 /* CertificateIssuer.h */; };
+		B43B39F92CB99090006AA284 /* PreferencesStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = B43B39F32CB99090006AA284 /* PreferencesStorage.h */; };
+		B43B39FA2CB99090006AA284 /* ControllerStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = B43B39F12CB99090006AA284 /* ControllerStorage.h */; };
 		B45373AA2A9FE73400807602 /* WebSocketServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B45373A92A9FE73400807602 /* WebSocketServer.cpp */; };
 		B45373BD2A9FEA9100807602 /* service.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B22A9FEA9000807602 /* service.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
 		B45373BE2A9FEA9100807602 /* network.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B32A9FEA9000807602 /* network.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
@@ -785,6 +791,12 @@
 		B43B39E62CB859A5006AA284 /* DumpMemoryGraphCommand.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DumpMemoryGraphCommand.mm; sourceTree = "<group>"; };
 		B43B39E72CB859A5006AA284 /* LeaksTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LeaksTool.h; sourceTree = "<group>"; };
 		B43B39E82CB859A5006AA284 /* LeaksTool.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LeaksTool.mm; sourceTree = "<group>"; };
+		B43B39EF2CB99090006AA284 /* CertificateIssuer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CertificateIssuer.h; sourceTree = "<group>"; };
+		B43B39F02CB99090006AA284 /* CertificateIssuer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CertificateIssuer.mm; sourceTree = "<group>"; };
+		B43B39F12CB99090006AA284 /* ControllerStorage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ControllerStorage.h; sourceTree = "<group>"; };
+		B43B39F22CB99090006AA284 /* ControllerStorage.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ControllerStorage.mm; sourceTree = "<group>"; };
+		B43B39F32CB99090006AA284 /* PreferencesStorage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferencesStorage.h; sourceTree = "<group>"; };
+		B43B39F42CB99090006AA284 /* PreferencesStorage.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PreferencesStorage.mm; sourceTree = "<group>"; };
 		B45373A92A9FE73400807602 /* WebSocketServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WebSocketServer.cpp; sourceTree = "<group>"; };
 		B45373B22A9FEA9000807602 /* service.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = service.c; path = "repo/lib/core-net/service.c"; sourceTree = "<group>"; };
 		B45373B32A9FEA9000807602 /* network.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = network.c; path = "repo/lib/core-net/network.c"; sourceTree = "<group>"; };
@@ -987,6 +999,12 @@
 		037C3D9B2991BD4F00B7EEE2 /* common */ = {
 			isa = PBXGroup;
 			children = (
+				B43B39EF2CB99090006AA284 /* CertificateIssuer.h */,
+				B43B39F02CB99090006AA284 /* CertificateIssuer.mm */,
+				B43B39F12CB99090006AA284 /* ControllerStorage.h */,
+				B43B39F22CB99090006AA284 /* ControllerStorage.mm */,
+				B43B39F32CB99090006AA284 /* PreferencesStorage.h */,
+				B43B39F42CB99090006AA284 /* PreferencesStorage.mm */,
 				B4E262132AA0C7A300DBA5BC /* RemoteDataModelLogger.h */,
 				B4E262122AA0C7A300DBA5BC /* RemoteDataModelLogger.mm */,
 				037C3D9C2991BD4F00B7EEE2 /* CHIPCommandBridge.mm */,
@@ -1632,6 +1650,9 @@
 				B4FCD5712B603A6300832859 /* DownloadLogCommand.h in Headers */,
 				037C3DC32991BD5100B7EEE2 /* Commands.h in Headers */,
 				B4F773CA2CB54B61008C6B23 /* LeakChecker.h in Headers */,
+				B43B39F82CB99090006AA284 /* CertificateIssuer.h in Headers */,
+				B43B39F92CB99090006AA284 /* PreferencesStorage.h in Headers */,
+				B43B39FA2CB99090006AA284 /* ControllerStorage.h in Headers */,
 				037C3DB82991BD5000B7EEE2 /* ClusterCommandBridge.h in Headers */,
 				037C3DC82991BD5100B7EEE2 /* CHIPToolKeypair.h in Headers */,
 				037C3DB52991BD5000B7EEE2 /* WriteAttributeCommandBridge.h in Headers */,
@@ -1971,6 +1992,9 @@
 				B45373DF2A9FEB6F00807602 /* system.c in Sources */,
 				B45373FC2A9FEC4F00807602 /* unix-caps.c in Sources */,
 				B45373FE2A9FEC4F00807602 /* unix-fds.c in Sources */,
+				B43B39F52CB99090006AA284 /* ControllerStorage.mm in Sources */,
+				B43B39F62CB99090006AA284 /* CertificateIssuer.mm in Sources */,
+				B43B39F72CB99090006AA284 /* PreferencesStorage.mm in Sources */,
 				B43B39EA2CB859A5006AA284 /* DumpMemoryGraphCommand.mm in Sources */,
 				B43B39EB2CB859A5006AA284 /* LeaksTool.mm in Sources */,
 				B45374002A9FEC4F00807602 /* unix-init.c in Sources */,
