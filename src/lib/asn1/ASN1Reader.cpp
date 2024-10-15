@@ -244,7 +244,7 @@ CHIP_ERROR ASN1Reader::GetBitString(uint32_t & outVal)
 CHIP_ERROR ASN1Reader::DecodeHead()
 {
     const uint8_t * p = mElemStart;
-    ReturnErrorCodeIf(p >= mBufEnd, ASN1_ERROR_UNDERRUN);
+    VerifyOrReturnError(p < mBufEnd, ASN1_ERROR_UNDERRUN);
 
     Class       = *p & 0xC0;
     Constructed = (*p & 0x20) != 0;
@@ -254,7 +254,7 @@ CHIP_ERROR ASN1Reader::DecodeHead()
     VerifyOrReturnError(Tag < 0x1F, ASN1_ERROR_UNSUPPORTED_ENCODING);
 
     p++;
-    ReturnErrorCodeIf(p >= mBufEnd, ASN1_ERROR_UNDERRUN);
+    VerifyOrReturnError(p < mBufEnd, ASN1_ERROR_UNDERRUN);
 
     if ((*p & 0x80) == 0)
     {
@@ -275,7 +275,7 @@ CHIP_ERROR ASN1Reader::DecodeHead()
         p++;
         for (; lenLen > 0; lenLen--, p++)
         {
-            ReturnErrorCodeIf(p >= mBufEnd, ASN1_ERROR_UNDERRUN);
+            VerifyOrReturnError(p < mBufEnd, ASN1_ERROR_UNDERRUN);
             VerifyOrReturnError((ValueLen & 0xFF000000) == 0, ASN1_ERROR_LENGTH_OVERFLOW);
             ValueLen = (ValueLen << 8) | *p;
         }

@@ -557,7 +557,7 @@ CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
         }
 #endif // CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
 
-        ReturnErrorCodeIf(serialNumLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(serialNumLen < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
         VerifyOrReturnError(buf[serialNumLen] == 0, CHIP_ERROR_INVALID_STRING_LENGTH);
 
         err = CHIP_NO_ERROR;
