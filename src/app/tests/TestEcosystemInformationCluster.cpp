@@ -59,6 +59,7 @@ public:
     }
 
     std::vector<ConcreteAttributePath> & GetDirtyList() { return mDirtyMarkedList; }
+
 private:
     std::vector<ConcreteAttributePath> mDirtyMarkedList;
 };

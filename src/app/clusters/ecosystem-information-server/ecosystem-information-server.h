@@ -25,9 +25,9 @@
 #include <utility>
 #include <vector>
 
-#include <app/reporting/reporting.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/reporting/reporting.h>
 
 #include <app/AttributeAccessInterface.h>
 
@@ -47,7 +47,9 @@ public:
     }
 };
 
-class TestOnlyParameter {};
+class TestOnlyParameter
+{
+};
 
 // This intentionally mirrors Structs::EcosystemDeviceStruct::Type but has ownership
 // of underlying types.
@@ -163,8 +165,8 @@ class EcosystemInformationServer : public MatterContext
 public:
     static EcosystemInformationServer & Instance();
 
-    EcosystemInformationServer() : mMatterContext(*this) {};
-    EcosystemInformationServer(TestOnlyParameter _, MatterContext & aMatterContext) : mMatterContext(aMatterContext) {};
+    EcosystemInformationServer() : mMatterContext(*this){};
+    EcosystemInformationServer(TestOnlyParameter _, MatterContext & aMatterContext) : mMatterContext(aMatterContext){};
 
     /**
      * @brief Add EcosystemInformation Cluster to endpoint so we respond appropriately on endpoint
