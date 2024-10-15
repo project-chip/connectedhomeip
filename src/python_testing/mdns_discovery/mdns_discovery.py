@@ -267,7 +267,7 @@ class MdnsDiscovery:
             service_name (str): The unique name of the mDNS service.
             Example:            
                 C82B83803DECA0B2-0000000012344321._matter._tcp.local.
-            
+
             record_type (DNSRecordType): The type of record to look for (SRV, TXT, AAAA, A).
             Example:
                 _matterd._tcp.local. (from the MdnsServiceType enum)
