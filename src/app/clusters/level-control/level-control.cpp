@@ -125,6 +125,7 @@ static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs, bo
 static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, chip::Optional<chip::BitMask<OptionsBitmap>> optionsMask,
                                chip::Optional<chip::BitMask<OptionsBitmap>> optionsOverride);
 
+static Status VerifyOptionsBitmap(Optional<BitMask<OptionsBitmap>> optionsMask, Optional<BitMask<OptionsBitmap>> optionsOverride);
 static Status SetCurrentLevelQuietReport(EndpointId endpoint, EmberAfLevelControlState * state,
                                          DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition);
 
@@ -434,7 +435,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
 
     if (status != Status::Success || currentLevel.IsNull())
     {
-        ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
+        ChipLogError(Zcl, "ERR: reading current level %x", to_underlying(status));
         state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
         writeRemainingTime(endpoint, 0);
         return;
@@ -469,7 +470,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     status          = SetCurrentLevelQuietReport(endpoint, state, currentLevel, isTransitionEnd);
     if (status != Status::Success)
     {
-        ChipLogProgress(Zcl, "ERR: writing current level %x", to_underlying(status));
+        ChipLogError(Zcl, "ERR: writing current level %x", to_underlying(status));
         state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
         writeRemainingTime(endpoint, 0);
         return;
@@ -491,7 +492,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
             status                = Attributes::CurrentLevel::Set(endpoint, storedLevel8u);
             if (status != Status::Success)
             {
-                ChipLogProgress(Zcl, "ERR: writing current level %x", to_underlying(status));
+                ChipLogError(Zcl, "ERR: writing current level %x", to_underlying(status));
             }
             else
             {
@@ -578,6 +579,28 @@ static void setOnOffValue(EndpointId endpoint, bool onOff)
         OnOffServer::Instance().setOnOffValue(endpoint, (onOff ? OnOff::Commands::On::Id : OnOff::Commands::Off::Id), true);
     }
 #endif // MATTER_DM_PLUGIN_ON_OFF
+}
+
+static Status VerifyOptionsBitmap(Optional<BitMask<OptionsBitmap>> optionsMask, Optional<BitMask<OptionsBitmap>> optionsOverride)
+{
+    constexpr BitMask<OptionsBitmap> maxOptionValue(
+        OptionsBitmap::kExecuteIfOff, OptionsBitmap::kCoupleColorTempToLevel); // add any new bitmap field to this value!
+
+    // Based on spec, we shall expect a value for those arguments. But that's not what has been done in SDK so far.
+    // Should we error out?
+    if (optionsMask.HasValue())
+    {
+        VerifyOrReturnError(optionsMask.Value() <= maxOptionValue, Status::ConstraintError,
+                            ChipLogError(Zcl, "Command error: out of range optionsMask argument"));
+    }
+
+    if (optionsOverride.HasValue())
+    {
+        VerifyOrReturnError(optionsOverride.Value() <= maxOptionValue, Status::ConstraintError,
+                            ChipLogError(Zcl, "Command error: out of range optionsOverride argument"));
+    }
+
+    return Status::Success;
 }
 
 static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, chip::Optional<chip::BitMask<OptionsBitmap>> optionsMask,
@@ -886,6 +909,12 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
         return Status::InvalidCommand;
     }
 
+    Status status = VerifyOptionsBitmap(optionsMask, optionsOverride);
+    if (status != Status::Success)
+    {
+        return status;
+    }
+
     if (!shouldExecuteIfOff(endpoint, commandId, optionsMask, optionsOverride))
     {
         return Status::Success;
@@ -894,16 +923,16 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     // Cancel any currently active command before fiddling with the state.
     cancelEndpointTimerCallback(endpoint);
 
-    Status status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
+    status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status != Status::Success)
     {
-        ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
+        ChipLogError(Zcl, "ERR: reading current level %x", to_underlying(status));
         return status;
     }
 
     if (currentLevel.IsNull())
     {
-        ChipLogProgress(Zcl, "ERR: Current Level is null");
+        ChipLogError(Zcl, "ERR: Current Level is null");
         return Status::Failure;
     }
 
@@ -962,7 +991,7 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
             status                       = Attributes::OnOffTransitionTime::Get(endpoint, &onOffTransitionTime);
             if (status != Status::Success)
             {
-                ChipLogProgress(Zcl, "ERR: reading on/off transition time %x", to_underlying(status));
+                ChipLogError(Zcl, "ERR: reading on/off transition time %x", to_underlying(status));
                 return status;
             }
 
@@ -1049,6 +1078,11 @@ static void moveHandler(CommandHandler * commandObj, const ConcreteCommandPath &
         goto send_default_response;
     }
 
+    if ((status = VerifyOptionsBitmap(optionsMask, optionsOverride)) != Status::Success)
+    {
+        goto send_default_response;
+    }
+
     if (!shouldExecuteIfOff(endpoint, commandId, optionsMask, optionsOverride))
     {
         status = Status::Success;
@@ -1065,7 +1099,7 @@ static void moveHandler(CommandHandler * commandObj, const ConcreteCommandPath &
         status = Attributes::DefaultMoveRate::Get(endpoint, defaultMoveRate);
         if (status != Status::Success || defaultMoveRate.IsNull())
         {
-            ChipLogProgress(Zcl, "ERR: reading default move rate %x", to_underlying(status));
+            ChipLogError(Zcl, "ERR: reading default move rate %x", to_underlying(status));
             eventDuration = FASTEST_TRANSITION_TIME_MS;
         }
         else
@@ -1102,13 +1136,13 @@ static void moveHandler(CommandHandler * commandObj, const ConcreteCommandPath &
     status                 = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status != Status::Success)
     {
-        ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
+        ChipLogError(Zcl, "ERR: reading current level %x", to_underlying(status));
         goto send_default_response;
     }
 
     if (currentLevel.IsNull())
     {
-        ChipLogProgress(Zcl, "ERR: Current Level is null");
+        ChipLogError(Zcl, "ERR: Current Level is null");
         status = Status::Failure;
 
         goto send_default_response;
@@ -1193,6 +1227,11 @@ static void stepHandler(CommandHandler * commandObj, const ConcreteCommandPath &
         goto send_default_response;
     }
 
+    if ((status = VerifyOptionsBitmap(optionsMask, optionsOverride)) != Status::Success)
+    {
+        goto send_default_response;
+    }
+
     if (!shouldExecuteIfOff(endpoint, commandId, optionsMask, optionsOverride))
     {
         status = Status::Success;
@@ -1205,13 +1244,13 @@ static void stepHandler(CommandHandler * commandObj, const ConcreteCommandPath &
     status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status != Status::Success)
     {
-        ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
+        ChipLogError(Zcl, "ERR: reading current level %x", to_underlying(status));
         goto send_default_response;
     }
 
     if (currentLevel.IsNull())
     {
-        ChipLogProgress(Zcl, "ERR: Current Level is null");
+        ChipLogError(Zcl, "ERR: Current Level is null");
         status = Status::Failure;
 
         goto send_default_response;
@@ -1328,6 +1367,11 @@ static void stopHandler(CommandHandler * commandObj, const ConcreteCommandPath &
         goto send_default_response;
     }
 
+    if ((status = VerifyOptionsBitmap(optionsMask, optionsOverride)) != Status::Success)
+    {
+        goto send_default_response;
+    }
+
     if (!shouldExecuteIfOff(endpoint, commandId, optionsMask, optionsOverride))
     {
         goto send_default_response;
@@ -1357,7 +1401,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     EmberAfLevelControlState * state = getState(endpoint);
     if (state == nullptr)
     {
-        ChipLogProgress(Zcl, "ERR: Level control cluster not available on ep%d", endpoint);
+        ChipLogError(Zcl, "ERR: Level control cluster not available on ep%d", endpoint);
         return;
     }
 
@@ -1367,13 +1411,13 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     status = Attributes::CurrentLevel::Get(endpoint, temporaryCurrentLevelCache);
     if (status != Status::Success)
     {
-        ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
+        ChipLogError(Zcl, "ERR: reading current level %x", to_underlying(status));
         return;
     }
 
     if (temporaryCurrentLevelCache.IsNull())
     {
-        ChipLogProgress(Zcl, "ERR: Current Level is null");
+        ChipLogError(Zcl, "ERR: Current Level is null");
         return;
     }
 
@@ -1383,7 +1427,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         status = Attributes::OnLevel::Get(endpoint, resolvedLevel);
         if (status != Status::Success)
         {
-            ChipLogProgress(Zcl, "ERR: reading on level %x", to_underlying(status));
+            ChipLogError(Zcl, "ERR: reading on level %x", to_underlying(status));
             return;
         }
 
@@ -1412,7 +1456,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         status = Attributes::OnOffTransitionTime::Get(endpoint, &currentOnOffTransitionTime);
         if (status != Status::Success)
         {
-            ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
+            ChipLogError(Zcl, "ERR: reading current level %x", to_underlying(status));
             return;
         }
         transitionTime.SetNonNull(currentOnOffTransitionTime);
@@ -1432,7 +1476,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         status = SetCurrentLevelQuietReport(endpoint, state, minimumLevelAllowedForTheDevice, false /*isEndOfTransition*/);
         if (status != Status::Success)
         {
-            ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
+            ChipLogError(Zcl, "ERR: reading current level %x", to_underlying(status));
             return;
         }
 
@@ -1468,7 +1512,7 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
 
     if (state == nullptr)
     {
-        ChipLogProgress(Zcl, "ERR: Level control cluster not available on ep%d", endpoint);
+        ChipLogError(Zcl, "ERR: Level control cluster not available on ep%d", endpoint);
         return;
     }
 
