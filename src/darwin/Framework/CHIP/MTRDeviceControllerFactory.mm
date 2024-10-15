@@ -78,6 +78,13 @@ using namespace chip::Tracing::DarwinFramework;
 
 @end
 
+class MTRApplicationCallback : public app::ReadHandler::ApplicationCallback {
+    CHIP_ERROR OnSubscriptionRequested(app::ReadHandler & readHandler, Transport::SecureSession & secureSession) override
+    {
+        return readHandler.SetMaxReportingInterval(kSubscriptionMaxIntervalPublisherLimit);
+    }
+};
+
 MTR_DIRECT_MEMBERS
 @interface MTRDeviceControllerFactory ()
 - (void)preWarmCommissioningSessionDone;
@@ -90,6 +97,7 @@ MTR_DIRECT_MEMBERS
 
     Credentials::IgnoreCertificateValidityPeriodPolicy _certificateValidityPolicy;
     Crypto::RawKeySessionKeystore _sessionKeystore;
+    MTRApplicationCallback _applicationCallback;
     // We use TestPersistentStorageDelegate just to get an in-memory store to back
     // our group data provider impl.  We initialize this store correctly on every
     // controller startup, so don't need to actually persist it.
@@ -239,6 +247,8 @@ MTR_DIRECT_MEMBERS
 
     // Make sure the deinit order here is the reverse of the init order in
     // startControllerFactory:
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+
     _certificationDeclarationCertificates = nil;
     _productAttestationAuthorityCertificates = nil;
 
@@ -365,6 +375,8 @@ MTR_DIRECT_MEMBERS
 
         _productAttestationAuthorityCertificates = [startupParams.productAttestationAuthorityCertificates copy];
         _certificationDeclarationCertificates = [startupParams.certificationDeclarationCertificates copy];
+
+        app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&_applicationCallback);
 
         {
             chip::Controller::FactoryInitParams params;
