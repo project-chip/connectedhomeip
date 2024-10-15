@@ -106,10 +106,10 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
 
     auto section = mConfig.sections[kDefaultSectionName];
 
-    ReturnErrorCodeIf(!SyncDoesKeyExist(key), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(SyncDoesKeyExist(key), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     std::string escapedKey = EscapeKey(key);
-    ReturnErrorCodeIf(!inipp::extract(section[escapedKey], iniValue), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inipp::extract(section[escapedKey], iniValue), CHIP_ERROR_INVALID_ARGUMENT);
 
     iniValue = Base64ToString(iniValue);
 
@@ -148,7 +148,7 @@ CHIP_ERROR PersistentStorage::SyncDeleteKeyValue(const char * key)
 {
     auto section = mConfig.sections[kDefaultSectionName];
 
-    ReturnErrorCodeIf(!SyncDoesKeyExist(key), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(SyncDoesKeyExist(key), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     std::string escapedKey = EscapeKey(key);
     section.erase(escapedKey);

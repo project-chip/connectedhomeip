@@ -196,7 +196,7 @@ CHIP_ERROR AndroidConfig::ReadConfigValue(Key key, uint32_t & val)
 CHIP_ERROR AndroidConfig::ReadConfigValue(Key key, uint64_t & val)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    ReturnErrorCodeIf(!gAndroidConfigObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(gAndroidConfigObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gReadConfigValueLongMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -223,7 +223,7 @@ CHIP_ERROR AndroidConfig::ReadConfigValue(Key key, uint64_t & val)
 CHIP_ERROR AndroidConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    ReturnErrorCodeIf(!gAndroidConfigObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(gAndroidConfigObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gReadConfigValueStrMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -253,7 +253,7 @@ CHIP_ERROR AndroidConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize
 CHIP_ERROR AndroidConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    ReturnErrorCodeIf(!gAndroidConfigObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(gAndroidConfigObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gReadConfigValueBinMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -300,7 +300,7 @@ CHIP_ERROR AndroidConfig::WriteConfigValue(Key key, uint32_t val)
 CHIP_ERROR AndroidConfig::WriteConfigValue(Key key, uint64_t val)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    ReturnErrorCodeIf(!gAndroidConfigObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(gAndroidConfigObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gWriteConfigValueLongMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -325,7 +325,7 @@ CHIP_ERROR AndroidConfig::WriteConfigValue(Key key, uint64_t val)
 CHIP_ERROR AndroidConfig::WriteConfigValueStr(Key key, const char * str)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    ReturnErrorCodeIf(!gAndroidConfigObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(gAndroidConfigObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gWriteConfigValueStrMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -376,7 +376,7 @@ exit:
 CHIP_ERROR AndroidConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    ReturnErrorCodeIf(!gAndroidConfigObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(gAndroidConfigObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gWriteConfigValueBinMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(chip::CanCastTo<uint32_t>(dataLen), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -403,7 +403,7 @@ CHIP_ERROR AndroidConfig::WriteConfigValueBin(Key key, const uint8_t * data, siz
 CHIP_ERROR AndroidConfig::ClearConfigValue(Key key)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    ReturnErrorCodeIf(!gAndroidConfigObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(gAndroidConfigObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gClearConfigValueMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -427,7 +427,7 @@ CHIP_ERROR AndroidConfig::ClearConfigValue(Key key)
 bool AndroidConfig::ConfigValueExists(Key key)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    ReturnErrorCodeIf(!gAndroidConfigObject.HasValidObjectRef(), false);
+    VerifyOrReturnError(gAndroidConfigObject.HasValidObjectRef(), false);
     ReturnErrorCodeIf(gConfigValueExistsMethod == nullptr, false);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();

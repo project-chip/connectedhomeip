@@ -271,7 +271,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
     // ACL check for non-internal requests
     if (!request.operationFlags.Has(DataModel::OperationFlags::kInternal))
     {
-        ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(request.subjectDescriptor.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
 
         Access::RequestPath requestPath{ .cluster     = request.path.mClusterId,
                                          .endpoint    = request.path.mEndpointId,

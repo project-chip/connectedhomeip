@@ -182,9 +182,9 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
         externalOperationalKeypair = params.operationalKeypair;
     }
 
-    ReturnErrorCodeIf(!rcacBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
-    ReturnErrorCodeIf(!icacBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
-    ReturnErrorCodeIf(!nocBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(rcacBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(icacBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(nocBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
 
     MutableByteSpan rcacSpan(rcacBuf.Get(), chipCertAllocatedLen);
 

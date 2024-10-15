@@ -119,7 +119,7 @@ CHIP_ERROR OTAImageHeaderParser::DecodeFixed()
     ReturnErrorCodeIf(fileIdentifier != kOTAImageFileIdentifier, CHIP_ERROR_INVALID_FILE_IDENTIFIER);
     // Safety check against malicious headers.
     ReturnErrorCodeIf(mHeaderTlvSize > kMaxHeaderSize, CHIP_ERROR_NO_MEMORY);
-    ReturnErrorCodeIf(!mBuffer.Alloc(mHeaderTlvSize), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(mBuffer.Alloc(mHeaderTlvSize), CHIP_ERROR_NO_MEMORY);
 
     mState        = State::kTlv;
     mBufferOffset = 0;

@@ -66,7 +66,7 @@ CHIP_ERROR ASN1Reader::Next()
 
 CHIP_ERROR ASN1Reader::EnterConstructedType()
 {
-    ReturnErrorCodeIf(!Constructed, ASN1_ERROR_INVALID_STATE);
+    VerifyOrReturnError(Constructed, ASN1_ERROR_INVALID_STATE);
 
     return EnterContainer(0);
 }
@@ -78,7 +78,7 @@ CHIP_ERROR ASN1Reader::ExitConstructedType()
 
 CHIP_ERROR ASN1Reader::GetConstructedType(const uint8_t *& val, uint32_t & valLen)
 {
-    ReturnErrorCodeIf(!Constructed, ASN1_ERROR_INVALID_STATE);
+    VerifyOrReturnError(Constructed, ASN1_ERROR_INVALID_STATE);
 
     val    = mElemStart;
     valLen = mHeadLen + ValueLen;

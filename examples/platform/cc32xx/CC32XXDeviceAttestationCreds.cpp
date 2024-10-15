@@ -350,7 +350,7 @@ CHIP_ERROR DeviceAttestationCredsCC32XX::GetFirmwareInformation(MutableByteSpan 
 CHIP_ERROR DeviceAttestationCredsCC32XX::GetDeviceAttestationCert(MutableByteSpan & out_buffer)
 {
     ReturnErrorCodeIf(out_buffer.size() < mFactoryData->dac_cert.len, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(!mFactoryData->dac_cert.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(mFactoryData->dac_cert.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     return CopySpanToMutableSpan(ByteSpan{ mFactoryData->dac_cert.data, mFactoryData->dac_cert.len }, out_buffer);
     return CHIP_NO_ERROR;
@@ -359,7 +359,7 @@ CHIP_ERROR DeviceAttestationCredsCC32XX::GetDeviceAttestationCert(MutableByteSpa
 CHIP_ERROR DeviceAttestationCredsCC32XX::GetProductAttestationIntermediateCert(MutableByteSpan & out_buffer)
 {
     ReturnErrorCodeIf(out_buffer.size() < mFactoryData->pai_cert.len, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(!mFactoryData->pai_cert.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(mFactoryData->pai_cert.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     return CopySpanToMutableSpan(ByteSpan{ mFactoryData->pai_cert.data, mFactoryData->pai_cert.len }, out_buffer);
 }

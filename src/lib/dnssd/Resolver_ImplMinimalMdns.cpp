@@ -590,7 +590,7 @@ CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResol
         break;
     }
 
-    ReturnErrorCodeIf(!qname.nameCount, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(qname.nameCount, CHIP_ERROR_NO_MEMORY);
 
     mdns::Minimal::Query query(qname);
     query
@@ -665,7 +665,7 @@ CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResol
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(builder.Ok(), CHIP_ERROR_INTERNAL);
     return CHIP_NO_ERROR;
 }
 

@@ -98,7 +98,7 @@ CHIP_ERROR ChipDeviceScanner::StartScan(uint16_t timeout)
 
 CHIP_ERROR ChipDeviceScanner::StopScan()
 {
-    ReturnErrorCodeIf(!mIsScanning, CHIP_NO_ERROR);
+    VerifyOrReturnError(mIsScanning, CHIP_NO_ERROR);
 
     int rc = esp_ble_gap_stop_scanning();
     if (rc != 0)

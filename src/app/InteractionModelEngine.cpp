@@ -1988,7 +1988,7 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
 CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
 {
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    ReturnErrorCodeIf(!mpSubscriptionResumptionStorage, CHIP_NO_ERROR);
+    VerifyOrReturnError(mpSubscriptionResumptionStorage, CHIP_NO_ERROR);
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     ReturnErrorCodeIf(mSubscriptionResumptionScheduled, CHIP_NO_ERROR);
 #endif

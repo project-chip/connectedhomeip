@@ -30,7 +30,7 @@ public:
     CHIP_ERROR SetMdnsHostName(const chip::CharSpan & hostName)
     {
         ReturnErrorCodeIf(hostName.size() != sizeof(mHostNameBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-        ReturnErrorCodeIf(!IsValidMdnsHostName(hostName), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(IsValidMdnsHostName(hostName), CHIP_ERROR_INVALID_ARGUMENT);
         memcpy(mHostNameBuffer, hostName.data(), hostName.size());
         return CHIP_NO_ERROR;
     }

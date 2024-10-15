@@ -200,7 +200,7 @@ CHIP_ERROR ResponseSender::Respond(uint16_t messageId, const QueryData & query, 
 
 CHIP_ERROR ResponseSender::FlushReply()
 {
-    ReturnErrorCodeIf(!mResponseBuilder.HasPacketBuffer(), CHIP_NO_ERROR); // nothing to flush
+    VerifyOrReturnError(mResponseBuilder.HasPacketBuffer(), CHIP_NO_ERROR); // nothing to flush
 
     if (mResponseBuilder.HasResponseRecords())
     {

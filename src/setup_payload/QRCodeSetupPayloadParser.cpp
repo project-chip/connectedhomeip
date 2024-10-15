@@ -270,7 +270,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populateTLV(SetupPayload & outPayload, cons
     ReturnErrorCodeIf(tlvBytesLength == 0, CHIP_NO_ERROR);
 
     tlvArray.Alloc(tlvBytesLength);
-    ReturnErrorCodeIf(!tlvArray, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(tlvArray, CHIP_ERROR_NO_MEMORY);
 
     for (size_t i = 0; i < tlvBytesLength; i++)
     {

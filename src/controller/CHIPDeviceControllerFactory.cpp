@@ -197,7 +197,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     {
         // TODO(#16231): Previously (and still) the objects new-ed in this entire method seem expected to last forever...
         auto newFabricTable = Platform::MakeUnique<FabricTable>();
-        ReturnErrorCodeIf(!newFabricTable, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(newFabricTable, CHIP_ERROR_NO_MEMORY);
 
         FabricTable::InitParams fabricTableInitParams;
         fabricTableInitParams.storage             = params.fabricIndependentStorage;

@@ -213,26 +213,26 @@ CHIP_ERROR NXPConfig::InitStorageWearStats(void)
 
 CHIP_ERROR NXPConfig::ReadConfigValue(Key key, bool & val)
 {
-    ReturnErrorCodeIf(!ValidConfigKey(key), CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrReturnError(ValidConfigKey(key), CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     return ReadSimpleConfigValue(key, val);
 }
 
 CHIP_ERROR NXPConfig::ReadConfigValue(Key key, uint32_t & val)
 {
-    ReturnErrorCodeIf(!ValidConfigKey(key), CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrReturnError(ValidConfigKey(key), CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     return ReadSimpleConfigValue(key, val);
 }
 
 CHIP_ERROR NXPConfig::ReadConfigValue(Key key, uint64_t & val)
 {
-    ReturnErrorCodeIf(!ValidConfigKey(key), CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrReturnError(ValidConfigKey(key), CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     return ReadSimpleConfigValue(key, val);
 }
 
 CHIP_ERROR NXPConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ReturnErrorCodeIf(!ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrReturnError(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     // Pretend that the buffer is smaller by 1 to secure space for null-character
     err = ReadConfigValueImpl(key, buf, bufSize ? bufSize - 1 : 0, outLen);
 
@@ -295,7 +295,7 @@ CHIP_ERROR NXPConfig::WriteConfigValueStr(Key key, const char * str)
 
 CHIP_ERROR NXPConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    ReturnErrorCodeIf(!ValidConfigKey(key), CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    VerifyOrReturnError(ValidConfigKey(key), CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     return WriteConfigValueImpl(key, str, strLen);
 }
 
