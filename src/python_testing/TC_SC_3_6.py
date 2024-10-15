@@ -45,8 +45,8 @@ from typing import List
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClustersObjects
 from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from chip.utils import CommissioningBuildingBlocks
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 # TODO: Overall, we need to add validation that session IDs have not changed throughout to be agnostic

@@ -157,6 +157,7 @@ __all__ = [
     "ContentControl",
     "ContentAppObserver",
     "ZoneManagement",
+    "CameraAvStreamManagement",
     "WebRTCTransportProvider",
     "WebRTCTransportRequestor",
     "Chime",
@@ -46992,6 +46993,1658 @@ class ZoneManagement(Cluster):
 
             zones: 'typing.List[uint]' = field(default_factory=lambda: [])
             reason: 'ZoneManagement.Enums.ZoneEventStoppedReasonEnum' = 0
+
+
+@dataclass
+class CameraAvStreamManagement(Cluster):
+    id: typing.ClassVar[int] = 0x00000551
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="maxConcurrentVideoEncoders", Tag=0x00000000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="maxEncodedPixelRate", Tag=0x00000001, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="videoSensorParams", Tag=0x00000002, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoSensorParamsStruct]),
+                ClusterObjectFieldDescriptor(Label="nightVisionCapable", Tag=0x00000003, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="minViewport", Tag=0x00000004, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]),
+                ClusterObjectFieldDescriptor(Label="rateDistortionTradeOffPoints", Tag=0x00000005, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct]]),
+                ClusterObjectFieldDescriptor(Label="maxPreRollBufferSize", Tag=0x00000006, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="microphoneCapabilities", Tag=0x00000007, Type=typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]),
+                ClusterObjectFieldDescriptor(Label="speakerCapabilities", Tag=0x00000008, Type=typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]),
+                ClusterObjectFieldDescriptor(Label="twoWayTalkSupport", Tag=0x00000009, Type=typing.Optional[CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum]),
+                ClusterObjectFieldDescriptor(Label="supportedSnapshotParams", Tag=0x0000000A, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotParamsStruct]]),
+                ClusterObjectFieldDescriptor(Label="maxNetworkBandwidth", Tag=0x0000000B, Type=uint),
+                ClusterObjectFieldDescriptor(Label="currentFrameRate", Tag=0x0000000C, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="HDRModeEnabled", Tag=0x0000000D, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="currentVideoCodecs", Tag=0x0000000E, Type=typing.Optional[typing.List[CameraAvStreamManagement.Enums.VideoCodecEnum]]),
+                ClusterObjectFieldDescriptor(Label="currentSnapshotConfig", Tag=0x0000000F, Type=typing.Optional[CameraAvStreamManagement.Structs.SnapshotParamsStruct]),
+                ClusterObjectFieldDescriptor(Label="fabricsUsingCamera", Tag=0x00000010, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="allocatedVideoStreams", Tag=0x00000011, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.VideoStreamStruct]]),
+                ClusterObjectFieldDescriptor(Label="allocatedAudioStreams", Tag=0x00000012, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.AudioStreamStruct]]),
+                ClusterObjectFieldDescriptor(Label="allocatedSnapshotStreams", Tag=0x00000013, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotStreamStruct]]),
+                ClusterObjectFieldDescriptor(Label="rankedVideoStreamPrioritiesList", Tag=0x00000014, Type=typing.Optional[typing.List[CameraAvStreamManagement.Enums.StreamTypeEnum]]),
+                ClusterObjectFieldDescriptor(Label="softRecordingPrivacyModeEnabled", Tag=0x00000015, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="softLivestreamPrivacyModeEnabled", Tag=0x00000016, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="hardPrivacyModeOn", Tag=0x00000017, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="nightVision", Tag=0x00000018, Type=typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]),
+                ClusterObjectFieldDescriptor(Label="nightVisionIllum", Tag=0x00000019, Type=typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]),
+                ClusterObjectFieldDescriptor(Label="AWBEnabled", Tag=0x0000001A, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="autoShutterSpeedEnabled", Tag=0x0000001B, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="autoISOEnabled", Tag=0x0000001C, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="viewport", Tag=0x0000001D, Type=typing.Optional[CameraAvStreamManagement.Structs.ViewportStruct]),
+                ClusterObjectFieldDescriptor(Label="speakerMuted", Tag=0x0000001E, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="speakerVolumeLevel", Tag=0x0000001F, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="speakerMaxLevel", Tag=0x00000020, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="speakerMinLevel", Tag=0x00000021, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="microphoneMuted", Tag=0x00000022, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="microphoneVolumeLevel", Tag=0x00000023, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="microphoneMaxLevel", Tag=0x00000024, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="microphoneMinLevel", Tag=0x00000025, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="microphoneAGCEnabled", Tag=0x00000026, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="imageRotation", Tag=0x00000027, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="imageFlipHorizontal", Tag=0x00000028, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="imageFlipVertical", Tag=0x00000029, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="localVideoRecordingEnabled", Tag=0x0000002A, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="localSnapshotRecordingEnabled", Tag=0x0000002B, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="statusLightEnabled", Tag=0x0000002C, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="statusLightBrightness", Tag=0x0000002D, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
+                ClusterObjectFieldDescriptor(Label="depthSensorStatus", Tag=0x0000002E, Type=typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    maxConcurrentVideoEncoders: 'typing.Optional[uint]' = None
+    maxEncodedPixelRate: 'typing.Optional[uint]' = None
+    videoSensorParams: 'typing.Optional[CameraAvStreamManagement.Structs.VideoSensorParamsStruct]' = None
+    nightVisionCapable: 'typing.Optional[bool]' = None
+    minViewport: 'typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]' = None
+    rateDistortionTradeOffPoints: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct]]' = None
+    maxPreRollBufferSize: 'typing.Optional[uint]' = None
+    microphoneCapabilities: 'typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]' = None
+    speakerCapabilities: 'typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]' = None
+    twoWayTalkSupport: 'typing.Optional[CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum]' = None
+    supportedSnapshotParams: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotParamsStruct]]' = None
+    maxNetworkBandwidth: 'uint' = None
+    currentFrameRate: 'typing.Optional[uint]' = None
+    HDRModeEnabled: 'typing.Optional[bool]' = None
+    currentVideoCodecs: 'typing.Optional[typing.List[CameraAvStreamManagement.Enums.VideoCodecEnum]]' = None
+    currentSnapshotConfig: 'typing.Optional[CameraAvStreamManagement.Structs.SnapshotParamsStruct]' = None
+    fabricsUsingCamera: 'typing.List[uint]' = None
+    allocatedVideoStreams: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.VideoStreamStruct]]' = None
+    allocatedAudioStreams: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.AudioStreamStruct]]' = None
+    allocatedSnapshotStreams: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotStreamStruct]]' = None
+    rankedVideoStreamPrioritiesList: 'typing.Optional[typing.List[CameraAvStreamManagement.Enums.StreamTypeEnum]]' = None
+    softRecordingPrivacyModeEnabled: 'typing.Optional[bool]' = None
+    softLivestreamPrivacyModeEnabled: 'typing.Optional[bool]' = None
+    hardPrivacyModeOn: 'typing.Optional[bool]' = None
+    nightVision: 'typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]' = None
+    nightVisionIllum: 'typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]' = None
+    AWBEnabled: 'typing.Optional[bool]' = None
+    autoShutterSpeedEnabled: 'typing.Optional[bool]' = None
+    autoISOEnabled: 'typing.Optional[bool]' = None
+    viewport: 'typing.Optional[CameraAvStreamManagement.Structs.ViewportStruct]' = None
+    speakerMuted: 'typing.Optional[bool]' = None
+    speakerVolumeLevel: 'typing.Optional[uint]' = None
+    speakerMaxLevel: 'typing.Optional[uint]' = None
+    speakerMinLevel: 'typing.Optional[uint]' = None
+    microphoneMuted: 'typing.Optional[bool]' = None
+    microphoneVolumeLevel: 'typing.Optional[uint]' = None
+    microphoneMaxLevel: 'typing.Optional[uint]' = None
+    microphoneMinLevel: 'typing.Optional[uint]' = None
+    microphoneAGCEnabled: 'typing.Optional[bool]' = None
+    imageRotation: 'typing.Optional[uint]' = None
+    imageFlipHorizontal: 'typing.Optional[bool]' = None
+    imageFlipVertical: 'typing.Optional[bool]' = None
+    localVideoRecordingEnabled: 'typing.Optional[bool]' = None
+    localSnapshotRecordingEnabled: 'typing.Optional[bool]' = None
+    statusLightEnabled: 'typing.Optional[bool]' = None
+    statusLightBrightness: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
+    depthSensorStatus: 'typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]' = None
+    generatedCommandList: 'typing.List[uint]' = None
+    acceptedCommandList: 'typing.List[uint]' = None
+    eventList: 'typing.List[uint]' = None
+    attributeList: 'typing.List[uint]' = None
+    featureMap: 'uint' = None
+    clusterRevision: 'uint' = None
+
+    class Enums:
+        class AudioCodecEnum(MatterIntEnum):
+            kOpus = 0x00
+            kAacLc = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
+        class ImageCodecEnum(MatterIntEnum):
+            kJpeg = 0x00
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 1
+
+        class StreamTypeEnum(MatterIntEnum):
+            kInternal = 0x00
+            kRecording = 0x01
+            kAnalysis = 0x02
+            kLiveView = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
+
+        class TriStateAutoEnum(MatterIntEnum):
+            kOff = 0x00
+            kOn = 0x01
+            kAuto = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
+        class TwoWayTalkSupportTypeEnum(MatterIntEnum):
+            kNotSupported = 0x00
+            kHalfDuplex = 0x01
+            kFullDuplex = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
+        class VideoCodecEnum(MatterIntEnum):
+            kH264 = 0x00
+            kHevc = 0x01
+            kVvc = 0x02
+            kAv1 = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kPrivacy = 0x1
+            kAudio = 0x2
+            kSpeaker = 0x4
+            kImageControl = 0x8
+            kVideo = 0x10
+            kSnapshot = 0x20
+            kWatermark = 0x40
+            kOnScreenDisplay = 0x80
+            kLocalStorage = 0x100
+
+    class Structs:
+        @dataclass
+        class VideoResolutionStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="width", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="height", Tag=1, Type=uint),
+                    ])
+
+            width: 'uint' = 0
+            height: 'uint' = 0
+
+        @dataclass
+        class VideoStreamStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamType", Tag=1, Type=CameraAvStreamManagement.Enums.StreamTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="videoCodec", Tag=2, Type=CameraAvStreamManagement.Enums.VideoCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="minFrameRate", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="maxFrameRate", Tag=4, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=5, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=6, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="minBitRate", Tag=7, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="maxBitRate", Tag=8, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="minFragmentLen", Tag=9, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="maxFragmentLen", Tag=10, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="watermarkEnabled", Tag=11, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="OSDEnabled", Tag=12, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="referenceCount", Tag=13, Type=uint),
+                    ])
+
+            videoStreamID: 'uint' = 0
+            streamType: 'CameraAvStreamManagement.Enums.StreamTypeEnum' = 0
+            videoCodec: 'CameraAvStreamManagement.Enums.VideoCodecEnum' = 0
+            minFrameRate: 'uint' = 0
+            maxFrameRate: 'uint' = 0
+            minResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            maxResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            minBitRate: 'uint' = 0
+            maxBitRate: 'uint' = 0
+            minFragmentLen: 'uint' = 0
+            maxFragmentLen: 'uint' = 0
+            watermarkEnabled: 'typing.Optional[bool]' = None
+            OSDEnabled: 'typing.Optional[bool]' = None
+            referenceCount: 'uint' = 0
+
+        @dataclass
+        class SnapshotStreamStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="snapshotStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="imageCodec", Tag=1, Type=CameraAvStreamManagement.Enums.ImageCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="frameRate", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="bitRate", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=4, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=5, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="quality", Tag=6, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="referenceCount", Tag=7, Type=uint),
+                    ])
+
+            snapshotStreamID: 'uint' = 0
+            imageCodec: 'CameraAvStreamManagement.Enums.ImageCodecEnum' = 0
+            frameRate: 'uint' = 0
+            bitRate: 'uint' = 0
+            minResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            maxResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            quality: 'uint' = 0
+            referenceCount: 'uint' = 0
+
+        @dataclass
+        class SnapshotParamsStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="resolution", Tag=0, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="maxFrameRate", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="imageCodec", Tag=2, Type=CameraAvStreamManagement.Enums.ImageCodecEnum),
+                    ])
+
+            resolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            maxFrameRate: 'uint' = 0
+            imageCodec: 'CameraAvStreamManagement.Enums.ImageCodecEnum' = 0
+
+        @dataclass
+        class RateDistortionTradeOffPointsStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="codec", Tag=0, Type=CameraAvStreamManagement.Enums.VideoCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="resolution", Tag=1, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="minBitRate", Tag=2, Type=uint),
+                    ])
+
+            codec: 'CameraAvStreamManagement.Enums.VideoCodecEnum' = 0
+            resolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            minBitRate: 'uint' = 0
+
+        @dataclass
+        class AudioCapabilitiesStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="maxNumberOfChannels", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="supportedCodecs", Tag=1, Type=typing.List[CameraAvStreamManagement.Enums.AudioCodecEnum]),
+                        ClusterObjectFieldDescriptor(Label="supportedSampleRates", Tag=2, Type=typing.List[uint]),
+                        ClusterObjectFieldDescriptor(Label="supportedBitDepths", Tag=3, Type=typing.List[uint]),
+                    ])
+
+            maxNumberOfChannels: 'uint' = 0
+            supportedCodecs: 'typing.List[CameraAvStreamManagement.Enums.AudioCodecEnum]' = field(default_factory=lambda: [])
+            supportedSampleRates: 'typing.List[uint]' = field(default_factory=lambda: [])
+            supportedBitDepths: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AudioStreamStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamType", Tag=1, Type=CameraAvStreamManagement.Enums.StreamTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="audioCodec", Tag=2, Type=CameraAvStreamManagement.Enums.AudioCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="channelCount", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sampleRate", Tag=4, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="bitRate", Tag=5, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="bitDepth", Tag=6, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="referenceCount", Tag=7, Type=uint),
+                    ])
+
+            audioStreamID: 'uint' = 0
+            streamType: 'CameraAvStreamManagement.Enums.StreamTypeEnum' = 0
+            audioCodec: 'CameraAvStreamManagement.Enums.AudioCodecEnum' = 0
+            channelCount: 'uint' = 0
+            sampleRate: 'uint' = 0
+            bitRate: 'uint' = 0
+            bitDepth: 'uint' = 0
+            referenceCount: 'uint' = 0
+
+        @dataclass
+        class VideoSensorParamsStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="sensorWidth", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sensorHeight", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="HDRCapable", Tag=2, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="maxFPS", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="maxHDRFPS", Tag=4, Type=uint),
+                    ])
+
+            sensorWidth: 'uint' = 0
+            sensorHeight: 'uint' = 0
+            HDRCapable: 'bool' = False
+            maxFPS: 'uint' = 0
+            maxHDRFPS: 'uint' = 0
+
+        @dataclass
+        class ViewportStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="x1", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="y1", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="x2", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="y2", Tag=3, Type=uint),
+                    ])
+
+            x1: 'uint' = 0
+            y1: 'uint' = 0
+            x2: 'uint' = 0
+            y2: 'uint' = 0
+
+    class Commands:
+        @dataclass
+        class AudioStreamAllocate(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'AudioStreamAllocateResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="streamType", Tag=0, Type=CameraAvStreamManagement.Enums.StreamTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="audioCodec", Tag=1, Type=CameraAvStreamManagement.Enums.AudioCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="channelCount", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sampleRate", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="bitRate", Tag=4, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="bitDepth", Tag=5, Type=uint),
+                    ])
+
+            streamType: 'CameraAvStreamManagement.Enums.StreamTypeEnum' = 0
+            audioCodec: 'CameraAvStreamManagement.Enums.AudioCodecEnum' = 0
+            channelCount: 'uint' = 0
+            sampleRate: 'uint' = 0
+            bitRate: 'uint' = 0
+            bitDepth: 'uint' = 0
+
+        @dataclass
+        class AudioStreamAllocateResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=0, Type=uint),
+                    ])
+
+            audioStreamID: 'uint' = 0
+
+        @dataclass
+        class AudioStreamDeallocate(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=0, Type=uint),
+                    ])
+
+            audioStreamID: 'uint' = 0
+
+        @dataclass
+        class VideoStreamAllocate(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'VideoStreamAllocateResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="streamType", Tag=0, Type=CameraAvStreamManagement.Enums.StreamTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="videoCodec", Tag=1, Type=CameraAvStreamManagement.Enums.VideoCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="minFrameRate", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="maxFrameRate", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=4, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=5, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="minBitRate", Tag=6, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="maxBitRate", Tag=7, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="minFragmentLen", Tag=8, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="maxFragmentLen", Tag=9, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="watermarkEnabled", Tag=10, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="OSDEnabled", Tag=11, Type=typing.Optional[bool]),
+                    ])
+
+            streamType: 'CameraAvStreamManagement.Enums.StreamTypeEnum' = 0
+            videoCodec: 'CameraAvStreamManagement.Enums.VideoCodecEnum' = 0
+            minFrameRate: 'uint' = 0
+            maxFrameRate: 'uint' = 0
+            minResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            maxResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            minBitRate: 'uint' = 0
+            maxBitRate: 'uint' = 0
+            minFragmentLen: 'uint' = 0
+            maxFragmentLen: 'uint' = 0
+            watermarkEnabled: 'typing.Optional[bool]' = None
+            OSDEnabled: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class VideoStreamAllocateResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=0, Type=uint),
+                    ])
+
+            videoStreamID: 'uint' = 0
+
+        @dataclass
+        class VideoStreamModify(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="resolution", Tag=1, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]),
+                        ClusterObjectFieldDescriptor(Label="watermarkEnabled", Tag=2, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="OSDEnabled", Tag=3, Type=typing.Optional[bool]),
+                    ])
+
+            videoStreamID: 'uint' = 0
+            resolution: 'typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]' = None
+            watermarkEnabled: 'typing.Optional[bool]' = None
+            OSDEnabled: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class VideoStreamDeallocate(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000006
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=0, Type=uint),
+                    ])
+
+            videoStreamID: 'uint' = 0
+
+        @dataclass
+        class SnapshotStreamAllocate(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000007
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'SnapshotStreamAllocateResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="imageCodec", Tag=0, Type=CameraAvStreamManagement.Enums.ImageCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="frameRate", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="bitRate", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=3, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=4, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="quality", Tag=5, Type=uint),
+                    ])
+
+            imageCodec: 'CameraAvStreamManagement.Enums.ImageCodecEnum' = 0
+            frameRate: 'uint' = 0
+            bitRate: 'uint' = 0
+            minResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            maxResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            quality: 'uint' = 0
+
+        @dataclass
+        class SnapshotStreamAllocateResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000008
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="snapshotStreamID", Tag=0, Type=uint),
+                    ])
+
+            snapshotStreamID: 'uint' = 0
+
+        @dataclass
+        class SnapshotStreamDeallocate(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000009
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="snapshotStreamID", Tag=0, Type=uint),
+                    ])
+
+            snapshotStreamID: 'uint' = 0
+
+        @dataclass
+        class SetStreamPriorities(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x0000000A
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="streamPriorities", Tag=0, Type=typing.List[CameraAvStreamManagement.Enums.StreamTypeEnum]),
+                    ])
+
+            streamPriorities: 'typing.List[CameraAvStreamManagement.Enums.StreamTypeEnum]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class CaptureSnapshot(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x0000000B
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="snapshotStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="requestedResolution", Tag=1, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                    ])
+
+            snapshotStreamID: 'uint' = 0
+            requestedResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+
+        @dataclass
+        class CaptureSnapshotResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x0000000C
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="data", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="imageCodec", Tag=1, Type=CameraAvStreamManagement.Enums.ImageCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="resolution", Tag=2, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                    ])
+
+            data: 'bytes' = b""
+            imageCodec: 'CameraAvStreamManagement.Enums.ImageCodecEnum' = 0
+            resolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+
+        @dataclass
+        class SetViewport(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x0000000D
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="viewport", Tag=0, Type=CameraAvStreamManagement.Structs.ViewportStruct),
+                    ])
+
+            viewport: 'CameraAvStreamManagement.Structs.ViewportStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.ViewportStruct())
+
+        @dataclass
+        class SetImageRotation(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x0000000E
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="angle", Tag=0, Type=uint),
+                    ])
+
+            angle: 'uint' = 0
+
+        @dataclass
+        class SetImageFlipHorizontal(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x0000000F
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="enabled", Tag=0, Type=bool),
+                    ])
+
+            enabled: 'bool' = False
+
+        @dataclass
+        class SetImageFlipVertical(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000010
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="enabled", Tag=0, Type=bool),
+                    ])
+
+            enabled: 'bool' = False
+
+    class Attributes:
+        @dataclass
+        class MaxConcurrentVideoEncoders(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class MaxEncodedPixelRate(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class VideoSensorParams(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Structs.VideoSensorParamsStruct])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Structs.VideoSensorParamsStruct]' = None
+
+        @dataclass
+        class NightVisionCapable(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class MinViewport(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]' = None
+
+        @dataclass
+        class RateDistortionTradeOffPoints(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct]])
+
+            value: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct]]' = None
+
+        @dataclass
+        class MaxPreRollBufferSize(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class MicrophoneCapabilities(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]' = None
+
+        @dataclass
+        class SpeakerCapabilities(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000008
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]' = None
+
+        @dataclass
+        class TwoWayTalkSupport(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000009
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum]' = None
+
+        @dataclass
+        class SupportedSnapshotParams(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000A
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotParamsStruct]])
+
+            value: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotParamsStruct]]' = None
+
+        @dataclass
+        class MaxNetworkBandwidth(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000B
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class CurrentFrameRate(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000C
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class HDRModeEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000D
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class CurrentVideoCodecs(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000E
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Enums.VideoCodecEnum]])
+
+            value: 'typing.Optional[typing.List[CameraAvStreamManagement.Enums.VideoCodecEnum]]' = None
+
+        @dataclass
+        class CurrentSnapshotConfig(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000F
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Structs.SnapshotParamsStruct])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Structs.SnapshotParamsStruct]' = None
+
+        @dataclass
+        class FabricsUsingCamera(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000010
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AllocatedVideoStreams(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000011
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.VideoStreamStruct]])
+
+            value: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.VideoStreamStruct]]' = None
+
+        @dataclass
+        class AllocatedAudioStreams(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000012
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.AudioStreamStruct]])
+
+            value: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.AudioStreamStruct]]' = None
+
+        @dataclass
+        class AllocatedSnapshotStreams(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000013
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotStreamStruct]])
+
+            value: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotStreamStruct]]' = None
+
+        @dataclass
+        class RankedVideoStreamPrioritiesList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000014
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Enums.StreamTypeEnum]])
+
+            value: 'typing.Optional[typing.List[CameraAvStreamManagement.Enums.StreamTypeEnum]]' = None
+
+        @dataclass
+        class SoftRecordingPrivacyModeEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000015
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class SoftLivestreamPrivacyModeEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000016
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class HardPrivacyModeOn(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000017
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class NightVision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000018
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]' = None
+
+        @dataclass
+        class NightVisionIllum(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000019
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]' = None
+
+        @dataclass
+        class AWBEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000001A
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class AutoShutterSpeedEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000001B
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class AutoISOEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000001C
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class Viewport(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000001D
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Structs.ViewportStruct])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Structs.ViewportStruct]' = None
+
+        @dataclass
+        class SpeakerMuted(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000001E
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class SpeakerVolumeLevel(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000001F
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class SpeakerMaxLevel(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000020
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class SpeakerMinLevel(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000021
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class MicrophoneMuted(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000022
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class MicrophoneVolumeLevel(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000023
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class MicrophoneMaxLevel(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000024
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class MicrophoneMinLevel(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000025
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class MicrophoneAGCEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000026
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class ImageRotation(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000027
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class ImageFlipHorizontal(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000028
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class ImageFlipVertical(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000029
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class LocalVideoRecordingEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000002A
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class LocalSnapshotRecordingEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000002B
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class StatusLightEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000002C
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class StatusLightBrightness(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000002D
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum])
+
+            value: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
+
+        @dataclass
+        class DepthSensorStatus(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000002E
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]' = None
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class EventList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFA
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+    class Events:
+        @dataclass
+        class VideoStreamChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamType", Tag=1, Type=typing.Optional[CameraAvStreamManagement.Enums.StreamTypeEnum]),
+                        ClusterObjectFieldDescriptor(Label="videoCodec", Tag=2, Type=typing.Optional[CameraAvStreamManagement.Enums.VideoCodecEnum]),
+                        ClusterObjectFieldDescriptor(Label="minFrameRate", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="maxFrameRate", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=5, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]),
+                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=6, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]),
+                        ClusterObjectFieldDescriptor(Label="minBitRate", Tag=7, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="maxBitRate", Tag=8, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="minFragmentLen", Tag=9, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="maxFragmentLen", Tag=10, Type=typing.Optional[uint]),
+                    ])
+
+            videoStreamID: 'uint' = 0
+            streamType: 'typing.Optional[CameraAvStreamManagement.Enums.StreamTypeEnum]' = None
+            videoCodec: 'typing.Optional[CameraAvStreamManagement.Enums.VideoCodecEnum]' = None
+            minFrameRate: 'typing.Optional[uint]' = None
+            maxFrameRate: 'typing.Optional[uint]' = None
+            minResolution: 'typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]' = None
+            maxResolution: 'typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]' = None
+            minBitRate: 'typing.Optional[uint]' = None
+            maxBitRate: 'typing.Optional[uint]' = None
+            minFragmentLen: 'typing.Optional[uint]' = None
+            maxFragmentLen: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class AudioStreamChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamType", Tag=1, Type=typing.Optional[CameraAvStreamManagement.Enums.StreamTypeEnum]),
+                        ClusterObjectFieldDescriptor(Label="audioCodec", Tag=2, Type=typing.Optional[CameraAvStreamManagement.Enums.AudioCodecEnum]),
+                        ClusterObjectFieldDescriptor(Label="channelCount", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="sampleRate", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="bitRate", Tag=5, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="bitDepth", Tag=6, Type=typing.Optional[uint]),
+                    ])
+
+            audioStreamID: 'uint' = 0
+            streamType: 'typing.Optional[CameraAvStreamManagement.Enums.StreamTypeEnum]' = None
+            audioCodec: 'typing.Optional[CameraAvStreamManagement.Enums.AudioCodecEnum]' = None
+            channelCount: 'typing.Optional[uint]' = None
+            sampleRate: 'typing.Optional[uint]' = None
+            bitRate: 'typing.Optional[uint]' = None
+            bitDepth: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class SnapshotStreamChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="snapshotStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="imageCodec", Tag=1, Type=typing.Optional[CameraAvStreamManagement.Enums.ImageCodecEnum]),
+                        ClusterObjectFieldDescriptor(Label="frameRate", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="bitRate", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=4, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]),
+                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=5, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]),
+                        ClusterObjectFieldDescriptor(Label="quality", Tag=6, Type=typing.Optional[uint]),
+                    ])
+
+            snapshotStreamID: 'uint' = 0
+            imageCodec: 'typing.Optional[CameraAvStreamManagement.Enums.ImageCodecEnum]' = None
+            frameRate: 'typing.Optional[uint]' = None
+            bitRate: 'typing.Optional[uint]' = None
+            minResolution: 'typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]' = None
+            maxResolution: 'typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]' = None
+            quality: 'typing.Optional[uint]' = None
 
 
 @dataclass

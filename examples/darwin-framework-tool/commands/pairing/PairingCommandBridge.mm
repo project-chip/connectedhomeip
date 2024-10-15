@@ -19,6 +19,7 @@
 #import <Matter/Matter.h>
 
 #include "../common/CHIPCommandBridge.h"
+#include "../common/CertificateIssuer.h"
 #include "DeviceControllerDelegateBridge.h"
 #include "PairingCommandBridge.h"
 #include <lib/support/logging/CHIPLogging.h>
@@ -51,6 +52,12 @@ void PairingCommandBridge::SetUpDeviceControllerDelegate()
     CHIPToolDeviceControllerDelegate * deviceControllerDelegate = [[CHIPToolDeviceControllerDelegate alloc] init];
     [deviceControllerDelegate setCommandBridge:this];
     [deviceControllerDelegate setDeviceID:mNodeId];
+
+    // With per-controller storage, the certificate issuer creates the operational certificate.
+    // When using shared storage, this step is a no-op.
+    auto * certificateIssuer = [CertificateIssuer sharedInstance];
+    certificateIssuer.nextNodeID = @(mNodeId);
+    certificateIssuer.fabricID = CurrentCommissionerFabricId();
 
     if (mCommissioningType != CommissioningType::None) {
         MTRCommissioningParameters * params = [[MTRCommissioningParameters alloc] init];
