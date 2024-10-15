@@ -56,6 +56,8 @@ chip_mdns = "platform"
 #chip_automation_logging = true
 #chip_error_logging = true
 
+chip_progress_logging = false
+
 chip_system_config_use_open_thread_inet_endpoints = true
 chip_with_lwip = false
 
