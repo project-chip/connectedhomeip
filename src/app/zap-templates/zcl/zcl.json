@@ -22,6 +22,7 @@
         "boolean-state-configuration-cluster.xml",
         "actions-cluster.xml",
         "bridged-device-basic-information.xml",
+        "camera-av-stream-management-cluster.xml",
         "chime-cluster.xml",
         "chip-ota.xml",
         "channel-cluster.xml",
@@ -662,7 +663,15 @@
             "ThreadNetworks",
             "ThreadNetworkTableSize"
         ],
-        "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"]
+        "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"],
+        "Camera AV Stream Management": [
+            "VideoSensorParams",
+            "MinViewport",
+            "MicrophoneCapabilities",
+            "SpeakerCapabilities",
+            "CurrentSnapshotConfig",
+            "Viewport"
+        ]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",
