@@ -407,7 +407,7 @@ Done
 Over-The-Air software updates are supported with the RW61x all-clusters example.
 The process to follow in order to perform a software update is described in the
 dedicated guide
-['Matter Over-The-Air Software Update with NXP RW61x example applications'](../../../../../docs/platforms/nxp/nxp_rw61x_ota_software_update.md).
+['Matter Over-The-Air Software Update with NXP RW61x example applications'](../../../../../docs/platforms/nxp/nxp_RTs_ota_software_update.md).
 
 <a name="thread-border-router-overview"></a>
 

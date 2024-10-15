@@ -412,7 +412,7 @@ out/debug/chip-rt1060-all-cluster-example.
 Optional GN options that can be added when building an application:
 
 -   To enable the
-    [secondary network commissioning interface](../../../../../docs/guides/nxp/nxp_otbr_guide.md#using-the-secondary-network-commissioning-interface),
+    [secondary network commissioning interface](../../../../../docs/platforms/nxp/nxp_otbr_guide.md#using-the-secondary-network-commissioning-interface),
     the arguments `chip_enable_secondary_nwk_if=true` and
     `chip_device_config_thread_network_endpoint_id=3` must be added to the _gn
     gen_ command. Note that this is only supported when building the Matter over
@@ -428,14 +428,14 @@ Optional GN options that can be added when building an application:
 -   To build with the option to have Matter certificates/keys pre-loaded in a
     specific flash area the argument `chip_with_factory_data=1` must be added to
     the _gn gen_ command. For more information, see
-    [Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp/nxp_manufacturing_flow.md)
+    [Guide for writing manufacturing data on NXP devices](../../../../../docs/platforms/nxp/nxp_manufacturing_flow.md)
 
 <a name="manufacturing"></a>
 
 ## Manufacturing data
 
 See
-[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp/nxp_manufacturing_flow.md)
+[Guide for writing manufacturing data on NXP devices](../../../../../docs/platforms/nxp/nxp_manufacturing_flow.md)
 
 Other comments:
 
@@ -600,7 +600,7 @@ The "ble-thread" pairing method can be used in order to commission the device.
 In order to create or join a Thread network on the Matter Border Router, the TBR
 management cluster or the `otcli` commands from the matter CLI can be used. For
 more information about using the TBR management cluster follow instructions from
-['Using the TBR management cluster'](../../../../../docs/guides/nxp/nxp_otbr_guide.md#using-the-thread-border-router-management-cluster).
+['Using the TBR management cluster'](../../../../../docs/platforms/nxp/nxp_otbr_guide.md#using-the-thread-border-router-management-cluster).
 For more information about using the matter shell, follow instructions from
 ['Testing the all-clusters application with Matter CLI'](#testing-the-all-clusters-application-with-matter-cli-enabled).
 
@@ -720,4 +720,4 @@ To enable Thread Border Router support see the [build](README.md#building)
 section.
 
 The complete Border Router guide is located
-[here](../../../../../docs/guides/nxp/nxp_otbr_guide.md).
+[here](../../../../../docs/platforms/nxp/nxp_otbr_guide.md).
