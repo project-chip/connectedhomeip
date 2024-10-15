@@ -44,9 +44,8 @@ namespace MicrowaveOvenControl {
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
                    BitMask<MicrowaveOvenControl::Feature> aFeature, Clusters::OperationalState::Instance & aOpStateInstance,
                    Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
-    AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
-    mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
+    CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId), AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId),
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
     mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
 {
     mDelegate->SetInstance(this);
@@ -248,11 +247,16 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
 
     if (startAfterSetting.HasValue())
     {
+        ConcreteCommandPath commandPath(mEndpointId, OperationalState::Id, OperationalState::Commands::Start::Id);
+
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+        bool commandExists = ServerClusterCommandExists(commandPath) == Status::Success;
+#else
+        bool commandExists =
+            InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetAcceptedCommandInfo(commandPath).has_value();
+#endif
         VerifyOrExit(
-            ServerClusterCommandExists(
-                ConcreteCommandPath(mEndpointId, OperationalState::Id, OperationalState::Commands::Start::Id)) == Status::Success,
-            status = Status::InvalidCommand;
-            ChipLogError(
+            commandExists, status = Status::InvalidCommand; ChipLogError(
                 Zcl,
                 "Microwave Oven Control: Failed to set cooking parameters, Start command of operational state is not supported"));
     }
