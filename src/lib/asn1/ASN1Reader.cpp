@@ -153,7 +153,7 @@ CHIP_ERROR ASN1Reader::GetInteger(int64_t & val)
     size_t valPaddingLen                = sizeof(int64_t) - ValueLen;
 
     VerifyOrReturnError(Value != nullptr, ASN1_ERROR_INVALID_STATE);
-    ReturnErrorCodeIf(ValueLen < 1, ASN1_ERROR_INVALID_ENCODING);
+    VerifyOrReturnError(ValueLen >= 1, ASN1_ERROR_INVALID_ENCODING);
     ReturnErrorCodeIf(ValueLen > sizeof(int64_t), ASN1_ERROR_VALUE_OVERFLOW);
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);
 
@@ -187,7 +187,7 @@ CHIP_ERROR ASN1Reader::GetUTCTime(ASN1UniversalTime & outTime)
 {
     // Supported Encoding: YYMMDDHHMMSSZ
     VerifyOrReturnError(Value != nullptr, ASN1_ERROR_INVALID_STATE);
-    ReturnErrorCodeIf(ValueLen < 1, ASN1_ERROR_INVALID_ENCODING);
+    VerifyOrReturnError(ValueLen >= 1, ASN1_ERROR_INVALID_ENCODING);
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);
     VerifyOrReturnError(ValueLen == 13 && Value[12] == 'Z', ASN1_ERROR_UNSUPPORTED_ENCODING);
 
@@ -198,7 +198,7 @@ CHIP_ERROR ASN1Reader::GetGeneralizedTime(ASN1UniversalTime & outTime)
 {
     // Supported Encoding: YYYYMMDDHHMMSSZ
     VerifyOrReturnError(Value != nullptr, ASN1_ERROR_INVALID_STATE);
-    ReturnErrorCodeIf(ValueLen < 1, ASN1_ERROR_INVALID_ENCODING);
+    VerifyOrReturnError(ValueLen >= 1, ASN1_ERROR_INVALID_ENCODING);
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);
     VerifyOrReturnError(ValueLen == 15 && Value[14] == 'Z', ASN1_ERROR_UNSUPPORTED_ENCODING);
 
@@ -220,7 +220,7 @@ CHIP_ERROR ASN1Reader::GetBitString(uint32_t & outVal)
 {
     // NOTE: only supports DER encoding.
     VerifyOrReturnError(Value != nullptr, ASN1_ERROR_INVALID_STATE);
-    ReturnErrorCodeIf(ValueLen < 1, ASN1_ERROR_INVALID_ENCODING);
+    VerifyOrReturnError(ValueLen >= 1, ASN1_ERROR_INVALID_ENCODING);
     ReturnErrorCodeIf(ValueLen > 5, ASN1_ERROR_UNSUPPORTED_ENCODING);
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);
 

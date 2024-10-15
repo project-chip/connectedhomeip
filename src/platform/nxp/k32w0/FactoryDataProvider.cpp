@@ -76,7 +76,7 @@ CHIP_ERROR FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t * pBuf
 
         if (searchedType == type)
         {
-            ReturnErrorCodeIf(bufLength < length, CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrReturnError(bufLength >= length, CHIP_ERROR_BUFFER_TOO_SMALL);
             memcpy(pBuf, (void *) (addr + kValueOffset), length);
 
             if (offset)

@@ -108,7 +108,7 @@ const char * GetOIDName(OID oid)
 CHIP_ERROR ASN1Reader::GetObjectId(OID & oid)
 {
     VerifyOrReturnError(Value != nullptr, ASN1_ERROR_INVALID_STATE);
-    ReturnErrorCodeIf(ValueLen < 1, ASN1_ERROR_INVALID_ENCODING);
+    VerifyOrReturnError(ValueLen >= 1, ASN1_ERROR_INVALID_ENCODING);
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);
     VerifyOrReturnError(CanCastTo<uint16_t>(ValueLen), ASN1_ERROR_INVALID_ENCODING);
     oid = ParseObjectID(Value, static_cast<uint16_t>(ValueLen));

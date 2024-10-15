@@ -55,7 +55,7 @@ CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId)
 
     // Ensure we have at least totalLength chars.
     size_t len = strnlen(name, totalLength);
-    ReturnErrorCodeIf(len < totalLength, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(len >= totalLength, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Check that we have a proper terminator.
     ReturnErrorCodeIf(name[totalLength] != '\0' && name[totalLength] != '.', CHIP_ERROR_WRONG_NODE_ID);
@@ -81,7 +81,7 @@ CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId)
 
 CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, const chip::ByteSpan & macOrEui64)
 {
-    ReturnErrorCodeIf(bufferLen < macOrEui64.size() * 2 + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(bufferLen >= macOrEui64.size() * 2 + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     int idx = 0;
     for (size_t i = 0; i < macOrEui64.size(); ++i)

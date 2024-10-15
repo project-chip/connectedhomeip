@@ -110,7 +110,7 @@ void OTAImageHeaderParser::Append(ByteSpan & buffer, uint32_t numBytes)
 
 CHIP_ERROR OTAImageHeaderParser::DecodeFixed()
 {
-    ReturnErrorCodeIf(mBufferOffset < kFixedHeaderSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(mBufferOffset >= kFixedHeaderSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     Encoding::LittleEndian::Reader reader(mBuffer.Get(), mBufferOffset);
     uint32_t fileIdentifier;
@@ -129,7 +129,7 @@ CHIP_ERROR OTAImageHeaderParser::DecodeFixed()
 
 CHIP_ERROR OTAImageHeaderParser::DecodeTlv(OTAImageHeader & header)
 {
-    ReturnErrorCodeIf(mBufferOffset < mHeaderTlvSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(mBufferOffset >= mHeaderTlvSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     TLV::TLVReader tlvReader;
     tlvReader.Init(mBuffer.Get(), mBufferOffset);
