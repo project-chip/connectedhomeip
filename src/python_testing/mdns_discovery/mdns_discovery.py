@@ -84,14 +84,14 @@ class MdnsServiceType(Enum):
 
 class MdnsServiceListener(ServiceListener):
     """
-    A service listener required for the TXT record data to get populated and come back
+    A service listener required during mDNS service discovery
     """
 
     def __init__(self):
         self.updated_event = asyncio.Event()
 
     def add_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
-        sleep(0.25)
+        sleep(0.125)
         self.updated_event.set()
 
     def remove_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
@@ -141,7 +141,7 @@ class MdnsDiscovery:
         """
         Asynchronously discovers a commissioner mDNS service within the network.
 
-        Args:
+        Optional args:
             log_output (bool): Logs the discovered services to the console. Defaults to False.
             discovery_timeout_sec (float): Defaults to 15 seconds.
 
@@ -157,7 +157,7 @@ class MdnsDiscovery:
         """
         Asynchronously discovers a commissionable mDNS service within the network.
 
-        Args:
+        Optional args:
             log_output (bool): Logs the discovered services to the console. Defaults to False.
             discovery_timeout_sec (float): Defaults to 15 seconds.
 
@@ -176,16 +176,19 @@ class MdnsDiscovery:
         """
         Asynchronously discovers an operational mDNS service within the network.
 
-        Args:
+        Optional args:
             log_output (bool): Logs the discovered services to the console. Defaults to False.
             discovery_timeout_sec (float): Defaults to 15 seconds.
-            node_id: the node id to create the service name from 
-            compressed_fabric_id: the fabric id to create the service name from 
+            node_id: the node id to create the service name from
+            compressed_fabric_id: the fabric id to create the service name from
 
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
         """
-        # Validation to ensure both or none of the parameters are provided
+
+        # Validation to ensure that both node_id and compressed_fabric_id are provided or both are None.
+        if (node_id is None) != (compressed_fabric_id is None):
+            raise ValueError("Both node_id and compressed_fabric_id must be provided together or not at all.")
 
         self._name_filter = f'{compressed_fabric_id:016x}-{node_id:016x}.{MdnsServiceType.OPERATIONAL.value}'.upper()
         return await self._get_service(MdnsServiceType.OPERATIONAL, log_output, discovery_timeout_sec)
@@ -196,7 +199,7 @@ class MdnsDiscovery:
         """
         Asynchronously discovers a border router mDNS service within the network.
 
-        Args:
+        Optional args:
             log_output (bool): Logs the discovered services to the console. Defaults to False.
             discovery_timeout_sec (float): Defaults to 15 seconds.
 
@@ -211,7 +214,7 @@ class MdnsDiscovery:
         """
         Asynchronously discovers all available mDNS services within the network.
 
-        Args:
+        Optional args:
             log_output (bool): Logs the discovered services to the console. Defaults to False.
             discovery_timeout_sec (float): Defaults to 15 seconds.
 
@@ -229,7 +232,7 @@ class MdnsDiscovery:
         of the service types discovered. This method utilizes the AsyncZeroconfServiceTypes.async_find()
         function to perform the network scan for mDNS services.
 
-        Args:
+        Optional args:
             log_output (bool): If set to True, the discovered service types are logged to the console.
                             This can be useful for debugging or informational purposes. Defaults to False.
             discovery_timeout_sec (float): The maximum time (in seconds) to wait for the discovery process. Defaults to 10.0 seconds.
@@ -242,11 +245,11 @@ class MdnsDiscovery:
         try:
             discovered_services = list(await asyncio.wait_for(AsyncZeroconfServiceTypes.async_find(), timeout=discovery_timeout_sec))
         except asyncio.TimeoutError:
-            print(f"MDNS service types discovery timed out after {discovery_timeout_sec} seconds.")
+            logger.info(f"MDNS service types discovery timed out after {discovery_timeout_sec} seconds.")
             discovered_services = []
 
         if log_output:
-            print(f"MDNS discovered service types: {discovered_services}")
+            logger.info(f"MDNS discovered service types: {discovered_services}")
 
         return discovered_services
 
@@ -260,12 +263,19 @@ class MdnsDiscovery:
         Asynchronously discovers an mDNS service within the network by service name, service type,
         and record type.
 
-        Args:
+        Required args:
+            service_name (str): The unique name of the mDNS service.
+            Example:            
+                C82B83803DECA0B2-0000000012344321._matter._tcp.local.
+            
+            record_type (DNSRecordType): The type of record to look for (SRV, TXT, AAAA, A).
+            Example:
+                _matterd._tcp.local. (from the MdnsServiceType enum)
+
+        Optional args:
+            service_type (str): The service type of the service. Defaults to None.
             log_output (bool): Logs the discovered services to the console. Defaults to False.
             discovery_timeout_sec (float): Defaults to 15 seconds.
-            service_name (str): The unique name of the mDNS service. Defaults to None.
-            service_type (str): The service type of the service. Defaults to None.
-            record_type (DNSRecordType): The type of record to look for (SRV, TXT, AAAA, A).
 
         Returns:
             Union[Optional[MdnsServiceInfo], Optional[DNSRecord]]: An instance of MdnsServiceInfo,
@@ -274,10 +284,10 @@ class MdnsDiscovery:
         mdns_service_info = None
 
         if service_type:
-            print(
+            logger.info(
                 f"\nLooking for MDNS service type '{service_type}',  service name '{service_name}', record type '{record_type.name}'\n")
         else:
-            print(
+            logger.info(
                 f"\nLooking for MDNS service with service name '{service_name}', record type '{record_type.name}'\n")
 
         # Adds service listener
@@ -288,7 +298,7 @@ class MdnsDiscovery:
         try:
             await asyncio.wait_for(service_listener.updated_event.wait(), discovery_timeout_sec)
         except asyncio.TimeoutError:
-            print(f"Service lookup for {service_name} timeout ({discovery_timeout_sec}) reached without an update.")
+            logger.info(f"Service lookup for {service_name} timeout ({discovery_timeout_sec}) reached without an update.")
         finally:
             self._zc.remove_service_listener(service_listener)
 
@@ -307,7 +317,7 @@ class MdnsDiscovery:
                     dns_incoming = DNSIncoming(listener.data)
                     if dns_incoming.data:
                         answers = dns_incoming.answers()
-                        print(f"\nIncoming DNSRecord: {answers}\n")
+                        logger.info(f"\nIncoming DNSRecord: {answers}\n")
                         return answers.pop(0) if answers else None
         else:
             # Adds service to discovered services
@@ -510,7 +520,7 @@ class MdnsDiscovery:
 
     def _log_output(self) -> str:
         """
-        Converts the discovered services to a JSON string and log it.
+        Converts the discovered services to a JSON string and logs it.
 
         The method is intended to be used for debugging or informational purposes, providing a clear and
         comprehensive view of all services discovered during the mDNS service discovery process.

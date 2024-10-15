@@ -177,11 +177,13 @@ class TC_SC_4_3(MatterBaseTest):
 
     @staticmethod
     def verify_hostname(hostname: str) -> bool:
-        # Remove '.local' or '.local.' suffix if present
+        # Remove any trailing dot
+        if hostname.endswith('.'):
+            hostname = hostname[:-1]
+
+        # Remove '.local' suffix if present
         if hostname.endswith('.local'):
             hostname = hostname[:-6]
-        elif hostname.endswith('.local.'):
-            hostname = hostname[:-7]
 
         # Regular expression to match an uppercase hexadecimal string of 12 or 16 characters
         pattern = re.compile(r'^[0-9A-F]{12}$|^[0-9A-F]{16}$')
@@ -204,9 +206,9 @@ class TC_SC_4_3(MatterBaseTest):
         self.step(2)
         ep0_servers = await self.get_descriptor_server_list()
 
-        # Check if ep0_servers contains the ICD Management cluster ID (0x0046)
+        # Check if ep0_servers contain the ICD Management cluster ID (0x0046)
         supports_icd = Clusters.IcdManagement.id in ep0_servers
-        logging.info(f"\n\n\tsupports_icd: {supports_icd}\n\n")
+        logging.info(f"supports_icd: {supports_icd}")
 
         # *** STEP 3 ***
         # If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves
@@ -214,7 +216,7 @@ class TC_SC_4_3(MatterBaseTest):
         self.step(3)
         if supports_icd:
             active_mode_threshold_ms = await self.get_idle_mode_threshhold_ms()
-        logging.info(f"\n\n\tactive_mode_threshold_ms: {active_mode_threshold_ms}\n\n")
+        logging.info(f"active_mode_threshold_ms: {active_mode_threshold_ms}")
 
         # *** STEP 4 ***
         # If supports_icd is true, TH reads FeatureMap from the ICD Management cluster on EP0. If the LITS feature
@@ -224,7 +226,7 @@ class TC_SC_4_3(MatterBaseTest):
             feature_map = await self.get_icd_feature_map()
             LITS = Clusters.IcdManagement.Bitmaps.Feature.kLongIdleTimeSupport
             supports_lit = bool(feature_map & LITS == LITS)
-            logging.info(f"\n\n\tkLongIdleTimeSupport set: {supports_lit}\n\n")
+            logging.info(f"kLongIdleTimeSupport set: {supports_lit}")
 
         # *** STEP 5 ***
         # TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the
