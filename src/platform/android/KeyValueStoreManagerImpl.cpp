@@ -142,7 +142,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 {
     VerifyOrReturnError(mKeyValueStoreManagerObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mSetMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorCodeIf(value_size > kMaxKvsValueBytes, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(value_size <= kMaxKvsValueBytes, CHIP_ERROR_INVALID_ARGUMENT);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_ERROR_INTERNAL);

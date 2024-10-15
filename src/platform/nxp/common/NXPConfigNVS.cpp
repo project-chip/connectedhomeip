@@ -259,7 +259,7 @@ CHIP_ERROR NXPConfig::ReadConfigValueBin(const char * keyString, uint8_t * buf, 
 
     // to be able to concat CHIP_DEVICE_STRING_SETTINGS_KEY"/" and keyString, + 1 for end char
     key_name_len = strlen(keyString) + strlen(CHIP_DEVICE_STRING_SETTINGS_KEY) + 1;
-    ReturnErrorCodeIf(key_name_len > (SETTINGS_MAX_NAME_LEN + 1), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    VerifyOrReturnError(key_name_len <= (SETTINGS_MAX_NAME_LEN + 1), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
     sprintf(key_name, CHIP_DEVICE_STRING_SETTINGS_KEY "/%s", keyString);
     settings_load_subtree_direct(key_name, ConfigValueCallback, &request);
@@ -311,7 +311,7 @@ CHIP_ERROR NXPConfig::WriteConfigValueBin(const char * keyString, const uint8_t 
 
     // to be able to concat CHIP_DEVICE_STRING_SETTINGS_KEY"/" and keyString, + 1 for end char
     key_name_len = strlen(keyString) + strlen(CHIP_DEVICE_STRING_SETTINGS_KEY) + 1;
-    ReturnErrorCodeIf(key_name_len > (SETTINGS_MAX_NAME_LEN + 1), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    VerifyOrReturnError(key_name_len <= (SETTINGS_MAX_NAME_LEN + 1), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
     sprintf(key_name, CHIP_DEVICE_STRING_SETTINGS_KEY "/%s", keyString);
     if (settings_save_one(key_name, data, dataLen) != 0)
@@ -340,7 +340,7 @@ CHIP_ERROR NXPConfig::ClearConfigValue(const char * keyString)
 
     // to be able to concat CHIP_DEVICE_STRING_SETTINGS_KEY"/" and keyString, + 1 for end char
     key_name_len = strlen(keyString) + strlen(CHIP_DEVICE_STRING_SETTINGS_KEY) + 1;
-    ReturnErrorCodeIf(key_name_len > (SETTINGS_MAX_NAME_LEN + 1), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    VerifyOrReturnError(key_name_len <= (SETTINGS_MAX_NAME_LEN + 1), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
     sprintf(key_name, CHIP_DEVICE_STRING_SETTINGS_KEY "/%s", keyString);
     if (settings_delete(key_name) != 0)

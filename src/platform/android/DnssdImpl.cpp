@@ -247,7 +247,7 @@ CHIP_ERROR extractProtocol(const char * serviceType, char (&outServiceName)[N], 
     VerifyOrReturnError(dotPos != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     size_t lengthWithoutProtocol = static_cast<size_t>(dotPos - serviceType);
-    ReturnErrorCodeIf(lengthWithoutProtocol + 1 > N, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(lengthWithoutProtocol + 1 <= N, CHIP_ERROR_INVALID_ARGUMENT);
 
     memcpy(outServiceName, serviceType, lengthWithoutProtocol);
     outServiceName[lengthWithoutProtocol] = '\0'; // Set a null terminator

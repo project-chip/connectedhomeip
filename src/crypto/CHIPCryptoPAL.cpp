@@ -75,7 +75,7 @@ CHIP_ERROR ReadDerUnsignedIntegerIntoRaw(Reader & reader, MutableByteSpan raw_in
 
     // Check for pseudo-zero to mark unsigned value
     // This means we have too large an integer (should be at most 1 byte too large), it's invalid
-    ReturnErrorCodeIf(integer_len > (raw_integer_out.size() + 1), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(integer_len <= (raw_integer_out.size() + 1), CHIP_ERROR_INVALID_ARGUMENT);
 
     if (integer_len == (raw_integer_out.size() + 1u))
     {

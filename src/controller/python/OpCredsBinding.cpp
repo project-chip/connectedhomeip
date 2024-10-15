@@ -413,9 +413,9 @@ PyChipError pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(
     uint8_t * rcac, uint32_t rcacLen, const uint8_t * ipk, uint32_t ipkLen, chip::VendorId adminVendorId,
     bool enableServerInteractions)
 {
-    ReturnErrorCodeIf(nocLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
-    ReturnErrorCodeIf(icacLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
-    ReturnErrorCodeIf(rcacLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(nocLen <= Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(icacLen <= Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(rcacLen <= Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
 
     ChipLogDetail(Controller, "Creating New Device Controller");
 

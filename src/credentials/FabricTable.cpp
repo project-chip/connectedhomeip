@@ -2110,7 +2110,7 @@ CHIP_ERROR FabricTable::SetFabricLabel(FabricIndex fabricIndex, const CharSpan &
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
-    ReturnErrorCodeIf(fabricLabel.size() > kFabricLabelMaxLengthInBytes, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(fabricLabel.size() <= kFabricLabelMaxLengthInBytes, CHIP_ERROR_INVALID_ARGUMENT);
 
     FabricInfo * fabricInfo  = GetMutableFabricByIndex(fabricIndex);
     bool fabricIsInitialized = (fabricInfo != nullptr) && fabricInfo->IsInitialized();

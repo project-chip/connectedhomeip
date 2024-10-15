@@ -118,7 +118,7 @@ CHIP_ERROR OTAImageHeaderParser::DecodeFixed()
     ReturnErrorOnFailure(reader.Read32(&fileIdentifier).Read64(&totalSize).Read32(&mHeaderTlvSize).StatusCode());
     VerifyOrReturnError(fileIdentifier == kOTAImageFileIdentifier, CHIP_ERROR_INVALID_FILE_IDENTIFIER);
     // Safety check against malicious headers.
-    ReturnErrorCodeIf(mHeaderTlvSize > kMaxHeaderSize, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(mHeaderTlvSize <= kMaxHeaderSize, CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(mBuffer.Alloc(mHeaderTlvSize), CHIP_ERROR_NO_MEMORY);
 
     mState        = State::kTlv;
@@ -146,7 +146,7 @@ CHIP_ERROR OTAImageHeaderParser::DecodeTlv(OTAImageHeader & header)
     ReturnErrorOnFailure(tlvReader.Get(header.mSoftwareVersion));
     ReturnErrorOnFailure(tlvReader.Next(TLV::ContextTag(Tag::kSoftwareVersionString)));
     ReturnErrorOnFailure(tlvReader.Get(header.mSoftwareVersionString));
-    ReturnErrorCodeIf(header.mSoftwareVersionString.size() > kMaxSoftwareVersionStringSize, CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrReturnError(header.mSoftwareVersionString.size() <= kMaxSoftwareVersionStringSize, CHIP_ERROR_INVALID_STRING_LENGTH);
     ReturnErrorOnFailure(tlvReader.Next(TLV::ContextTag(Tag::kPayloadSize)));
     ReturnErrorOnFailure(tlvReader.Get(header.mPayloadSize));
     ReturnErrorOnFailure(tlvReader.Next());
@@ -166,7 +166,7 @@ CHIP_ERROR OTAImageHeaderParser::DecodeTlv(OTAImageHeader & header)
     if (tlvReader.GetTag() == TLV::ContextTag(Tag::kReleaseNotesURL))
     {
         ReturnErrorOnFailure(tlvReader.Get(header.mReleaseNotesURL));
-        ReturnErrorCodeIf(header.mReleaseNotesURL.size() > kMaxReleaseNotesURLSize, CHIP_ERROR_INVALID_STRING_LENGTH);
+        VerifyOrReturnError(header.mReleaseNotesURL.size() <= kMaxReleaseNotesURLSize, CHIP_ERROR_INVALID_STRING_LENGTH);
         ReturnErrorOnFailure(tlvReader.Next());
     }
 

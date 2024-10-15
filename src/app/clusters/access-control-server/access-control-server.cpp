@@ -367,7 +367,7 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
             }
             auto & item = iterator.GetValue();
             // TODO(#13590): generated code doesn't automatically handle max length so do it manually
-            ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+            VerifyOrReturnError(item.data.size() <= kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
             ReturnErrorOnFailure(CheckExtensionEntryDataFormat(item.data));
 
@@ -390,7 +390,7 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
         AccessControlCluster::Structs::AccessControlExtensionStruct::DecodableType item;
         ReturnErrorOnFailure(aDecoder.Decode(item));
         // TODO(#13590): generated code doesn't automatically handle max length so do it manually
-        ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnError(item.data.size() <= kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         ReturnErrorOnFailure(CheckExtensionEntryDataFormat(item.data));
 

@@ -627,7 +627,7 @@ bool CsaCdKeysTrustStore::IsCdTestKey(const ByteSpan & kid) const
 
 CHIP_ERROR CsaCdKeysTrustStore::AddTrustedKey(const ByteSpan & kid, const Crypto::P256PublicKey & pubKey)
 {
-    ReturnErrorCodeIf(kid.size() > SingleKeyEntry::kMaxKidSize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(kid.size() <= SingleKeyEntry::kMaxKidSize, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(kid.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mNumTrustedKeys != kMaxNumTrustedKeys, CHIP_ERROR_NO_MEMORY);
 
