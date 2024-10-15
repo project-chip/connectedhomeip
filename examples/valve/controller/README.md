@@ -39,7 +39,7 @@ To compile the chip-repl, from the root of the chip tree:
 . scripts/activate.sh
 ./scripts/build_python.sh -i out/pyenv
 source out/pyenv/activate
-out/pyenv/chip-repl --
+out/pyenv/bin/chip-repl
 ```
 
 The chip-repl is a shell that lets you directly call python functions. It
@@ -60,7 +60,7 @@ from chip import ChipDeviceCtrl
 await devCtrl.CommissionOnNetwork(nodeId=1, setupPinCode=20202021, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=3840)
 ```
 
-### Interacting with teh valve app
+### Interacting with the valve app
 
 To create a drinks machine controller:
 
