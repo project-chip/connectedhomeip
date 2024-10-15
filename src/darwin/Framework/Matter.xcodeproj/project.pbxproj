@@ -259,6 +259,22 @@
 		754784672BFE93B00089C372 /* MTRDeviceStorageBehaviorConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 754784632BFE65B70089C372 /* MTRDeviceStorageBehaviorConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		754F3DF427FBB94B00E60580 /* MTREventTLVValueDecoder_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 754F3DF327FBB94B00E60580 /* MTREventTLVValueDecoder_Internal.h */; };
 		7560FD1C27FBBD3F005E85B3 /* MTREventTLVValueDecoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7560FD1B27FBBD3F005E85B3 /* MTREventTLVValueDecoder.mm */; };
+		7592BCF32CBEE98C00EB74A0 /* Instance.h in Headers */ = {isa = PBXBuildFile; fileRef = 7592BCF12CBEE98C00EB74A0 /* Instance.h */; };
+		7592BCF42CBEE98C00EB74A0 /* EmberMetadata.h in Headers */ = {isa = PBXBuildFile; fileRef = 7592BCEF2CBEE98C00EB74A0 /* EmberMetadata.h */; };
+		7592BCF52CBEE98C00EB74A0 /* CodegenDataModelProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 7592BCEB2CBEE98C00EB74A0 /* CodegenDataModelProvider.h */; };
+		7592BCF62CBEE98C00EB74A0 /* CodegenDataModelProvider_Read.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7592BCED2CBEE98C00EB74A0 /* CodegenDataModelProvider_Read.cpp */; };
+		7592BCF72CBEE98C00EB74A0 /* Instance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7592BCF22CBEE98C00EB74A0 /* Instance.cpp */; };
+		7592BCF82CBEE98C00EB74A0 /* EmberMetadata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7592BCF02CBEE98C00EB74A0 /* EmberMetadata.cpp */; };
+		7592BCF92CBEE98C00EB74A0 /* CodegenDataModelProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7592BCEC2CBEE98C00EB74A0 /* CodegenDataModelProvider.cpp */; };
+		7592BCFA2CBEE98C00EB74A0 /* CodegenDataModelProvider_Write.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7592BCEE2CBEE98C00EB74A0 /* CodegenDataModelProvider_Write.cpp */; };
+		7592BCFB2CBEE98C00EB74A0 /* CodegenDataModelProvider_Read.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7592BCED2CBEE98C00EB74A0 /* CodegenDataModelProvider_Read.cpp */; };
+		7592BCFC2CBEE98C00EB74A0 /* Instance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7592BCF22CBEE98C00EB74A0 /* Instance.cpp */; };
+		7592BCFD2CBEE98C00EB74A0 /* EmberMetadata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7592BCF02CBEE98C00EB74A0 /* EmberMetadata.cpp */; };
+		7592BCFE2CBEE98C00EB74A0 /* CodegenDataModelProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7592BCEC2CBEE98C00EB74A0 /* CodegenDataModelProvider.cpp */; };
+		7592BCFF2CBEE98C00EB74A0 /* CodegenDataModelProvider_Write.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7592BCEE2CBEE98C00EB74A0 /* CodegenDataModelProvider_Write.cpp */; };
+		7592BD002CBEE98C00EB74A0 /* Instance.h in Headers */ = {isa = PBXBuildFile; fileRef = 7592BCF12CBEE98C00EB74A0 /* Instance.h */; };
+		7592BD012CBEE98C00EB74A0 /* EmberMetadata.h in Headers */ = {isa = PBXBuildFile; fileRef = 7592BCEF2CBEE98C00EB74A0 /* EmberMetadata.h */; };
+		7592BD022CBEE98C00EB74A0 /* CodegenDataModelProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 7592BCEB2CBEE98C00EB74A0 /* CodegenDataModelProvider.h */; };
 		7596A83E28751220004DAE0E /* MTRBaseClusters_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 7596A83D28751220004DAE0E /* MTRBaseClusters_Internal.h */; };
 		7596A84428762729004DAE0E /* MTRDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 7596A84228762729004DAE0E /* MTRDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7596A84528762729004DAE0E /* MTRDevice.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7596A84328762729004DAE0E /* MTRDevice.mm */; };
@@ -707,6 +723,14 @@
 		754784662BFE6B890089C372 /* MTRDeviceStorageBehaviorConfiguration_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceStorageBehaviorConfiguration_Internal.h; sourceTree = "<group>"; };
 		754F3DF327FBB94B00E60580 /* MTREventTLVValueDecoder_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTREventTLVValueDecoder_Internal.h; sourceTree = "<group>"; };
 		7560FD1B27FBBD3F005E85B3 /* MTREventTLVValueDecoder.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTREventTLVValueDecoder.mm; sourceTree = "<group>"; };
+		7592BCEB2CBEE98C00EB74A0 /* CodegenDataModelProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CodegenDataModelProvider.h; sourceTree = "<group>"; };
+		7592BCEC2CBEE98C00EB74A0 /* CodegenDataModelProvider.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CodegenDataModelProvider.cpp; sourceTree = "<group>"; };
+		7592BCED2CBEE98C00EB74A0 /* CodegenDataModelProvider_Read.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CodegenDataModelProvider_Read.cpp; sourceTree = "<group>"; };
+		7592BCEE2CBEE98C00EB74A0 /* CodegenDataModelProvider_Write.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CodegenDataModelProvider_Write.cpp; sourceTree = "<group>"; };
+		7592BCEF2CBEE98C00EB74A0 /* EmberMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EmberMetadata.h; sourceTree = "<group>"; };
+		7592BCF02CBEE98C00EB74A0 /* EmberMetadata.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = EmberMetadata.cpp; sourceTree = "<group>"; };
+		7592BCF12CBEE98C00EB74A0 /* Instance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Instance.h; sourceTree = "<group>"; };
+		7592BCF22CBEE98C00EB74A0 /* Instance.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Instance.cpp; sourceTree = "<group>"; };
 		7596A83D28751220004DAE0E /* MTRBaseClusters_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRBaseClusters_Internal.h; sourceTree = "<group>"; };
 		7596A84228762729004DAE0E /* MTRDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDevice.h; sourceTree = "<group>"; };
 		7596A84328762729004DAE0E /* MTRDevice.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDevice.mm; sourceTree = "<group>"; };
@@ -1089,6 +1113,7 @@
 		1E857311265519DE0050A4D9 /* app */ = {
 			isa = PBXGroup;
 			children = (
+				7521D2932CBECE3F00218E16 /* codegen-data-model-provider */,
 				75A202E72BA8DBB700A771DD /* reporting */,
 				5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */,
 				514C79F22B62ED5500DD6D7B /* attribute-storage.cpp */,
@@ -1247,6 +1272,21 @@
 				514C7A032B6436D500DD6D7B /* MTRServerCluster_Internal.h */,
 			);
 			path = ServerEndpoint;
+			sourceTree = "<group>";
+		};
+		7521D2932CBECE3F00218E16 /* codegen-data-model-provider */ = {
+			isa = PBXGroup;
+			children = (
+				7592BCEB2CBEE98C00EB74A0 /* CodegenDataModelProvider.h */,
+				7592BCEC2CBEE98C00EB74A0 /* CodegenDataModelProvider.cpp */,
+				7592BCED2CBEE98C00EB74A0 /* CodegenDataModelProvider_Read.cpp */,
+				7592BCEE2CBEE98C00EB74A0 /* CodegenDataModelProvider_Write.cpp */,
+				7592BCEF2CBEE98C00EB74A0 /* EmberMetadata.h */,
+				7592BCF02CBEE98C00EB74A0 /* EmberMetadata.cpp */,
+				7592BCF12CBEE98C00EB74A0 /* Instance.h */,
+				7592BCF22CBEE98C00EB74A0 /* Instance.cpp */,
+			);
+			path = "codegen-data-model-provider";
 			sourceTree = "<group>";
 		};
 		75A202E72BA8DBB700A771DD /* reporting */ = {
@@ -1655,6 +1695,9 @@
 				037C3DB72991BD5000B7EEE2 /* ModelCommandBridge.h in Headers */,
 				037C3DC52991BD5100B7EEE2 /* StorageManagementCommand.h in Headers */,
 				037C3DCC2991BD5100B7EEE2 /* MTRError_Utils.h in Headers */,
+				7592BD002CBEE98C00EB74A0 /* Instance.h in Headers */,
+				7592BD012CBEE98C00EB74A0 /* EmberMetadata.h in Headers */,
+				7592BD022CBEE98C00EB74A0 /* CodegenDataModelProvider.h in Headers */,
 				037C3DAD2991BD4F00B7EEE2 /* PairingCommandBridge.h in Headers */,
 				037C3DBB2991BD5000B7EEE2 /* Commands.h in Headers */,
 				512431262BA0C8BA000BC136 /* ResetMRPParametersCommand.h in Headers */,
@@ -1781,6 +1824,9 @@
 				51FE723F2ACDEF3E00437032 /* MTRCommandPayloadExtensions_Internal.h in Headers */,
 				51D0B12E2B6177FD006E3511 /* MTRAccessGrant.h in Headers */,
 				1E4D655029C208DD00BC3478 /* MTRCommissionableBrowserDelegate.h in Headers */,
+				7592BCF32CBEE98C00EB74A0 /* Instance.h in Headers */,
+				7592BCF42CBEE98C00EB74A0 /* EmberMetadata.h in Headers */,
+				7592BCF52CBEE98C00EB74A0 /* CodegenDataModelProvider.h in Headers */,
 				7596A84828762783004DAE0E /* MTRAsyncCallbackWorkQueue.h in Headers */,
 				5A7947E527C0129F00434CF2 /* MTRDeviceController+XPC.h in Headers */,
 				51E95DFB2A78443C00A434F0 /* MTRSessionResumptionStorageBridge.h in Headers */,
@@ -1945,6 +1991,11 @@
 				B45373D12A9FEB0C00807602 /* alloc.c in Sources */,
 				B45373DD2A9FEB5300807602 /* base64-decode.c in Sources */,
 				B45373D22A9FEB0C00807602 /* buflist.c in Sources */,
+				7592BCFB2CBEE98C00EB74A0 /* CodegenDataModelProvider_Read.cpp in Sources */,
+				7592BCFC2CBEE98C00EB74A0 /* Instance.cpp in Sources */,
+				7592BCFD2CBEE98C00EB74A0 /* EmberMetadata.cpp in Sources */,
+				7592BCFE2CBEE98C00EB74A0 /* CodegenDataModelProvider.cpp in Sources */,
+				7592BCFF2CBEE98C00EB74A0 /* CodegenDataModelProvider_Write.cpp in Sources */,
 				B45373C12A9FEA9100807602 /* close.c in Sources */,
 				B45373D42A9FEB0C00807602 /* context.c in Sources */,
 				B45373E52A9FEBA400807602 /* date.c in Sources */,
@@ -2040,6 +2091,11 @@
 				515C1C6F284F9FFB00A48F0C /* MTRFramework.mm in Sources */,
 				51029DF6293AA6100087AFB0 /* MTROperationalCertificateIssuer.mm in Sources */,
 				27A53C1827FBC6920053F131 /* MTRAttestationTrustStoreBridge.mm in Sources */,
+				7592BCF62CBEE98C00EB74A0 /* CodegenDataModelProvider_Read.cpp in Sources */,
+				7592BCF72CBEE98C00EB74A0 /* Instance.cpp in Sources */,
+				7592BCF82CBEE98C00EB74A0 /* EmberMetadata.cpp in Sources */,
+				7592BCF92CBEE98C00EB74A0 /* CodegenDataModelProvider.cpp in Sources */,
+				7592BCFA2CBEE98C00EB74A0 /* CodegenDataModelProvider_Write.cpp in Sources */,
 				93B2CF9A2B56E45C00E4D187 /* MTRClusterNames.mm in Sources */,
 				998F287126D56940001846C6 /* MTRP256KeypairBridge.mm in Sources */,
 				516416012B6B483C00D5CE11 /* MTRIMDispatch.mm in Sources */,
