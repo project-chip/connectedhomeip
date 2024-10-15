@@ -133,7 +133,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     // OperationalCertificateStore needs to be provided to init the fabric table if fabric table is
     // not provided wholesale.
     ReturnErrorCodeIf((params.fabricTable == nullptr) && (params.opCertStore == nullptr), CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(params.sessionKeystore == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(params.sessionKeystore != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CONFIG_NETWORK_LAYER_BLE
 #if CONFIG_DEVICE_LAYER

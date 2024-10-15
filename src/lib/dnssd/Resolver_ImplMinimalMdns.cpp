@@ -770,7 +770,7 @@ CHIP_ERROR MinMdnsResolver::ScheduleRetries()
 {
     MATTER_TRACE_SCOPE("Schedule retries", "MinMdnsResolver");
 
-    ReturnErrorCodeIf(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mSystemLayer->CancelTimer(&RetryCallback, this);
 
     std::optional<System::Clock::Timeout> delay = mActiveResolves.GetTimeUntilNextExpectedResponse();

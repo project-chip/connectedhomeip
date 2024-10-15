@@ -59,7 +59,7 @@ CHIP_ERROR ASN1Reader::Next()
 
     ResetElementState();
 
-    ReturnErrorCodeIf(mElemStart == mContainerEnd, ASN1_END);
+    VerifyOrReturnError(mElemStart != mContainerEnd, ASN1_END);
 
     return DecodeHead();
 }
@@ -103,7 +103,7 @@ CHIP_ERROR ASN1Reader::ExitEncapsulatedType()
 
 CHIP_ERROR ASN1Reader::EnterContainer(uint32_t offset)
 {
-    ReturnErrorCodeIf(mNumSavedContexts == kMaxContextDepth, ASN1_ERROR_MAX_DEPTH_EXCEEDED);
+    VerifyOrReturnError(mNumSavedContexts != kMaxContextDepth, ASN1_ERROR_MAX_DEPTH_EXCEEDED);
 
     mSavedContexts[mNumSavedContexts].ElemStart     = mElemStart;
     mSavedContexts[mNumSavedContexts].HeadLen       = mHeadLen;
@@ -127,7 +127,7 @@ CHIP_ERROR ASN1Reader::EnterContainer(uint32_t offset)
 
 CHIP_ERROR ASN1Reader::ExitContainer()
 {
-    ReturnErrorCodeIf(mNumSavedContexts == 0, ASN1_ERROR_INVALID_STATE);
+    VerifyOrReturnError(mNumSavedContexts != 0, ASN1_ERROR_INVALID_STATE);
 
     ASN1ParseContext & prevContext = mSavedContexts[--mNumSavedContexts];
 
@@ -152,7 +152,7 @@ CHIP_ERROR ASN1Reader::GetInteger(int64_t & val)
     uint8_t encodedVal[sizeof(int64_t)] = { 0 };
     size_t valPaddingLen                = sizeof(int64_t) - ValueLen;
 
-    ReturnErrorCodeIf(Value == nullptr, ASN1_ERROR_INVALID_STATE);
+    VerifyOrReturnError(Value != nullptr, ASN1_ERROR_INVALID_STATE);
     ReturnErrorCodeIf(ValueLen < 1, ASN1_ERROR_INVALID_ENCODING);
     ReturnErrorCodeIf(ValueLen > sizeof(int64_t), ASN1_ERROR_VALUE_OVERFLOW);
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);
@@ -173,7 +173,7 @@ CHIP_ERROR ASN1Reader::GetInteger(int64_t & val)
 
 CHIP_ERROR ASN1Reader::GetBoolean(bool & val)
 {
-    ReturnErrorCodeIf(Value == nullptr, ASN1_ERROR_INVALID_STATE);
+    VerifyOrReturnError(Value != nullptr, ASN1_ERROR_INVALID_STATE);
     ReturnErrorCodeIf(ValueLen != 1, ASN1_ERROR_INVALID_ENCODING);
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);
     VerifyOrReturnError(Value[0] == 0 || Value[0] == 0xFF, ASN1_ERROR_INVALID_ENCODING);
@@ -186,7 +186,7 @@ CHIP_ERROR ASN1Reader::GetBoolean(bool & val)
 CHIP_ERROR ASN1Reader::GetUTCTime(ASN1UniversalTime & outTime)
 {
     // Supported Encoding: YYMMDDHHMMSSZ
-    ReturnErrorCodeIf(Value == nullptr, ASN1_ERROR_INVALID_STATE);
+    VerifyOrReturnError(Value != nullptr, ASN1_ERROR_INVALID_STATE);
     ReturnErrorCodeIf(ValueLen < 1, ASN1_ERROR_INVALID_ENCODING);
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);
     VerifyOrReturnError(ValueLen == 13 && Value[12] == 'Z', ASN1_ERROR_UNSUPPORTED_ENCODING);
@@ -197,7 +197,7 @@ CHIP_ERROR ASN1Reader::GetUTCTime(ASN1UniversalTime & outTime)
 CHIP_ERROR ASN1Reader::GetGeneralizedTime(ASN1UniversalTime & outTime)
 {
     // Supported Encoding: YYYYMMDDHHMMSSZ
-    ReturnErrorCodeIf(Value == nullptr, ASN1_ERROR_INVALID_STATE);
+    VerifyOrReturnError(Value != nullptr, ASN1_ERROR_INVALID_STATE);
     ReturnErrorCodeIf(ValueLen < 1, ASN1_ERROR_INVALID_ENCODING);
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);
     VerifyOrReturnError(ValueLen == 15 && Value[14] == 'Z', ASN1_ERROR_UNSUPPORTED_ENCODING);
@@ -219,7 +219,7 @@ static uint8_t ReverseBits(uint8_t v)
 CHIP_ERROR ASN1Reader::GetBitString(uint32_t & outVal)
 {
     // NOTE: only supports DER encoding.
-    ReturnErrorCodeIf(Value == nullptr, ASN1_ERROR_INVALID_STATE);
+    VerifyOrReturnError(Value != nullptr, ASN1_ERROR_INVALID_STATE);
     ReturnErrorCodeIf(ValueLen < 1, ASN1_ERROR_INVALID_ENCODING);
     ReturnErrorCodeIf(ValueLen > 5, ASN1_ERROR_UNSUPPORTED_ENCODING);
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);

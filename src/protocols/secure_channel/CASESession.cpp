@@ -784,7 +784,7 @@ CHIP_ERROR CASESession::SendSigma1()
 
     // Lookup fabric info.
     const auto * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
-    ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // Validate that we have a session ID allocated.
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);

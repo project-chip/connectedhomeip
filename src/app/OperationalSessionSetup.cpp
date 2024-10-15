@@ -318,7 +318,7 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
 #endif
 
     mCASEClient = mClientPool->Allocate();
-    ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(mCASEClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESession);
     CHIP_ERROR err = mCASEClient->EstablishSession(mInitParams, mPeerId, mDeviceAddress, config, this);

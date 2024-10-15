@@ -230,7 +230,7 @@ CHIP_ERROR NxpChipDnssdRemoveServices()
 
 CHIP_ERROR NxpChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
-    ReturnErrorCodeIf(service == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
     uint32_t txtBufferOffset    = 0;

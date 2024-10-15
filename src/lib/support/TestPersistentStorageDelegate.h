@@ -227,7 +227,7 @@ protected:
 
         uint16_t valueSizeUint16 = static_cast<uint16_t>(valueSize);
         ReturnErrorCodeIf(size == 0 && valueSizeUint16 == 0, CHIP_NO_ERROR);
-        ReturnErrorCodeIf(buffer == nullptr, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(buffer != nullptr, CHIP_ERROR_BUFFER_TOO_SMALL);
 
         uint16_t sizeToCopy = std::min(size, valueSizeUint16);
 

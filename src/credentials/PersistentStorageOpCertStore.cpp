@@ -210,7 +210,7 @@ bool PersistentStorageOpCertStore::HasCertificateForFabric(FabricIndex fabricInd
 
 CHIP_ERROR PersistentStorageOpCertStore::AddNewTrustedRootCertForFabric(FabricIndex fabricIndex, const ByteSpan & rcac)
 {
-    ReturnErrorCodeIf(mStorage == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
     ReturnErrorCodeIf(rcac.empty() || (rcac.size() > Credentials::kMaxCHIPCertLength), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -234,7 +234,7 @@ CHIP_ERROR PersistentStorageOpCertStore::AddNewTrustedRootCertForFabric(FabricIn
 CHIP_ERROR PersistentStorageOpCertStore::AddNewOpCertsForFabric(FabricIndex fabricIndex, const ByteSpan & noc,
                                                                 const ByteSpan & icac)
 {
-    ReturnErrorCodeIf(mStorage == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
     ReturnErrorCodeIf(noc.empty() || (noc.size() > Credentials::kMaxCHIPCertLength), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(icac.size() > Credentials::kMaxCHIPCertLength, CHIP_ERROR_INVALID_ARGUMENT);
@@ -275,7 +275,7 @@ CHIP_ERROR PersistentStorageOpCertStore::AddNewOpCertsForFabric(FabricIndex fabr
 CHIP_ERROR PersistentStorageOpCertStore::UpdateOpCertsForFabric(FabricIndex fabricIndex, const ByteSpan & noc,
                                                                 const ByteSpan & icac)
 {
-    ReturnErrorCodeIf(mStorage == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
     ReturnErrorCodeIf(noc.empty() || (noc.size() > Credentials::kMaxCHIPCertLength), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(icac.size() > Credentials::kMaxCHIPCertLength, CHIP_ERROR_INVALID_ARGUMENT);

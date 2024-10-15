@@ -295,7 +295,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::NOCChainGenerated(CHIP_ERROR sta
                                                                   Optional<Crypto::IdentityProtectionKeySpan> ipk,
                                                                   Optional<NodeId> adminSubject)
 {
-    ReturnErrorCodeIf(mOnNOCCompletionCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mOnNOCCompletionCallback != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     Callback::Callback<OnNOCChainGeneration> * onCompletion = mOnNOCCompletionCallback;
     mOnNOCCompletionCallback                                = nullptr;

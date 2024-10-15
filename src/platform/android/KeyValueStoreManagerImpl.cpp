@@ -81,10 +81,10 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrReturnError(mKeyValueStoreManagerObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorCodeIf(mGetMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mGetMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    ReturnErrorCodeIf(env == nullptr, CHIP_JNI_ERROR_NO_ENV);
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
 
     chip::UtfString javaKey(env, key);
 
@@ -141,11 +141,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
     VerifyOrReturnError(mKeyValueStoreManagerObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorCodeIf(mSetMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mSetMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(value_size > kMaxKvsValueBytes, CHIP_ERROR_INVALID_ARGUMENT);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INTERNAL);
 
     std::unique_ptr<char[]> buffer(new char[BASE64_ENCODED_LEN(value_size) + 1]);
 
@@ -171,10 +171,10 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
     VerifyOrReturnError(mKeyValueStoreManagerObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorCodeIf(mDeleteMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mDeleteMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INTERNAL);
 
     UtfString javaKey(env, key);
 

@@ -925,7 +925,7 @@ CHIP_ERROR DeriveGroupOperationalCredentials(const ByteSpan & epoch_key, const B
 CHIP_ERROR ExtractVIDPIDFromAttributeString(DNAttrType attrType, const ByteSpan & attr,
                                             AttestationCertVidPid & vidpidFromMatterAttr, AttestationCertVidPid & vidpidFromCNAttr)
 {
-    ReturnErrorCodeIf(attrType == DNAttrType::kUnspecified, CHIP_NO_ERROR);
+    VerifyOrReturnError(attrType != DNAttrType::kUnspecified, CHIP_NO_ERROR);
     ReturnErrorCodeIf(attr.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     if (attrType == DNAttrType::kMatterVID || attrType == DNAttrType::kMatterPID)

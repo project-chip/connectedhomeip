@@ -105,7 +105,7 @@ extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism()
     {
         chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
         buffer.Calloc(FactoryDataProvider::kFactoryDataSize);
-        ReturnErrorCodeIf(buffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(buffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
         auto status = PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void *) buffer.Get(),
                                               FactoryDataProvider::kFactoryDataSize, &backupLength);

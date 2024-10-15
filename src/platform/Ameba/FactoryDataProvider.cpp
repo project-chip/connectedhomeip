@@ -325,7 +325,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pIterationCount(uint32_t & iterationCou
 
     if (kReadFromFlash)
     {
-        ReturnErrorCodeIf(mFactoryData.cdata.spake2_it == 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        VerifyOrReturnError(mFactoryData.cdata.spake2_it != 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         iterationCount = mFactoryData.cdata.spake2_it;
         err            = CHIP_NO_ERROR;
     }
@@ -416,7 +416,7 @@ CHIP_ERROR FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
 
     if (kReadFromFlash)
     {
-        ReturnErrorCodeIf(mFactoryData.cdata.passcode == 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        VerifyOrReturnError(mFactoryData.cdata.passcode != 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         setupPasscode = mFactoryData.cdata.passcode;
         err           = CHIP_NO_ERROR;
     }

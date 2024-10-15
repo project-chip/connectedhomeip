@@ -80,7 +80,7 @@ CHIP_ERROR WiFiPAFBase::Init(const WiFiPAFListenParameters & param)
 CHIP_ERROR WiFiPAFBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
     ReturnErrorCodeIf(address.GetTransportType() != Type::kWiFiPAF, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
     DeviceLayer::ConnectivityMgr().WiFiPAFSend(std::move(msgBuf));
 
     return CHIP_NO_ERROR;

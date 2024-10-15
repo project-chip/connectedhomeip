@@ -629,7 +629,7 @@ CHIP_ERROR CsaCdKeysTrustStore::AddTrustedKey(const ByteSpan & kid, const Crypto
 {
     ReturnErrorCodeIf(kid.size() > SingleKeyEntry::kMaxKidSize, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(kid.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(mNumTrustedKeys == kMaxNumTrustedKeys, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(mNumTrustedKeys != kMaxNumTrustedKeys, CHIP_ERROR_NO_MEMORY);
 
     auto & entry = mTrustedKeys[mNumTrustedKeys];
 

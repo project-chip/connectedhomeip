@@ -183,7 +183,7 @@ CHIP_ERROR NXPConfig::InitStorageWearStats(void)
 
     /* Create an empty flash wear profile */
     flash_wear_profile = (nvs_storage_wear_profile_t *) calloc(1, flash_wear_profile_size);
-    ReturnErrorCodeIf(flash_wear_profile == NULL, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(flash_wear_profile != NULL, CHIP_ERROR_NO_MEMORY);
 
     /* Try to read the flash wear profile from the User Support diagnostic log key */
     CHIP_ERROR err = ReadConfigValueBin((const char *) keyUser, (uint8_t *) flash_wear_profile, flash_wear_profile_size, size);

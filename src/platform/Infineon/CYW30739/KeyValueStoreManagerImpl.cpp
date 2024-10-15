@@ -199,7 +199,7 @@ KeyValueStoreManagerImpl::KeyConfigIdEntry * KeyValueStoreManagerImpl::AllocateE
     VerifyOrReturnError(freeConfigID.HasValue(), nullptr);
 
     newEntry = Platform::New<KeyConfigIdEntry>(freeConfigID.Value(), KeyStorage(key));
-    ReturnErrorCodeIf(newEntry == nullptr, nullptr);
+    VerifyOrReturnError(newEntry != nullptr, nullptr);
 
     KeyConfigIdEntry * entry = static_cast<KeyConfigIdEntry *>(slist_tail(&mKeyConfigIdList));
     if (entry == nullptr)

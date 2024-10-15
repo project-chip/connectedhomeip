@@ -724,7 +724,7 @@ CHIP_ERROR CompareAccessControl(AccessControl & ac, const EntryData * entryData,
         ReturnErrorOnFailure(ac.ReadEntry(i, entry));
         ReturnErrorOnFailure(CompareEntry(entry, *entryData));
     }
-    ReturnErrorCodeIf(ac.ReadEntry(count, entry) == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(ac.ReadEntry(count, entry) != CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 
