@@ -45,7 +45,6 @@ from mobly import asserts
 from zeroconf.const import _TYPE_AAAA, _TYPES
 
 '''
-Category
 Functional conformance
 
 Purpose
