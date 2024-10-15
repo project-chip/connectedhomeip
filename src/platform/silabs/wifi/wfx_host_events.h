@@ -147,12 +147,13 @@ typedef enum
 /* Note that these are same as RSI_security */
 typedef enum
 {
-    WFX_SEC_UNSPECIFIED = 0,
-    WFX_SEC_NONE        = 1,
-    WFX_SEC_WEP         = 2,
-    WFX_SEC_WPA         = 3,
-    WFX_SEC_WPA2        = 4,
-    WFX_SEC_WPA3        = 5,
+    WFX_SEC_UNSPECIFIED    = 0,
+    WFX_SEC_NONE           = 1,
+    WFX_SEC_WEP            = 2,
+    WFX_SEC_WPA            = 3,
+    WFX_SEC_WPA2           = 4,
+    WFX_SEC_WPA3           = 5,
+    WFX_SEC_WPA_WPA2_MIXED = 6,
 } wfx_sec_t;
 
 typedef struct
