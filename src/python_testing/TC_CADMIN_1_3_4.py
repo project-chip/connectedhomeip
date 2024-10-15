@@ -272,6 +272,10 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
             [2024-10-08 11:57:43.144125][TEST][STDOUT][MatterTest] 10-08 11:57:42.777 INFO Device returned status 9 on receiving the NOC
             [2024-10-08 11:57:43.144365][TEST][STDOUT][MatterTest] 10-08 11:57:42.777 INFO Add NOC failed with error src/controller/CHIPDeviceController.cpp:1712: CHIP Error 0x0000007E: Trying to add a NOC for a fabric that already exists
         """
+        revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
+        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
+        sleep(1)
 
         self.step(14)
         # TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx
@@ -287,7 +291,7 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
 
     def steps_TC_CADMIN_1_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH_CR1 starts a commissioning process with DUT_CE"),
+            TestStep(1, "TH_CR1 starts a commissioning process with DUT_CE", is_commissioning=True),
             TestStep(2, "TH_CR1 reads the BasicCommissioningInfo attribute from the General Commissioning cluster and saves the MaxCumulativeFailsafeSeconds field as max_window_duration."),
             TestStep("3a", "TH_CR1 opens a commissioning window on DUT_CE using a commissioning timeout of max_window_duration using BCM",
                      "DUT_CE opens its Commissioning window to allow a second commissioning."),
