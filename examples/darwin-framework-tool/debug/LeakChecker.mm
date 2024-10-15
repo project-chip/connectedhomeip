@@ -29,6 +29,7 @@
 
 - (BOOL)hasMemoryLeaks
 {
+#if TARGET_OS_OSX
     pid_t pid = getpid();
     auto * pidString = [NSString stringWithFormat:@"%d", pid];
 
@@ -51,6 +52,9 @@
         NSLog(@"%@", output);
         return YES;
     }
+#else
+    NSLog(@"Running leaks as a task is supported on this platform.");
+#endif // TARGET_OS_OSX
 
     return NO;
 }

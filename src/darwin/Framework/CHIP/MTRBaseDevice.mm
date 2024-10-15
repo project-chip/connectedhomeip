@@ -1894,7 +1894,7 @@ NSTimeInterval MTRTimeIntervalForEventTimestampValue(uint64_t timeValue)
     uint64_t eventTimestampValueSeconds = timeValue / chip::kMillisecondsPerSecond;
     uint64_t eventTimestampValueRemainderMilliseconds = timeValue % chip::kMillisecondsPerSecond;
     NSTimeInterval eventTimestampValueRemainder
-        = NSTimeInterval(eventTimestampValueRemainderMilliseconds / static_cast<uint64_t>(chip::kMillisecondsPerSecond));
+        = NSTimeInterval(eventTimestampValueRemainderMilliseconds) / static_cast<double>(chip::kMillisecondsPerSecond);
     NSTimeInterval eventTimestampValue = eventTimestampValueSeconds + eventTimestampValueRemainder;
 
     return eventTimestampValue;
