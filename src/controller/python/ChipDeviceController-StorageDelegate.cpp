@@ -32,7 +32,7 @@ namespace Controller {
 
 CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
 {
-    ReturnErrorCodeIf(((value == nullptr) && (size != 0)), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((value != nullptr) || (size == 0), CHIP_ERROR_INVALID_ARGUMENT);
 
     auto val = mStorage.find(key);
     if (val == mStorage.end())
@@ -114,7 +114,7 @@ CHIP_ERROR StorageAdapter::SyncGetKeyValue(const char * key, void * value, uint1
 
 CHIP_ERROR StorageAdapter::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
-    ReturnErrorCodeIf(((value == nullptr) && (size != 0)), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((value != nullptr) || (size == 0), CHIP_ERROR_INVALID_ARGUMENT);
     ChipLogDetail(Controller, "StorageAdapter::SetKeyValue: Key = %s, Value = %p (%u)", StringOrNullMarker(key), value, size);
     mSetKeyCb(mContext, key, value, size);
     return CHIP_NO_ERROR;

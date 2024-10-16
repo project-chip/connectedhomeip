@@ -118,7 +118,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         ChipLogError(DeviceLayer, "KeyValueStoreManager base64 decoding failed");
         return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
     }
-    ReturnErrorCodeIf(offset_bytes != 0 && offset_bytes >= decodedLength, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(offset_bytes == 0 || offset_bytes < decodedLength, CHIP_ERROR_INVALID_ARGUMENT);
     size_t read_size = std::min<size_t>(value_size, decodedLength - offset_bytes);
     if (value_size + offset_bytes < decodedLength)
     {
