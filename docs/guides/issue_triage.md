@@ -19,20 +19,20 @@ rather than the SDK GitHub issues.
 
 ### Google Integration
 
-- General integration link: <https://developers.home.google.com/matter>
-- Support via the communities areas:
-  - Stack overflow:
+-   General integration link: <https://developers.home.google.com/matter>
+-   Support via the communities areas:
+    -   Stack overflow:
         <https://stackoverflow.com/questions/tagged/google-smart-home>
-  - Google Nest Community:
+    -   Google Nest Community:
         <https://www.googlenestcommunity.com/t5/Smart-Home-Developer-Forum/bd-p/Smart-Home-Developer-Forum>
 
 ### Environments not currently supported / not maintained
 
 Some items are explicitly not maintained currently
 
-- Windows integration: no official maintainer for this so currently not
+-   Windows integration: no official maintainer for this so currently not
     supported
-- Old compiler support: CHIP requires a C++17 or higher compiler.
+-   Old compiler support: CHIP requires a C++17 or higher compiler.
 
 ## Platform maintainers
 
