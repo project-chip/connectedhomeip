@@ -206,8 +206,7 @@ static_library("ESP32") {
   }
 
   if (chip_use_factory_data_provider && chip_use_secure_cert_dac_provider) {
-    # These files has no dependency on chip_use_secure_cert_dac_provider but if we are reading the commissionable data from
-    # from secure cert then we should expect that the attestation data is present there as well.
+    # These files have no dependency on chip_use_secure_cert_dac_provider, but if we are reading the commissionable data from the secure cert, we should expect the attestation data to be present there as well.
     sources += [
       "ESP32SecureCertDataProvider.cpp",
       "ESP32SecureCertDataProvider.h",

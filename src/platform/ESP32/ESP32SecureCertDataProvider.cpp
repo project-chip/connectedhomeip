@@ -133,8 +133,12 @@ CHIP_ERROR ESP32SecureCertDataProvider::GetSpake2pVerifier(MutableByteSpan & ver
 
 CHIP_ERROR ESP32SecureCertDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
     ScopedTLVInfo tlvInfo(MatterTLVSubType::kRotatingDeviceIdUniqueId);
     return tlvInfo.GetValue(uniqueIdSpan);
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_ENABLE_ROTATING_DEVICE_ID
 }
 
 } // namespace DeviceLayer
