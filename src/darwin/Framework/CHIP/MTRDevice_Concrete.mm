@@ -1646,11 +1646,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
     [_mostRecentReportTimes addObject:[NSDate now]];
 
-    {
-        std::lock_guard lock(_descriptionLock);
-        _mostRecentReportTimeForDescription = [_mostRecentReportTimes lastObject];
-    }
-
     // Calculate running average and update multiplier - need at least 2 items to calculate intervals
     if (_mostRecentReportTimes.count > 2) {
         NSTimeInterval cumulativeIntervals = 0;

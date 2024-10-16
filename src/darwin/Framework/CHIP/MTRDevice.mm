@@ -541,35 +541,7 @@ using namespace chip::Tracing::DarwinFramework;
 // method will need to be updated to reflect that.
 - (BOOL)_deviceUsesThread
 {
-    os_unfair_lock_assert_owner(&self->_lock);
-
-#ifdef DEBUG
-    // Note: This is a hack to allow our unit tests to test the subscription pooling behavior we have implemented for thread, so we mock devices to be a thread device
-    __block BOOL pretendThreadEnabled = NO;
-    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
-        if ([testDelegate respondsToSelector:@selector(unitTestPretendThreadEnabled:)]) {
-            pretendThreadEnabled = [testDelegate unitTestPretendThreadEnabled:self];
-        }
-    }];
-    if (pretendThreadEnabled) {
-        return YES;
-    }
-#endif
-
-    MTRClusterPath * networkCommissioningClusterPath = [MTRClusterPath clusterPathWithEndpointID:@(kRootEndpointId) clusterID:@(MTRClusterIDTypeNetworkCommissioningID)];
-    MTRDeviceClusterData * networkCommissioningClusterData = [self _clusterDataForPath:networkCommissioningClusterPath];
-    NSNumber * networkCommissioningClusterFeatureMapValueNumber = networkCommissioningClusterData.attributes[@(MTRClusterGlobalAttributeFeatureMapID)][MTRValueKey];
-
-    if (networkCommissioningClusterFeatureMapValueNumber == nil)
-        return NO;
-    if (![networkCommissioningClusterFeatureMapValueNumber isKindOfClass:[NSNumber class]]) {
-        MTR_LOG_ERROR("%@ Unexpected NetworkCommissioning FeatureMap value %@", self, networkCommissioningClusterFeatureMapValueNumber);
-        return NO;
-    }
-
-    uint32_t networkCommissioningClusterFeatureMapValue = static_cast<uint32_t>(networkCommissioningClusterFeatureMapValueNumber.unsignedLongValue);
-
-    return (networkCommissioningClusterFeatureMapValue & MTRNetworkCommissioningFeatureThreadNetworkInterface) != 0 ? YES : NO;
+    return NO;
 }
 
 - (NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)_clusterDataToPersistSnapshot
