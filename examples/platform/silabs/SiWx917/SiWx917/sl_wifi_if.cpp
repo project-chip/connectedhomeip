@@ -623,7 +623,7 @@ static void wfx_rsi_save_ap_info(void) // translation
  **********************************************************************************************/
 static sl_status_t wfx_rsi_do_join(void)
 {
-    ReturnErrorCodeIf((wfx_rsi.dev_state & (WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED)), SL_STATUS_IN_PROGRESS);
+    VerifyOrReturnError(!(wfx_rsi.dev_state & (WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED)), SL_STATUS_IN_PROGRESS);
     sl_status_t status = SL_STATUS_OK;
     sl_wifi_client_configuration_t ap;
     memset(&ap, 0, sizeof(ap));

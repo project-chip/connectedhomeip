@@ -50,8 +50,8 @@ void ASN1Reader::Init(const uint8_t * buf, size_t len)
 
 CHIP_ERROR ASN1Reader::Next()
 {
-    ReturnErrorCodeIf(EndOfContents, ASN1_END);
-    ReturnErrorCodeIf(IndefiniteLen, ASN1_ERROR_UNSUPPORTED_ENCODING);
+    VerifyOrReturnError(!EndOfContents, ASN1_END);
+    VerifyOrReturnError(!IndefiniteLen, ASN1_ERROR_UNSUPPORTED_ENCODING);
 
     // Note: avoid using addition assignment operator (+=), which may result in integer overflow
     // in the right hand side of an assignment (mHeadLen + ValueLen).
@@ -91,7 +91,7 @@ CHIP_ERROR ASN1Reader::EnterEncapsulatedType()
                             (Tag == kASN1UniversalTag_OctetString || Tag == kASN1UniversalTag_BitString),
                         ASN1_ERROR_INVALID_STATE);
 
-    ReturnErrorCodeIf(Constructed, ASN1_ERROR_UNSUPPORTED_ENCODING);
+    VerifyOrReturnError(!Constructed, ASN1_ERROR_UNSUPPORTED_ENCODING);
 
     return EnterContainer((Tag == kASN1UniversalTag_BitString) ? 1 : 0);
 }
@@ -131,7 +131,7 @@ CHIP_ERROR ASN1Reader::ExitContainer()
 
     ASN1ParseContext & prevContext = mSavedContexts[--mNumSavedContexts];
 
-    ReturnErrorCodeIf(prevContext.IndefiniteLen, ASN1_ERROR_UNSUPPORTED_ENCODING);
+    VerifyOrReturnError(!prevContext.IndefiniteLen, ASN1_ERROR_UNSUPPORTED_ENCODING);
 
     mElemStart = prevContext.ElemStart + prevContext.HeadLen + prevContext.ValueLen;
 

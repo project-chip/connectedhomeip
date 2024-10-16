@@ -294,7 +294,7 @@ exit:
 CHIP_ERROR ChipDeviceScanner::StartChipScan(unsigned timeoutMs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ReturnErrorCodeIf(mIsScanning, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
     kScanTimeout = timeoutMs;
 

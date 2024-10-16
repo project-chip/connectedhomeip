@@ -324,7 +324,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
             bool triedEncode = false;
             ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor, aIsFabricFiltered, aPath, aAttributeReports,
                                                         apEncoderState, attributeOverride, &triedEncode));
-            ReturnErrorCodeIf(triedEncode, CHIP_NO_ERROR);
+            VerifyOrReturnError(!triedEncode, CHIP_NO_ERROR);
         }
     }
 
