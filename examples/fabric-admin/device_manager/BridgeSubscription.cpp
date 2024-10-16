@@ -49,6 +49,11 @@ CHIP_ERROR BridgeSubscription::StartSubscription(Controller::DeviceController & 
 {
     assertChipStackLockedByCurrentThread();
 
+    VerifyOrDie(!subscriptionStarted); // Ensure it's not called multiple times.
+
+    // Mark as started
+    subscriptionStarted = true;
+
     mEndpointId = endpointId;
 
     CHIP_ERROR err = controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
@@ -97,20 +102,23 @@ void BridgeSubscription::OnEventData(const app::EventHeader & eventHeader, TLV::
     DeviceMgr().HandleEventData(eventHeader, *data);
 }
 
-void BridgeSubscription::OnReportEnd()
-{
-    // We will call mOnDoneCallback in OnDone.
-}
-
 void BridgeSubscription::OnError(CHIP_ERROR error)
 {
     ChipLogProgress(NotSpecified, "Error on remote fabric sync bridge subscription: %" CHIP_ERROR_FORMAT, error.Format());
+
+    // Reset the subscription state to allow retry
+    subscriptionStarted = false;
 }
 
 void BridgeSubscription::OnDone(ReadClient * apReadClient)
 {
     mClient.reset();
     ChipLogProgress(NotSpecified, "The remote fabric sync bridge subscription is terminated");
+
+    // Reset the subscription state to allow retry
+    subscriptionStarted = false;
+
+    // TODO:(#36092) Fabric-Admin should attempt to re-subscribe when the subscription to the remote bridge is terminated.
 }
 
 void BridgeSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)

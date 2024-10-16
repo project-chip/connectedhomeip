@@ -58,7 +58,6 @@ public:
                          const chip::app::StatusIB & status) override;
     void OnEventData(const chip::app::EventHeader & eventHeader, chip::TLV::TLVReader * data,
                      const chip::app::StatusIB * status) override;
-    void OnReportEnd() override;
     void OnError(CHIP_ERROR error) override;
     void OnDone(chip::app::ReadClient * apReadClient) override;
 
@@ -74,4 +73,5 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
     chip::EndpointId mEndpointId;
+    bool subscriptionStarted = false;
 };
