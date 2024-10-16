@@ -318,7 +318,7 @@ void emberAfEndpointChanged(chip::EndpointId endpoint, chip::app::AttributesChan
 ///
 /// Changes to metadata structure (e.g. endpoint enable/disable and dynamic endpoint changes)
 /// are reflected in this generation count changing.
-uint emberAfMetadataStructureGeneration();
+unsigned emberAfMetadataStructureGeneration();
 
 namespace chip {
 namespace app {

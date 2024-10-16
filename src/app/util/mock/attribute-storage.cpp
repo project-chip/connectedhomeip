@@ -61,7 +61,7 @@ using namespace Clusters::Globals::Attributes;
 
 namespace {
 
-uint metadataStructureGeneration  = 0;
+unsigned metadataStructureGeneration  = 0;
 DataVersion dataVersion           = 0;
 const MockNodeConfig * mockConfig = nullptr;
 
@@ -343,7 +343,7 @@ void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, Attribute
     listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
 }
 
-uint emberAfMetadataStructureGeneration()
+unsigned emberAfMetadataStructureGeneration()
 {
     return metadataStructureGeneration;
 }

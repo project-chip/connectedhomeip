@@ -96,7 +96,7 @@ uint16_t emberEndpointCount = 0;
 /// Determines a incremental unique index for ember
 /// metadata that is increased whenever a structural change is made to the
 /// ember metadata (e.g. changing dynamic endpoints or enabling/disabling endpoints)
-uint emberMetadataStructureGeneration = 0;
+unsigned emberMetadataStructureGeneration = 0;
 
 // If we have attributes that are more than 4 bytes, then
 // we need this data block for the defaults
@@ -955,7 +955,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
     return true;
 }
 
-uint emberAfMetadataStructureGeneration()
+unsigned emberAfMetadataStructureGeneration()
 {
     return emberMetadataStructureGeneration;
 }
