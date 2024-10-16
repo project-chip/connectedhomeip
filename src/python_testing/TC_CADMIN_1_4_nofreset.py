@@ -47,6 +47,7 @@ from mobly import asserts
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
 
+
 class TC_CADMIN_1_4_nofreset(MatterBaseTest):
     async def get_fabrics(self, th: ChipDeviceCtrl) -> int:
         OC_cluster = Clusters.OperationalCredentials
@@ -118,10 +119,12 @@ class TC_CADMIN_1_4_nofreset(MatterBaseTest):
         setupPayloadInfo = self.get_setup_payload_info()
         self.print_step("Setup payload info", setupPayloadInfo)
         if not setupPayloadInfo[0].passcode:
-            asserts.assert_true(False, 'passcode must be a provided value in the test in order for this test to work due to using BCM, please rerun test with providing --passcode <value>')
+            asserts.assert_true(
+                False, 'passcode must be a provided value in the test in order for this test to work due to using BCM, please rerun test with providing --passcode <value>')
 
         if not setupPayloadInfo[0].filter_value:
-            asserts.assert_true(False, 'discriminator must be a provided value in the test in order for this test to work due to using BCM, please rerun test with providing --discriminator <value>')
+            asserts.assert_true(
+                False, 'discriminator must be a provided value in the test in order for this test to work due to using BCM, please rerun test with providing --discriminator <value>')
         self.step(1)
 
         # Establishing TH1
@@ -194,6 +197,7 @@ class TC_CADMIN_1_4_nofreset(MatterBaseTest):
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
