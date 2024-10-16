@@ -30,13 +30,10 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import random
-from time import sleep
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from chip.tlv import TLVReader
 from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
