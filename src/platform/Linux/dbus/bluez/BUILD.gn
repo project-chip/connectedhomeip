@@ -23,4 +23,7 @@ gdbus_library("bluez") {
   interface_prefix = "org.bluez"
   c_generate_object_manager = true
   dbus_out_dir = "platform/Linux/dbus/bluez"
+
+  # The generated code here is not -Wconversion-clean.
+  no_wconversion = true
 }

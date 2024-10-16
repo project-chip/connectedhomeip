@@ -43,6 +43,14 @@ ti_sysconfig("sysconfig") {
     "ti_drivers_config.c",
     "ti_drivers_config.h",
   ]
+
+  # ti_drivers_config.c doesn't compile with -Wconversion.
+  cflags = [ "-Wno-conversion" ]
+}
+
+config("lock_app_no_conversion_config") {
+  # The simplelink_sdk bits don't compile with -Wconversion.
+  cflags = [ "-Wno-conversion" ]
 }
 
 source_set("lock_app_sdk") {
@@ -50,6 +58,7 @@ source_set("lock_app_sdk") {
 
   configs -= [ "${build_root}/config/compiler:std_default" ]
   configs += [ ":sdk_posix_config" ]
+  configs += [ ":lock_app_no_conversion_config" ]
 
   sources = [
     "${chip_root}/src/platform/cc32xx/Logging.cpp",
