@@ -22,8 +22,8 @@ from cryptography.x509.oid import NameOID
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric.types import (
-    CERTIFICATE_PUBLIC_KEY_TYPES,
-    CERTIFICATE_PRIVATE_KEY_TYPES,
+    CertificatePublicKeyTypes,
+    CertificateIssuerPrivateKeyTypes,
 )
 
 
@@ -213,7 +213,7 @@ class CAHierarchy:
         self,
         name: str,
         cert: x509.Certificate,
-        key: Union[CERTIFICATE_PRIVATE_KEY_TYPES, None],
+        key: Union[CertificateIssuerPrivateKeyTypes, None],
         bundle_root: bool,
     ) -> tuple[str, str]:
         """
@@ -245,7 +245,7 @@ class CAHierarchy:
         return (key_path, cert_path)
 
     def _sign_cert(
-        self, dns: str, public_key: CERTIFICATE_PUBLIC_KEY_TYPES
+        self, dns: str, public_key: CertificatePublicKeyTypes
     ) -> x509.Certificate:
         """
         Generate and sign a certificate.
