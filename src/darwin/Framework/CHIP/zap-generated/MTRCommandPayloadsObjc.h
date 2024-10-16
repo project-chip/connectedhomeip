@@ -10996,6 +10996,526 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVStreamManagementClusterAudioStreamAllocateParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull streamType MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull audioCodec MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull channelCount MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull sampleRate MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull bitRate MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull bitDepth MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVStreamManagementClusterAudioStreamAllocateResponseParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull audioStreamID MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * Initialize an MTRCameraAVStreamManagementClusterAudioStreamAllocateResponseParams with a response-value dictionary
+ * of the sort that MTRDeviceResponseHandler would receive.
+ *
+ * Will return nil and hand out an error if the response-value dictionary is not
+ * a command data response or is not the right command response.
+ *
+ * Will return nil and hand out an error if the data response does not match the known
+ * schema for this command.
+ */
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVStreamManagementClusterAudioStreamDeallocateParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull audioStreamID MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVStreamManagementClusterVideoStreamAllocateParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull streamType MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull videoCodec MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull minFrameRate MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull maxFrameRate MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nonnull minResolution MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nonnull maxResolution MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull minBitRate MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull maxBitRate MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull minFragmentLen MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull maxFragmentLen MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable watermarkEnabled MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable osdEnabled MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVStreamManagementClusterVideoStreamAllocateResponseParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull videoStreamID MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * Initialize an MTRCameraAVStreamManagementClusterVideoStreamAllocateResponseParams with a response-value dictionary
+ * of the sort that MTRDeviceResponseHandler would receive.
+ *
+ * Will return nil and hand out an error if the response-value dictionary is not
+ * a command data response or is not the right command response.
+ *
+ * Will return nil and hand out an error if the data response does not match the known
+ * schema for this command.
+ */
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVStreamManagementClusterVideoStreamModifyParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull videoStreamID MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable resolution MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable watermarkEnabled MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable osdEnabled MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVStreamManagementClusterVideoStreamDeallocateParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull videoStreamID MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVStreamManagementClusterSnapshotStreamAllocateParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull imageCodec MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull frameRate MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull bitRate MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nonnull minResolution MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nonnull maxResolution MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull quality MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVStreamManagementClusterSnapshotStreamAllocateResponseParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull snapshotStreamID MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * Initialize an MTRCameraAVStreamManagementClusterSnapshotStreamAllocateResponseParams with a response-value dictionary
+ * of the sort that MTRDeviceResponseHandler would receive.
+ *
+ * Will return nil and hand out an error if the response-value dictionary is not
+ * a command data response or is not the right command response.
+ *
+ * Will return nil and hand out an error if the data response does not match the known
+ * schema for this command.
+ */
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVStreamManagementClusterSnapshotStreamDeallocateParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull snapshotStreamID MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVStreamManagementClusterSetStreamPrioritiesParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSArray * _Nonnull streamPriorities MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVStreamManagementClusterCaptureSnapshotParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull snapshotStreamID MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nonnull requestedResolution MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVStreamManagementClusterCaptureSnapshotResponseParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSData * _Nonnull data MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull imageCodec MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nonnull resolution MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * Initialize an MTRCameraAVStreamManagementClusterCaptureSnapshotResponseParams with a response-value dictionary
+ * of the sort that MTRDeviceResponseHandler would receive.
+ *
+ * Will return nil and hand out an error if the response-value dictionary is not
+ * a command data response or is not the right command response.
+ *
+ * Will return nil and hand out an error if the data response does not match the known
+ * schema for this command.
+ */
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVStreamManagementClusterSetViewportParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) MTRCameraAVStreamManagementClusterViewportStruct * _Nonnull viewport MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVStreamManagementClusterSetImageRotationParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull angle MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVStreamManagementClusterSetImageFlipHorizontalParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull enabled MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVStreamManagementClusterSetImageFlipVerticalParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull enabled MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRWebRTCTransportProviderClusterSolicitOfferParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull streamType MTR_PROVISIONALLY_AVAILABLE;

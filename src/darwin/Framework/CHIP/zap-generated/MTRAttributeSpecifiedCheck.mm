@@ -5954,6 +5954,174 @@ static BOOL AttributeIsSpecifiedInZoneManagementCluster(AttributeId aAttributeId
     }
     }
 }
+static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CameraAvStreamManagement;
+    switch (aAttributeId) {
+    case Attributes::MaxConcurrentVideoEncoders::Id: {
+        return YES;
+    }
+    case Attributes::MaxEncodedPixelRate::Id: {
+        return YES;
+    }
+    case Attributes::VideoSensorParams::Id: {
+        return YES;
+    }
+    case Attributes::NightVisionCapable::Id: {
+        return YES;
+    }
+    case Attributes::MinViewport::Id: {
+        return YES;
+    }
+    case Attributes::RateDistortionTradeOffPoints::Id: {
+        return YES;
+    }
+    case Attributes::MaxPreRollBufferSize::Id: {
+        return YES;
+    }
+    case Attributes::MicrophoneCapabilities::Id: {
+        return YES;
+    }
+    case Attributes::SpeakerCapabilities::Id: {
+        return YES;
+    }
+    case Attributes::TwoWayTalkSupport::Id: {
+        return YES;
+    }
+    case Attributes::SupportedSnapshotParams::Id: {
+        return YES;
+    }
+    case Attributes::MaxNetworkBandwidth::Id: {
+        return YES;
+    }
+    case Attributes::CurrentFrameRate::Id: {
+        return YES;
+    }
+    case Attributes::HDRModeEnabled::Id: {
+        return YES;
+    }
+    case Attributes::CurrentVideoCodecs::Id: {
+        return YES;
+    }
+    case Attributes::CurrentSnapshotConfig::Id: {
+        return YES;
+    }
+    case Attributes::FabricsUsingCamera::Id: {
+        return YES;
+    }
+    case Attributes::AllocatedVideoStreams::Id: {
+        return YES;
+    }
+    case Attributes::AllocatedAudioStreams::Id: {
+        return YES;
+    }
+    case Attributes::AllocatedSnapshotStreams::Id: {
+        return YES;
+    }
+    case Attributes::RankedVideoStreamPrioritiesList::Id: {
+        return YES;
+    }
+    case Attributes::SoftRecordingPrivacyModeEnabled::Id: {
+        return YES;
+    }
+    case Attributes::SoftLivestreamPrivacyModeEnabled::Id: {
+        return YES;
+    }
+    case Attributes::HardPrivacyModeOn::Id: {
+        return YES;
+    }
+    case Attributes::NightVision::Id: {
+        return YES;
+    }
+    case Attributes::NightVisionIllum::Id: {
+        return YES;
+    }
+    case Attributes::AWBEnabled::Id: {
+        return YES;
+    }
+    case Attributes::AutoShutterSpeedEnabled::Id: {
+        return YES;
+    }
+    case Attributes::AutoISOEnabled::Id: {
+        return YES;
+    }
+    case Attributes::Viewport::Id: {
+        return YES;
+    }
+    case Attributes::SpeakerMuted::Id: {
+        return YES;
+    }
+    case Attributes::SpeakerVolumeLevel::Id: {
+        return YES;
+    }
+    case Attributes::SpeakerMaxLevel::Id: {
+        return YES;
+    }
+    case Attributes::SpeakerMinLevel::Id: {
+        return YES;
+    }
+    case Attributes::MicrophoneMuted::Id: {
+        return YES;
+    }
+    case Attributes::MicrophoneVolumeLevel::Id: {
+        return YES;
+    }
+    case Attributes::MicrophoneMaxLevel::Id: {
+        return YES;
+    }
+    case Attributes::MicrophoneMinLevel::Id: {
+        return YES;
+    }
+    case Attributes::MicrophoneAGCEnabled::Id: {
+        return YES;
+    }
+    case Attributes::ImageRotation::Id: {
+        return YES;
+    }
+    case Attributes::ImageFlipHorizontal::Id: {
+        return YES;
+    }
+    case Attributes::ImageFlipVertical::Id: {
+        return YES;
+    }
+    case Attributes::LocalVideoRecordingEnabled::Id: {
+        return YES;
+    }
+    case Attributes::LocalSnapshotRecordingEnabled::Id: {
+        return YES;
+    }
+    case Attributes::StatusLightEnabled::Id: {
+        return YES;
+    }
+    case Attributes::StatusLightBrightness::Id: {
+        return YES;
+    }
+    case Attributes::DepthSensorStatus::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInWebRTCTransportProviderCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WebRTCTransportProvider;
@@ -6785,6 +6953,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ZoneManagement::Id: {
         return AttributeIsSpecifiedInZoneManagementCluster(aAttributeId);
+    }
+    case Clusters::CameraAvStreamManagement::Id: {
+        return AttributeIsSpecifiedInCameraAVStreamManagementCluster(aAttributeId);
     }
     case Clusters::WebRTCTransportProvider::Id: {
         return AttributeIsSpecifiedInWebRTCTransportProviderCluster(aAttributeId);

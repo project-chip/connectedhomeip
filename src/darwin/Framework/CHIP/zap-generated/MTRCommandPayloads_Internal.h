@@ -2068,6 +2068,108 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRCameraAVStreamManagementClusterAudioStreamAllocateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterAudioStreamAllocateResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamAllocateResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterAudioStreamDeallocateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterVideoStreamAllocateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterVideoStreamAllocateResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamAllocateResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterVideoStreamModifyParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterVideoStreamDeallocateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterSnapshotStreamAllocateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterSnapshotStreamAllocateResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocateResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterSnapshotStreamDeallocateParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterSetStreamPrioritiesParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterCaptureSnapshotParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterCaptureSnapshotResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshotResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterSetViewportParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterSetImageRotationParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterSetImageFlipHorizontalParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCameraAVStreamManagementClusterSetImageFlipVerticalParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRWebRTCTransportProviderClusterSolicitOfferParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
