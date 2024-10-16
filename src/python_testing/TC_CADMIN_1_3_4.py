@@ -240,7 +240,7 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params2.randomDiscriminator)
         except ChipStackError as e:
             asserts.assert_equal(e.err,  0x0000007E,
-                                    "Expected to return Trying to add NOC for fabric that already exists")
+                                 "Expected to return Trying to add NOC for fabric that already exists")
         """
         expected error:
             [2024-10-08 11:57:43.144125][TEST][STDOUT][MatterTest] 10-08 11:57:42.777 INFO Device returned status 9 on receiving the NOC
@@ -358,6 +358,7 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
