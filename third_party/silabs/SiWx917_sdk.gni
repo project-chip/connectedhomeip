@@ -166,6 +166,11 @@ template("siwx917_sdk") {
         "RGB_LED_ENABLED",
         "SI917_DEVKIT",
       ]
+    } else {
+      _include_dirs += [
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/config",
+      ]
     }
 
     if (use_system_view) {
@@ -661,8 +666,6 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_temp_sensor.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_driver_gpio.c",
-
-      #  "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_usart.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_peripheral_drivers/src/sl_si91x_peripheral_gpio.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_ram.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_rom.c",
@@ -735,6 +738,11 @@ template("siwx917_sdk") {
       sources += [
         "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_si91x_rgb_led_instances.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/rgb_led/src/sl_si91x_rgb_led.c",
+      ]
+    } else {
+      sources += [
+        "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_si91x_led_instances.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/src/sl_si91x_led.c",
       ]
     }
 
