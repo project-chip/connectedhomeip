@@ -501,6 +501,7 @@ def sign_client_certificate(
 
 
 def run(host: Optional[str], port: Optional[int], working_directory: Optional[str], dns: Optional[str]):
+    global wd, device_hierarchy
     # For the Test Harness implementation, will need to find a way to return a reference
     # to the server running in the background. This function currently doesn't return.
     with WorkingDirectory(working_directory) as directory:
