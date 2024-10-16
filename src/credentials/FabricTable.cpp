@@ -1621,7 +1621,9 @@ CHIP_ERROR FabricTable::AddNewPendingTrustedRootCert(const ByteSpan & rcac)
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // We should not already have pending NOC chain elements when we get here
-    VerifyOrReturnError(!mStateFlags.HasAny(StateFlags::kIsTrustedRootPending, StateFlags::kIsUpdatePending, StateFlags::kIsAddPending), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(
+        !mStateFlags.HasAny(StateFlags::kIsTrustedRootPending, StateFlags::kIsUpdatePending, StateFlags::kIsAddPending),
+        CHIP_ERROR_INCORRECT_STATE);
 
     EnsureNextAvailableFabricIndexUpdated();
     FabricIndex fabricIndexToUse = kUndefinedFabricIndex;

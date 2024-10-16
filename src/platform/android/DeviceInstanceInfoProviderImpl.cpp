@@ -32,7 +32,8 @@ CHIP_ERROR DeviceInstanceInfoProviderImpl::GetHardwareVersionString(char * buf, 
                                                       hardwareVersionLen);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING),
+                            CHIP_ERROR_BUFFER_TOO_SMALL);
         strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
     }
 

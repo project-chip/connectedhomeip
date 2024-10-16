@@ -239,7 +239,8 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t
 #endif
 
     VerifyOrReturnError(bufSize >= sizeof(appDescription->version), CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(sizeof(appDescription->version) <= ConfigurationManager::kMaxSoftwareVersionStringLength, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(sizeof(appDescription->version) <= ConfigurationManager::kMaxSoftwareVersionStringLength,
+                        CHIP_ERROR_INTERNAL);
     strcpy(buf, appDescription->version);
     return CHIP_NO_ERROR;
 }

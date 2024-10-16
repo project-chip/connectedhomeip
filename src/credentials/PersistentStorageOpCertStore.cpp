@@ -215,7 +215,8 @@ CHIP_ERROR PersistentStorageOpCertStore::AddNewTrustedRootCertForFabric(FabricIn
     ReturnErrorCodeIf(rcac.empty() || (rcac.size() > Credentials::kMaxCHIPCertLength), CHIP_ERROR_INVALID_ARGUMENT);
 
     VerifyOrReturnError(!mStateFlags.HasAny(StateFlags::kUpdateOpCertsCalled, StateFlags::kAddNewTrustedRootCalled,
-                                         StateFlags::kAddNewOpCertsCalled), CHIP_ERROR_INCORRECT_STATE);
+                                            StateFlags::kAddNewOpCertsCalled),
+                        CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!StorageHasCertificate(mStorage, fabricIndex, CertChainElement::kRcac), CHIP_ERROR_INCORRECT_STATE);
 
     Platform::ScopedMemoryBufferWithSize<uint8_t> rcacBuf;
@@ -239,7 +240,8 @@ CHIP_ERROR PersistentStorageOpCertStore::AddNewOpCertsForFabric(FabricIndex fabr
     VerifyOrReturnError(icac.size() <= Credentials::kMaxCHIPCertLength, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Can't have called UpdateOpCertsForFabric first, or called with pending certs
-    VerifyOrReturnError(!mStateFlags.HasAny(StateFlags::kUpdateOpCertsCalled, StateFlags::kAddNewOpCertsCalled), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mStateFlags.HasAny(StateFlags::kUpdateOpCertsCalled, StateFlags::kAddNewOpCertsCalled),
+                        CHIP_ERROR_INCORRECT_STATE);
 
     // Need to have trusted roots installed to make the chain valid
     VerifyOrReturnError(mStateFlags.Has(StateFlags::kAddNewTrustedRootCalled), CHIP_ERROR_INCORRECT_STATE);
@@ -279,7 +281,8 @@ CHIP_ERROR PersistentStorageOpCertStore::UpdateOpCertsForFabric(FabricIndex fabr
     VerifyOrReturnError(icac.size() <= Credentials::kMaxCHIPCertLength, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Can't have called AddNewOpCertsForFabric first, and should never get here after AddNewTrustedRootCertForFabric.
-    VerifyOrReturnError(!mStateFlags.HasAny(StateFlags::kAddNewOpCertsCalled, StateFlags::kAddNewTrustedRootCalled), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mStateFlags.HasAny(StateFlags::kAddNewOpCertsCalled, StateFlags::kAddNewTrustedRootCalled),
+                        CHIP_ERROR_INCORRECT_STATE);
 
     // Can't have already pending NOC from UpdateOpCerts not yet committed
     VerifyOrReturnError(!mStateFlags.Has(StateFlags::kUpdateOpCertsCalled), CHIP_ERROR_INCORRECT_STATE);

@@ -71,7 +71,8 @@ CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId)
     static_assert(fabricIdByteLength == sizeof(uint64_t), "Wrong number of bytes");
     peerId->SetCompressedFabricId(Encoding::BigEndian::Get64(buf));
 
-    VerifyOrReturnError(Encoding::HexToBytes(name + fabricIdStringLength + 1, nodeIdStringLength, buf, bufferSize) != 0, CHIP_ERROR_WRONG_NODE_ID);
+    VerifyOrReturnError(Encoding::HexToBytes(name + fabricIdStringLength + 1, nodeIdStringLength, buf, bufferSize) != 0,
+                        CHIP_ERROR_WRONG_NODE_ID);
     // Buf now stores the node id id, as big-endian bytes.
     static_assert(nodeIdByteLength == sizeof(uint64_t), "Wrong number of bytes");
     peerId->SetNodeId(Encoding::BigEndian::Get64(buf));
