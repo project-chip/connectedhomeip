@@ -114,7 +114,7 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
     iniValue = Base64ToString(iniValue);
 
     uint16_t dataSize = static_cast<uint16_t>(iniValue.size());
-    ReturnErrorCodeIf(size == 0 && dataSize == 0, CHIP_NO_ERROR);
+    VerifyOrReturnError(size != 0 || dataSize != 0, CHIP_NO_ERROR);
     VerifyOrReturnError(value != nullptr, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     uint16_t sizeToCopy = std::min(size, dataSize);
