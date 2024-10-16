@@ -19,20 +19,20 @@ rather than the SDK GitHub issues.
 
 ### Google Integration
 
--   General integration link: <https://developers.home.google.com/matter>
--   Support via the communities areas:
-    -   Stack overflow:
+- General integration link: <https://developers.home.google.com/matter>
+- Support via the communities areas:
+  - Stack overflow:
         <https://stackoverflow.com/questions/tagged/google-smart-home>
-    -   Google Nest Community:
+  - Google Nest Community:
         <https://www.googlenestcommunity.com/t5/Smart-Home-Developer-Forum/bd-p/Smart-Home-Developer-Forum>
 
 ### Environments not currently supported / not maintained
 
 Some items are explicitly not maintained currently
 
--   Windows integration: no official maintainer for this so currently not
+- Windows integration: no official maintainer for this so currently not
     supported
--   Old compiler support: CHIP requires a C++17 or higher compiler.
+- Old compiler support: CHIP requires a C++17 or higher compiler.
 
 ## Platform maintainers
 
@@ -67,6 +67,7 @@ affected that are not platform-specific.
 | Minimal MDNS                          | Andrei Litvin                    | N/A                                                                                              | mdns specfic. Note that platformdns also exists and issues are often "DNSSD" rather than minmdns specific                                                                                  |
 | Python testing infrastructure/helpers | Cecille Freeman                  | N/A                                                                                              | Writing tests cases in python. **NOTE** this is for test infrastrure and NOT for individual test issues. Test case failures are associated with test applications or the test case script. |
 | ZAP Code Generation                   | Boris Zbarsky, Bharat Raju Dandu | [zap](https://github.com/project-chip/connectedhomeip/issues?q=is%3Aopen+is%3Aissue+label%3Azap) | Some issues may be in the zap project itself. This is for generic code generation issues and help, often regarding `.zapt` templates                                                       |
+| src/crypto, src/credentials           | Tennessee Carmel-Veilleux        | N/A                                                                                              |                                                                                                                                                                                            |
 
 ## Example maintenance
 
@@ -76,9 +77,9 @@ types or functionality) as well as individual examples.
 
 ### Per device type
 
-| Device Type(s) | Contact                      | Label | Note(s) |
-| -------------- | ---------------------------- | ----- | ------- |
-| Fabric Bridge  | Yufeng Wang, Terence Hampson |       |         |
+| Device Type(s)             | Contact                      | Label                                                                                                        | Note(s) |
+| -------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------ | ------- |
+| Fabric Bridge, Fabric Sync | Yufeng Wang, Terence Hampson | [fabric-sync](https://github.com/project-chip/connectedhomeip/pulls?q=is%3Aopen+is%3Apr+label%3Afabric-sync) |         |
 
 ### Per example
 
@@ -102,28 +103,26 @@ types or functionality) as well as individual examples.
 | `examples/java-matter-controller`              | Yunhan Wang, Yufeng Wang     |              |
 | `examples/kotlin-matter-controller`            | Yunhan Wang, Yufeng Wang     |              |
 | `examples/laundry-washer-app`                  |                              | UNMAINTAINED |
-| `examples/lighting-app`                        |                              | UNMAINTAINED |
+| `examples/lighting-app`                        | Junior Martinez              |              |
 | `examples/lighting-app-data-mode-no-unique-id` |                              | UNMAINTAINED |
 | `examples/light-switch-app`                    |                              | UNMAINTAINED |
 | `examples/lit-icd-app`                         | Yunhan Wang                  |              |
 | `examples/lock-app`                            |                              | UNMAINTAINED |
 | `examples/log-source-app`                      |                              | UNMAINTAINED |
-| `examples/microwave-oven-app`                  |                              | UNMAINTAINED |
+| `examples/microwave-oven-app`                  | Rob Bultman                  |              |
 | `examples/minimal-mdns`                        | Andrei Litvin                |              |
-| `examples/network-manager-app`                 |                              | UNMAINTAINED |
+| `examples/network-manager-app`                 | Thomas Lea                   |              |
 | `examples/ota-provider-app`                    |                              | UNMAINTAINED |
 | `examples/ota-requestor-app`                   |                              | UNMAINTAINED |
 | `examples/persistent-storage`                  |                              | UNMAINTAINED |
 | `examples/pigweed-app`                         |                              | UNMAINTAINED |
 | `examples/placeholder`                         |                              | UNMAINTAINED |
-| `examples/platform`                            |                              | UNMAINTAINED |
 | `examples/providers`                           |                              | UNMAINTAINED |
 | `examples/pump-app`                            |                              | UNMAINTAINED |
 | `examples/pump-controller-app`                 |                              | UNMAINTAINED |
 | `examples/refrigerator-app`                    |                              | UNMAINTAINED |
 | `examples/resource-monitoring-app`             |                              | UNMAINTAINED |
 | `examples/rvc-app`                             |                              | UNMAINTAINED |
-| `examples/shell`                               |                              | UNMAINTAINED |
 | `examples/smoke-co-alarm-app`                  |                              | UNMAINTAINED |
 | `examples/temperature-measurement-app`         |                              | UNMAINTAINED |
 | `examples/thermostat`                          |                              | UNMAINTAINED |
