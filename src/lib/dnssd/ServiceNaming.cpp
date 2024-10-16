@@ -58,7 +58,7 @@ CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId)
     VerifyOrReturnError(len >= totalLength, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Check that we have a proper terminator.
-    ReturnErrorCodeIf(name[totalLength] != '\0' && name[totalLength] != '.', CHIP_ERROR_WRONG_NODE_ID);
+    VerifyOrReturnError(name[totalLength] == '\0' || name[totalLength] == '.', CHIP_ERROR_WRONG_NODE_ID);
 
     // Check what we have a separator where we expect.
     VerifyOrReturnError(name[fabricIdStringLength] == '-', CHIP_ERROR_WRONG_NODE_ID);
