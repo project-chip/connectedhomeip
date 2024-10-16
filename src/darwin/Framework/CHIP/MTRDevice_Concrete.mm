@@ -121,6 +121,108 @@ private:
 
 } // anonymous namespace
 
+#pragma mark - MTRDeviceClusterData
+
+@implementation MTRDeviceClusterData {
+    NSMutableDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _attributes;
+}
+
+- (void)storeValue:(MTRDeviceDataValueDictionary _Nullable)value forAttribute:(NSNumber *)attribute
+{
+    _attributes[attribute] = value;
+}
+
+- (void)removeValueForAttribute:(NSNumber *)attribute
+{
+    [_attributes removeObjectForKey:attribute];
+}
+
+- (NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> *)attributes
+{
+    return _attributes;
+}
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<MTRDeviceClusterData: dataVersion %@ attributes count %lu>", _dataVersion, static_cast<unsigned long>(_attributes.count)];
+}
+
+- (nullable instancetype)init
+{
+    return [self initWithDataVersion:nil attributes:nil];
+}
+
+// Attributes dictionary is: attributeID => data-value dictionary
+- (nullable instancetype)initWithDataVersion:(NSNumber * _Nullable)dataVersion attributes:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _Nullable)attributes
+{
+    self = [super init];
+    if (self == nil) {
+        return nil;
+    }
+
+    _dataVersion = [dataVersion copy];
+    _attributes = [NSMutableDictionary dictionaryWithCapacity:attributes.count];
+    [_attributes addEntriesFromDictionary:attributes];
+
+    return self;
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)decoder
+{
+    self = [super init];
+    if (self == nil) {
+        return nil;
+    }
+
+    _dataVersion = [decoder decodeObjectOfClass:[NSNumber class] forKey:sDataVersionKey];
+    if (_dataVersion != nil && ![_dataVersion isKindOfClass:[NSNumber class]]) {
+        MTR_LOG_ERROR("MTRDeviceClusterData got %@ for data version, not NSNumber.", _dataVersion);
+        return nil;
+    }
+
+    static NSSet * const sAttributeValueClasses = [NSSet setWithObjects:[NSDictionary class], [NSArray class], [NSData class], [NSString class], [NSNumber class], nil];
+    _attributes = [decoder decodeObjectOfClasses:sAttributeValueClasses forKey:sAttributesKey];
+    if (_attributes != nil && ![_attributes isKindOfClass:[NSDictionary class]]) {
+        MTR_LOG_ERROR("MTRDeviceClusterData got %@ for attributes, not NSDictionary.", _attributes);
+        return nil;
+    }
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [coder encodeObject:self.dataVersion forKey:sDataVersionKey];
+    [coder encodeObject:self.attributes forKey:sAttributesKey];
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    return [[MTRDeviceClusterData alloc] initWithDataVersion:_dataVersion attributes:_attributes];
+}
+
+- (BOOL)isEqualToClusterData:(MTRDeviceClusterData *)otherClusterData
+{
+    return MTREqualObjects(_dataVersion, otherClusterData.dataVersion)
+        && MTREqualObjects(_attributes, otherClusterData.attributes);
+}
+
+- (BOOL)isEqual:(id)object
+{
+    if ([object class] != [self class]) {
+        return NO;
+    }
+
+    return [self isEqualToClusterData:object];
+}
+
+@end
+
 #pragma mark - MTRDevice
 
 // Utility methods for working with MTRInternalDeviceState, located near the
@@ -208,7 +310,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // whatever lock protects the time sync bits.
 @property (nonatomic, readonly) os_unfair_lock timeSyncLock;
 
-@property (nonatomic) chip::FabricIndex fabricIndex;
 @property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * unreportedEvents;
 @property (nonatomic) BOOL receivingReport;
 @property (nonatomic) BOOL receivingPrimingReport;
@@ -367,7 +468,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (self = [super initForSubclassesWithNodeID:nodeID controller:controller]) {
         _timeSyncLock = OS_UNFAIR_LOCK_INIT;
         _descriptionLock = OS_UNFAIR_LOCK_INIT;
-        _fabricIndex = controller.fabricIndex;
         _queue
             = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _expectedValueCache = [NSMutableDictionary dictionary];

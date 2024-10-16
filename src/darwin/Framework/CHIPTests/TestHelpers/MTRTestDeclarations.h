@@ -51,6 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRDevice (Test)
 - (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther;
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
+- (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
 @end
 
 #pragma mark - Declarations for items compiled only for DEBUG configuration
@@ -85,6 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (MTRDeviceClusterData *)unitTestGetClusterDataForPath:(MTRClusterPath *)path;
 - (NSSet<MTRClusterPath *> *)unitTestGetPersistedClusters;
 - (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;
+- (NSUInteger)unitTestAttributeCount;
 @end
 #endif
 

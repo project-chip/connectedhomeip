@@ -157,22 +157,6 @@ MTR_DIRECT_MEMBERS
 @property (nonatomic) dispatch_queue_t queue;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
 
-// Method to insert persisted cluster data
-//   Contains data version information and attribute values.
-- (void)setPersistedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData;
-
-// Method to insert persisted data that pertains to the whole device.
-- (void)setPersistedDeviceData:(NSDictionary<NSString *, id> *)data;
-
-#ifdef DEBUG
-- (NSUInteger)unitTestAttributeCount;
-#endif
-
-- (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
-
-// Returns whether this MTRDevice uses Thread for communication
-- (BOOL)deviceUsesThread;
-
 #pragma mark - MTRDevice functionality to deal with delegates.
 
 // Returns YES if any non-null delegates were found
