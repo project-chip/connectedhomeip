@@ -19,20 +19,20 @@ rather than the SDK GitHub issues.
 
 ### Google Integration
 
--   General integration link: <https://developers.home.google.com/matter>
--   Support via the communities areas:
-    -   Stack overflow:
+- General integration link: <https://developers.home.google.com/matter>
+- Support via the communities areas:
+  - Stack overflow:
         <https://stackoverflow.com/questions/tagged/google-smart-home>
-    -   Google Nest Community:
+  - Google Nest Community:
         <https://www.googlenestcommunity.com/t5/Smart-Home-Developer-Forum/bd-p/Smart-Home-Developer-Forum>
 
 ### Environments not currently supported / not maintained
 
 Some items are explicitly not maintained currently
 
--   Windows integration: no official maintainer for this so currently not
+- Windows integration: no official maintainer for this so currently not
     supported
--   Old compiler support: CHIP requires a C++17 or higher compiler.
+- Old compiler support: CHIP requires a C++17 or higher compiler.
 
 ## Platform maintainers
 
@@ -58,15 +58,15 @@ purpose in order to avoid spam.
 The following people can be contacted about issues in specific area of code are
 affected that are not platform-specific.
 
-| Code area                    | Contact                          | Label                                                                                            | Note(s)                                                                                                                              |
-| ---------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
-| ARM cross-compile            | Andrei Litvin                    | N/A                                                                                              | Some support for cross-compiling on x64 linux for arm64 linux (like Raspberry PI)                                                    |
-| Build system (darwin, xcode) | Boris Zbarsky, Justin Wood       | N/A                                                                                              | darwin specific builds, xcode connector                                                                                              |
-| Build system (gn, ninja)     | Andrei Litvin                    | N/A                                                                                              | General build system questions and gn support, generally on Linux                                                                    |
-| MatterIDL                    | Andrei Litvin                    | N/A                                                                                              | General .matter files and code generation based on it                                                                                |
-| Minimal MDNS                 | Andrei Litvin                    | N/A                                                                                              | mdns specfic. Note that platformdns also exists and issues are often "DNSSD" rather than minmdns specific                            |
-| Python tests scripts         | Cecille Freeman                  | N/A                                                                                              | Writing tests cases in python                                                                                                        |
-| ZAP Code Generation          | Boris Zbarsky, Bharat Raju Dandu | [zap](https://github.com/project-chip/connectedhomeip/issues?q=is%3Aopen+is%3Aissue+label%3Azap) | Some issues may be in the zap project itself. This is for generic code generation issues and help, often regarding `.zapt` templates |
+| Code area                             | Contact                          | Label                                                                                            | Note(s)                                                                                                                                                                                    |
+| ------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ARM cross-compile                     | Andrei Litvin                    | N/A                                                                                              | Some support for cross-compiling on x64 linux for arm64 linux (like Raspberry PI)                                                                                                          |
+| Build system (darwin, xcode)          | Boris Zbarsky, Justin Wood       | N/A                                                                                              | darwin specific builds, xcode connector                                                                                                                                                    |
+| Build system (gn, ninja)              | Andrei Litvin                    | N/A                                                                                              | General build system questions and gn support, generally on Linux                                                                                                                          |
+| MatterIDL                             | Andrei Litvin                    | N/A                                                                                              | General .matter files and code generation based on it                                                                                                                                      |
+| Minimal MDNS                          | Andrei Litvin                    | N/A                                                                                              | mdns specfic. Note that platformdns also exists and issues are often "DNSSD" rather than minmdns specific                                                                                  |
+| Python testing infrastructure/helpers | Cecille Freeman                  | N/A                                                                                              | Writing tests cases in python. **NOTE** this is for test infrastrure and NOT for individual test issues. Test case failures are associated with test applications or the test case script. |
+| ZAP Code Generation                   | Boris Zbarsky, Bharat Raju Dandu | [zap](https://github.com/project-chip/connectedhomeip/issues?q=is%3Aopen+is%3Aissue+label%3Azap) | Some issues may be in the zap project itself. This is for generic code generation issues and help, often regarding `.zapt` templates                                                       |
 
 ## Example maintenance
 
