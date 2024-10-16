@@ -570,9 +570,9 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    ChipLogProgress(NotSpecified, "WiFi-PAF: initialzing");
-    if (LinuxDeviceOptions::GetInstance().mWiFi)
+    if (LinuxDeviceOptions::GetInstance().mWiFi && LinuxDeviceOptions::GetInstance().mWiFiPAF)
     {
+        ChipLogProgress(NotSpecified, "WiFi-PAF: initialzing");
         if (EnsureWiFiIsStarted())
         {
             ChipLogProgress(NotSpecified, "Wi-Fi Management started");
