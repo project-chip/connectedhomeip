@@ -5,6 +5,9 @@ using namespace ::chip;
 
 void CommissionerControl::Init(Controller::DeviceCommissioner & commissioner, NodeId nodeId, EndpointId endpointId)
 {
+    // Ensure that mCommissioner is not already initialized
+    VerifyOrDie(mCommissioner == nullptr);
+
     ChipLogProgress(NotSpecified, "Initilize CommissionerControl");
     mCommissioner  = &commissioner;
     mDestinationId = nodeId;
@@ -75,7 +78,6 @@ void CommissionerControl::OnError(const app::CommandSender * client, CHIP_ERROR 
 {
     // Handle the error, then reset mCommandSender
     ChipLogProgress(NotSpecified, "CommissionerControl: OnError: Error: %s", ErrorStr(error));
-    mCommandSender.reset();
 }
 
 void CommissionerControl::OnDone(app::CommandSender * client)
@@ -129,7 +131,6 @@ void CommissionerControl::OnDeviceConnectedFn(void * context, Messaging::Exchang
     OperationalDeviceProxy device(&exchangeMgr, sessionHandle);
 
     CHIP_ERROR err = self->SendCommandForType(self->mCommandType, &device);
-    ;
     LogErrorOnFailure(err);
 }
 

@@ -23,12 +23,13 @@
 
 /**
  * @class CommissionerControl
- * @brief This class handles commissioning control operations using CHIP commands, including sending
+ * @brief This class handles sending CHIP commands related to commissioning, including sending
  * commissioning approval requests and commissioning nodes.
  *
- * The class implements the `chip::app::CommandSender::Callback` interface to handle responses, errors,
- * and completion events for the commands it sends. It allows sending commands related to commissioning
- * and tracks the status of the operations.
+ * The class acts as a command sender and implements the `chip::app::CommandSender::Callback` interface
+ * to handle responses, errors, and completion events for the commands it sends. It relies on external
+ * CCTRL delegate and server mechanisms to manage the overall protocol and state transitions, including
+ * processing the CommissioningRequestResult and invoking CommissionNode.
  */
 class CommissionerControl : public chip::app::CommandSender::Callback
 {
@@ -75,6 +76,8 @@ public:
     virtual void OnDone(chip::app::CommandSender * client) override;
 
 private:
+    static constexpr uint16_t kMaxDeviceLabelLength = 64;
+
     enum class CommandType : uint8_t
     {
         kUndefined                    = 0,
@@ -94,8 +97,7 @@ private:
         VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
         chip::app::CommandSender::AddRequestDataParameters addRequestDataParams(chip::NullOptional);
-        // Using TestOnly AddRequestData to allow for an intentionally malformed request for server validation testing.
-        ReturnErrorOnFailure(mCommandSender->TestOnlyAddRequestDataNoTimedCheck(commandPath, value, addRequestDataParams));
+        ReturnErrorOnFailure(mCommandSender->AddRequestData(commandPath, value, addRequestDataParams));
         ReturnErrorOnFailure(mCommandSender->SendCommandRequest(device->GetSecureSession().Value()));
 
         return CHIP_NO_ERROR;
@@ -113,6 +115,7 @@ private:
     chip::NodeId mDestinationId  = chip::kUndefinedNodeId;
     chip::EndpointId mEndpointId = chip::kRootEndpointId;
     CommandType mCommandType     = CommandType::kUndefined;
+    char mLabelBuffer[kMaxDeviceLabelLength];
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
