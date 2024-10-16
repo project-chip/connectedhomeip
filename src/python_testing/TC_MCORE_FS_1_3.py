@@ -37,7 +37,7 @@
 #       --string-arg th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
@@ -50,9 +50,11 @@ import tempfile
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from chip.testing.apps import AppServerSubprocess
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
-from TC_MCORE_FS_1_1 import AppServer
+
+_DEVICE_TYPE_AGGREGATOR = 0x000E
 
 
 class TC_MCORE_FS_1_3(MatterBaseTest):
@@ -84,13 +86,15 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         self.th_server_passcode = 20202021
 
         # Start the TH_SERVER_NO_UID app.
-        self.th_server = AppServer(
+        self.th_server = AppServerSubprocess(
             th_server_app,
             storage_dir=self.storage.name,
             port=self.th_server_port,
             discriminator=self.th_server_discriminator,
             passcode=self.th_server_passcode)
-        self.th_server.start()
+        self.th_server.start(
+            expected_output="Server initialization complete",
+            timeout=30)
 
     def teardown_class(self):
         if self.th_server is not None:
@@ -107,7 +111,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
                      "TH verifies a value is visible for the UniqueID from the DUT_FSA's Bridged Device Basic Information Cluster."),
         ]
 
-    async def commission_via_commissioner_control(self, controller_node_id: int, device_node_id: int):
+    async def commission_via_commissioner_control(self, controller_node_id: int, device_node_id: int, endpoint_id: int):
         """Commission device_node_id to controller_node_id using CommissionerControl cluster."""
 
         request_id = random.randint(0, 0xFFFFFFFFFFFFFFFF)
@@ -126,6 +130,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
 
         await self.send_single_cmd(
             node_id=controller_node_id,
+            endpoint=endpoint_id,
             cmd=Clusters.CommissionerControl.Commands.RequestCommissioningApproval(
                 requestID=request_id,
                 vendorID=vendor_id,
@@ -138,6 +143,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
 
         resp = await self.send_single_cmd(
             node_id=controller_node_id,
+            endpoint=endpoint_id,
             cmd=Clusters.CommissionerControl.Commands.CommissionNode(
                 requestID=request_id,
                 responseTimeoutSeconds=30,
@@ -192,9 +198,30 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             endpoint=0,
         ))
 
+        aggregator_endpoint = 0
+
+        # Iterate through the endpoints on the DUT_FSA_BRIDGE
+        for endpoint in dut_fsa_bridge_endpoints:
+            # Read the DeviceTypeList attribute for the current endpoint
+            device_type_list = await self.read_single_attribute_check_success(
+                cluster=Clusters.Descriptor,
+                attribute=Clusters.Descriptor.Attributes.DeviceTypeList,
+                node_id=self.dut_node_id,
+                endpoint=endpoint
+            )
+
+            # Check if any of the device types is an AGGREGATOR
+            if any(device_type.deviceType == _DEVICE_TYPE_AGGREGATOR for device_type in device_type_list):
+                aggregator_endpoint = endpoint
+                logging.info(f"Aggregator endpoint found: {aggregator_endpoint}")
+                break
+
+        asserts.assert_not_equal(aggregator_endpoint, 0, "Invalid aggregator endpoint. Cannot proceed with commissioning.")
+
         await self.commission_via_commissioner_control(
             controller_node_id=self.dut_node_id,
-            device_node_id=th_server_th_node_id)
+            device_node_id=th_server_th_node_id,
+            endpoint_id=aggregator_endpoint)
 
         # Wait for the device to appear on the DUT_FSA_BRIDGE.
         await asyncio.sleep(2 if self.is_pics_sdk_ci_only else 30)

@@ -17,10 +17,10 @@
  */
 
 #include "SoftwareFaultReports.h"
-#include "FreeRTOS.h"
 #include "silabs_utils.h"
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
 #include <app/util/attribute-storage.h>
+#include <cmsis_os2.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -75,7 +75,7 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
     // Allow some time for the Fault event to be sent as the next action after exiting this function
     // is typically an assert or reboot.
     // Depending on the task at fault, it is possible the event can't be transmitted.
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    osDelay(pdMS_TO_TICKS(1000));
 #endif // MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
 }
 

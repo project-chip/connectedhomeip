@@ -146,6 +146,7 @@ def BuildHostTarget():
         TargetPart('air-quality-sensor', app=HostApp.AIR_QUALITY_SENSOR),
         TargetPart('network-manager', app=HostApp.NETWORK_MANAGER),
         TargetPart('energy-management', app=HostApp.ENERGY_MANAGEMENT),
+        TargetPart('water-leak-detector', app=HostApp.WATER_LEAK_DETECTOR),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -668,7 +669,6 @@ def BuildTizenTarget():
     # apps
     target.AppendFixedTargets([
         TargetPart('all-clusters', app=TizenApp.ALL_CLUSTERS),
-        TargetPart('all-clusters-minimal', app=TizenApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('chip-tool', app=TizenApp.CHIP_TOOL),
         TargetPart('light', app=TizenApp.LIGHT),
         TargetPart('tests', app=TizenApp.TESTS),

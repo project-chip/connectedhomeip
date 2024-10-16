@@ -710,6 +710,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
   provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
   provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  provisional readonly attribute access(read: administer) optional int32u TCUpdateDeadline = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1697,7 +1698,7 @@ cluster GroupKeyManagement = 63 {
 }
 
 /** Supports the ability for clients to request the commissioning of themselves or other nodes onto a fabric which the cluster server can commission onto. */
-provisional cluster CommissionerControl = 1873 {
+cluster CommissionerControl = 1873 {
   revision 1;
 
   bitmap SupportedDeviceCategoryBitmap : bitmap32 {
@@ -2058,21 +2059,6 @@ endpoint 0 {
     handle command KeySetReadAllIndices;
     handle command KeySetReadAllIndicesResponse;
   }
-
-  server cluster CommissionerControl {
-    emits event CommissioningRequestResult;
-    ram      attribute supportedDeviceCategories default = 0;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-
-    handle command RequestCommissioningApproval;
-    handle command CommissionNode;
-    handle command ReverseOpenCommissioningWindow;
-  }
 }
 endpoint 1 {
   device type ma_aggregator = 14, version 1;
@@ -2101,6 +2087,21 @@ endpoint 1 {
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
+  }
+
+  server cluster CommissionerControl {
+    emits event CommissioningRequestResult;
+    ram      attribute supportedDeviceCategories default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command RequestCommissioningApproval;
+    handle command CommissionNode;
+    handle command ReverseOpenCommissioningWindow;
   }
 }
 

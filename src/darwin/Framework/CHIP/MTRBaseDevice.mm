@@ -232,6 +232,11 @@ static void LogStringAndReturnError(NSString * errorStr, MTRErrorCode errorCode,
 
 @end
 
+@interface MTRBaseDevice ()
+// Will return nil if our controller is not in fact a concrete controller.
+@property (nullable, nonatomic, strong, readonly) MTRDeviceController_Concrete * concreteController;
+@end
+
 @implementation MTRBaseDevice
 
 - (instancetype)initWithPASEDevice:(chip::DeviceProxy *)device controller:(MTRDeviceController *)controller
@@ -261,9 +266,24 @@ static void LogStringAndReturnError(NSString * errorStr, MTRErrorCode errorCode,
     return [controller baseDeviceForNodeID:nodeID];
 }
 
+- (nullable MTRDeviceController_Concrete *)concreteController
+{
+    auto * controller = self.deviceController;
+    if ([controller isKindOfClass:MTRDeviceController_Concrete.class]) {
+        return static_cast<MTRDeviceController_Concrete *>(controller);
+    }
+
+    return nil;
+}
+
 - (MTRTransportType)sessionTransportType
 {
-    return [self.deviceController sessionTransportTypeForDevice:self];
+    auto * concreteController = self.concreteController;
+    if (concreteController == nil) {
+        MTR_LOG_ERROR("Unable to determine session transport type for MTRBaseDevice created with an XPC controller");
+        return MTRTransportTypeUndefined;
+    }
+    return [concreteController sessionTransportTypeForDevice:self];
 }
 
 - (void)invalidateCASESession
@@ -272,7 +292,14 @@ static void LogStringAndReturnError(NSString * errorStr, MTRErrorCode errorCode,
         return;
     }
 
-    [self.deviceController invalidateCASESessionForNode:self.nodeID];
+    auto * concreteController = self.concreteController;
+    if (concreteController == nil) {
+        // Nothing we can do here.
+        MTR_LOG_ERROR("Unable invalidate CASE session for MTRBaseDevice created with an XPC controller");
+        return;
+    }
+
+    [concreteController invalidateCASESessionForNode:@(self.nodeID)];
 }
 
 namespace {
@@ -311,121 +338,131 @@ public:
         return;
     }
 
+    auto * concreteController = self.concreteController;
+    if (concreteController == nil) {
+        // No subscriptions (or really any MTRBaseDevice use) with XPC controllers.
+        MTR_LOG_ERROR("Unable to create subscription for MTRBaseDevice created with an XPC controller");
+        dispatch_async(queue, ^{
+            errorHandler([MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+        });
+        return;
+    }
+
     // Copy params before going async.
     params = [params copy];
 
-    [self.deviceController getSessionForNode:self.nodeID
-                                  completion:^(ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session,
-                                      NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
-                                      if (error != nil) {
-                                          dispatch_async(queue, ^{
-                                              errorHandler(error);
-                                          });
-                                          return;
-                                      }
+    [concreteController getSessionForNode:self.nodeID
+                               completion:^(ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session,
+                                   NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
+                                   if (error != nil) {
+                                       dispatch_async(queue, ^{
+                                           errorHandler(error);
+                                       });
+                                       return;
+                                   }
 
-                                      // Wildcard endpoint, cluster, attribute, event.
-                                      auto attributePath = std::make_unique<AttributePathParams>();
-                                      auto eventPath = std::make_unique<EventPathParams>();
-                                      eventPath->mIsUrgentEvent = params.reportEventsUrgently;
-                                      ReadPrepareParams readParams(session.Value());
-                                      [params toReadPrepareParams:readParams];
-                                      readParams.mpAttributePathParamsList = attributePath.get();
-                                      readParams.mAttributePathParamsListSize = 1;
-                                      readParams.mpEventPathParamsList = eventPath.get();
-                                      readParams.mEventPathParamsListSize = 1;
+                                   // Wildcard endpoint, cluster, attribute, event.
+                                   auto attributePath = std::make_unique<AttributePathParams>();
+                                   auto eventPath = std::make_unique<EventPathParams>();
+                                   eventPath->mIsUrgentEvent = params.reportEventsUrgently;
+                                   ReadPrepareParams readParams(session.Value());
+                                   [params toReadPrepareParams:readParams];
+                                   readParams.mpAttributePathParamsList = attributePath.get();
+                                   readParams.mAttributePathParamsListSize = 1;
+                                   readParams.mpEventPathParamsList = eventPath.get();
+                                   readParams.mEventPathParamsListSize = 1;
 
-                                      std::unique_ptr<ClusterStateCache> clusterStateCache;
-                                      ReadClient::Callback * callbackForReadClient = nullptr;
-                                      OnDoneHandler onDoneHandler = nil;
+                                   std::unique_ptr<ClusterStateCache> clusterStateCache;
+                                   ReadClient::Callback * callbackForReadClient = nullptr;
+                                   OnDoneHandler onDoneHandler = nil;
 
-                                      if (clusterStateCacheContainer) {
-                                          __weak MTRClusterStateCacheContainer * weakPtr = clusterStateCacheContainer;
-                                          onDoneHandler = ^{
-                                              // This, like all manipulation of cppClusterStateCache, needs to run on the Matter
-                                              // queue.
-                                              MTRClusterStateCacheContainer * container = weakPtr;
-                                              if (container) {
-                                                  container.cppClusterStateCache = nullptr;
-                                                  container.baseDevice = nil;
-                                              }
-                                          };
-                                      }
+                                   if (clusterStateCacheContainer) {
+                                       __weak MTRClusterStateCacheContainer * weakPtr = clusterStateCacheContainer;
+                                       onDoneHandler = ^{
+                                           // This, like all manipulation of cppClusterStateCache, needs to run on the Matter
+                                           // queue.
+                                           MTRClusterStateCacheContainer * container = weakPtr;
+                                           if (container) {
+                                               container.cppClusterStateCache = nullptr;
+                                               container.baseDevice = nil;
+                                           }
+                                       };
+                                   }
 
-                                      auto callback = std::make_unique<SubscriptionCallback>(
-                                          ^(NSArray * value) {
-                                              dispatch_async(queue, ^{
-                                                  if (attributeReportHandler != nil) {
-                                                      attributeReportHandler(value);
-                                                  }
-                                              });
-                                          },
-                                          ^(NSArray * value) {
-                                              dispatch_async(queue, ^{
-                                                  if (eventReportHandler != nil) {
-                                                      eventReportHandler(value);
-                                                  }
-                                              });
-                                          },
-                                          ^(NSError * error) {
-                                              dispatch_async(queue, ^{
-                                                  errorHandler(error);
-                                              });
-                                          },
-                                          ^(NSError * error, NSNumber * resubscriptionDelay) {
-                                              dispatch_async(queue, ^{
-                                                  if (resubscriptionScheduled != nil) {
-                                                      resubscriptionScheduled(error, resubscriptionDelay);
-                                                  }
-                                              });
-                                          },
-                                          ^(void) {
-                                              dispatch_async(queue, ^{
-                                                  if (subscriptionEstablished != nil) {
-                                                      subscriptionEstablished();
-                                                  }
-                                              });
-                                          },
-                                          onDoneHandler);
+                                   auto callback = std::make_unique<SubscriptionCallback>(
+                                       ^(NSArray * value) {
+                                           dispatch_async(queue, ^{
+                                               if (attributeReportHandler != nil) {
+                                                   attributeReportHandler(value);
+                                               }
+                                           });
+                                       },
+                                       ^(NSArray * value) {
+                                           dispatch_async(queue, ^{
+                                               if (eventReportHandler != nil) {
+                                                   eventReportHandler(value);
+                                               }
+                                           });
+                                       },
+                                       ^(NSError * error) {
+                                           dispatch_async(queue, ^{
+                                               errorHandler(error);
+                                           });
+                                       },
+                                       ^(NSError * error, NSNumber * resubscriptionDelay) {
+                                           dispatch_async(queue, ^{
+                                               if (resubscriptionScheduled != nil) {
+                                                   resubscriptionScheduled(error, resubscriptionDelay);
+                                               }
+                                           });
+                                       },
+                                       ^(void) {
+                                           dispatch_async(queue, ^{
+                                               if (subscriptionEstablished != nil) {
+                                                   subscriptionEstablished();
+                                               }
+                                           });
+                                       },
+                                       onDoneHandler);
 
-                                      if (clusterStateCacheContainer) {
-                                          clusterStateCache = std::make_unique<ClusterStateCache>(*callback.get());
-                                          callbackForReadClient = &clusterStateCache->GetBufferedCallback();
-                                      } else {
-                                          callbackForReadClient = &callback->GetBufferedCallback();
-                                      }
+                                   if (clusterStateCacheContainer) {
+                                       clusterStateCache = std::make_unique<ClusterStateCache>(*callback.get());
+                                       callbackForReadClient = &clusterStateCache->GetBufferedCallback();
+                                   } else {
+                                       callbackForReadClient = &callback->GetBufferedCallback();
+                                   }
 
-                                      auto readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(),
-                                          exchangeManager, *callbackForReadClient, ReadClient::InteractionType::Subscribe);
+                                   auto readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(),
+                                       exchangeManager, *callbackForReadClient, ReadClient::InteractionType::Subscribe);
 
-                                      CHIP_ERROR err;
-                                      if (!params.resubscribeAutomatically) {
-                                          err = readClient->SendRequest(readParams);
-                                      } else {
-                                          // SendAutoResubscribeRequest cleans up the params, even on failure.
-                                          attributePath.release();
-                                          eventPath.release();
-                                          err = readClient->SendAutoResubscribeRequest(std::move(readParams));
-                                      }
+                                   CHIP_ERROR err;
+                                   if (!params.resubscribeAutomatically) {
+                                       err = readClient->SendRequest(readParams);
+                                   } else {
+                                       // SendAutoResubscribeRequest cleans up the params, even on failure.
+                                       attributePath.release();
+                                       eventPath.release();
+                                       err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+                                   }
 
-                                      if (err != CHIP_NO_ERROR) {
-                                          dispatch_async(queue, ^{
-                                              errorHandler([MTRError errorForCHIPErrorCode:err]);
-                                          });
+                                   if (err != CHIP_NO_ERROR) {
+                                       dispatch_async(queue, ^{
+                                           errorHandler([MTRError errorForCHIPErrorCode:err]);
+                                       });
 
-                                          return;
-                                      }
+                                       return;
+                                   }
 
-                                      if (clusterStateCacheContainer) {
-                                          clusterStateCacheContainer.cppClusterStateCache = clusterStateCache.get();
-                                          // ClusterStateCache will be deleted when OnDone is called.
-                                          callback->AdoptClusterStateCache(std::move(clusterStateCache));
-                                          clusterStateCacheContainer.baseDevice = self;
-                                      }
-                                      // Callback and ReadClient will be deleted when OnDone is called.
-                                      callback->AdoptReadClient(std::move(readClient));
-                                      callback.release();
-                                  }];
+                                   if (clusterStateCacheContainer) {
+                                       clusterStateCacheContainer.cppClusterStateCache = clusterStateCache.get();
+                                       // ClusterStateCache will be deleted when OnDone is called.
+                                       callback->AdoptClusterStateCache(std::move(clusterStateCache));
+                                       clusterStateCacheContainer.baseDevice = self;
+                                   }
+                                   // Callback and ReadClient will be deleted when OnDone is called.
+                                   callback->AdoptReadClient(std::move(readClient));
+                                   callback.release();
+                               }];
 }
 
 static NSDictionary<NSString *, id> * _MakeDataValueDictionary(NSString * type, id _Nullable value, NSNumber * _Nullable dataVersion)
@@ -1616,6 +1653,16 @@ exit:
         return;
     }
 
+    auto * concreteController = self.concreteController;
+    if (concreteController == nil) {
+        // No subscriptions (or really any MTRBaseDevice use) with XPC controllers.
+        MTR_LOG_ERROR("Unable to create subscription for MTRBaseDevice created with an XPC controller");
+        dispatch_async(queue, ^{
+            reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+        });
+        return;
+    }
+
     // Copy params before going async.
     NSArray<MTRAttributeRequestPath *> * attributes = nil;
     if (attributePaths != nil) {
@@ -1629,7 +1676,7 @@ exit:
 
     params = (params == nil) ? nil : [params copy];
 
-    [self.deviceController
+    [concreteController
         getSessionForNode:self.nodeID
                completion:^(ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session,
                    NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
@@ -1847,7 +1894,7 @@ NSTimeInterval MTRTimeIntervalForEventTimestampValue(uint64_t timeValue)
     uint64_t eventTimestampValueSeconds = timeValue / chip::kMillisecondsPerSecond;
     uint64_t eventTimestampValueRemainderMilliseconds = timeValue % chip::kMillisecondsPerSecond;
     NSTimeInterval eventTimestampValueRemainder
-        = NSTimeInterval(eventTimestampValueRemainderMilliseconds) / chip::kMillisecondsPerSecond;
+        = NSTimeInterval(eventTimestampValueRemainderMilliseconds) / static_cast<double>(chip::kMillisecondsPerSecond);
     NSTimeInterval eventTimestampValue = eventTimestampValueSeconds + eventTimestampValueRemainder;
 
     return eventTimestampValue;
@@ -1890,6 +1937,16 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         return;
     }
 
+    auto * concreteController = self.concreteController;
+    if (concreteController == nil) {
+        MTR_LOG_ERROR("Can't open a commissioning window via MTRBaseDevice created with an XPC controller");
+        dispatch_async(queue, ^{
+            MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, CHIP_ERROR_INCORRECT_STATE);
+            completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+        });
+        return;
+    }
+
     unsigned long long durationVal = [duration unsignedLongLongValue];
     if (!CanCastTo<uint16_t>(durationVal)) {
         MTR_LOG_ERROR("Error: Duration %llu is too large.", durationVal);
@@ -1925,7 +1982,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         passcode.Emplace(static_cast<uint32_t>(passcodeVal));
     }
 
-    [self.deviceController
+    [concreteController
         asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
             auto resultCallback = ^(CHIP_ERROR status, const SetupPayload & payload) {
                 if (status != CHIP_NO_ERROR) {
@@ -2175,11 +2232,20 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
                     queue:(dispatch_queue_t)queue
                completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
-    [_deviceController downloadLogFromNodeWithID:@(_nodeID)
-                                            type:type
-                                         timeout:timeout
-                                           queue:queue
-                                      completion:completion];
+    auto * concreteController = self.concreteController;
+    if (concreteController == nil) {
+        MTR_LOG_ERROR("Can't download logs via MTRBaseDevice created with an XPC controller");
+        dispatch_async(queue, ^{
+            completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+        });
+        return;
+    }
+
+    [concreteController downloadLogFromNodeWithID:@(_nodeID)
+                                             type:type
+                                          timeout:timeout
+                                            queue:queue
+                                       completion:completion];
 }
 
 - (NSString *)description
@@ -2302,6 +2368,45 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 @end
 
+static NSString * FormatPossiblyWildcardEndpoint(NSNumber * _Nullable possiblyWildcardEndpoint)
+{
+    if (possiblyWildcardEndpoint == nil) {
+        return @"wildcard";
+    }
+
+    return [NSString stringWithFormat:@"%u", possiblyWildcardEndpoint.unsignedShortValue];
+}
+
+static NSString * FormatPossiblyWildcardCluster(NSNumber * _Nullable possiblyWildcardCluster)
+{
+    if (possiblyWildcardCluster == nil) {
+        return @"wildcard";
+    }
+
+    return [NSString stringWithFormat:@"0x%llx (%llu, %@)",
+                     possiblyWildcardCluster.unsignedLongLongValue,
+                     possiblyWildcardCluster.unsignedLongLongValue,
+                     MTRClusterNameForID(static_cast<MTRClusterIDType>(possiblyWildcardCluster.unsignedLongLongValue))];
+}
+
+static NSString * FormatPossiblyWildcardClusterElement(NSNumber * _Nullable possiblyWildcardCluster, NSNumber * _Nullable possiblyWildcardElement, NSString * (^nameGetter)(MTRClusterIDType clusterID, NSNumber * elementID))
+{
+    if (possiblyWildcardElement == nil) {
+        return @"wildcard";
+    }
+
+    if (possiblyWildcardCluster == nil) {
+        // We can't get a useful name for this, so just return the numeric
+        // value.
+        return [NSString stringWithFormat:@"0x%llx (%llu)", possiblyWildcardElement.unsignedLongLongValue, possiblyWildcardElement.unsignedLongLongValue];
+    }
+
+    return [NSString stringWithFormat:@"0x%llx (%llu, %@)",
+                     possiblyWildcardElement.unsignedLongLongValue,
+                     possiblyWildcardElement.unsignedLongLongValue,
+                     nameGetter(static_cast<MTRClusterIDType>(possiblyWildcardCluster.unsignedLongLongValue), possiblyWildcardElement)];
+}
+
 @implementation MTRAttributeRequestPath
 - (instancetype)initWithEndpointID:(NSNumber * _Nullable)endpointID
                          clusterID:(NSNumber * _Nullable)clusterID
@@ -2315,9 +2420,12 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRAttributeRequestPath endpoint %u cluster 0x%llx (%llu) attribute 0x%llx (%llu)>",
-                     _endpoint.unsignedShortValue, _cluster.unsignedLongLongValue, _cluster.unsignedLongLongValue,
-                     _attribute.unsignedLongLongValue, _attribute.unsignedLongLongValue];
+    NSString * endpointStr = FormatPossiblyWildcardEndpoint(_endpoint);
+    NSString * clusterStr = FormatPossiblyWildcardCluster(_cluster);
+    NSString * attributeStr = FormatPossiblyWildcardClusterElement(_cluster, _attribute, ^(MTRClusterIDType clusterID, NSNumber * attributeID) {
+        return MTRAttributeNameForID(clusterID, static_cast<MTRAttributeIDType>(attributeID.unsignedLongLongValue));
+    });
+    return [NSString stringWithFormat:@"<MTRAttributeRequestPath endpoint %@ cluster %@ attribute %@>", endpointStr, clusterStr, attributeStr];
 }
 
 + (MTRAttributeRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
@@ -2439,9 +2547,12 @@ static NSString * const sAttributeIDKey = @"attributeIDKey";
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTREventRequestPath endpoint %u cluster 0x%llx (%llu) event 0x%llx (%llu)>",
-                     _endpoint.unsignedShortValue, _cluster.unsignedLongLongValue, _cluster.unsignedLongLongValue,
-                     _event.unsignedLongLongValue, _event.unsignedLongLongValue];
+    NSString * endpointStr = FormatPossiblyWildcardEndpoint(_endpoint);
+    NSString * clusterStr = FormatPossiblyWildcardCluster(_cluster);
+    NSString * eventStr = FormatPossiblyWildcardClusterElement(_cluster, _event, ^(MTRClusterIDType clusterID, NSNumber * eventID) {
+        return MTREventNameForID(clusterID, static_cast<MTREventIDType>(eventID.unsignedLongLongValue));
+    });
+    return [NSString stringWithFormat:@"<MTREventRequestPath endpoint %@ cluster %@ event %@>", endpointStr, clusterStr, eventStr];
 }
 
 + (MTREventRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
@@ -2561,8 +2672,9 @@ static NSString * const sEventAttributeIDKey = @"attributeIDKey";
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRClusterPath endpoint %u cluster 0x%llx (%llu)>", _endpoint.unsignedShortValue,
-                     _cluster.unsignedLongLongValue, _cluster.unsignedLongLongValue];
+    return [NSString stringWithFormat:@"<MTRClusterPath endpoint %u cluster 0x%llx (%llu, %@)>", _endpoint.unsignedShortValue,
+                     _cluster.unsignedLongLongValue, _cluster.unsignedLongLongValue,
+                     MTRClusterNameForID(static_cast<MTRClusterIDType>(_cluster.unsignedLongLongValue))];
 }
 
 + (MTRClusterPath *)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
@@ -2646,9 +2758,11 @@ static NSString * const sClusterKey = @"clusterKey";
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRAttributePath endpoint %u cluster 0x%llx (%llu) attribute 0x%llx (%llu)>",
-                     self.endpoint.unsignedShortValue, self.cluster.unsignedLongLongValue, self.cluster.unsignedLongLongValue,
-                     _attribute.unsignedLongLongValue, _attribute.unsignedLongLongValue];
+    return [NSString stringWithFormat:@"<MTRAttributePath endpoint %u cluster 0x%llx (%llu, %@) 0x%llx (%llu, %@)>",
+                     self.endpoint.unsignedShortValue,
+                     self.cluster.unsignedLongLongValue, self.cluster.unsignedLongLongValue, MTRClusterNameForID(static_cast<MTRClusterIDType>(self.cluster.unsignedLongLongValue)),
+                     _attribute.unsignedLongLongValue, _attribute.unsignedLongLongValue,
+                     MTRAttributeNameForID(static_cast<MTRClusterIDType>(self.cluster.unsignedLongLongValue), static_cast<MTRAttributeIDType>(_attribute.unsignedLongLongValue))];
 }
 
 + (MTRAttributePath *)attributePathWithEndpointID:(NSNumber *)endpointID
@@ -2743,8 +2857,11 @@ static NSString * const sAttributeKey = @"attributeKey";
 - (NSString *)description
 {
     return
-        [NSString stringWithFormat:@"<MTREventPath endpoint %u cluster 0x%llx (%llu) event 0x%llx (%llu)>", self.endpoint.unsignedShortValue,
-                  self.cluster.unsignedLongLongValue, self.cluster.unsignedLongLongValue, _event.unsignedLongLongValue, _event.unsignedLongLongValue];
+        [NSString stringWithFormat:@"<MTREventPath endpoint %u cluster 0x%llx (%llu, %@) event 0x%llx (%llu, %@)>",
+                  self.endpoint.unsignedShortValue,
+                  self.cluster.unsignedLongLongValue, self.cluster.unsignedLongLongValue, MTRClusterNameForID(static_cast<MTRClusterIDType>(self.cluster.unsignedLongLongValue)),
+                  _event.unsignedLongLongValue, _event.unsignedLongLongValue,
+                  MTREventNameForID(static_cast<MTRClusterIDType>(self.cluster.unsignedLongLongValue), static_cast<MTREventIDType>(_event.unsignedLongLongValue))];
 }
 
 + (MTREventPath *)eventPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID

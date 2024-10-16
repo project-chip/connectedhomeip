@@ -140,39 +140,6 @@ public:
     CHIP_ERROR UnpairDevice(chip::NodeId nodeId);
 
 private:
-    struct CommissioningWindowParams
-    {
-        chip::NodeId nodeId;
-        chip::EndpointId endpointId;
-        uint16_t commissioningWindowTimeout;
-        uint32_t iteration;
-        uint16_t discriminator;
-        chip::Optional<uint32_t> setupPIN;
-        uint8_t verifierBuffer[chip::Crypto::kSpake2p_VerifierSerialized_Length];
-        chip::ByteSpan verifier;
-        uint8_t saltBuffer[chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length];
-        chip::ByteSpan salt;
-    };
-
-    struct PairDeviceWithCodeParams
-    {
-        chip::NodeId nodeId;
-        char payloadBuffer[kMaxManualCodeLength + 1];
-    };
-
-    struct PairDeviceParams
-    {
-        chip::NodeId nodeId;
-        uint32_t setupPINCode;
-        uint16_t deviceRemotePort;
-        char ipAddrBuffer[chip::Inet::IPAddress::kMaxStringLength];
-    };
-
-    struct UnpairDeviceParams
-    {
-        chip::NodeId nodeId;
-    };
-
     // Constructors
     PairingManager();
     PairingManager(const PairingManager &)             = delete;
@@ -202,14 +169,10 @@ private:
                                       const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
                                       chip::Credentials::AttestationVerificationResult attestationResult) override;
 
-    static void OnOpenCommissioningWindow(intptr_t context);
     static void OnOpenCommissioningWindowResponse(void * context, chip::NodeId deviceId, CHIP_ERROR status,
                                                   chip::SetupPayload payload);
     static void OnOpenCommissioningWindowVerifierResponse(void * context, chip::NodeId deviceId, CHIP_ERROR status);
     static void OnCurrentFabricRemove(void * context, chip::NodeId remoteNodeId, CHIP_ERROR status);
-    static void OnPairDeviceWithCode(intptr_t context);
-    static void OnPairDevice(intptr_t context);
-    static void OnUnpairDevice(intptr_t context);
 
     // Private data members
     chip::Controller::DeviceCommissioner * mCommissioner = nullptr;
@@ -219,12 +182,17 @@ private:
     CommissioningDelegate * mCommissioningDelegate             = nullptr;
     PairingDelegate * mPairingDelegate                         = nullptr;
 
-    chip::NodeId mNodeId            = chip::kUndefinedNodeId;
-    uint16_t mDiscriminator         = 0;
-    uint32_t mSetupPINCode          = 0;
-    const char * mOnboardingPayload = nullptr;
-    bool mDeviceIsICD               = false;
+    chip::NodeId mNodeId = chip::kUndefinedNodeId;
+    chip::ByteSpan mVerifier;
+    chip::ByteSpan mSalt;
+    uint16_t mDiscriminator = 0;
+    uint32_t mSetupPINCode  = 0;
+    bool mDeviceIsICD       = false;
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
+    uint8_t mVerifierBuffer[chip::Crypto::kSpake2p_VerifierSerialized_Length];
+    uint8_t mSaltBuffer[chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length];
+    char mRemoteIpAddr[chip::Inet::IPAddress::kMaxStringLength];
+    char mOnboardingPayload[kMaxManualCodeLength + 1];
 
     chip::Optional<bool> mICDRegistration;
     chip::Optional<chip::NodeId> mICDCheckInNodeId;

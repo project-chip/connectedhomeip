@@ -12,7 +12,7 @@ For more details see
 
 For information on how to build, run, test and debug this example and further
 information about the platform it is run on see
-[Open IoT SDK examples](../../../docs/guides/openiotsdk_examples.md).
+[Open IoT SDK examples](../../../docs/platforms/openiotsdk/openiotsdk_examples.md).
 
 The example name to use in the scripts is `shell`.
 

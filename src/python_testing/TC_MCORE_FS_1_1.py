@@ -35,7 +35,7 @@
 #       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
@@ -47,29 +47,11 @@ import time
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.testing.tasks import Subprocess
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.apps import AppServerSubprocess
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
-
-class AppServer(Subprocess):
-    """Wrapper class for starting an application server in a subprocess."""
-
-    # Prefix for log messages from the application server.
-    PREFIX = b"[SERVER]"
-
-    def __init__(self, app: str, storage_dir: str, discriminator: int, passcode: int, port: int = 5540):
-        storage_kvs_dir = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")[1]
-        # Start the server application with dedicated KVS storage.
-        super().__init__(app, "--KVS", storage_kvs_dir,
-                         '--secured-device-port', str(port),
-                         "--discriminator", str(discriminator),
-                         "--passcode", str(passcode),
-                         output_cb=lambda line, is_stderr: self.PREFIX + line)
-
-    def start(self):
-        # Start process and block until it prints the expected output.
-        super().start(expected_output="Server initialization complete")
+_DEVICE_TYPE_AGGREGATOR = 0x000E
 
 
 class TC_MCORE_FS_1_1(MatterBaseTest):
@@ -95,14 +77,16 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         self.th_server_discriminator = random.randint(0, 4095)
         self.th_server_passcode = 20202021
 
-        # Start the TH_SERVER_NO_UID app.
-        self.th_server = AppServer(
+        # Start the TH_SERVER app.
+        self.th_server = AppServerSubprocess(
             th_server_app,
             storage_dir=self.storage.name,
             port=self.th_server_port,
             discriminator=self.th_server_discriminator,
             passcode=self.th_server_passcode)
-        self.th_server.start()
+        self.th_server.start(
+            expected_output="Server initialization complete",
+            timeout=30)
 
         logging.info("Commissioning from separate fabric")
         # Create a second controller on a new fabric to communicate to the server
@@ -142,8 +126,34 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_1(self):
-        # TODO this value should either be determined or passed in from command line
         dut_commissioning_control_endpoint = 0
+
+        # Get the list of endpoints on the DUT_FSA_BRIDGE before adding the TH_SERVER_NO_UID.
+        dut_fsa_bridge_endpoints = set(await self.read_single_attribute_check_success(
+            cluster=Clusters.Descriptor,
+            attribute=Clusters.Descriptor.Attributes.PartsList,
+            node_id=self.dut_node_id,
+            endpoint=0,
+        ))
+
+        # Iterate through the endpoints on the DUT_FSA_BRIDGE
+        for endpoint in dut_fsa_bridge_endpoints:
+            # Read the DeviceTypeList attribute for the current endpoint
+            device_type_list = await self.read_single_attribute_check_success(
+                cluster=Clusters.Descriptor,
+                attribute=Clusters.Descriptor.Attributes.DeviceTypeList,
+                node_id=self.dut_node_id,
+                endpoint=endpoint
+            )
+
+            # Check if any of the device types is an AGGREGATOR
+            if any(device_type.deviceType == _DEVICE_TYPE_AGGREGATOR for device_type in device_type_list):
+                dut_commissioning_control_endpoint = endpoint
+                logging.info(f"Aggregator endpoint found: {dut_commissioning_control_endpoint}")
+                break
+
+        asserts.assert_not_equal(dut_commissioning_control_endpoint, 0, "Invalid aggregator endpoint. Cannot proceed with test.")
+
         self.step(1)
         self.step(2)
         self.step(3)
