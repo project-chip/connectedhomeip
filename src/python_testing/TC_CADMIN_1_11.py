@@ -37,6 +37,7 @@ from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBas
                                                                        default_matter_test_main)
 from mobly import asserts
 
+
 class TC_CADMIN_1_11(MatterBaseTest):
     async def OpenCommissioningWindow(self, th, expectedErrCode) -> CommissioningParameters:
         if expectedErrCode is None:
