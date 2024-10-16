@@ -89,12 +89,12 @@ class TC_CADMIN_1_4_nofreset(MatterBaseTest):
         current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
         return current_fabric_index
 
-    def pics_TC_CADMIN_1_4_noreset(self) -> list[str]:
+    def pics_TC_CADMIN_1_4_nofreset(self) -> list[str]:
         return ["CADMIN.S"]
 
-    def steps_TC_CADMIN_1_4_noreset(self) -> list[TestStep]:
+    def steps_TC_CADMIN_1_4_nofreset(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH_CR1 starts a commissioning process with DUT_CE", is_commissioning=True),
+            TestStep(1, "TH_CR1 starts a commissioning process with DUT_CE", is_commissioning=False),
             TestStep(2, "TH_CR1 reads the BasicCommissioningInfo attribute from the General Commissioning cluster and saves the MaxCumulativeFailsafeSeconds field as max_window_duration."),
             TestStep("3a", "TH_CR1 opens a commissioning window on DUT_CE using a commissioning timeout of max_window_duration using BCM",
                      "DUT_CE opens its Commissioning window to allow a second commissioning."),
@@ -112,7 +112,8 @@ class TC_CADMIN_1_4_nofreset(MatterBaseTest):
         ]
 
     @async_test_body
-    async def test_TC_CADMIN_1_4_noreset(self):
+    async def test_TC_CADMIN_1_4_nofreset(self):
+        self.step(1)
         setupPayloadInfo = self.get_setup_payload_info()
         self.print_step("Setup payload info", setupPayloadInfo)
         if not setupPayloadInfo[0].passcode:
@@ -122,7 +123,6 @@ class TC_CADMIN_1_4_nofreset(MatterBaseTest):
         if not setupPayloadInfo[0].filter_value:
             asserts.assert_true(
                 False, 'discriminator must be a provided value in the test in order for this test to work due to using BCM, please rerun test with providing --discriminator <value>')
-        self.step(1)
 
         # Establishing TH1
         self.th1 = self.default_controller
