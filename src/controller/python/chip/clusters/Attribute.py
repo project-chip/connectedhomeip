@@ -572,8 +572,8 @@ class SubscriptionTransaction:
 
         handle = chip.native.GetLibraryHandle()
         builtins.chipStack.Call(
-            lambda: handle.pychip_ReadClient_Abort(
-                self._readTransaction._pReadClient, self._readTransaction._pReadCallback))
+            lambda: handle.pychip_ReadClient_ShutdownSubscription(
+                self._readTransaction._pReadClient))
         self._isDone = True
 
     def __del__(self):
@@ -648,12 +648,10 @@ class AsyncReadTransaction:
         self._cache = AttributeCache(returnClusterObject=returnClusterObject)
         self._changedPathSet: Set[AttributePath] = set()
         self._pReadClient = None
-        self._pReadCallback = None
         self._resultError: Optional[PyChipError] = None
 
-    def SetClientObjPointers(self, pReadClient, pReadCallback):
+    def SetClientObjPointers(self, pReadClient):
         self._pReadClient = pReadClient
-        self._pReadCallback = pReadCallback
 
     def GetAllEventValues(self):
         return self._events
@@ -1095,7 +1093,6 @@ def Read(transaction: AsyncReadTransaction, device,
             eventPathsForCffi[idx] = cast(ctypes.c_char_p(path), c_void_p)
 
     readClientObj = ctypes.POINTER(c_void_p)()
-    readCallbackObj = ctypes.POINTER(c_void_p)()
 
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     params = _ReadParams.parse(b'\x00' * _ReadParams.sizeof())
@@ -1115,7 +1112,6 @@ def Read(transaction: AsyncReadTransaction, device,
         lambda: handle.pychip_ReadClient_Read(
             ctypes.py_object(transaction),
             ctypes.byref(readClientObj),
-            ctypes.byref(readCallbackObj),
             device,
             ctypes.c_char_p(params),
             attributePathsForCffi,
@@ -1127,7 +1123,7 @@ def Read(transaction: AsyncReadTransaction, device,
             ctypes.c_size_t(0 if events is None else len(events)),
             eventNumberFilterPtr))
 
-    transaction.SetClientObjPointers(readClientObj, readCallbackObj)
+    transaction.SetClientObjPointers(readClientObj)
 
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
