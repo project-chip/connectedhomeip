@@ -71,9 +71,9 @@ def process_test_script_output(line, is_stderr):
 @click.command()
 @click.option("--app", type=click.Path(exists=True), default=None,
               help='Path to local application to use, omit to use external apps.')
-@click.option("--factoryreset", is_flag=True,
+@click.option("--factory-reset/--no-factory-reset", default=None,
               help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests.')
-@click.option("--factoryreset-app-only", is_flag=True,
+@click.option("--factory-reset-app-only/--no-factory-reset-app-only", default=None,
               help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests, but not the controller config')
 @click.option("--app-args", type=str, default='',
               help='The extra arguments passed to the device. Can use placeholders like {SCRIPT_BASE_NAME}')
@@ -90,9 +90,10 @@ def process_test_script_output(line, is_stderr):
               help='Script arguments, can use placeholders like {SCRIPT_BASE_NAME}.')
 @click.option("--script-gdb", is_flag=True,
               help='Run script through gdb')
-@click.option("--quiet", is_flag=True, help="Do not print output from passing tests. Use this flag in CI to keep github log sizes manageable.")
+@click.option("--quiet/--no-quiet", default=None,
+              help="Do not print output from passing tests. Use this flag in CI to keep GitHub log size manageable.")
 @click.option("--load-from-env", default=None, help="YAML file that contains values for environment variables.")
-def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: str,
+def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, script: str, script_args: str, script_gdb: bool, quiet: bool, load_from_env):
     if load_from_env:
         reader = MetadataReader(load_from_env)
@@ -106,18 +107,23 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
                 app_args=app_args,
                 app_ready_pattern=app_ready_pattern,
                 script_args=script_args,
-                factory_reset=factoryreset,
-                factory_reset_app_only=factoryreset_app_only,
                 script_gdb=script_gdb,
-                quiet=quiet
             )
         ]
 
     if not runs:
-        raise Exception(
-            "No valid runs were found. Make sure you add runs to your file, see https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md document for reference/example.")
+        raise click.ClickException(
+            "No valid runs were found. Make sure you add runs to your file, see "
+            "https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md document for reference/example.")
 
-    coloredlogs.install(level='INFO')
+    # Override runs Metadata with the command line arguments
+    for run in runs:
+        if factory_reset is not None:
+            run.factory_reset = factory_reset
+        if factory_reset_app_only is not None:
+            run.factory_reset_app_only = factory_reset_app_only
+        if quiet is not None:
+            run.quiet = quiet
 
     for run in runs:
         logging.info("Executing %s %s", run.py_script_path.split('/')[-1], run.run)
@@ -215,4 +221,5 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
 
 if __name__ == '__main__':
+    coloredlogs.install(level='INFO')
     main(auto_envvar_prefix='CHIP')

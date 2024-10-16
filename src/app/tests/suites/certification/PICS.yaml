@@ -339,6 +339,13 @@ PICS:
           "Does commissionee provide a Firmware Information field in the
           AttestationResponse?"
       id: MCORE.DA.ATTESTELEMENT_FW_INFO
+
+    #
+    # Fabric Synchronization
+    #
+    - label: "Does the device implement Fabric Synchronization capabilities?"
+      id: MCORE.FS
+
     #
     #IDM
     #

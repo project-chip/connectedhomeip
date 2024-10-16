@@ -8,9 +8,11 @@
 PROJECT_FLOW
 VSCODE_DEVELOPMENT
 ci-cd/index
+development_controllers/index
 getting_started/index
 cluster_and_device_type_dev/index
 guides/index
+platforms/index
 style/index
 examples/index
 product_considerations/index

@@ -156,6 +156,10 @@ __all__ = [
     "AccountLogin",
     "ContentControl",
     "ContentAppObserver",
+    "ZoneManagement",
+    "CameraAvStreamManagement",
+    "WebRTCTransportProvider",
+    "WebRTCTransportRequestor",
     "Chime",
     "EcosystemInformation",
     "CommissionerControl",
@@ -267,7 +271,7 @@ class Globals:
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 95,
+            kUnknownEnumValue = 95
 
         class AtomicRequestTypeEnum(MatterIntEnum):
             kBeginWrite = 0x00
@@ -277,7 +281,7 @@ class Globals:
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class FloorSurfaceTag(MatterIntEnum):
             kCarpet = 0x00
@@ -308,7 +312,7 @@ class Globals:
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 24,
+            kUnknownEnumValue = 24
 
         class LandmarkTag(MatterIntEnum):
             kAirConditioner = 0x00
@@ -366,7 +370,7 @@ class Globals:
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 51,
+            kUnknownEnumValue = 51
 
         class PositionTag(MatterIntEnum):
             kLeft = 0x00
@@ -380,7 +384,7 @@ class Globals:
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7,
+            kUnknownEnumValue = 7
 
         class RelativePositionTag(MatterIntEnum):
             kUnder = 0x00
@@ -394,7 +398,7 @@ class Globals:
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7,
+            kUnknownEnumValue = 7
 
         class TestGlobalEnum(MatterIntEnum):
             kSomeValue = 0x00
@@ -404,7 +408,7 @@ class Globals:
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class ThreeLevelAutoEnum(MatterIntEnum):
             kLow = 0x00
@@ -415,7 +419,7 @@ class Globals:
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
     class Bitmaps:
         class TestGlobalBitmap(IntFlag):
@@ -507,7 +511,7 @@ class Identify(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class EffectVariantEnum(MatterIntEnum):
             kDefault = 0x00
@@ -515,7 +519,7 @@ class Identify(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 1,
+            kUnknownEnumValue = 1
 
         class IdentifyTypeEnum(MatterIntEnum):
             kNone = 0x00
@@ -528,7 +532,7 @@ class Identify(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6,
+            kUnknownEnumValue = 6
 
     class Commands:
         @dataclass
@@ -1055,7 +1059,7 @@ class OnOff(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class DyingLightEffectVariantEnum(MatterIntEnum):
             kDyingLightFadeOff = 0x00
@@ -1063,7 +1067,7 @@ class OnOff(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 1,
+            kUnknownEnumValue = 1
 
         class EffectIdentifierEnum(MatterIntEnum):
             kDelayedAllOff = 0x00
@@ -1072,7 +1076,7 @@ class OnOff(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class StartUpOnOffEnum(MatterIntEnum):
             kOff = 0x00
@@ -1082,7 +1086,7 @@ class OnOff(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -1421,7 +1425,7 @@ class LevelControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class StepModeEnum(MatterIntEnum):
             kUp = 0x00
@@ -1430,7 +1434,7 @@ class LevelControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -2525,7 +2529,7 @@ class AccessControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 0,
+            kUnknownEnumValue = 0
 
         class AccessControlEntryPrivilegeEnum(MatterIntEnum):
             kView = 0x01
@@ -2537,7 +2541,7 @@ class AccessControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 0,
+            kUnknownEnumValue = 0
 
         class AccessRestrictionTypeEnum(MatterIntEnum):
             kAttributeAccessForbidden = 0x00
@@ -2548,7 +2552,7 @@ class AccessControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class ChangeTypeEnum(MatterIntEnum):
             kChanged = 0x00
@@ -2558,7 +2562,7 @@ class AccessControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -3018,7 +3022,7 @@ class Actions(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class ActionStateEnum(MatterIntEnum):
             kInactive = 0x00
@@ -3029,7 +3033,7 @@ class Actions(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class ActionTypeEnum(MatterIntEnum):
             kOther = 0x00
@@ -3043,7 +3047,7 @@ class Actions(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7,
+            kUnknownEnumValue = 7
 
         class EndpointListTypeEnum(MatterIntEnum):
             kOther = 0x00
@@ -3053,7 +3057,7 @@ class Actions(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
     class Bitmaps:
         class CommandBits(IntFlag):
@@ -3627,7 +3631,7 @@ class BasicInformation(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 21,
+            kUnknownEnumValue = 21
 
         class ProductFinishEnum(MatterIntEnum):
             kOther = 0x00
@@ -3640,7 +3644,7 @@ class BasicInformation(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6,
+            kUnknownEnumValue = 6
 
     class Structs:
         @dataclass
@@ -4255,7 +4259,7 @@ class OtaSoftwareUpdateProvider(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class DownloadProtocolEnum(MatterIntEnum):
             kBDXSynchronous = 0x00
@@ -4266,7 +4270,7 @@ class OtaSoftwareUpdateProvider(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class StatusEnum(MatterIntEnum):
             kUpdateAvailable = 0x00
@@ -4277,7 +4281,7 @@ class OtaSoftwareUpdateProvider(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
     class Commands:
         @dataclass
@@ -4532,7 +4536,7 @@ class OtaSoftwareUpdateRequestor(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class ChangeReasonEnum(MatterIntEnum):
             kUnknown = 0x00
@@ -4544,7 +4548,7 @@ class OtaSoftwareUpdateRequestor(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class UpdateStateEnum(MatterIntEnum):
             kUnknown = 0x00
@@ -4560,7 +4564,7 @@ class OtaSoftwareUpdateRequestor(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 9,
+            kUnknownEnumValue = 9
 
     class Structs:
         @dataclass
@@ -5042,7 +5046,7 @@ class TimeFormatLocalization(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 12,
+            kUnknownEnumValue = 12
 
         class HourFormatEnum(MatterIntEnum):
             k12hr = 0x00
@@ -5052,7 +5056,7 @@ class TimeFormatLocalization(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -5238,7 +5242,7 @@ class UnitLocalization(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -5623,7 +5627,7 @@ class PowerSource(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 33,
+            kUnknownEnumValue = 33
 
         class BatChargeFaultEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -5641,7 +5645,7 @@ class PowerSource(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 11,
+            kUnknownEnumValue = 11
 
         class BatChargeLevelEnum(MatterIntEnum):
             kOk = 0x00
@@ -5651,7 +5655,7 @@ class PowerSource(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class BatChargeStateEnum(MatterIntEnum):
             kUnknown = 0x00
@@ -5662,7 +5666,7 @@ class PowerSource(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class BatCommonDesignationEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -5750,7 +5754,7 @@ class PowerSource(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 81,
+            kUnknownEnumValue = 81
 
         class BatFaultEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -5760,7 +5764,7 @@ class PowerSource(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class BatReplaceabilityEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -5771,7 +5775,7 @@ class PowerSource(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class PowerSourceStatusEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -5782,7 +5786,7 @@ class PowerSource(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class WiredCurrentTypeEnum(MatterIntEnum):
             kAc = 0x00
@@ -5791,7 +5795,7 @@ class PowerSource(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class WiredFaultEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -5801,7 +5805,7 @@ class PowerSource(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -6541,6 +6545,7 @@ class GeneralCommissioning(Cluster):
                 ClusterObjectFieldDescriptor(Label="TCMinRequiredVersion", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="TCAcknowledgements", Tag=0x00000007, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="TCAcknowledgementsRequired", Tag=0x00000008, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="TCUpdateDeadline", Tag=0x00000009, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -6558,6 +6563,7 @@ class GeneralCommissioning(Cluster):
     TCMinRequiredVersion: 'typing.Optional[uint]' = None
     TCAcknowledgements: 'typing.Optional[uint]' = None
     TCAcknowledgementsRequired: 'typing.Optional[bool]' = None
+    TCUpdateDeadline: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -6579,7 +6585,7 @@ class GeneralCommissioning(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 8,
+            kUnknownEnumValue = 8
 
         class RegulatoryLocationTypeEnum(MatterIntEnum):
             kIndoor = 0x00
@@ -6589,7 +6595,7 @@ class GeneralCommissioning(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -6895,6 +6901,22 @@ class GeneralCommissioning(Cluster):
             value: 'typing.Optional[bool]' = None
 
         @dataclass
+        class TCUpdateDeadline(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000030
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000009
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -7055,7 +7077,7 @@ class NetworkCommissioning(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 13,
+            kUnknownEnumValue = 13
 
         class WiFiBandEnum(MatterIntEnum):
             k2g4 = 0x00
@@ -7068,7 +7090,7 @@ class NetworkCommissioning(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6,
+            kUnknownEnumValue = 6
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -7683,7 +7705,7 @@ class DiagnosticLogs(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class StatusEnum(MatterIntEnum):
             kSuccess = 0x00
@@ -7695,7 +7717,7 @@ class DiagnosticLogs(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class TransferProtocolEnum(MatterIntEnum):
             kResponsePayload = 0x00
@@ -7704,7 +7726,7 @@ class DiagnosticLogs(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
     class Commands:
         @dataclass
@@ -7901,7 +7923,7 @@ class GeneralDiagnostics(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7,
+            kUnknownEnumValue = 7
 
         class HardwareFaultEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -7919,7 +7941,7 @@ class GeneralDiagnostics(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 11,
+            kUnknownEnumValue = 11
 
         class InterfaceTypeEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -7931,7 +7953,7 @@ class GeneralDiagnostics(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class NetworkFaultEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -7942,7 +7964,7 @@ class GeneralDiagnostics(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class RadioFaultEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -7956,7 +7978,7 @@ class GeneralDiagnostics(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7,
+            kUnknownEnumValue = 7
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -8811,7 +8833,7 @@ class ThreadNetworkDiagnostics(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class NetworkFaultEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -8822,7 +8844,7 @@ class ThreadNetworkDiagnostics(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class RoutingRoleEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -8836,7 +8858,7 @@ class ThreadNetworkDiagnostics(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7,
+            kUnknownEnumValue = 7
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -10178,7 +10200,7 @@ class WiFiNetworkDiagnostics(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class ConnectionStatusEnum(MatterIntEnum):
             kConnected = 0x00
@@ -10187,7 +10209,7 @@ class WiFiNetworkDiagnostics(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class SecurityTypeEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -10200,7 +10222,7 @@ class WiFiNetworkDiagnostics(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6,
+            kUnknownEnumValue = 6
 
         class WiFiVersionEnum(MatterIntEnum):
             kA = 0x00
@@ -10214,7 +10236,7 @@ class WiFiNetworkDiagnostics(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7,
+            kUnknownEnumValue = 7
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -10658,7 +10680,7 @@ class EthernetNetworkDiagnostics(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 10,
+            kUnknownEnumValue = 10
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -10981,7 +11003,7 @@ class TimeSynchronization(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class StatusCode(MatterIntEnum):
             kTimeNotAccepted = 0x02
@@ -10989,7 +11011,7 @@ class TimeSynchronization(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 0,
+            kUnknownEnumValue = 0
 
         class TimeSourceEnum(MatterIntEnum):
             kNone = 0x00
@@ -11013,7 +11035,7 @@ class TimeSynchronization(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 17,
+            kUnknownEnumValue = 17
 
         class TimeZoneDatabaseEnum(MatterIntEnum):
             kFull = 0x00
@@ -11023,7 +11045,7 @@ class TimeSynchronization(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -11671,7 +11693,7 @@ class BridgedDeviceBasicInformation(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 21,
+            kUnknownEnumValue = 21
 
         class ProductFinishEnum(MatterIntEnum):
             kOther = 0x00
@@ -11684,7 +11706,7 @@ class BridgedDeviceBasicInformation(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6,
+            kUnknownEnumValue = 6
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -12543,7 +12565,7 @@ class AdministratorCommissioning(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class StatusCode(MatterIntEnum):
             kBusy = 0x02
@@ -12553,7 +12575,7 @@ class AdministratorCommissioning(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 0,
+            kUnknownEnumValue = 0
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -12814,7 +12836,7 @@ class OperationalCredentials(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 0,
+            kUnknownEnumValue = 0
 
         class NodeOperationalCertStatusEnum(MatterIntEnum):
             kOk = 0x00
@@ -12831,7 +12853,7 @@ class OperationalCredentials(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7,
+            kUnknownEnumValue = 7
 
     class Structs:
         @dataclass
@@ -13316,7 +13338,7 @@ class GroupKeyManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -14515,7 +14537,7 @@ class IcdManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class OperatingModeEnum(MatterIntEnum):
             kSit = 0x00
@@ -14524,7 +14546,7 @@ class IcdManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -14958,7 +14980,7 @@ class Timer(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -15217,7 +15239,7 @@ class OvenCavityOperationalState(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class OperationalStateEnum(MatterIntEnum):
             kStopped = 0x00
@@ -15228,7 +15250,7 @@ class OvenCavityOperationalState(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
     class Structs:
         @dataclass
@@ -15621,7 +15643,7 @@ class OvenMode(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 10,
+            kUnknownEnumValue = 10
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -15890,7 +15912,7 @@ class LaundryDryerControls(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
     class Attributes:
         @dataclass
@@ -16906,7 +16928,7 @@ class LaundryWasherControls(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -18369,7 +18391,7 @@ class AirQuality(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7,
+            kUnknownEnumValue = 7
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -18550,7 +18572,7 @@ class SmokeCoAlarm(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class ContaminationStateEnum(MatterIntEnum):
             kNormal = 0x00
@@ -18561,7 +18583,7 @@ class SmokeCoAlarm(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class EndOfServiceEnum(MatterIntEnum):
             kNormal = 0x00
@@ -18570,7 +18592,7 @@ class SmokeCoAlarm(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class ExpressedStateEnum(MatterIntEnum):
             kNormal = 0x00
@@ -18586,7 +18608,7 @@ class SmokeCoAlarm(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 9,
+            kUnknownEnumValue = 9
 
         class MuteStateEnum(MatterIntEnum):
             kNotMuted = 0x00
@@ -18595,7 +18617,7 @@ class SmokeCoAlarm(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class SensitivityEnum(MatterIntEnum):
             kHigh = 0x00
@@ -18605,7 +18627,7 @@ class SmokeCoAlarm(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -19433,7 +19455,7 @@ class MicrowaveOvenMode(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 10,
+            kUnknownEnumValue = 10
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -19973,7 +19995,7 @@ class OperationalState(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class OperationalStateEnum(MatterIntEnum):
             kStopped = 0x00
@@ -19984,7 +20006,7 @@ class OperationalState(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
     class Structs:
         @dataclass
@@ -21301,7 +21323,7 @@ class HepaFilterMonitoring(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class DegradationDirectionEnum(MatterIntEnum):
             kUp = 0x00
@@ -21310,7 +21332,7 @@ class HepaFilterMonitoring(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class ProductIdentifierTypeEnum(MatterIntEnum):
             kUpc = 0x00
@@ -21322,7 +21344,7 @@ class HepaFilterMonitoring(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -21596,7 +21618,7 @@ class ActivatedCarbonFilterMonitoring(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class DegradationDirectionEnum(MatterIntEnum):
             kUp = 0x00
@@ -21605,7 +21627,7 @@ class ActivatedCarbonFilterMonitoring(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class ProductIdentifierTypeEnum(MatterIntEnum):
             kUpc = 0x00
@@ -21617,7 +21639,7 @@ class ActivatedCarbonFilterMonitoring(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -22252,7 +22274,7 @@ class ValveConfigurationAndControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 0,
+            kUnknownEnumValue = 0
 
         class ValveStateEnum(MatterIntEnum):
             kClosed = 0x00
@@ -22262,7 +22284,7 @@ class ValveConfigurationAndControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -22706,7 +22728,7 @@ class ElectricalPowerMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 15,
+            kUnknownEnumValue = 15
 
         class PowerModeEnum(MatterIntEnum):
             kUnknown = 0x00
@@ -22716,7 +22738,7 @@ class ElectricalPowerMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -23293,7 +23315,7 @@ class ElectricalEnergyMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 15,
+            kUnknownEnumValue = 15
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -23663,7 +23685,7 @@ class WaterHeaterManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -24014,7 +24036,7 @@ class DemandResponseLoadControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 10,
+            kUnknownEnumValue = 10
 
         class HeatingSourceEnum(MatterIntEnum):
             kAny = 0x00
@@ -24024,7 +24046,7 @@ class DemandResponseLoadControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class LoadControlEventChangeSourceEnum(MatterIntEnum):
             kAutomatic = 0x00
@@ -24033,7 +24055,7 @@ class DemandResponseLoadControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class LoadControlEventStatusEnum(MatterIntEnum):
             kUnknown = 0x00
@@ -24053,7 +24075,7 @@ class DemandResponseLoadControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 13,
+            kUnknownEnumValue = 13
 
     class Bitmaps:
         class CancelControlBitmap(IntFlag):
@@ -24605,7 +24627,7 @@ class Messages(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class MessagePriorityEnum(MatterIntEnum):
             kLow = 0x00
@@ -24616,7 +24638,7 @@ class Messages(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -24955,7 +24977,7 @@ class DeviceEnergyManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class CauseEnum(MatterIntEnum):
             kNormalCompletion = 0x00
@@ -24967,7 +24989,7 @@ class DeviceEnergyManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class CostTypeEnum(MatterIntEnum):
             kFinancial = 0x00
@@ -24978,7 +25000,7 @@ class DeviceEnergyManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class ESAStateEnum(MatterIntEnum):
             kOffline = 0x00
@@ -24990,7 +25012,7 @@ class DeviceEnergyManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class ESATypeEnum(MatterIntEnum):
             kEvse = 0x00
@@ -25012,7 +25034,7 @@ class DeviceEnergyManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 14,
+            kUnknownEnumValue = 14
 
         class ForecastUpdateReasonEnum(MatterIntEnum):
             kInternalOptimization = 0x00
@@ -25022,7 +25044,7 @@ class DeviceEnergyManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class OptOutStateEnum(MatterIntEnum):
             kNoOptOut = 0x00
@@ -25033,7 +25055,7 @@ class DeviceEnergyManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class PowerAdjustReasonEnum(MatterIntEnum):
             kNoAdjustment = 0x00
@@ -25043,7 +25065,7 @@ class DeviceEnergyManagement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -25722,7 +25744,7 @@ class EnergyEvse(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class FaultStateEnum(MatterIntEnum):
             kNoError = 0x00
@@ -25746,7 +25768,7 @@ class EnergyEvse(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 16,
+            kUnknownEnumValue = 16
 
         class StateEnum(MatterIntEnum):
             kNotPluggedIn = 0x00
@@ -25760,7 +25782,7 @@ class EnergyEvse(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7,
+            kUnknownEnumValue = 7
 
         class SupplyStateEnum(MatterIntEnum):
             kDisabled = 0x00
@@ -25773,7 +25795,7 @@ class EnergyEvse(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6,
+            kUnknownEnumValue = 6
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -26624,7 +26646,7 @@ class EnergyPreference(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -27961,7 +27983,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class CredentialRuleEnum(MatterIntEnum):
             kSingle = 0x00
@@ -27971,7 +27993,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class CredentialTypeEnum(MatterIntEnum):
             kProgrammingPIN = 0x00
@@ -27987,7 +28009,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 9,
+            kUnknownEnumValue = 9
 
         class DataOperationTypeEnum(MatterIntEnum):
             kAdd = 0x00
@@ -27997,7 +28019,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class DlLockState(MatterIntEnum):
             kNotFullyLocked = 0x00
@@ -28008,7 +28030,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class DlLockType(MatterIntEnum):
             kDeadBolt = 0x00
@@ -28027,7 +28049,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 12,
+            kUnknownEnumValue = 12
 
         class DlStatus(MatterIntEnum):
             kSuccess = 0x00
@@ -28041,7 +28063,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class DoorLockOperationEventCode(MatterIntEnum):
             kUnknownOrMfgSpecific = 0x00
@@ -28063,7 +28085,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 15,
+            kUnknownEnumValue = 15
 
         class DoorLockProgrammingEventCode(MatterIntEnum):
             kUnknownOrMfgSpecific = 0x00
@@ -28077,7 +28099,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7,
+            kUnknownEnumValue = 7
 
         class DoorLockSetPinOrIdStatus(MatterIntEnum):
             kSuccess = 0x00
@@ -28088,7 +28110,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class DoorLockUserStatus(MatterIntEnum):
             kAvailable = 0x00
@@ -28099,7 +28121,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class DoorLockUserType(MatterIntEnum):
             kUnrestricted = 0x00
@@ -28112,7 +28134,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class DoorStateEnum(MatterIntEnum):
             kDoorOpen = 0x00
@@ -28125,7 +28147,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6,
+            kUnknownEnumValue = 6
 
         class LockDataTypeEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -28146,7 +28168,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 14,
+            kUnknownEnumValue = 14
 
         class LockOperationTypeEnum(MatterIntEnum):
             kLock = 0x00
@@ -28158,7 +28180,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class OperatingModeEnum(MatterIntEnum):
             kNormal = 0x00
@@ -28170,7 +28192,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class OperationErrorEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -28182,7 +28204,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class OperationSourceEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -28200,7 +28222,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 11,
+            kUnknownEnumValue = 11
 
         class UserStatusEnum(MatterIntEnum):
             kAvailable = 0x00
@@ -28210,7 +28232,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class UserTypeEnum(MatterIntEnum):
             kUnrestrictedUser = 0x00
@@ -28227,7 +28249,7 @@ class DoorLock(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 10,
+            kUnknownEnumValue = 10
 
     class Bitmaps:
         class DaysMaskMap(IntFlag):
@@ -30012,7 +30034,7 @@ class WindowCovering(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 24,
+            kUnknownEnumValue = 24
 
         class Type(MatterIntEnum):
             kRollerShade = 0x00
@@ -30030,7 +30052,7 @@ class WindowCovering(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 10,
+            kUnknownEnumValue = 10
 
     class Bitmaps:
         class ConfigStatus(IntFlag):
@@ -30673,7 +30695,7 @@ class ServiceArea(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class SelectAreasStatus(MatterIntEnum):
             kSuccess = 0x00
@@ -30684,7 +30706,7 @@ class ServiceArea(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class SkipAreaStatus(MatterIntEnum):
             kSuccess = 0x00
@@ -30695,7 +30717,7 @@ class ServiceArea(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -31119,7 +31141,7 @@ class PumpConfigurationAndControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class OperationModeEnum(MatterIntEnum):
             kNormal = 0x00
@@ -31130,7 +31152,7 @@ class PumpConfigurationAndControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -32042,7 +32064,7 @@ class Thermostat(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 1,
+            kUnknownEnumValue = 1
 
         class ACCompressorTypeEnum(MatterIntEnum):
             kUnknown = 0x00
@@ -32053,7 +32075,7 @@ class Thermostat(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class ACLouverPositionEnum(MatterIntEnum):
             kClosed = 0x01
@@ -32065,7 +32087,7 @@ class Thermostat(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 0,
+            kUnknownEnumValue = 0
 
         class ACRefrigerantTypeEnum(MatterIntEnum):
             kUnknown = 0x00
@@ -32076,7 +32098,7 @@ class Thermostat(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class ACTypeEnum(MatterIntEnum):
             kUnknown = 0x00
@@ -32088,7 +32110,7 @@ class Thermostat(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class ControlSequenceOfOperationEnum(MatterIntEnum):
             kCoolingOnly = 0x00
@@ -32101,7 +32123,7 @@ class Thermostat(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6,
+            kUnknownEnumValue = 6
 
         class PresetScenarioEnum(MatterIntEnum):
             kOccupied = 0x01
@@ -32115,7 +32137,7 @@ class Thermostat(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 0,
+            kUnknownEnumValue = 0
 
         class SetpointChangeSourceEnum(MatterIntEnum):
             kManual = 0x00
@@ -32125,7 +32147,7 @@ class Thermostat(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class SetpointRaiseLowerModeEnum(MatterIntEnum):
             kHeat = 0x00
@@ -32135,7 +32157,7 @@ class Thermostat(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class StartOfWeekEnum(MatterIntEnum):
             kSunday = 0x00
@@ -32149,7 +32171,7 @@ class Thermostat(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7,
+            kUnknownEnumValue = 7
 
         class SystemModeEnum(MatterIntEnum):
             kOff = 0x00
@@ -32165,7 +32187,7 @@ class Thermostat(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class TemperatureSetpointHoldEnum(MatterIntEnum):
             kSetpointHoldOff = 0x00
@@ -32174,7 +32196,7 @@ class Thermostat(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class ThermostatRunningModeEnum(MatterIntEnum):
             kOff = 0x00
@@ -32184,7 +32206,7 @@ class Thermostat(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 1,
+            kUnknownEnumValue = 1
 
     class Bitmaps:
         class ACErrorCodeBitmap(IntFlag):
@@ -33645,7 +33667,7 @@ class FanControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class FanModeEnum(MatterIntEnum):
             kOff = 0x00
@@ -33659,7 +33681,7 @@ class FanControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7,
+            kUnknownEnumValue = 7
 
         class FanModeSequenceEnum(MatterIntEnum):
             kOffLowMedHigh = 0x00
@@ -33672,7 +33694,7 @@ class FanControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6,
+            kUnknownEnumValue = 6
 
         class StepDirectionEnum(MatterIntEnum):
             kIncrease = 0x00
@@ -33681,7 +33703,7 @@ class FanControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -34053,7 +34075,7 @@ class ThermostatUserInterfaceConfiguration(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6,
+            kUnknownEnumValue = 6
 
         class ScheduleProgrammingVisibilityEnum(MatterIntEnum):
             kScheduleProgrammingPermitted = 0x00
@@ -34062,7 +34084,7 @@ class ThermostatUserInterfaceConfiguration(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class TemperatureDisplayModeEnum(MatterIntEnum):
             kCelsius = 0x00
@@ -34071,7 +34093,7 @@ class ThermostatUserInterfaceConfiguration(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
     class Attributes:
         @dataclass
@@ -34355,7 +34377,7 @@ class ColorControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class ColorLoopDirectionEnum(MatterIntEnum):
             kDecrement = 0x00
@@ -34364,7 +34386,7 @@ class ColorControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class ColorModeEnum(MatterIntEnum):
             kCurrentHueAndCurrentSaturation = 0x00
@@ -34374,7 +34396,7 @@ class ColorControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class DirectionEnum(MatterIntEnum):
             kShortest = 0x00
@@ -34385,7 +34407,7 @@ class ColorControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class DriftCompensationEnum(MatterIntEnum):
             kNone = 0x00
@@ -34397,7 +34419,7 @@ class ColorControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class EnhancedColorModeEnum(MatterIntEnum):
             kCurrentHueAndCurrentSaturation = 0x00
@@ -34408,7 +34430,7 @@ class ColorControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class MoveModeEnum(MatterIntEnum):
             kStop = 0x00
@@ -34418,7 +34440,7 @@ class ColorControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class StepModeEnum(MatterIntEnum):
             kUp = 0x01
@@ -34427,7 +34449,7 @@ class ColorControl(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 0,
+            kUnknownEnumValue = 0
 
     class Bitmaps:
         class ColorCapabilitiesBitmap(IntFlag):
@@ -36254,7 +36276,7 @@ class IlluminanceMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
     class Attributes:
         @dataclass
@@ -37361,7 +37383,7 @@ class OccupancySensing(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -37796,7 +37818,7 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class MeasurementMediumEnum(MatterIntEnum):
             kAir = 0x00
@@ -37806,7 +37828,7 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class MeasurementUnitEnum(MatterIntEnum):
             kPpm = 0x00
@@ -37821,7 +37843,7 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 8,
+            kUnknownEnumValue = 8
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -38162,7 +38184,7 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class MeasurementMediumEnum(MatterIntEnum):
             kAir = 0x00
@@ -38172,7 +38194,7 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class MeasurementUnitEnum(MatterIntEnum):
             kPpm = 0x00
@@ -38187,7 +38209,7 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 8,
+            kUnknownEnumValue = 8
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -38528,7 +38550,7 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class MeasurementMediumEnum(MatterIntEnum):
             kAir = 0x00
@@ -38538,7 +38560,7 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class MeasurementUnitEnum(MatterIntEnum):
             kPpm = 0x00
@@ -38553,7 +38575,7 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 8,
+            kUnknownEnumValue = 8
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -38894,7 +38916,7 @@ class OzoneConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class MeasurementMediumEnum(MatterIntEnum):
             kAir = 0x00
@@ -38904,7 +38926,7 @@ class OzoneConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class MeasurementUnitEnum(MatterIntEnum):
             kPpm = 0x00
@@ -38919,7 +38941,7 @@ class OzoneConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 8,
+            kUnknownEnumValue = 8
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -39260,7 +39282,7 @@ class Pm25ConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class MeasurementMediumEnum(MatterIntEnum):
             kAir = 0x00
@@ -39270,7 +39292,7 @@ class Pm25ConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class MeasurementUnitEnum(MatterIntEnum):
             kPpm = 0x00
@@ -39285,7 +39307,7 @@ class Pm25ConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 8,
+            kUnknownEnumValue = 8
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -39626,7 +39648,7 @@ class FormaldehydeConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class MeasurementMediumEnum(MatterIntEnum):
             kAir = 0x00
@@ -39636,7 +39658,7 @@ class FormaldehydeConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class MeasurementUnitEnum(MatterIntEnum):
             kPpm = 0x00
@@ -39651,7 +39673,7 @@ class FormaldehydeConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 8,
+            kUnknownEnumValue = 8
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -39992,7 +40014,7 @@ class Pm1ConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class MeasurementMediumEnum(MatterIntEnum):
             kAir = 0x00
@@ -40002,7 +40024,7 @@ class Pm1ConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class MeasurementUnitEnum(MatterIntEnum):
             kPpm = 0x00
@@ -40017,7 +40039,7 @@ class Pm1ConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 8,
+            kUnknownEnumValue = 8
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -40358,7 +40380,7 @@ class Pm10ConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class MeasurementMediumEnum(MatterIntEnum):
             kAir = 0x00
@@ -40368,7 +40390,7 @@ class Pm10ConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class MeasurementUnitEnum(MatterIntEnum):
             kPpm = 0x00
@@ -40383,7 +40405,7 @@ class Pm10ConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 8,
+            kUnknownEnumValue = 8
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -40724,7 +40746,7 @@ class TotalVolatileOrganicCompoundsConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class MeasurementMediumEnum(MatterIntEnum):
             kAir = 0x00
@@ -40734,7 +40756,7 @@ class TotalVolatileOrganicCompoundsConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class MeasurementUnitEnum(MatterIntEnum):
             kPpm = 0x00
@@ -40749,7 +40771,7 @@ class TotalVolatileOrganicCompoundsConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 8,
+            kUnknownEnumValue = 8
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -41090,7 +41112,7 @@ class RadonConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
         class MeasurementMediumEnum(MatterIntEnum):
             kAir = 0x00
@@ -41100,7 +41122,7 @@ class RadonConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
         class MeasurementUnitEnum(MatterIntEnum):
             kPpm = 0x00
@@ -41115,7 +41137,7 @@ class RadonConcentrationMeasurement(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 8,
+            kUnknownEnumValue = 8
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -42359,7 +42381,7 @@ class Channel(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class LineupInfoTypeEnum(MatterIntEnum):
             kMso = 0x00
@@ -42367,7 +42389,7 @@ class Channel(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 1,
+            kUnknownEnumValue = 1
 
         class StatusEnum(MatterIntEnum):
             kSuccess = 0x00
@@ -42377,7 +42399,7 @@ class Channel(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -42900,7 +42922,7 @@ class TargetNavigator(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
     class Structs:
         @dataclass
@@ -43176,7 +43198,7 @@ class MediaPlayback(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 18,
+            kUnknownEnumValue = 18
 
         class PlaybackStateEnum(MatterIntEnum):
             kPlaying = 0x00
@@ -43187,7 +43209,7 @@ class MediaPlayback(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
         class StatusEnum(MatterIntEnum):
             kSuccess = 0x00
@@ -43200,7 +43222,7 @@ class MediaPlayback(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6,
+            kUnknownEnumValue = 6
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -43829,7 +43851,7 @@ class MediaInput(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 12,
+            kUnknownEnumValue = 12
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -44294,7 +44316,7 @@ class KeypadInput(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 14,
+            kUnknownEnumValue = 14
 
         class StatusEnum(MatterIntEnum):
             kSuccess = 0x00
@@ -44304,7 +44326,7 @@ class KeypadInput(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 3
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -44494,7 +44516,7 @@ class ContentLauncher(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 18,
+            kUnknownEnumValue = 18
 
         class MetricTypeEnum(MatterIntEnum):
             kPixels = 0x00
@@ -44503,7 +44525,7 @@ class ContentLauncher(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
         class ParameterEnum(MatterIntEnum):
             kActor = 0x00
@@ -44527,7 +44549,7 @@ class ContentLauncher(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 17,
+            kUnknownEnumValue = 17
 
         class StatusEnum(MatterIntEnum):
             kSuccess = 0x00
@@ -44539,7 +44561,7 @@ class ContentLauncher(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -44906,7 +44928,7 @@ class AudioOutput(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6,
+            kUnknownEnumValue = 6
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -45132,7 +45154,7 @@ class ApplicationLauncher(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6,
+            kUnknownEnumValue = 6
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -45413,7 +45435,7 @@ class ApplicationBasic(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
     class Structs:
         @dataclass
@@ -46378,7 +46400,7 @@ class ContentAppObserver(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2,
+            kUnknownEnumValue = 2
 
     class Commands:
         @dataclass
@@ -46505,6 +46527,2774 @@ class ContentAppObserver(Cluster):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000510
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+
+@dataclass
+class ZoneManagement(Cluster):
+    id: typing.ClassVar[int] = 0x00000550
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="supportedZoneSources", Tag=0x00000000, Type=typing.List[ZoneManagement.Enums.ZoneSourceEnum]),
+                ClusterObjectFieldDescriptor(Label="zones", Tag=0x00000001, Type=typing.Optional[typing.List[ZoneManagement.Structs.ZoneInformationStruct]]),
+                ClusterObjectFieldDescriptor(Label="timeControl", Tag=0x00000002, Type=typing.List[ZoneManagement.Structs.ZoneTriggeringTimeControlStruct]),
+                ClusterObjectFieldDescriptor(Label="sensitivity", Tag=0x00000003, Type=uint),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    supportedZoneSources: 'typing.List[ZoneManagement.Enums.ZoneSourceEnum]' = None
+    zones: 'typing.Optional[typing.List[ZoneManagement.Structs.ZoneInformationStruct]]' = None
+    timeControl: 'typing.List[ZoneManagement.Structs.ZoneTriggeringTimeControlStruct]' = None
+    sensitivity: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = None
+    acceptedCommandList: 'typing.List[uint]' = None
+    eventList: 'typing.List[uint]' = None
+    attributeList: 'typing.List[uint]' = None
+    featureMap: 'uint' = None
+    clusterRevision: 'uint' = None
+
+    class Enums:
+        class StatusCodeEnum(MatterIntEnum):
+            kZoneNotFound = 0x02
+            kZoneInUse = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 0
+
+        class ZoneEventStoppedReasonEnum(MatterIntEnum):
+            kActionStopped = 0x00
+            kTimeout = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
+        class ZoneEventTriggeredReasonEnum(MatterIntEnum):
+            kMotion = 0x00
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 1
+
+        class ZoneSourceEnum(MatterIntEnum):
+            kMfg = 0x00
+            kUser = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
+        class ZoneTypeEnum(MatterIntEnum):
+            kTwoDCARTZone = 0x00
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 1
+
+        class ZoneUseEnum(MatterIntEnum):
+            kMotion = 0x00
+            kPrivacy = 0x01
+            kFocus = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kTwoDimensionalCartesianZone = 0x1
+
+    class Structs:
+        @dataclass
+        class TwoDCartesianVertexStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="x", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="y", Tag=1, Type=uint),
+                    ])
+
+            x: 'uint' = 0
+            y: 'uint' = 0
+
+        @dataclass
+        class TwoDCartesianZoneStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="use", Tag=1, Type=ZoneManagement.Enums.ZoneUseEnum),
+                        ClusterObjectFieldDescriptor(Label="vertices", Tag=2, Type=typing.List[ZoneManagement.Structs.TwoDCartesianVertexStruct]),
+                        ClusterObjectFieldDescriptor(Label="color", Tag=3, Type=typing.Optional[str]),
+                    ])
+
+            name: 'str' = ""
+            use: 'ZoneManagement.Enums.ZoneUseEnum' = 0
+            vertices: 'typing.List[ZoneManagement.Structs.TwoDCartesianVertexStruct]' = field(default_factory=lambda: [])
+            color: 'typing.Optional[str]' = None
+
+        @dataclass
+        class ZoneInformationStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zoneID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="zoneType", Tag=1, Type=ZoneManagement.Enums.ZoneTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="zoneSource", Tag=2, Type=ZoneManagement.Enums.ZoneSourceEnum),
+                    ])
+
+            zoneID: 'uint' = 0
+            zoneType: 'ZoneManagement.Enums.ZoneTypeEnum' = 0
+            zoneSource: 'ZoneManagement.Enums.ZoneSourceEnum' = 0
+
+        @dataclass
+        class ZoneTriggeringTimeControlStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="initialDuration", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="augmentationDuration", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="maxDuration", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="blindDuration", Tag=3, Type=uint),
+                    ])
+
+            initialDuration: 'uint' = 0
+            augmentationDuration: 'uint' = 0
+            maxDuration: 'uint' = 0
+            blindDuration: 'uint' = 0
+
+    class Commands:
+        @dataclass
+        class CreateTwoDCartesianZone(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000550
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'CreateTwoDCartesianZoneResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zone", Tag=0, Type=ZoneManagement.Structs.TwoDCartesianZoneStruct),
+                    ])
+
+            zone: 'ZoneManagement.Structs.TwoDCartesianZoneStruct' = field(default_factory=lambda: ZoneManagement.Structs.TwoDCartesianZoneStruct())
+
+        @dataclass
+        class CreateTwoDCartesianZoneResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000550
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zoneID", Tag=0, Type=uint),
+                    ])
+
+            zoneID: 'uint' = 0
+
+        @dataclass
+        class UpdateTwoDCartesianZone(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000550
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zoneID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="zone", Tag=1, Type=ZoneManagement.Structs.TwoDCartesianZoneStruct),
+                    ])
+
+            zoneID: 'uint' = 0
+            zone: 'ZoneManagement.Structs.TwoDCartesianZoneStruct' = field(default_factory=lambda: ZoneManagement.Structs.TwoDCartesianZoneStruct())
+
+        @dataclass
+        class GetTwoDCartesianZone(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000550
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'GetTwoDCartesianZoneResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zoneID", Tag=0, Type=typing.Union[None, Nullable, uint]),
+                    ])
+
+            zoneID: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class GetTwoDCartesianZoneResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000550
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zones", Tag=0, Type=typing.List[ZoneManagement.Structs.TwoDCartesianZoneStruct]),
+                    ])
+
+            zones: 'typing.List[ZoneManagement.Structs.TwoDCartesianZoneStruct]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class RemoveZone(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000550
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zoneID", Tag=0, Type=uint),
+                    ])
+
+            zoneID: 'uint' = 0
+
+    class Attributes:
+        @dataclass
+        class SupportedZoneSources(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[ZoneManagement.Enums.ZoneSourceEnum])
+
+            value: 'typing.List[ZoneManagement.Enums.ZoneSourceEnum]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class Zones(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[ZoneManagement.Structs.ZoneInformationStruct]])
+
+            value: 'typing.Optional[typing.List[ZoneManagement.Structs.ZoneInformationStruct]]' = None
+
+        @dataclass
+        class TimeControl(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[ZoneManagement.Structs.ZoneTriggeringTimeControlStruct])
+
+            value: 'typing.List[ZoneManagement.Structs.ZoneTriggeringTimeControlStruct]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class Sensitivity(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class EventList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFA
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+    class Events:
+        @dataclass
+        class ZoneTriggered(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zones", Tag=0, Type=typing.List[uint]),
+                        ClusterObjectFieldDescriptor(Label="reason", Tag=1, Type=ZoneManagement.Enums.ZoneEventTriggeredReasonEnum),
+                    ])
+
+            zones: 'typing.List[uint]' = field(default_factory=lambda: [])
+            reason: 'ZoneManagement.Enums.ZoneEventTriggeredReasonEnum' = 0
+
+        @dataclass
+        class ZoneStopped(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000550
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="zones", Tag=0, Type=typing.List[uint]),
+                        ClusterObjectFieldDescriptor(Label="reason", Tag=1, Type=ZoneManagement.Enums.ZoneEventStoppedReasonEnum),
+                    ])
+
+            zones: 'typing.List[uint]' = field(default_factory=lambda: [])
+            reason: 'ZoneManagement.Enums.ZoneEventStoppedReasonEnum' = 0
+
+
+@dataclass
+class CameraAvStreamManagement(Cluster):
+    id: typing.ClassVar[int] = 0x00000551
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="maxConcurrentVideoEncoders", Tag=0x00000000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="maxEncodedPixelRate", Tag=0x00000001, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="videoSensorParams", Tag=0x00000002, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoSensorParamsStruct]),
+                ClusterObjectFieldDescriptor(Label="nightVisionCapable", Tag=0x00000003, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="minViewport", Tag=0x00000004, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]),
+                ClusterObjectFieldDescriptor(Label="rateDistortionTradeOffPoints", Tag=0x00000005, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct]]),
+                ClusterObjectFieldDescriptor(Label="maxPreRollBufferSize", Tag=0x00000006, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="microphoneCapabilities", Tag=0x00000007, Type=typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]),
+                ClusterObjectFieldDescriptor(Label="speakerCapabilities", Tag=0x00000008, Type=typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]),
+                ClusterObjectFieldDescriptor(Label="twoWayTalkSupport", Tag=0x00000009, Type=typing.Optional[CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum]),
+                ClusterObjectFieldDescriptor(Label="supportedSnapshotParams", Tag=0x0000000A, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotParamsStruct]]),
+                ClusterObjectFieldDescriptor(Label="maxNetworkBandwidth", Tag=0x0000000B, Type=uint),
+                ClusterObjectFieldDescriptor(Label="currentFrameRate", Tag=0x0000000C, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="HDRModeEnabled", Tag=0x0000000D, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="currentVideoCodecs", Tag=0x0000000E, Type=typing.Optional[typing.List[CameraAvStreamManagement.Enums.VideoCodecEnum]]),
+                ClusterObjectFieldDescriptor(Label="currentSnapshotConfig", Tag=0x0000000F, Type=typing.Optional[CameraAvStreamManagement.Structs.SnapshotParamsStruct]),
+                ClusterObjectFieldDescriptor(Label="fabricsUsingCamera", Tag=0x00000010, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="allocatedVideoStreams", Tag=0x00000011, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.VideoStreamStruct]]),
+                ClusterObjectFieldDescriptor(Label="allocatedAudioStreams", Tag=0x00000012, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.AudioStreamStruct]]),
+                ClusterObjectFieldDescriptor(Label="allocatedSnapshotStreams", Tag=0x00000013, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotStreamStruct]]),
+                ClusterObjectFieldDescriptor(Label="rankedVideoStreamPrioritiesList", Tag=0x00000014, Type=typing.Optional[typing.List[CameraAvStreamManagement.Enums.StreamTypeEnum]]),
+                ClusterObjectFieldDescriptor(Label="softRecordingPrivacyModeEnabled", Tag=0x00000015, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="softLivestreamPrivacyModeEnabled", Tag=0x00000016, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="hardPrivacyModeOn", Tag=0x00000017, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="nightVision", Tag=0x00000018, Type=typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]),
+                ClusterObjectFieldDescriptor(Label="nightVisionIllum", Tag=0x00000019, Type=typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]),
+                ClusterObjectFieldDescriptor(Label="AWBEnabled", Tag=0x0000001A, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="autoShutterSpeedEnabled", Tag=0x0000001B, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="autoISOEnabled", Tag=0x0000001C, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="viewport", Tag=0x0000001D, Type=typing.Optional[CameraAvStreamManagement.Structs.ViewportStruct]),
+                ClusterObjectFieldDescriptor(Label="speakerMuted", Tag=0x0000001E, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="speakerVolumeLevel", Tag=0x0000001F, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="speakerMaxLevel", Tag=0x00000020, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="speakerMinLevel", Tag=0x00000021, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="microphoneMuted", Tag=0x00000022, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="microphoneVolumeLevel", Tag=0x00000023, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="microphoneMaxLevel", Tag=0x00000024, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="microphoneMinLevel", Tag=0x00000025, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="microphoneAGCEnabled", Tag=0x00000026, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="imageRotation", Tag=0x00000027, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="imageFlipHorizontal", Tag=0x00000028, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="imageFlipVertical", Tag=0x00000029, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="localVideoRecordingEnabled", Tag=0x0000002A, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="localSnapshotRecordingEnabled", Tag=0x0000002B, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="statusLightEnabled", Tag=0x0000002C, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="statusLightBrightness", Tag=0x0000002D, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
+                ClusterObjectFieldDescriptor(Label="depthSensorStatus", Tag=0x0000002E, Type=typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    maxConcurrentVideoEncoders: 'typing.Optional[uint]' = None
+    maxEncodedPixelRate: 'typing.Optional[uint]' = None
+    videoSensorParams: 'typing.Optional[CameraAvStreamManagement.Structs.VideoSensorParamsStruct]' = None
+    nightVisionCapable: 'typing.Optional[bool]' = None
+    minViewport: 'typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]' = None
+    rateDistortionTradeOffPoints: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct]]' = None
+    maxPreRollBufferSize: 'typing.Optional[uint]' = None
+    microphoneCapabilities: 'typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]' = None
+    speakerCapabilities: 'typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]' = None
+    twoWayTalkSupport: 'typing.Optional[CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum]' = None
+    supportedSnapshotParams: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotParamsStruct]]' = None
+    maxNetworkBandwidth: 'uint' = None
+    currentFrameRate: 'typing.Optional[uint]' = None
+    HDRModeEnabled: 'typing.Optional[bool]' = None
+    currentVideoCodecs: 'typing.Optional[typing.List[CameraAvStreamManagement.Enums.VideoCodecEnum]]' = None
+    currentSnapshotConfig: 'typing.Optional[CameraAvStreamManagement.Structs.SnapshotParamsStruct]' = None
+    fabricsUsingCamera: 'typing.List[uint]' = None
+    allocatedVideoStreams: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.VideoStreamStruct]]' = None
+    allocatedAudioStreams: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.AudioStreamStruct]]' = None
+    allocatedSnapshotStreams: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotStreamStruct]]' = None
+    rankedVideoStreamPrioritiesList: 'typing.Optional[typing.List[CameraAvStreamManagement.Enums.StreamTypeEnum]]' = None
+    softRecordingPrivacyModeEnabled: 'typing.Optional[bool]' = None
+    softLivestreamPrivacyModeEnabled: 'typing.Optional[bool]' = None
+    hardPrivacyModeOn: 'typing.Optional[bool]' = None
+    nightVision: 'typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]' = None
+    nightVisionIllum: 'typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]' = None
+    AWBEnabled: 'typing.Optional[bool]' = None
+    autoShutterSpeedEnabled: 'typing.Optional[bool]' = None
+    autoISOEnabled: 'typing.Optional[bool]' = None
+    viewport: 'typing.Optional[CameraAvStreamManagement.Structs.ViewportStruct]' = None
+    speakerMuted: 'typing.Optional[bool]' = None
+    speakerVolumeLevel: 'typing.Optional[uint]' = None
+    speakerMaxLevel: 'typing.Optional[uint]' = None
+    speakerMinLevel: 'typing.Optional[uint]' = None
+    microphoneMuted: 'typing.Optional[bool]' = None
+    microphoneVolumeLevel: 'typing.Optional[uint]' = None
+    microphoneMaxLevel: 'typing.Optional[uint]' = None
+    microphoneMinLevel: 'typing.Optional[uint]' = None
+    microphoneAGCEnabled: 'typing.Optional[bool]' = None
+    imageRotation: 'typing.Optional[uint]' = None
+    imageFlipHorizontal: 'typing.Optional[bool]' = None
+    imageFlipVertical: 'typing.Optional[bool]' = None
+    localVideoRecordingEnabled: 'typing.Optional[bool]' = None
+    localSnapshotRecordingEnabled: 'typing.Optional[bool]' = None
+    statusLightEnabled: 'typing.Optional[bool]' = None
+    statusLightBrightness: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
+    depthSensorStatus: 'typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]' = None
+    generatedCommandList: 'typing.List[uint]' = None
+    acceptedCommandList: 'typing.List[uint]' = None
+    eventList: 'typing.List[uint]' = None
+    attributeList: 'typing.List[uint]' = None
+    featureMap: 'uint' = None
+    clusterRevision: 'uint' = None
+
+    class Enums:
+        class AudioCodecEnum(MatterIntEnum):
+            kOpus = 0x00
+            kAacLc = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
+        class ImageCodecEnum(MatterIntEnum):
+            kJpeg = 0x00
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 1
+
+        class StreamTypeEnum(MatterIntEnum):
+            kInternal = 0x00
+            kRecording = 0x01
+            kAnalysis = 0x02
+            kLiveView = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
+
+        class TriStateAutoEnum(MatterIntEnum):
+            kOff = 0x00
+            kOn = 0x01
+            kAuto = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
+        class TwoWayTalkSupportTypeEnum(MatterIntEnum):
+            kNotSupported = 0x00
+            kHalfDuplex = 0x01
+            kFullDuplex = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
+        class VideoCodecEnum(MatterIntEnum):
+            kH264 = 0x00
+            kHevc = 0x01
+            kVvc = 0x02
+            kAv1 = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kPrivacy = 0x1
+            kAudio = 0x2
+            kSpeaker = 0x4
+            kImageControl = 0x8
+            kVideo = 0x10
+            kSnapshot = 0x20
+            kWatermark = 0x40
+            kOnScreenDisplay = 0x80
+            kLocalStorage = 0x100
+
+    class Structs:
+        @dataclass
+        class VideoResolutionStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="width", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="height", Tag=1, Type=uint),
+                    ])
+
+            width: 'uint' = 0
+            height: 'uint' = 0
+
+        @dataclass
+        class VideoStreamStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamType", Tag=1, Type=CameraAvStreamManagement.Enums.StreamTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="videoCodec", Tag=2, Type=CameraAvStreamManagement.Enums.VideoCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="minFrameRate", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="maxFrameRate", Tag=4, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=5, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=6, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="minBitRate", Tag=7, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="maxBitRate", Tag=8, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="minFragmentLen", Tag=9, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="maxFragmentLen", Tag=10, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="watermarkEnabled", Tag=11, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="OSDEnabled", Tag=12, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="referenceCount", Tag=13, Type=uint),
+                    ])
+
+            videoStreamID: 'uint' = 0
+            streamType: 'CameraAvStreamManagement.Enums.StreamTypeEnum' = 0
+            videoCodec: 'CameraAvStreamManagement.Enums.VideoCodecEnum' = 0
+            minFrameRate: 'uint' = 0
+            maxFrameRate: 'uint' = 0
+            minResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            maxResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            minBitRate: 'uint' = 0
+            maxBitRate: 'uint' = 0
+            minFragmentLen: 'uint' = 0
+            maxFragmentLen: 'uint' = 0
+            watermarkEnabled: 'typing.Optional[bool]' = None
+            OSDEnabled: 'typing.Optional[bool]' = None
+            referenceCount: 'uint' = 0
+
+        @dataclass
+        class SnapshotStreamStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="snapshotStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="imageCodec", Tag=1, Type=CameraAvStreamManagement.Enums.ImageCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="frameRate", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="bitRate", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=4, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=5, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="quality", Tag=6, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="referenceCount", Tag=7, Type=uint),
+                    ])
+
+            snapshotStreamID: 'uint' = 0
+            imageCodec: 'CameraAvStreamManagement.Enums.ImageCodecEnum' = 0
+            frameRate: 'uint' = 0
+            bitRate: 'uint' = 0
+            minResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            maxResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            quality: 'uint' = 0
+            referenceCount: 'uint' = 0
+
+        @dataclass
+        class SnapshotParamsStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="resolution", Tag=0, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="maxFrameRate", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="imageCodec", Tag=2, Type=CameraAvStreamManagement.Enums.ImageCodecEnum),
+                    ])
+
+            resolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            maxFrameRate: 'uint' = 0
+            imageCodec: 'CameraAvStreamManagement.Enums.ImageCodecEnum' = 0
+
+        @dataclass
+        class RateDistortionTradeOffPointsStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="codec", Tag=0, Type=CameraAvStreamManagement.Enums.VideoCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="resolution", Tag=1, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="minBitRate", Tag=2, Type=uint),
+                    ])
+
+            codec: 'CameraAvStreamManagement.Enums.VideoCodecEnum' = 0
+            resolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            minBitRate: 'uint' = 0
+
+        @dataclass
+        class AudioCapabilitiesStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="maxNumberOfChannels", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="supportedCodecs", Tag=1, Type=typing.List[CameraAvStreamManagement.Enums.AudioCodecEnum]),
+                        ClusterObjectFieldDescriptor(Label="supportedSampleRates", Tag=2, Type=typing.List[uint]),
+                        ClusterObjectFieldDescriptor(Label="supportedBitDepths", Tag=3, Type=typing.List[uint]),
+                    ])
+
+            maxNumberOfChannels: 'uint' = 0
+            supportedCodecs: 'typing.List[CameraAvStreamManagement.Enums.AudioCodecEnum]' = field(default_factory=lambda: [])
+            supportedSampleRates: 'typing.List[uint]' = field(default_factory=lambda: [])
+            supportedBitDepths: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AudioStreamStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamType", Tag=1, Type=CameraAvStreamManagement.Enums.StreamTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="audioCodec", Tag=2, Type=CameraAvStreamManagement.Enums.AudioCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="channelCount", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sampleRate", Tag=4, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="bitRate", Tag=5, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="bitDepth", Tag=6, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="referenceCount", Tag=7, Type=uint),
+                    ])
+
+            audioStreamID: 'uint' = 0
+            streamType: 'CameraAvStreamManagement.Enums.StreamTypeEnum' = 0
+            audioCodec: 'CameraAvStreamManagement.Enums.AudioCodecEnum' = 0
+            channelCount: 'uint' = 0
+            sampleRate: 'uint' = 0
+            bitRate: 'uint' = 0
+            bitDepth: 'uint' = 0
+            referenceCount: 'uint' = 0
+
+        @dataclass
+        class VideoSensorParamsStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="sensorWidth", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sensorHeight", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="HDRCapable", Tag=2, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="maxFPS", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="maxHDRFPS", Tag=4, Type=uint),
+                    ])
+
+            sensorWidth: 'uint' = 0
+            sensorHeight: 'uint' = 0
+            HDRCapable: 'bool' = False
+            maxFPS: 'uint' = 0
+            maxHDRFPS: 'uint' = 0
+
+        @dataclass
+        class ViewportStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="x1", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="y1", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="x2", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="y2", Tag=3, Type=uint),
+                    ])
+
+            x1: 'uint' = 0
+            y1: 'uint' = 0
+            x2: 'uint' = 0
+            y2: 'uint' = 0
+
+    class Commands:
+        @dataclass
+        class AudioStreamAllocate(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'AudioStreamAllocateResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="streamType", Tag=0, Type=CameraAvStreamManagement.Enums.StreamTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="audioCodec", Tag=1, Type=CameraAvStreamManagement.Enums.AudioCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="channelCount", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sampleRate", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="bitRate", Tag=4, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="bitDepth", Tag=5, Type=uint),
+                    ])
+
+            streamType: 'CameraAvStreamManagement.Enums.StreamTypeEnum' = 0
+            audioCodec: 'CameraAvStreamManagement.Enums.AudioCodecEnum' = 0
+            channelCount: 'uint' = 0
+            sampleRate: 'uint' = 0
+            bitRate: 'uint' = 0
+            bitDepth: 'uint' = 0
+
+        @dataclass
+        class AudioStreamAllocateResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=0, Type=uint),
+                    ])
+
+            audioStreamID: 'uint' = 0
+
+        @dataclass
+        class AudioStreamDeallocate(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=0, Type=uint),
+                    ])
+
+            audioStreamID: 'uint' = 0
+
+        @dataclass
+        class VideoStreamAllocate(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'VideoStreamAllocateResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="streamType", Tag=0, Type=CameraAvStreamManagement.Enums.StreamTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="videoCodec", Tag=1, Type=CameraAvStreamManagement.Enums.VideoCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="minFrameRate", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="maxFrameRate", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=4, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=5, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="minBitRate", Tag=6, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="maxBitRate", Tag=7, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="minFragmentLen", Tag=8, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="maxFragmentLen", Tag=9, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="watermarkEnabled", Tag=10, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="OSDEnabled", Tag=11, Type=typing.Optional[bool]),
+                    ])
+
+            streamType: 'CameraAvStreamManagement.Enums.StreamTypeEnum' = 0
+            videoCodec: 'CameraAvStreamManagement.Enums.VideoCodecEnum' = 0
+            minFrameRate: 'uint' = 0
+            maxFrameRate: 'uint' = 0
+            minResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            maxResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            minBitRate: 'uint' = 0
+            maxBitRate: 'uint' = 0
+            minFragmentLen: 'uint' = 0
+            maxFragmentLen: 'uint' = 0
+            watermarkEnabled: 'typing.Optional[bool]' = None
+            OSDEnabled: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class VideoStreamAllocateResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=0, Type=uint),
+                    ])
+
+            videoStreamID: 'uint' = 0
+
+        @dataclass
+        class VideoStreamModify(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="resolution", Tag=1, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]),
+                        ClusterObjectFieldDescriptor(Label="watermarkEnabled", Tag=2, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="OSDEnabled", Tag=3, Type=typing.Optional[bool]),
+                    ])
+
+            videoStreamID: 'uint' = 0
+            resolution: 'typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]' = None
+            watermarkEnabled: 'typing.Optional[bool]' = None
+            OSDEnabled: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class VideoStreamDeallocate(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000006
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=0, Type=uint),
+                    ])
+
+            videoStreamID: 'uint' = 0
+
+        @dataclass
+        class SnapshotStreamAllocate(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000007
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'SnapshotStreamAllocateResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="imageCodec", Tag=0, Type=CameraAvStreamManagement.Enums.ImageCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="frameRate", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="bitRate", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=3, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=4, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                        ClusterObjectFieldDescriptor(Label="quality", Tag=5, Type=uint),
+                    ])
+
+            imageCodec: 'CameraAvStreamManagement.Enums.ImageCodecEnum' = 0
+            frameRate: 'uint' = 0
+            bitRate: 'uint' = 0
+            minResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            maxResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+            quality: 'uint' = 0
+
+        @dataclass
+        class SnapshotStreamAllocateResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000008
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="snapshotStreamID", Tag=0, Type=uint),
+                    ])
+
+            snapshotStreamID: 'uint' = 0
+
+        @dataclass
+        class SnapshotStreamDeallocate(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000009
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="snapshotStreamID", Tag=0, Type=uint),
+                    ])
+
+            snapshotStreamID: 'uint' = 0
+
+        @dataclass
+        class SetStreamPriorities(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x0000000A
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="streamPriorities", Tag=0, Type=typing.List[CameraAvStreamManagement.Enums.StreamTypeEnum]),
+                    ])
+
+            streamPriorities: 'typing.List[CameraAvStreamManagement.Enums.StreamTypeEnum]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class CaptureSnapshot(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x0000000B
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="snapshotStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="requestedResolution", Tag=1, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                    ])
+
+            snapshotStreamID: 'uint' = 0
+            requestedResolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+
+        @dataclass
+        class CaptureSnapshotResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x0000000C
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="data", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="imageCodec", Tag=1, Type=CameraAvStreamManagement.Enums.ImageCodecEnum),
+                        ClusterObjectFieldDescriptor(Label="resolution", Tag=2, Type=CameraAvStreamManagement.Structs.VideoResolutionStruct),
+                    ])
+
+            data: 'bytes' = b""
+            imageCodec: 'CameraAvStreamManagement.Enums.ImageCodecEnum' = 0
+            resolution: 'CameraAvStreamManagement.Structs.VideoResolutionStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.VideoResolutionStruct())
+
+        @dataclass
+        class SetViewport(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x0000000D
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="viewport", Tag=0, Type=CameraAvStreamManagement.Structs.ViewportStruct),
+                    ])
+
+            viewport: 'CameraAvStreamManagement.Structs.ViewportStruct' = field(default_factory=lambda: CameraAvStreamManagement.Structs.ViewportStruct())
+
+        @dataclass
+        class SetImageRotation(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x0000000E
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="angle", Tag=0, Type=uint),
+                    ])
+
+            angle: 'uint' = 0
+
+        @dataclass
+        class SetImageFlipHorizontal(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x0000000F
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="enabled", Tag=0, Type=bool),
+                    ])
+
+            enabled: 'bool' = False
+
+        @dataclass
+        class SetImageFlipVertical(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000551
+            command_id: typing.ClassVar[int] = 0x00000010
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="enabled", Tag=0, Type=bool),
+                    ])
+
+            enabled: 'bool' = False
+
+    class Attributes:
+        @dataclass
+        class MaxConcurrentVideoEncoders(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class MaxEncodedPixelRate(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class VideoSensorParams(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Structs.VideoSensorParamsStruct])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Structs.VideoSensorParamsStruct]' = None
+
+        @dataclass
+        class NightVisionCapable(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class MinViewport(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]' = None
+
+        @dataclass
+        class RateDistortionTradeOffPoints(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct]])
+
+            value: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct]]' = None
+
+        @dataclass
+        class MaxPreRollBufferSize(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class MicrophoneCapabilities(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]' = None
+
+        @dataclass
+        class SpeakerCapabilities(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000008
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Structs.AudioCapabilitiesStruct]' = None
+
+        @dataclass
+        class TwoWayTalkSupport(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000009
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum]' = None
+
+        @dataclass
+        class SupportedSnapshotParams(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000A
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotParamsStruct]])
+
+            value: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotParamsStruct]]' = None
+
+        @dataclass
+        class MaxNetworkBandwidth(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000B
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class CurrentFrameRate(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000C
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class HDRModeEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000D
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class CurrentVideoCodecs(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000E
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Enums.VideoCodecEnum]])
+
+            value: 'typing.Optional[typing.List[CameraAvStreamManagement.Enums.VideoCodecEnum]]' = None
+
+        @dataclass
+        class CurrentSnapshotConfig(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000F
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Structs.SnapshotParamsStruct])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Structs.SnapshotParamsStruct]' = None
+
+        @dataclass
+        class FabricsUsingCamera(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000010
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AllocatedVideoStreams(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000011
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.VideoStreamStruct]])
+
+            value: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.VideoStreamStruct]]' = None
+
+        @dataclass
+        class AllocatedAudioStreams(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000012
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.AudioStreamStruct]])
+
+            value: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.AudioStreamStruct]]' = None
+
+        @dataclass
+        class AllocatedSnapshotStreams(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000013
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotStreamStruct]])
+
+            value: 'typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotStreamStruct]]' = None
+
+        @dataclass
+        class RankedVideoStreamPrioritiesList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000014
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvStreamManagement.Enums.StreamTypeEnum]])
+
+            value: 'typing.Optional[typing.List[CameraAvStreamManagement.Enums.StreamTypeEnum]]' = None
+
+        @dataclass
+        class SoftRecordingPrivacyModeEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000015
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class SoftLivestreamPrivacyModeEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000016
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class HardPrivacyModeOn(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000017
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class NightVision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000018
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]' = None
+
+        @dataclass
+        class NightVisionIllum(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000019
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]' = None
+
+        @dataclass
+        class AWBEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000001A
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class AutoShutterSpeedEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000001B
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class AutoISOEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000001C
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class Viewport(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000001D
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Structs.ViewportStruct])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Structs.ViewportStruct]' = None
+
+        @dataclass
+        class SpeakerMuted(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000001E
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class SpeakerVolumeLevel(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000001F
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class SpeakerMaxLevel(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000020
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class SpeakerMinLevel(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000021
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class MicrophoneMuted(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000022
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class MicrophoneVolumeLevel(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000023
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class MicrophoneMaxLevel(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000024
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class MicrophoneMinLevel(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000025
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class MicrophoneAGCEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000026
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class ImageRotation(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000027
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class ImageFlipHorizontal(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000028
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class ImageFlipVertical(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000029
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class LocalVideoRecordingEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000002A
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class LocalSnapshotRecordingEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000002B
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class StatusLightEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000002C
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class StatusLightBrightness(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000002D
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum])
+
+            value: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
+
+        @dataclass
+        class DepthSensorStatus(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000002E
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum])
+
+            value: 'typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]' = None
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class EventList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFA
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+    class Events:
+        @dataclass
+        class VideoStreamChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamType", Tag=1, Type=typing.Optional[CameraAvStreamManagement.Enums.StreamTypeEnum]),
+                        ClusterObjectFieldDescriptor(Label="videoCodec", Tag=2, Type=typing.Optional[CameraAvStreamManagement.Enums.VideoCodecEnum]),
+                        ClusterObjectFieldDescriptor(Label="minFrameRate", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="maxFrameRate", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=5, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]),
+                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=6, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]),
+                        ClusterObjectFieldDescriptor(Label="minBitRate", Tag=7, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="maxBitRate", Tag=8, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="minFragmentLen", Tag=9, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="maxFragmentLen", Tag=10, Type=typing.Optional[uint]),
+                    ])
+
+            videoStreamID: 'uint' = 0
+            streamType: 'typing.Optional[CameraAvStreamManagement.Enums.StreamTypeEnum]' = None
+            videoCodec: 'typing.Optional[CameraAvStreamManagement.Enums.VideoCodecEnum]' = None
+            minFrameRate: 'typing.Optional[uint]' = None
+            maxFrameRate: 'typing.Optional[uint]' = None
+            minResolution: 'typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]' = None
+            maxResolution: 'typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]' = None
+            minBitRate: 'typing.Optional[uint]' = None
+            maxBitRate: 'typing.Optional[uint]' = None
+            minFragmentLen: 'typing.Optional[uint]' = None
+            maxFragmentLen: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class AudioStreamChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamType", Tag=1, Type=typing.Optional[CameraAvStreamManagement.Enums.StreamTypeEnum]),
+                        ClusterObjectFieldDescriptor(Label="audioCodec", Tag=2, Type=typing.Optional[CameraAvStreamManagement.Enums.AudioCodecEnum]),
+                        ClusterObjectFieldDescriptor(Label="channelCount", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="sampleRate", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="bitRate", Tag=5, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="bitDepth", Tag=6, Type=typing.Optional[uint]),
+                    ])
+
+            audioStreamID: 'uint' = 0
+            streamType: 'typing.Optional[CameraAvStreamManagement.Enums.StreamTypeEnum]' = None
+            audioCodec: 'typing.Optional[CameraAvStreamManagement.Enums.AudioCodecEnum]' = None
+            channelCount: 'typing.Optional[uint]' = None
+            sampleRate: 'typing.Optional[uint]' = None
+            bitRate: 'typing.Optional[uint]' = None
+            bitDepth: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class SnapshotStreamChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="snapshotStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="imageCodec", Tag=1, Type=typing.Optional[CameraAvStreamManagement.Enums.ImageCodecEnum]),
+                        ClusterObjectFieldDescriptor(Label="frameRate", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="bitRate", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="minResolution", Tag=4, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]),
+                        ClusterObjectFieldDescriptor(Label="maxResolution", Tag=5, Type=typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]),
+                        ClusterObjectFieldDescriptor(Label="quality", Tag=6, Type=typing.Optional[uint]),
+                    ])
+
+            snapshotStreamID: 'uint' = 0
+            imageCodec: 'typing.Optional[CameraAvStreamManagement.Enums.ImageCodecEnum]' = None
+            frameRate: 'typing.Optional[uint]' = None
+            bitRate: 'typing.Optional[uint]' = None
+            minResolution: 'typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]' = None
+            maxResolution: 'typing.Optional[CameraAvStreamManagement.Structs.VideoResolutionStruct]' = None
+            quality: 'typing.Optional[uint]' = None
+
+
+@dataclass
+class WebRTCTransportProvider(Cluster):
+    id: typing.ClassVar[int] = 0x00000553
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="currentSessions", Tag=0x00000000, Type=typing.List[WebRTCTransportProvider.Structs.WebRTCSessionStruct]),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    currentSessions: 'typing.List[WebRTCTransportProvider.Structs.WebRTCSessionStruct]' = None
+    generatedCommandList: 'typing.List[uint]' = None
+    acceptedCommandList: 'typing.List[uint]' = None
+    eventList: 'typing.List[uint]' = None
+    attributeList: 'typing.List[uint]' = None
+    featureMap: 'uint' = None
+    clusterRevision: 'uint' = None
+
+    class Enums:
+        class StreamTypeEnum(MatterIntEnum):
+            kInternal = 0x00
+            kRecording = 0x01
+            kAnalysis = 0x02
+            kLiveView = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
+
+        class WebRTCEndReasonEnum(MatterIntEnum):
+            kIceFailed = 0x00
+            kIceTimeout = 0x01
+            kUserHangup = 0x02
+            kUserBusy = 0x03
+            kReplaced = 0x04
+            kNoUserMedia = 0x05
+            kInviteTimeout = 0x06
+            kAnsweredElsewhere = 0x07
+            kOutOfResources = 0x08
+            kMediaTimeout = 0x09
+            kLowPower = 0x0A
+            kUnknownReason = 0x0B
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 12
+
+    class Bitmaps:
+        class WebRTCMetadataOptions(IntFlag):
+            kDataTLV = 0x1
+
+    class Structs:
+        @dataclass
+        class ICEServerStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="urls", Tag=1, Type=typing.List[str]),
+                        ClusterObjectFieldDescriptor(Label="username", Tag=2, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="credential", Tag=3, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="caid", Tag=4, Type=typing.Optional[uint]),
+                    ])
+
+            urls: 'typing.List[str]' = field(default_factory=lambda: [])
+            username: 'typing.Optional[str]' = None
+            credential: 'typing.Optional[str]' = None
+            caid: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class WebRTCSessionStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="id", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="peerFabricIndex", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamType", Tag=4, Type=WebRTCTransportProvider.Enums.StreamTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=6, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=7, Type=uint),
+                    ])
+
+            id: 'uint' = 0
+            peerNodeID: 'uint' = 0
+            peerFabricIndex: 'uint' = 0
+            streamType: 'WebRTCTransportProvider.Enums.StreamTypeEnum' = 0
+            videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
+            audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
+            metadataOptions: 'uint' = 0
+
+    class Commands:
+        @dataclass
+        class SolicitOffer(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000553
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'SolicitOfferResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="streamType", Tag=0, Type=WebRTCTransportProvider.Enums.StreamTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=1, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=2, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="ICEServers", Tag=3, Type=typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]]),
+                        ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=4, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=5, Type=typing.Optional[uint]),
+                    ])
+
+            streamType: 'WebRTCTransportProvider.Enums.StreamTypeEnum' = 0
+            videoStreamID: 'typing.Union[None, Nullable, uint]' = None
+            audioStreamID: 'typing.Union[None, Nullable, uint]' = None
+            ICEServers: 'typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]]' = None
+            ICETransportPolicy: 'typing.Optional[str]' = None
+            metadataOptions: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class SolicitOfferResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000553
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="deferredOffer", Tag=1, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=2, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=3, Type=typing.Union[None, Nullable, uint]),
+                    ])
+
+            webRTCSessionID: 'uint' = 0
+            deferredOffer: 'bool' = False
+            videoStreamID: 'typing.Union[None, Nullable, uint]' = None
+            audioStreamID: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class ProvideOffer(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000553
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'ProvideOfferResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="sdp", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="streamType", Tag=2, Type=WebRTCTransportProvider.Enums.StreamTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=3, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=4, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="ICEServers", Tag=5, Type=typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]]),
+                        ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=6, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=7, Type=typing.Optional[uint]),
+                    ])
+
+            webRTCSessionID: 'typing.Union[Nullable, uint]' = NullValue
+            sdp: 'str' = ""
+            streamType: 'WebRTCTransportProvider.Enums.StreamTypeEnum' = 0
+            videoStreamID: 'typing.Union[None, Nullable, uint]' = None
+            audioStreamID: 'typing.Union[None, Nullable, uint]' = None
+            ICEServers: 'typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]]' = None
+            ICETransportPolicy: 'typing.Optional[str]' = None
+            metadataOptions: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class ProvideOfferResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000553
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=2, Type=uint),
+                    ])
+
+            webRTCSessionID: 'uint' = 0
+            videoStreamID: 'uint' = 0
+            audioStreamID: 'uint' = 0
+
+        @dataclass
+        class ProvideAnswer(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000553
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sdp", Tag=1, Type=str),
+                    ])
+
+            webRTCSessionID: 'uint' = 0
+            sdp: 'str' = ""
+
+        @dataclass
+        class ProvideICECandidate(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000553
+            command_id: typing.ClassVar[int] = 0x00000006
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="ICECandidate", Tag=1, Type=str),
+                    ])
+
+            webRTCSessionID: 'uint' = 0
+            ICECandidate: 'str' = ""
+
+        @dataclass
+        class EndSession(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000553
+            command_id: typing.ClassVar[int] = 0x00000007
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="reason", Tag=1, Type=WebRTCTransportProvider.Enums.WebRTCEndReasonEnum),
+                    ])
+
+            webRTCSessionID: 'uint' = 0
+            reason: 'WebRTCTransportProvider.Enums.WebRTCEndReasonEnum' = 0
+
+    class Attributes:
+        @dataclass
+        class CurrentSessions(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000553
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[WebRTCTransportProvider.Structs.WebRTCSessionStruct])
+
+            value: 'typing.List[WebRTCTransportProvider.Structs.WebRTCSessionStruct]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000553
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000553
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class EventList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000553
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFA
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000553
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000553
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000553
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+
+@dataclass
+class WebRTCTransportRequestor(Cluster):
+    id: typing.ClassVar[int] = 0x00000554
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="currentSessions", Tag=0x00000000, Type=typing.List[WebRTCTransportRequestor.Structs.WebRTCSessionStruct]),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    currentSessions: 'typing.List[WebRTCTransportRequestor.Structs.WebRTCSessionStruct]' = None
+    generatedCommandList: 'typing.List[uint]' = None
+    acceptedCommandList: 'typing.List[uint]' = None
+    eventList: 'typing.List[uint]' = None
+    attributeList: 'typing.List[uint]' = None
+    featureMap: 'uint' = None
+    clusterRevision: 'uint' = None
+
+    class Enums:
+        class StreamTypeEnum(MatterIntEnum):
+            kInternal = 0x00
+            kRecording = 0x01
+            kAnalysis = 0x02
+            kLiveView = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
+
+        class WebRTCEndReasonEnum(MatterIntEnum):
+            kIceFailed = 0x00
+            kIceTimeout = 0x01
+            kUserHangup = 0x02
+            kUserBusy = 0x03
+            kReplaced = 0x04
+            kNoUserMedia = 0x05
+            kInviteTimeout = 0x06
+            kAnsweredElsewhere = 0x07
+            kOutOfResources = 0x08
+            kMediaTimeout = 0x09
+            kLowPower = 0x0A
+            kUnknownReason = 0x0B
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 12
+
+    class Bitmaps:
+        class WebRTCMetadataOptions(IntFlag):
+            kDataTLV = 0x1
+
+    class Structs:
+        @dataclass
+        class ICEServerStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="urls", Tag=1, Type=typing.List[str]),
+                        ClusterObjectFieldDescriptor(Label="username", Tag=2, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="credential", Tag=3, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="caid", Tag=4, Type=typing.Optional[uint]),
+                    ])
+
+            urls: 'typing.List[str]' = field(default_factory=lambda: [])
+            username: 'typing.Optional[str]' = None
+            credential: 'typing.Optional[str]' = None
+            caid: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class WebRTCSessionStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="id", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="peerFabricIndex", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamType", Tag=4, Type=WebRTCTransportRequestor.Enums.StreamTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=6, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=7, Type=uint),
+                    ])
+
+            id: 'uint' = 0
+            peerNodeID: 'uint' = 0
+            peerFabricIndex: 'uint' = 0
+            streamType: 'WebRTCTransportRequestor.Enums.StreamTypeEnum' = 0
+            videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
+            audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
+            metadataOptions: 'uint' = 0
+
+    class Commands:
+        @dataclass
+        class Offer(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000554
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sdp", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="ICEServers", Tag=2, Type=typing.Optional[typing.List[WebRTCTransportRequestor.Structs.ICEServerStruct]]),
+                        ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=3, Type=typing.Optional[str]),
+                    ])
+
+            webRTCSessionID: 'uint' = 0
+            sdp: 'str' = ""
+            ICEServers: 'typing.Optional[typing.List[WebRTCTransportRequestor.Structs.ICEServerStruct]]' = None
+            ICETransportPolicy: 'typing.Optional[str]' = None
+
+        @dataclass
+        class Answer(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000554
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sdp", Tag=1, Type=str),
+                    ])
+
+            webRTCSessionID: 'uint' = 0
+            sdp: 'str' = ""
+
+        @dataclass
+        class ICECandidate(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000554
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="ICECandidate", Tag=1, Type=str),
+                    ])
+
+            webRTCSessionID: 'uint' = 0
+            ICECandidate: 'str' = ""
+
+        @dataclass
+        class End(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000554
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="reason", Tag=1, Type=WebRTCTransportRequestor.Enums.WebRTCEndReasonEnum),
+                    ])
+
+            webRTCSessionID: 'uint' = 0
+            reason: 'WebRTCTransportRequestor.Enums.WebRTCEndReasonEnum' = 0
+
+    class Attributes:
+        @dataclass
+        class CurrentSessions(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000554
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[WebRTCTransportRequestor.Structs.WebRTCSessionStruct])
+
+            value: 'typing.List[WebRTCTransportRequestor.Structs.WebRTCSessionStruct]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000554
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000554
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class EventList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000554
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFA
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000554
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000554
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000554
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -47378,7 +50168,7 @@ class UnitTesting(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 4
 
     class Bitmaps:
         class Bitmap16MaskMap(IntFlag):
@@ -49992,7 +52782,7 @@ class FaultInjection(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 5
 
     class Commands:
         @dataclass

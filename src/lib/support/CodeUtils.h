@@ -131,30 +131,6 @@
 
 #include <nlassert.h>
 
-namespace chip {
-
-// Generic min() and max() functions
-//
-template <typename _T>
-constexpr inline const _T & min(const _T & a, const _T & b)
-{
-    if (b < a)
-        return b;
-
-    return a;
-}
-
-template <typename _T>
-constexpr inline const _T & max(const _T & a, const _T & b)
-{
-    if (a < b)
-        return b;
-
-    return a;
-}
-
-} // namespace chip
-
 /**
  *  @def ReturnErrorOnFailure(expr)
  *

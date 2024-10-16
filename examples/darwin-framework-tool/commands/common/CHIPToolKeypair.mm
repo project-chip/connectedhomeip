@@ -1,9 +1,30 @@
+/*
+ *   Copyright (c) 2024 Project CHIP Authors
+ *   All rights reserved.
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *
+ */
+
 #import "CHIPToolKeypair.h"
 #import <Matter/Matter.h>
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/asn1/ASN1.h>
 #include <stddef.h>
+
+#import "CHIPCommandStorageDelegate.h"
+#import "ControllerStorage.h"
 
 #define CHIPPlugin_CAKeyTag "com.apple.matter.commissioner.ca.issuer.id"
 #define Public_KeySize "256"
@@ -76,12 +97,10 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
     return _ipk;
 }
 
-- (CHIP_ERROR)createOrLoadKeys:(CHIPToolPersistentStorageDelegate *)storage
+- (CHIP_ERROR)createOrLoadKeys:(id)storage
 {
     chip::ASN1::ASN1UniversalTime effectiveTime;
     chip::Crypto::P256SerializedKeypair serializedKey;
-    NSData * value;
-    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Initializing the default start validity to start of 2021. The default validity duration is 10 years.
     CHIP_ZERO_AT(effectiveTime);
@@ -90,8 +109,8 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
     effectiveTime.Day = 1;
     ReturnErrorOnFailure(chip::Credentials::ASN1ToChipEpochTime(effectiveTime, _mNow));
 
-    value = [storage storageDataForKey:kOperationalCredentialsIssuerKeypairStorage];
-    err = [self initSerializedKeyFromValue:value serializedKey:serializedKey];
+    __auto_type * value = [self _getValueForKeyWithStorage:storage key:kOperationalCredentialsIssuerKeypairStorage];
+    __auto_type err = [self initSerializedKeyFromValue:value serializedKey:serializedKey];
 
     if (err != CHIP_NO_ERROR) {
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
@@ -101,12 +120,12 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
         ReturnErrorOnFailure([self Serialize:serializedKey]);
 
         NSData * valueData = [NSData dataWithBytes:serializedKey.Bytes() length:serializedKey.Length()];
-        [storage setStorageData:valueData forKey:kOperationalCredentialsIssuerKeypairStorage];
+        [self _setValueForKeyWithStorage:storage key:kOperationalCredentialsIssuerKeypairStorage value:valueData];
     } else {
         ReturnErrorOnFailure([self Deserialize:serializedKey]);
     }
 
-    NSData * ipk = [storage storageDataForKey:kOperationalCredentialsIPK];
+    NSData * ipk = [self _getValueForKeyWithStorage:storage key:kOperationalCredentialsIPK];
     if (ipk == nil) {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
@@ -116,12 +135,31 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
         ReturnLogErrorOnFailure(chip::Crypto::DRBG_get_bytes(tempIPK, sizeof(tempIPK)));
 
         _ipk = [NSData dataWithBytes:tempIPK length:sizeof(tempIPK)];
-        [storage setStorageData:_ipk forKey:kOperationalCredentialsIPK];
+        [self _setValueForKeyWithStorage:storage key:kOperationalCredentialsIPK value:_ipk];
     } else {
         _ipk = ipk;
     }
 
     return CHIP_NO_ERROR;
+}
+
+- (NSData *)_getValueForKeyWithStorage:(id)storage key:(NSString *)key
+{
+    if ([storage isKindOfClass:[CHIPToolPersistentStorageDelegate class]]) {
+        return [storage storageDataForKey:key];
+    } else if ([storage isKindOfClass:[ControllerStorage class]]) {
+        return [storage valueForKey:key];
+    }
+    return nil;
+}
+
+- (void)_setValueForKeyWithStorage:(id)storage key:(NSString *)key value:(NSData *)value
+{
+    if ([storage isKindOfClass:[CHIPToolPersistentStorageDelegate class]]) {
+        [storage setStorageData:value forKey:key];
+    } else if ([storage isKindOfClass:[ControllerStorage class]]) {
+        [storage storeValue:value forKey:key];
+    }
 }
 
 - (CHIP_ERROR)initSerializedKeyFromValue:(NSData *)value serializedKey:(chip::Crypto::P256SerializedKeypair &)serializedKey

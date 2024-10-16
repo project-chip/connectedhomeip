@@ -38,7 +38,8 @@ AsNumber(chip::Optional<T> optional)
 
 inline NSDate * MatterEpochSecondsAsDate(uint32_t matterEpochSeconds)
 {
-    return [NSDate dateWithTimeIntervalSince1970:(chip::kChipEpochSecondsSinceUnixEpoch + (NSTimeInterval) matterEpochSeconds)];
+    const auto interval = static_cast<uint64_t>(chip::kChipEpochSecondsSinceUnixEpoch) + static_cast<uint64_t>(matterEpochSeconds);
+    return [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval) interval];
 }
 
 template <typename Rep, typename Period>

@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <commands/pairing/PairingCommand.h>
+#include <device_manager/PairingManager.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <set>
@@ -94,17 +94,17 @@ public:
      * This function initiates the process to open the commissioning window for a device identified by the given node ID.
      *
      * @param nodeId               The ID of the node that should open the commissioning window.
-     * @param commissioningTimeoutSec The time in seconds before the commissioning window closes. This value determines
-     *                             how long the commissioning window remains open for incoming connections.
      * @param iterations           The number of PBKDF (Password-Based Key Derivation Function) iterations to use
      *                             for deriving the PAKE (Password Authenticated Key Exchange) verifier.
+     * @param commissioningTimeoutSec The time in seconds before the commissioning window closes. This value determines
+     *                             how long the commissioning window remains open for incoming connections.
      * @param discriminator        The device-specific discriminator, determined during commissioning, which helps
      *                             to uniquely identify the device among others.
      * @param salt                 The salt used in the cryptographic operations for commissioning.
      * @param verifier             The PAKE verifier used to authenticate the commissioning process.
      *
      */
-    void OpenDeviceCommissioningWindow(chip::NodeId nodeId, uint32_t commissioningTimeoutSec, uint32_t iterations,
+    void OpenDeviceCommissioningWindow(chip::NodeId nodeId, uint32_t iterations, uint16_t commissioningTimeoutSec,
                                        uint16_t discriminator, const chip::ByteSpan & salt, const chip::ByteSpan & verifier);
 
     /**

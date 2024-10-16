@@ -19,28 +19,36 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${CHIP_LOCK_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --manual-code 10054912339 --bool-arg ignore_in_progress:True allow_provisional:True --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --tests test_TC_IDM_10_2
+# test-runner-runs:
+#   run1:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --bool-arg ignore_in_progress:True allow_provisional:True
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --tests test_TC_IDM_10_2
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 # TODO: Enable 10.5 in CI once the door lock OTA requestor problem is sorted.
 from typing import Callable
 
 import chip.clusters as Clusters
-from basic_composition_support import BasicCompositionTests
+from chip.testing.basic_composition import BasicCompositionTests
+from chip.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
+                                             evaluate_feature_choice_conformance)
+from chip.testing.conformance import ConformanceDecision, conformance_allowed
+from chip.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type,
+                                               device_type_id_type, is_valid_device_type_id)
+from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
+                                         MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
+from chip.testing.spec_parsing import CommandType, build_xml_clusters, build_xml_device_types
 from chip.tlv import uint
-from choice_conformance_support import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
-                                        evaluate_feature_choice_conformance)
-from conformance_support import ConformanceDecision, conformance_allowed
-from global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type, device_type_id_type,
-                                  is_valid_device_type_id)
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                    MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
-from spec_parsing_support import CommandType, build_xml_clusters, build_xml_device_types
 
 
 class DeviceConformanceTests(BasicCompositionTests):

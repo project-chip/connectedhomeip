@@ -1124,6 +1124,42 @@ static BOOL CommandNeedsTimedInvokeInContentAppObserverCluster(AttributeId aAttr
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInZoneManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ZoneManagement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInCameraAVStreamManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CameraAvStreamManagement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInWebRTCTransportProviderCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WebRTCTransportProvider;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInWebRTCTransportRequestorCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WebRTCTransportRequestor;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInChimeCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Chime;
@@ -1520,6 +1556,18 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ContentAppObserver::Id: {
         return CommandNeedsTimedInvokeInContentAppObserverCluster(commandID);
+    }
+    case Clusters::ZoneManagement::Id: {
+        return CommandNeedsTimedInvokeInZoneManagementCluster(commandID);
+    }
+    case Clusters::CameraAvStreamManagement::Id: {
+        return CommandNeedsTimedInvokeInCameraAVStreamManagementCluster(commandID);
+    }
+    case Clusters::WebRTCTransportProvider::Id: {
+        return CommandNeedsTimedInvokeInWebRTCTransportProviderCluster(commandID);
+    }
+    case Clusters::WebRTCTransportRequestor::Id: {
+        return CommandNeedsTimedInvokeInWebRTCTransportRequestorCluster(commandID);
     }
     case Clusters::Chime::Id: {
         return CommandNeedsTimedInvokeInChimeCluster(commandID);

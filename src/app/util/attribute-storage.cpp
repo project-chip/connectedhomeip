@@ -255,7 +255,7 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
     {
         if (emAfEndpoints[index].endpoint == id)
         {
-            return static_cast<uint8_t>(index - FIXED_ENDPOINT_COUNT);
+            return static_cast<uint16_t>(index - FIXED_ENDPOINT_COUNT);
         }
     }
     return kEmberInvalidEndpointIndex;
@@ -322,7 +322,7 @@ EndpointId emberAfClearDynamicEndpoint(uint16_t index)
 {
     EndpointId ep = 0;
 
-    index = static_cast<uint8_t>(index + FIXED_ENDPOINT_COUNT);
+    index = static_cast<uint16_t>(index + FIXED_ENDPOINT_COUNT);
 
     if ((index < MAX_ENDPOINT_COUNT) && (emAfEndpoints[index].endpoint != kInvalidEndpointId) &&
         (emberAfEndpointIndexIsEnabled(index)))
@@ -1007,13 +1007,15 @@ uint8_t emberAfGetClusterCountForEndpoint(EndpointId endpoint)
 
 Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(EndpointId endpoint, CHIP_ERROR & err)
 {
-    uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
-    Span<const EmberAfDeviceType> ret;
+    return emberAfDeviceTypeListFromEndpointIndex(emberAfIndexFromEndpoint(endpoint), err);
+}
 
+chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsigned endpointIndex, CHIP_ERROR & err)
+{
     if (endpointIndex == 0xFFFF)
     {
         err = CHIP_ERROR_INVALID_ARGUMENT;
-        return ret;
+        return Span<const EmberAfDeviceType>();
     }
 
     err = CHIP_NO_ERROR;

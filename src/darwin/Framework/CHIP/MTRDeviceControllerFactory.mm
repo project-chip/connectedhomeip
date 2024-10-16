@@ -70,17 +70,6 @@ using namespace chip;
 using namespace chip::Controller;
 using namespace chip::Tracing::DarwinFramework;
 
-static bool sExitHandlerRegistered = false;
-static void ShutdownOnExit()
-{
-    // Depending on the structure of the software, this code might execute *after* the main autorelease pool has exited.
-    // Therefore, it needs to be enclosed in its own autorelease pool.
-    @autoreleasepool {
-        MTR_LOG("ShutdownOnExit invoked on exit");
-        [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
-    }
-}
-
 @interface MTRDeviceControllerFactoryParams ()
 
 // Flag to keep track of whether our .storage is real consumer-provided storage
@@ -394,17 +383,6 @@ MTR_DIRECT_MEMBERS
             SuccessOrExit(err = _controllerFactory->Init(params));
         }
 
-        // This needs to happen after DeviceControllerFactory::Init,
-        // because that creates (lazily, by calling functions with
-        // static variables in them) some static-lifetime objects.
-        if (!sExitHandlerRegistered) {
-            if (atexit(ShutdownOnExit) != 0) {
-                char error[128];
-                strerror_r(errno, error, sizeof(error));
-                MTR_LOG_ERROR("Warning: Failed to register atexit handler: %s", error);
-            }
-            sExitHandlerRegistered = true;
-        }
         HeapObjectPoolExitHandling::IgnoreLeaksOnExit();
 
         // Make sure we don't leave a system state running while we have no
@@ -441,8 +419,8 @@ MTR_DIRECT_MEMBERS
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
-    while ([_controllers count] != 0) {
-        [_controllers[0] shutdown];
+    for (MTRDeviceController * controller in [_controllers copy]) {
+        [controller shutdown];
     }
 
     dispatch_sync(_chipWorkQueue, ^{
