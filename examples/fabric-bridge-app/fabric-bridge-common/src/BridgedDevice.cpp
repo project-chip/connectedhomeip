@@ -77,7 +77,7 @@ void BridgedDevice::ReachableChanged(bool reachable)
                                                    app::Clusters::BridgedDeviceBasicInformation::Attributes::Reachable::Id);
 
             app::Clusters::BridgedDeviceBasicInformation::Events::ReachableChanged::Type event{};
-            EventNumber eventNumber      = 0;
+            EventNumber eventNumber = 0;
 
             CHIP_ERROR err = app::LogEvent(event, endpointId, eventNumber);
             if (err != CHIP_NO_ERROR)
