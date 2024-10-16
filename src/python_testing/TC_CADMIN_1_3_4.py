@@ -284,6 +284,10 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
     @async_test_body
     async def test_TC_CADMIN_1_4(self):
         self.step(1)
+        setupPayloadInfo = self.get_setup_payload_info()
+        if not setupPayloadInfo:
+            asserts.assert_true(
+                False, 'passcode and discriminator must be provided values in order for this test to work due to using BCM, please rerun test with providing --passcode <value> and --discriminator <value>')
 
         # Establishing TH1
         self.th1 = self.default_controller
@@ -314,7 +318,6 @@ class TC_CADMIN_1_3_4(MatterBaseTest):
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
         self.th2 = th2_fabric_admin.NewController(nodeId=2)
-        setupPayloadInfo = self.get_setup_payload_info()
         await self.th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=setupPayloadInfo[0].passcode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=setupPayloadInfo[0].filter_value)

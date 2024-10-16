@@ -85,7 +85,7 @@ class TC_CADMIN_1_4_nofreset(MatterBaseTest):
         return current_fabric_index
 
     @async_test_body
-    async def test_TC_CADMIN_1_4_nofreset(self):
+    async def test_TC_CADMIN_1_4(self):
         setupPayloadInfo = self.get_setup_payload_info()
         if not setupPayloadInfo:
             asserts.assert_true(
