@@ -125,13 +125,17 @@ void CommissionerControl::OnDeviceConnectedFn(void * context, Messaging::Exchang
     OperationalDeviceProxy device(&exchangeMgr, sessionHandle);
 
     CHIP_ERROR err = self->SendCommandForType(self->mCommandType, &device);
-    LogErrorOnFailure(err);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to send CommissionerControl command.");
+        self->OnDone(nullptr);
+    }
 }
 
 void CommissionerControl::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
 {
     LogErrorOnFailure(err);
-
     CommissionerControl * self = reinterpret_cast<CommissionerControl *>(context);
-    VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectionFailureFn: context is null"));
+    VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
+    self->OnDone(nullptr);
 }
