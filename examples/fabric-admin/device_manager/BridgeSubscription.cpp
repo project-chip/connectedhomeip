@@ -105,9 +105,6 @@ void BridgeSubscription::OnEventData(const app::EventHeader & eventHeader, TLV::
 void BridgeSubscription::OnError(CHIP_ERROR error)
 {
     ChipLogProgress(NotSpecified, "Error on remote fabric sync bridge subscription: %" CHIP_ERROR_FORMAT, error.Format());
-
-    // Reset the subscription state to allow retry
-    subscriptionStarted = false;
 }
 
 void BridgeSubscription::OnDone(ReadClient * apReadClient)
