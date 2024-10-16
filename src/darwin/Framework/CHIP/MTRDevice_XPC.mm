@@ -193,17 +193,15 @@
     MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
 
     // Save old state for comparison later
-    NSNumber *oldStateNumber = self._internalState[kMTRDeviceInternalPropertyDeviceState];
-    NSNumber *newStateNumber = dictionary[kMTRDeviceInternalPropertyDeviceState];
+    NSNumber * oldStateNumber = self._internalState[kMTRDeviceInternalPropertyDeviceState];
+    NSNumber * newStateNumber = dictionary[kMTRDeviceInternalPropertyDeviceState];
     [self _setInternalState:dictionary];
 
     // Call delegate if state changed. State is considered changed if:
     // 1) old state is nil but new state is not nil
     // 2) old state is not nil but new state is nil
     // 3) both old and new state are not nil, and they are not equal
-    if ((!oldStateNumber && newStateNumber) ||
-        (oldStateNumber && !newStateNumber) ||
-        (oldStateNumber && newStateNumber && ![newStateNumber isEqualToNumber:oldStateNumber])) {
+    if ((!oldStateNumber && newStateNumber) || (oldStateNumber && !newStateNumber) || (oldStateNumber && newStateNumber && ![newStateNumber isEqualToNumber:oldStateNumber])) {
         MTRDeviceState state = static_cast<MTRDeviceState>(newStateNumber ? newStateNumber.unsignedIntegerValue : MTRDeviceStateUnknown);
         [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
             [delegate device:self stateChanged:state];
@@ -213,13 +211,13 @@
 
 - (MTRDeviceState)state
 {
-    NSNumber *stateNumber = self._internalState[kMTRDeviceInternalPropertyDeviceState];
+    NSNumber * stateNumber = self._internalState[kMTRDeviceInternalPropertyDeviceState];
     return stateNumber ? static_cast<MTRDeviceState>(stateNumber.unsignedIntegerValue) : MTRDeviceStateUnknown;
 }
 
 - (BOOL)deviceCachePrimed
 {
-    NSNumber *deviceCachePrimedNumber = self._internalState[kMTRDeviceInternalPropertyDeviceCachePrimed];
+    NSNumber * deviceCachePrimedNumber = self._internalState[kMTRDeviceInternalPropertyDeviceCachePrimed];
     return deviceCachePrimedNumber.boolValue;
 }
 
@@ -234,11 +232,6 @@
 }
 
 #pragma mark - Remote Commands
-
-//MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(state, MTRDeviceState, MTRDeviceStateUnknown, getStateWithReply)
-//MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(deviceCachePrimed, BOOL, NO, getDeviceCachePrimedWithReply)
-//MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedStartTime, NSDate * _Nullable, nil, getEstimatedStartTimeWithReply)
-//MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedSubscriptionLatency, NSNumber * _Nullable, nil, getEstimatedSubscriptionLatencyWithReply)
 
 typedef NSDictionary<NSString *, id> * _Nullable ReadAttributeResponseType;
 MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributeWithEndpointID

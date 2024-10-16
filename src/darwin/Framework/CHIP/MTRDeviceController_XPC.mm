@@ -359,9 +359,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 
 #pragma mark - XPC Action Overrides
 
-//MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(isRunning, BOOL, NO, getIsRunningWithReply)
-//MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(controllerNodeID, NSNumber *, nil, controllerNodeIDWithReply)
-
 // Not Supported via XPC
 // - (oneway void)deviceController:(NSUUID *)controller setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload newNodeID:(NSNumber *)newNodeID withReply:(void(^)(BOOL success, NSError * _Nullable error))reply;
 // - (oneway void)deviceController:(NSUUID *)controller setupCommissioningSessionWithDiscoveredDevice:(MTRCommissionableBrowserResult *)discoveredDevice payload:(MTRSetupPayload *)payload newNodeID:(NSNumber *)newNodeID withReply:(void(^)(BOOL success, NSError * _Nullable error))reply;
@@ -452,31 +449,31 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
     //     ]
     //  }
 
-    NSDictionary *controllerContext = configuration[MTRDeviceControllerRegistrationControllerContextKey];
-    NSNumber *controllerNodeID = controllerContext[MTRDeviceControllerRegistrationControllerNodeIDKey];
+    NSDictionary * controllerContext = configuration[MTRDeviceControllerRegistrationControllerContextKey];
+    NSNumber * controllerNodeID = controllerContext[MTRDeviceControllerRegistrationControllerNodeIDKey];
     if (controllerNodeID && [controllerNodeID isKindOfClass:[NSNumber class]]) {
         _controllerNodeID = controllerContext[MTRDeviceControllerRegistrationControllerNodeIDKey];
     }
-    NSNumber *isRunning = controllerContext[MTRDeviceControllerRegistrationControllerIsRunningKey];
+    NSNumber * isRunning = controllerContext[MTRDeviceControllerRegistrationControllerIsRunningKey];
     if (isRunning && [isRunning isKindOfClass:[NSNumber class]]) {
         _isRunning = isRunning.boolValue;
     }
 
-    NSArray *deviceInfoList = configuration[MTRDeviceControllerRegistrationNodeIDsKey];
+    NSArray * deviceInfoList = configuration[MTRDeviceControllerRegistrationNodeIDsKey];
 
     MTR_LOG("Received controllerConfigurationUpdated: controllerNode ID %@ deviceInfoList %@", self.controllerNodeID, deviceInfoList);
 
-    for (NSDictionary *deviceInfo in deviceInfoList) {
+    for (NSDictionary * deviceInfo in deviceInfoList) {
         if (![deviceInfo isKindOfClass:[NSDictionary class]]) {
             MTR_LOG_ERROR(" - deviceInfo %@ not NSDictionary class %@", deviceInfo, NSStringFromClass([deviceInfo class]));
             continue;
         }
-        NSNumber *nodeID = deviceInfo[MTRDeviceControllerRegistrationNodeIDKey];
+        NSNumber * nodeID = deviceInfo[MTRDeviceControllerRegistrationNodeIDKey];
         if (nodeID && ![nodeID isKindOfClass:[NSNumber class]]) {
             MTR_LOG_ERROR(" - deviceInfo %@ nodeID not NSNumber class %@", deviceInfo, NSStringFromClass([nodeID class]));
             continue;
         }
-        NSDictionary *deviceInternalState = deviceInfo[MTRDeviceControllerRegistrationDeviceInternalStateKey];
+        NSDictionary * deviceInternalState = deviceInfo[MTRDeviceControllerRegistrationDeviceInternalStateKey];
         if (deviceInternalState && ![deviceInternalState isKindOfClass:[NSDictionary class]]) {
             MTR_LOG_ERROR(" - deviceInfo %@ deviceInternalState not NSNumber class %@", deviceInfo, NSStringFromClass([deviceInternalState class]));
             continue;
