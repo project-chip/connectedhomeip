@@ -1429,7 +1429,6 @@ class MatterBaseTest(base_test.BaseTestClass):
             # TODO: I very much do not want to have people passing in strings here. Do we really need the expression
             #       as a string? Does it get used by the TH?
             self.runner_hook.step_skipped(name=str(num), expression="")
-        
         logging.info(f'**** Skipping: {num}')
         self.step_skipped = True
 
@@ -1480,7 +1479,6 @@ class MatterBaseTest(base_test.BaseTestClass):
             name = f'{step} : {current_step.description}'
 
             self.runner_hook.step_start(name=name, endpoint=current_step.endpoint)
-        
         self.step_start_time = datetime.now(tz=timezone.utc)
         self.current_step_index += 1
         self.step_skipped = False
