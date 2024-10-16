@@ -1465,6 +1465,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             asserts.fail(f'Unexpected test step: {step} - steps not called in order, or step does not exist')
 
         current_step = steps[self.current_step_index]
+        self.print_step(step, current_step.description, endpoint)
+
         if self.runner_hook:
             # If we've reached the next step with no assertion and the step wasn't skipped, it passed
             if not self.step_skipped and self.current_step_index != 0:
@@ -1477,11 +1479,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             # TODO: it seems like the step start should take a number and a name
             name = f'{step} : {current_step.description}'
 
-            self.print_step(step, current_step.description, endpoint)
             self.runner_hook.step_start(name=name, endpoint=current_step.endpoint)
         
-        self.print_step(step, current_step.description)
-
         self.step_start_time = datetime.now(tz=timezone.utc)
         self.current_step_index += 1
         self.step_skipped = False
