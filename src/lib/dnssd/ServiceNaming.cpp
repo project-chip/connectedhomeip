@@ -63,7 +63,7 @@ CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId)
     // Check what we have a separator where we expect.
     ReturnErrorCodeIf(name[fabricIdStringLength] != '-', CHIP_ERROR_WRONG_NODE_ID);
 
-    static constexpr size_t bufferSize = max(fabricIdByteLength, nodeIdByteLength);
+    static constexpr size_t bufferSize = std::max(fabricIdByteLength, nodeIdByteLength);
     uint8_t buf[bufferSize];
 
     ReturnErrorCodeIf(Encoding::HexToBytes(name, fabricIdStringLength, buf, bufferSize) == 0, CHIP_ERROR_WRONG_NODE_ID);

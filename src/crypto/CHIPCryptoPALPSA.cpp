@@ -472,7 +472,7 @@ exit:
 
     for (uint32_t blockNo = 1; key_length != 0; ++blockNo)
     {
-        uint8_t in[chip::max(kMacLength, kSpake2p_Max_PBKDF_Salt_Length + 4)];
+        uint8_t in[std::max(kMacLength, kSpake2p_Max_PBKDF_Salt_Length + 4)];
         size_t inLength = salt_length + 4;
         uint8_t out[kMacLength];
         size_t outLength;
@@ -495,7 +495,7 @@ exit:
             inLength = outLength;
         }
 
-        const size_t usedKeyLength = chip::min<size_t>(key_length, kMacLength);
+        const size_t usedKeyLength = std::min<size_t>(key_length, kMacLength);
         memcpy(key, result, usedKeyLength);
         key += usedKeyLength;
         key_length -= usedKeyLength;
