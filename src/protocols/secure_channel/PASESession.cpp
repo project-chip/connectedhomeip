@@ -164,8 +164,8 @@ CHIP_ERROR PASESession::WaitForPairing(SessionManager & sessionManager, const Sp
     // Return early on error here, as we have not initialized any state yet
     VerifyOrReturnError(!salt.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(salt.data() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(salt.size() < kSpake2p_Min_PBKDF_Salt_Length || salt.size() > kSpake2p_Max_PBKDF_Salt_Length,
-                      CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length && salt.size() <= kSpake2p_Max_PBKDF_Salt_Length,
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR err = Init(sessionManager, kSetupPINCodeUndefinedValue, delegate);
     // From here onwards, let's go to exit on error, as some state might have already

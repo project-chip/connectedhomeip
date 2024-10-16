@@ -603,10 +603,10 @@ CHIP_ERROR Spake2pVerifier::ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan &
     uint8_t littleEndianSetupPINCode[sizeof(uint32_t)];
     Encoding::LittleEndian::Put32(littleEndianSetupPINCode, setupPin);
 
-    ReturnErrorCodeIf(salt.size() < kSpake2p_Min_PBKDF_Salt_Length || salt.size() > kSpake2p_Max_PBKDF_Salt_Length,
-                      CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(pbkdf2IterCount < kSpake2p_Min_PBKDF_Iterations || pbkdf2IterCount > kSpake2p_Max_PBKDF_Iterations,
-                      CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length && salt.size() <= kSpake2p_Max_PBKDF_Salt_Length,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(pbkdf2IterCount >= kSpake2p_Min_PBKDF_Iterations && pbkdf2IterCount <= kSpake2p_Max_PBKDF_Iterations,
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     return pbkdf2.pbkdf2_sha256(littleEndianSetupPINCode, sizeof(littleEndianSetupPINCode), salt.data(), salt.size(),
                                 pbkdf2IterCount, ws_len, ws);
