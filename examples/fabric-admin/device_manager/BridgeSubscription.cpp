@@ -140,6 +140,7 @@ void BridgeSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchange
     readParams.mEventPathParamsListSize     = 1;
     readParams.mMinIntervalFloorSeconds     = kSubscribeMinInterval;
     readParams.mMaxIntervalCeilingSeconds   = kSubscribeMaxInterval;
+    readParams.mKeepSubscriptions           = true;
 
     CHIP_ERROR err = mClient->SendRequest(readParams);
 
