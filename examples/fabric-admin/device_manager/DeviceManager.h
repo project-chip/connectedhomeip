@@ -211,11 +211,8 @@ private:
     bool mInitialized     = false;
     uint64_t mRequestId   = 0;
 
-<<<<<<< HEAD
-    CommissionerControl mCommissionerControl;
-=======
     BridgeSubscription mBridgeSubscriber;
->>>>>>> upstream/master
+    CommissionerControl mCommissionerControl;
 };
 
 /**
