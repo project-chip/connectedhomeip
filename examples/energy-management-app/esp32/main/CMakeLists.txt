@@ -19,6 +19,7 @@
 set(PRIV_INCLUDE_DIRS_LIST
   "${APP_GEN_DIR}"
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
+  "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/common/include"
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/device-energy-management/include"
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/energy-evse/include"
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/energy-reporting/include"
