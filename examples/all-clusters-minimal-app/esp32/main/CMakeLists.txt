@@ -19,6 +19,7 @@
 # The list of src and include dirs must be in sync with that in all-clusters-minimal-app/esp32/main/component.mk
 set(PRIV_INCLUDE_DIRS_LIST
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/include"
+  "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/common/include"
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/device-energy-management/include"
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/energy-evse/include"
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/energy-reporting/include"
