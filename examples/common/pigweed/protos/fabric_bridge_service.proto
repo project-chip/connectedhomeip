@@ -36,7 +36,7 @@ message AdministratorCommissioningChanged {
 
 message ReachabilityChanged {
   ScopedNode id = 1;
-  bool reachability = 12;
+  bool reachability = 2;
 }
 
 service FabricBridge {

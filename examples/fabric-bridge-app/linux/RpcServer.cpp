@@ -226,7 +226,6 @@ pw::Status FabricBridge::DeviceReachableChanged(const chip_rpc_ReachabilityChang
         return pw::Status::NotFound();
     }
 
-    // TODO This needs to call the right thing
     device->ReachableChanged(request.reachability);
 
     return pw::OkStatus();
