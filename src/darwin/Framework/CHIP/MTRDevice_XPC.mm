@@ -309,14 +309,12 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
 // Not Supported via XPC
 // - (oneway void)downloadLogOfType:(MTRDiagnosticLogType)type nodeID:(NSNumber *)nodeID timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
 
-
 #pragma mark - Storage Overrides
 
 - (NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)_clusterDataToPersistSnapshot
 {
     return nil;
 }
-
 
 - (BOOL)_dataStoreExists
 {
@@ -325,7 +323,6 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
 
 - (void)_persistClusterData
 {
-
 }
 
 - (BOOL)_deviceIsReportingExcessively
