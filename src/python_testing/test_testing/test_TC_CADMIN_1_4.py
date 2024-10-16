@@ -16,6 +16,8 @@
 #    limitations under the License.
 #
 
+from mobly import asserts
+from mdns_discovery import mdns_discovery
 import asyncio
 import os
 import sys
@@ -27,11 +29,9 @@ from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
 from chip.tlv import TLVReader
 from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
-                                                                       default_matter_test_main)
+                                         default_matter_test_main)
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
-from mdns_discovery import mdns_discovery
-from mobly import asserts
 
 # Reachable attribute is off in the pics file
 # MaxPathsPerInvoke is not include in the pics file
@@ -39,6 +39,7 @@ from mobly import asserts
 
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
+
 
 class TC_CADMIN_1_4_nofreset(MatterBaseTest):
     async def get_fabrics(self, th: ChipDeviceCtrl) -> int:
@@ -153,6 +154,7 @@ class TC_CADMIN_1_4_nofreset(MatterBaseTest):
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+
 
 if __name__ == "__main__":
     asyncio.run(default_matter_test_main())
