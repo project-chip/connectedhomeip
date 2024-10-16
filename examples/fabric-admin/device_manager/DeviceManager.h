@@ -61,7 +61,7 @@ public:
 
     void UpdateLastUsedNodeId(chip::NodeId nodeId);
 
-    void SetRemoteBridgeNodeId(chip::NodeId nodeId) { mRemoteBridgeNodeId = nodeId; }
+    void SetRemoteBridgeNodeId(chip::NodeId nodeId);
 
     void SetLocalBridgePort(uint16_t port) { mLocalBridgePort = port; }
     void SetLocalBridgeSetupPinCode(uint32_t pinCode) { mLocalBridgeSetupPinCode = pinCode; }

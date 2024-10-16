@@ -69,6 +69,12 @@ void DeviceManager::UpdateLastUsedNodeId(NodeId nodeId)
     }
 }
 
+void DeviceManager::SetRemoteBridgeNodeId(chip::NodeId nodeId)
+{
+    mRemoteBridgeNodeId = nodeId;
+    mCommissionerControl.Init(PairingManager::Instance().CurrentCommissioner(), mRemoteBridgeNodeId, kAggregatorEndpointId);
+}
+
 void DeviceManager::AddSyncedDevice(const Device & device)
 {
     mSyncedDevices.insert(device);
@@ -244,7 +250,6 @@ void DeviceManager::HandleReadSupportedDeviceCategories(TLV::TLVReader & data)
     if (value.Has(app::Clusters::CommissionerControl::SupportedDeviceCategoryBitmap::kFabricSynchronization))
     {
         ChipLogProgress(NotSpecified, "Remote Fabric-Bridge supports Fabric Synchronization, start reverse commissioning.");
-        mCommissionerControl.Init(PairingManager::Instance().CurrentCommissioner(), mRemoteBridgeNodeId, kAggregatorEndpointId);
         RequestCommissioningApproval();
     }
 }
