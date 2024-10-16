@@ -27,7 +27,8 @@ MTR_TESTABLE
 - (id)initWithUniqueIdentifier:(NSUUID *)UUID machServiceName:(NSString *)machServiceName options:(NSXPCConnectionOptions)options
 #endif
 
-    @property(nullable, atomic, retain, readwrite)NSXPCConnection * xpcConnection;
+@property(nullable, atomic, retain, readwrite) NSXPCConnection * xpcConnection;
+@property(atomic, readonly) BOOL isRunning;
 
 @end
 

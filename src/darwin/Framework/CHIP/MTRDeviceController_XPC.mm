@@ -43,6 +43,9 @@
 NSString * const MTRDeviceControllerRegistrationControllerContextKey = @"MTRDeviceControllerRegistrationControllerContext";
 NSString * const MTRDeviceControllerRegistrationNodeIDsKey = @"MTRDeviceControllerRegistrationNodeIDs";
 NSString * const MTRDeviceControllerRegistrationNodeIDKey = @"MTRDeviceControllerRegistrationNodeID";
+NSString * const MTRDeviceControllerRegistrationControllerNodeIDKey = @"MTRDeviceControllerRegistrationControllerNodeID";
+NSString * const MTRDeviceControllerRegistrationControllerIsRunningKey = @"MTRDeviceControllerRegistrationControllerIsRunning";
+NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKey = @"MTRDeviceControllerRegistrationDeviceInternalState";
 
 // #define MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 
@@ -70,23 +73,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
     MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDsKey, nodeIDs, registrationInfo)
     MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationControllerContextKey, controllerContext, registrationInfo)
 
-    MTR_LOG("%@ Starting existing NodeID Registration", self);
-    for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
-        MTR_LOG("%@ => Registering nodeID: %@", self, nodeID);
-        mtr_weakify(self);
-
-        [[self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-            mtr_strongify(self);
-            MTR_LOG_ERROR("%@ Registration error for device nodeID: %@ : %@", self, nodeID, error);
-        }] deviceController:self.uniqueIdentifier registerNodeID:nodeID reply:^(NSDictionary * _Nonnull internalState) {
-            mtr_strongify(self);
-            MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
-            [device device:nodeID internalStateUpdated:internalState];
-        }];
-    }
-
-    MTR_LOG("%@ Done existing NodeID Registration", self);
-
     [self updateControllerConfiguration:registrationInfo];
 }
 
@@ -108,6 +94,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 
 #pragma mark - XPC
 @synthesize controllerNodeID = _controllerNodeID;
+@synthesize isRunning = _isRunning;
 
 + (NSMutableSet *)_allowedClasses
 {
@@ -160,20 +147,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
             argumentIndex:0
                   ofReply:YES];
 
-    // registerNodeID: returns dictionary containing standard nsstring / nsnumber / nsdate objects.
-    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
-    [interface setClasses:allowedClasses
-              forSelector:@selector(deviceController:registerNodeID:reply:)
-            argumentIndex:0
-                  ofReply:YES];
-
-    // checkInWithContext: returns dictionary containing standard nsstring / nsnumber objects.
-    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
-    [interface setClasses:allowedClasses
-              forSelector:@selector(deviceController:checkInWithContext:reply:)
-            argumentIndex:0
-                  ofReply:YES];
-
     return interface;
 }
 
@@ -197,6 +170,13 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 
     [interface setClasses:allowedClasses
               forSelector:@selector(device:receivedEventReport:)
+            argumentIndex:1
+                  ofReply:NO];
+
+    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+
+    [interface setClasses:allowedClasses
+              forSelector:@selector(controller:controllerConfigurationUpdated:)
             argumentIndex:1
                   ofReply:NO];
 
@@ -280,13 +260,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 
         MTR_LOG("%@ Activating new XPC connection", self);
         [self.xpcConnection activate];
-
-        [[self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-            MTR_LOG_ERROR("Checkin error: %@", error);
-        }] deviceController:self.uniqueIdentifier checkInWithContext:@{} reply:^(NSDictionary * _Nonnull controllerInfo) {
-            // Get the controller nodeID
-            ;
-        }];
 
         // FIXME: Trying to kick all the MTRDevices attached to this controller to re-establish connections
         //        This state needs to be stored properly and re-established at connnection time
@@ -386,7 +359,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 
 #pragma mark - XPC Action Overrides
 
-MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(isRunning, BOOL, NO, getIsRunningWithReply)
+//MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(isRunning, BOOL, NO, getIsRunningWithReply)
 //MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(controllerNodeID, NSNumber *, nil, controllerNodeIDWithReply)
 
 // Not Supported via XPC
@@ -463,6 +436,59 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(isRunning, BOOL, NO, getIsRunningW
 }
 
 #pragma mark - MTRDeviceController Protocol Client
+
+- (oneway void)controller:(NSUUID *)controller controllerConfigurationUpdated:(NSDictionary *)configuration
+{
+    // Reuse the same format as config dictionary, and add values for internal states
+    //  @{
+    //     MTRDeviceControllerRegistrationControllerContextKey: @{
+    //         MTRDeviceControllerRegistrationControllerNodeIDKey: controllerNodeID
+    //     }
+    //     MTRDeviceControllerRegistrationNodeIDsKey: @[
+    //        @{
+    //            MTRDeviceControllerRegistrationNodeIDKey: nodeID,
+    //            MTRDeviceControllerRegistrationDeviceInternalStateKey: deviceInternalStateDictionary
+    //        }
+    //     ]
+    //  }
+
+    NSDictionary *controllerContext = configuration[MTRDeviceControllerRegistrationControllerContextKey];
+    NSNumber *controllerNodeID = controllerContext[MTRDeviceControllerRegistrationControllerNodeIDKey];
+    if (controllerNodeID && [controllerNodeID isKindOfClass:[NSNumber class]]) {
+        _controllerNodeID = controllerContext[MTRDeviceControllerRegistrationControllerNodeIDKey];
+    }
+    NSNumber *isRunning = controllerContext[MTRDeviceControllerRegistrationControllerIsRunningKey];
+    if (isRunning && [isRunning isKindOfClass:[NSNumber class]]) {
+        _isRunning = isRunning.boolValue;
+    }
+
+    NSArray *deviceInfoList = configuration[MTRDeviceControllerRegistrationNodeIDsKey];
+
+    MTR_LOG("Received controllerConfigurationUpdated: controllerNode ID %@ deviceInfoList %@", self.controllerNodeID, deviceInfoList);
+
+    for (NSDictionary *deviceInfo in deviceInfoList) {
+        if (![deviceInfo isKindOfClass:[NSDictionary class]]) {
+            MTR_LOG_ERROR(" - deviceInfo %@ not NSDictionary class %@", deviceInfo, NSStringFromClass([deviceInfo class]));
+            continue;
+        }
+        NSNumber *nodeID = deviceInfo[MTRDeviceControllerRegistrationNodeIDKey];
+        if (nodeID && ![nodeID isKindOfClass:[NSNumber class]]) {
+            MTR_LOG_ERROR(" - deviceInfo %@ nodeID not NSNumber class %@", deviceInfo, NSStringFromClass([nodeID class]));
+            continue;
+        }
+        NSDictionary *deviceInternalState = deviceInfo[MTRDeviceControllerRegistrationDeviceInternalStateKey];
+        if (deviceInternalState && ![deviceInternalState isKindOfClass:[NSDictionary class]]) {
+            MTR_LOG_ERROR(" - deviceInfo %@ deviceInternalState not NSNumber class %@", deviceInfo, NSStringFromClass([deviceInternalState class]));
+            continue;
+        }
+        if (!nodeID || !deviceInternalState) {
+            MTR_LOG(" - deviceInfo %@ missing elements: nodeID %@ internalState %@", deviceInfo, nodeID, deviceInternalState);
+            continue;
+        }
+        MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
+        [device device:nodeID internalStateUpdated:deviceInternalState];
+    }
+}
 
 // Not Supported via XPC
 //- (oneway void)controller:(NSUUID *)controller statusUpdate:(MTRCommissioningStatus)status {
