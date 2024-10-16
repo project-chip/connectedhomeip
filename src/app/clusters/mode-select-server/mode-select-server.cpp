@@ -156,7 +156,7 @@ class DefaultModeSelectSceneHandler : public scenes::DefaultSceneHandlerImpl
 public:
     DefaultSceneHandlerImpl::StatePairBuffer<uint8_t, kModeSelectMaxEnpointCount> mSceneEndpointStatePairs;
     // As per spec, 1 attribute is scenable in the mode select cluster
-    static constexpr uint8_t scenableAttributeCount = 1;
+    static constexpr uint8_t kScenableAttributeCount = 1;
 
     DefaultModeSelectSceneHandler() = default;
     ~DefaultModeSelectSceneHandler() override {}
@@ -165,10 +165,9 @@ public:
     // endpoint
     virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
     {
-        ClusterId * buffer = clusterBuffer.data();
         if (emberAfContainsServer(endpoint, ModeSelect::Id) && clusterBuffer.size() >= 1)
         {
-            buffer[0] = ModeSelect::Id;
+            clusterBuffer[0] = ModeSelect::Id;
             clusterBuffer.reduce_size(1);
         }
         else
@@ -201,7 +200,7 @@ public:
             return CHIP_ERROR_READ_FAILED;
         }
 
-        AttributeValuePair pairs[scenableAttributeCount];
+        AttributeValuePair pairs[kScenableAttributeCount];
 
         pairs[0].attributeID = Attributes::CurrentMode::Id;
         pairs[0].valueUnsigned8.SetValue(currentMode);
@@ -228,7 +227,7 @@ public:
 
         size_t attributeCount = 0;
         ReturnErrorOnFailure(attributeValueList.ComputeSize(&attributeCount));
-        VerifyOrReturnError(attributeCount <= scenableAttributeCount, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(attributeCount <= kScenableAttributeCount, CHIP_ERROR_BUFFER_TOO_SMALL);
 
         auto pair_iterator = attributeValueList.begin();
         while (pair_iterator.Next())
