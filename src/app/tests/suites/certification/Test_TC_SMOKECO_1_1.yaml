@@ -267,3 +267,46 @@ tests:
           value: []
           constraints:
               type: list
+
+    - label: "bad step"
+      PICS: ACL.S.A0000 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool accesscontrol read acl 1 0
+
+           On TH1(Chiptool) ,  Verify that the AccessControlEntryStruct contains 2 elements with  Subject as SUBJECTS and Target as null
+          [1656928460.992030][4255:4260] CHIP:DMG:        ],
+          [1656928460.992075][4255:4260] CHIP:DMG:
+          [1656928460.992101][4255:4260] CHIP:DMG:        SuppressResponse = true,
+          [1656928460.992126][4255:4260] CHIP:DMG:        InteractionModelRevision = 1
+          [1656928460.992149][4255:4260] CHIP:DMG: }
+          [1656928460.992513][4255:4260] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 1070401481
+          [1656928460.992588][4255:4260] CHIP:TOO:   ACL: 2 entries
+          [1656928460.992647][4255:4260] CHIP:TOO:     [1]: {
+          [1656928460.992687][4255:4260] CHIP:TOO:       Privilege: 5
+          [1656928460.992712][4255:4260] CHIP:TOO:       AuthMode: 2
+          [1656928460.992738][4255:4260] CHIP:TOO:       Subjects: 1 entries
+          [1656928460.992767][4255:4260] CHIP:TOO:         [1]: 112233
+          [1656928460.992794][4255:4260] CHIP:TOO:       Targets: null
+          [1656928460.992817][4255:4260] CHIP:TOO:       FabricIndex: 1
+          [1656928460.992840][4255:4260] CHIP:TOO:      }
+          [1656928460.992873][4255:4260] CHIP:TOO:     [2]: {
+          [1656928460.992896][4255:4260] CHIP:TOO:       Privilege: 3
+          [1656928460.992918][4255:4260] CHIP:TOO:       AuthMode: 2
+          [1656928460.992945][4255:4260] CHIP:TOO:       Subjects: 4 entries
+          [1656928460.992971][4255:4260] CHIP:TOO:         [1]: 33
+          [1656928460.992995][4255:4260] CHIP:TOO:         [2]: 44
+          [1656928460.993020][4255:4260] CHIP:TOO:         [3]: 55
+          [1656928460.993045][4255:4260] CHIP:TOO:         [4]: 66
+          [1656928460.993069][4255:4260] CHIP:TOO:       Targets: null
+          [1656928460.993091][4255:4260] CHIP:TOO:       FabricIndex: 1
+          [1656928460.993113][4255:4260] CHIP:TOO:      }
+          [1656928460.993204][4255:4260] CHIP:EM: Sending Standalone Ack for MessageCounter:154962728 on exchange 64378i
+          [1656928460.993291][4255:4260] CHIP:IN: Prepared secure message 0xffffad69f958 to 0x0000000000000001 (1)  o
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
