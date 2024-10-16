@@ -28,14 +28,9 @@ CHIP_ERROR CommissionerControl::RequestCommissioningApproval(uint64_t requestId,
 
     if (label.HasValue())
     {
+        VerifyOrReturnError(label.Value().size() <= kMaxDeviceLabelLength, CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(mLabelBuffer, label.Value().data(), label.Value().size());
         mRequestCommissioningApproval.label = Optional<Span<const char>>(CharSpan(mLabelBuffer, label.Value().size()));
-    }
-
-    CommissioneeDeviceProxy * commissioneeDeviceProxy = nullptr;
-    if (CHIP_NO_ERROR == mCommissioner->GetDeviceBeingCommissioned(mDestinationId, &commissioneeDeviceProxy))
-    {
-        return SendCommandForType(CommandType::kRequestCommissioningApproval, commissioneeDeviceProxy);
     }
 
     mCommandType = CommandType::kRequestCommissioningApproval;
@@ -50,12 +45,6 @@ CHIP_ERROR CommissionerControl::CommissionNode(uint64_t requestId, uint16_t resp
 
     mCommissionNode.requestID              = requestId;
     mCommissionNode.responseTimeoutSeconds = responseTimeoutSeconds;
-
-    CommissioneeDeviceProxy * commissioneeDeviceProxy = nullptr;
-    if (CHIP_NO_ERROR == mCommissioner->GetDeviceBeingCommissioned(mDestinationId, &commissioneeDeviceProxy))
-    {
-        return SendCommandForType(CommandType::kCommissionNode, commissioneeDeviceProxy);
-    }
 
     mCommandType = CommandType::kCommissionNode;
     return mCommissioner->GetConnectedDevice(mDestinationId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
