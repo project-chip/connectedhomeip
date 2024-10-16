@@ -369,7 +369,7 @@ bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
     wfx_rsi.scan_cb = callback;
 
     VerifyOrReturnError(ssid != nullptr, false);
-    wfx_rsi.scan_ssid_length = strnlen(ssid, chip::min<size_t>(sizeof(ssid), WFX_MAX_SSID_LENGTH));
+    wfx_rsi.scan_ssid_length = strnlen(ssid, std::min<size_t>(sizeof(ssid), WFX_MAX_SSID_LENGTH));
     wfx_rsi.scan_ssid        = reinterpret_cast<char *>(chip::Platform::MemoryAlloc(wfx_rsi.scan_ssid_length));
     VerifyOrReturnError(wfx_rsi.scan_ssid != nullptr, false);
     chip::Platform::CopyString(wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length, ssid);

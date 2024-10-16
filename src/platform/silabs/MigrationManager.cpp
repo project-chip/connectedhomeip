@@ -57,7 +57,7 @@ void MigrationManager::applyMigrations()
         if (lastMigationGroupDone < migrationTable[i].migrationGroup)
         {
             (*migrationTable[i].migrationFunc)();
-            completedMigrationGroup = max(migrationTable[i].migrationGroup, completedMigrationGroup);
+            completedMigrationGroup = std::max(migrationTable[i].migrationGroup, completedMigrationGroup);
         }
     }
     SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MigrationCounter, completedMigrationGroup);

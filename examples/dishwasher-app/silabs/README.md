@@ -228,7 +228,7 @@ You can provision and control the Matter device using the python controller,
 Silabs provides `chip-tool` as a wrapper function and more user-friendly method
 of using [chip-tool](../../chip-tool/README.md) within the pre-built Raspberry
 Pi image. For more info on using `chip-tool`, see
-[Chiptool](../../../docs/guides/chip_tool_guide.md).
+[Chiptool](../../../docs/development_controllers/chip-tool/chip_tool_guide.md).
 
 Here is an example using `chip-tool`:
 

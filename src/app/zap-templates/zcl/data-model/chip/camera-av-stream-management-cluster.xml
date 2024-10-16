@@ -192,122 +192,122 @@ Git: 0.9-fall2024-387-gfd3062545
     <attribute code="0x0008" side="server" define="SPEAKER_CAPABILITIES" type="AudioCapabilitiesStruct" reportable="true" optional="true">SpeakerCapabilities</attribute>
     <attribute code="0x0009" side="server" define="TWO_WAY_TALK_SUPPORT" type="TwoWayTalkSupportTypeEnum" reportable="true" min="0x00" max="0x02" optional="true">TwoWayTalkSupport</attribute>
     <attribute code="0x000A" side="server" define="SUPPORTED_SNAPSHOT_PARAMS" type="array" entryType="SnapshotParamsStruct" reportable="true" optional="true">SupportedSnapshotParams</attribute>
-    <attribute code="0x000B" side="server" define="HDRCAPABLE" type="int32u" reportable="true">MaxNetworkBandwidth</attribute>
-    <attribute code="0x000C" side="server" define="MAX_NETWORK_BANDWIDTH" type="int16u" reportable="true" optional="true">CurrentFrameRate</attribute>
-    <attribute code="0x000D" side="server" define="CURRENT_FRAME_RATE" type="boolean" optional="true" default="0" writable="true">
+    <attribute code="0x000B" side="server" define="MAX_NETWORK_BANDWIDTH" type="int32u" reportable="true">MaxNetworkBandwidth</attribute>
+    <attribute code="0x000C" side="server" define="CURRENT_FRAME_RATE" type="int16u" reportable="true" optional="true">CurrentFrameRate</attribute>
+    <attribute code="0x000D" side="server" define="HDRMODE_ENABLED" type="boolean" default="0" writable="true" optional="true">
       <description>HDRModeEnabled</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x000E" side="server" define="HDRMODE" type="array" optional="true" entryType="VideoCodecEnum" reportable="true">CurrentVideoCodecs</attribute>
-    <attribute code="0x000F" side="server" define="CURRENT_VIDEO_CODECS" type="SnapshotParamsStruct" reportable="true" optional="true">CurrentSnapshotConfig</attribute>
-    <attribute code="0x0010" side="server" define="CURRENT_SNAPSHOT_CONFIG" type="array" reportable="true" entryType="fabric_idx">FabricsUsingCamera</attribute>
-    <attribute code="0x0011" side="server" define="FABRICS_USING_CAMERA" type="array" entryType="VideoStreamStruct" reportable="true" optional="true">AllocatedVideoStreams</attribute>
-    <attribute code="0x0012" side="server" define="ALLOCATED_VIDEO_STREAMS" type="array" entryType="AudioStreamStruct" reportable="true" optional="true">AllocatedAudioStreams</attribute>
-    <attribute code="0x0013" side="server" define="ALLOCATED_AUDIO_STREAMS" type="array" entryType="SnapshotStreamStruct" reportable="true" optional="true">AllocatedSnapshotStreams</attribute>
-    <attribute code="0x0014" side="server" define="ALLOCATED_SNAPSHOT_STREAMS" type="array" entryType="StreamTypeEnum" reportable="true" optional="true" writable="true">
+    <attribute code="0x000E" side="server" define="CURRENT_VIDEO_CODECS" type="array" entryType="VideoCodecEnum" reportable="true" optional="true">CurrentVideoCodecs</attribute>
+    <attribute code="0x000F" side="server" define="CURRENT_SNAPSHOT_CONFIG" type="SnapshotParamsStruct" reportable="true" optional="true">CurrentSnapshotConfig</attribute>
+    <attribute code="0x0010" side="server" define="FABRICS_USING_CAMERA" type="array" entryType="fabric_idx" reportable="true">FabricsUsingCamera</attribute>
+    <attribute code="0x0011" side="server" define="ALLOCATED_VIDEO_STREAMS" type="array" entryType="VideoStreamStruct" reportable="true" optional="true">AllocatedVideoStreams</attribute>
+    <attribute code="0x0012" side="server" define="ALLOCATED_AUDIO_STREAMS" type="array" entryType="AudioStreamStruct" reportable="true" optional="true">AllocatedAudioStreams</attribute>
+    <attribute code="0x0013" side="server" define="ALLOCATED_SNAPSHOT_STREAMS" type="array" entryType="SnapshotStreamStruct" reportable="true" optional="true">AllocatedSnapshotStreams</attribute>
+    <attribute code="0x0014" side="server" define="RANKED_VIDEO_STREAM_PRIORITIES_LIST" type="array" entryType="StreamTypeEnum" reportable="true" writable="true" optional="true">
       <description>RankedVideoStreamPrioritiesList</description>
       <access op="read" privilege="administer"/>
       <access op="write" privilege="administer"/>
     </attribute>
-    <attribute code="0x0015" side="server" define="RANKED_VIDEO_STREAM_PRIORITIES_LIST" type="boolean" writable="true" optional="true" default="0">SoftRecordingPrivacyModeEnabled</attribute>
-    <attribute code="0x0016" side="server" define="SOFT_RECORDING_PRIVACY_MODE_SETTING" type="boolean" writable="true" optional="true" default="0">SoftLivestreamPrivacyModeEnabled</attribute>
-    <attribute code="0x0017" side="server" define="SOFT_LIVESTREAM_PRIVACY_MODE_SETTING" type="boolean" optional="true" reportable="true" default="0">HardPrivacyModeOn</attribute>
-    <attribute code="0x0018" side="server" define="HARD_PRIVACY_MODE" type="TriStateAutoEnum" optional="true" min="0x00" max="0x02" writable="true">
+    <attribute code="0x0015" side="server" define="SOFT_RECORDING_PRIVACY_MODE_ENABLED" type="boolean" default="0" writable="true" optional="true">SoftRecordingPrivacyModeEnabled</attribute>
+    <attribute code="0x0016" side="server" define="SOFT_LIVESTREAM_PRIVACY_MODE_ENABLED" type="boolean" default="0" writable="true" optional="true">SoftLivestreamPrivacyModeEnabled</attribute>
+    <attribute code="0x0017" side="server" define="HARD_PRIVACY_MODE_ON" type="boolean" reportable="true" default="0" optional="true">HardPrivacyModeOn</attribute>
+    <attribute code="0x0018" side="server" define="NIGHT_VISION" type="TriStateAutoEnum" min="0x00" max="0x02" writable="true" optional="true">
       <description>NightVision</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x0019" side="server" define="NIGHT_VISION" type="TriStateAutoEnum" min="0x00" max="0x02" writable="true" optional="true">
+    <attribute code="0x0019" side="server" define="NIGHT_VISION_ILLUM" type="TriStateAutoEnum" min="0x00" max="0x02" writable="true" optional="true">
       <description>NightVisionIllum</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x001A" side="server" define="NIGHT_VISION_ILLUM" type="boolean" writable="true" optional="true" default="0">
+    <attribute code="0x001A" side="server" define="AWBENABLED" type="boolean" default="0" writable="true" optional="true">
       <description>AWBEnabled</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x001B" side="server" define="AWB" type="boolean" writable="true" optional="true" default="0">
+    <attribute code="0x001B" side="server" define="AUTO_SHUTTER_SPEED_ENABLED" type="boolean" default="0" writable="true" optional="true">
       <description>AutoShutterSpeedEnabled</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x001C" side="server" define="SHUTTER_SPEED" type="boolean" writable="true" optional="true" default="0">
+    <attribute code="0x001C" side="server" define="AUTO_ISOENABLED" type="boolean" default="0" writable="true" optional="true">
       <description>AutoISOEnabled</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x001D" side="server" define="ISO" type="ViewportStruct" optional="true">Viewport</attribute>
-    <attribute code="0x001E" side="server" define="VIEWPORT" type="boolean" optional="true" default="0" writable="true">
+    <attribute code="0x001D" side="server" define="VIEWPORT" type="ViewportStruct" optional="true">Viewport</attribute>
+    <attribute code="0x001E" side="server" define="SPEAKER_MUTED" type="boolean" default="0" writable="true" optional="true">
       <description>SpeakerMuted</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x001F" side="server" define="SPEAKER_ENABLED" type="int8u" writable="true" optional="true" max="254">
+    <attribute code="0x001F" side="server" define="SPEAKER_VOLUME_LEVEL" type="int8u" max="254" writable="true" optional="true">
       <description>SpeakerVolumeLevel</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x0020" side="server" define="SPEAKER_VOLUME_LEVEL" type="int8u" max="254" writable="true" optional="true">
+    <attribute code="0x0020" side="server" define="SPEAKER_MAX_LEVEL" type="int8u" max="254" writable="true" optional="true">
       <description>SpeakerMaxLevel</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x0021" side="server" define="SPEAKER_MAX_LEVEL" type="int8u" max="254" writable="true" optional="true">
+    <attribute code="0x0021" side="server" define="SPEAKER_MIN_LEVEL" type="int8u" max="254" writable="true" optional="true">
       <description>SpeakerMinLevel</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x0022" side="server" define="SPEAKER_MIN_LEVEL" type="boolean" writable="true" optional="true" default="0">
+    <attribute code="0x0022" side="server" define="MICROPHONE_MUTED" type="boolean" default="0" writable="true" optional="true">
       <description>MicrophoneMuted</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x0023" side="server" define="MIC_STATUS" type="int8u" writable="true" optional="true" max="254">
+    <attribute code="0x0023" side="server" define="MICROPHONE_VOLUME_LEVEL" type="int8u" max="254" writable="true" optional="true">
       <description>MicrophoneVolumeLevel</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x0024" side="server" define="MIC_VOLUME_LEVEL" type="int8u" max="254" writable="true" optional="true">
+    <attribute code="0x0024" side="server" define="MICROPHONE_MAX_LEVEL" type="int8u" max="254" writable="true" optional="true">
       <description>MicrophoneMaxLevel</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x0025" side="server" define="MIC_MAX_LEVEL" type="int8u" max="254" writable="true" optional="true">
+    <attribute code="0x0025" side="server" define="MICROPHONE_MIN_LEVEL" type="int8u" max="254" writable="true" optional="true">
       <description>MicrophoneMinLevel</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x0026" side="server" define="MIC_MIN_LEVEL" type="boolean" writable="true" optional="true" default="1">
+    <attribute code="0x0026" side="server" define="MICROPHONE_AGCENABLED" type="boolean" default="1" writable="true" optional="true">
       <description>MicrophoneAGCEnabled</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x0027" side="server" define="MIC_AGCENABLED" type="int16u" optional="true" max="359">ImageRotation</attribute>
-    <attribute code="0x0028" side="server" define="IMAGE_ROTATION" type="boolean" optional="true" default="0">ImageFlipHorizontal</attribute>
-    <attribute code="0x0029" side="server" define="IMAGE_FLIP_HORIZONTAL" type="boolean" optional="true" default="0">ImageFlipVertical</attribute>
-    <attribute code="0x002A" side="server" define="IMAGE_FLIP_VERTICAL" type="boolean" optional="true" default="0" writable="true">
+    <attribute code="0x0027" side="server" define="IMAGE_ROTATION" type="int16u" max="359" optional="true">ImageRotation</attribute>
+    <attribute code="0x0028" side="server" define="IMAGE_FLIP_HORIZONTAL" type="boolean" default="0" optional="true">ImageFlipHorizontal</attribute>
+    <attribute code="0x0029" side="server" define="IMAGE_FLIP_VERTICAL" type="boolean" default="0" optional="true">ImageFlipVertical</attribute>
+    <attribute code="0x002A" side="server" define="LOCAL_VIDEO_RECORDING_ENABLED" type="boolean" default="0" writable="true" optional="true">
       <description>LocalVideoRecordingEnabled</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x002B" side="server" define="LOCAL_VIDEO_RECORDING_ENABLED" type="boolean" writable="true" optional="true" default="0">
+    <attribute code="0x002B" side="server" define="LOCAL_SNAPSHOT_RECORDING_ENABLED" type="boolean" default="0" writable="true" optional="true">
       <description>LocalSnapshotRecordingEnabled</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x002C" side="server" define="LOCAL_SNAPSHOT_RECORDING_ENABLED" type="boolean" writable="true" optional="true" default="1">
+    <attribute code="0x002C" side="server" define="STATUS_LIGHT_ENABLED" type="boolean" default="1" writable="true" optional="true">
       <description>StatusLightEnabled</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x002D" side="server" define="STATUS_LIGHT" type="ThreeLevelAutoEnum" writable="true" optional="true" min="0x00" max="0x03">
+    <attribute code="0x002D" side="server" define="STATUS_LIGHT_BRIGHTNESS" type="ThreeLevelAutoEnum" min="0x00" max="0x03" writable="true" optional="true">
       <description>StatusLightBrightness</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x002E" side="server" define="STATUS_LIGHT_BRIGHTNESS" type="TriStateAutoEnum" min="0x00" max="0x02" writable="true" optional="true">
+    <attribute code="0x002E" side="server" define="DEPTH_SENSOR_STATUS" type="TriStateAutoEnum" min="0x00" max="0x02" writable="true" optional="true">
       <description>DepthSensorStatus</description>
       <access op="read" privilege="manage"/>
       <access op="write" privilege="manage"/>
