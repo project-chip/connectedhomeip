@@ -25,7 +25,12 @@ CHIP_ERROR CommissionerControl::RequestCommissioningApproval(uint64_t requestId,
     mRequestCommissioningApproval.requestID = requestId;
     mRequestCommissioningApproval.vendorID  = static_cast<VendorId>(vendorId);
     mRequestCommissioningApproval.productID = productId;
-    mRequestCommissioningApproval.label     = label;
+
+    if (label.HasValue())
+    {
+        memcpy(mLabelBuffer, label.Value().data(), label.Value().size());
+        mRequestCommissioningApproval.label = Optional<Span<const char>>(CharSpan(mLabelBuffer, label.Value().size()));
+    }
 
     CommissioneeDeviceProxy * commissioneeDeviceProxy = nullptr;
     if (CHIP_NO_ERROR == mCommissioner->GetDeviceBeingCommissioned(mDestinationId, &commissioneeDeviceProxy))
