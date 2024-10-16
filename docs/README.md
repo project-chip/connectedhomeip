@@ -2,34 +2,39 @@
 
 ## Building and Developing
 
--   A quick start guide to building a demo application and controller is
+- A quick start guide to building a demo application and controller is
     available in the [Getting started](./getting_started/) guide
--   A guide to new cluster and device type development is available in the
+- A guide to new cluster and device type development is available in the
     [New Cluster and Device Type Developement Guide](./cluster_and_device_type_dev/)
--   Documentation about building from the command line can be found in
+- Documentation about building from the command line can be found in
     [the build guide](guides/BUILDING.md)
--   Documentation about running [cirque](https://github.com/openweave/cirque)
+- Documentation about running [cirque](https://github.com/openweave/cirque)
     tests can be found in
     [the cirque test guide](../src/test_driver/linux-cirque/README.md)
--   Documentation about standard build & development flows using
+- Documentation about standard build & development flows using
     [Visual Studio Code](https://code.visualstudio.com/) can be found in
     [the development guide](./VSCODE_DEVELOPMENT.md)
 
+## Issue triage
+
+Project issues are triaged and maintained according to the
+[issue triage](./guides/issue_triage.md) guide.
+
 ## Platform Guides
 
--   Various guides are available [here](./guides/README.md) that cover platform
+- Various guides are available [here](./guides/README.md) that cover platform
     bring up, testing, and various troubleshooting things.
 
 ## Project Flow
 
--   Documentation about general project usage of GitHub, and project tools is
+- Documentation about general project usage of GitHub, and project tools is
     documented in [the project flow](./PROJECT_FLOW.md)
 
 ## Style Guide
 
--   Documentation about style is documented in
+- Documentation about style is documented in
     [the style guide](./style/style_guide.md)
--   Additional documentation about more specific files are in the
+- Additional documentation about more specific files are in the
     [style folder](./style/)
 
 ## Third Party Tools
