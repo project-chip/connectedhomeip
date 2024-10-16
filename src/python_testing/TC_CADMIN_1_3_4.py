@@ -31,13 +31,11 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-import logging
 import random
 from time import sleep
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from chip.tlv import TLVReader
