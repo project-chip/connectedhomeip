@@ -386,6 +386,12 @@ const EmberAfCluster * emberAfFindServerCluster(EndpointId endpoint, ClusterId c
     return nullptr;
 }
 
+unsigned emberAfMetadataStructureGeneration()
+{
+    // DynamicServer at this point hardcodes a single OTA provider cluster
+    return 0;
+}
+
 Protocols::InteractionModel::Status emberAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
 {
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
