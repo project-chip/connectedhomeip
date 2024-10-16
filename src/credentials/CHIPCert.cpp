@@ -1245,7 +1245,7 @@ CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, N
 {
     // Since we assume the cert is pre-validated, we are going to assume that
     // its subject in fact has both a node id and a fabric id.
-    ReturnErrorCodeIf(outNodeId == nullptr || outFabricId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(outNodeId != nullptr && outFabricId != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     NodeId nodeId      = 0;
     FabricId fabricId  = kUndefinedFabricId;
     bool foundNodeId   = false;
