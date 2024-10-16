@@ -235,6 +235,40 @@ const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endp
 // Initial configuration
 void emberAfEndpointConfigure();
 
+// setup a dynamic endpoint's EmberAfEndpointType from a list of template clusters.
+//
+// This is a alternative to declaring dynamic endpoint metadata using DECLARE_DYNAMIC_* macros.
+//
+// As clusters to be used in dynamic endpoint setup need to be defined in ZAP anyway
+// (usually on a special endpoint which remains always disabled), the cluster's
+// metadata including all attributes already exists and can be re-used this way,
+// without error prone manual duplicating with DECLARE_DYNAMIC_*
+//
+// templateEndpointId specifies a endpoint which is usually disabled, but containing
+// cluster definitions that should be used for instantiating active endpoints.
+//
+// templateClusterIds is a list of clusterIds to be used for the new endpoint.
+//
+// endpointType will be setup with the specified clusters and their storage size so
+// it can be used in a subsequent call to emberAfSetDynamicEndpoint instead of
+// an endpoint manually constructed with DECLARE_DYNAMIC_*.
+//
+// Note: passing invalid templateEndpointId/templateClusterIds combinations, i.e. clusters
+//   not present in the specified template endpoint, will cause the function will die with
+//   an error message as this indicates severe internal inconsistency of the setup.
+//
+// Note: function may allocate memory for the endpoint declaration.
+//   Use emberAfResetEndpointDeclaration to properly dispose of an endpoint declaration.
+void emberAfSetupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, chip::EndpointId templateEndpointId,
+                                            const chip::Span<const chip::ClusterId> & templateClusterIds);
+
+// reset an endpoint declaration that was setup with emberAfSetupDynamicEndpointDeclaration
+// to free all extra memory that might have been allocated.
+//
+// Warning: passing endpoint declarations that are not set up with
+//   emberAfSetupDynamicEndpointDeclaration is NOT allowed and likely causes undefined crashes.
+void emberAfResetDynamicEndpointDeclaration(EmberAfEndpointType & endpointType);
+
 // Register a dynamic endpoint. This involves registering descriptors that describe
 // the composition of the endpoint (encapsulated in the 'ep' argument) as well as providing
 // storage for data versions.
@@ -251,6 +285,10 @@ void emberAfEndpointConfigure();
 //
 // An optional parent endpoint id should be passed for child endpoints of composed device.
 //
+// An optional dynamicAttributeStorage can be passed to allow automatic attribute storage.
+// This must point to a memory block of ep->endpointSize bytes size. If provided, the memory
+// needs to remain allocated until this dynamic endpoint is cleared.
+//
 // Returns  CHIP_NO_ERROR                   No error.
 //          CHIP_ERROR_NO_MEMORY            MAX_ENDPOINT_COUNT is reached or when no storage is left for clusters
 //          CHIP_ERROR_INVALID_ARGUMENT     The EndpointId value passed is kInvalidEndpointId
@@ -259,7 +297,8 @@ void emberAfEndpointConfigure();
 CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
                                      const chip::Span<chip::DataVersion> & dataVersionStorage,
                                      chip::Span<const EmberAfDeviceType> deviceTypeList = {},
-                                     chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
+                                     chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId,
+                                     uint8_t * dynamicAttributeStorage                  = nullptr);
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 /**
