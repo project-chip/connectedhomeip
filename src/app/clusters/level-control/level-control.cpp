@@ -910,7 +910,7 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     }
 
     Status status = VerifyOptionsBitmap(optionsMask, optionsOverride);
-    if (status != Status::Success)
+    VerifyOrReturnError(Status::Success == status, status);
     {
         return status;
     }
