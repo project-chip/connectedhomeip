@@ -471,6 +471,8 @@ class EncodableValue:
                 return "UInt"
             else:
                 return "ULong"
+        elif isinstance(t, IdlTypedefType):
+            return self.data_type.name
         else:
             return "Any"
 
@@ -507,7 +509,7 @@ class EncodableValue:
         if self.is_list:
             return "Ljava/util/ArrayList;"
 
-        t = ParseDataType(self.data_type, self.context)
+        t = ParseDataType(self.data_type, self.context, desugar_typedef = True)
 
         if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:

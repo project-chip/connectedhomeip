@@ -55,6 +55,9 @@ bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
 
 {% endfor %}
 
+{% for typedef in idl.global_typedefs %}
+typedef {{typedef.name}} : {{ typedef.base_type}};
+
 {%- for cluster in idl.clusters %}
 {% if cluster.description %}/** {{cluster.description}} */
 {% endif %}

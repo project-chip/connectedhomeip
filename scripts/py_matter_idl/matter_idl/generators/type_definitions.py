@@ -161,6 +161,15 @@ class IdlType:
         return self.item_type == IdlItemType.STRUCT
 
 
+@dataclass
+class IdlTypedefType:
+    """
+    A typedef (concrete type that aliases another type)
+    """
+    idl_name: str
+    base_type: Union[BasicInteger, BasicString, FundamentalType, IdlType, IdlEnumType, IdlBitmapType]
+
+
 # Data types, held by ZAP in chip-types.xml and generally by the spec.
 __CHIP_SIZED_TYPES__ = {
     "bitmap16": BasicInteger(idl_name="bitmap16", byte_count=2, is_signed=False),
@@ -295,6 +304,13 @@ class TypeLookupContext:
 
         return None
 
+    def find_typedef(self, name) -> Optional[matter_idl_types.Typedef]:
+        for s in self.all_typedefs:
+            if s.name == name:
+                return s
+
+        return None
+
     @property
     def all_enums(self):
         """
@@ -330,6 +346,18 @@ class TypeLookupContext:
             for e in self.cluster.structs:
                 yield e
 
+    @property
+    def all_typedefs(self):
+        """
+        All typedefs defined within this lookup context.
+
+        typedefs are only defined at cluster level. If lookup context does not
+        include a typedef, the typedef list will be empty.
+        """
+        if self.cluster:
+            for t in self.cluster.typedefs:
+                yield t
+
     def is_enum_type(self, name: str):
         """
         Determine if the given type name is an enumeration.
@@ -346,6 +374,12 @@ class TypeLookupContext:
         Determine if the given type name is type that is known to be a struct
         """
         return any(map(lambda s: s.name == name, self.all_structs))
+
+    def is_typedef_type(self, name: str):
+        """
+        Determine if the given type name is type that is known to be a typedef
+        """
+        return any(map(lambda s: s.name == name, self.all_typedefs))
 
     def is_untyped_bitmap_type(self, name: str):
         """Determine if the given type is a untyped bitmap (just an interger size)."""
@@ -364,7 +398,7 @@ class TypeLookupContext:
         return any(map(lambda s: s.name == name, self.all_bitmaps))
 
 
-def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[BasicInteger, BasicString, FundamentalType, IdlType, IdlEnumType, IdlBitmapType]:
+def ParseDataType(data_type: DataType, lookup: TypeLookupContext, desugar_typedef: bool = False) -> Union[BasicInteger, BasicString, FundamentalType, IdlType, IdlEnumType, IdlBitmapType, IdlTypedefType]:
     """
     Given a AST data type and a lookup context, match it to a type that can be later
     be used for generation.
@@ -404,8 +438,17 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
 
     b = lookup.find_bitmap(data_type.name)
     if b:
-        # Valid enum found. it MUST be based on a valid data type
+        # Valid bitmap found. it MUST be based on a valid data type
         return IdlBitmapType(idl_name=data_type.name, base_type=__CHIP_SIZED_TYPES__[b.base_type.lower()])
+
+    t = lookup.find_typedef(data_type.name)
+    if t:
+        # Valid typedef found. it MUST be based on a valid data type
+        typedef_base_type = ParseDataType(DataType(name=t.base_type), lookup)
+        if desugar_typedef:
+            return typedef_base_type
+        else:
+            return IdlTypedefType(idl_name=data_type.name, base_type=typedef_base_type)
 
     result = IdlType(idl_name=data_type.name, item_type=IdlItemType.UNKNOWN)
     if lookup.find_struct(data_type.name):
