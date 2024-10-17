@@ -444,7 +444,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
                 # Test Harness Reads it back again to confirm the successful write of MaxHeatSetpointLimit attribute
                 val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxHeatSetpointLimit)
-                asserts.assert_equal(val, 2900)
+                asserts.assert_equal(val, AbsMaxHeatSetpointLimitValue-1)
 
         if self.pics_guard(hasHeatingFeature and hasMaxHeatSetpointLimitAttribute):
             # Test Harness Writes MaxHeatSetpointLimit to value below the AbsMinHeatSetpointLimit
@@ -683,7 +683,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(OccupiedHeatingSetpointValue), endpoint_id=endpoint)
 
             # Sends SetpointRaise Command Heat Only
-            await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=-30))
+            await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=-30), endpoint=endpoint)
 
            # Test Harness Reads back OccupiedHeatingSetpoint to confirm the success of the write
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedHeatingSetpoint)
@@ -696,7 +696,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(OccupiedHeatingSetpointValue), endpoint_id=endpoint)
 
             # Test Harness Sends SetpointRaise Command Heat Only
-            await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=30))
+            await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=30), endpoint=endpoint)
 
             # Test Harness Reads back OccupiedHeatingSetpoint to confirm the success of the write
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedHeatingSetpoint)
@@ -706,7 +706,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         if self.pics_guard(hasCoolingFeature):
             # Test Harness Sends SetpointRaise Command Cool Only
-            await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kCool, amount=-30))
+            await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kCool, amount=-30), endpoint=endpoint)
 
             # Test Harness Reads back OccupiedCoolingSetpoint to confirm the success of the write
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedCoolingSetpoint)
@@ -719,7 +719,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedCoolingSetpoint(OccupiedCoolingSetpointValue), endpoint_id=endpoint)
 
             # Test Harness Sends SetpointRaise Command Cool Only
-            await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kCool, amount=30))
+            await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kCool, amount=30), endpoint=endpoint)
 
             # Test Harness Reads back OccupiedCoolingSetpoint to confirm the success of the write
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedCoolingSetpoint)
@@ -737,7 +737,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         if self.pics_guard(hasHeatingFeature or hasCoolingFeature):
             # Test Harness Sends SetpointRaise Command Heat & Cool
-            await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=-30))
+            await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=-30), endpoint=endpoint)
 
             if self.pics_guard(hasCoolingFeature):
                 # Test Harness Reads back OccupiedCoolingSetpoint to confirm the success of the write
@@ -761,7 +761,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         if self.pics_guard(hasHeatingFeature or hasCoolingFeature):
             # Test Harness Sends SetpointRaise Command Heat & Cool
-            await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=30))
+            await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=30), endpoint=endpoint)
 
             if self.pics_guard(hasCoolingFeature):
                 # Test Harness Reads back OccupiedCoolingSetpoint to confirm the success of the write
