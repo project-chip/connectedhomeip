@@ -72,6 +72,4 @@ void ReportCommand::OnEventData(const app::EventHeader & eventHeader, TLV::TLVRe
     }
 
     LogErrorOnFailure(RemoteDataModelLogger::LogEventAsJSON(eventHeader, data));
-
-    DeviceMgr().HandleEventData(eventHeader, *data);
 }
