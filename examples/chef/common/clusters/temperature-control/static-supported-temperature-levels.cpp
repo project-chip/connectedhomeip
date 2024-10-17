@@ -17,6 +17,8 @@
  */
 
 #include <app/util/config.h>
+
+#ifdef MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
 #include "static-supported-temperature-levels.h"
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
 
@@ -25,13 +27,10 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::TemperatureControl;
 using chip::Protocols::InteractionModel::Status;
 
-
-//#ifdef MATTER_DM_PLUGIN_WASHER_SERVER
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
 CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { CharSpan("Hot", 3), CharSpan("Warm", 4),
                                                                               CharSpan("Freezing", 8) };
-
 const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints
     [MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
         EndpointPair(1, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions, 3) // Options for Endpoint 1
@@ -75,3 +74,4 @@ void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
     VerifyOrDie(endpoint == 1); // this cluster is only enabled for endpoint 1.
     chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
+#endif // MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
