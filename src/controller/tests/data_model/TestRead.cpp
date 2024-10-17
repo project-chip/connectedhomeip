@@ -1811,11 +1811,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest1)
         numSubscriptionEstablishedCalls++;
     };
 
-    //
-    // Test the server-side application altering the subscription intervals.
-    //
-    mAlterSubscriptionIntervals = false;
-
     EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                   &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 5, 5,
                   onSubscriptionEstablishedCb, nullptr, true),
@@ -1837,8 +1832,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest1)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    mAlterSubscriptionIntervals = false;
 }
 
 // Subscriber sends the request with particular max-interval value:
@@ -1879,11 +1872,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest2)
         numSubscriptionEstablishedCalls++;
     };
 
-    //
-    // Test the server-side application altering the subscription intervals.
-    //
-    mAlterSubscriptionIntervals = false;
-
     EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                   &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
                   onSubscriptionEstablishedCb, nullptr, true),
@@ -1905,8 +1893,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest2)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    mAlterSubscriptionIntervals = false;
 }
 
 // Subscriber sends the request with particular max-interval value:
@@ -1973,8 +1959,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest3)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    mAlterSubscriptionIntervals = false;
 }
 
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -2033,8 +2017,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest4)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    mAlterSubscriptionIntervals = false;
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
@@ -2077,11 +2059,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest5)
         numSubscriptionEstablishedCalls++;
     };
 
-    //
-    // Test the server-side application altering the subscription intervals.
-    //
-    mAlterSubscriptionIntervals = false;
-
     EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                   &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
                   onSubscriptionEstablishedCb, nullptr, true),
@@ -2103,8 +2080,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest5)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    mAlterSubscriptionIntervals = false;
 }
 
 // Subscriber sends the request with particular max-interval value:
@@ -2171,8 +2146,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest6)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    mAlterSubscriptionIntervals = false;
 }
 
 // Subscriber sends the request with particular max-interval value:
@@ -2239,8 +2212,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest7)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    mAlterSubscriptionIntervals = false;
 }
 
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -2299,8 +2270,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest8)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    mAlterSubscriptionIntervals = false;
 }
 
 // Subscriber sends the request with particular max-interval value:
@@ -2331,11 +2300,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest9)
         numSubscriptionEstablishedCalls++;
     };
 
-    //
-    // Test the server-side application altering the subscription intervals.
-    //
-    mAlterSubscriptionIntervals = false;
-
     EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                   &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 5, 4,
                   onSubscriptionEstablishedCb, nullptr, true),
@@ -2354,8 +2318,6 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest9)
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    mAlterSubscriptionIntervals = false;
 }
 
 /**
