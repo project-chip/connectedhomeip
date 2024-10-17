@@ -76,8 +76,9 @@ MTR_DIRECT_MEMBERS
     P256PublicKeySpan publicKeySpan;
     CHIP_ERROR err = ExtractPublicKeyFromChipCert(AsByteSpan(_bytes), publicKeySpan);
 
-    if (err != CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR) {
         return nil;
+    }
 
     return AsData(publicKeySpan);
 }
