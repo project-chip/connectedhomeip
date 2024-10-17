@@ -28,7 +28,6 @@ from chip.testing.matter_testing import MatterBaseTest, async_test_body, default
 from chip.tlv import TLVReader
 from mobly import asserts
 
-
 # Reachable attribute is off in the pics file
 # MaxPathsPerInvoke is not include in the pics file
 # Vendor ID is included on ON in the PICS file
