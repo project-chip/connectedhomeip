@@ -346,14 +346,6 @@ void DeviceManager::HandleAttributePartsListUpdate(TLV::TLVReader & data)
     {
         // print to console
         fprintf(stderr, "A new device is added on Endpoint: %u\n", endpoint);
-
-        if (mAutoSyncEnabled)
-        {
-            StringBuilder<kMaxCommandSize> commandBuilder;
-            commandBuilder.Add("fabricsync sync-device ");
-            commandBuilder.AddFormat("%d", endpoint);
-            PushCommand(commandBuilder.c_str());
-        }
     }
 
     // Process removed endpoints
@@ -367,19 +359,6 @@ void DeviceManager::HandleAttributePartsListUpdate(TLV::TLVReader & data)
         {
             ChipLogProgress(NotSpecified, "No device on Endpoint: %u", endpoint);
             continue;
-        }
-
-        if (mAutoSyncEnabled)
-        {
-            NodeId nodeId = device->GetNodeId();
-            if (PairingManager::Instance().UnpairDevice(nodeId) != CHIP_NO_ERROR)
-            {
-                ChipLogError(NotSpecified, "Failed to unpair device " ChipLogFormatX64, ChipLogValueX64(nodeId));
-            }
-            else
-            {
-                PairingManager::Instance().SetPairingDelegate(this);
-            }
         }
     }
 }

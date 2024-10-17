@@ -68,13 +68,9 @@ public:
     void SetLocalBridgeSetupPinCode(uint32_t pinCode) { mLocalBridgeSetupPinCode = pinCode; }
     void SetLocalBridgeNodeId(chip::NodeId nodeId) { mLocalBridgeNodeId = nodeId; }
 
-    bool IsAutoSyncEnabled() const { return mAutoSyncEnabled; }
-
     bool IsFabricSyncReady() const { return mRemoteBridgeNodeId != chip::kUndefinedNodeId; }
 
     bool IsLocalBridgeReady() const { return mLocalBridgeNodeId != chip::kUndefinedNodeId; }
-
-    void EnableAutoSync(bool state) { mAutoSyncEnabled = state; }
 
     void AddSyncedDevice(const Device & device);
 
@@ -207,9 +203,8 @@ private:
     chip::NodeId mLocalBridgeNodeId = chip::kUndefinedNodeId;
 
     std::set<Device> mSyncedDevices;
-    bool mAutoSyncEnabled = false;
-    bool mInitialized     = false;
-    uint64_t mRequestId   = 0;
+    bool mInitialized   = false;
+    uint64_t mRequestId = 0;
 
     BridgeSubscription mBridgeSubscriber;
 };
