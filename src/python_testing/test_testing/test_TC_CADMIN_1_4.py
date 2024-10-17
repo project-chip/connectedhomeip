@@ -60,6 +60,7 @@ class TC_CADMIN_1_4_nofreset(MatterBaseTest):
         return th_rcac_decoded
 
     async def get_txt_record(self):
+        from mdns_discovery import mdns_discovery
         discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
         comm_service = await discovery.get_commissionable_service(
             discovery_timeout_sec=240,
@@ -86,7 +87,6 @@ class TC_CADMIN_1_4_nofreset(MatterBaseTest):
 
     @async_test_body
     async def test_TC_CADMIN_1_4(self):
-        from mdns_discovery import mdns_discovery
         setupPayloadInfo = self.get_setup_payload_info()
         if not setupPayloadInfo:
             asserts.assert_true(
