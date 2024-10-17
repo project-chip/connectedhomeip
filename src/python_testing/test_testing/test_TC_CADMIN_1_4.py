@@ -26,7 +26,6 @@ from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from chip.tlv import TLVReader
-from mdns_discovery import mdns_discovery
 from mobly import asserts
 
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -87,6 +86,7 @@ class TC_CADMIN_1_4_nofreset(MatterBaseTest):
 
     @async_test_body
     async def test_TC_CADMIN_1_4(self):
+        from mdns_discovery import mdns_discovery
         setupPayloadInfo = self.get_setup_payload_info()
         if not setupPayloadInfo:
             asserts.assert_true(
