@@ -20,10 +20,10 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <device_manager/BridgeSubscription.h>
+#include <device_manager/CommissionerControl.h>
 #include <device_manager/FabricSyncGetter.h>
 #include <device_manager/PairingManager.h>
 #include <platform/CHIPDeviceLayer.h>
-
 #include <set>
 
 constexpr uint32_t kDefaultSetupPinCode    = 20202021;
@@ -63,7 +63,7 @@ public:
 
     void UpdateLastUsedNodeId(chip::NodeId nodeId);
 
-    void SetRemoteBridgeNodeId(chip::NodeId nodeId) { mRemoteBridgeNodeId = nodeId; }
+    void SetRemoteBridgeNodeId(chip::NodeId nodeId);
 
     void SetLocalBridgePort(uint16_t port) { mLocalBridgePort = port; }
     void SetLocalBridgeSetupPinCode(uint32_t pinCode) { mLocalBridgeSetupPinCode = pinCode; }
@@ -208,6 +208,7 @@ private:
     uint64_t mRequestId = 0;
 
     BridgeSubscription mBridgeSubscriber;
+    CommissionerControl mCommissionerControl;
     FabricSyncGetter mFabricSyncGetter;
 };
 
