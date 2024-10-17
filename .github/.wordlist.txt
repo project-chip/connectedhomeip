@@ -735,6 +735,7 @@ isUpperCase
 itemName
 iterable
 itsfoss
+IW
 JDK
 jinja
 JLink
@@ -893,6 +894,7 @@ microcontroller
 microcontrollers
 MicroSD
 middleware
+MIMXRT
 minApplicableSoftwareVersion
 Minicom
 MinInterval
@@ -924,6 +926,7 @@ Multicast
 multilib
 Multiprotocol
 multithreaded
+Murata
 mutex
 mutexes
 mv
@@ -1452,6 +1455,8 @@ trackFree
 TransferSession
 transitionTime
 TransportMgrBase
+triaged
+triaging
 TriggerEffect
 TRNG
 trustm
