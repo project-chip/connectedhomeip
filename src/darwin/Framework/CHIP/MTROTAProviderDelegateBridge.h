@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022 - 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  */
 
 #import <Matter/MTROTAProviderDelegate.h>
+
+#import "MTROTAUnsolicitedBDXMessageHandler.h"
 
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 
@@ -65,6 +67,9 @@ private:
     static void ConvertToNotifyUpdateAppliedParams(
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData,
         MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams * commandParams);
+
+protected:
+    MTROTAUnsolicitedBDXMessageHandler mOtaUnsolicitedBDXMsgHandler;
 };
 
 NS_ASSUME_NONNULL_END
