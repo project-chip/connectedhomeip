@@ -37596,7 +37596,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 } // namespace NightVisionCapable
 
-namespace MaxPreRollBufferSize {
+namespace MaxContentBufferSize {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
 {
@@ -37641,7 +37641,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
     return emberAfWriteAttribute(endpoint, Clusters::CameraAvStreamManagement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
-} // namespace MaxPreRollBufferSize
+} // namespace MaxContentBufferSize
 
 namespace TwoWayTalkSupport {
 
