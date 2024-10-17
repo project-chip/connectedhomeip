@@ -11,8 +11,10 @@ the setup payload or performing discovery actions.
 
 ## Installation
 
-On devices running SnapD, like Ubuntu, the CHIP Tool can be installed from the
-Snap Store. To do this, run:
+On Linux distributions
+[running snapd](https://snapcraft.io/docs/installing-snapd), such as Ubuntu, the
+CHIP Tool can be installed using the
+[chip-tool snap](https://snapcraft.io/chip-tool). To do this, run:
 
 ```
 sudo snap install chip-tool
@@ -20,7 +22,7 @@ sudo snap install chip-tool
 
 ## Building from source
 
-The source files of the CHIP Tool is available in the `examples/chip-tool`
+The source files of the CHIP Tool are available in the `examples/chip-tool`
 directory.
 
 The source can be compiled on Linux (amd64/aarch64) or macOS. If you want to run
