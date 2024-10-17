@@ -16,7 +16,6 @@
 #    limitations under the License.
 #
 
-from mdns_discovery import mdns_discovery
 import asyncio
 import os
 import random
@@ -27,6 +26,7 @@ from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from chip.tlv import TLVReader
+from mdns_discovery import mdns_discovery
 from mobly import asserts
 
 # isort: off
