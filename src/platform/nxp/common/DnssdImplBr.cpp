@@ -144,7 +144,7 @@ static uint32_t mServiceListFreeIndex;
 
 CHIP_ERROR NxpChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
-    struct netif * extNetif     = (ConnectivityManagerImpl().GetExternalInterface()).GetPlatformInterface();
+    struct netif * extNetif = (ConnectivityManagerImpl().GetExternalInterface()).GetPlatformInterface();
 
     mNetifIndex = netif_get_index(extNetif);
     initCallback(context, CHIP_NO_ERROR);

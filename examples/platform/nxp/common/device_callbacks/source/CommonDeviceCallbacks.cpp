@@ -81,8 +81,7 @@ void chip::NXP::App::CommonDeviceCallbacks::DeviceEventCallback(const ChipDevice
         break;
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     case DeviceEventType::kThreadConnectivityChange:
-        if (!ConnectivityMgr().IsWiFiStationConnected() &&
-           (event->ThreadConnectivityChange.Result == kConnectivity_Established))
+        if (!ConnectivityMgr().IsWiFiStationConnected() && (event->ThreadConnectivityChange.Result == kConnectivity_Established))
         {
             // Restart DnsSd service when operating as Matter over Thread
             chip::app::DnssdServer::Instance().StartServer();
