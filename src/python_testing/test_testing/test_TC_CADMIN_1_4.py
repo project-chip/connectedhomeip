@@ -28,9 +28,14 @@ from chip.testing.matter_testing import MatterBaseTest, async_test_body, default
 from chip.tlv import TLVReader
 from mobly import asserts
 
+# isort: off
+
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
 
+from mdns_discovery import mdns_discovery
+
+# isort: on
 
 # Reachable attribute is off in the pics file
 # MaxPathsPerInvoke is not include in the pics file
@@ -40,7 +45,7 @@ opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
 
 
-class TC_CADMIN_1_4_nofreset(MatterBaseTest):
+class TC_CADMIN_1_4_noreset(MatterBaseTest):
     async def get_fabrics(self, th: ChipDeviceCtrl) -> int:
         OC_cluster = Clusters.OperationalCredentials
         if th == self.th2:
@@ -60,7 +65,6 @@ class TC_CADMIN_1_4_nofreset(MatterBaseTest):
         return th_rcac_decoded
 
     async def get_txt_record(self):
-        from mdns_discovery import mdns_discovery
         discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
         comm_service = await discovery.get_commissionable_service(
             discovery_timeout_sec=240,
