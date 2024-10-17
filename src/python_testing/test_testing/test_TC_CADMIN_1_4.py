@@ -90,7 +90,7 @@ class TC_CADMIN_1_4_noreset(MatterBaseTest):
             asserts.assert_true(
                 False, 'passcode and discriminator must be provided values in order for this test to work due to using BCM, please rerun test with providing --passcode <value> and --discriminator <value>')
             sys.exit(0)
-            
+
         # Establishing TH1
         self.th1 = self.default_controller
 

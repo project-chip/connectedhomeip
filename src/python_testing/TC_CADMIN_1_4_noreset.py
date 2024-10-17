@@ -51,6 +51,7 @@ from mobly import asserts
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
 
+
 class TC_CADMIN_1_4_noreset(MatterBaseTest):
     async def get_fabrics(self, th: ChipDeviceCtrl) -> int:
         OC_cluster = Clusters.OperationalCredentials
@@ -196,6 +197,7 @@ class TC_CADMIN_1_4_noreset(MatterBaseTest):
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
