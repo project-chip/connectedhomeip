@@ -79,7 +79,6 @@ MTR_DIRECT_MEMBERS
     if ( err != CHIP_NO_ERROR ) return nil;
     
     return AsData(publicKeySpan);
-
 }
 
 - (NSDate *)notAfter
