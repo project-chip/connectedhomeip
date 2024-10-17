@@ -82,6 +82,8 @@ static_library("fabric-admin-utils") {
     "commands/pairing/ToTLVCert.cpp",
     "device_manager/BridgeSubscription.cpp",
     "device_manager/BridgeSubscription.h",
+    "device_manager/CommissionerControl.cpp",
+    "device_manager/CommissionerControl.h",
     "device_manager/DeviceManager.cpp",
     "device_manager/DeviceManager.h",
     "device_manager/DeviceSubscription.cpp",
