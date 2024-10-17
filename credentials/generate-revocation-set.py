@@ -211,6 +211,7 @@ class DCLDClient:
         list[dict]
             List of revocation points
         '''
+
         if self.use_rest:
             response = requests.get(f"{self.rest_node_url}/dcl/pki/revocation-points/{issuer_subject_key_id}").json()
         else:
@@ -294,8 +295,12 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
         # 5. Validate the certification path containing CRLSignerCertificate.
         crl_signer_issuer_name = base64.b64encode(crl_signer_certificate.issuer.public_bytes()).decode('utf-8')
 
-        crl_signer_authority_key_id = crl_signer_certificate.extensions.get_extension_for_oid(
-            x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier
+        try:
+            crl_signer_authority_key_id = crl_signer_certificate.extensions.get_extension_for_oid(
+                x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier
+        except Exception:
+            logging.warning("CRL Signer AKID not found, continue...")
+            continue
 
         # Convert CRL Signer AKID to colon separated hex
         crl_signer_authority_key_id = crl_signer_authority_key_id.hex().upper()
@@ -407,10 +412,18 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
 
         issuer_name = base64.b64encode(crl_file.issuer.public_bytes()).decode('utf-8')
 
-        revocation_set.append({"type": "revocation_set",
-                               "issuer_subject_key_id": issuer_subject_key_id,
-                               "issuer_name": issuer_name,
-                               "revoked_serial_numbers": serialnumber_list})
+        entry = {
+            "type": "revocation_set",
+            "issuer_subject_key_id": issuer_subject_key_id,
+            "issuer_name": issuer_name,
+            "revoked_serial_numbers": serialnumber_list,
+            "crl_signer_cert": revocation_point["crlSignerCertificate"],
+        }
+
+        if "crlSignerDelegator" in revocation_point:
+            entry["crl_signer_delegator"] = revocation_point["crlSignerDelegator"]
+
+        revocation_set.append(entry)
 
     with open(output, 'w+') as outfile:
         json.dump(revocation_set, outfile, indent=4)
