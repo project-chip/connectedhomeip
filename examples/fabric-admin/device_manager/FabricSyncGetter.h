@@ -25,26 +25,31 @@
 #include <optional>
 
 /**
- * @brief Class used to get UniqueID from Bridged Device Basic Information Cluster
+ * @brief Class used to get FabricSynchronization from SupportedDeviceCategories attribute of Commissioner Control Cluster.
  *
- * When syncing a device from another fabric that does not have a UniqueID, spec
- * dictates:
- *    When a Fabric Synchronizing Administrator commissions a Synchronized Device,
- *    it SHALL persist and maintain an association with the UniqueID in the Bridged
- *    Device Basic Information Cluster exposed by another Fabric Synchronizing
- *    Administrator.
- *
- * This class assists in retrieving the UniqueId in the above situation.
+ * Functionality:
+ *  - Establishes a CASE session to communicate with the remote bridge.
+ *  - Retrieves the attribute data from the endpoint which host Aggregator.
+ *  - Provides callbacks for success, error, and completion when retrieving data.
  */
-class UniqueIdGetter : public chip::app::ReadClient::Callback
+class FabricSyncGetter : public chip::app::ReadClient::Callback
 {
 public:
-    using OnDoneCallback = std::function<void(std::optional<chip::CharSpan>)>;
+    using OnDoneCallback = std::function<void(chip::TLV::TLVReader & data)>;
 
-    UniqueIdGetter();
+    FabricSyncGetter();
 
-    CHIP_ERROR GetUniqueId(OnDoneCallback onDoneCallback, chip::Controller::DeviceController & controller, chip::NodeId nodeId,
-                           chip::EndpointId endpointId);
+    /**
+     * @brief Initiates the process of retrieving fabric synchronization data from the target device.
+     *
+     * @param onDoneCallback A callback function to be invoked when the data retrieval is complete.
+     * @param controller The device controller used to establish a session with the target device.
+     * @param nodeId The Node ID of the target device.
+     * @param endpointId The Endpoint ID from which to retrieve the fabric synchronization data.
+     * @return CHIP_ERROR Returns an error if the process fails, CHIP_NO_ERROR on success.
+     */
+    CHIP_ERROR GetFabricSynchronizationData(OnDoneCallback onDoneCallback, chip::Controller::DeviceController & controller,
+                                            chip::NodeId nodeId, chip::EndpointId endpointId);
 
     ///////////////////////////////////////////////////////////////
     // ReadClient::Callback implementation
@@ -64,12 +69,7 @@ private:
     std::unique_ptr<chip::app::ReadClient> mClient;
 
     OnDoneCallback mOnDoneCallback;
-
+    chip::EndpointId mEndpointId;
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
-
-    bool mCurrentlyGettingUid = false;
-    bool mUniqueIdHasValue    = false;
-    char mUniqueId[33];
-    chip::EndpointId mEndpointId;
 };
