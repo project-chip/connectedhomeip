@@ -31,10 +31,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
-import os
 import random
-import sys
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
