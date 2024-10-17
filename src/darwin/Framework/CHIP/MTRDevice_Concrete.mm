@@ -389,8 +389,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             mtr_weakify(self);
             _systemTimeChangeObserverToken = [[NSNotificationCenter defaultCenter] addObserverForName:NSSystemClockDidChangeNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
                 mtr_strongify(self);
-                std::lock_guard lock(self->_lock);
-                [self _resetStorageBehaviorState];
+                if (self) {
+                    std::lock_guard lock(self->_lock);
+                    [self _resetStorageBehaviorState];
+                }
             }];
         }
 
@@ -760,10 +762,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             mtr_weakify(self);
             [self _scheduleSubscriptionPoolWork:^{
                 mtr_strongify(self);
-                [self->_deviceController asyncDispatchToMatterQueue:^{
-                    std::lock_guard lock(self->_lock);
-                    [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and scheduled subscription is happening", reason]];
-                } errorHandler:nil];
+                if (self) {
+                    [self->_deviceController asyncDispatchToMatterQueue:^{
+                        std::lock_guard lock(self->_lock);
+                        [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and scheduled subscription is happening", reason]];
+                    } errorHandler:nil];
+                }
             } inNanoseconds:0 description:@"MTRDevice setDelegate first subscription"];
         } else {
             [_deviceController asyncDispatchToMatterQueue:^{
@@ -1178,6 +1182,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
             mtr_strongify(self);
+            if (!self) {
+                return;
+            }
+
             MTR_LOG("%@ - work item is ready to attempt pooled subscription", self);
             os_unfair_lock_lock(&self->_lock);
 #ifdef DEBUG
@@ -1257,14 +1265,16 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     mtr_weakify(self);
     auto resubscriptionBlock = ^{
         mtr_strongify(self);
-        [self->_deviceController asyncDispatchToMatterQueue:^{
-            [self _triggerResubscribeWithReason:@"ResubscriptionNeeded timer fired" nodeLikelyReachable:NO];
-        } errorHandler:^(NSError * _Nonnull error) {
-            // If controller is not running, clear work item from the subscription queue
-            MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
-            std::lock_guard lock(self->_lock);
-            [self _clearSubscriptionPoolWork];
-        }];
+        if (self) {
+            [self->_deviceController asyncDispatchToMatterQueue:^{
+                [self _triggerResubscribeWithReason:@"ResubscriptionNeeded timer fired" nodeLikelyReachable:NO];
+            } errorHandler:^(NSError * _Nonnull error) {
+                // If controller is not running, clear work item from the subscription queue
+                MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
+                std::lock_guard lock(self->_lock);
+                [self _clearSubscriptionPoolWork];
+            }];
+        }
     };
 
     int64_t resubscriptionDelayNs = static_cast<int64_t>(resubscriptionDelayMs.unsignedIntValue * NSEC_PER_MSEC);
@@ -1369,11 +1379,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     mtr_weakify(self);
     auto resubscriptionBlock = ^{
         mtr_strongify(self);
-        [self->_deviceController asyncDispatchToMatterQueue:^{
-            std::lock_guard lock(self->_lock);
-            [self _reattemptSubscriptionNowIfNeededWithReason:@"got subscription reset"];
+        if (self) {
+            [self->_deviceController asyncDispatchToMatterQueue:^{
+                std::lock_guard lock(self->_lock);
+                [self _reattemptSubscriptionNowIfNeededWithReason:@"got subscription reset"];
+            }
+                                                   errorHandler:nil];
         }
-                                               errorHandler:nil];
     };
 
     int64_t resubscriptionDelayNs = static_cast<int64_t>(secondsToWait * NSEC_PER_SEC);
