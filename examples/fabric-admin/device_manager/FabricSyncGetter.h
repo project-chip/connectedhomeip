@@ -25,7 +25,7 @@
 #include <optional>
 
 /**
- * @brief Class used to get FabricSynchronization from SupportedDeviceCategories attriburte of Commissioner Control Cluster.
+ * @brief Class used to get FabricSynchronization from SupportedDeviceCategories attribute of Commissioner Control Cluster.
  *
  * Functionality:
  *  - Establishes a CASE session to communicate with the remote bridge.
