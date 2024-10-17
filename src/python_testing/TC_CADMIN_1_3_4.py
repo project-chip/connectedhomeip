@@ -19,7 +19,7 @@
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
 #     factory-reset: true
-#     quiet: false
+#     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
