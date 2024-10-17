@@ -26,15 +26,8 @@ from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from chip.tlv import TLVReader
-from mdns_discovery import mdns_discovery
 from mobly import asserts
 
-# isort: off
-
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(parent_dir)
-
-# isort: on
 
 # Reachable attribute is off in the pics file
 # MaxPathsPerInvoke is not include in the pics file
@@ -64,6 +57,9 @@ class TC_CADMIN_1_4_noreset(MatterBaseTest):
         return th_rcac_decoded
 
     async def get_txt_record(self):
+        parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sys.path.append(parent_dir)
+        from mdns_discovery import mdns_discovery
         discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
         comm_service = await discovery.get_commissionable_service(
             discovery_timeout_sec=240,
