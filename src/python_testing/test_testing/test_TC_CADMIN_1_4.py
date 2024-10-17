@@ -24,7 +24,7 @@ import sys
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from chip.tlv import TLVReader
 from mdns_discovery import mdns_discovery
 from mobly import asserts
@@ -102,14 +102,14 @@ class TC_CADMIN_1_4_nofreset(MatterBaseTest):
         obcCmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
 
-        services = await get_txt_record()
+        services = await self.get_txt_record()
         if services.txt_record['CM'] != "1":
             asserts.fail(f"Expected cm record value not found, instead value found was {str(services.txt_record['CM'])}")
 
         BI_cluster = Clusters.BasicInformation
         nl_attribute = BI_cluster.Attributes.NodeLabel
-        await write_nl_attr(th=self.th1, attr_val=nl_attribute)
-        await read_nl_attr(th=self.th1, attr_val=nl_attribute)
+        await self.write_nl_attr(th=self.th1, attr_val=nl_attribute)
+        await self.read_nl_attr(th=self.th1, attr_val=nl_attribute)
 
         # Establishing TH2
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -120,11 +120,11 @@ class TC_CADMIN_1_4_nofreset(MatterBaseTest):
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=setupPayloadInfo[0].filter_value)
 
         # TH_CR1 reads the Fabrics attribute from the Node Operational Credentials cluster using a fabric-filtered read
-        th1_fabric_info = await get_fabrics(th=self.th1)
+        th1_fabric_info = await self.get_fabrics(th=self.th1)
 
         # Verify that the RootPublicKey matches the root public key for TH_CR1 and the NodeID matches the node ID used when TH_CR1 commissioned the device.
         await self.send_single_cmd(dev_ctrl=self.th1, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(10))
-        th1_rcac_decoded = await get_rcac_decoded(th=self.th1)
+        th1_rcac_decoded = await self.get_rcac_decoded(th=self.th1)
         if th1_fabric_info[0].rootPublicKey != th1_rcac_decoded[9]:
             asserts.fail("public keys from fabric and certs for TH1 are not the same")
         if th1_fabric_info[0].nodeID != self.dut_node_id:
@@ -134,11 +134,11 @@ class TC_CADMIN_1_4_nofreset(MatterBaseTest):
         await self.th1.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
 
         # TH_CR2 reads the Fabrics attribute from the Node Operational Credentials cluster using a fabric-filtered read
-        th2_fabric_info = await get_fabrics(th=self.th2)
+        th2_fabric_info = await self.get_fabrics(th=self.th2)
 
         # Verify that the RootPublicKey matches the root public key for TH_CR2 and the NodeID matches the node ID used when TH_CR2 commissioned the device.
         await self.send_single_cmd(dev_ctrl=self.th2, node_id=self.dut_node_id, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(self.max_window_duration))
-        th2_rcac_decoded = await get_rcac_decoded(th=self.th2)
+        th2_rcac_decoded = await self.get_rcac_decoded(th=self.th2)
         if th2_fabric_info['rootPublicKey'] != th2_rcac_decoded[9]:
             asserts.fail("public keys from fabric and certs for TH2 are not the same")
         if th2_fabric_info['nodeID'] != self.dut_node_id:
@@ -153,7 +153,6 @@ class TC_CADMIN_1_4_nofreset(MatterBaseTest):
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
-
 
 if __name__ == "__main__":
     asyncio.run(default_matter_test_main())
