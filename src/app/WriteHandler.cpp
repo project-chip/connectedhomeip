@@ -44,11 +44,13 @@ namespace app {
 
 namespace {
 
-class AutoReleaseIterator
+/// Wraps a EndpointIterator and ensures that `::Release()` is called
+/// for the iterator (assuming it is non-null)
+class AutoReleaseGroupEndpointIterator
 {
 public:
-    AutoReleaseIterator(Credentials::GroupDataProvider::EndpointIterator * iterator) : mIterator(iterator) {}
-    ~AutoReleaseIterator()
+    AutoReleaseGroupEndpointIterator(Credentials::GroupDataProvider::EndpointIterator * iterator) : mIterator(iterator) {}
+    ~AutoReleaseGroupEndpointIterator()
     {
         if (mIterator != nullptr)
         {
@@ -58,7 +60,6 @@ public:
 
     bool IsNull() const { return mIterator == nullptr; }
     bool Next(Credentials::GroupDataProvider::GroupEndpoint & item) { return mIterator->Next(item); }
-
 private:
     Credentials::GroupDataProvider::EndpointIterator * mIterator;
 };
@@ -480,7 +481,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
                       "Received group attribute write for Group=%u Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
                       groupId, ChipLogValueMEI(dataAttributePath.mClusterId), ChipLogValueMEI(dataAttributePath.mAttributeId));
 
-        AutoReleaseIterator iterator(Credentials::GetGroupDataProvider()->IterateEndpoints(fabric));
+        AutoReleaseGroupEndpointIterator iterator(Credentials::GetGroupDataProvider()->IterateEndpoints(fabric));
         VerifyOrExit(!iterator.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
         bool shouldReportListWriteEnd = ShouldReportListWriteEnd(
