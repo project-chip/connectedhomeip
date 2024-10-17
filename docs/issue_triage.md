@@ -32,9 +32,8 @@ This applies if there is an issue with Home interacting with a device (as
 opposed to an issue with Matter.framework or the SDK that is encountered by code
 actually running on darwin).
 
-General instructions available at
-<https://project-chip.github.io/connectedhomeip-doc/guides/darwin.html#providing-feedback-to-apple>
-(or specifically [here](./guides/darwin.md))
+General instructions available at [here](./guides/darwin.md) in the
+`Providing feedback to Apple` section.
 
 Once a Feedback Assistant ticket is filed, the ticket ID can be sent to Boris
 Zbkarsky to ensure it is noticed by the right people
