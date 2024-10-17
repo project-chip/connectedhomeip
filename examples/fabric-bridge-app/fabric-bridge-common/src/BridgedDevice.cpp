@@ -69,9 +69,9 @@ void BridgedDevice::ReachableChanged(bool reachable)
 {
     EndpointId endpointId = mEndpointId;
     bool reachableChanged = (mReachable != reachable);
-    SetReachable(reachable);
     if (reachableChanged)
     {
+        SetReachable(reachable);
         DeviceLayer::SystemLayer().ScheduleLambda([endpointId]() {
             MatterReportingAttributeChangeCallback(endpointId, app::Clusters::BridgedDeviceBasicInformation::Id,
                                                    app::Clusters::BridgedDeviceBasicInformation::Attributes::Reachable::Id);
