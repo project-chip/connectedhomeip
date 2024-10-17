@@ -302,7 +302,7 @@ public:
      */
     Reader & Skip(size_t len)
     {
-        len = ::chip::min(len, mAvailable);
+        len = std::min(len, mAvailable);
         mReadPtr += len;
         mAvailable = static_cast<size_t>(mAvailable - len);
         return *this;

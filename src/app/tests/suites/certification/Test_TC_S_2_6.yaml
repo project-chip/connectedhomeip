@@ -28,8 +28,15 @@ config:
 tests:
     - label: "Precondition: Commission DUT to TH1"
       verification: |
-          Once DUT reach the  commissionable state send the following command on TH1:
-          pairing onnetwork 1 20202021
+          - DUT should be commissioned onto TH1, TH2, and TH3.
+          - The Scene Table capacity for a given fabric SHALL be less than half (rounded down towards 0) of the Scene Table entries (as indicated in the SceneTableSize attribute).
+          - MaxRemainingCapacity is (SceneTableSize-1)/2.
+          - TH1, TH2, and TH3 should be on separate, distinct fabrics.
+
+          Send the below command in respective DUT
+          ./chip-all-clusters-app
+
+          Once DUT reach the  commissionable state send the following command  ./chip-tool pairing onnetwork 1 20202021 command on TH1.
           Verify the commissioning completed with success on TH(chip-tool) from DUT
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
       disabled: true
@@ -38,7 +45,7 @@ tests:
       verification: |
           Open a commissioning window On TH1(Chiptool)using below command
 
-           pairing open-commissioning-window 1 1 400 2000 3841
+          ./chip-tool pairing open-commissioning-window 1 1 400 2000 3841
 
           Verify the Successfully opened pairing window On TH1(Chiptool)e device
 
@@ -52,7 +59,7 @@ tests:
       verification: |
           Now send the below command for commissionin DUT to TH2 with Manual pairing code generated in TH1 using open commission window
 
-          pairing code 2 36253605617 --commissioner-name beta
+          ./chip-tool pairing code 2 36253605617 --commissioner-name beta
 
           Verify the commissioning completed with success on TH2(chip-tool) from DUT
 
@@ -64,7 +71,7 @@ tests:
       verification: |
           Open a commissioning window On TH1(Chiptool)using below command
 
-           pairing open-commissioning-window 1 1 400 2000 3842
+          ./chip-tool pairing open-commissioning-window 1 1 400 2000 3842
 
           Verify the Successfully opened pairing window On TH1(Chiptool)e device
 
@@ -78,7 +85,7 @@ tests:
       verification: |
           send the below command for commissionin DUT to TH3 with Manual pairing code generated in TH1 using open commission window
 
-          pairing code 3 36545248276 --commissioner-name gamma
+          ./chip-tool pairing code 3 36545248276 --commissioner-name gamma
 
           Verify the commissioning completed with success on TH3(chip-tool) from DUT
 
@@ -91,7 +98,7 @@ tests:
           field set to 0x0000."
       PICS: S.S.C03.Rsp
       verification: |
-          scenesmanagement remove-all-scenes 0x0000 1 1
+          ./chip-tool scenesmanagement remove-all-scenes 0x0000 1 1
 
           Verify the RemoveAllScenesResponse with following fields:
           Status is SUCCESS
@@ -107,7 +114,7 @@ tests:
     - label: "Step 1b: Repeat Step 1a with TH2."
       PICS: S.S.C03.Rsp
       verification: |
-          scenesmanagement remove-all-scenes 0x0000 2 1 --commissioner-name beta
+          ./chip-tool scenesmanagement remove-all-scenes 0x0000 2 1 --commissioner-name beta
 
           Verify the RemoveAllScenesResponse with following fields:
           Status is SUCCESS
@@ -124,7 +131,7 @@ tests:
     - label: "Step 1C: Repeat Step 1a with TH3."
       PICS: S.S.C03.Rsp
       verification: |
-          scenesmanagement remove-all-scenes 0x0000 3 1 --commissioner-name gamma
+          ./chip-tool scenesmanagement remove-all-scenes 0x0000 3 1 --commissioner-name gamma
 
           Verify the RemoveAllScenesResponse with following fields:
           Status is SUCCESS
@@ -140,7 +147,7 @@ tests:
 
     - label: "Step 2a: TH1 reads from the DUT the SceneTableSize attribute"
       verification: |
-          scenesmanagement read scene-table-size 1 1
+          ./chip-tool scenesmanagement read scene-table-size 1 1
 
           Verify the "SceneTableSize" attribute value is SceneTableSize(minimum=16) which is recorded into SceneTableSize on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
@@ -155,7 +162,7 @@ tests:
       verification: |
           Please use Interactive mode to Verify the subscription
           Here the command to enter interactive mode:--
-          interactive start
+          ./chip-tool interactive start
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 
@@ -235,7 +242,7 @@ tests:
 
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
-          interactive start
+          ./chip-tool interactive start
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 
@@ -295,7 +302,7 @@ tests:
       verification: |
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
-          interactive start
+          ./chip-tool interactive start
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 

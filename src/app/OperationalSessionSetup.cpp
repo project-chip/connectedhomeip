@@ -744,7 +744,7 @@ CHIP_ERROR OperationalSessionSetup::ScheduleSessionSetupReattempt(System::Clock:
                   "Our backoff calculation will overflow.");
     System::Clock::Timeout actualTimerDelay = System::Clock::Seconds16(
         static_cast<uint16_t>(CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_INITIAL_DELAY_SECONDS
-                              << min((mAttemptsDone - 1), CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_MAX_BACKOFF)));
+                              << std::min((mAttemptsDone - 1), CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_MAX_BACKOFF)));
     const bool responseWasBusy = mRequestedBusyDelay != System::Clock::kZero;
     if (responseWasBusy)
     {

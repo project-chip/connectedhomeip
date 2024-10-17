@@ -102,7 +102,7 @@ CHIP_ERROR OTAImageHeaderParser::AccumulateAndDecode(ByteSpan & buffer, OTAImage
 
 void OTAImageHeaderParser::Append(ByteSpan & buffer, uint32_t numBytes)
 {
-    numBytes = chip::min(numBytes, static_cast<uint32_t>(buffer.size()));
+    numBytes = std::min(numBytes, static_cast<uint32_t>(buffer.size()));
     memcpy(&mBuffer[mBufferOffset], buffer.data(), numBytes);
     mBufferOffset += numBytes;
     buffer = buffer.SubSpan(numBytes);

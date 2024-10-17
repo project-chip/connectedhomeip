@@ -619,8 +619,9 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindAttributeIndex(const Em
 
 const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const ConcreteClusterPath & path)
 {
-    // cache things
-    if (mPreviouslyFoundCluster.has_value() && (mPreviouslyFoundCluster->path == path))
+    if (mPreviouslyFoundCluster.has_value() && (mPreviouslyFoundCluster->path == path) &&
+        (mEmberMetadataStructureGeneration == emberAfMetadataStructureGeneration()))
+
     {
         return mPreviouslyFoundCluster->cluster;
     }
@@ -628,7 +629,8 @@ const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const Concret
     const EmberAfCluster * cluster = emberAfFindServerCluster(path.mEndpointId, path.mClusterId);
     if (cluster != nullptr)
     {
-        mPreviouslyFoundCluster = std::make_optional<ClusterReference>(path, cluster);
+        mPreviouslyFoundCluster           = std::make_optional<ClusterReference>(path, cluster);
+        mEmberMetadataStructureGeneration = emberAfMetadataStructureGeneration();
     }
     return cluster;
 }

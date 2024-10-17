@@ -65,10 +65,6 @@ extern "C" {
 #include "sl_power_manager.h"
 #endif
 
-#if !defined(MIN)
-#define MIN(A, B) ((A) < (B) ? (A) : (B))
-#endif
-
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
 #define HELPER1(x) EUSART##x##_RX_IRQn
 #else
@@ -278,7 +274,7 @@ static uint16_t RetrieveFromFifo(Fifo_t * fifo, uint8_t * pData, uint16_t SizeTo
     VerifyOrDie(pData != nullptr);
     VerifyOrDie(SizeToRead <= fifo->MaxSize);
 
-    uint16_t ReadSize        = MIN(SizeToRead, AvailableDataCount(fifo));
+    uint16_t ReadSize        = std::min(SizeToRead, AvailableDataCount(fifo));
     uint16_t nBytesBeforWrap = (fifo->MaxSize - fifo->Head);
 
     if (ReadSize > nBytesBeforWrap)

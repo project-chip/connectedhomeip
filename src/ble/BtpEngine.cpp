@@ -274,7 +274,7 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
         // mRxFragmentSize may be smaller than the characteristic size.  Make sure
         // we're not truncating to a data length smaller than what we have already consumed.
         VerifyOrExit(reader.OctetsRead() <= mRxFragmentSize, err = BLE_ERROR_REASSEMBLER_INCORRECT_STATE);
-        data->SetDataLength(chip::min(data->DataLength(), static_cast<size_t>(mRxFragmentSize)));
+        data->SetDataLength(std::min(data->DataLength(), static_cast<size_t>(mRxFragmentSize)));
 
         // Now mark the bytes we consumed as consumed.
         data->ConsumeHead(static_cast<uint16_t>(reader.OctetsRead()));

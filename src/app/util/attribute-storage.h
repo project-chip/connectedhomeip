@@ -312,6 +312,14 @@ void emberAfAttributeChanged(chip::EndpointId endpoint, chip::ClusterId clusterI
 /// any cluster data versions.
 void emberAfEndpointChanged(chip::EndpointId endpoint, chip::app::AttributesChangedListener * listener);
 
+/// Maintains a increasing index of structural changes within ember
+/// that determine if existing "indexes" and metadata pointers within ember
+/// are still valid or not.
+///
+/// Changes to metadata structure (e.g. endpoint enable/disable and dynamic endpoint changes)
+/// are reflected in this generation count changing.
+unsigned emberAfMetadataStructureGeneration();
+
 namespace chip {
 namespace app {
 

@@ -22,8 +22,6 @@
  */
 #include "CHIPFaultInjection.h"
 
-#include <nlassert.h>
-
 #include <string.h>
 
 namespace chip {

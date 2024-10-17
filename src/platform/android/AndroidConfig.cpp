@@ -280,7 +280,7 @@ CHIP_ERROR AndroidConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufS
     }
 
     outLen = static_cast<size_t>(env->GetArrayLength(javaValue));
-    memcpy(buf, elements, min(outLen, bufSize));
+    memcpy(buf, elements, std::min(outLen, bufSize));
 
     env->ReleaseByteArrayElements(javaValue, elements, 0);
 

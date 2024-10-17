@@ -137,6 +137,7 @@ private:
         ClusterReference(const ConcreteClusterPath p, const EmberAfCluster * c) : path(p), cluster(c) {}
     };
     std::optional<ClusterReference> mPreviouslyFoundCluster;
+    unsigned mEmberMetadataStructureGeneration = 0;
 
     /// Finds the specified ember cluster
     ///
