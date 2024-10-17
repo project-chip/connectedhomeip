@@ -28,8 +28,6 @@
 #include "em_usart.h"
 #include "gpiointerrupt.h"
 
-#include "wifi_config.h"
-
 #include "AppConfig.h"
 #include "sl_wfx_board.h"
 #include "sl_wfx_host.h"

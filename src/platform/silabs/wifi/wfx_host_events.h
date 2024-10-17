@@ -331,8 +331,8 @@ void wfx_cancel_scan(void);
 void wfx_started_notify(void);
 void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t * ap);
 void wfx_disconnected_notify(int32_t status);
+
 /* Implemented for LWIP */
-void wfx_host_received_sta_frame_cb(uint8_t * buf, int len);
 void wfx_lwip_set_sta_link_up(void);
 void wfx_lwip_set_sta_link_down(void);
 void wfx_lwip_start(void);

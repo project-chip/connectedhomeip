@@ -26,7 +26,6 @@
 #include "em_usart.h"
 
 #include "wfx_host_events.h"
-#include "wifi_config.h"
 
 #include "dhcp_client.h"
 #include "ethernetif.h"

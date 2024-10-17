@@ -14,36 +14,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include "lwip/err.h"
-#include "lwip/netif.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
-/***************************************************************************
- * @fn  err_t sta_ethernetif_init(struct netif *netif)
- * @brief
- * Sets up the station network interface.
+#include <lwip/err.h>
+#include <lwip/netif.h>
+
+/**
+ * @brief TODO
  *
- * @param netif the lwip network interface structure
- * @returns ERR_OK if successful
- ******************************************************************************/
+ * @param netif
+ * @return err_t
+ */
 err_t sta_ethernetif_init(struct netif * netif);
 
-/***************************************************************************
- * @fn err_t ap_ethernetif_init(struct netif *netif
- * @brief
- * Sets up the AP network interface.
+/**
+ * @brief TODO
  *
- * @param netif the lwip network interface structure
- * @returns ERR_OK if successful
- ******************************************************************************/
-err_t ap_ethernetif_init(struct netif * netif);
-
+ * @param buf
+ * @param len
+ */
 void wfx_host_received_sta_frame_cb(uint8_t * buf, int len);
-
-#ifdef __cplusplus
-}
-#endif

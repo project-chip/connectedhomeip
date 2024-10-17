@@ -21,12 +21,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "wfx_host_events.h"
-#include "wifi_config.h"
+#include "ethernetif.h"
+#include "lwip/ethip6.h"
+#include "lwip/timeouts.h"
+#include "netif/etharp.h"
+#include <cmsis_os2.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <wfx_host_events.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "cmsis_os2.h"
 #include "sl_board_configuration.h"
 #include "sl_net.h"
 #include "sl_si91x_driver.h"
@@ -39,28 +44,19 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-/* LwIP includes. */
-#include "ethernetif.h"
-#include "lwip/ethip6.h"
-#include "lwip/timeouts.h"
-#include "netif/etharp.h"
-#include <lib/support/logging/CHIPLogging.h>
 
-StaticSemaphore_t xEthernetIfSemaBuffer;
-
-/*****************************************************************************
- * Defines
- ******************************************************************************/
 #define STATION_NETIF0 's'
 #define STATION_NETIF1 't'
 
 #define LWIP_FRAME_ALIGNMENT 60
 
+// TODO: Should not be global
 uint32_t gOverrunCount = 0;
 
-/*****************************************************************************
- * Variables
- ******************************************************************************/
+namespace {
+
+StaticSemaphore_t xEthernetIfSemaBuffer;
+SemaphoreHandle_t ethout_sem;
 
 /*****************************************************************************
  * @fn static void low_level_init(struct netif *netif)
@@ -72,14 +68,13 @@ uint32_t gOverrunCount = 0;
  * @return
  *    None
  ******************************************************************************/
-static void low_level_init(struct netif * netif)
+void low_level_init(struct netif * netif)
 {
     /* set netif MAC hardware address length */
     netif->hwaddr_len = ETH_HWADDR_LEN;
 
     /* Set netif MAC hardware address */
     sl_wfx_mac_address_t mac_addr;
-
     wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &mac_addr);
 
     netif->hwaddr[0] = mac_addr.octet[0];
@@ -109,7 +104,7 @@ static void low_level_init(struct netif * netif)
  * @return
  *     None
  ************************************************************************************/
-static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
+void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
 {
     struct pbuf *p, *q;
     uint32_t bufferoffset;
@@ -175,7 +170,6 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
     }
 }
 
-static SemaphoreHandle_t ethout_sem;
 /*****************************************************************************
  *  @fn  static err_t low_level_output(struct netif *netif, struct pbuf *p)
  *  @brief
@@ -189,30 +183,25 @@ static SemaphoreHandle_t ethout_sem;
  * @return
  *    ERR_OK if successful
  ******************************************************************************/
-static err_t low_level_output(struct netif * netif, struct pbuf * p)
+err_t low_level_output(struct netif * netif, struct pbuf * p)
 {
     UNUSED_PARAMETER(netif);
-    sl_status_t status;
-    status = sl_wifi_send_raw_data_frame(SL_WIFI_CLIENT_INTERFACE, (uint8_t *) p->payload, p->len);
-    if (status != SL_STATUS_OK)
-    {
-        return ERR_IF;
-    }
+
+    sl_status_t status = sl_wifi_send_raw_data_frame(SL_WIFI_CLIENT_INTERFACE, (uint8_t *) p->payload, p->len);
+    VerifyOrReturnError(status == SL_STATUS_OK, ERR_IF);
+
     return ERR_OK;
 }
 
-/*****************************************************************************
- *  @fn  void sl_si91x_host_process_data_frame(uint8_t *buf, int len)
- *  @brief
- *    host received frame cb
+} // namespace
+
+/**
+ * @brief TODO : WEAK implementation to receive data
  *
- * @param[in] buf: buffer
- *
- * @param[in] len: length
- *
- * @return
- *    None
- ******************************************************************************/
+ * @param interface
+ * @param buffer
+ * @return sl_status_t
+ */
 sl_status_t sl_si91x_host_process_data_frame(sl_wifi_interface_t interface, sl_wifi_buffer_t * buffer)
 {
     struct pbuf * pbuf_packet;
