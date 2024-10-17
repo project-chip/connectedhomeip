@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <device_manager/BridgeSubscription.h>
+#include <device_manager/FabricSyncGetter.h>
 #include <device_manager/PairingManager.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -212,6 +213,7 @@ private:
     uint64_t mRequestId   = 0;
 
     BridgeSubscription mBridgeSubscriber;
+    FabricSyncGetter mFabricSyncGetter;
 };
 
 /**

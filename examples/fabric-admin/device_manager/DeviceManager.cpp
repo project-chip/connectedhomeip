@@ -212,13 +212,18 @@ void DeviceManager::ReadSupportedDeviceCategories()
         return;
     }
 
-    StringBuilder<kMaxCommandSize> commandBuilder;
+    ChipLogProgress(NotSpecified, "Read SupportedDeviceCategories from the remote bridge.");
 
-    commandBuilder.Add("commissionercontrol read supported-device-categories ");
-    commandBuilder.AddFormat("%ld ", mRemoteBridgeNodeId);
-    commandBuilder.AddFormat("%d", kAggregatorEndpointId);
+    CHIP_ERROR error = mFabricSyncGetter.GetFabricSynchronizationData(
+        [this](TLV::TLVReader & data) { this->HandleReadSupportedDeviceCategories(data); },
+        PairingManager::Instance().CurrentCommissioner(), this->GetRemoteBridgeNodeId(), kAggregatorEndpointId);
 
-    PushCommand(commandBuilder.c_str());
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified,
+                     "Failed to read SupportedDeviceCategories from the remote bridge (NodeId: %lu). Error: %" CHIP_ERROR_FORMAT,
+                     mRemoteBridgeNodeId, error.Format());
+    }
 }
 
 void DeviceManager::HandleReadSupportedDeviceCategories(TLV::TLVReader & data)
@@ -421,13 +426,6 @@ void DeviceManager::HandleReverseOpenCommissioningWindow(TLV::TLVReader & data)
 
 void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & path, TLV::TLVReader & data)
 {
-    if (path.mClusterId == CommissionerControl::Id &&
-        path.mAttributeId == CommissionerControl::Attributes::SupportedDeviceCategories::Id)
-    {
-        HandleReadSupportedDeviceCategories(data);
-        return;
-    }
-
     if (path.mClusterId == Descriptor::Id && path.mAttributeId == Descriptor::Attributes::PartsList::Id)
     {
         HandleAttributePartsListUpdate(data);
