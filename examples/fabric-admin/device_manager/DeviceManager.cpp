@@ -33,9 +33,6 @@ namespace {
 constexpr EndpointId kAggregatorEndpointId = 1;
 constexpr uint16_t kWindowTimeout          = 300;
 constexpr uint16_t kIteration              = 1000;
-constexpr uint16_t kSubscribeMinInterval   = 0;
-constexpr uint16_t kSubscribeMaxInterval   = 60;
-constexpr uint16_t kAggragatorEndpointId   = 1;
 constexpr uint16_t kMaxDiscriminatorLength = 4095;
 
 } // namespace
@@ -193,23 +190,17 @@ void DeviceManager::UnpairLocalFabricBridge()
 
 void DeviceManager::SubscribeRemoteFabricBridge()
 {
-    // Listen to the state changes of the remote fabric bridge.
-    StringBuilder<kMaxCommandSize> commandBuilder;
+    ChipLogProgress(NotSpecified, "Start subscription to the remote bridge.")
 
-    // Prepare and push the descriptor subscribe command
-    commandBuilder.Add("descriptor subscribe parts-list ");
-    commandBuilder.AddFormat("%d %d %lu %d", kSubscribeMinInterval, kSubscribeMaxInterval, mRemoteBridgeNodeId,
-                             kAggragatorEndpointId);
-    PushCommand(commandBuilder.c_str());
+        CHIP_ERROR error = mBridgeSubscriber.StartSubscription(PairingManager::Instance().CurrentCommissioner(),
+                                                               mRemoteBridgeNodeId, kAggregatorEndpointId);
 
-    // Clear the builder for the next command
-    commandBuilder.Reset();
-
-    // Prepare and push the commissioner control subscribe command
-    commandBuilder.Add("commissionercontrol subscribe-event commissioning-request-result ");
-    commandBuilder.AddFormat("%d %d %lu %d --is-urgent true --keepSubscriptions true", kSubscribeMinInterval, kSubscribeMaxInterval,
-                             mRemoteBridgeNodeId, kAggregatorEndpointId);
-    PushCommand(commandBuilder.c_str());
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to subscribe to the remote bridge (NodeId: %lu). Error: %" CHIP_ERROR_FORMAT,
+                     mRemoteBridgeNodeId, error.Format());
+        return;
+    }
 }
 
 void DeviceManager::ReadSupportedDeviceCategories()
@@ -221,13 +212,18 @@ void DeviceManager::ReadSupportedDeviceCategories()
         return;
     }
 
-    StringBuilder<kMaxCommandSize> commandBuilder;
+    ChipLogProgress(NotSpecified, "Read SupportedDeviceCategories from the remote bridge.");
 
-    commandBuilder.Add("commissionercontrol read supported-device-categories ");
-    commandBuilder.AddFormat("%ld ", mRemoteBridgeNodeId);
-    commandBuilder.AddFormat("%d", kAggregatorEndpointId);
+    CHIP_ERROR error = mFabricSyncGetter.GetFabricSynchronizationData(
+        [this](TLV::TLVReader & data) { this->HandleReadSupportedDeviceCategories(data); },
+        PairingManager::Instance().CurrentCommissioner(), this->GetRemoteBridgeNodeId(), kAggregatorEndpointId);
 
-    PushCommand(commandBuilder.c_str());
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified,
+                     "Failed to read SupportedDeviceCategories from the remote bridge (NodeId: %lu). Error: %" CHIP_ERROR_FORMAT,
+                     mRemoteBridgeNodeId, error.Format());
+    }
 }
 
 void DeviceManager::HandleReadSupportedDeviceCategories(TLV::TLVReader & data)
@@ -355,14 +351,6 @@ void DeviceManager::HandleAttributePartsListUpdate(TLV::TLVReader & data)
     {
         // print to console
         fprintf(stderr, "A new device is added on Endpoint: %u\n", endpoint);
-
-        if (mAutoSyncEnabled)
-        {
-            StringBuilder<kMaxCommandSize> commandBuilder;
-            commandBuilder.Add("fabricsync sync-device ");
-            commandBuilder.AddFormat("%d", endpoint);
-            PushCommand(commandBuilder.c_str());
-        }
     }
 
     // Process removed endpoints
@@ -376,19 +364,6 @@ void DeviceManager::HandleAttributePartsListUpdate(TLV::TLVReader & data)
         {
             ChipLogProgress(NotSpecified, "No device on Endpoint: %u", endpoint);
             continue;
-        }
-
-        if (mAutoSyncEnabled)
-        {
-            NodeId nodeId = device->GetNodeId();
-            if (PairingManager::Instance().UnpairDevice(nodeId) != CHIP_NO_ERROR)
-            {
-                ChipLogError(NotSpecified, "Failed to unpair device " ChipLogFormatX64, ChipLogValueX64(nodeId));
-            }
-            else
-            {
-                PairingManager::Instance().SetPairingDelegate(this);
-            }
         }
     }
 }
@@ -430,13 +405,6 @@ void DeviceManager::HandleReverseOpenCommissioningWindow(TLV::TLVReader & data)
 
 void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & path, TLV::TLVReader & data)
 {
-    if (path.mClusterId == CommissionerControl::Id &&
-        path.mAttributeId == CommissionerControl::Attributes::SupportedDeviceCategories::Id)
-    {
-        HandleReadSupportedDeviceCategories(data);
-        return;
-    }
-
     if (path.mClusterId == Descriptor::Id && path.mAttributeId == Descriptor::Attributes::PartsList::Id)
     {
         HandleAttributePartsListUpdate(data);
