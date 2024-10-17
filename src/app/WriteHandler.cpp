@@ -49,7 +49,7 @@ namespace {
 class AutoReleaseGroupEndpointIterator
 {
 public:
-    AutoReleaseGroupEndpointIterator(Credentials::GroupDataProvider::EndpointIterator * iterator) : mIterator(iterator) {}
+    explicit AutoReleaseGroupEndpointIterator(Credentials::GroupDataProvider::EndpointIterator * iterator) : mIterator(iterator) {}
     ~AutoReleaseGroupEndpointIterator()
     {
         if (mIterator != nullptr)
