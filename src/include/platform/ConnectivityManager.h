@@ -36,7 +36,7 @@
 #include <inet/TCPEndPoint.h>
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-#include <transport/raw/WiFiPAF.h>
+#include <wifipaf/WiFiPAFLayer.h>
 #endif
 
 namespace chip {
@@ -185,9 +185,9 @@ public:
     CHIP_ERROR WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
                               OnConnectionErrorFunct onError);
     CHIP_ERROR WiFiPAFCancelConnect();
+    CHIP_ERROR WiFiPAFCancelIncompleteConnect();
     CHIP_ERROR WiFiPAFSend(System::PacketBufferHandle && msgBuf);
-    Transport::WiFiPAFBase * GetWiFiPAF();
-    void SetWiFiPAF(Transport::WiFiPAFBase * pmWiFiPAF);
+    WiFiPAF::WiFiPAFLayer * GetWiFiPAF();
 #endif
 
     // WiFi AP methods
@@ -289,12 +289,15 @@ struct ConnectivityManager::SEDIntervalsConfig
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#define NAN_FREQ_LIST_ALL 0xff
 struct ConnectivityManager::WiFiPAFAdvertiseParam
 {
     /* To enable/disable WiFiPAF Commissioning */
     bool enable;
-    /* The optional commands */
-    const char * ExtCmds;
+
+    /* Frequency list */
+    uint16_t freq_list_len;
+    uint16_t * pfreq_list;
 };
 #endif
 
@@ -454,6 +457,11 @@ inline CHIP_ERROR ConnectivityManager::WiFiPAFCancelConnect()
     return static_cast<ImplClass *>(this)->_WiFiPAFCancelConnect();
 }
 
+inline CHIP_ERROR ConnectivityManager::WiFiPAFCancelIncompleteConnect()
+{
+    return static_cast<ImplClass *>(this)->_WiFiPAFCancelIncompleteConnect();
+}
+
 inline CHIP_ERROR ConnectivityManager::WiFiPAFSend(chip::System::PacketBufferHandle && msgBuf)
 {
     return static_cast<ImplClass *>(this)->_WiFiPAFSend(std::move(msgBuf));
@@ -505,14 +513,9 @@ inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-inline Transport::WiFiPAFBase * ConnectivityManager::GetWiFiPAF()
+inline WiFiPAF::WiFiPAFLayer * ConnectivityManager::GetWiFiPAF()
 {
     return static_cast<ImplClass *>(this)->_GetWiFiPAF();
-}
-
-inline void ConnectivityManager::SetWiFiPAF(Transport::WiFiPAFBase * pWiFiPAF)
-{
-    return static_cast<ImplClass *>(this)->_SetWiFiPAF(pWiFiPAF);
 }
 #endif
 
