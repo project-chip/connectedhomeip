@@ -226,7 +226,8 @@ CHIP_ERROR DeviceSubscription::StartSubscription(OnDoneCallback onDoneCallback, 
 
     mOnDoneCallback = onDoneCallback;
     MoveToState(State::Connecting);
-    CHIP_ERROR err = controller.GetConnectedDevice(scopedNodeId.GetNodeId(), &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err =
+        controller.GetConnectedDevice(scopedNodeId.GetNodeId(), &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         MoveToState(State::Idle);
