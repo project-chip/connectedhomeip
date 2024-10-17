@@ -1,0 +1,4 @@
+zeroconf
+cryptography
+uvicorn
+fastapi
