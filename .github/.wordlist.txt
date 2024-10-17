@@ -1452,6 +1452,8 @@ trackFree
 TransferSession
 transitionTime
 TransportMgrBase
+triaged
+triaging
 TriggerEffect
 TRNG
 trustm
