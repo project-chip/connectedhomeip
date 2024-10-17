@@ -81,7 +81,7 @@ void DeferredAttributePersistenceProvider::FlushAndScheduleNext()
         }
         else
         {
-            nextFlushTime = chip::min(nextFlushTime, da.GetFlushTime());
+            nextFlushTime = std::min(nextFlushTime, da.GetFlushTime());
         }
     }
 

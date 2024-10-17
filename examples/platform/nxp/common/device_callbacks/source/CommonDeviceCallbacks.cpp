@@ -79,7 +79,16 @@ void chip::NXP::App::CommonDeviceCallbacks::DeviceEventCallback(const ChipDevice
     case DeviceEventType::kCommissioningComplete:
         CommonDeviceCallbacks::OnComissioningComplete(event);
         break;
-#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    case DeviceEventType::kThreadConnectivityChange:
+        if (!ConnectivityMgr().IsWiFiStationConnected() && (event->ThreadConnectivityChange.Result == kConnectivity_Established))
+        {
+            // Restart DnsSd service when operating as Matter over Thread
+            chip::app::DnssdServer::Instance().StartServer();
+        }
+        break;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#endif // CHIP_ENABLE_OPENTHREAD
     case DeviceLayer::DeviceEventType::kDnssdInitialized:
         ChipLogProgress(DeviceLayer, "kDnssdInitialized");
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -158,20 +167,13 @@ void chip::NXP::App::CommonDeviceCallbacks::OnSessionEstablished(chip::DeviceLay
 #if CHIP_ENABLE_OPENTHREAD
 void chip::NXP::App::CommonDeviceCallbacks::OnComissioningComplete(const chip::DeviceLayer::ChipDeviceEvent * event)
 {
-#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    if (ConnectivityMgr().IsWiFiStationConnected())
-    {
-        // Disable thr nwk commissioining cluster
-        app::Clusters::NetworkCommissioning::Attributes::InterfaceEnabled::Set(CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID, 0);
-    }
-    else if (ConnectivityMgr().IsThreadProvisioned())
+    if (!ConnectivityMgr().IsWiFiStationConnected() && ConnectivityMgr().IsThreadProvisioned())
     {
         // Set WIFI cluster interface attribute to disable.
         app::Clusters::NetworkCommissioning::Attributes::InterfaceEnabled::Set(0, 0);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-#endif // _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
 
 #if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
     /*

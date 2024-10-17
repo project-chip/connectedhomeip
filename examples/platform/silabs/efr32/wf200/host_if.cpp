@@ -736,7 +736,7 @@ int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
     int32_t signal_strength;
 
-    ap->ssid_length = strnlen(ap_info.ssid, chip::min<size_t>(sizeof(ap_info.ssid), WFX_MAX_SSID_LENGTH));
+    ap->ssid_length = strnlen(ap_info.ssid, std::min<size_t>(sizeof(ap_info.ssid), WFX_MAX_SSID_LENGTH));
     chip::Platform::CopyString(ap->ssid, ap->ssid_length, ap_info.ssid);
     memcpy(ap->bssid, ap_info.bssid, sizeof(ap_info.bssid));
     ap->security = ap_info.security;

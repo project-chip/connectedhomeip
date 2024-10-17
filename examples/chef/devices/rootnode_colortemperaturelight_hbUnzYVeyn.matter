@@ -2300,7 +2300,7 @@ endpoint 1 {
   }
 
   server cluster LevelControl {
-    persist  attribute currentLevel default = 0x00;
+    persist  attribute currentLevel default = 0xFE;
     ram      attribute remainingTime default = 0x0000;
     ram      attribute minLevel default = 0x1;
     ram      attribute maxLevel default = 0xFE;

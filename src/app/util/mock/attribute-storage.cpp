@@ -61,8 +61,9 @@ using namespace Clusters::Globals::Attributes;
 
 namespace {
 
-DataVersion dataVersion           = 0;
-const MockNodeConfig * mockConfig = nullptr;
+unsigned metadataStructureGeneration = 0;
+DataVersion dataVersion              = 0;
+const MockNodeConfig * mockConfig    = nullptr;
 
 const MockNodeConfig & DefaultMockNodeConfig()
 {
@@ -342,6 +343,11 @@ void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, Attribute
     listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
 }
 
+unsigned emberAfMetadataStructureGeneration()
+{
+    return metadataStructureGeneration;
+}
+
 namespace chip {
 namespace app {
 
@@ -494,12 +500,14 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
 
 void SetMockNodeConfig(const MockNodeConfig & config)
 {
+    metadataStructureGeneration++;
     mockConfig = &config;
 }
 
 /// Resets the mock attribute storage to the default configuration.
 void ResetMockNodeConfig()
 {
+    metadataStructureGeneration++;
     mockConfig = nullptr;
 }
 

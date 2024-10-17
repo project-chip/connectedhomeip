@@ -33,15 +33,25 @@ namespace Dnssd {
 
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
-    NxpChipDnssdInit(initCallback, errorCallback, context);
-    OpenThreadDnssdInit(initCallback, errorCallback, context);
+    if (ConnectivityMgr().IsWiFiStationConnected())
+    {
+        ReturnErrorOnFailure(NxpChipDnssdInit(initCallback, errorCallback, context));
+    }
+    else if (ConnectivityMgr().IsThreadProvisioned())
+    {
+        ReturnErrorOnFailure(OpenThreadDnssdInit(initCallback, errorCallback, context));
+    }
+    else
+    {
+        initCallback(context, CHIP_ERROR_INCORRECT_STATE);
+    }
 
     return CHIP_NO_ERROR;
 }
 
 void ChipDnssdShutdown()
 {
-    NxpChipDnssdShutdown();
+    // Empty implementation. Intentionally left blank
 }
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
