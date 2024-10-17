@@ -16,6 +16,8 @@
 #    limitations under the License.
 #
 
+from mobly import asserts
+from mdns_discovery import mdns_discovery
 import asyncio
 import os
 import random
@@ -31,10 +33,8 @@ from chip.tlv import TLVReader
 
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
-from mdns_discovery import mdns_discovery
 
 # isort: on
-from mobly import asserts
 
 # Reachable attribute is off in the pics file
 # MaxPathsPerInvoke is not include in the pics file
