@@ -77,7 +77,7 @@ MTR_DIRECT_MEMBERS
     CHIP_ERROR err = ExtractPublicKeyFromChipCert(AsByteSpan(_bytes), publicKeySpan);
 
     if ( err != CHIP_NO_ERROR ) return nil;
-    
+
     return AsData(publicKeySpan);
 }
 
