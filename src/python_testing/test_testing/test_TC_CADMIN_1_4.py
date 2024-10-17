@@ -16,6 +16,7 @@
 #    limitations under the License.
 #
 
+from mdns_discovery import mdns_discovery
 import asyncio
 import os
 import random
@@ -33,7 +34,6 @@ from mobly import asserts
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
 
-from mdns_discovery import mdns_discovery
 
 # isort: on
 
