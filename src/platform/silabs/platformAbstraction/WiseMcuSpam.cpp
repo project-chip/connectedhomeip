@@ -36,7 +36,7 @@ extern "C" {
 #include "sl_event_handler.h"
 #include "sl_si91x_button.h"
 #include "sl_si91x_button_pin_config.h"
-#ifndef SI917_DEVKIT
+#ifndef RGB_LED_ENABLED
 #include "sl_si91x_led.h"
 #include "sl_si91x_led_config.h"
 #include "sl_si91x_led_instances.h"
@@ -59,9 +59,10 @@ void soc_pll_config(void);
 #include "uart.h"
 #endif
 // TODO Remove this when SI91X-16606 is addressed
-#ifdef SI917_DEVKIT
-#define SL_LED_COUNT 1
-// uint8_t ledPinArray[SL_LED_COUNT] = {SL_LED_LEDB_PIN};
+#ifdef RGB_LED_ENABLED
+#define SL_LED_COUNT SL_SI91X_RGB_LED_COUNT
+const sl_rgb_led_t * ledPinArray[SL_LED_COUNT] = { &led_led0 };
+#define SL_RGB_LED_INSTANCE(n) (ledPinArray[n])
 #else
 #define SL_LED_COUNT SL_SI91x_LED_COUNT
 uint8_t ledPinArray[SL_LED_COUNT] = { SL_LED_LED0_PIN, SL_LED_LED1_PIN };
@@ -121,7 +122,7 @@ CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led)
 #ifndef RGB_LED_ENABLED
     (state) ? sl_si91x_led_set(ledPinArray[led]) : sl_si91x_led_clear(ledPinArray[led]);
 #else
-    (state) ? sl_si91x_simple_rgb_led_on(&led_led0) : sl_si91x_simple_rgb_led_off(&led_led0);
+    (state) ? sl_si91x_simple_rgb_led_on(SL_RGB_LED_INSTANCE(led)) : sl_si91x_simple_rgb_led_off(SL_RGB_LED_INSTANCE(led));
 #endif
     return CHIP_NO_ERROR;
 }
@@ -138,7 +139,7 @@ CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
 #ifndef RGB_LED_ENABLED
     sl_si91x_led_toggle(ledPinArray[led]);
 #else
-    sl_si91x_simple_rgb_led_toggle(&led_led0);
+    sl_si91x_simple_rgb_led_toggle(SL_RGB_LED_INSTANCE(led));
 #endif
     return CHIP_NO_ERROR;
 }
