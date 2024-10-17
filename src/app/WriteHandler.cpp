@@ -60,6 +60,7 @@ public:
 
     bool IsNull() const { return mIterator == nullptr; }
     bool Next(Credentials::GroupDataProvider::GroupEndpoint & item) { return mIterator->Next(item); }
+
 private:
     Credentials::GroupDataProvider::EndpointIterator * mIterator;
 };
