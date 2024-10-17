@@ -419,7 +419,8 @@ void DeviceManager::HandleReverseOpenCommissioningWindow(TLV::TLVReader & data)
 
 void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & path, TLV::TLVReader & data)
 {
-    if (path.mClusterId == Descriptor::Id && path.mAttributeId == Descriptor::Attributes::PartsList::Id)
+    if (path.mClusterId == app::Clusters::Descriptor::Id &&
+        path.mAttributeId == app::Clusters::Descriptor::Attributes::PartsList::Id)
     {
         HandleAttributePartsListUpdate(data);
         return;
