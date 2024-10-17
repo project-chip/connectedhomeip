@@ -21,6 +21,9 @@ import os
 import random
 import sys
 
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
+
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
@@ -28,10 +31,6 @@ from chip.testing.matter_testing import MatterBaseTest, async_test_body, default
 from chip.tlv import TLVReader
 from mdns_discovery import mdns_discovery
 from mobly import asserts
-
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(parent_dir)
-
 
 # Reachable attribute is off in the pics file
 # MaxPathsPerInvoke is not include in the pics file
