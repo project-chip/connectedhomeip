@@ -94,7 +94,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 
 #pragma mark - XPC
 @synthesize controllerNodeID = _controllerNodeID;
-@synthesize isRunning = _isRunning;
 
 + (NSMutableSet *)_allowedClasses
 {
@@ -454,10 +453,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
     if (controllerNodeID && [controllerNodeID isKindOfClass:[NSNumber class]]) {
         _controllerNodeID = controllerContext[MTRDeviceControllerRegistrationControllerNodeIDKey];
     }
-    NSNumber * isRunning = controllerContext[MTRDeviceControllerRegistrationControllerIsRunningKey];
-    if (isRunning && [isRunning isKindOfClass:[NSNumber class]]) {
-        _isRunning = isRunning.boolValue;
-    }
 
     NSArray * deviceInfoList = configuration[MTRDeviceControllerRegistrationNodeIDsKey];
 
@@ -485,6 +480,13 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
         MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
         [device device:nodeID internalStateUpdated:deviceInternalState];
     }
+}
+
+// TODO: Create DeviceControllerRunningState that is a tri-state with "unknown", "not running", and "running" states
+- (BOOL)isRunning
+{
+    // For XPC controller, always return yes
+    return YES;
 }
 
 // Not Supported via XPC

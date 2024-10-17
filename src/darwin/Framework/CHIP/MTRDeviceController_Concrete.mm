@@ -488,12 +488,6 @@ using namespace chip::Tracing::DarwinFramework;
         if (_operationalCredentialsDelegate != nil) {
             _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
         }
-
-        [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
-            if ([delegate respondsToSelector:@selector(controller:isRunningChangedTo:)]) {
-                [delegate controller:self isRunningChangedTo:NO];
-            }
-        } logString:__PRETTY_FUNCTION__];
     }
 
     if (!self.suspended) {
@@ -753,12 +747,6 @@ using namespace chip::Tracing::DarwinFramework;
         self->_deviceControllerDelegateBridge->setDelegate(self, selfDelegate, _chipWorkQueue);
 
         MTR_LOG("%@ startup succeeded for nodeID 0x%016llX", self, self->_cppCommissioner->GetNodeId());
-
-        [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
-            if ([delegate respondsToSelector:@selector(controller:isRunningChangedTo:)]) {
-                [delegate controller:self isRunningChangedTo:YES];
-            }
-        } logString:__PRETTY_FUNCTION__];
     });
 
     if (commissionerInitialized == NO) {

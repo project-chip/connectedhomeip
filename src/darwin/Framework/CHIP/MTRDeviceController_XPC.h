@@ -28,7 +28,6 @@ MTR_TESTABLE
 #endif
 
     @property(nullable, atomic, retain, readwrite)NSXPCConnection * xpcConnection;
-@property (atomic, readonly) BOOL isRunning;
 
 @end
 
