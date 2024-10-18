@@ -1485,11 +1485,12 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @brief The maximum number of clusters per scene, defaults to 3 for a typical usecase (onOff + level control + color control
- * cluster). Needs to be changed in case a greater number of clusters is chosen.
+ * @brief The maximum number of clusters per scene, we recommend using 4 for a typical use case (onOff + level control + color
+ * control cluster + mode selec cluster). Needs to be changed in case a greater number of clusters is chosen. In the event the
+ * device does not need to support the mode select cluster, the maximum number of clusters per scene should be set to 3.
  */
 #ifndef CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE
-#define CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE 3
+#define CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE 4
 #endif
 
 /**
@@ -1665,6 +1666,22 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
 #define CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC 2
+#endif
+
+/**
+ * @def CHIP_CONFIG_CRYPTO_PSA_ICD_MAX_CLIENTS
+ *
+ * @brief
+ *   Maximum number of ICD clients. Based on this number, platforms that utilize the
+ *   PSA Crypto API should reserve key slot range.
+ *
+ * @note
+ *   For platforms that utilize the PSA Crypto API, this configuration is used to
+ *   compute the number of PSA key slots. It should remain unchanged during the device's lifetime,
+ *   as alterations may lead to issues with backwards compatibility.
+ */
+#ifndef CHIP_CONFIG_CRYPTO_PSA_ICD_MAX_CLIENTS
+#define CHIP_CONFIG_CRYPTO_PSA_ICD_MAX_CLIENTS 256
 #endif
 
 /**

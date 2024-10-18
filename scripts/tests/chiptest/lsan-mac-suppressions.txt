@@ -20,6 +20,7 @@ leak:drbg_ctr_init
 leak:rand_pool_new
 leak:RAND_priv_bytes
 leak:drbg_bytes
+leak:RAND_bytes
 
 # TODO: OpenSSL ERR_get_state seems to leak.
 leak:ERR_get_state
@@ -46,3 +47,29 @@ leak:nw_path_monitor_create
 
 # TODO: See the previous comment about nw_path_monitor_create, since it also applies to nw_path_monitor_start
 leak:nw_path_monitor_start
+
+# TODO: The nw_path_monitor bits no longer show up in the stack with a nice
+# name (show up as <unknown module>), but they are still leaking.  List the part
+# of the stack that _does_ appear.
+leak:HostNameRegistrar::Register
+
+# TODO: What is LI_get_thread_info?  Seems like some sort of thread-local storage?
+leak:LI_get_thread_info
+
+# TODO: What is __CFTSDGetTable?  It's called from a bunch of <unknown module>
+# stuff, unfortunately, so it's the only thing from those stacks we can list
+# here.
+leak:__CFTSDGetTable
+
+# TODO: Why is LSAN treating AutoreleasePoolPage::autoreleaseNoPage as a leak?
+leak:AutoreleasePoolPage::autoreleaseNoPage
+
+# TODO: What is _fetchInitializingClassList and why does LSAN think it's
+# leaking? Everything higher on the stack is <unknown module>.
+leak:_fetchInitializingClassList
+
+# TLS storage
+leak:CRYPTO_set_thread_local
+
+# Not our leak, clearly:
+leak:CFXNotificationRegistrarFind

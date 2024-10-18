@@ -23,6 +23,8 @@
  */
 
 #pragma once
+#include <cmsis_os2.h>
+#include <sl_cmsis_os2_common.h>
 
 // ==================== Platform Adaptations ====================
 
@@ -129,6 +131,10 @@
 
 // ========== Platform-specific Configuration Overrides =========
 
+#ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY osPriorityHigh
+#endif
+
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
 #if SLI_SI91X_MCU_INTERFACE
 #define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (7 * 1024)
@@ -155,7 +161,7 @@
 
 #define CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE 25
 
-#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING SL_MATTER_BLE_EXTENDED_ADV
+#define CHIP_DEVICE_CONFIG_EXT_ADVERTISING SL_MATTER_BLE_EXTENDED_ADV
 
 /*
     ICD Configuration Defines

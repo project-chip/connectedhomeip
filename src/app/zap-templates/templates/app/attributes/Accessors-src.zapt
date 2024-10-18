@@ -36,7 +36,7 @@ namespace {{asUpperCamelCase label}} {
 {{#*inline "clusterId"}}Clusters::{{asUpperCamelCase parent.label}}::Id{{/inline}}
 {{#*inline "sizingBytes"}}{{#if (isShortString type)}}1{{else}}2{{/if}}{{/inline}}
 
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, {{accessorGetterType this}} value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, {{accessorGetterType this}} value)
 {
     {{~#if (isString type)}}
     {{#if isNullable}}
@@ -109,7 +109,13 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, {{accessorGet
       Encoding::LittleEndian::Put16(zclString, length);
     {{/if}}
     memcpy(&zclString[{{>sizingBytes}}], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE{{#if passMarkDirty}}, markDirty{{/if}});
+    {{#if passMarkDirty}}
+    return emberAfWriteAttribute(
+      ConcreteAttributePath(endpoint, {{>clusterId}}, Id),
+      EmberAfWriteDataInput(zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+    {{else}}
+    return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE);
+    {{/if}}
     {{else}}
     using Traits = NumericAttributeTraits<{{accessorTraitType type}}>;
     if (!Traits::CanRepresentValue(/* isNullable = */ {{isNullable}}, value))
@@ -119,16 +125,22 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, {{accessorGet
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, writable, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE{{#if passMarkDirty}}, markDirty{{/if}});
+    {{#if passMarkDirty}}
+    return emberAfWriteAttribute(
+      ConcreteAttributePath(endpoint, {{>clusterId}}, Id),
+      EmberAfWriteDataInput(writable, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+    {{else}}
+    return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, writable, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE);
+    {{/if}}
     {{/if}}
 {{/inline}}
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value, MarkAttributeDirty markDirty)
 {
     {{> setBody passMarkDirty=true}}
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value)
 {
     {{> setBody passMarkDirty=false}}
 }
@@ -138,27 +150,39 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEn
 {{#*inline "setNullBody"}}
     {{#if (isString type)}}
     uint8_t zclString[{{>sizingBytes}}] = { {{#if (isShortString type)}}0xFF{{else}}0xFF, 0xFF{{/if}} };
-    return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE{{#if passMarkDirty}}, markDirty{{/if}});
+    {{#if passMarkDirty}}
+    return emberAfWriteAttribute(
+        ConcreteAttributePath(endpoint, {{>clusterId}}, Id),
+        EmberAfWriteDataInput(zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+    {{else}}
+    return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE);
+    {{/if}}
     {{else}}
     using Traits = NumericAttributeTraits<{{accessorTraitType type}}>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, writable, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE{{#if passMarkDirty}}, markDirty{{/if}});
+    {{#if passMarkDirty}}
+    return emberAfWriteAttribute(
+        ConcreteAttributePath(endpoint, {{>clusterId}}, Id),
+        EmberAfWriteDataInput(writable, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+    {{else}}
+    return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, writable, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE);
+    {{/if}}
     {{/if}}
 {{/inline}}
 
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
 {
     {{> setNullBody passMarkDirty=true}}
 }
 
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
 {
     {{> setNullBody passMarkDirty=false}}
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value, MarkAttributeDirty markDirty)
 {
   if (value.IsNull()) {
     return SetNull(endpoint, markDirty);
@@ -167,7 +191,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEn
   return Set(endpoint, value.Value(), markDirty);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value)
 {
   if (value.IsNull()) {
     return SetNull(endpoint);

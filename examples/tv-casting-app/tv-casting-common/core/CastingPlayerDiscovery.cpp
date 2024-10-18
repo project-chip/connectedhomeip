@@ -25,7 +25,6 @@ namespace core {
 using namespace chip::System;
 using namespace chip::Controller;
 using namespace chip::Dnssd;
-using namespace std;
 
 CastingPlayerDiscovery * CastingPlayerDiscovery::_castingPlayerDiscovery = nullptr;
 

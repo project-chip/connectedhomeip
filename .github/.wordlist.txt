@@ -453,6 +453,7 @@ dpkg
 dropdown
 dryrun
 DS
+DSLS
 duplicative
 DUT
 DUTS
@@ -461,6 +462,7 @@ DV
 DVK
 dynload
 eabi
+EAF
 EB
 ECC
 ECD
@@ -551,6 +553,7 @@ feff
 ffaa
 ffeebaefa
 FFF
+FFFFFFFFFFFF0102
 fffe
 fffff
 Fi
@@ -572,6 +575,7 @@ fsync
 ftd
 fullclean
 fuzzer
+fuzzers
 fuzztest
 FW
 gbl
@@ -731,6 +735,7 @@ isUpperCase
 itemName
 iterable
 itsfoss
+IW
 JDK
 jinja
 JLink
@@ -889,6 +894,7 @@ microcontroller
 microcontrollers
 MicroSD
 middleware
+MIMXRT
 minApplicableSoftwareVersion
 Minicom
 MinInterval
@@ -920,6 +926,7 @@ Multicast
 multilib
 Multiprotocol
 multithreaded
+Murata
 mutex
 mutexes
 mv
@@ -1002,6 +1009,7 @@ OpenThreadDemo
 openweave
 OperationalCredentials
 operationalDataset
+operationalstate
 opkg
 OPTIGA
 optionMask
@@ -1447,6 +1455,8 @@ trackFree
 TransferSession
 transitionTime
 TransportMgrBase
+triaged
+triaging
 TriggerEffect
 TRNG
 trustm
@@ -1599,6 +1609,7 @@ xFFF
 xFFFF
 xfffff
 xFFFFFFEFFFFFFFFF
+XMLPICSValidator
 xtensa
 xvzf
 xwayland
@@ -1625,3 +1636,5 @@ zhengyaohan
 Zigbee
 zigbeealliance
 zigbeethread
+zsdk
+TBR

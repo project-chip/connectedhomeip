@@ -16,8 +16,9 @@ name: Darwin
 
 on:
     push:
-        branches-ignore:
-            - "dependabot/**"
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
     workflow_dispatch:
@@ -105,15 +106,13 @@ jobs:
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug/ota-requestor-app chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0
             - name: Run Framework Tests
-              # For now disable unguarded-availability-new warnings because we
-              # internally use APIs that we are annotating as only available on
-              # new enough versions.  Maybe we should change out deployment
-              # target versions instead?
+              # We want to ensure that our log upload runs on timeout, so use a timeout here shorter
+              # than the 6-hour overall job timeout.  4.5 hours should be plenty.
+              timeout-minutes: 270
               working-directory: src/darwin/Framework
               run: |
                   mkdir -p /tmp/darwin/framework-tests
-                  echo "This is a simple log" > /tmp/darwin/framework-tests/end_user_support_log.txt
-                  ../../../out/debug/all-clusters-app/chip-all-clusters-app --interface-id -1 --end_user_support_log /tmp/darwin/framework-tests/end_user_support_log.txt > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
+                  ../../../out/debug/all-clusters-app/chip-all-clusters-app --interface-id -1 > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
 
                   export TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1
 

@@ -41,13 +41,14 @@ operation by corrupting packages and OTA will not work.
 
 The user actions are summarized below:
 
-| button | action      | state                        | output                                                                                                                                 |
-| ------ | ----------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| SW2    | short press | not commissioned             | Enable BLE advertising                                                                                                                 |
-| SW2    | short press | commissioned + device is LIT | Enable Active Mode                                                                                                                     |
-| SW2    | long press  | NA                           | Initiate a factory reset (can be cancelled by pressing the button again within the factory reset timeout limit - 6 seconds by default) |
-| SW3    | short press | NA                           | Toggle attribute `StateValue` value                                                                                                    |
-| SW3    | long press  | NA                           | Clean soft reset of the device (takes into account proper Matter shutdown procedure)                                                   |
+| button | action       | state                                        | output                                                                                                                                 |
+| ------ | ------------ | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| SW2    | short press  | not commissioned                             | Enable BLE advertising                                                                                                                 |
+| SW2    | short press  | commissioned + device is LIT                 | Enable Active Mode                                                                                                                     |
+| SW2    | double press | commissioned + device is LIT + supports DSLS | Enable / Disable SIT Mode                                                                                                              |
+| SW2    | long press   | NA                                           | Initiate a factory reset (can be cancelled by pressing the button again within the factory reset timeout limit - 6 seconds by default) |
+| SW3    | short press  | NA                                           | Toggle attribute `StateValue` value                                                                                                    |
+| SW3    | long press   | NA                                           | Clean soft reset of the device (takes into account proper Matter shutdown procedure)                                                   |
 
 ## Building
 
@@ -164,4 +165,4 @@ Run -> Debug Configurations... -> C/C++ Application
 ## OTA
 
 Please see
-[k32w1 OTA guide](../../../../docs/guides/nxp/nxp_mcxw71_ota_guide.md).
+[k32w1 OTA guide](../../../../docs/platforms/nxp/nxp_mcxw71_ota_guide.md).

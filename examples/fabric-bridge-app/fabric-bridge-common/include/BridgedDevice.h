@@ -49,11 +49,14 @@ public:
         std::optional<chip::VendorId> openerVendorId       = std::nullopt;
     };
 
-    BridgedDevice(chip::NodeId nodeId);
+    BridgedDevice(chip::ScopedNodeId scopedNodeId);
     virtual ~BridgedDevice() = default;
 
     [[nodiscard]] bool IsReachable() const { return mReachable; }
     void SetReachable(bool reachable);
+    // Reachability attribute changed and requires marking attribute as dirty and sending
+    // event.
+    void ReachableChanged(bool reachable);
 
     void LogActiveChangeEvent(uint32_t promisedActiveDurationMs);
 
@@ -62,7 +65,7 @@ public:
 
     inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
     inline chip::EndpointId GetEndpointId() { return mEndpointId; };
-    inline chip::NodeId GetNodeId() { return mNodeId; };
+    inline chip::ScopedNodeId GetScopedNodeId() { return mScopedNodeId; };
     inline void SetParentEndpointId(chip::EndpointId id) { mParentEndpointId = id; };
     inline chip::EndpointId GetParentEndpointId() { return mParentEndpointId; };
 
@@ -80,7 +83,7 @@ protected:
     bool mReachable = false;
     bool mIsIcd     = false;
 
-    chip::NodeId mNodeId               = 0;
+    chip::ScopedNodeId mScopedNodeId;
     chip::EndpointId mEndpointId       = 0;
     chip::EndpointId mParentEndpointId = 0;
 

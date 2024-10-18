@@ -238,8 +238,9 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t
     appDescription = esp_ota_get_app_description();
 #endif
 
-    ReturnErrorCodeIf(bufSize < sizeof(appDescription->version), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(sizeof(appDescription->version) > ConfigurationManager::kMaxSoftwareVersionStringLength, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(bufSize >= sizeof(appDescription->version), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(sizeof(appDescription->version) <= ConfigurationManager::kMaxSoftwareVersionStringLength,
+                        CHIP_ERROR_INTERNAL);
     strcpy(buf, appDescription->version);
     return CHIP_NO_ERROR;
 }
@@ -267,6 +268,23 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
     location       = static_cast<uint8_t>(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
     return CHIP_NO_ERROR;
 #endif // CONFIG_ENABLE_ESP32_LOCATIONCAPABILITY
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetDeviceTypeId(uint32_t & deviceType)
+{
+    uint32_t value = 0;
+    CHIP_ERROR err = ReadConfigValue(ESP32Config::kConfigKey_PrimaryDeviceType, value);
+
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        deviceType = CHIP_DEVICE_CONFIG_DEVICE_TYPE;
+    }
+    else
+    {
+        deviceType = value;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreCountryCode(const char * code, size_t codeLen)

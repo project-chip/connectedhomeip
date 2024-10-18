@@ -3,7 +3,7 @@
 A prototype application that demonstrates OTA provider capabilities.
 
 Please
-[setup ESP-IDF and CHIP Environment](../../../docs/guides/esp32/setup_idf_chip.md)
+[setup ESP-IDF and CHIP Environment](../../../docs/platforms/esp32/setup_idf_chip.md)
 
 ---
 
@@ -16,7 +16,7 @@ Please
 ### Building and Commissioning
 
 Generate the OTA image as described
-[here](../../../docs/guides/esp32/ota.md#generate-chip-ota-image)
+[here](../../../docs/platforms/esp32/ota.md#generate-chip-ota-image)
 
 #### Configure OTA image to serve
 
@@ -36,7 +36,7 @@ Generate the OTA image as described
     terminator.
 
 Follow
-[ESP32 Application Usage Guide](../../../docs/guides/esp32/build_app_and_commission.md)
+[ESP32 Application Usage Guide](../../../docs/platforms/esp32/build_app_and_commission.md)
 to Build, Flash, Monitor, and Commission the device.
 
 Once device is commissioned successfully, then please try below steps.

@@ -23,6 +23,7 @@
  *
  */
 
+#include <algorithm>
 #include <limits>
 #include <stdint.h>
 #include <stdio.h>
@@ -57,8 +58,8 @@ char * IPAddress::ToString(char * buf, uint32_t bufSize) const
     // socklen_t is sometimes signed, sometimes not, so the only safe way to do
     // this is to promote everything to an unsigned type that's known to be big
     // enough for everything, then cast back to uint32_t after taking the min.
-    bufSize =
-        static_cast<uint32_t>(min(static_cast<uintmax_t>(std::numeric_limits<socklen_t>::max()), static_cast<uintmax_t>(bufSize)));
+    bufSize = static_cast<uint32_t>(
+        std::min(static_cast<uintmax_t>(std::numeric_limits<socklen_t>::max()), static_cast<uintmax_t>(bufSize)));
 #if INET_CONFIG_ENABLE_IPV4
     if (IsIPv4())
     {

@@ -105,11 +105,11 @@ extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism()
     {
         chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
         buffer.Calloc(FactoryDataProvider::kFactoryDataSize);
-        ReturnErrorCodeIf(buffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(buffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
         auto status = PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void *) buffer.Get(),
                                               FactoryDataProvider::kFactoryDataSize, &backupLength);
-        ReturnErrorCodeIf(PDM_E_STATUS_OK != status, CHIP_FACTORY_DATA_PDM_RESTORE);
+        VerifyOrReturnError(PDM_E_STATUS_OK == status, CHIP_FACTORY_DATA_PDM_RESTORE);
 
         error = FactoryDataProviderImpl::UpdateData(buffer.Get());
         if (error == CHIP_NO_ERROR)
@@ -157,11 +157,11 @@ CHIP_ERROR FactoryDataProviderImpl::UpdateData(uint8_t * pBuf)
     NV_Init();
 
     auto status = NV_FlashEraseSector(kFactoryDataStart, kFactoryDataSize);
-    ReturnErrorCodeIf(status != kStatus_FLASH_Success, CHIP_FACTORY_DATA_FLASH_ERASE);
+    VerifyOrReturnError(status == kStatus_FLASH_Success, CHIP_FACTORY_DATA_FLASH_ERASE);
 
     Header * header = (Header *) pBuf;
     status          = NV_FlashProgramUnaligned(kFactoryDataStart, sizeof(Header) + header->size, pBuf);
-    ReturnErrorCodeIf(status != kStatus_FLASH_Success, CHIP_FACTORY_DATA_FLASH_PROGRAM);
+    VerifyOrReturnError(status == kStatus_FLASH_Success, CHIP_FACTORY_DATA_FLASH_PROGRAM);
 
     return CHIP_NO_ERROR;
 }

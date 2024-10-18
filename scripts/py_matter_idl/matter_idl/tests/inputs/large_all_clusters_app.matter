@@ -269,13 +269,6 @@ server cluster OnOff = 6 {
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 
-server cluster OnOffSwitchConfiguration = 7 {
-  readonly attribute enum8 switchType = 0;
-  attribute enum8 switchActions = 16;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 server cluster LevelControl = 8 {
   enum MoveMode : ENUM8 {
     kUp = 0;
@@ -2460,22 +2453,6 @@ server cluster WindowCovering = 258 {
   command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
 }
 
-server cluster BarrierControl = 259 {
-  readonly attribute enum8 barrierMovingState = 1;
-  readonly attribute bitmap16 barrierSafetyStatus = 2;
-  readonly attribute bitmap8 barrierCapabilities = 3;
-  readonly attribute int8u barrierPosition = 10;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct BarrierControlGoToPercentRequest {
-    INT8U percentOpen = 0;
-  }
-
-  command BarrierControlGoToPercent(BarrierControlGoToPercentRequest): DefaultSuccess = 0;
-  command BarrierControlStop(): DefaultSuccess = 1;
-}
-
 server cluster PumpConfigurationAndControl = 512 {
   enum PumpControlMode : ENUM8 {
     kConstantSpeed = 0;
@@ -3514,22 +3491,6 @@ server cluster AccountLogin = 1294 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster ElectricalMeasurement = 2820 {
-  readonly attribute bitmap32 measurementType = 0;
-  readonly attribute int32s totalActivePower = 772;
-  readonly attribute int16u rmsVoltage = 1285;
-  readonly attribute int16u rmsVoltageMin = 1286;
-  readonly attribute int16u rmsVoltageMax = 1287;
-  readonly attribute int16u rmsCurrent = 1288;
-  readonly attribute int16u rmsCurrentMin = 1289;
-  readonly attribute int16u rmsCurrentMax = 1290;
-  readonly attribute int16s activePower = 1291;
-  readonly attribute int16s activePowerMin = 1292;
-  readonly attribute int16s activePowerMax = 1293;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 server cluster UnitTesting = 4294048773 {
   enum SimpleEnum : ENUM8 {
     kUnspecified = 0;
@@ -4239,13 +4200,6 @@ endpoint 1 {
     ram      attribute clusterRevision default = 4;
   }
 
-  server cluster OnOffSwitchConfiguration {
-    ram      attribute switchType;
-    ram      attribute switchActions;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster LevelControl {
     persist  attribute currentLevel default = 0xFE;
     ram      attribute remainingTime;
@@ -4412,15 +4366,6 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0x17;
     ram      attribute clusterRevision default = 5;
-  }
-
-  server cluster BarrierControl {
-    ram      attribute barrierMovingState;
-    ram      attribute barrierSafetyStatus;
-    ram      attribute barrierCapabilities;
-    ram      attribute barrierPosition;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 1;
   }
 
   server cluster PumpConfigurationAndControl {
@@ -4689,22 +4634,6 @@ endpoint 1 {
   server cluster AccountLogin {
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster ElectricalMeasurement {
-    ram      attribute measurementType;
-    ram      attribute totalActivePower;
-    ram      attribute rmsVoltage default = 0xffff;
-    ram      attribute rmsVoltageMin default = 0x8000;
-    ram      attribute rmsVoltageMax default = 0x8000;
-    ram      attribute rmsCurrent default = 0xffff;
-    ram      attribute rmsCurrentMin default = 0xffff;
-    ram      attribute rmsCurrentMax default = 0xffff;
-    ram      attribute activePower default = 0xffff;
-    ram      attribute activePowerMin default = 0xffff;
-    ram      attribute activePowerMax default = 0xffff;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 3;
   }
 
   server cluster UnitTesting {

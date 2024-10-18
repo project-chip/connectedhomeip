@@ -327,7 +327,7 @@ void ConnectivityManagerImpl::DriveStationState()
                     ChipLogProgress(DeviceLayer, "Attempting to connect WiFi");
                     if ((serr = wfx_connect_to_ap()) != SL_STATUS_OK)
                     {
-                        ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed.");
+                        ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed: %" PRId32, serr);
                     }
                     SuccessOrExit(serr);
 
