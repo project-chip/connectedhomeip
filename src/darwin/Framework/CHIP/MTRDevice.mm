@@ -25,6 +25,7 @@
 #import "MTRConversion.h"
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRDeviceDataValueDictionary.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"

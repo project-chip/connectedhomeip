@@ -18,14 +18,14 @@
 #import <Foundation/Foundation.h>
 #import <Matter/Matter.h>
 
-// For MTRDeviceDataValueDictionary:
+#import "MTRDeviceClusterData.h"
+#import "MTRDeviceDataValueDictionary.h"
 #import "MTRDevice_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Declarations for internal methods
 
-@class MTRDeviceClusterData;
 // MTRDeviceControllerDataStore.h includes C++ header, and so we need to declare the methods separately
 @protocol MTRDeviceControllerDataStoreAttributeStoreMethods
 - (nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)getStoredClusterDataForNodeID:(NSNumber *)nodeID;

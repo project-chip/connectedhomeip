@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRDevice.h>
 
+#import "MTRDeviceClusterData.h"
 #import "MTRDeviceController_Concrete.h"
 
 NS_ASSUME_NONNULL_BEGIN

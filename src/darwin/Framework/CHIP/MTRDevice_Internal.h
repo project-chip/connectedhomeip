@@ -28,8 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class MTRAsyncWorkQueue;
 
-typedef NSDictionary<NSString *, id> * MTRDeviceDataValueDictionary;
-
 typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 
 typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
@@ -51,20 +49,6 @@ typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
     // then re-created a subscription.
     MTRInternalDeviceStateLaterSubscriptionEstablished = 4,
 };
-
-/**
- * Information about a cluster: data version and known attribute values.
- */
-MTR_TESTABLE
-@interface MTRDeviceClusterData : NSObject <NSSecureCoding, NSCopying>
-@property (nonatomic, nullable) NSNumber * dataVersion;
-@property (nonatomic, readonly) NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes; // attributeID => data-value dictionary
-
-- (void)storeValue:(MTRDeviceDataValueDictionary _Nullable)value forAttribute:(NSNumber *)attribute;
-- (void)removeValueForAttribute:(NSNumber *)attribute;
-
-- (nullable instancetype)initWithDataVersion:(NSNumber * _Nullable)dataVersion attributes:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _Nullable)attributes;
-@end
 
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
@@ -191,11 +175,6 @@ MTR_DIRECT_MEMBERS
 
 static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
 static NSString * const kTestStorageUserDefaultEnabledKey = @"enableTestStorage";
-
-// ex-MTRDeviceClusterData constants
-static NSString * const sDataVersionKey = @"dataVersion";
-static NSString * const sAttributesKey = @"attributes";
-static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribeLatency";
 
 // Declared inside platform, but noting here for reference
 // static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
