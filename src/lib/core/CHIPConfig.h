@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
@@ -1844,6 +1844,24 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
 #define CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS 5
 #endif // CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
+
+/**
+ * @file
+ * Configuration settings for Terms and Conditions (TC) acknowledgements during device commissioning.
+ */
+
+/**
+ * @def CHIP_CONFIG_TC_REQUIRED
+ *
+ * @brief Indicates whether terms and conditions are required during commissioning.
+ *
+ * This macro defines whether the device commissioning process requires the user to acknowledge terms and conditions.
+ * - 1: Terms and conditions are required.
+ * - 0: Terms and conditions are not required.
+ */
+#ifndef CHIP_CONFIG_TC_REQUIRED
+#define CHIP_CONFIG_TC_REQUIRED 0
+#endif
 
 /**
  * @}
