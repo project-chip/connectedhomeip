@@ -351,15 +351,74 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSecondaryPairingHint
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSoftwareVersionString(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
-    return CHIP_NO_ERROR;
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    size_t softwareVersionStringLen = 0; // without counting null-terminator
+
+    err = ReadConfigValueStr(ConfigClass::kConfigKey_SoftwareVersionString, buf, bufSize, softwareVersionStringLen);
+
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING, sizeof(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING));
+
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+
+    return err;
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSerialNumber(const char * serialNum, size_t serialNumLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSerialNumber(CharSpan serialNumber)
 {
-    return WriteConfigValueStr(ConfigClass::kConfigKey_SerialNum, serialNum, serialNumLen);
+    return WriteConfigValueStr(ConfigClass::kConfigKey_SerialNum, serialNumber.data(), serialNumber.size());
+}
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreVendorName(CharSpan vendorName)
+{
+
+    return WriteConfigValueStr(ConfigClass::kConfigKey_VendorName, vendorName.data(), vendorName.size());
+}
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreProductName(CharSpan productName)
+{
+    return WriteConfigValueStr(ConfigClass::kConfigKey_ProductName, productName.data(), productName.size());
+}
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreHardwareVersionString(CharSpan hardwareVersionString)
+{
+    return WriteConfigValueStr(ConfigClass::kConfigKey_HardwareVersionString, hardwareVersionString.data(),
+                               hardwareVersionString.size());
+}
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSoftwareVersionString(CharSpan softwareVersionString)
+{
+    return WriteConfigValueStr(ConfigClass::kConfigKey_SoftwareVersionString, softwareVersionString.data(),
+                               softwareVersionString.size());
+}
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreVendorName(const char * vendorName, size_t vendorNameLen)
+{
+    return WriteConfigValueStr(ConfigClass::kConfigKey_VendorName, vendorName, vendorNameLen);
+}
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreProductName(const char * productName, size_t productNameLen)
+{
+    return WriteConfigValueStr(ConfigClass::kConfigKey_ProductName, productName, productNameLen);
+}
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreHardwareVersionString(const char * hardwareVersionString,
+                                                                                    size_t hardwareVersionStringLen)
+{
+    return WriteConfigValueStr(ConfigClass::kConfigKey_HardwareVersionString, hardwareVersionString, hardwareVersionStringLen);
+}
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSoftwareVersionString(const char * softwareVersionString,
+                                                                                    size_t softwareVersionStringLen)
+{
+    return WriteConfigValueStr(ConfigClass::kConfigKey_SoftwareVersionString, softwareVersionString, softwareVersionStringLen);
 }
 
 template <class ConfigClass>

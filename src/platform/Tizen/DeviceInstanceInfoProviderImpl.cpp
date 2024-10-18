@@ -33,5 +33,17 @@ CHIP_ERROR DeviceInstanceInfoProviderImpl::GetProductId(uint16_t & productId)
     return Internal::PosixConfig::ReadConfigValue(Internal::PosixConfig::kConfigKey_ProductId, productId);
 }
 
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetVendorName(char * buf, size_t bufSize)
+{
+    size_t vendorNameLen = 0;
+    return Internal::PosixConfig::ReadConfigValueStr(Internal::PosixConfig::kConfigKey_VendorName, buf, bufSize, vendorNameLen);
+}
+
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetProductName(char * buf, size_t bufSize)
+{
+    size_t productNameLen = 0;
+    return Internal::PosixConfig::ReadConfigValueStr(Internal::PosixConfig::kConfigKey_ProductName, buf, bufSize, productNameLen);
+}
+
 } // namespace DeviceLayer
 } // namespace chip

@@ -68,7 +68,7 @@ public:
     CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer) override;
     CHIP_ERROR GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & buildTime) override;
     CHIP_ERROR SetFirmwareBuildChipEpochTime(System::Clock::Seconds32 buildTime) override;
-    CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override;
+    CHIP_ERROR StoreSerialNumber(CharSpan serialNumber) override;
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) override;
@@ -103,6 +103,17 @@ public:
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
     CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override;
     CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override;
+
+    CHIP_ERROR StoreVendorName(CharSpan vendorName) override;
+    CHIP_ERROR StoreProductName(CharSpan productName) override;
+    CHIP_ERROR StoreHardwareVersionString(CharSpan hardwareVersionString) override;
+    CHIP_ERROR StoreSoftwareVersionString(CharSpan softwareVersionString) override;
+
+    CHIP_ERROR StoreVendorName(const char * vendorName, size_t vendorNameLen) override;
+    CHIP_ERROR StoreProductName(const char * productName, size_t productNameLen) override;
+    CHIP_ERROR StoreHardwareVersionString(const char * hardwareVersionString, size_t hardwareVersionStringLen) override;
+    CHIP_ERROR StoreSoftwareVersionString(const char * softwareVersionString, size_t softwareVersionStringLen) override;
+
 #if CHIP_CONFIG_TEST
     void RunUnitTests() override;
 #endif

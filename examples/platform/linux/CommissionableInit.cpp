@@ -20,6 +20,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
+#include <stdio.h>
 
 #include "CommissionableInit.h"
 
@@ -97,6 +98,35 @@ CHIP_ERROR InitConfigurationManager(ConfigurationManagerImpl & configManager, Li
     if (options.payload.productID != 0)
     {
         configManager.StoreProductId(options.payload.productID);
+    }
+
+    if (options.vendorName.HasValue())
+    {
+        CharSpan vendor_name(options.vendorName.Value().c_str(), options.vendorName.Value().size());
+        VerifyOrDie(configManager.StoreVendorName(vendor_name) == CHIP_NO_ERROR);
+    }
+    if (options.productName.HasValue())
+    {
+        CharSpan product_name(options.productName.Value().c_str(), options.productName.Value().size());
+        VerifyOrDie(configManager.StoreProductName(product_name) == CHIP_NO_ERROR);
+    }
+    if (options.hardwareVersionString.HasValue())
+    {
+        CharSpan hardware_version_string(options.hardwareVersionString.Value().c_str(),
+                                         options.hardwareVersionString.Value().size());
+        VerifyOrDie(configManager.StoreHardwareVersionString(hardware_version_string) == CHIP_NO_ERROR);
+    }
+    if (options.softwareVersionString.HasValue())
+    {
+        CharSpan software_version_string(options.softwareVersionString.Value().c_str(),
+                                         options.softwareVersionString.Value().size());
+        VerifyOrDie(configManager.StoreSoftwareVersionString(software_version_string) == CHIP_NO_ERROR);
+    }
+
+    if (options.serialNumber.HasValue())
+    {
+        CharSpan serial_number(options.serialNumber.Value().c_str(), options.serialNumber.Value().size());
+        VerifyOrDie(configManager.StoreSerialNumber(serial_number) == CHIP_NO_ERROR);
     }
 
     return CHIP_NO_ERROR;
