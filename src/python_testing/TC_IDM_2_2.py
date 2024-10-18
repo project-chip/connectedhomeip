@@ -40,8 +40,8 @@ from chip.clusters.ClusterObjects import ClusterObject
 from chip.clusters.enum import MatterIntEnum
 from chip.interaction_model import InteractionModelError, Status
 from chip.tlv import uint
-from matter_testing_infrastructure.chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from matter_testing_infrastructure.chip.testing.basic_composition import BasicCompositionTests
+from matter_testing_infrastructure.chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
