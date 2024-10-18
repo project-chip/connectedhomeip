@@ -53,7 +53,7 @@ CHIP_ERROR RestartAdvertising()
 {
     // Note: bt_le_adv_stop() returns success when the advertising was not started
     ReturnErrorOnFailure(MapErrorZephyr(bt_le_adv_stop()));
-    ReturnErrorCodeIf(sys_slist_is_empty(&sRequests), CHIP_NO_ERROR);
+    VerifyOrReturnError(!sys_slist_is_empty(&sRequests), CHIP_NO_ERROR);
 
     const Request & top          = ToRequest(sys_slist_peek_head(&sRequests));
     const bt_le_adv_param params = BT_LE_ADV_PARAM_INIT(top.options, top.minInterval, top.maxInterval, nullptr);

@@ -182,9 +182,9 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
         externalOperationalKeypair = params.operationalKeypair;
     }
 
-    ReturnErrorCodeIf(!rcacBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
-    ReturnErrorCodeIf(!icacBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
-    ReturnErrorCodeIf(!nocBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(rcacBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(icacBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(nocBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
 
     MutableByteSpan rcacSpan(rcacBuf.Get(), chipCertAllocatedLen);
 
@@ -2745,7 +2745,7 @@ void DeviceCommissioner::OnScanNetworksResponse(void * context,
 
 CHIP_ERROR DeviceCommissioner::NetworkCredentialsReady()
 {
-    ReturnErrorCodeIf(mCommissioningStage != CommissioningStage::kNeedsNetworkCreds, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mCommissioningStage == CommissioningStage::kNeedsNetworkCreds, CHIP_ERROR_INCORRECT_STATE);
 
     // need to advance to next step
     CommissioningStageComplete(CHIP_NO_ERROR);
@@ -2755,7 +2755,7 @@ CHIP_ERROR DeviceCommissioner::NetworkCredentialsReady()
 
 CHIP_ERROR DeviceCommissioner::ICDRegistrationInfoReady()
 {
-    ReturnErrorCodeIf(mCommissioningStage != CommissioningStage::kICDGetRegistrationInfo, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mCommissioningStage == CommissioningStage::kICDGetRegistrationInfo, CHIP_ERROR_INCORRECT_STATE);
 
     // need to advance to next step
     CommissioningStageComplete(CHIP_NO_ERROR);

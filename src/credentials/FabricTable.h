@@ -96,7 +96,7 @@ public:
     CompressedFabricId GetCompressedFabricId() const { return mCompressedFabricId; }
     CHIP_ERROR GetCompressedFabricIdBytes(MutableByteSpan & compressedFabricId) const
     {
-        ReturnErrorCodeIf(compressedFabricId.size() != sizeof(uint64_t), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(compressedFabricId.size() == sizeof(uint64_t), CHIP_ERROR_INVALID_ARGUMENT);
         Encoding::BigEndian::Put64(compressedFabricId.data(), GetCompressedFabricId());
         return CHIP_NO_ERROR;
     }

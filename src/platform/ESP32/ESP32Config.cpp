@@ -217,7 +217,7 @@ CHIP_ERROR ESP32Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
         {
             return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
-        ReturnErrorCodeIf(buf[outLen - 1] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+        VerifyOrReturnError(buf[outLen - 1] == 0, CHIP_ERROR_INVALID_STRING_LENGTH);
         ReturnMappedErrorOnFailure(err);
     }
 

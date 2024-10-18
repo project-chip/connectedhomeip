@@ -152,14 +152,14 @@ CHIP_ERROR Convert(StagingSubject from, NodeId & to)
     switch (from.authMode)
     {
     case StagingAuthMode::kPase:
-        ReturnErrorCodeIf((from.nodeId & ~kMaskPAKEKeyId) != 0, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError((from.nodeId & ~kMaskPAKEKeyId) == 0, CHIP_ERROR_INVALID_ARGUMENT);
         to = NodeIdFromPAKEKeyId(static_cast<PasscodeId>(from.nodeId));
         break;
     case StagingAuthMode::kCase:
         to = from.nodeId;
         break;
     case StagingAuthMode::kGroup:
-        ReturnErrorCodeIf((from.nodeId & ~kMaskGroupId) != 0, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError((from.nodeId & ~kMaskGroupId) == 0, CHIP_ERROR_INVALID_ARGUMENT);
         to = NodeIdFromGroupId(static_cast<GroupId>(from.nodeId));
         break;
     default:

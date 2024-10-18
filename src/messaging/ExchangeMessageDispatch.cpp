@@ -38,7 +38,7 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionManager * sessionManager,
                                                 bool isReliableTransmission, Protocols::Id protocol, uint8_t type,
                                                 System::PacketBufferHandle && message)
 {
-    ReturnErrorCodeIf(!MessagePermitted(protocol, type), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(MessagePermitted(protocol, type), CHIP_ERROR_INVALID_ARGUMENT);
 
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(exchangeId).SetMessageType(protocol, type).SetInitiator(isInitiator);
