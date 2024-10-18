@@ -227,12 +227,10 @@ class NxpBuilder(GnBuilder):
         self.iw416_transceiver = iw416_transceiver
         self.w8801_transceiver = w8801_transceiver
         self.iwx12_transceiver = iwx12_transceiver
-        if self.low_power:
-            if log_level != NxpLogLevel.NONE:
-                logging.warning("Switching log level to 'NONE' for low power build")
-            self.log_level = NxpLogLevel.NONE
-        else:
-            self.log_level = log_level
+        if self.low_power and log_level != NxpLogLevel.NONE:
+            logging.warning("Switching log level to 'NONE' for low power build")
+            log_level = NxpLogLevel.NONE
+        self.log_level = log_level
 
     def GnBuildArgs(self):
         args = []
