@@ -263,7 +263,6 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0009" name="DoNotUse">
-      <access read="true" readPrivilege="view"/>
       <disallowConform/>
     </attribute>
   </attributes>
