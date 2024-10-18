@@ -113,7 +113,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="TL"/>
       </mandatoryConform>
-      <constraint type="between" from="0" to="31"/>
+      <constraint type="max" value="31"/>
     </attribute>
     <attribute id="0x0005" name="SupportedTemperatureLevels" type="list">
       <entry type="string">

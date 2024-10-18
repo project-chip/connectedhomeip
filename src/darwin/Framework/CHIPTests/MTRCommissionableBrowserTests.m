@@ -36,9 +36,27 @@ static bool sHelperAppsStarted = false;
 // Singleton controller we use.
 static MTRDeviceController * sController = nil;
 
+static NSString * kInstanceNameKey = @"instanceName";
+static NSString * kVendorIDKey = @"vendorID";
+static NSString * kProductIDKey = @"productID";
+static NSString * kDiscriminatorKey = @"discriminator";
+static NSString * kCommissioningModeKey = @"commissioningMode";
+
+static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserResult * result)
+{
+    return @{
+        kInstanceNameKey : result.instanceName,
+        kVendorIDKey : result.vendorID,
+        kProductIDKey : result.productID,
+        kDiscriminatorKey : result.discriminator,
+        kCommissioningModeKey : @(result.commissioningMode),
+    };
+}
+
 @interface DeviceScannerDelegate : NSObject <MTRCommissionableBrowserDelegate>
 @property (nonatomic, nullable) XCTestExpectation * expectation;
-@property (nonatomic) NSNumber * resultsCount;
+@property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * results;
+@property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * removedResults;
 
 - (instancetype)initWithExpectation:(XCTestExpectation *)expectation;
 - (void)controller:(MTRDeviceController *)controller didFindCommissionableDevice:(MTRCommissionableBrowserResult *)device;
@@ -52,8 +70,9 @@ static MTRDeviceController * sController = nil;
         return nil;
     }
 
-    _resultsCount = 0;
     _expectation = expectation;
+    _results = [[NSMutableArray alloc] init];
+    _removedResults = [[NSMutableArray alloc] init];
     return self;
 }
 
@@ -63,8 +82,9 @@ static MTRDeviceController * sController = nil;
         return nil;
     }
 
-    _resultsCount = 0;
     _expectation = nil;
+    _results = [[NSMutableArray alloc] init];
+    _removedResults = [[NSMutableArray alloc] init];
     return self;
 }
 
@@ -77,12 +97,26 @@ static MTRDeviceController * sController = nil;
         return;
     }
 
-    _resultsCount = @(_resultsCount.unsignedLongValue + 1);
-    if ([_resultsCount isEqual:@(kExpectedDiscoveredDevicesCount)]) {
+    __auto_type * snapshot = ResultSnapshot(device);
+
+    XCTAssertFalse([_results containsObject:snapshot], @"Newly discovered device %@ should not be in results already.", snapshot);
+
+    [_results addObject:snapshot];
+
+    if (_results.count == kExpectedDiscoveredDevicesCount) {
+        // Do some sanity checking on our results and removedResults to make
+        // sure we really only saw the relevant set of things.
+        NSSet<NSDictionary<NSString *, id> *> * finalResultsSet = [NSSet setWithArray:_results];
+        NSSet<NSDictionary<NSString *, id> *> * allResultsSet = [finalResultsSet copy];
+        allResultsSet = [allResultsSet setByAddingObjectsFromArray:_removedResults];
+
+        // Ensure that we just saw the same results as our final set popping in and out if things
+        // ever got removed here.
+        XCTAssertEqualObjects(finalResultsSet, allResultsSet);
         [self.expectation fulfill];
     }
 
-    XCTAssertLessThanOrEqual(_resultsCount.unsignedLongValue, kExpectedDiscoveredDevicesCount);
+    XCTAssertLessThanOrEqual(_results.count, kExpectedDiscoveredDevicesCount);
 
     __auto_type instanceName = device.instanceName;
     __auto_type vendorId = device.vendorID;
@@ -108,6 +142,12 @@ static MTRDeviceController * sController = nil;
 
     NSLog(
         @"Removed Device (%@) with discriminator: %@ (vendor: %@, product: %@)", instanceName, discriminator, vendorId, productId);
+
+    __auto_type * snapshot = ResultSnapshot(device);
+    XCTAssertTrue([_results containsObject:snapshot], @"Removed device %@ is not something we found before", snapshot);
+
+    [_removedResults addObject:snapshot];
+    [_results removeObject:snapshot];
 }
 @end
 

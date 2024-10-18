@@ -216,8 +216,9 @@ class ClusterParser:
         except (KeyError, StopIteration):
             self._derived = None
 
-        if list(cluster.iter('provisionalConform')):
-            self._is_provisional = True
+        for id in cluster.iter('clusterIds'):
+            if list(id.iter('provisionalConform')):
+                self._is_provisional = True
 
         try:
             classification = next(cluster.iter('classification'))
@@ -403,6 +404,8 @@ class ClusterParser:
                 return CommandType.UNKNOWN
             if element.attrib['direction'].lower() == 'commandtoserver':
                 return CommandType.ACCEPTED
+            if element.attrib['direction'].lower() == 'responsefromclient':
+                return CommandType.UNKNOWN
             raise Exception(f"Unknown direction: {element.attrib['direction']}")
         except KeyError:
             return CommandType.UNKNOWN

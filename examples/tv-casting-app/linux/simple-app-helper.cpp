@@ -267,7 +267,7 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
     // For a connection failure, called back with an error and nullptr.
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
-        ChipLogProgress(
+        ChipLogError(
             AppServer,
             "simple-app-helper.cpp::ConnectionHandler(): Failed to connect to CastingPlayer (ID: %s) with err %" CHIP_ERROR_FORMAT,
             targetCastingPlayer->GetId(), err.Format()));

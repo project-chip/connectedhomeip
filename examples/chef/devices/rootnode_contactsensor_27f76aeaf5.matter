@@ -409,14 +409,10 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_sensitive info event access(read: administer) AccessRestrictionEntryChanged = 2 {
-    fabric_idx fabricIndex = 254;
-  }
-
-  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 3 {
+  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 2 {
     int64u token = 0;
-    nullable long_char_string instruction = 1;
-    nullable long_char_string redirectURL = 2;
+    optional long_char_string instruction = 1;
+    optional long_char_string ARLRequestFlowUrl = 2;
     fabric_idx fabricIndex = 254;
   }
 
@@ -443,7 +439,7 @@ cluster AccessControl = 31 {
   }
 
   /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
-  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
@@ -1908,6 +1904,8 @@ internal cluster UnitTesting = 4294048773 {
   attribute TestGlobalEnum globalEnum = 51;
   attribute TestGlobalStruct globalStruct = 52;
   attribute optional boolean unsupported = 255;
+  attribute optional int8u readFailureCode = 12288;
+  attribute optional int32u failureInt32U = 12289;
   attribute nullable boolean nullableBoolean = 16384;
   attribute nullable Bitmap8MaskMap nullableBitmap8 = 16385;
   attribute nullable Bitmap16MaskMap nullableBitmap16 = 16386;

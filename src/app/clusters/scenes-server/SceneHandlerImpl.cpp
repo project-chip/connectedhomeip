@@ -77,62 +77,25 @@ bool IsExactlyOneValuePopulated(const AttributeValuePairType & type)
 /// CapAttributeValue
 /// Cap the attribute value based on the attribute's min and max if they are defined,
 /// or based on the attribute's size if they are not.
-/// @param[in] aVPair   AttributeValuePairType
-/// @param[in] metadata  EmberAfAttributeMetadata
 ///
-template <typename Type>
+/// The TypeForMinMax template parameter determines the type to use for the
+/// min/max computation.  The Type template parameter determines how the
+/// resulting value is actually represented, because for booleans we
+/// unfortunately end up using uint8, not an actual boolean.
+///
+/// @param[in] value   The value from the AttributeValuePairType that we were given.
+/// @param[in] metadata  The metadata for the attribute the value is for.
+///
+///
+///
+template <typename Type, typename TypeForMinMax = Type>
 void CapAttributeValue(typename app::NumericAttributeTraits<Type>::WorkingType & value, const EmberAfAttributeMetadata * metadata)
 {
-    using IntType     = app::NumericAttributeTraits<Type>;
-    using WorkingType = typename IntType::WorkingType;
+    using IntType     = app::NumericAttributeTraits<TypeForMinMax>;
+    using WorkingType = std::remove_reference_t<decltype(value)>;
 
-    WorkingType maxValue;
-    WorkingType minValue;
-    uint16_t bitWidth = static_cast<uint16_t>(emberAfAttributeSize(metadata) * 8);
-
-    // TODO Use min/max values from Type to obtain min/max instead of relying on metadata. See:
-    // https://github.com/project-chip/connectedhomeip/issues/35328
-
-    // Min/Max Value caps for the OddSize integers
-    if (metadata->IsSignedIntegerAttribute())
-    {
-        // We use emberAfAttributeSize for cases like INT24S, INT40S, INT48S, INT56S where numeric_limits<WorkingType>::max()
-        // wouldn't work
-        maxValue = static_cast<WorkingType>((1ULL << (bitWidth - 1)) - 1);
-        minValue = static_cast<WorkingType>(-(1ULL << (bitWidth - 1)));
-    }
-    else
-    {
-        // We use emberAfAttributeSize for cases like INT24U, INT40U, INT48U, INT56U where numeric_limits<WorkingType>::max()
-        // wouldn't work
-        if (ZCL_INT64U_ATTRIBUTE_TYPE == app::Compatibility::Internal::AttributeBaseType(metadata->attributeType))
-        {
-            maxValue = static_cast<WorkingType>(UINT64_MAX); // Bit shift of 64 is undefined so we use UINT64_MAX
-        }
-        else
-        {
-            maxValue = static_cast<WorkingType>((1ULL << bitWidth) - 1);
-        }
-        minValue = static_cast<WorkingType>(0);
-    }
-
-    // Ensure that the metadata's signedness matches the working type's signedness
-    VerifyOrDie(metadata->IsSignedIntegerAttribute() == std::is_signed<WorkingType>::value);
-
-    if (metadata->IsBoolean())
-    {
-        if (metadata->IsNullable() && (value != 1 && value != 0))
-        {
-            // If the attribute is nullable, the value can be set to NULL
-            app::NumericAttributeTraits<WorkingType>::SetNull(value);
-        }
-        else
-        {
-            // Caping the value to 1 in case values greater than 1 are set
-            value = value ? 1 : 0;
-        }
-        return;
-    }
+    WorkingType minValue = IntType::MinValue(metadata->IsNullable());
+    WorkingType maxValue = IntType::MaxValue(metadata->IsNullable());
 
     // Check metadata for min and max values
     if (metadata->HasMinMax())
@@ -142,10 +105,6 @@ void CapAttributeValue(typename app::NumericAttributeTraits<Type>::WorkingType &
         maxValue                                        = ConvertDefaultValueToWorkingValue<Type>(minMaxValue->maxValue);
     }
 
-    // If the attribute is nullable, the min and max values calculated for types will not be valid, however this does not
-    // change the behavior here as the value will already be NULL if it is out of range. E.g. a nullable INT8U has a minValue of
-    // -127. The code above determin minValue = -128, so an input value of -128 would not enter the condition block below, but would
-    // be considered NULL nonetheless.
     if (metadata->IsNullable() && (minValue > value || maxValue < value))
     {
         // If the attribute is nullable, the value can be set to NULL
@@ -187,6 +146,9 @@ CHIP_ERROR ValidateAttributePath(EndpointId endpoint, ClusterId cluster, Attribu
     switch (app::Compatibility::Internal::AttributeBaseType(metadata->attributeType))
     {
     case ZCL_BOOLEAN_ATTRIBUTE_TYPE:
+        VerifyOrReturnError(aVPair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        CapAttributeValue<uint8_t, bool>(aVPair.valueUnsigned8.Value(), metadata);
+        break;
     case ZCL_INT8U_ATTRIBUTE_TYPE:
         VerifyOrReturnError(aVPair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
         CapAttributeValue<uint8_t>(aVPair.valueUnsigned8.Value(), metadata);

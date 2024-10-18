@@ -81,21 +81,6 @@ Davis, CA 95616, USA
       <item value="4" name="BusyWithOtherAdmin" summary="[[ref_BusyWithOtherAdmin]] Attempting to arm fail-safe or execute CommissioningComplete from a fabric different than the one associated with the current fail-safe context.">
         <mandatoryConform/>
       </item>
-      <item value="5" name="RequiredTCNotAccepted" summary="[[ref_RequiredTCNotAccepted]] One or more required TC features from the Enhanced Setup Flow were not accepted.">
-        <mandatoryConform>
-          <feature name="TC"/>
-        </mandatoryConform>
-      </item>
-      <item value="6" name="TCAcknowledgementsNotReceived" summary="[[ref_TCAcknowledgementsNotReceived]] No acknowledgements from the user for the TC features were received.">
-        <mandatoryConform>
-          <feature name="TC"/>
-        </mandatoryConform>
-      </item>
-      <item value="7" name="TCMinVersionNotMet" summary="[[ref_TCMinVersionNotMet]] The version of the TC features acknowledged by the user did not meet the minimum required version.">
-        <mandatoryConform>
-          <feature name="TC"/>
-        </mandatoryConform>
-      </item>
     </enum>
     <enum name="RegulatoryLocationTypeEnum">
       <item value="0" name="Indoor" summary="Indoor only">
@@ -145,24 +130,35 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0005" name="TCAcceptedVersion" type="uint16">
       <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TC"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0006" name="TCMinRequiredVersion" type="uint16">
       <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TC"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0007" name="TCAcknowledgements" type="map16">
       <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TC"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0008" name="TCAcknowledgementsRequired" type="bool" default="true">
       <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0009" name="TCUpdateDeadline" type="uint32">
+      <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TC"/>
       </mandatoryConform>

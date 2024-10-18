@@ -31480,11 +31480,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _requestId = @(0);
+        _requestID = @(0);
 
-        _vendorId = @(0);
+        _vendorID = @(0);
 
-        _productId = @(0);
+        _productID = @(0);
 
         _label = nil;
         _timedInvokeTimeoutMs = nil;
@@ -31497,9 +31497,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRCommissionerControlClusterRequestCommissioningApprovalParams alloc] init];
 
-    other.requestId = self.requestId;
-    other.vendorId = self.vendorId;
-    other.productId = self.productId;
+    other.requestID = self.requestID;
+    other.vendorID = self.vendorID;
+    other.productID = self.productID;
     other.label = self.label;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -31509,7 +31509,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestId:%@; vendorId:%@; productId:%@; label:%@; >", NSStringFromClass([self class]), _requestId, _vendorId, _productId, _label];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestID:%@; vendorID:%@; productID:%@; label:%@; >", NSStringFromClass([self class]), _requestID, _vendorID, _productID, _label];
     return descriptionString;
 }
 
@@ -31522,13 +31522,13 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::CommissionerControl::Commands::RequestCommissioningApproval::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.requestId = self.requestId.unsignedLongLongValue;
+        encodableStruct.requestID = self.requestID.unsignedLongLongValue;
     }
     {
-        encodableStruct.vendorId = static_cast<std::remove_reference_t<decltype(encodableStruct.vendorId)>>(self.vendorId.unsignedShortValue);
+        encodableStruct.vendorID = static_cast<std::remove_reference_t<decltype(encodableStruct.vendorID)>>(self.vendorID.unsignedShortValue);
     }
     {
-        encodableStruct.productId = self.productId.unsignedShortValue;
+        encodableStruct.productID = self.productID.unsignedShortValue;
     }
     {
         if (self.label != nil) {
@@ -31580,7 +31580,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _requestId = @(0);
+        _requestID = @(0);
 
         _responseTimeoutSeconds = @(0);
         _timedInvokeTimeoutMs = nil;
@@ -31593,7 +31593,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRCommissionerControlClusterCommissionNodeParams alloc] init];
 
-    other.requestId = self.requestId;
+    other.requestID = self.requestID;
     other.responseTimeoutSeconds = self.responseTimeoutSeconds;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -31603,7 +31603,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestId:%@; responseTimeoutSeconds:%@; >", NSStringFromClass([self class]), _requestId, _responseTimeoutSeconds];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestID:%@; responseTimeoutSeconds:%@; >", NSStringFromClass([self class]), _requestID, _responseTimeoutSeconds];
     return descriptionString;
 }
 
@@ -31616,7 +31616,7 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::CommissionerControl::Commands::CommissionNode::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.requestId = self.requestId.unsignedLongLongValue;
+        encodableStruct.requestID = self.requestID.unsignedLongLongValue;
     }
     {
         encodableStruct.responseTimeoutSeconds = self.responseTimeoutSeconds.unsignedShortValue;

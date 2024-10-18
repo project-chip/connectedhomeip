@@ -9171,6 +9171,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"Unsupported";
             break;
 
+        case MTRAttributeIDTypeClusterUnitTestingAttributeReadFailureCodeID:
+            result = @"ReadFailureCode";
+            break;
+
+        case MTRAttributeIDTypeClusterUnitTestingAttributeFailureInt32UID:
+            result = @"FailureInt32U";
+            break;
+
         case MTRAttributeIDTypeClusterUnitTestingAttributeNullableBooleanID:
             result = @"NullableBoolean";
             break;
@@ -9505,10 +9513,6 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
 
         case MTREventIDTypeClusterAccessControlEventAccessControlExtensionChangedID:
             result = @"AccessControlExtensionChanged";
-            break;
-
-        case MTREventIDTypeClusterAccessControlEventAccessRestrictionEntryChangedID:
-            result = @"AccessRestrictionEntryChanged";
             break;
 
         case MTREventIDTypeClusterAccessControlEventFabricRestrictionReviewUpdateID:

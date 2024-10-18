@@ -44,6 +44,7 @@
 #import "MTRDeviceController_XPC.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
+#import "MTRDevice_XPC_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
 #import "MTRLogging_Internal.h"
@@ -82,6 +83,8 @@
 
 @implementation MTRDevice_XPC
 
+@synthesize _internalState;
+
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     // TODO: Verify that this is a valid MTRDeviceController_XPC?
@@ -93,14 +96,42 @@
     return self;
 }
 
+- (void)dealloc
+{
+    [self _setInternalState:nil];
+}
+
 - (NSString *)description
 {
-    // TODO: Figure out whether, and if so how, to log: VID, PID, WiFi, Thread,
-    // internalDeviceState (do we even have such a thing here?), last
-    // subscription attempt wait (does that apply to us?) queued work (do we
-    // have any?), last report, last subscription failure (does that apply to us?).
+    NSString * wifi;
+    NSString * thread;
+    NSNumber * networkFeatures = [self._internalState objectForKey:kMTRDeviceInternalPropertyNetworkFeatures];
+
+    if (networkFeatures == nil) {
+        wifi = @"NO";
+        thread = @"NO";
+    } else {
+        wifi = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureWiFiNetworkInterface);
+        thread = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface);
+    }
+
+    // TODO: Add these to the description
+    // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceState, _internalDeviceStateForDescription, properties);
+    // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionAttemptWait, _lastSubscriptionAttemptWaitForDescription, properties);
+    // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyMostRecentReportTime, _mostRecentReportTimeForDescription, properties);
+    // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionFailureTime, _lastSubscriptionFailureTimeForDescription, properties);
+
     return [NSString
-        stringWithFormat:@"<MTRDevice: %p, XPC: YES, node: %016llX-%016llX (%llu), controller: %@>", self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _deviceController.uniqueIdentifier];
+        stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, controller: %@>",
+        NSStringFromClass(self.class), self,
+        _deviceController.compressedFabricID.unsignedLongLongValue,
+        _nodeID.unsignedLongLongValue,
+        _nodeID.unsignedLongLongValue,
+        [self._internalState objectForKey:kMTRDeviceInternalPropertyKeyVendorID],
+        [self._internalState objectForKey:kMTRDeviceInternalPropertyKeyProductID],
+        wifi,
+        thread,
+        _deviceController.uniqueIdentifier];
 }
 
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
@@ -157,6 +188,12 @@
             [delegate deviceConfigurationChanged:self];
         }
     }];
+}
+
+- (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary
+{
+    [self _setInternalState:dictionary];
+    MTR_LOG("%@ internal state updated", self);
 }
 
 #pragma mark - Remote Commands

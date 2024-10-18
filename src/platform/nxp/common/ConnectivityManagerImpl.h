@@ -144,6 +144,7 @@ private:
 
     BitFlags<GenericConnectivityManagerImpl_WiFi::ConnectivityFlags> mFlags;
     static netif_ext_callback_t sNetifCallback;
+    static constexpr uint32_t kWlanInitWaitMs = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
 
 #if CHIP_ENABLE_OPENTHREAD
     static constexpr uint8_t kMaxIp6Addr = 3;

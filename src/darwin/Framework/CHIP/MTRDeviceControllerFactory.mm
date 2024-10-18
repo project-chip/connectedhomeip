@@ -474,6 +474,7 @@ MTR_DIRECT_MEMBERS
     dispatch_queue_t _Nullable otaProviderDelegateQueue;
     NSUInteger concurrentSubscriptionPoolSize = 0;
     MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration = nil;
+    BOOL startSuspended = NO;
     if ([startupParams isKindOfClass:[MTRDeviceControllerParameters class]]) {
         MTRDeviceControllerParameters * params = startupParams;
         storageDelegate = params.storageDelegate;
@@ -483,6 +484,7 @@ MTR_DIRECT_MEMBERS
         otaProviderDelegateQueue = params.otaProviderDelegateQueue;
         concurrentSubscriptionPoolSize = params.concurrentSubscriptionEstablishmentsAllowedOnThread;
         storageBehaviorConfiguration = params.storageBehaviorConfiguration;
+        startSuspended = params.startSuspended;
     } else if ([startupParams isKindOfClass:[MTRDeviceControllerStartupParams class]]) {
         MTRDeviceControllerStartupParams * params = startupParams;
         storageDelegate = nil;
@@ -545,7 +547,8 @@ MTR_DIRECT_MEMBERS
                     otaProviderDelegateQueue:otaProviderDelegateQueue
                             uniqueIdentifier:uniqueIdentifier
               concurrentSubscriptionPoolSize:concurrentSubscriptionPoolSize
-                storageBehaviorConfiguration:storageBehaviorConfiguration];
+                storageBehaviorConfiguration:storageBehaviorConfiguration
+                              startSuspended:startSuspended];
     if (controller == nil) {
         if (error != nil) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];

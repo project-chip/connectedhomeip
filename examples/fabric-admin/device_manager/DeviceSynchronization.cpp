@@ -136,15 +136,11 @@ void DeviceSynchronizer::OnDone(chip::app::ReadClient * apReadClient)
 #if defined(PW_RPC_ENABLED)
     if (mState == State::ReceivedResponse && !DeviceMgr().IsCurrentBridgeDevice(mCurrentDeviceData.node_id))
     {
-        auto * device = DeviceMgr().FindDeviceByNode(mCurrentDeviceData.node_id);
-        if (!mCurrentDeviceData.has_unique_id && device)
+        GetUniqueId();
+        if (mState == State::GettingUid)
         {
-            GetUid(device->GetEndpointId());
-            if (mState == State::GettingUid)
-            {
-                // GetUid was successful and we rely on callback to call SynchronizationCompleteAddDevice.
-                return;
-            }
+            // GetUniqueId was successful and we rely on callback to call SynchronizationCompleteAddDevice.
+            return;
         }
         SynchronizationCompleteAddDevice();
     }
@@ -211,31 +207,48 @@ void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceCont
     MoveToState(State::Connecting);
 }
 
-void DeviceSynchronizer::GetUid(EndpointId remoteEndpointIdOfInterest)
+void DeviceSynchronizer::GetUniqueId()
 {
     VerifyOrDie(mState == State::ReceivedResponse);
     VerifyOrDie(mController);
-    VerifyOrDie(DeviceMgr().IsFabricSyncReady());
-    auto remoteBridgeNodeId = DeviceMgr().GetRemoteBridgeNodeId();
 
-    CHIP_ERROR err = mUidGetter.GetUid(
-        [this](std::optional<CharSpan> aUniqueId) {
-            if (aUniqueId.has_value())
-            {
-                this->mCurrentDeviceData.has_unique_id = true;
-                memcpy(this->mCurrentDeviceData.unique_id, aUniqueId.value().data(), aUniqueId.value().size());
-            }
-            else
-            {
-                ChipLogError(NotSpecified, "We expected to get UniqueId from remote fabric sync bridge");
-            }
-            this->SynchronizationCompleteAddDevice();
-        },
-        *mController, remoteBridgeNodeId, remoteEndpointIdOfInterest);
+    // If we have a UniqueId we can return leaving state in ReceivedResponse.
+    VerifyOrReturn(!mCurrentDeviceData.has_unique_id, ChipLogDetail(NotSpecified, "We already have UniqueId"));
+
+    auto * device = DeviceMgr().FindDeviceByNode(mCurrentDeviceData.node_id);
+    // If there is no associated remote Fabric Sync Aggregator there is no other place for us to try
+    // getting the UniqueId from and can return leaving the state in ReceivedResponse.
+    VerifyOrReturn(device, ChipLogDetail(NotSpecified, "No remote Fabric Sync Aggregator to get UniqueId from"));
+
+    // Because device is not-null we expect IsFabricSyncReady to be true. IsFabricSyncReady indicates we have a
+    // connection to the remote Fabric Sync Aggregator.
+    VerifyOrDie(DeviceMgr().IsFabricSyncReady());
+    auto remoteBridgeNodeId               = DeviceMgr().GetRemoteBridgeNodeId();
+    EndpointId remoteEndpointIdOfInterest = device->GetEndpointId();
+
+    ChipLogDetail(NotSpecified, "Attempting to get UniqueId from remote Fabric Sync Aggregator") CHIP_ERROR err =
+        mUniqueIdGetter.GetUniqueId(
+            [this](std::optional<CharSpan> aUniqueId) {
+                if (aUniqueId.has_value())
+                {
+                    this->mCurrentDeviceData.has_unique_id = true;
+                    memcpy(this->mCurrentDeviceData.unique_id, aUniqueId.value().data(), aUniqueId.value().size());
+                }
+                else
+                {
+                    ChipLogError(NotSpecified, "We expected to get UniqueId from remote Fabric Sync Aggregator, but failed");
+                }
+                this->SynchronizationCompleteAddDevice();
+            },
+            *mController, remoteBridgeNodeId, remoteEndpointIdOfInterest);
 
     if (err == CHIP_NO_ERROR)
     {
         MoveToState(State::GettingUid);
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Failed to get UniqueId from remote Fabric Sync Aggregator")
     }
 }
 

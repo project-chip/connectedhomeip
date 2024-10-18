@@ -1744,6 +1744,12 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
 
     device_descriptors = config.qr_code_content + config.manual_code + config.discriminators
 
+    if not config.dut_node_ids:
+        config.dut_node_ids = [_DEFAULT_DUT_NODE_ID]
+
+    if args.commissioning_method is None:
+        return True
+
     if len(config.dut_node_ids) > len(device_descriptors):
         print("error: More node IDs provided than discriminators")
         return False
@@ -1751,8 +1757,6 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     if len(config.dut_node_ids) < len(device_descriptors):
         # We generate new node IDs sequentially from the last one seen for all
         # missing NodeIDs when commissioning many nodes at once.
-        if not config.dut_node_ids:
-            config.dut_node_ids = [_DEFAULT_DUT_NODE_ID]
         missing = len(device_descriptors) - len(config.dut_node_ids)
         for i in range(missing):
             config.dut_node_ids.append(config.dut_node_ids[-1] + 1)
@@ -1764,9 +1768,6 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     if len(config.discriminators) != len(set(config.discriminators)):
         print("error: Duplicate value in discriminator list")
         return False
-
-    if args.commissioning_method is None:
-        return True
 
     if args.discriminators == [] and (args.qr_code == [] and args.manual_code == []):
         print("error: Missing --discriminator when no --qr-code/--manual-code present!")

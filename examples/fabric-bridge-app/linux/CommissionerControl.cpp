@@ -79,8 +79,8 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const
     VerifyOrReturnError(mNextStep == Step::kIdle, CHIP_ERROR_INCORRECT_STATE);
 
     CommissionerControl::Events::CommissioningRequestResult::Type result;
-    result.requestId    = request.requestId;
-    result.clientNodeId = request.clientNodeId;
+    result.requestID    = request.requestId;
+    result.clientNodeID = request.clientNodeId;
     result.fabricIndex  = request.fabricIndex;
     result.statusCode   = static_cast<uint8_t>(Protocols::InteractionModel::Status::Success);
 

@@ -68,9 +68,7 @@ Davis, CA 95616, USA
     <feature bit="0" code="EXTS" name="Extension" summary="Device provides ACL Extension attribute">
       <optionalConform/>
     </feature>
-    <feature bit="1" code="MNGD" name="ManagedDevice" summary="Device is managed">
-      <optionalConform/>
-    </feature>
+    <feature bit="1" code="MNGD" name="ManagedDevice" summary="Device is managed"/>
   </features>
   <dataTypes>
     <enum name="AccessControlEntryAuthModeEnum">
@@ -333,13 +331,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </event>
-    <event id="0x02" name="AccessRestrictionEntryChanged" priority="info">
-      <access readPrivilege="admin" fabricSensitive="true"/>
-      <mandatoryConform>
-        <feature name="MNGD"/>
-      </mandatoryConform>
-    </event>
-    <event id="0x03" name="FabricRestrictionReviewUpdate" priority="info">
+    <event id="0x02" name="FabricRestrictionReviewUpdate" priority="info">
       <access readPrivilege="admin" fabricSensitive="true"/>
       <mandatoryConform>
         <feature name="MNGD"/>
@@ -348,13 +340,11 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="1" name="Instruction" type="string">
-        <quality nullable="true"/>
-        <mandatoryConform/>
+        <optionalConform/>
         <constraint type="maxLength" value="512"/>
       </field>
-      <field id="2" name="RedirectURL" type="string">
-        <quality nullable="true"/>
-        <mandatoryConform/>
+      <field id="2" name="ARLRequestFlowUrl" type="string">
+        <optionalConform/>
         <constraint type="maxLength" value="256"/>
       </field>
     </event>

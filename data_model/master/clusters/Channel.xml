@@ -366,7 +366,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x04" name="GetProgramGuide" direction="commandToServer" response="ProgramGuideResponse">
-      <quality largeMessage="true"/>
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="EG"/>
@@ -401,7 +400,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x05" name="ProgramGuideResponse" direction="responseFromServer">
-      <quality largeMessage="true"/>
       <mandatoryConform>
         <feature name="EG"/>
       </mandatoryConform>
@@ -414,7 +412,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x06" name="RecordProgram" direction="commandToServer" response="Y">
-      <quality largeMessage="true"/>
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <andTerm>
@@ -440,7 +437,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x07" name="CancelRecordProgram" direction="commandToServer" response="Y">
-      <quality largeMessage="true"/>
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <andTerm>

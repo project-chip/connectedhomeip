@@ -47,10 +47,11 @@ class TC_BRBINFO_4_1(MatterBaseTest):
     async def _read_attribute_expect_success(self, endpoint, cluster, attribute, node_id):
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute, node_id=node_id)
 
-    # Override default timeout to support a 60 min wait
+    # This test has some manual steps and also multiple sleeps >= 30 seconds. Test typically runs under 3 mins,
+    # so 6 minutes is more than enough.
     @property
     def default_timeout(self) -> int:
-        return 63*60
+        return 6*60
 
     def desc_TC_BRBINFO_4_1(self) -> str:
         """Returns a description of this test"""
