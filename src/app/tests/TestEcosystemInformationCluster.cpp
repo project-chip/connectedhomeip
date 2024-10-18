@@ -49,11 +49,28 @@ const ClusterId kEcosystemInfoClusterId         = EcosystemInformation::Id;
 const AttributeId kDeviceDirectoryAttributeId   = EcosystemInformation::Attributes::DeviceDirectory::Id;
 const AttributeId kLocationDirectoryAttributeId = EcosystemInformation::Attributes::LocationDirectory::Id;
 
+class MockMatterContext : public MatterContext
+{
+public:
+    virtual void MarkDirty(EndpointId endpointId, AttributeId attributeId) override
+    {
+        ConcreteAttributePath path(endpointId, kEcosystemInfoClusterId, attributeId);
+        mDirtyMarkedList.push_back(path);
+    }
+
+    std::vector<ConcreteAttributePath> & GetDirtyList() { return mDirtyMarkedList; }
+
+private:
+    std::vector<ConcreteAttributePath> mDirtyMarkedList;
+};
+
 } // namespace
 
 class TestEcosystemInformationCluster : public ::testing::Test
 {
 public:
+    TestEcosystemInformationCluster() : mClusterServer(TestOnlyParameter(), mMockMatterContext) {}
+
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
@@ -80,7 +97,10 @@ public:
         return locationInfo;
     }
 
+    MockMatterContext & GetMockMatterContext() { return mMockMatterContext; }
+
 private:
+    MockMatterContext mMockMatterContext;
     Clusters::EcosystemInformation::EcosystemInformationServer mClusterServer;
 };
 
@@ -265,6 +285,19 @@ TEST_F(TestEcosystemInformationCluster, AddDeviceInfo)
     ASSERT_FALSE(iterator.Next());
 }
 
+TEST_F(TestEcosystemInformationCluster, AddDeviceInfoResultInMarkDirty)
+{
+    std::unique_ptr<EcosystemDeviceStruct> deviceInfo = CreateSimplestValidDeviceStruct();
+    ASSERT_EQ(EcoInfoCluster().AddDeviceInfo(kValidEndpointId, std::move(deviceInfo)), CHIP_NO_ERROR);
+
+    auto markedDirtyList = GetMockMatterContext().GetDirtyList();
+    ASSERT_EQ(markedDirtyList.size(), 1u);
+    ConcreteAttributePath path = markedDirtyList[0];
+    ASSERT_EQ(path.mEndpointId, kValidEndpointId);
+    ASSERT_EQ(path.mClusterId, kEcosystemInfoClusterId);
+    ASSERT_EQ(path.mAttributeId, kDeviceDirectoryAttributeId);
+}
+
 TEST_F(TestEcosystemInformationCluster, BuildingEcosystemLocationStruct)
 {
     EcosystemLocationStruct::Builder locationInfoBuilder;
@@ -386,6 +419,22 @@ TEST_F(TestEcosystemInformationCluster, AddLocationInfo)
     ASSERT_EQ(locationDirectoryEntry.locationDescriptorLastEdit, 0u);
     ASSERT_EQ(locationDirectoryEntry.fabricIndex, Testing::kAdminSubjectDescriptor.fabricIndex);
     ASSERT_FALSE(iterator.Next());
+}
+
+TEST_F(TestEcosystemInformationCluster, AddLocationInfoResultInMarkDirty)
+{
+    std::unique_ptr<EcosystemLocationStruct> locationInfo = CreateValidLocationStruct();
+    const char * kValidLocationIdStr                      = "SomeLocationIdString";
+    ASSERT_EQ(EcoInfoCluster().AddLocationInfo(kValidEndpointId, kValidLocationIdStr, Testing::kAdminSubjectDescriptor.fabricIndex,
+                                               std::move(locationInfo)),
+              CHIP_NO_ERROR);
+
+    auto markedDirtyList = GetMockMatterContext().GetDirtyList();
+    ASSERT_EQ(markedDirtyList.size(), 1u);
+    ConcreteAttributePath path = markedDirtyList[0];
+    ASSERT_EQ(path.mEndpointId, kValidEndpointId);
+    ASSERT_EQ(path.mClusterId, kEcosystemInfoClusterId);
+    ASSERT_EQ(path.mAttributeId, kLocationDirectoryAttributeId);
 }
 
 } // namespace app

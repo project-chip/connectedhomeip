@@ -305,15 +305,3 @@ CHIP_ERROR FabricSyncDeviceCommand::RunCommand(EndpointId remoteId)
 
     return CHIP_NO_ERROR;
 }
-
-CHIP_ERROR FabricAutoSyncCommand::RunCommand(bool enableAutoSync)
-{
-    DeviceMgr().EnableAutoSync(enableAutoSync);
-
-    // print to console
-    fprintf(stderr, "Auto Fabric Sync is %s.\n", enableAutoSync ? "enabled" : "disabled");
-    fprintf(stderr,
-            "WARNING: The auto-sync command is currently under development and may contain bugs. Use it at your own risk.\n");
-
-    return CHIP_NO_ERROR;
-}
