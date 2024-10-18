@@ -305,7 +305,7 @@ void emberAfSetupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, 
         //   to the way static cluster code generation works.
         const_cast<EmberAfCluster &>(endpointType.cluster[i]) = *cluster;
         // sum up the needed storage
-        endpointType.endpointSize = (uint16_t) (endpointType.endpointSize + cluster->clusterSize);
+        endpointType.endpointSize += cluster->clusterSize;
     }
 }
 
@@ -352,7 +352,8 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
     }
 
 #if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
-    if (!dynamicAttributeStorage.empty() && dynamicAttributeStorage.size()<ep->endpointSize) {
+    if (!dynamicAttributeStorage.empty() && dynamicAttributeStorage.size() < ep->endpointSize)
+    {
         return CHIP_ERROR_NO_MEMORY; // not enough memory provided for dynamic attribute storage
     }
 #endif
@@ -714,15 +715,21 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                                 // - singleton: statically allocated in singletonAttributeData global
                                 // - static endpoint: statically allocated in attributeData global
                                 // - dynamic endpoint with dynamic storage: in memory block provided at endpoint instantiation
-                                uint8_t * attributeLocation =
-                                    (am->mask & ATTRIBUTE_MASK_SINGLETON
-                                         ? singletonAttributeLocation(am)
+                                uint8_t * attributeLocation;
+                                if (am->mask & ATTRIBUTE_MASK_SINGLETON)
+                                {
+                                    attributeLocation = singletonAttributeLocation(am);
+                                }
 #if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
-                                         : (hasDynamicAttributeStorage ? emAfEndpoints[ep].dynamicAttributeStorage : attributeData)
-#else
-                                         : attributeData
+                                else if (hasDynamicAttributeStorage)
+                                {
+                                    attributeLocation = emAfEndpoints[ep].dynamicAttributeStorage.data();
+                                }
 #endif
-                                             + attributeStorageOffset);
+                                else
+                                {
+                                    attributeLocation = attributeData;
+                                }
 
                                 uint8_t *src, *dst;
                                 if (write)
