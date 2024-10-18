@@ -1327,7 +1327,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readMaxPreRollBufferSizeAttribute(): UInt? {
+  suspend fun readMaxContentBufferSizeAttribute(): UInt? {
     val ATTRIBUTE_ID: UInt = 6u
 
     val attributePath =
@@ -1349,7 +1349,7 @@ class CameraAvStreamManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Maxprerollbuffersize attribute not found in response" }
+    requireNotNull(attributeData) { "Maxcontentbuffersize attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -1363,7 +1363,7 @@ class CameraAvStreamManagementCluster(
     return decodedValue
   }
 
-  suspend fun subscribeMaxPreRollBufferSizeAttribute(
+  suspend fun subscribeMaxContentBufferSizeAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
@@ -1399,7 +1399,7 @@ class CameraAvStreamManagementCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Maxprerollbuffersize attribute not found in Node State update"
+            "Maxcontentbuffersize attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
