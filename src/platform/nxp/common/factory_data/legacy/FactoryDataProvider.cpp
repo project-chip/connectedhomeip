@@ -129,10 +129,10 @@ CHIP_ERROR FactoryDataProvider::Validate()
     uint8_t output[Crypto::kSHA256_Hash_Length] = { 0 };
 
     memcpy(&mHeader, (void *) mConfig.start, sizeof(Header));
-    ReturnErrorCodeIf(mHeader.hashId != kHashId, CHIP_FACTORY_DATA_HASH_ID);
+    VerifyOrReturnError(mHeader.hashId == kHashId, CHIP_FACTORY_DATA_HASH_ID);
 
     ReturnErrorOnFailure(Crypto::Hash_SHA256((uint8_t *) mConfig.payload, mHeader.size, output));
-    ReturnErrorCodeIf(memcmp(output, mHeader.hash, kHashLen) != 0, CHIP_FACTORY_DATA_SHA_CHECK);
+    VerifyOrReturnError(memcmp(output, mHeader.hash, kHashLen) == 0, CHIP_FACTORY_DATA_SHA_CHECK);
 
     return CHIP_NO_ERROR;
 }
@@ -150,7 +150,7 @@ CHIP_ERROR FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t * pBuf
 
         if (searchedType == type)
         {
-            ReturnErrorCodeIf(bufLength < length, CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrReturnError(bufLength >= length, CHIP_ERROR_BUFFER_TOO_SMALL);
             memcpy(pBuf, (void *) (addr + kValueOffset), length);
 
             if (offset)
@@ -241,7 +241,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kSaltId, (uint8_t *) (&saltB64[0]), sizeof(saltB64), saltB64Len));
     size_t saltLen = chip::Base64Decode32(saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
 
-    ReturnErrorCodeIf(saltLen > saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(saltLen <= saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(saltBuf.data(), saltB64, saltLen);
     saltBuf.reduce_size(saltLen);
 
@@ -255,7 +255,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kVerifierId, (uint8_t *) &verifierB64[0], sizeof(verifierB64), verifierB64Len));
 
     verifierLen = chip::Base64Decode32(verifierB64, verifierB64Len, reinterpret_cast<uint8_t *>(verifierB64));
-    ReturnErrorCodeIf(verifierLen > verifierBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(verifierLen <= verifierBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(verifierBuf.data(), verifierB64, verifierLen);
     verifierBuf.reduce_size(verifierLen);
 
@@ -401,7 +401,7 @@ CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & un
     {
         constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
 
-        ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(sizeof(uniqueId) <= uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
         uniqueIdLen = sizeof(uniqueId);
         err         = CHIP_NO_ERROR;
@@ -419,7 +419,7 @@ CHIP_ERROR FactoryDataProvider::GetProductFinish(app::Clusters::BasicInformation
     uint8_t productFinish;
     uint16_t length = 0;
     auto err        = SearchForId(FactoryDataId::kProductFinish, &productFinish, sizeof(productFinish), length);
-    ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
 
     *finish = static_cast<app::Clusters::BasicInformation::ProductFinishEnum>(productFinish);
 
@@ -431,7 +431,7 @@ CHIP_ERROR FactoryDataProvider::GetProductPrimaryColor(app::Clusters::BasicInfor
     uint8_t color;
     uint16_t length = 0;
     auto err        = SearchForId(FactoryDataId::kProductPrimaryColor, &color, sizeof(color), length);
-    ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
 
     *primaryColor = static_cast<app::Clusters::BasicInformation::ColorEnum>(color);
 
