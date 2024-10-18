@@ -46,8 +46,6 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-              with:
-                fetch-depth: 0
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -63,6 +61,8 @@ jobs:
             #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 3ed7686a9378de6be1368c912f9a42f998bbfb18"
 
             - name: Build example Telink (B92 retention) Air Quality Sensor App
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9528a_retention-air-quality-sensor' build"
@@ -75,6 +75,8 @@ jobs:
               run: rm -rf ./out
 
             - name: Build example Telink (W91) All Clusters App
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               continue-on-error: true
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -88,6 +90,8 @@ jobs:
               run: rm -rf ./out
 
             - name: Build example Telink (B92) All Clusters Minimal App
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9528a-all-clusters-minimal' build"
@@ -100,6 +104,7 @@ jobs:
               run: rm -rf ./out
 
             - name: Build example Telink (B95) Bridge App
+              # Run test for master and all PRs
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9258a-bridge' build"
@@ -112,6 +117,7 @@ jobs:
               run: rm -rf ./out
 
             - name: Build example Telink (B92 retention) Contact Sensor App
+              # Run test for master and all PRs
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9528a_retention-contact-sensor' build"
@@ -124,6 +130,7 @@ jobs:
               run: rm -rf ./out
 
             - name: Build tools required for Factory Data
+              # Run test for master and all PRs
               run: |
                   ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
                   ./scripts/build/gn_gen.sh
@@ -134,6 +141,7 @@ jobs:
               run: rm -rf ./out/telink*
 
             - name: Build example Telink (W91) Lighting App with OTA, Factory Data
+              # Run test for master and all PRs
               continue-on-error: true
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -147,6 +155,7 @@ jobs:
               run: rm -rf ./out/telink*
 
             - name: Build example Telink (B91) Lighting App with OTA, RPC, Factory Data and 4Mb flash
+              # Run test for master and all PRs
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light-ota-rpc-factory-data-4mb' build"
@@ -159,6 +168,7 @@ jobs:
               run: rm -rf ./out/telink*
 
             - name: Build example Telink (B92) Light Switch App with OTA, Shell, Factory Data
+              # Run test for master and all PRs
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9528a-light-switch-ota-shell-factory-data' build"
@@ -171,6 +181,8 @@ jobs:
               run: rm -rf ./out
 
             - name: Build example Telink (B92) Lock App with DFU
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9528a-lock-dfu' build"
@@ -183,6 +195,8 @@ jobs:
               run: rm -rf ./out
 
             - name: Build example Telink (B95) OTA Requestor App
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9258a-ota-requestor' build"
@@ -195,6 +209,8 @@ jobs:
               run: rm -rf ./out
 
             - name: Build example Telink (B91 USB) Pump App
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-pump-usb' build"
@@ -207,6 +223,8 @@ jobs:
               run: rm -rf ./out
 
             - name: Build example Telink (B91) Pump Controller App
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-pump-controller' build"
@@ -219,6 +237,8 @@ jobs:
               run: rm -rf ./out
 
             - name: Build example Telink (B91) Shell App
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-shell' build"
@@ -231,6 +251,8 @@ jobs:
               run: rm -rf ./out
 
             - name: Build example Telink (B92 retention) Smoke CO Alarm App
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9528a_retention-smoke-co-alarm' build"
@@ -243,6 +265,8 @@ jobs:
               run: rm -rf ./out
 
             - name: Build example Telink (B91 Mars) Temperature Measurement App with OTA
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-temperature-measurement-mars-ota' build"
@@ -255,6 +279,8 @@ jobs:
               run: rm -rf ./out
 
             - name: Build example Telink (B91) Thermostat App
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-thermostat' build"
@@ -267,6 +293,8 @@ jobs:
               run: rm -rf ./out
 
             - name: Build example Telink (W91) Window Covering App
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               continue-on-error: true
               run: |
                   ./scripts/run_in_build_env.sh \
