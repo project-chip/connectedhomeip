@@ -70,7 +70,7 @@ CHIP_ERROR FactoryDataDriverImpl::InitRamBackup(void)
     VerifyOrReturnError(mFactoryDataRamBuff == nullptr, CHIP_ERROR_INTERNAL);
 
     mFactoryDataRamBuff = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(mMaxSize));
-    ReturnErrorCodeIf(mFactoryDataRamBuff == nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mFactoryDataRamBuff != nullptr, CHIP_ERROR_INTERNAL);
 
     memset(mFactoryDataRamBuff, 0, mMaxSize);
     memcpy(mFactoryDataRamBuff, (void *) &mFactoryData->app_factory_data[0], mSize);
@@ -97,7 +97,7 @@ CHIP_ERROR FactoryDataDriverImpl::ReadBackupInRam()
     if (mFactoryDataRamBuff == nullptr)
     {
         mFactoryDataRamBuff = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(mMaxSize));
-        ReturnErrorCodeIf(mFactoryDataRamBuff == nullptr, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(mFactoryDataRamBuff != nullptr, CHIP_ERROR_NO_MEMORY);
         memset(mFactoryDataRamBuff, 0, mMaxSize);
     }
 
@@ -111,7 +111,7 @@ CHIP_ERROR FactoryDataDriverImpl::ReadBackupInRam()
 CHIP_ERROR FactoryDataDriverImpl::BackupFactoryData()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    ReturnErrorCodeIf(mFactoryData == nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mFactoryData != nullptr, CHIP_ERROR_INTERNAL);
 
     error = KeyValueStoreMgr().Put(FactoryDataDriverImpl::GetFactoryBackupKey().KeyName(), &mFactoryData->app_factory_data[0],
                                    mMaxSize);

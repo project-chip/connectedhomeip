@@ -350,7 +350,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 
     if (checkAcl)
     {
-        ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), Status::UnsupportedAccess);
+        VerifyOrReturnError(request.subjectDescriptor.has_value(), Status::UnsupportedAccess);
 
         Access::RequestPath requestPath{ .cluster     = request.path.mClusterId,
                                          .endpoint    = request.path.mEndpointId,
