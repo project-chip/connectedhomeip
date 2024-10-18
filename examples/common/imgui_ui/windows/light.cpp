@@ -147,7 +147,9 @@ void Light::Render()
         ImGui::SliderInt("Current Level", &uiValue, mMinLevel, mMaxLevel);
         if (uiValue != mCurrentLevel.Value())
         {
-            mTargetLevel.SetValue(uiValue); // schedule future update
+            // uiValue must be in the uint8_t range because mMinLevel and
+            // mMaxLevel are.
+            mTargetLevel.SetValue(static_cast<uint8_t>(uiValue)); // schedule future update
         }
     }
     ImGui::Unindent();
