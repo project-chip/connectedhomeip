@@ -3303,7 +3303,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return nil;
 }
 
-- (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther
+- (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)one isEqualToDataValue:(MTRDeviceDataValueDictionary)theOther
 {
     // Sanity check for nil cases
     if (!one && !theOther) {
@@ -3317,6 +3317,133 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     // Attribute data-value dictionaries are equal if type and value are equal, and specifically, this should return true if values are both nil
     return [one[MTRTypeKey] isEqual:theOther[MTRTypeKey]] && ((one[MTRValueKey] == theOther[MTRValueKey]) || [one[MTRValueKey] isEqual:theOther[MTRValueKey]]);
+}
+
+// _attributeDataValue:isEquivalentToDataValue: differs from
+// _attributeDataValue:isEqualToDataValue in that it does not insist on the
+// order of fields in structs matching between the two values.  While in theory
+// the spec does require a specific ordering for struct fields, in practice we
+// should not force certain API consumers to deal with knowing what that
+// ordering is.
+- (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)one isEquivalentToDataValue:(MTRDeviceDataValueDictionary)theOther
+{
+    // Sanity check for nil cases
+    if (!one && !theOther) {
+        MTR_LOG_ERROR("%@ attribute data-value comparison does not expect comparing two nil dictionaries", self);
+        return YES;
+    }
+
+    if (!one || !theOther) {
+        // Comparing against nil is expected, and should return NO quietly
+        return NO;
+    }
+
+    if (![one[MTRTypeKey] isEqual:theOther[MTRTypeKey]]) {
+        // Different types, not equivalent.
+        return NO;
+    }
+
+    if ([MTRArrayValueType isEqual:one[MTRTypeKey]]) {
+        // For array-values, check that sizes are same and entries are equivalent.
+        if (![one[MTRValueKey] isKindOfClass:NSArray.class] || ![theOther[MTRValueKey] isKindOfClass:NSArray.class]) {
+            // Malformed data, just claim not equivalent.
+            MTR_LOG_ERROR("%@ array-values not equivalent because at least one is not an NSArrray: %@, %@", self, one, theOther);
+            return NO;
+        }
+
+        NSArray<NSDictionary<NSString *, MTRDeviceDataValueDictionary> *> * oneArray = one[MTRValueKey];
+        NSArray<NSDictionary<NSString *, MTRDeviceDataValueDictionary> *> * theOtherArray = theOther[MTRValueKey];
+
+        if (oneArray.count != theOtherArray.count) {
+            return NO;
+        }
+
+        for (NSUInteger i = 0; i < oneArray.count; ++i) {
+            NSDictionary<NSString *, MTRDeviceDataValueDictionary> * oneEntry = oneArray[i];
+            NSDictionary<NSString *, MTRDeviceDataValueDictionary> * theOtherEntry = theOtherArray[i];
+
+            if (![oneEntry isKindOfClass:NSDictionary.class] || ![theOtherEntry isKindOfClass:NSDictionary.class]) {
+                MTR_LOG_ERROR("%@ array-values not equivalent because they contain entries that are not NSDictionary: %@, %@", self, oneEntry, theOtherEntry);
+                return NO;
+            }
+
+            if (![self _attributeDataValue:oneEntry[MTRDataKey] isEquivalentToDataValue:theOtherEntry[MTRDataKey]]) {
+                return NO;
+            }
+        }
+
+        return YES;
+    }
+
+    if (![MTRStructureValueType isEqual:one[MTRTypeKey]]) {
+        // For everything except arrays and structs, equivalence and equality
+        // are the same.
+        return [self _attributeDataValue:one isEqualToDataValue:theOther];
+    }
+
+    // Now we have two structure-values.  Make sure they have the same number of fields
+    // in them.
+    if (![one[MTRValueKey] isKindOfClass:NSArray.class] || ![theOther[MTRValueKey] isKindOfClass:NSArray.class]) {
+        // Malformed data, just claim not equivalent.
+        MTR_LOG_ERROR("%@ structure-values not equivalent because at least one is not an NSArrray: %@, %@", self, one, theOther);
+        return NO;
+    }
+
+    NSArray<NSDictionary<NSString *, id> *> * oneArray = one[MTRValueKey];
+    NSArray<NSDictionary<NSString *, id> *> * theOtherArray = theOther[MTRValueKey];
+
+    if (oneArray.count != theOtherArray.count) {
+        return NO;
+    }
+
+    for (NSDictionary<NSString *, id> * oneField in oneArray) {
+        if (![oneField[MTRContextTagKey] isKindOfClass:NSNumber.class] || ![oneField[MTRDataKey] isKindOfClass:NSDictionary.class]) {
+            MTR_LOG_ERROR("%@ structure-value contains invalid field %@", self, oneField);
+            return NO;
+        }
+
+        NSNumber * oneContextTag = oneField[MTRContextTagKey];
+
+        // Make sure it's present in the other array.  In practice, these are
+        // pretty small arrays, so the O(N^2) behavior here is ok.
+        BOOL found = NO;
+        for (NSDictionary<NSString *, id> * theOtherField in theOtherArray) {
+            if (![theOtherField[MTRContextTagKey] isKindOfClass:NSNumber.class] || ![theOtherField[MTRDataKey] isKindOfClass:NSDictionary.class]) {
+                MTR_LOG_ERROR("%@ structure-value contains invalid field %@", self, theOtherField);
+                return NO;
+            }
+
+            NSNumber * theOtherContextTag = theOtherField[MTRContextTagKey];
+            if ([oneContextTag isEqual:theOtherContextTag]) {
+                found = YES;
+
+                // Compare the data.
+                if (![self _attributeDataValue:oneField[MTRDataKey] isEquivalentToDataValue:theOtherField[MTRDataKey]]) {
+                    return NO;
+                }
+
+                // Found a match for the context tag, stop looking.
+                break;
+            }
+        }
+
+        if (!found) {
+            // Context tag present in one but not theOther.
+            return NO;
+        }
+    }
+
+    // All entries in the first field array matched entries in the second field
+    // array.  Since the lengths are equal, the two arrays must match, as long
+    // as all the context tags listed are distinct.  If someone produces invalid
+    // TLV with the same context tag set in it multiple times, this method could
+    // claim two structure-values are equivalent when the first has two fields
+    // with context tag N and the second has a field with context tag N and
+    // another field with context tag M.  That should be ok, in practice, but if
+    // we discover it's not we will need a better algorithm here.  It's not
+    // clear what "equivalent" should mean for such malformed TLV, expecially if
+    // the same context tag maps to different values in one of the structs.
+    return YES;
 }
 
 // Utility to return data value dictionary without data version
@@ -3534,9 +3661,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     NSMutableArray * attributePathsToReport = [NSMutableArray array];
     for (NSDictionary<NSString *, id> * attributeResponseValue in reportedAttributeValues) {
         MTRAttributePath * attributePath = attributeResponseValue[MTRAttributePathKey];
-        NSDictionary * attributeDataValue = attributeResponseValue[MTRDataKey];
-        NSError * attributeError = attributeResponseValue[MTRErrorKey];
-        NSDictionary * previousValue;
+        MTRDeviceDataValueDictionary _Nullable attributeDataValue = attributeResponseValue[MTRDataKey];
+        NSError * _Nullable attributeError = attributeResponseValue[MTRErrorKey];
+        MTRDeviceDataValueDictionary _Nullable previousValue;
 
         // sanity check either data value or error must exist
         if (!attributeDataValue && !attributeError) {
