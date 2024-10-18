@@ -1,4 +1,4 @@
-# How to Add New Device Types & Clusters
+# Adding new clusters and device types to the codegen
 
 This document outlines the process needed to add a new Matter device type and
 related clusters. Obviously, the steps below assume that the related Matter
