@@ -36,7 +36,7 @@ chip_test_suite("data_model") {
       "TestWrite.cpp",
     ]
     if (chip_device_platform != "efr32") {
-      test_sources += ["TestRead.cpp"]
+      test_sources += [ "TestRead.cpp" ]
     }
   }
 
