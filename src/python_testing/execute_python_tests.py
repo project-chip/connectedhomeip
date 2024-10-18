@@ -64,6 +64,7 @@ def main(search_directory, env_file):
         "TC_OpstateCommon.py",  # Shared code for TC_OPSTATE, not a standalone test
         "TC_pics_checker.py",  # Currently isn't enabled because we don't have any examples with conformant PICS
         "TC_TMP_2_1.py",  # src/python_testing/test_testing/test_TC_TMP_2_1.py is the Unit test of this test
+	"TC_CADMIN_1_4_noreset.py", # Run only to verify that TC_CADMIN_1_4 works correctly at the end of src/python_testing/TC_CADMIN_1_3_4.py
         "TC_OCC_3_1.py",  # There are CI issues for the test cases that implements manually controlling sensor device for the occupancy state ON/OFF change
         "TC_OCC_3_2.py",  # There are CI issues for the test cases that implements manually controlling sensor device for the occupancy state ON/OFF change
         "TestCommissioningTimeSync.py",  # Code/Test not being used or not shared code for any other tests

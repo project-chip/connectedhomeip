@@ -28,7 +28,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: false
-#     quiet: true
+#     quiet: false
 # === END CI TEST ARGUMENTS ===
 
 import random
@@ -99,7 +99,7 @@ class TC_CADMIN_1_4_noreset(MatterBaseTest):
 
     def steps_TC_CADMIN_1_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH_CR1 starts a commissioning process with DUT_CE", is_commissioning=False),
+            TestStep(1, "TH_CR1 starts a commissioning process with DUT_CE", is_commissioning=True),
             TestStep(2, "TH_CR1 reads the BasicCommissioningInfo attribute from the General Commissioning cluster and saves the MaxCumulativeFailsafeSeconds field as max_window_duration."),
             TestStep("3a", "TH_CR1 opens a commissioning window on DUT_CE using a commissioning timeout of max_window_duration using BCM",
                      "DUT_CE opens its Commissioning window to allow a second commissioning."),
