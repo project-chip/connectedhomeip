@@ -89,6 +89,11 @@ public:
     static const Key kConfigKey_VendorId;
     static const Key kConfigKey_ProductId;
 
+    static const Key kConfigKey_VendorName;
+    static const Key kConfigKey_ProductName;
+    static const Key kConfigKey_HardwareVersionString;
+    static const Key kConfigKey_SoftwareVersionString;
+
     // Config Keys
     static const Key kConfigKey_ServiceConfig;
     static const Key kConfigKey_PairedAccountId;

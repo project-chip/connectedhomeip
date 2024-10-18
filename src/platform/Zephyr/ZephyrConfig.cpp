@@ -73,6 +73,11 @@ const ZephyrConfig::Key ZephyrConfig::kConfigKey_RegulatoryLocation = CONFIG_KEY
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_CountryCode        = CONFIG_KEY(NAMESPACE_CONFIG "country-code");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_UniqueId           = CONFIG_KEY(NAMESPACE_CONFIG "unique-id");
 
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_VendorName            = CONFIG_KEY(NAMESPACE_CONFIG "vendor-name");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_ProductName           = CONFIG_KEY(NAMESPACE_CONFIG "product-name");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_HardwareVersionString = CONFIG_KEY(NAMESPACE_CONFIG "hardware-version-string");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_SoftwareVersionString = CONFIG_KEY(NAMESPACE_CONFIG "software-version-string");
+
 // Keys stored in the counters namespace
 const ZephyrConfig::Key ZephyrConfig::kCounterKey_RebootCount           = CONFIG_KEY(NAMESPACE_COUNTERS "reboot-count");
 const ZephyrConfig::Key ZephyrConfig::kCounterKey_BootReason            = CONFIG_KEY(NAMESPACE_COUNTERS "boot-reason");

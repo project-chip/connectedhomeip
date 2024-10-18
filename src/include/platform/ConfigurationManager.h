@@ -114,7 +114,6 @@ public:
 #endif
     virtual CHIP_ERROR GetRegulatoryLocation(uint8_t & location)                       = 0;
     virtual CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)    = 0;
-    virtual CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen)  = 0;
     virtual CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) = 0;
     virtual CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer)                      = 0;
     virtual CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer)                      = 0;
@@ -133,6 +132,16 @@ public:
     virtual CHIP_ERROR SetFailSafeArmed(bool val)                                      = 0;
 
     virtual CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) = 0;
+    virtual CHIP_ERROR StoreSerialNumber(CharSpan serialNumber)                                            = 0;
+    virtual CHIP_ERROR StoreVendorName(CharSpan vendorName)                                                = 0;
+    virtual CHIP_ERROR StoreProductName(CharSpan productName)                                              = 0;
+    virtual CHIP_ERROR StoreHardwareVersionString(CharSpan hardwareVersionString)                          = 0;
+    virtual CHIP_ERROR StoreSoftwareVersionString(CharSpan softwareVersionString)                          = 0;
+
+    virtual CHIP_ERROR StoreVendorName(const char * vendorName, size_t vendorNameLen)                                  = 0;
+    virtual CHIP_ERROR StoreProductName(const char * productName, size_t productNameLen)                               = 0;
+    virtual CHIP_ERROR StoreHardwareVersionString(const char * hardwareVersionString, size_t hardwareVersionStringLen) = 0;
+    virtual CHIP_ERROR StoreSoftwareVersionString(const char * softwareVersionString, size_t softwareVersionStringLen) = 0;
 
 #if CHIP_CONFIG_TEST
     virtual void RunUnitTests() = 0;

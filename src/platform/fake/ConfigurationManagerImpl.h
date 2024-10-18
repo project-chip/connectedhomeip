@@ -49,7 +49,11 @@ private:
     }
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreSerialNumber(CharSpan serialNumber) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreVendorName(CharSpan vendorName) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreProductName(CharSpan productName) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreHardwareVersionString(CharSpan hardwareVersionString) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreSoftwareVersionString(CharSpan softwareVersionString) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -85,6 +89,18 @@ private:
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    CHIP_ERROR StoreVendorName(const char * vendorName, size_t vendorNameLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreProductName(const char * productName, size_t productNameLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreHardwareVersionString(const char * hardwareVersionString, size_t hardwareVersionStringLen) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR StoreSoftwareVersionString(const char * softwareVersionString, size_t softwareVersionStringLen) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
 #if CHIP_CONFIG_TEST
     void RunUnitTests() override {}
 #endif

@@ -67,6 +67,11 @@ const KVPsaPsStore::Key KVPsaPsStore::kConfigKey_CountryCode        = GetPsaPaKe
 const KVPsaPsStore::Key KVPsaPsStore::kConfigKey_LocationCapability = GetPsaPaKey(kMatterConfig_KeyOffset, 0x08);
 const KVPsaPsStore::Key KVPsaPsStore::kConfigKey_UniqueId           = GetPsaPaKey(kMatterConfig_KeyOffset, 0x09);
 
+const KVPsaPsStore::Key KVPsaPsStore::kConfigKey_VendorName            = GetPsaPaKey(kMatterConfig_KeyOffset, 0x0A);
+const KVPsaPsStore::Key KVPsaPsStore::kConfigKey_ProductName           = GetPsaPaKey(kMatterConfig_KeyOffset, 0x0B);
+const KVPsaPsStore::Key KVPsaPsStore::kConfigKey_HardwareVersionString = GetPsaPaKey(kMatterConfig_KeyOffset, 0x0C);
+const KVPsaPsStore::Key KVPsaPsStore::kConfigKey_SoftwareVersionString = GetPsaPaKey(kMatterConfig_KeyOffset, 0x0D);
+
 // Keys stored in the Matter counters group
 const KVPsaPsStore::Key KVPsaPsStore::kCounterKey_RebootCount           = GetPsaPaKey(kMatterCounter_KeyOffset, 0x00);
 const KVPsaPsStore::Key KVPsaPsStore::kCounterKey_UpTime                = GetPsaPaKey(kMatterCounter_KeyOffset, 0x01);
