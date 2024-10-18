@@ -34,14 +34,14 @@
 #       --int-arg PIXIT.RVCRUNM.MODE_B:2
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factoryreset: true
+#     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import enum
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 # This test requires several additional command line arguments.

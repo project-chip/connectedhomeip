@@ -119,7 +119,6 @@ using namespace chip::Tracing::DarwinFramework;
 @end
 
 @implementation MTRDeviceController {
-    chip::Controller::DeviceCommissioner * _cppCommissioner;
     chip::Credentials::PartialDACVerifier * _partialDACVerifier;
     chip::Credentials::DefaultDACVerifier * _defaultDACVerifier;
     MTRDeviceControllerDelegateBridge * _deviceControllerDelegateBridge;
@@ -206,7 +205,8 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (BOOL)isRunning
 {
-    return _cppCommissioner != nullptr;
+    MTR_ABSTRACT_METHOD();
+    return NO;
 }
 
 #pragma mark - Suspend/resume support
@@ -313,7 +313,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (void)shutdown
 {
-    // Subclass hook; nothing to do.
+    [self _clearDeviceControllerDelegates];
 }
 
 - (nullable NSNumber *)controllerNodeID
@@ -547,37 +547,9 @@ using namespace chip::Tracing::DarwinFramework;
     completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
 }
 
-- (MTRTransportType)sessionTransportTypeForDevice:(MTRBaseDevice *)device
-{
-    VerifyOrReturnValue([self checkIsRunning], MTRTransportTypeUndefined);
-
-    __block MTRTransportType result = MTRTransportTypeUndefined;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning]);
-
-        if (device.isPASEDevice) {
-            chip::CommissioneeDeviceProxy * deviceProxy;
-            VerifyOrReturn(CHIP_NO_ERROR == self->_cppCommissioner->GetDeviceBeingCommissioned(device.nodeID, &deviceProxy));
-            result = MTRMakeTransportType(deviceProxy->GetDeviceTransportType());
-        } else {
-            auto scopedNodeID = self->_cppCommissioner->GetPeerScopedId(device.nodeID);
-            auto sessionHandle = self->_cppCommissioner->SessionMgr()->FindSecureSessionForNode(scopedNodeID);
-            VerifyOrReturn(sessionHandle.HasValue());
-            result = MTRMakeTransportType(sessionHandle.Value()->AsSecureSession()->GetPeerAddress().GetTransportType());
-        }
-    });
-    return result;
-}
-
-- (void)asyncGetCommissionerOnMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
-                             errorHandler:(nullable MTRDeviceErrorHandler)errorHandler
-{
-    MTR_ABSTRACT_METHOD();
-    errorHandler([MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
-}
-
 - (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler
 {
+    // TODO: Figure out how to get callsites to have an MTRDeviceController_Concrete.
     MTR_ABSTRACT_METHOD();
     errorHandler([MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
 }
@@ -625,31 +597,6 @@ using namespace chip::Tracing::DarwinFramework;
 {
     auto storedValue = _storedCompressedFabricID.load();
     return storedValue.has_value() ? @(storedValue.value()) : nil;
-}
-
-- (void)invalidateCASESessionForNode:(chip::NodeId)nodeID;
-{
-    auto block = ^{
-        auto sessionMgr = self->_cppCommissioner->SessionMgr();
-        VerifyOrDie(sessionMgr != nullptr);
-
-        sessionMgr->MarkSessionsAsDefunct(
-            self->_cppCommissioner->GetPeerScopedId(nodeID), chip::MakeOptional(chip::Transport::SecureSession::Type::kCASE));
-    };
-
-    [self syncRunOnWorkQueue:block error:nil];
-}
-
-- (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
-                             type:(MTRDiagnosticLogType)type
-                          timeout:(NSTimeInterval)timeout
-                            queue:(dispatch_queue_t)queue
-                       completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
-{
-    MTR_ABSTRACT_METHOD();
-    dispatch_async(queue, ^{
-        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
-    });
 }
 
 #ifdef DEBUG
@@ -721,6 +668,14 @@ using namespace chip::Tracing::DarwinFramework;
         } else {
             MTR_LOG("%@ removeDeviceControllerDelegate: delegate %p not found in %lu", self, delegate, static_cast<unsigned long>(_delegates.count));
         }
+    }
+}
+
+- (void)_clearDeviceControllerDelegates
+{
+    @synchronized(self) {
+        _strongDelegateForSetDelegateAPI = nil;
+        [_delegates removeAllObjects];
     }
 }
 

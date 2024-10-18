@@ -40,46 +40,53 @@
 
 @end
 
+NSString * const MTRDeviceControllerRegistrationControllerContextKey = @"MTRDeviceControllerRegistrationControllerContext";
+NSString * const MTRDeviceControllerRegistrationNodeIDsKey = @"MTRDeviceControllerRegistrationNodeIDs";
+NSString * const MTRDeviceControllerRegistrationNodeIDKey = @"MTRDeviceControllerRegistrationNodeID";
+
 // #define MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 
 @implementation MTRDeviceController_XPC
 
-#pragma mark - Device Node ID Commands
+#pragma mark - Node ID Management
+
+MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
+                                               : (NSDictionary *) controllerState, updateControllerConfiguration
+                                               : (NSDictionary *) controllerState)
+
+- (void)_updateRegistrationInfo
+{
+    NSMutableDictionary * registrationInfo = [NSMutableDictionary dictionary];
+
+    NSMutableDictionary * controllerContext = [NSMutableDictionary dictionary];
+    NSMutableArray * nodeIDs = [NSMutableArray array];
+
+    for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
+        NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
+        MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
+
+        [nodeIDs addObject:nodeDictionary];
+    }
+    MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDsKey, nodeIDs, registrationInfo)
+    MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationControllerContextKey, controllerContext, registrationInfo)
+
+    [self updateControllerConfiguration:registrationInfo];
+}
 
 - (void)_registerNodeID:(NSNumber *)nodeID
 {
-    @try {
-        [[self.xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-            MTR_LOG_ERROR("Register node error: %@   nodeID: %@", error, nodeID);
-        }] deviceController:self.uniqueIdentifier registerNodeID:nodeID];
-    } @catch (NSException * exception) {
-        MTR_LOG_ERROR("Exception registering nodeID: %@", exception);
-    }
+    [self _updateRegistrationInfo];
 }
 
 - (void)_unregisterNodeID:(NSNumber *)nodeID
 {
-    @try {
-        [[self.xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-            MTR_LOG_ERROR("Unregister node error: %@   nodeID: %@", error, nodeID);
-        }] deviceController:self.uniqueIdentifier unregisterNodeID:nodeID];
-    } @catch (NSException * exception) {
-        MTR_LOG_ERROR("Exception unregistering nodeID: %@", exception);
-    }
+    [self _updateRegistrationInfo];
 }
 
-- (void)_checkinWithContext:(NSDictionary *)context
+- (void)removeDevice:(MTRDevice *)device
 {
-    @try {
-        if (!context)
-            context = [NSDictionary dictionary];
-
-        [[self.xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-            MTR_LOG_ERROR("Checkin error: %@", error);
-        }] deviceController:self.uniqueIdentifier checkInWithContext:context];
-    } @catch (NSException * exception) {
-        MTR_LOG_ERROR("Exception checking in with context: %@", exception);
-    }
+    [super removeDevice:device];
+    [self _updateRegistrationInfo];
 }
 
 #pragma mark - XPC
@@ -241,18 +248,10 @@
         MTR_LOG("%@ Activating new XPC connection", self);
         [self.xpcConnection activate];
 
-        [self _checkinWithContext:[NSDictionary dictionary]];
-
         // FIXME: Trying to kick all the MTRDevices attached to this controller to re-establish connections
         //        This state needs to be stored properly and re-established at connnection time
 
-        MTR_LOG("%@ Starting existing NodeID Registration", self);
-        for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
-            MTR_LOG("%@ => Registering nodeID: %@", self, nodeID);
-            [self _registerNodeID:nodeID];
-        }
-
-        MTR_LOG("%@ Done existing NodeID Registration", self);
+        [self _updateRegistrationInfo];
         self.xpcConnectedOrConnecting = YES;
     } else {
         MTR_LOG_ERROR("%@ Failed to set up XPC Connection", self);
@@ -340,7 +339,7 @@
     [self.nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
     MTR_LOG("%s: returning XPC device for node id %@", __PRETTY_FUNCTION__, nodeID);
 
-    [self _registerNodeID:nodeID];
+    [self _updateRegistrationInfo];
 
     return deviceToReturn;
 }

@@ -54,6 +54,11 @@ public:
     {
         return pw::Status::Unimplemented();
     }
+
+    virtual pw::Status DeviceReachableChanged(const chip_rpc_ReachabilityChanged & request, pw_protobuf_Empty & response)
+    {
+        return pw::Status::Unimplemented();
+    }
 };
 
 } // namespace rpc

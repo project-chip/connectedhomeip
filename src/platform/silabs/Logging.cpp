@@ -293,13 +293,6 @@ extern "C" void LwIPLog(const char * aFormat, ...)
     }
 
     PrintLog(formattedMsg);
-
-#if configCHECK_FOR_STACK_OVERFLOW
-    // Force a stack overflow check.
-    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
-        taskYIELD();
-#endif
-
     // Let the application know that a log message has been emitted.
     chip::DeviceLayer::OnLogOutput();
 #endif // SILABS_LOG_ENABLED
@@ -348,12 +341,6 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
         }
 
         PrintLog(formattedMsg);
-
-#if configCHECK_FOR_STACK_OVERFLOW
-        // Force a stack overflow check.
-        if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
-            taskYIELD();
-#endif
     }
 
     // Let the application know that a log message has been emitted.

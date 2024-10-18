@@ -273,7 +273,7 @@ extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism()
     CHIP_ERROR error           = CHIP_NO_ERROR;
     FactoryDataDriver * driver = &FactoryDataDrv();
 
-    ReturnErrorCodeIf(driver == nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(driver != nullptr, CHIP_ERROR_INTERNAL);
 
     // Check if key related to factory data backup exists.
     // If it does, it means an external event (such as a power loss)

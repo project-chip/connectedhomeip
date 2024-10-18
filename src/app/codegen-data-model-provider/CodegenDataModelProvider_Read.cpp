@@ -271,7 +271,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
     // ACL check for non-internal requests
     if (!request.operationFlags.Has(DataModel::OperationFlags::kInternal))
     {
-        ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(request.subjectDescriptor.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
 
         Access::RequestPath requestPath{ .cluster     = request.path.mClusterId,
                                          .endpoint    = request.path.mEndpointId,
@@ -281,7 +281,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
                                                           RequiredPrivilege::ForReadAttribute(request.path));
         if (err != CHIP_NO_ERROR)
         {
-            ReturnErrorCodeIf((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
+            VerifyOrReturnError((err == CHIP_ERROR_ACCESS_DENIED) || (err == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
 
             // Implementation of 8.4.3.2 of the spec for path expansion
             if (request.path.mExpanded)
@@ -319,7 +319,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
             request.path, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId),
             encoder);
     }
-    ReturnErrorCodeIf(aai_result.has_value(), *aai_result);
+    VerifyOrReturnError(!aai_result.has_value(), *aai_result);
 
     if (!std::holds_alternative<const EmberAfAttributeMetadata *>(metadata))
     {
