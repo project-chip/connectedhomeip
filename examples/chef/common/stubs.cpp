@@ -70,10 +70,6 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]   
 #include "chef-laundry-washer-controls-delegate-impl.h"
 #endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_CONTROLS_SERVER
 
-#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
-#include "chef-laundry-washer-mode.h"
-#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
-
 #ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
 #include "chef-operational-state-delegate-impl.h"
 #endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
