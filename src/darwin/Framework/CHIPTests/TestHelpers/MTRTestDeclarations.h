@@ -50,6 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDevice (Test)
 - (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther;
+- (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)one isEquivalentToDataValue:(MTRDeviceDataValueDictionary)theOther;
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
 @end
