@@ -117,6 +117,7 @@
 {
     MTRCertificateInfo * info = [[MTRCertificateInfo alloc] initWithTLVBytes:self.exampleNOCertTLV];
     XCTAssertNotNil(info);
+    XCTAssertNotNil(info.publicKeyData);
     XCTAssertEqual([NSDate.now compare:info.notBefore], NSOrderedDescending);
     XCTAssertEqual([NSDate.now compare:info.notAfter], NSOrderedAscending);
 

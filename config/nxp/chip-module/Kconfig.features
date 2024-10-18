@@ -95,6 +95,8 @@ config CHIP_ETHERNET
 	select NET_TCP
 	select DNS_RESOLVER
 	select MDNS_RESOLVER
+	select MDNS_RESPONDER
+	select DNS_SD
 	select MBEDTLS_PKCS5_C
 	select MBEDTLS_HKDF_C
 	select MBEDTLS_ECDSA_C

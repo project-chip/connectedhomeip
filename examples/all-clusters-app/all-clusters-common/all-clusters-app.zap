@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 104,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,20 +41,23 @@
         "code": 17,
         "profileId": 259,
         "label": "MA-powersource",
-        "name": "MA-powersource"
+        "name": "MA-powersource",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 17,
           "profileId": 259,
           "label": "MA-powersource",
-          "name": "MA-powersource"
+          "name": "MA-powersource",
+          "deviceTypeOrder": 0
         },
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 1
         }
       ],
       "deviceVersions": [
@@ -6102,20 +6105,23 @@
         "code": 256,
         "profileId": 259,
         "label": "MA-onofflight",
-        "name": "MA-onofflight"
+        "name": "MA-onofflight",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 256,
           "profileId": 259,
           "label": "MA-onofflight",
-          "name": "MA-onofflight"
+          "name": "MA-onofflight",
+          "deviceTypeOrder": 0
         },
         {
           "code": 17,
           "profileId": 259,
           "label": "MA-powersource",
-          "name": "MA-powersource"
+          "name": "MA-powersource",
+          "deviceTypeOrder": 1
         }
       ],
       "deviceVersions": [
@@ -14527,38 +14533,6 @@
               "reportableChange": 0
             },
             {
-              "name": "StartUpMode",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "OnMode",
-              "code": 3,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -14709,38 +14683,6 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "StartUpMode",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "OnMode",
-              "code": 3,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -14898,38 +14840,6 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": null,
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "StartUpMode",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "OnMode",
-              "code": 3,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -23363,20 +23273,23 @@
         "code": 256,
         "profileId": 259,
         "label": "MA-onofflight",
-        "name": "MA-onofflight"
+        "name": "MA-onofflight",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 256,
           "profileId": 259,
           "label": "MA-onofflight",
-          "name": "MA-onofflight"
+          "name": "MA-onofflight",
+          "deviceTypeOrder": 0
         },
         {
           "code": 17,
           "profileId": 259,
           "label": "MA-powersource",
-          "name": "MA-powersource"
+          "name": "MA-powersource",
+          "deviceTypeOrder": 1
         }
       ],
       "deviceVersions": [
@@ -24815,14 +24728,16 @@
         "code": 15,
         "profileId": 259,
         "label": "MA-genericswitch",
-        "name": "MA-genericswitch"
+        "name": "MA-genericswitch",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 15,
           "profileId": 259,
           "label": "MA-genericswitch",
-          "name": "MA-genericswitch"
+          "name": "MA-genericswitch",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -25274,14 +25189,16 @@
         "code": 15,
         "profileId": 259,
         "label": "MA-genericswitch",
-        "name": "MA-genericswitch"
+        "name": "MA-genericswitch",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 15,
           "profileId": 259,
           "label": "MA-genericswitch",
-          "name": "MA-genericswitch"
+          "name": "MA-genericswitch",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -25685,14 +25602,16 @@
         "code": 25,
         "profileId": 259,
         "label": "MA-secondary-network-interface",
-        "name": "MA-secondary-network-interface"
+        "name": "MA-secondary-network-interface",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 25,
           "profileId": 259,
           "label": "MA-secondary-network-interface",
-          "name": "MA-secondary-network-interface"
+          "name": "MA-secondary-network-interface",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [

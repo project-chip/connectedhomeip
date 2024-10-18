@@ -1,4 +1,4 @@
-# Welcome to Matter's documentation!
+# Welcome to Matter's documentation
 
 ```{toctree}
 :maxdepth: 2
@@ -25,6 +25,7 @@ zap_clusters
 spec_clusters
 upgrading
 ERROR_CODES
+issue_triage
 
 ```
 

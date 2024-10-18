@@ -95,11 +95,6 @@ void UniqueIdGetter::OnAttributeData(const ConcreteDataAttributePath & path, TLV
     }
 }
 
-void UniqueIdGetter::OnReportEnd()
-{
-    // We will call mOnDoneCallback in OnDone.
-}
-
 void UniqueIdGetter::OnError(CHIP_ERROR error)
 {
     ChipLogProgress(NotSpecified, "Error Getting UID: %" CHIP_ERROR_FORMAT, error.Format());
