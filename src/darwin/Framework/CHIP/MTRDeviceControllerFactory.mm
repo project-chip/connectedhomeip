@@ -1249,11 +1249,9 @@ MTR_DIRECT_MEMBERS
 
 - (void)_maybeLogBacktrace:(NSString *)message
 {
-#ifdef DEBUG
     @autoreleasepool {
         MTR_LOG("[%@]: %@", message, [NSThread callStackSymbols]);
     }
-#endif // DEBUG
 }
 
 @end
