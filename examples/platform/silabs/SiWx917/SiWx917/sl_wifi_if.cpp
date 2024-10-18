@@ -67,14 +67,12 @@ extern "C" {
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
 #include "rsi_rom_power_save.h"
+#include "sl_gpio_board.h"
+#include "sl_si91x_button.h"
 #include "sl_si91x_button_pin_config.h"
+#include "sl_si91x_driver_gpio.h"
 #include "sl_si91x_power_manager.h"
-
 namespace {
-// TODO: should be removed once we are getting the press interrupt for button 0 with sleep
-#define BUTTON_PRESSED 1
-bool btn0_pressed = false;
-
 #ifdef ENABLE_CHIP_SHELL
 bool ps_requirement_added = false;
 #endif // ENABLE_CHIP_SHELL
@@ -262,23 +260,36 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #if SLI_SI91X_MCU_INTERFACE
-// Required to invoke button press event during sleep as falling edge is not detected
-void sl_si91x_invoke_btn_press_event(void)
+// This function is called when the button is pressed when in sleep then the idleTask is handling the button press event
+void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
 {
-    // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
-    if (!RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN) && !btn0_pressed)
+    // UULP_GPIO_2 is used to detect the button 0 press
+    VerifyOrReturn(pin_intr == RTE_UULP_GPIO_2_PIN, ChipLogError(DeviceLayer, "invalid pin interrupt: %ld", pin_intr));
+    sl_status_t status      = SL_STATUS_OK;
+    uint8_t pin_intr_status = sl_si91x_gpio_get_uulp_npss_pin(pin_intr);
+    if (pin_intr_status == LOW)
     {
-        sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_PRESSED);
-        btn0_pressed = true;
+        // BTN_0 is pressed
+        // NOTE: the GPIO is masked since the interrupt is invoked before scheduler is started, thus this is required to hand over
+        // control to scheduler, the PIN is unmasked in the power manager flow before going to sleep
+        status = sl_si91x_gpio_driver_mask_uulp_npss_interrupt(BIT(pin_intr));
+        VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(DeviceLayer, "failed to mask interrupt: %ld", status));
     }
-    if (RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN))
-    {
-        btn0_pressed = false;
-    }
+}
+// Required to invoke button press event during sleep as falling edge is not detected
+// NOTE: flow is GPIO wakeup due to BTN0 press -> check button state in idle task
+// required as the GPIO interrupt is not detected during sleep for BUTTON RELEASED
+void sl_si91x_btn_event_handler(void)
+{
+    sl_button_on_change(SL_BUTTON_BTN0_NUMBER,
+                        (sl_si91x_gpio_get_uulp_npss_pin(SL_BUTTON_BTN0_PIN) == LOW) ? BUTTON_PRESSED : BUTTON_RELEASED);
+}
 
+void sl_si91x_uart_power_requirement_handler(void)
+{
 #ifdef ENABLE_CHIP_SHELL
     // Checking the UULP PIN 1 status to reinit the UART and not allow the device to go to sleep
-    if (RSI_NPSSGPIO_GetPin(RTE_UULP_GPIO_1_PIN))
+    if (sl_si91x_gpio_get_uulp_npss_pin(RTE_UULP_GPIO_1_PIN))
     {
         if (!ps_requirement_added)
         {
@@ -407,12 +418,13 @@ static sl_status_t wfx_rsi_init(void)
 #ifdef ENABLE_CHIP_SHELL
     // While using the matter shell with the ICD server, the GPIO 1 is used to check the UULP PIN 1 status
     // since UART doesn't act as a wakeup source in the UULP mode
-    /*Configuring the NPS GPIO 1*/
-    RSI_NPSSGPIO_SetPinMux(RTE_UULP_GPIO_1_PIN, 0);
-    /*Configure the NPSS GPIO direction to input */
-    RSI_NPSSGPIO_SetDir(RTE_UULP_GPIO_1_PIN, 1);
-    /*Enable the REN*/
-    RSI_NPSSGPIO_InputBufferEn(RTE_UULP_GPIO_1_PIN, 1);
+    /* Configuring the NPS GPIO 1 */
+    sl_si91x_gpio_set_uulp_npss_pin_mux(RTE_UULP_GPIO_1_PIN, sl_si91x_uulp_npss_mode_t.NPSS_GPIO_PIN_MUX_MODE0);
+    /* Configure the NPSS GPIO direction to input */
+    sl_si91x_gpio_set_uulp_npss_direction(RTE_UULP_GPIO_1_PIN, sl_si91x_gpio_direction_t.GPIO_INPUT);
+    /* Enable the REN */
+    sl_si91x_gpio_select_uulp_npss_receiver(RTE_UULP_GPIO_0_PIN, sl_si91x_gpio_receiver_t.GPIO_RECEIVER_EN)
+
 #endif // ENABLE_CHIP_SHELL
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 #endif /* SLI_SI91X_MCU_INTERFACE */
