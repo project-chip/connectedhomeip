@@ -22,7 +22,6 @@
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
-#       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
@@ -93,13 +92,12 @@ class TC_CADMIN_1_4_noreset(MatterBaseTest):
         current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
         return current_fabric_index
 
-    @async_test_body
-    def pics_TC_CADMIN_1_4(self) -> list[str]:
+    def pics_TC_CADMIN_1_4_noreset(self) -> list[str]:
         return ["CADMIN.S"]
 
-    def steps_TC_CADMIN_1_4(self) -> list[TestStep]:
+    def steps_TC_CADMIN_1_4_noreset(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH_CR1 starts a commissioning process with DUT_CE", is_commissioning=True),
+            TestStep(1, "TH_CR1 starts a commissioning process with DUT_CE"),
             TestStep(2, "TH_CR1 reads the BasicCommissioningInfo attribute from the General Commissioning cluster and saves the MaxCumulativeFailsafeSeconds field as max_window_duration."),
             TestStep("3a", "TH_CR1 opens a commissioning window on DUT_CE using a commissioning timeout of max_window_duration using BCM",
                      "DUT_CE opens its Commissioning window to allow a second commissioning."),
@@ -117,12 +115,12 @@ class TC_CADMIN_1_4_noreset(MatterBaseTest):
         ]
 
     @async_test_body
-    async def test_TC_CADMIN_1_4(self):
+    async def test_TC_CADMIN_1_4_noreset(self):
         self.step(1)
         setupPayloadInfo = self.get_setup_payload_info()
         if not setupPayloadInfo:
             asserts.assert_true(
-                False, 'passcode and discriminator must be provided values in order for this test to work due to using BCM, please rerun test with providing --passcode <value> and --discriminator <value>')
+                False, 'passcode and discriminator must be provided values in order for this test to work due to using BCM, please rerun test providing --passcode <value> and --discriminator <value>')
 
         # Establishing TH1
         self.th1 = self.default_controller
