@@ -125,15 +125,12 @@ class TestSubscriptionResumptionCapacity(CHIPVirtualHome):
         self.reset_thread_devices(server_ids)
 
         for req_device_id in req_ids:
-            self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-                CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_clusters-0.0-py3-none-any.whl")))
-            self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-                CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl")))
-            self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-                CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_repl-0.0-py3-none-any.whl")))
+            self.install_package(req_device_id, CHIP_REPO)
 
         command1 = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
-                    "--args python3 {} -t 300 -a {} --paa-trust-store-path {} --subscription-capacity {}").format(
+                    "--args {}/python3 {} -t 300 -a {} --paa-trust-store-path {} --subscription-capacity {}").format(
+                        os.path.join(
+                            CHIP_REPO, "cirque_venv/bin"),
                         os.path.join(CHIP_REPO, "src/controller/python/test/test_scripts",
                                      "subscription_resumption_capacity_test_ctrl1.py"),
                         ethernet_ip, os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
@@ -144,8 +141,10 @@ class TestSubscriptionResumptionCapacity(CHIPVirtualHome):
                          "Test failed: non-zero return code")
 
         command2 = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
-                    "--args python3 {} -t 300 -a {} --paa-trust-store-path {} --remote-server-app {} "
+                    "--args {}/python3 {} -t 300 -a {} --paa-trust-store-path {} --remote-server-app {} "
                     "--subscription-capacity {}").format(
+                        os.path.join(
+                            CHIP_REPO, "cirque_venv/bin"),
                         os.path.join(CHIP_REPO, "src/controller/python/test/test_scripts",
                                      "subscription_resumption_capacity_test_ctrl2.py"),
                         ethernet_ip, os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
