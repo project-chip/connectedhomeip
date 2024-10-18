@@ -1507,20 +1507,14 @@ bool InteractionModelEngine::IsExistentAttributePath(const ConcreteAttributePath
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 #if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-
-    bool providerResult = GetDataModelProvider()
-                              ->GetAttributeInfo(ConcreteAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId))
-                              .has_value();
+    bool providerResult = GetDataModelProvider()->GetAttributeInfo(path).has_value();
 
     bool emberResult = emberAfContainsAttribute(path.mEndpointId, path.mClusterId, path.mAttributeId);
 
     // Ensure that Provider interface and ember are IDENTICAL in attribute location (i.e. "check" mode)
     VerifyOrDie(providerResult == emberResult);
 #endif
-
-    return GetDataModelProvider()
-        ->GetAttributeInfo(ConcreteAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId))
-        .has_value();
+    return GetDataModelProvider()->GetAttributeInfo(path).has_value();
 #else
     return emberAfContainsAttribute(path.mEndpointId, path.mClusterId, path.mAttributeId);
 #endif
