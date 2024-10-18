@@ -56,6 +56,7 @@ def check_manual_steps():
     for test in AllChipToolYamlTests(use_short_run_name=False):
         cmd = f'git diff HEAD^..HEAD --unified=0 -- {test.run_name}'
         print(subprocess.check_output('pwd', shell=True).decode())
+        print(subprocess.check_output('git log --oneline | head', shell=True).decode())
         print(f'Running cmd: {cmd}')
         output = subprocess.check_output(cmd, shell=True).decode().splitlines()
         user_prompt_added = [line for line in output if re.search(r'^\+.*UserPrompt.*', line)]
