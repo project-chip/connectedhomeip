@@ -24,6 +24,7 @@
 #include <app/util/af-types.h>
 #include <app/util/config.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/Global.h>
 #include <lib/core/TLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
@@ -82,10 +83,10 @@ public:
 
     CHIP_ERROR LoadFromStorage();
 
-    static BindingTable & GetInstance() { return sInstance; }
+    static BindingTable & GetInstance() { return sInstance.get(); }
 
 private:
-    static BindingTable sInstance;
+    static Global<BindingTable> sInstance;
 
     static constexpr uint32_t kStorageVersion  = 1;
     static constexpr uint8_t kEntryStorageSize = TLV::EstimateStructOverhead(
