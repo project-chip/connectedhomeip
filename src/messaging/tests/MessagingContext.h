@@ -220,6 +220,10 @@ class LoopbackMessagingContext : public ::testing::Test, public MessagingContext
 public:
     virtual ~LoopbackMessagingContext() {}
 
+    // Pigweed test pure virtual will get overriden
+    // TODO: why is a context a Test?
+    virtual void PigweedTestBody() {}
+
     // These functions wrap spLoopbackTransportManager methods
     static auto & GetSystemLayer() { return spLoopbackTransportManager->GetSystemLayer(); }
     static auto & GetLoopback() { return spLoopbackTransportManager->GetLoopback(); }

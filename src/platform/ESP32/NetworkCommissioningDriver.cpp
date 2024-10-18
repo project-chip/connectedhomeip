@@ -143,7 +143,7 @@ CHIP_ERROR ESPWiFiDriver::RevertConfiguration()
     size_t credentialsLen = 0;
 
     CHIP_ERROR error = PersistedStorage::KeyValueStoreMgr().Get(kWiFiSSIDKeyName, network.ssid, sizeof(network.ssid), &ssidLen);
-    ReturnErrorCodeIf(error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
+    VerifyOrReturnError(error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
     VerifyOrExit(CanCastTo<uint8_t>(ssidLen), error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, network.credentials, sizeof(network.credentials),
                                                           &credentialsLen) == CHIP_NO_ERROR,
@@ -263,6 +263,18 @@ CHIP_ERROR ESPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
     return ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
 }
+
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+CHIP_ERROR ESPWiFiDriver::DisconnectFromNetwork()
+{
+    if (chip::DeviceLayer::Internal::ESP32Utils::IsStationProvisioned())
+    {
+        // Attaching to an empty network will disconnect the network.
+        ReturnErrorOnFailure(ConnectWiFiNetwork(nullptr, 0, nullptr, 0));
+    }
+    return CHIP_NO_ERROR;
+}
+#endif
 
 void ESPWiFiDriver::OnConnectWiFiNetwork()
 {

@@ -338,6 +338,9 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
 @end
 
 @implementation MTRDeviceControllerExternalCertificateParameters
+
+@dynamic rootCertificate;
+
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                    storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
                        uniqueIdentifier:(NSUUID *)uniqueIdentifier

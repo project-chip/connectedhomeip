@@ -86,7 +86,7 @@ MediaTek platform.
     Chip tool standalone, Android or iOS app
 
     [CHIP
-    Tool]](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/chip_tool_guide.md)
+    Tool]](https://github.com/project-chip/connectedhomeip/blob/master/docs/development_controllers/chip-tool/chip_tool_guide.md)
 
     Here is an example with the CHIP Tool controller:
 

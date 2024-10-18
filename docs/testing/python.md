@@ -25,7 +25,7 @@ Python tests located in src/python_testing
         section should include various parameters and their respective values,
         which will guide the test runner on how to execute the tests.
 -   All test classes inherit from `MatterBaseTest` in
-    [matter_testing_support.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_support.py)
+    [matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/chip/testing/matter_testing.py)
     -   Support for commissioning using the python controller
     -   Default controller (`self.default_controller`) of type `ChipDeviceCtrl`
     -   `MatterBaseTest` inherits from the Mobly BaseTestClass
@@ -38,7 +38,7 @@ Python tests located in src/python_testing
         decorated with the @async_test_body decorator
 -   Use `ChipDeviceCtrl` to interact with the DUT
     -   Controller API is in `ChipDeviceCtrl.py` (see API doc in file)
-    -   Some support methods in `matter_testing_support.py`
+    -   Some support methods in `matter_testing.py`
 -   Use Mobly assertions for failing tests
 -   `self.step()` along with a `steps_*` method to mark test plan steps for cert
     tests
@@ -50,12 +50,19 @@ Python tests located in src/python_testing
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 class TC_MYTEST_1_1(MatterBaseTest):
@@ -372,7 +379,7 @@ pai = await dev_ctrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Comm
 ## Mobly helpers
 
 The test system is based on Mobly, and the
-[matter_testing_support.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_support.py)
+[matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/chip/testing/matter_testing.py)
 class provides some helpers for Mobly integration.
 
 -   `default_matter_test_main`
@@ -554,11 +561,11 @@ these steps to set this up:
 
 ## Other support utilities
 
--   `basic_composition_support`
+-   `basic_composition`
     -   wildcard read, whole device analysis
 -   `CommissioningFlowBlocks`
     -   various commissioning support for core tests
--   `spec_parsing_support`
+-   `spec_parsing`
     -   parsing data model XML into python readable format
 
 # Running tests locally
@@ -587,7 +594,7 @@ Next build the python wheels and create / activate a venv (called `pyenv` here,
 but any name may be used)
 
 ```
-./scripts/build_python.sh -i pyenv
+./scripts/build_python.sh -i out/python_env
 source pyenv/bin/activate
 ```
 
@@ -620,7 +627,9 @@ for the CI). These arguments can be passed as sets of key/value pairs using the
 `./scripts/tests/run_python_test.py` is a convenient script that starts an
 example DUT on the host and includes factory reset support
 
-`./scripts/tests/run_python_test.py --factoryreset --app <your_app> --app-args "whatever" --script <your_script> --script-args "whatever"`
+```shell
+./scripts/tests/run_python_test.py --factory-reset --app <your_app> --app-args "whatever" --script <your_script> --script-args "whatever"
+```
 
 # Running tests in CI
 
@@ -628,7 +637,10 @@ example DUT on the host and includes factory reset support
 -   Don’t forget to set the PICS file to the ci-pics-values
 -   If there are steps in your test that will fail on CI (e.g. test vendor
     checks), gate them on the PICS_SDK_CI_ONLY
-    -   `is_ci = self.check_pics('PICS_SDK_CI_ONLY')`
+    -   ```python
+        if not self.is_pics_sdk_ci_only:
+            ...  # Step that will fail on CI
+        ```
 
 The CI test runner uses a structured environment setup that can be declared
 using structured comments at the top of the test file. To use this structured
@@ -637,71 +649,78 @@ format, use the `--load-from-env` flag with the `run_python_tests.py` runner.
 Ex:
 `scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDM_2_1.py'`
 
+## Running ALL or a subset of tests when changing application code
+
+`scripts/tests/local.py` is a wrapper that is able to build and run tests in a
+single command.
+
+Example to compile all prerequisites and then running all python tests:
+
+```shell
+./scripts/tests/local.py build         # will compile python in out/pyenv and ALL application prerequisites
+./scripts/tests/local.py python-tests  # Runs all python tests that are runnable in CI
+```
+
 ## Defining the CI test arguments
 
-Below is the format of the structured environment definition comments:
+Arguments required to run a test can be defined in the comment block at the top
+of the test script. The section with the arguments should be placed between the
+`# === BEGIN CI TEST ARGUMENTS ===` and `# === END CI TEST ARGUMENTS ===`
+markers. Arguments should be structured as a valid YAML dictionary with a root
+key `test-runner-runs`, followed by the run identifier, and then the parameters
+for that run, e.g.:
 
-```
+```python
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: <run_identifier>
-# test-runner-run/<run_identifier>/app: ${TYPE_OF_APP}
-# test-runner-run/<run_identifier>/factoryreset: <True|False>
-# test-runner-run/<run_identifier>/quiet: <True|False>
-# test-runner-run/<run_identifier>/app-args: <app_arguments>
-# test-runner-run/<run_identifier>/script-args: <script_arguments>
+# test-runner-runs:
+#   run1:
+#     app: ${TYPE_OF_APP}
+#     app-args: <app_arguments>
+#     script-args: <script_arguments>
+#     factory-reset: <true|false>
+#     quiet: <true|false>
 # === END CI TEST ARGUMENTS ===
 ```
 
-NOTE: The `=== BEGIN CI TEST ARGUMENTS ===` and `=== END CI TEST ARGUMENTS ===`
-markers must be present.
-
 ### Description of Parameters
 
--   `test-runner-runs`: Specifies the identifier for the run. This can be any
-    unique identifier.
-
-    -   Example: `run1`
-
--   `test-runner-run/<run_identifier>/app`: Indicates the application to be used
-    in the test. Different app types as needed could be referenced from section
-    [name: Generate an argument environment file ] of the file
+-   `app`: Indicates the application to be used in the test. Different app types
+    as needed could be referenced from section [name: Generate an argument
+    environment file ] of the file
     [.github/workflows/tests.yaml](https://github.com/project-chip/connectedhomeip/blob/master/.github/workflows/tests.yaml)
 
-        -   Example: `${TYPE_OF_APP}`
+    -   Example: `${TYPE_OF_APP}`
 
--   `test-runner-run/<run_identifier>/factoryreset`: Determines whether a
-    factory reset should be performed before the test.
+-   `factory-reset`: Determines whether a factory reset should be performed
+    before the test.
 
-    -   Example: `True`
+    -   Example: `true`
 
--   `test-runner-run/<run_identifier>/quiet`: Sets the verbosity level of the
-    test run. When set to True, the test run will be quieter.
+-   `quiet`: Sets the verbosity level of the test run. When set to True, the
+    test run will be quieter.
 
-    -   Example: `True`
+    -   Example: `true`
 
--   `test-runner-run/<run_identifier>/app-args`: Specifies the arguments to be
-    passed to the application during the test.
+-   `app-args`: Specifies the arguments to be passed to the application during
+    the test.
 
     -   Example:
         `--discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json`
 
--   `test-runner-run/<run_identifier>/script-args`: Specifies the arguments to
-    be passed to the test script.
+-   `app-ready-pattern`: Regular expression pattern to match against the output
+    of the application to determine when the application is ready. If this
+    parameter is specified, the test runner will not run the test script until
+    the pattern is found.
+
+    -   Example: `"Manual pairing code: \\[\\d+\\]"`
+
+-   `script-args`: Specifies the arguments to be passed to the test script.
 
     -   Example:
         `--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto`
-
--   `test-runner-run/<run_identifier>/script-start-delay`: Specifies the number
-    of seconds to wait before starting the test script. This parameter can be
-    used to allow the application to initialize itself properly before the test
-    script will try to commission it (e.g. in case if the application needs to
-    be commissioned to some other controller first). By default, the delay is 0
-    seconds.
-
-    -   Example: `10`
 
 This structured format ensures that all necessary configurations are clearly
 defined and easily understood, allowing for consistent and reliable test

@@ -13,16 +13,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/data-model-provider/ActionReturnStatus.h"
 #include <app/tests/test-interaction-model-api.h>
 
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/codegen-data-model-provider/Instance.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/util/basic-types.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/DataModelTypes.h>
 #include <messaging/ReliableMessageContext.h>
 
 using namespace chip::app::DataModel;
@@ -44,6 +45,18 @@ public:
 
 private:
     AttributeValueEncoder & mEncoder;
+};
+
+class TestOnlyAttributeValueDecoderAccessor
+{
+public:
+    TestOnlyAttributeValueDecoderAccessor(AttributeValueDecoder & decoder) : mDecoder(decoder) {}
+
+    TLV::TLVReader & GetTlvReader() { return mDecoder.mReader; }
+    void SetTriedDecode(bool triedDecode) { mDecoder.mTriedDecode = triedDecode; }
+
+private:
+    AttributeValueDecoder & mDecoder;
 };
 
 // Used by the code in TestWriteInteraction.cpp (and generally tests that interact with the WriteHandler may need this).
@@ -170,13 +183,27 @@ ActionReturnStatus TestImCustomDataModel::ReadAttribute(const ReadAttributeReque
 
 ActionReturnStatus TestImCustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    if (request.path.mDataVersion.HasValue() && request.path.mDataVersion.Value() == Test::kRejectedDataVersion)
+    {
+        return CHIP_IM_GLOBAL_STATUS(DataVersionMismatch);
+    }
+
+    TestOnlyAttributeValueDecoderAccessor decodeAccess(decoder);
+
+    decodeAccess.SetTriedDecode(true);
+
+    TLV::TLVWriter writer;
+    writer.Init(chip::Test::attributeDataTLV);
+    writer.CopyElement(TLV::AnonymousTag(), decodeAccess.GetTlvReader());
+    chip::Test::attributeDataTLVLen = writer.GetLengthWritten();
+
+    return CHIP_NO_ERROR;
 }
 
-ActionReturnStatus TestImCustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                                                 CommandHandler * handler)
+std::optional<ActionReturnStatus> TestImCustomDataModel::Invoke(const InvokeRequest & request,
+                                                                chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return std::make_optional<ActionReturnStatus>(CHIP_ERROR_NOT_IMPLEMENTED);
 }
 
 EndpointId TestImCustomDataModel::FirstEndpoint()
@@ -187,6 +214,17 @@ EndpointId TestImCustomDataModel::FirstEndpoint()
 EndpointId TestImCustomDataModel::NextEndpoint(EndpointId before)
 {
     return CodegenDataModelProviderInstance()->NextEndpoint(before);
+}
+
+std::optional<DataModel::DeviceTypeEntry> TestImCustomDataModel::FirstDeviceType(EndpointId endpoint)
+{
+    return std::nullopt;
+}
+
+std::optional<DataModel::DeviceTypeEntry> TestImCustomDataModel::NextDeviceType(EndpointId endpoint,
+                                                                                const DataModel::DeviceTypeEntry & previous)
+{
+    return std::nullopt;
 }
 
 ClusterEntry TestImCustomDataModel::FirstCluster(EndpointId endpoint)

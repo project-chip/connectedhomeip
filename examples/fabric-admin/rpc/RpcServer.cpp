@@ -42,38 +42,52 @@ namespace {
 
 #if defined(PW_RPC_FABRIC_ADMIN_SERVICE) && PW_RPC_FABRIC_ADMIN_SERVICE
 
+struct ScopedNodeIdHasher
+{
+    std::size_t operator()(const chip::ScopedNodeId & scopedNodeId) const
+    {
+        std::size_t h1 = std::hash<uint64_t>{}(scopedNodeId.GetFabricIndex());
+        std::size_t h2 = std::hash<uint64_t>{}(scopedNodeId.GetNodeId());
+        // Bitshifting h2 reduces collisions when fabricIndex == nodeId.
+        return h1 ^ (h2 << 1);
+    }
+};
+
 class FabricAdmin final : public rpc::FabricAdmin, public IcdManager::Delegate
 {
 public:
-    void OnCheckInCompleted(const chip::app::ICDClientInfo & clientInfo) override
+    void OnCheckInCompleted(const app::ICDClientInfo & clientInfo) override
     {
-        // Needs for accessing mPendingCheckIn
+        // Accessing mPendingCheckIn should only be done while holding ChipStackLock
         assertChipStackLockedByCurrentThread();
-        NodeId nodeId = clientInfo.peer_node.GetNodeId();
-        auto it       = mPendingCheckIn.find(nodeId);
+        ScopedNodeId scopedNodeId = clientInfo.peer_node;
+        auto it                   = mPendingCheckIn.find(scopedNodeId);
         VerifyOrReturn(it != mPendingCheckIn.end());
 
         KeepActiveDataForCheckIn checkInData = it->second;
         // Removed from pending map as check-in from this node has occured and we will handle the pending KeepActive
         // request.
-        mPendingCheckIn.erase(nodeId);
+        mPendingCheckIn.erase(scopedNodeId);
 
         auto timeNow = System::SystemClock().GetMonotonicTimestamp();
         if (timeNow > checkInData.mRequestExpiryTimestamp)
         {
-            ChipLogError(
-                NotSpecified,
-                "ICD check-in for device we have been waiting, came after KeepActive expiry. Reqeust dropped for Node ID: 0x%lx",
-                nodeId);
+            ChipLogError(NotSpecified,
+                         "ICD check-in for device we have been waiting, came after KeepActive expiry. Request dropped for ID: "
+                         "[%d:0x " ChipLogFormatX64 "]",
+                         scopedNodeId.GetFabricIndex(), ChipLogValueX64(scopedNodeId.GetNodeId()));
             return;
         }
 
-        // TODO(#33221): If there is a failure in sending the message this request just gets dropped.
-        // Work to see if there should be update to spec on whether some sort of failure later on
-        // Should be indicated in some manner, or identify a better recovery mechanism here.
-        auto onDone    = [=](uint32_t promisedActiveDuration) { ActiveChanged(nodeId, promisedActiveDuration); };
+        // TODO https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/10448. Spec does
+        // not define what to do if we fail to send the StayActiveRequest. We are assuming that any
+        // further attempts to send a StayActiveRequest will result in a similar failure. Because
+        // there is no mechanism for us to communicate with the client that sent out the KeepActive
+        // command that there was a failure, we simply fail silently. After spec issue is
+        // addressed, we can implement what spec defines here.
+        auto onDone    = [=](uint32_t promisedActiveDuration) { ActiveChanged(scopedNodeId, promisedActiveDuration); };
         CHIP_ERROR err = StayActiveSender::SendStayActiveCommand(checkInData.mStayActiveDurationMs, clientInfo.peer_node,
-                                                                 chip::app::InteractionModelEngine::GetInstance(), onDone);
+                                                                 app::InteractionModelEngine::GetInstance(), onDone);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(NotSpecified, "Failed to send StayActive command %s", err.AsString());
@@ -83,21 +97,23 @@ public:
     pw::Status OpenCommissioningWindow(const chip_rpc_DeviceCommissioningWindowInfo & request,
                                        chip_rpc_OperationStatus & response) override
     {
-        NodeId nodeId                 = request.node_id;
-        uint32_t commissioningTimeout = request.commissioning_timeout;
-        uint32_t iterations           = request.iterations;
-        uint32_t discriminator        = request.discriminator;
+        VerifyOrReturnValue(request.has_id, pw::Status::InvalidArgument());
+        // TODO(#35875): OpenDeviceCommissioningWindow uses the same controller every time and doesn't currently accept
+        // FabricIndex. For now we are dropping fabric index from the scoped node id.
+        NodeId nodeId                    = request.id.node_id;
+        uint32_t iterations              = request.iterations;
+        uint16_t discriminator           = request.discriminator;
+        uint16_t commissioningTimeoutSec = static_cast<uint16_t>(request.commissioning_timeout);
 
-        char saltHex[Crypto::kSpake2p_Max_PBKDF_Salt_Length * 2 + 1];
-        Encoding::BytesToHex(request.salt.bytes, request.salt.size, saltHex, sizeof(saltHex), Encoding::HexFlags::kNullTerminate);
+        // Log the request details for debugging
+        ChipLogProgress(NotSpecified,
+                        "Received OpenCommissioningWindow request: NodeId 0x%lx, Timeout: %u, Iterations: %u, Discriminator: %u",
+                        static_cast<unsigned long>(nodeId), commissioningTimeoutSec, iterations, discriminator);
 
-        char verifierHex[Crypto::kSpake2p_VerifierSerialized_Length * 2 + 1];
-        Encoding::BytesToHex(request.verifier.bytes, request.verifier.size, verifierHex, sizeof(verifierHex),
-                             Encoding::HexFlags::kNullTerminate);
-
-        ChipLogProgress(NotSpecified, "Received OpenCommissioningWindow request: 0x%lx", nodeId);
-
-        DeviceMgr().OpenDeviceCommissioningWindow(nodeId, commissioningTimeout, iterations, discriminator, saltHex, verifierHex);
+        // Open the device commissioning window using raw binary data for salt and verifier
+        DeviceMgr().OpenDeviceCommissioningWindow(nodeId, iterations, commissioningTimeoutSec, discriminator,
+                                                  ByteSpan(request.salt.bytes, request.salt.size),
+                                                  ByteSpan(request.verifier.bytes, request.verifier.size));
 
         response.success = true;
 
@@ -147,20 +163,21 @@ public:
 
     pw::Status KeepActive(const chip_rpc_KeepActiveParameters & request, pw_protobuf_Empty & response) override
     {
-        ChipLogProgress(NotSpecified, "Received KeepActive request: 0x%lx, %u", request.node_id, request.stay_active_duration_ms);
-        // TODO(#33221): We should really be using ScopedNode, but that requires larger fix in communication between
-        // fabric-admin and fabric-bridge. For now we make the assumption that there is only one fabric used by
-        // fabric-admin.
+        VerifyOrReturnValue(request.has_id, pw::Status::InvalidArgument());
+        ScopedNodeId scopedNodeId(request.id.node_id, request.id.fabric_index);
+        ChipLogProgress(NotSpecified, "Received KeepActive request: Id[%d, 0x" ChipLogFormatX64 "], %u",
+                        scopedNodeId.GetFabricIndex(), ChipLogValueX64(scopedNodeId.GetNodeId()), request.stay_active_duration_ms);
+
         KeepActiveWorkData * data =
-            Platform::New<KeepActiveWorkData>(this, request.node_id, request.stay_active_duration_ms, request.timeout_ms);
+            Platform::New<KeepActiveWorkData>(this, scopedNodeId, request.stay_active_duration_ms, request.timeout_ms);
         VerifyOrReturnValue(data, pw::Status::Internal());
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
+        DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
         return pw::OkStatus();
     }
 
-    void ScheduleSendingKeepActiveOnCheckIn(NodeId nodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs)
+    void ScheduleSendingKeepActiveOnCheckIn(ScopedNodeId scopedNodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs)
     {
-        // Needs for accessing mPendingCheckIn
+        // Accessing mPendingCheckIn should only be done while holding ChipStackLock
         assertChipStackLockedByCurrentThread();
 
         auto timeNow                             = System::SystemClock().GetMonotonicTimestamp();
@@ -168,14 +185,14 @@ public:
         KeepActiveDataForCheckIn checkInData     = { .mStayActiveDurationMs   = stayActiveDurationMs,
                                                      .mRequestExpiryTimestamp = expiryTimestamp };
 
-        auto it = mPendingCheckIn.find(nodeId);
+        auto it = mPendingCheckIn.find(scopedNodeId);
         if (it != mPendingCheckIn.end())
         {
             checkInData.mStayActiveDurationMs   = std::max(checkInData.mStayActiveDurationMs, it->second.mStayActiveDurationMs);
             checkInData.mRequestExpiryTimestamp = std::max(checkInData.mRequestExpiryTimestamp, it->second.mRequestExpiryTimestamp);
         }
 
-        mPendingCheckIn[nodeId] = checkInData;
+        mPendingCheckIn[scopedNodeId] = checkInData;
     }
 
 private:
@@ -187,12 +204,14 @@ private:
 
     struct KeepActiveWorkData
     {
-        KeepActiveWorkData(FabricAdmin * fabricAdmin, NodeId nodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs) :
-            mFabricAdmin(fabricAdmin), mNodeId(nodeId), mStayActiveDurationMs(stayActiveDurationMs), mTimeoutMs(timeoutMs)
+        KeepActiveWorkData(FabricAdmin * fabricAdmin, ScopedNodeId scopedNodeId, uint32_t stayActiveDurationMs,
+                           uint32_t timeoutMs) :
+            mFabricAdmin(fabricAdmin),
+            mScopedNodeId(scopedNodeId), mStayActiveDurationMs(stayActiveDurationMs), mTimeoutMs(timeoutMs)
         {}
 
         FabricAdmin * mFabricAdmin;
-        chip::NodeId mNodeId;
+        ScopedNodeId mScopedNodeId;
         uint32_t mStayActiveDurationMs;
         uint32_t mTimeoutMs;
     };
@@ -200,14 +219,14 @@ private:
     static void KeepActiveWork(intptr_t arg)
     {
         KeepActiveWorkData * data = reinterpret_cast<KeepActiveWorkData *>(arg);
-        data->mFabricAdmin->ScheduleSendingKeepActiveOnCheckIn(data->mNodeId, data->mStayActiveDurationMs, data->mTimeoutMs);
-        chip::Platform::Delete(data);
+        data->mFabricAdmin->ScheduleSendingKeepActiveOnCheckIn(data->mScopedNodeId, data->mStayActiveDurationMs, data->mTimeoutMs);
+        Platform::Delete(data);
     }
 
     // Modifications to mPendingCheckIn should be done on the MatterEventLoop thread
     // otherwise we would need a mutex protecting this data to prevent race as this
     // data is accessible by both RPC thread and Matter eventloop.
-    std::unordered_map<NodeId, KeepActiveDataForCheckIn> mPendingCheckIn;
+    std::unordered_map<ScopedNodeId, KeepActiveDataForCheckIn, ScopedNodeIdHasher> mPendingCheckIn;
 };
 
 FabricAdmin fabric_admin_service;

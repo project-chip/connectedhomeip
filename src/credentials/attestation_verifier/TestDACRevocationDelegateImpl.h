@@ -19,7 +19,8 @@
 
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/Span.h>
-#include <string_view>
+
+#include <string>
 
 namespace chip {
 namespace Credentials {
@@ -58,7 +59,7 @@ private:
                                 const CharSpan & serialNumberHexStr);
     bool IsCertificateRevoked(const ByteSpan & certDer);
 
-    std::string_view mDeviceAttestationRevocationSetPath;
+    std::string mDeviceAttestationRevocationSetPath;
 };
 
 } // namespace Credentials
