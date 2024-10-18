@@ -39,12 +39,12 @@ class DeviceSubscriptionManager;
 class DeviceSubscription : public chip::app::ReadClient::Callback
 {
 public:
-    using OnDoneCallback = std::function<void(chip::NodeId)>;
+    using OnDoneCallback = std::function<void(chip::ScopedNodeId)>;
 
     DeviceSubscription();
 
     CHIP_ERROR StartSubscription(OnDoneCallback onDoneCallback, chip::Controller::DeviceController & controller,
-                                 chip::NodeId nodeId);
+                                 chip::ScopedNodeId nodeId);
 
     /// This will trigger stopping the subscription. Once subscription is stopped the OnDoneCallback
     /// provided in StartSubscription will be called to indicate that subscription have been terminated.
@@ -80,7 +80,7 @@ private:
     void MoveToState(const State aTargetState);
     const char * GetStateStr() const;
 
-    chip::NodeId mNodeId = chip::kUndefinedNodeId;
+    chip::ScopedNodeId mScopedNodeId;
 
     OnDoneCallback mOnDoneCallback;
     std::unique_ptr<chip::app::ReadClient> mClient;
