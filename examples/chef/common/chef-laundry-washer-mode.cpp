@@ -150,7 +150,6 @@ chip::Protocols::InteractionModel::Status chefLaundryWasherModeReadCallback(chip
     return ret;
 }
 
-
 void emberAfLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
