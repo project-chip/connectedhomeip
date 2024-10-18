@@ -113,7 +113,7 @@
     }
 
     // TODO: Add these to the description
-    // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceState, _internalDeviceStateForDescription, properties);
+    // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceInternalState, _internalDeviceStateForDescription, properties);
     // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionAttemptWait, _lastSubscriptionAttemptWaitForDescription, properties);
     // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyMostRecentReportTime, _mostRecentReportTimeForDescription, properties);
     // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionFailureTime, _lastSubscriptionFailureTimeForDescription, properties);
@@ -136,7 +136,7 @@
 // required methods for MTRDeviceDelegates
 - (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state
 {
-    MTR_LOG("%s", __PRETTY_FUNCTION__);
+    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self stateChanged:state];
     }];
@@ -144,7 +144,7 @@
 
 - (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
-    MTR_LOG("%s", __PRETTY_FUNCTION__);
+    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self receivedAttributeReport:attributeReport];
     }];
@@ -152,7 +152,7 @@
 
 - (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
-    MTR_LOG("%s", __PRETTY_FUNCTION__);
+    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self receivedEventReport:eventReport];
     }];
@@ -161,7 +161,7 @@
 // optional methods for MTRDeviceDelegates - check for implementation before calling
 - (oneway void)deviceBecameActive:(NSNumber *)nodeID
 {
-    MTR_LOG("%s", __PRETTY_FUNCTION__);
+    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
             [delegate deviceBecameActive:self];
@@ -171,6 +171,7 @@
 
 - (oneway void)deviceCachePrimed:(NSNumber *)nodeID
 {
+    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceCachePrimed:)]) {
             [delegate deviceCachePrimed:self];
@@ -180,6 +181,7 @@
 
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID
 {
+    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceConfigurationChanged:)]) {
             [delegate deviceConfigurationChanged:self];
@@ -189,16 +191,48 @@
 
 - (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary
 {
+    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
+
+    // Save old state for comparison later
+    NSNumber * oldStateNumber = self._internalState[kMTRDeviceInternalPropertyDeviceState];
+    NSNumber * newStateNumber = dictionary[kMTRDeviceInternalPropertyDeviceState];
     [self _setInternalState:dictionary];
-    MTR_LOG("%@ internal state updated", self);
+
+    // Call delegate if state changed. State is considered changed if:
+    // 1) old state is nil but new state is not nil
+    // 2) old state is not nil but new state is nil
+    // 3) both old and new state are not nil, and they are not equal
+    if ((!oldStateNumber && newStateNumber) || (oldStateNumber && !newStateNumber) || (oldStateNumber && newStateNumber && ![newStateNumber isEqualToNumber:oldStateNumber])) {
+        MTRDeviceState state = static_cast<MTRDeviceState>(newStateNumber ? newStateNumber.unsignedIntegerValue : MTRDeviceStateUnknown);
+        [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+            [delegate device:self stateChanged:state];
+        }];
+    }
+}
+
+- (MTRDeviceState)state
+{
+    NSNumber * stateNumber = self._internalState[kMTRDeviceInternalPropertyDeviceState];
+    return stateNumber ? static_cast<MTRDeviceState>(stateNumber.unsignedIntegerValue) : MTRDeviceStateUnknown;
+}
+
+- (BOOL)deviceCachePrimed
+{
+    NSNumber * deviceCachePrimedNumber = self._internalState[kMTRDeviceInternalPropertyDeviceCachePrimed];
+    return deviceCachePrimedNumber.boolValue;
+}
+
+- (NSDate *)estimatedStartTime
+{
+    return self._internalState[kMTRDeviceInternalPropertyEstimatedStartTime];
+}
+
+- (NSNumber *)estimatedSubscriptionLatency
+{
+    return self._internalState[kMTRDeviceInternalPropertyEstimatedSubscriptionLatency];
 }
 
 #pragma mark - Remote Commands
-
-MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(state, MTRDeviceState, MTRDeviceStateUnknown, getStateWithReply)
-MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(deviceCachePrimed, BOOL, NO, getDeviceCachePrimedWithReply)
-MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedStartTime, NSDate * _Nullable, nil, getEstimatedStartTimeWithReply)
-MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedSubscriptionLatency, NSNumber * _Nullable, nil, getEstimatedSubscriptionLatencyWithReply)
 
 typedef NSDictionary<NSString *, id> * _Nullable ReadAttributeResponseType;
 MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributeWithEndpointID
