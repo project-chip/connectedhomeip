@@ -141,6 +141,7 @@ using namespace chip::Tracing::DarwinFramework;
 @synthesize commissionableBrowser = _commissionableBrowser;
 @synthesize concurrentSubscriptionPool = _concurrentSubscriptionPool;
 @synthesize storageBehaviorConfiguration = _storageBehaviorConfiguration;
+@synthesize controllerNodeID = _controllerNodeID;
 
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                       error:(NSError * __autoreleasing *)error
@@ -417,6 +418,7 @@ using namespace chip::Tracing::DarwinFramework;
         return;
     }
     [self finalShutdown];
+    [super shutdown];
 }
 
 - (void)finalShutdown
@@ -729,6 +731,7 @@ using namespace chip::Tracing::DarwinFramework;
 
         self->_storedFabricIndex = fabricIdx;
         self->_storedCompressedFabricID = _cppCommissioner->GetCompressedFabricId();
+        self->_controllerNodeID = @(_cppCommissioner->GetNodeId());
 
         chip::Crypto::P256PublicKey rootPublicKey;
         if (_cppCommissioner->GetRootPublicKey(rootPublicKey) == CHIP_NO_ERROR) {
@@ -791,18 +794,6 @@ using namespace chip::Tracing::DarwinFramework;
     MTR_LOG("%@ startup: %@", NSStringFromClass(self.class), self);
 
     return YES;
-}
-
-- (NSNumber *)controllerNodeID
-{
-    auto block = ^NSNumber * { return @(self->_cppCommissioner->GetNodeId()); };
-
-    NSNumber * nodeID = [self syncRunOnWorkQueueWithReturnValue:block error:nil];
-    if (!nodeID) {
-        MTR_LOG_ERROR("%@ A controller has no node id if it has not been started", self);
-    }
-
-    return nodeID;
 }
 
 static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
@@ -1158,7 +1149,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     os_unfair_lock_assert_owner(self.deviceMapLock);
 
-    MTRDevice * deviceToReturn = [[MTRDevice_Concrete alloc] initWithNodeID:nodeID controller:self];
+    MTRDevice_Concrete * deviceToReturn = [[MTRDevice_Concrete alloc] initWithNodeID:nodeID controller:self];
     // If we're not running, don't add the device to our map.  That would
     // create a cycle that nothing would break.  Just return the device,
     // which will be in exactly the state it would be in if it were created
@@ -1199,7 +1190,16 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     std::lock_guard lock(*self.deviceMapLock);
     NSMutableDictionary<NSNumber *, NSNumber *> * deviceAttributeCounts = [NSMutableDictionary dictionary];
     for (NSNumber * nodeID in self.nodeIDToDeviceMap) {
-        deviceAttributeCounts[nodeID] = @([[self.nodeIDToDeviceMap objectForKey:nodeID] unitTestAttributeCount]);
+        MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:nodeID];
+
+        // TODO: Can we not just assume this isKindOfClass test is true?  Would be
+        // really nice if we had compile-time checking for this somehow...
+        if (![device isKindOfClass:MTRDevice_Concrete.class]) {
+            continue;
+        }
+
+        auto * concreteDevice = static_cast<MTRDevice_Concrete *>(device);
+        deviceAttributeCounts[nodeID] = @([concreteDevice unitTestAttributeCount]);
     }
     return deviceAttributeCounts;
 }
@@ -1229,30 +1229,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     };
 
     return [self syncRunOnWorkQueueWithBoolReturnValue:block error:nil];
-}
-
-+ (nullable NSData *)computePASEVerifierForSetupPasscode:(NSNumber *)setupPasscode
-                                              iterations:(NSNumber *)iterations
-                                                    salt:(NSData *)salt
-                                                   error:(NSError * __autoreleasing *)error
-{
-    chip::Crypto::Spake2pVerifier verifier;
-    CHIP_ERROR err = verifier.Generate(iterations.unsignedIntValue, AsByteSpan(salt), setupPasscode.unsignedIntValue);
-
-    MATTER_LOG_METRIC_SCOPE(kMetricPASEVerifierForSetupCode, err);
-
-    if ([MTRDeviceController_Concrete checkForError:err logMsg:kDeviceControllerErrorSpake2pVerifierGenerationFailed error:error]) {
-        return nil;
-    }
-
-    uint8_t serializedBuffer[chip::Crypto::kSpake2p_VerifierSerialized_Length];
-    chip::MutableByteSpan serializedBytes(serializedBuffer);
-    err = verifier.Serialize(serializedBytes);
-    if ([MTRDeviceController_Concrete checkForError:err logMsg:kDeviceControllerErrorSpake2pVerifierSerializationFailed error:error]) {
-        return nil;
-    }
-
-    return AsData(serializedBytes);
 }
 
 - (NSData * _Nullable)attestationChallengeForDeviceID:(NSNumber *)deviceID
@@ -1422,9 +1398,19 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // Get the corresponding MTRDevice object to determine if the case/subscription pool is to be used
     MTRDevice * device = [self deviceForNodeID:@(nodeID)];
 
+    // TODO: Can we not just assume this isKindOfClass test is true?  Would be
+    // really nice if we had compile-time checking for this somehow...
+    if (![device isKindOfClass:MTRDevice_Concrete.class]) {
+        MTR_LOG_ERROR("%@ somehow has %@ instead of MTRDevice_Concrete for node ID 0x%016llX (%llu)", self, device, nodeID, nodeID);
+        completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    auto * concreteDevice = static_cast<MTRDevice_Concrete *>(device);
+
     // In the case that this device is known to use thread, queue this with subscription attempts as well, to
     // help with throttling Thread traffic.
-    if ([device deviceUsesThread]) {
+    if ([concreteDevice deviceUsesThread]) {
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull workItemCompletion) {
             MTRInternalDeviceConnectionCallback completionWrapper = ^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
@@ -1620,33 +1606,41 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return CHIP_NO_ERROR;
 }
 
-- (void)invalidateCASESessionForNode:(chip::NodeId)nodeID;
+- (void)invalidateCASESessionForNode:(NSNumber *)nodeID;
 {
     auto block = ^{
         auto sessionMgr = self->_cppCommissioner->SessionMgr();
         VerifyOrDie(sessionMgr != nullptr);
 
         sessionMgr->MarkSessionsAsDefunct(
-            self->_cppCommissioner->GetPeerScopedId(nodeID), chip::MakeOptional(chip::Transport::SecureSession::Type::kCASE));
+            self->_cppCommissioner->GetPeerScopedId(nodeID.unsignedLongLongValue), chip::MakeOptional(chip::Transport::SecureSession::Type::kCASE));
     };
 
     [self syncRunOnWorkQueue:block error:nil];
 }
 
-- (void)operationalInstanceAdded:(chip::NodeId)nodeID
+- (void)operationalInstanceAdded:(NSNumber *)nodeID
 {
     // Don't use deviceForNodeID here, because we don't want to create the
     // device if it does not already exist.
     os_unfair_lock_lock(self.deviceMapLock);
-    MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:@(nodeID)];
+    MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:nodeID];
     os_unfair_lock_unlock(self.deviceMapLock);
 
     if (device == nil) {
         return;
     }
 
-    ChipLogProgress(Controller, "Notifying device about node 0x" ChipLogFormatX64 " advertising", ChipLogValueX64(nodeID));
-    [device nodeMayBeAdvertisingOperational];
+    // TODO: Can we not just assume this isKindOfClass test is true?  Would be
+    // really nice if we had compile-time checking for this somehow...
+    if (![device isKindOfClass:MTRDevice_Concrete.class]) {
+        MTR_LOG_ERROR("%@ somehow has %@ instead of MTRDevice_Concrete for node ID 0x%016llX (%llu)", self, device, nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue);
+        return;
+    }
+
+    MTR_LOG("%@ Notifying %@ about its node advertising", self, device);
+    auto * concreteDevice = static_cast<MTRDevice_Concrete *>(device);
+    [concreteDevice nodeMayBeAdvertisingOperational];
 }
 
 - (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
@@ -1705,15 +1699,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return nil;
 }
 
-#ifdef DEBUG
-+ (void)forceLocalhostAdvertisingOnly
-{
-    auto interfaceIndex = chip::Inet::InterfaceId::PlatformType(kDNSServiceInterfaceIndexLocalOnly);
-    auto interfaceId = chip::Inet::InterfaceId(interfaceIndex);
-    chip::app::DnssdServer::Instance().SetInterfaceId(interfaceId);
-}
-#endif // DEBUG
-
 @end
 
 /**
@@ -1727,11 +1712,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 @end
 
 @implementation MTRDeviceController_Concrete (Deprecated)
-
-- (NSNumber *)controllerNodeId
-{
-    return self.controllerNodeID;
-}
 
 - (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId
 {
@@ -1976,11 +1956,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     };
 
     return [self syncRunOnWorkQueueWithReturnValue:block error:error];
-}
-
-- (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode iterations:(uint32_t)iterations salt:(NSData *)salt
-{
-    return [MTRDeviceController computePASEVerifierForSetupPasscode:@(setupPincode) iterations:@(iterations) salt:salt error:nil];
 }
 
 - (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue

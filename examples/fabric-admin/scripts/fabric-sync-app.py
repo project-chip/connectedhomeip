@@ -22,6 +22,7 @@ import signal
 import sys
 import typing
 from argparse import ArgumentParser
+from pathlib import Path
 from tempfile import TemporaryDirectory
 
 
@@ -142,8 +143,7 @@ async def run_bridge(program, storage_dir=None, rpc_admin_port=None,
                      secured_device_port=None):
     args = []
     if storage_dir is not None:
-        args.extend(["--KVS",
-                     os.path.join(storage_dir, "chip_fabric_bridge_kvs")])
+        args.extend(["--KVS", storage_dir.joinpath("chip_fabric_bridge_kvs")])
     if rpc_admin_port is not None:
         args.extend(["--fabric-admin-server-port", str(rpc_admin_port)])
     if rpc_bridge_port is not None:
@@ -169,14 +169,13 @@ async def main(args):
 
     storage_dir = args.storage_dir
     if storage_dir is not None:
-        os.makedirs(storage_dir, exist_ok=True)
+        storage_dir.mkdir(parents=True, exist_ok=True)
     else:
         storage = TemporaryDirectory(prefix="fabric-sync-app")
-        storage_dir = storage.name
+        storage_dir = Path(storage.name)
 
-    pipe = args.stdin_pipe
-    if pipe and not os.path.exists(pipe):
-        os.mkfifo(pipe)
+    if args.stdin_pipe and not args.stdin_pipe.exists():
+        os.mkfifo(args.stdin_pipe)
 
     admin, bridge = await asyncio.gather(
         run_admin(
@@ -206,6 +205,8 @@ async def main(args):
             admin.terminate()
         with contextlib.suppress(ProcessLookupError):
             bridge.terminate()
+        if args.stdin_pipe:
+            args.stdin_pipe.unlink(missing_ok=True)
         loop.remove_signal_handler(signal.SIGINT)
         loop.remove_signal_handler(signal.SIGTERM)
 
@@ -247,13 +248,17 @@ async def main(args):
     await admin.send(f"pairing open-commissioning-window {bridge_node_id} {cw_endpoint_id}"
                      f" {cw_option} {cw_timeout} {cw_iteration} {cw_discriminator}")
 
+    def get_input_forwarder():
+        if args.stdin_pipe:
+            return forward_pipe(args.stdin_pipe, admin.p.stdin)
+        return forward_stdin(admin.p.stdin)
+
     try:
-        forward = forward_pipe(pipe, admin.p.stdin) if pipe else forward_stdin(admin.p.stdin)
         # Wait for any of the tasks to complete.
         _, pending = await asyncio.wait([
             asyncio.create_task(admin.wait()),
             asyncio.create_task(bridge.wait()),
-            asyncio.create_task(forward),
+            asyncio.create_task(get_input_forwarder()),
         ], return_when=asyncio.FIRST_COMPLETED)
         # Cancel the remaining tasks.
         for task in pending:
@@ -269,22 +274,22 @@ async def main(args):
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Fabric-Sync Example Application")
-    parser.add_argument("--app-admin", metavar="PATH",
+    parser.add_argument("--app-admin", metavar="PATH", type=Path,
                         default=shutil.which("fabric-admin"),
                         help="path to the fabric-admin executable; default=%(default)s")
-    parser.add_argument("--app-bridge", metavar="PATH",
+    parser.add_argument("--app-bridge", metavar="PATH", type=Path,
                         default=shutil.which("fabric-bridge-app"),
                         help="path to the fabric-bridge executable; default=%(default)s")
     parser.add_argument("--app-admin-rpc-port", metavar="PORT", type=int,
                         help="fabric-admin RPC server port")
     parser.add_argument("--app-bridge-rpc-port", metavar="PORT", type=int,
                         help="fabric-bridge RPC server port")
-    parser.add_argument("--stdin-pipe", metavar="PATH",
+    parser.add_argument("--stdin-pipe", metavar="PATH", type=Path,
                         help="read input from a named pipe instead of stdin")
-    parser.add_argument("--storage-dir", metavar="PATH",
+    parser.add_argument("--storage-dir", metavar="PATH", type=Path,
                         help=("directory to place storage files in; by default "
                               "volatile storage is used"))
-    parser.add_argument("--paa-trust-store-path", metavar="PATH",
+    parser.add_argument("--paa-trust-store-path", metavar="PATH", type=Path,
                         help="path to directory holding PAA certificates")
     parser.add_argument("--commissioner-name", metavar="NAME",
                         help="commissioner name to use for the admin")
@@ -299,9 +304,11 @@ if __name__ == "__main__":
     parser.add_argument("--passcode", metavar="NUM", type=int,
                         help="passcode to use for the bridge")
     args = parser.parse_args()
-    if args.app_admin is None or not os.path.exists(args.app_admin):
+    if args.app_admin is None or not args.app_admin.exists():
         parser.error("fabric-admin executable not found in PATH. Use '--app-admin' argument to provide it.")
-    if args.app_bridge is None or not os.path.exists(args.app_bridge):
+    if args.app_bridge is None or not args.app_bridge.exists():
         parser.error("fabric-bridge-app executable not found in PATH. Use '--app-bridge' argument to provide it.")
+    if args.stdin_pipe and args.stdin_pipe.exists() and not args.stdin_pipe.is_fifo():
+        parser.error("given stdin pipe exists and is not a named pipe")
     with contextlib.suppress(KeyboardInterrupt):
         asyncio.run(main(args))

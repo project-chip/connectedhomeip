@@ -73,7 +73,7 @@ tests:
       PICS: "WNCV.S.F00 && WNCV.S.C05.Rsp"
       arguments:
           values:
-              - name: "liftPercent100thsValue"
+              - name: "LiftPercent100thsValue"
                 value: 2500
 
     ### Depends on a sleep/wait command how to do this with a real device for CI keep at 100ms
@@ -142,7 +142,7 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.C05.Rsp
       arguments:
           values:
-              - name: "liftPercent100thsValue"
+              - name: "LiftPercent100thsValue"
                 value: 7520
 
     ### Depends on a sleep/wait command how to do this with a real device for CI keep at 100ms

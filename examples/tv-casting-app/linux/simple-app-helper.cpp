@@ -289,7 +289,7 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
                         kDesiredEndpointVendorId);
     }
 
-    ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler(): Getting endpoints avaiable for demo interactions");
+    ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler(): Getting endpoints available for demo interactions");
     std::vector<matter::casting::memory::Strong<matter::casting::core::Endpoint>> endpoints = castingPlayer->GetEndpoints();
     LogEndpointsDetails(endpoints);
 
@@ -450,6 +450,9 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
 
         targetCastingPlayer->VerifyOrEstablishConnection(connectionCallbacks, matter::casting::core::kCommissioningWindowTimeoutSec,
                                                          idOptions);
+        ChipLogProgress(AppServer, "CommandHandler() request, VerifyOrEstablishConnection() called, calling StopDiscovery()");
+        // Stop discovery since we have discovered, and are now connecting to the desired CastingPlayer.
+        matter::casting::core::CastingPlayerDiscovery::GetInstance()->StopDiscovery();
         return CHIP_NO_ERROR;
     }
     if (strcmp(argv[0], "setcommissionerpasscode") == 0)

@@ -33,6 +33,8 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
                                                   AttributeReportIBs::Builder & reportBuilder,
                                                   const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState);
 
+bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion);
+
 } // namespace CheckedImpl
 } // namespace reporting
 } // namespace app

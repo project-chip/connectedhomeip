@@ -84,6 +84,7 @@ class HostApp(Enum):
     AIR_QUALITY_SENSOR = auto()
     NETWORK_MANAGER = auto()
     ENERGY_MANAGEMENT = auto()
+    WATER_LEAK_DETECTOR = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -154,6 +155,8 @@ class HostApp(Enum):
             return 'network-manager-app/linux'
         elif self == HostApp.ENERGY_MANAGEMENT:
             return 'energy-management-app/linux'
+        elif self == HostApp.WATER_LEAK_DETECTOR:
+            return 'water-leak-detector/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -266,6 +269,9 @@ class HostApp(Enum):
         elif self == HostApp.ENERGY_MANAGEMENT:
             yield 'chip-energy-management-app'
             yield 'chip-energy-management-app.map'
+        elif self == HostApp.WATER_LEAK_DETECTOR:
+            yield 'water-leak-detector-app'
+            yield 'water-leak-detector-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -324,6 +330,7 @@ class HostBuilder(GnBuilder):
                  chip_casting_simplified: Optional[bool] = None,
                  data_model_interface: Optional[str] = None,
                  chip_data_model_check_die_on_failure: Optional[bool] = None,
+                 disable_shell=False
                  ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -348,6 +355,9 @@ class HostBuilder(GnBuilder):
 
         if not enable_thread:
             self.extra_gn_options.append('chip_enable_openthread=false')
+
+        if disable_shell:
+            self.extra_gn_options.append('chip_build_libshell=false')
 
         if use_tsan:
             self.extra_gn_options.append('is_tsan=true')
@@ -560,7 +570,14 @@ class HostBuilder(GnBuilder):
 
     def PreBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
-            self._Execute(['ninja', '-C', self.output_dir, 'default'], title="Build-only")
+            cmd = ['ninja', '-C', self.output_dir]
+
+            if self.ninja_jobs is not None:
+                cmd.append('-j' + str(self.ninja_jobs))
+
+            cmd.append('default')
+
+            self._Execute(cmd, title="Build-only")
             self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
                            '--exclude', os.path.join(self.chip_dir, '**/tests/*'),
                            '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),

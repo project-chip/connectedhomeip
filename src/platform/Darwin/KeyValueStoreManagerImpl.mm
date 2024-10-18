@@ -152,13 +152,13 @@ namespace DeviceLayer {
                     return CHIP_NO_ERROR;
                 }
 
-                ReturnErrorCodeIf(gContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
-                ReturnErrorCodeIf(fileName == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-                ReturnErrorCodeIf(fileName[0] == '\0', CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(gContext == nullptr, CHIP_ERROR_INCORRECT_STATE);
+                VerifyOrReturnError(fileName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(fileName[0] != '\0', CHIP_ERROR_INVALID_ARGUMENT);
 
                 NSURL * url = nullptr;
                 NSString * filepath = [NSString stringWithUTF8String:fileName];
-                ReturnErrorCodeIf(filepath == nil, CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(filepath != nil, CHIP_ERROR_INVALID_ARGUMENT);
 
                 // relative paths are relative to Documents folder
                 if (![filepath hasPrefix:@"/"]) {
@@ -178,12 +178,12 @@ namespace DeviceLayer {
                 } else {
                     url = [NSURL fileURLWithPath:filepath];
                 }
-                ReturnErrorCodeIf(url == nullptr, CHIP_ERROR_NO_MEMORY);
+                VerifyOrReturnError(url != nullptr, CHIP_ERROR_NO_MEMORY);
 
                 ChipLogProgress(DeviceLayer, "KVS will be written to: %s", [[url absoluteString] UTF8String]);
 
                 NSManagedObjectModel * model = CreateManagedObjectModel();
-                ReturnErrorCodeIf(model == nullptr, CHIP_ERROR_NO_MEMORY);
+                VerifyOrReturnError(model != nullptr, CHIP_ERROR_NO_MEMORY);
 
                 // setup persistent store coordinator
 
@@ -220,9 +220,9 @@ namespace DeviceLayer {
             const char * key, void * value, size_t value_size, size_t * read_bytes_size, size_t offset)
         {
             @autoreleasepool {
-                ReturnErrorCodeIf(key == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-                ReturnErrorCodeIf(offset != 0, CHIP_ERROR_INVALID_ARGUMENT);
-                ReturnErrorCodeIf(gContext == nullptr, CHIP_ERROR_UNINITIALIZED);
+                VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(offset == 0, CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(gContext != nullptr, CHIP_ERROR_UNINITIALIZED);
 
                 KeyValueItem * item = FindItemForKey([[NSString alloc] initWithUTF8String:key], nil, true);
                 if (!item) {
@@ -261,8 +261,8 @@ namespace DeviceLayer {
         CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
         {
             @autoreleasepool {
-                ReturnErrorCodeIf(key == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-                ReturnErrorCodeIf(gContext == nullptr, CHIP_ERROR_UNINITIALIZED);
+                VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(gContext != nullptr, CHIP_ERROR_UNINITIALIZED);
 
                 KeyValueItem * item = FindItemForKey([[NSString alloc] initWithUTF8String:key], nil);
                 if (!item) {
@@ -288,13 +288,13 @@ namespace DeviceLayer {
         CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
         {
             @autoreleasepool {
-                ReturnErrorCodeIf(key == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-                ReturnErrorCodeIf(gContext == nullptr, CHIP_ERROR_UNINITIALIZED);
+                VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(gContext != nullptr, CHIP_ERROR_UNINITIALIZED);
 
                 NSData * data = [[NSData alloc] initWithBytes:value length:value_size];
 
                 NSString * itemKey = [[NSString alloc] initWithUTF8String:key];
-                ReturnErrorCodeIf(itemKey == nil, CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(itemKey != nil, CHIP_ERROR_INVALID_ARGUMENT);
 
                 KeyValueItem * item = FindItemForKey(itemKey, nil);
                 if (!item) {

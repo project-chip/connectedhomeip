@@ -40,10 +40,56 @@
 
 @end
 
+NSString * const MTRDeviceControllerRegistrationControllerContextKey = @"MTRDeviceControllerRegistrationControllerContext";
+NSString * const MTRDeviceControllerRegistrationNodeIDsKey = @"MTRDeviceControllerRegistrationNodeIDs";
+NSString * const MTRDeviceControllerRegistrationNodeIDKey = @"MTRDeviceControllerRegistrationNodeID";
+
 // #define MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 
 @implementation MTRDeviceController_XPC
 
+#pragma mark - Node ID Management
+
+MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
+                                               : (NSDictionary *) controllerState, updateControllerConfiguration
+                                               : (NSDictionary *) controllerState)
+
+- (void)_updateRegistrationInfo
+{
+    NSMutableDictionary * registrationInfo = [NSMutableDictionary dictionary];
+
+    NSMutableDictionary * controllerContext = [NSMutableDictionary dictionary];
+    NSMutableArray * nodeIDs = [NSMutableArray array];
+
+    for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
+        NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
+        MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
+
+        [nodeIDs addObject:nodeDictionary];
+    }
+    MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDsKey, nodeIDs, registrationInfo)
+    MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationControllerContextKey, controllerContext, registrationInfo)
+
+    [self updateControllerConfiguration:registrationInfo];
+}
+
+- (void)_registerNodeID:(NSNumber *)nodeID
+{
+    [self _updateRegistrationInfo];
+}
+
+- (void)_unregisterNodeID:(NSNumber *)nodeID
+{
+    [self _updateRegistrationInfo];
+}
+
+- (void)removeDevice:(MTRDevice *)device
+{
+    [super removeDevice:device];
+    [self _updateRegistrationInfo];
+}
+
+#pragma mark - XPC
 + (NSMutableSet *)_allowedClasses
 {
     static NSArray * sBaseAllowedClasses = @[
@@ -202,25 +248,10 @@
         MTR_LOG("%@ Activating new XPC connection", self);
         [self.xpcConnection activate];
 
-        [[self.xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-            MTR_LOG_ERROR("Checkin error: %@", error);
-        }] deviceController:self.uniqueIdentifier checkInWithContext:[NSDictionary dictionary]];
-
         // FIXME: Trying to kick all the MTRDevices attached to this controller to re-establish connections
         //        This state needs to be stored properly and re-established at connnection time
 
-        MTR_LOG("%@ Starting existing NodeID Registration", self);
-        for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
-            MTR_LOG("%@ => Registering nodeID: %@", self, nodeID);
-            mtr_weakify(self);
-
-            [[self.xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-                mtr_strongify(self);
-                MTR_LOG_ERROR("%@ Registration error for device nodeID: %@ : %@", self, nodeID, error);
-            }] deviceController:self.uniqueIdentifier registerNodeID:nodeID];
-        }
-
-        MTR_LOG("%@ Done existing NodeID Registration", self);
+        [self _updateRegistrationInfo];
         self.xpcConnectedOrConnecting = YES;
     } else {
         MTR_LOG_ERROR("%@ Failed to set up XPC Connection", self);
@@ -308,11 +339,7 @@
     [self.nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
     MTR_LOG("%s: returning XPC device for node id %@", __PRETTY_FUNCTION__, nodeID);
 
-    mtr_weakify(self);
-    [[self.xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-        mtr_strongify(self);
-        MTR_LOG_ERROR("%@ Registration error for device nodeID: %@ : %@", self, nodeID, error);
-    }] deviceController:self.uniqueIdentifier registerNodeID:nodeID];
+    [self _updateRegistrationInfo];
 
     return deviceToReturn;
 }
@@ -341,9 +368,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(controllerNodeID, NSNumber *, nil,
 
 //- (oneway void)deviceController:(NSUUID *)controller openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration withReply:(void(^)(NSError * _Nullable error))reply;
 //- (oneway void)deviceController:(NSUUID *)controller openPairingWindowWithPIN:(uint64_t)deviceID duration:(NSUInteger)duration discriminator:(NSUInteger)discriminator setupPIN:(NSUInteger)setupPIN  withReply:(void(^)(NSError * _Nullable error))reply;
-
-MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(shutdown, shutdownDeviceController
-                                               : self.uniqueIdentifier)
 
 #pragma mark - MTRDeviceProtocol Client
 

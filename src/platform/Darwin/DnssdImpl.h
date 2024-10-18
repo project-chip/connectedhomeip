@@ -233,6 +233,7 @@ struct InterfaceInfo
     std::vector<Inet::IPAddress> addresses;
     std::string fullyQualifiedDomainName;
     bool isDNSLookUpRequested = false;
+    bool HasAddresses() const { return addresses.size() != 0; };
 };
 
 struct InterfaceKey
@@ -245,6 +246,11 @@ struct InterfaceKey
             ((this->interfaceId == other.interfaceId) && (this->hostname < other.hostname)) ||
             ((this->interfaceId == other.interfaceId) && (this->hostname == other.hostname) &&
              (this->isSRPResult < other.isSRPResult));
+    }
+
+    inline bool operator==(const InterfaceKey & other) const
+    {
+        return this->interfaceId == other.interfaceId && this->hostname == other.hostname && this->isSRPResult == other.isSRPResult;
     }
 
     uint32_t interfaceId;
@@ -310,16 +316,6 @@ struct ResolveContext : public GenericContext
      *
      */
     void CancelSRPTimerIfRunning();
-
-private:
-    /**
-     * Try reporting the results we got on the provided interface index.
-     * Returns true if information was reported, false if not (e.g. if there
-     * were no IP addresses, etc).
-     */
-    bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, const std::string & hostname, bool isSRPResult);
-
-    bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex);
 };
 
 } // namespace Dnssd
