@@ -1,0 +1,39 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/python.gni")
+
+# Python package for Matter setup payload
+pw_python_package("matter-setup-payload") {
+  setup = [
+    "setup.py",
+    "setup.cfg",
+    "pyproject.toml",
+  ]
+
+  inputs = [ "README.md" ]
+
+  sources = [
+    "matter_setup_payload/__init__.py",
+    "matter_setup_payload/base38.py",
+    "matter_setup_payload/cli.py",
+    "matter_setup_payload/setup_payload.py",
+  ]
+
+  tests = [ "tests/test_matter_setup_payload.py" ]
+}
