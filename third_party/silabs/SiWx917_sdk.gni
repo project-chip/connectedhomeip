@@ -649,7 +649,6 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_temp_sensor.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_driver_gpio.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_usart.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_peripheral_drivers/src/sl_si91x_peripheral_gpio.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_ram.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_rom.c",

@@ -223,7 +223,7 @@
 [submodule "third_party/silabs/wifi_sdk"]
 	path = third_party/silabs/wifi_sdk
 	url = https://github.com/SiliconLabs/wiseconnect.git
-	branch = v3.3.2
+	branch = v3.3.3
 	platforms = silabs
 [submodule "editline"]
 	path = third_party/editline/repo
