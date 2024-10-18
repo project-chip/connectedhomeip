@@ -22,6 +22,10 @@ cluster {{asUpperCamelCase name}} = {{!}}
   }
 
   {{/zcl_enums}}
+  {{#zcl_typedefs}}
+  typedef {{asUpperCamelCase name preserveAcronyms=true}} : {{type}};
+
+  {{/zcl_typedefs}}
   {{#zcl_bitmaps}}
   bitmap {{asUpperCamelCase name preserveAcronyms=true}} : bitmap{{multiply size 8}} {
     {{#zcl_bitmap_items}}

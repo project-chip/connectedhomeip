@@ -23,7 +23,7 @@ from matter_idl.matter_idl_types import (ApiMaturity, Attribute, AttributeInstan
                                          AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation, CommandQuality,
                                          ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality,
                                          Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructQuality,
-                                         StructTag)
+                                         StructTag, Typedef)
 
 
 def UnionOfAllFlags(flags_list):
@@ -206,6 +206,10 @@ class MatterIdlTransformer(Transformer):
     @v_args(inline=True)
     def bitmap(self, id, type, *entries):
         return Bitmap(name=id, base_type=type, entries=list(entries))
+
+    @v_args(inline=True)
+    def typedef(self, id, type):
+        return Typedef(name=id, base_type=type)
 
     def field(self, args):
         data_type, name = args[0], args[1]
@@ -496,6 +500,8 @@ class MatterIdlTransformer(Transformer):
                 result.structs.append(item)
             elif isinstance(item, Command):
                 result.commands.append(item)
+            elif isinstance(item, Typedef):
+                result.typedefs.append(item)
             else:
                 raise Exception("UNKNOWN cluster content item: %r" % item)
 
@@ -508,6 +514,7 @@ class MatterIdlTransformer(Transformer):
         global_bitmaps = []
         global_enums = []
         global_structs = []
+        global_typedefs =[]
 
         for item in items:
             if isinstance(item, Cluster):
@@ -520,10 +527,12 @@ class MatterIdlTransformer(Transformer):
                 global_bitmaps.append(dataclasses.replace(item, is_global=True))
             elif isinstance(item, Struct):
                 global_structs.append(dataclasses.replace(item, is_global=True))
+            elif isinstance(item, Typedef):
+                global_typedefs.append(dataclasses.replace(item, is_global=True))
             else:
                 raise Exception("UNKNOWN idl content item: %r" % item)
 
-        return Idl(clusters=clusters, endpoints=endpoints, global_bitmaps=global_bitmaps, global_enums=global_enums, global_structs=global_structs)
+        return Idl(clusters=clusters, endpoints=endpoints, global_bitmaps=global_bitmaps, global_enums=global_enums, global_structs=global_structs, global_typedefs=global_typedefs)
 
     def prefix_doc_comment(self):
         print("TODO: prefix")
@@ -563,15 +572,16 @@ class GlobalMapping:
         self.bitmap_map = {b.name: b for b in idl.global_bitmaps}
         self.enum_map = {e.name: e for e in idl.global_enums}
         self.struct_map = {s.name: s for s in idl.global_structs}
+        self.typedef_map = {t.name: t for t in idl.global_typedefs}
 
-        self.global_types = set(self.bitmap_map.keys()).union(set(self.enum_map.keys())).union(set(self.struct_map.keys()))
+        self.global_types = set(self.bitmap_map.keys()).union(set(self.enum_map.keys())).union(set(self.struct_map.keys())).union(set(self.typedef_map.keys()))
 
         # Spec does not enforce unique naming in bitmap/enum/struct, however in practice
         # if we have both enum Foo and bitmap Foo for example, it would be impossible
         # to disambiguate `attribute Foo foo = 1` for the actual type we want.
         #
         # As a result, we do not try to namespace this and just error out
-        if len(self.global_types) != len(self.bitmap_map) + len(self.enum_map) + len(self.struct_map):
+        if len(self.global_types) != len(self.bitmap_map) + len(self.enum_map) + len(self.struct_map) + len(self.typedef_map):
             raise ValueError("Global type names are not unique.")
 
     def merge_global_types_into_cluster(self, cluster: Cluster) -> Cluster:
@@ -604,6 +614,10 @@ class GlobalMapping:
                     global_types_added.add(type_name)
                     changed = True
                     cluster.structs.append(self.struct_map[type_name])
+                elif type_name in self.typedef_map:
+                    global_types_added.add(type_name)
+                    changed = True
+                    cluster.typedefs.append(self.typedef_map[type_name])
 
         return cluster
 
@@ -638,7 +652,11 @@ class ParserWithLines:
         )
 
     def parse(self, file: str, file_name: Optional[str] = None):
-        idl = self.transformer.transform(self.parser.parse(file))
+        idl = None
+        try:
+            idl = self.transformer.transform(self.parser.parse(file))
+        except Exception as e:
+            raise Exception(f"Failed to parse: {file_name}") from e
         idl.parse_file_name = file_name
 
         # ZAP may generate the same definition of clusters several times.
