@@ -60,7 +60,7 @@ Davis, CA 95616, USA
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009D" name="Energy EVSE Mode Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
-    <revision revision="2" summary="Disallowed OnMode and StartUpMode attributes"/>
+    <revision revision="2" summary="Disallowed DEPONOFF feature and OnMode and StartUpMode attributes"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x009D" name="Energy EVSE Mode"/>

@@ -66,7 +66,7 @@ Davis, CA 95616, USA
     <revision revision="5" summary="CCB 3472 3474 3338"/>
     <revision revision="6" summary="New data model format and notation. Added User features. General cleanup of functionality"/>
     <revision revision="7" summary="Added support for European door locks (unbolt feature)"/>
-    <revision revision="8" summary="Removed LOG feature, fixed constraints on NumberOf*Schedules attributes.
+    <revision revision="8" summary="Removed LOG and NOT feature, fixed constraints on NumberOf*Schedules attributes.
              and added support for Aliro credential provisioning"/>
   </revisionHistory>
   <clusterIds>
@@ -598,9 +598,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
       <bitfield name="LockFactoryReset" bit="1" summary="Lock Reset to Factory Defaults">
-        <optionalConform/>
-      </bitfield>
-      <bitfield name="N/A" bit="2" summary="Reserved">
         <optionalConform/>
       </bitfield>
       <bitfield name="LockRadioPowerCycled" bit="3" summary="RF Module Power Cycled">
