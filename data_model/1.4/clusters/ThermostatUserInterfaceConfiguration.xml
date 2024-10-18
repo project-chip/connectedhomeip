@@ -106,17 +106,14 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="TemperatureDisplayMode" type="TemperatureDisplayModeEnum" default="Celsius">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
     </attribute>
     <attribute id="0x0001" name="KeypadLockout" type="KeypadLockoutEnum" default="NoLockout">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
     </attribute>
     <attribute id="0x0002" name="ScheduleProgrammingVisibility" type="ScheduleProgrammingVisibilityEnum" default="ScheduleProgrammingPermitted">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="desc"/>
     </attribute>
   </attributes>
 </cluster>
