@@ -18,8 +18,6 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     factoryreset: true
-#     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -28,6 +26,9 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -74,23 +75,6 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
                      "DUT_CE windows status shows the window is closed"),
         ]
 
-    def pics_TC_CADMIN_1_24(self) -> list[str]:
-        return ["CADMIN.S"]
-
-    def steps_TC_CADMIN_1_24(self) -> list[TestStep]:
-        return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 180 seconds",
-                     "DUT_CE opens its Commissioning window to allow a second commissioning"),
-            TestStep(3, "TH_CR1 sends an RevokeCommissioning command to the DUT"),
-            TestStep(4, "TH_CR1 reads the window status to verify the DUT_CE window is closed",
-                     "DUT_CE windows status shows the window is closed"),
-            TestStep(5, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 179 seconds",
-                     "DUT_CE does not open its Commissioning window to allow a second commissioning. DUT_CE shows 'Failed to open commissioning window. Global status 0x85'"),
-            TestStep(6, "TH_CR1 reads the window status to verify the DUT_CE window is closed",
-                     "DUT_CE windows status shows the window is closed"),
-        ]
-
     @async_test_body
     async def test_TC_CADMIN_1_22(self):
         self.step(1)
@@ -127,6 +111,23 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
         window_status2 = await self.get_window_status()
         if window_status2 != Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen:
             asserts.fail("Commissioning window is expected to be closed, but was found to be open")
+
+    def pics_TC_CADMIN_1_24(self) -> list[str]:
+        return ["CADMIN.S"]
+
+    def steps_TC_CADMIN_1_24(self) -> list[TestStep]:
+        return [
+            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(2, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 180 seconds",
+                     "DUT_CE opens its Commissioning window to allow a second commissioning"),
+            TestStep(3, "TH_CR1 sends an RevokeCommissioning command to the DUT"),
+            TestStep(4, "TH_CR1 reads the window status to verify the DUT_CE window is closed",
+                     "DUT_CE windows status shows the window is closed"),
+            TestStep(5, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 179 seconds",
+                     "DUT_CE does not open its Commissioning window to allow a second commissioning. DUT_CE shows 'Failed to open commissioning window. Global status 0x85'"),
+            TestStep(6, "TH_CR1 reads the window status to verify the DUT_CE window is closed",
+                     "DUT_CE windows status shows the window is closed"),
+        ]
 
     @async_test_body
     async def test_TC_CADMIN_1_24(self):
