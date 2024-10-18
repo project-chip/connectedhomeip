@@ -118,8 +118,21 @@ function cirquetest_cachekeyhash() {
 function cirquetest_bootstrap() {
     set -ex
 
+    # Enter virtual environment if not already set. Create cirque_venv if one doesn't exist.
+    if [[ -z "$VIRTUAL_ENV" ]]; then
+        if [[ -d "$REPO_DIR"/cirque_venv ]]; then
+            . "$REPO_DIR"/cirque_venv/bin/activate
+        else
+            if ! command -v virtualenv &>/dev/null; then
+                pip install --break-system-packages virtualenv
+            fi
+            virtualenv cirque_venv
+            . "$REPO_DIR"/cirque_venv/bin/activate
+        fi
+    fi
+
     cd "$REPO_DIR"/third_party/cirque/repo
-    pip3 install --break-system-packages pycodestyle==2.5.0 wheel
+    pip3 install pycodestyle==2.5.0 wheel paramiko
 
     make NO_GRPC=1 install -j
 
@@ -128,7 +141,7 @@ function cirquetest_bootstrap() {
     "$REPO_DIR"/integrations/docker/images/stage-2/chip-cirque-device-base/build.sh --build-arg OT_BR_POSIX_CHECKOUT="$OT_BR_POSIX_CHECKOUT"
 
     __cirquetest_build_ot_lazy
-    pip3 install --break-system-packages -r requirements_nogrpc.txt
+    pip3 install -r requirements_nogrpc.txt
 
     echo "OpenThread Version: $OPENTHREAD_CHECKOUT"
     echo "ot-br-posix Version: $OT_BR_POSIX_CHECKOUT"
