@@ -2254,7 +2254,7 @@ cluster PowerTopology = 156 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 provisional cluster DeviceEnergyManagementMode = 159 {
-  revision 1;
+  revision 2;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -2290,8 +2290,6 @@ provisional cluster DeviceEnergyManagementMode = 159 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2308,8 +2306,7 @@ provisional cluster DeviceEnergyManagementMode = 159 {
     optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -2792,8 +2789,6 @@ endpoint 3 {
   server cluster DeviceEnergyManagementMode {
     callback attribute supportedModes;
     callback attribute currentMode;
-    ram      attribute startUpMode;
-    ram      attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

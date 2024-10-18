@@ -2662,8 +2662,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Cluster EnergyEVSEMode attributes
     MTRAttributeIDTypeClusterEnergyEVSEModeAttributeSupportedModesID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterEnergyEVSEModeAttributeCurrentModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterEnergyEVSEModeAttributeStartUpModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterEnergyEVSEModeAttributeOnModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterEnergyEVSEModeAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterEnergyEVSEModeAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterEnergyEVSEModeAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
@@ -2674,8 +2672,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Cluster WaterHeaterMode attributes
     MTRAttributeIDTypeClusterWaterHeaterModeAttributeSupportedModesID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterWaterHeaterModeAttributeCurrentModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterWaterHeaterModeAttributeStartUpModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterWaterHeaterModeAttributeOnModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterWaterHeaterModeAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterWaterHeaterModeAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterWaterHeaterModeAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
@@ -2686,8 +2682,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Cluster DeviceEnergyManagementMode attributes
     MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeSupportedModesID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeCurrentModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeStartUpModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeOnModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
