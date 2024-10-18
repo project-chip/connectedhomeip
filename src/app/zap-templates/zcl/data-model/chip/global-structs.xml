@@ -38,5 +38,6 @@ limitations under the License.
     <item fieldId="0" name="Name" type="char_string" length="128" isNullable="false" optional="false"/>
     <item fieldId="1" name="MyBitmap" type="TestGlobalBitmap" isNullable="true" optional="false"/>
     <item fieldId="2" name="MyEnum" type="TestGlobalEnum" isNullable="true" optional="true"/>
+    <item fieldId="3" name="MyTypedef" type="TestGlobalTypedef" isNullable="true" optional="true"/>
   </struct>
 </configurator>
