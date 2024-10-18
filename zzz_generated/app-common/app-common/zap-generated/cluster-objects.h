@@ -41980,7 +41980,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RateDistortionTradeOffPoints
-namespace MaxPreRollBufferSize {
+namespace MaxContentBufferSize {
 struct TypeInfo
 {
     using Type             = uint32_t;
@@ -41988,10 +41988,10 @@ struct TypeInfo
     using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MaxPreRollBufferSize::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxContentBufferSize::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace MaxPreRollBufferSize
+} // namespace MaxContentBufferSize
 namespace MicrophoneCapabilities {
 struct TypeInfo
 {
@@ -42529,7 +42529,7 @@ struct TypeInfo
         Attributes::NightVisionCapable::TypeInfo::DecodableType nightVisionCapable = static_cast<bool>(0);
         Attributes::MinViewport::TypeInfo::DecodableType minViewport;
         Attributes::RateDistortionTradeOffPoints::TypeInfo::DecodableType rateDistortionTradeOffPoints;
-        Attributes::MaxPreRollBufferSize::TypeInfo::DecodableType maxPreRollBufferSize = static_cast<uint32_t>(0);
+        Attributes::MaxContentBufferSize::TypeInfo::DecodableType maxContentBufferSize = static_cast<uint32_t>(0);
         Attributes::MicrophoneCapabilities::TypeInfo::DecodableType microphoneCapabilities;
         Attributes::SpeakerCapabilities::TypeInfo::DecodableType speakerCapabilities;
         Attributes::TwoWayTalkSupport::TypeInfo::DecodableType twoWayTalkSupport =

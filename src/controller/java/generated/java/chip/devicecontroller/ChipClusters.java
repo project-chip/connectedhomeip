@@ -59730,7 +59730,7 @@ public class ChipClusters {
     private static final long NIGHT_VISION_CAPABLE_ATTRIBUTE_ID = 3L;
     private static final long MIN_VIEWPORT_ATTRIBUTE_ID = 4L;
     private static final long RATE_DISTORTION_TRADE_OFF_POINTS_ATTRIBUTE_ID = 5L;
-    private static final long MAX_PRE_ROLL_BUFFER_SIZE_ATTRIBUTE_ID = 6L;
+    private static final long MAX_CONTENT_BUFFER_SIZE_ATTRIBUTE_ID = 6L;
     private static final long MICROPHONE_CAPABILITIES_ATTRIBUTE_ID = 7L;
     private static final long SPEAKER_CAPABILITIES_ATTRIBUTE_ID = 8L;
     private static final long TWO_WAY_TALK_SUPPORT_ATTRIBUTE_ID = 9L;
@@ -60418,9 +60418,9 @@ public class ChipClusters {
         }, RATE_DISTORTION_TRADE_OFF_POINTS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMaxPreRollBufferSizeAttribute(
+    public void readMaxContentBufferSizeAttribute(
         LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_PRE_ROLL_BUFFER_SIZE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_CONTENT_BUFFER_SIZE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -60428,12 +60428,12 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MAX_PRE_ROLL_BUFFER_SIZE_ATTRIBUTE_ID, true);
+        }, MAX_CONTENT_BUFFER_SIZE_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMaxPreRollBufferSizeAttribute(
+    public void subscribeMaxContentBufferSizeAttribute(
         LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_PRE_ROLL_BUFFER_SIZE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_CONTENT_BUFFER_SIZE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -60441,7 +60441,7 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MAX_PRE_ROLL_BUFFER_SIZE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MAX_CONTENT_BUFFER_SIZE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readMicrophoneCapabilitiesAttribute(
