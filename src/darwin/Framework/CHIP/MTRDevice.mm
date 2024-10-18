@@ -38,11 +38,6 @@
 
 #import "lib/core/CHIPError.h"
 
-// TODO Should these string definitions just move to MTRDevice_Concrete, since
-// that's the only place they are used?
-NSString * const MTRPreviousDataKey = @"previousData";
-NSString * const MTRDataVersionKey = @"dataVersion";
-
 @implementation MTRDeviceDelegateInfo
 - (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
 {
