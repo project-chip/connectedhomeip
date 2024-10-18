@@ -220,9 +220,13 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 static NSString * const kMTRDeviceInternalPropertyKeyVendorID = @"MTRDeviceInternalStateKeyVendorID";
 static NSString * const kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalStateKeyProductID";
 static NSString * const kMTRDeviceInternalPropertyNetworkFeatures = @"MTRDeviceInternalPropertyNetworkFeatures";
-static NSString * const kMTRDeviceInternalPropertyDeviceState = @"MTRDeviceInternalPropertyDeviceState";
+static NSString * const kMTRDeviceInternalPropertyDeviceInternalState = @"MTRDeviceInternalPropertyDeviceInternalState";
 static NSString * const kMTRDeviceInternalPropertyLastSubscriptionAttemptWait = @"kMTRDeviceInternalPropertyLastSubscriptionAttemptWait";
 static NSString * const kMTRDeviceInternalPropertyMostRecentReportTime = @"MTRDeviceInternalPropertyMostRecentReportTime";
 static NSString * const kMTRDeviceInternalPropertyLastSubscriptionFailureTime = @"MTRDeviceInternalPropertyLastSubscriptionFailureTime";
+static NSString * const kMTRDeviceInternalPropertyDeviceState = @"MTRDeviceInternalPropertyDeviceState";
+static NSString * const kMTRDeviceInternalPropertyDeviceCachePrimed = @"MTRDeviceInternalPropertyDeviceCachePrimed";
+static NSString * const kMTRDeviceInternalPropertyEstimatedStartTime = @"MTRDeviceInternalPropertyEstimatedStartTime";
+static NSString * const kMTRDeviceInternalPropertyEstimatedSubscriptionLatency = @"MTRDeviceInternalPropertyEstimatedSubscriptionLatency";
 
 NS_ASSUME_NONNULL_END
