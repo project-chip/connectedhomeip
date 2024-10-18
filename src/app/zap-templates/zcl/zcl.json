@@ -59,6 +59,7 @@
         "global-bitmaps.xml",
         "global-enums.xml",
         "global-structs.xml",
+        "global-typedefs.xml",
         "groups-cluster.xml",
         "group-key-mgmt-cluster.xml",
         "icd-management-cluster.xml",
