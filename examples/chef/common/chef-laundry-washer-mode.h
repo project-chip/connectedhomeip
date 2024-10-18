@@ -85,9 +85,9 @@ void Shutdown();
 
 #ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
 chip::Protocols::InteractionModel::Status chefLaundryWasherModeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                      const EmberAfAttributeMetadata * attributeMetadata,
-                                                                      uint8_t * buffer);
+                                                                             const EmberAfAttributeMetadata * attributeMetadata,
+                                                                             uint8_t * buffer);
 chip::Protocols::InteractionModel::Status chefLaundryWasherModeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                     const EmberAfAttributeMetadata * attributeMetadata,
-                                                                     uint8_t * buffer, uint16_t maxReadLength);
+                                                                            const EmberAfAttributeMetadata * attributeMetadata,
+                                                                            uint8_t * buffer, uint16_t maxReadLength);
 #endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER

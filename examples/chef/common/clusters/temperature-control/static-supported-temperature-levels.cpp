@@ -38,11 +38,11 @@ const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatur
 
 uint8_t AppSupportedTemperatureLevelsDelegate::Size()
 {
-   for (auto & endpointPair : AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints)
+    for (auto & endpointPair : AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints)
     {
         if (endpointPair.mEndpointId == mEndpoint)
         {
-           return endpointPair.mSize;
+            return endpointPair.mSize;
         }
     }
     return 0;

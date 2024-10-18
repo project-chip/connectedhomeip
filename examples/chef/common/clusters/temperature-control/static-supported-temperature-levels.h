@@ -18,7 +18,7 @@
 
 #pragma once
 
-//#endif // MATTER_DM_PLUGIN_WASHER_SERVER
+// #endif // MATTER_DM_PLUGIN_WASHER_SERVER
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
 #include <app/util/config.h>
 
@@ -62,4 +62,4 @@ public:
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-//#endif // MATTER_DM_PLUGIN_WASHER_SERVER
+// #endif // MATTER_DM_PLUGIN_WASHER_SERVER

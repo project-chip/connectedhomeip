@@ -96,8 +96,8 @@ void LaundryWasherMode::Shutdown()
 }
 
 chip::Protocols::InteractionModel::Status chefLaundryWasherModeWriteCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                                        const EmberAfAttributeMetadata * attributeMetadata,
-                                                                        uint8_t * buffer)
+                                                                             const EmberAfAttributeMetadata * attributeMetadata,
+                                                                             uint8_t * buffer)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1
     VerifyOrDie(gLaundryWasherModeInstance != nullptr);
@@ -125,8 +125,8 @@ chip::Protocols::InteractionModel::Status chefLaundryWasherModeWriteCallback(chi
 }
 
 chip::Protocols::InteractionModel::Status chefLaundryWasherModeReadCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                                       const EmberAfAttributeMetadata * attributeMetadata,
-                                                                       uint8_t * buffer, uint16_t maxReadLength)
+                                                                            const EmberAfAttributeMetadata * attributeMetadata,
+                                                                            uint8_t * buffer, uint16_t maxReadLength)
 {
     VerifyOrReturnValue(maxReadLength > 0, chip::Protocols::InteractionModel::Status::ResourceExhausted);
     buffer[0] = gLaundryWasherModeInstance->GetCurrentMode();
