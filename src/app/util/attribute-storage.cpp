@@ -282,27 +282,28 @@ const EmberAfCluster * getClusterTypeDefinition(EndpointId endpointId, ClusterId
 } // anonymous namespace
 
 void emberAfSetupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, EndpointId templateEndpointId,
-                                            const Span<const ClusterId> & templateClusterIds)
+                                            const Span<const EmberAfClusterSpec> & templateClusterSpecs)
 {
     // allocate cluster list
-    size_t clusterCount = templateClusterIds.size();
+    size_t clusterCount = templateClusterSpecs.size();
     VerifyOrDieWithMsg(clusterCount <= 255, Support, "max 255 clusters per endpoint!");
     endpointType.clusterCount = static_cast<uint8_t>(clusterCount);
     endpointType.cluster      = new EmberAfCluster[endpointType.clusterCount];
     endpointType.endpointSize = 0;
     // get the actual cluster pointers and sum up memory size
-    for (size_t i = 0; i < templateClusterIds.size(); i++)
+    for (size_t i = 0; i < templateClusterSpecs.size(); i++)
     {
-        auto cluster = getClusterTypeDefinition(templateEndpointId, templateClusterIds[i], 0); // 0 = not filtered by a mask
-        VerifyOrDieWithMsg(cluster, Support, "cluster 0x%04x template in endpoint %u does not exist",
-                           (unsigned int) templateClusterIds.data()[i], (unsigned int) templateEndpointId);
+        auto cluster =
+            getClusterTypeDefinition(templateEndpointId, templateClusterSpecs[i].clusterId, templateClusterSpecs[i].mask);
+        VerifyOrDieWithMsg(cluster, Support, "cluster 0x%04x with mask %x could not be found in template endpoint %u",
+                           (unsigned int) templateClusterSpecs[i].clusterId, templateClusterSpecs[i].mask,
+                           (unsigned int) templateEndpointId);
         // for now, we need to copy the cluster definition, unfortunately.
         // TODO: make endpointType use a pointer to a list of EmberAfCluster* instead, so we can re-use cluster definitions
         //   instead of duplicating them here once for every instance.
-        // Note: we cannot struct assignment here, because cluster in EmberAfEndpointType is const due
-        //   to the way static cluster code generation works. So we have to resort to memcpy as a workaround
-        //   until the much more intrusive changes as suggested by the TODO above can be applied.
-        const_cast<EmberAfCluster&>(endpointType.cluster[i]) = *cluster;
+        // Note: we need const cast here, because cluster in EmberAfEndpointType is const due
+        //   to the way static cluster code generation works.
+        const_cast<EmberAfCluster &>(endpointType.cluster[i]) = *cluster;
         // sum up the needed storage
         endpointType.endpointSize = (uint16_t) (endpointType.endpointSize + cluster->clusterSize);
     }

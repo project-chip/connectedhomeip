@@ -51,6 +51,15 @@
 typedef uint8_t EmberAfClusterMask;
 
 /**
+ * @brief Type for specifiying cluster including mask, to differentiate server & client
+ */
+typedef struct
+{
+    chip::ClusterId clusterId;
+    EmberAfClusterMask mask;
+} EmberAfClusterSpec;
+
+/**
  * @brief Generic function type, used for either of the cluster function.
  *
  * This type is used for the array of the cluster functions, and should
