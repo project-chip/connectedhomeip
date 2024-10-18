@@ -55,6 +55,7 @@ def check_manual_steps():
     bad_tests = set()
     for test in AllChipToolYamlTests(use_short_run_name=False):
         cmd = f'git diff HEAD^..HEAD --unified=0 -- {test.run_name}'
+        print(f'Running cmd: {cmd}')
         output = subprocess.check_output(cmd, shell=True).decode().splitlines()
         user_prompt_added = [line for line in output if re.search(r'^\+.*UserPrompt.*', line)]
         user_prompt_removed = [line for line in output if re.search(r'^\-.*UserPrompt.*', line)]
