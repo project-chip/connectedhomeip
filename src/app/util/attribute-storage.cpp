@@ -321,8 +321,9 @@ void emberAfResetDynamicEndpointDeclaration(EmberAfEndpointType & endpointType)
 }
 
 CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
-                                     const Span<DataVersion> & dataVersionStorage, Span<const EmberAfDeviceType> deviceTypeList,
-                                     EndpointId parentEndpointId, uint8_t * dynamicAttributeStorage)
+                                     const chip::Span<chip::DataVersion> & dataVersionStorage,
+                                     chip::Span<const EmberAfDeviceType> deviceTypeList, EndpointId parentEndpointId,
+                                     Span<uint8_t> dynamicAttributeStorage)
 {
     auto realIndex = index + FIXED_ENDPOINT_COUNT;
 
@@ -350,6 +351,12 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
         }
     }
 
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+    if (!dynamicAttributeStorage.empty() && dynamicAttributeStorage.size()<ep->endpointSize) {
+        return CHIP_ERROR_NO_MEMORY; // not enough memory provided for dynamic attribute storage
+    }
+#endif
+
     emAfEndpoints[index].endpoint       = id;
     emAfEndpoints[index].deviceTypeList = deviceTypeList;
     emAfEndpoints[index].endpointType   = ep;
@@ -375,7 +382,7 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
     }
 
 #if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
-    if (dynamicAttributeStorage != nullptr && ep->endpointSize > 0)
+    if (!dynamicAttributeStorage.empty() && ep->endpointSize > 0)
     {
         // Flag the endpoint as enabled here, because otherwise loading attributes cannot work
         emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isEnabled);
@@ -675,7 +682,7 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
             }
 
 #if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
-            bool hasDynamicAttributeStorage = emAfEndpoints[ep].dynamicAttributeStorage != nullptr;
+            bool hasDynamicAttributeStorage = !emAfEndpoints[ep].dynamicAttributeStorage.empty();
             if (hasDynamicAttributeStorage)
             {
                 // endpoint storage is not in the static global `attributeData`, but offset
