@@ -36,9 +36,15 @@ extern "C" {
 #include "sl_event_handler.h"
 #include "sl_si91x_button.h"
 #include "sl_si91x_button_pin_config.h"
+#ifndef SI917_DEVKIT
 #include "sl_si91x_led.h"
 #include "sl_si91x_led_config.h"
 #include "sl_si91x_led_instances.h"
+#else
+#include "sl_si91x_rgb_led.h"
+#include "sl_si91x_rgb_led_config.h"
+#include "sl_si91x_rgb_led_instances.h"
+#endif // SI917_DEVKIT
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
 void soc_pll_config(void);
@@ -54,12 +60,13 @@ void soc_pll_config(void);
 #endif
 // TODO Remove this when SI91X-16606 is addressed
 #ifdef SI917_DEVKIT
-#define SL_LED_COUNT 1
-uint8_t ledPinArray[SL_LED_COUNT] = { SL_LED_LEDB_PIN };
+#define SL_LED_COUNT SL_SI91X_RGB_LED_COUNT
+const sl_rgb_led_t * ledPinArray[SL_LED_COUNT] = { &led_led0 };
+#define SL_RGB_LED_INSTANCE(n) (ledPinArray[n])
 #else
 #define SL_LED_COUNT SL_SI91x_LED_COUNT
 uint8_t ledPinArray[SL_LED_COUNT] = { SL_LED_LED0_PIN, SL_LED_LED1_PIN };
-#endif
+#endif // SI917_DEVKIT
 
 namespace chip {
 namespace DeviceLayer {
@@ -112,7 +119,11 @@ void SilabsPlatform::InitLed(void)
 CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led)
 {
     VerifyOrReturnError(led < SL_LED_COUNT, CHIP_ERROR_INVALID_ARGUMENT);
+#ifndef SI917_DEVKIT
     (state) ? sl_si91x_led_set(ledPinArray[led]) : sl_si91x_led_clear(ledPinArray[led]);
+#else
+    (state) ? sl_si91x_simple_rgb_led_on(SL_RGB_LED_INSTANCE(led)) : sl_si91x_simple_rgb_led_off(SL_RGB_LED_INSTANCE(led));
+#endif // SI917_DEVKIT
     return CHIP_NO_ERROR;
 }
 
@@ -125,7 +136,11 @@ bool SilabsPlatform::GetLedState(uint8_t led)
 CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
 {
     VerifyOrReturnError(led < SL_LED_COUNT, CHIP_ERROR_INVALID_ARGUMENT);
+#ifndef SI917_DEVKIT
     sl_si91x_led_toggle(ledPinArray[led]);
+#else
+    sl_si91x_simple_rgb_led_toggle(SL_RGB_LED_INSTANCE(led));
+#endif // SI917_DEVKIT
     return CHIP_NO_ERROR;
 }
 #endif // ENABLE_WSTK_LEDS
