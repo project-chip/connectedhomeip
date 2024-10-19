@@ -224,7 +224,7 @@ CHIP_ERROR NxpChipDnssdRemoveServices()
 
 CHIP_ERROR NxpChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
-    ReturnErrorCodeIf(service == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
     uint32_t txtBufferOffset    = 0;
@@ -634,7 +634,7 @@ CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService * service, const otSr
             entryIndex++;
         }
 
-        ReturnErrorCodeIf(alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(!alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
         mdnsService.mTextEntries   = serviceTxtEntries.mTxtEntries;
         mdnsService.mTextEntrySize = entryIndex;
