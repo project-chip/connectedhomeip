@@ -232,7 +232,18 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        // If a failure happens in PASESession::Init, we need to ensure that the passed exchange context is closed to prevent
+        // resource leaks.
+        exchangeCtxt->Close();
+
+        // If a failure happens in SendPBKDFParamRequest, we need to Discard the exchange (mExchangeCtxt) so that Clear() doesn't
+        // try closing it.  The exchange will handle that.
+        DiscardExchange();
         Clear();
+        ChipLogError(SecureChannel, "Failed during PASE session pairing request: %" CHIP_ERROR_FORMAT, err.Format());
+        MATTER_TRACE_COUNTER("PASEFail");
+        // Do this last in case the delegate frees us.
+        NotifySessionEstablishmentError(err);
     }
     return err;
 }
