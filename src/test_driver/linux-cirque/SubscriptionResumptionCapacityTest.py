@@ -125,12 +125,12 @@ class TestSubscriptionResumptionCapacity(CHIPVirtualHome):
         self.reset_thread_devices(server_ids)
 
         for req_device_id in req_ids:
-            self.install_package(req_device_id,CHIP_REPO)
+            self.install_package(req_device_id, CHIP_REPO)
 
         command1 = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
                     "--args {}/python3 {} -t 300 -a {} --paa-trust-store-path {} --subscription-capacity {}").format(
                         os.path.join(
-                                    CHIP_REPO, "cirque_venv/bin"),
+                            CHIP_REPO, "cirque_venv/bin"),
                         os.path.join(CHIP_REPO, "src/controller/python/test/test_scripts",
                                      "subscription_resumption_capacity_test_ctrl1.py"),
                         ethernet_ip, os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
@@ -144,7 +144,7 @@ class TestSubscriptionResumptionCapacity(CHIPVirtualHome):
                     "--args {}/python3 {} -t 300 -a {} --paa-trust-store-path {} --remote-server-app {} "
                     "--subscription-capacity {}").format(
                         os.path.join(
-                                    CHIP_REPO, "cirque_venv/bin"),
+                            CHIP_REPO, "cirque_venv/bin"),
                         os.path.join(CHIP_REPO, "src/controller/python/test/test_scripts",
                                      "subscription_resumption_capacity_test_ctrl2.py"),
                         ethernet_ip, os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),

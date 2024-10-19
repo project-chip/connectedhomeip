@@ -132,7 +132,7 @@ class TestCommissioner(CHIPVirtualHome):
 
         req_device_id = req_ids[0]
 
-        self.install_package(req_device_id,CHIP_REPO)
+        self.install_package(req_device_id, CHIP_REPO)
 
         command = ("gdb -return-child-result -q -ex run -ex bt --args {}/python3 "
                    "{} -t 150 -a {} --paa-trust-store-path {} --discriminator {} --nodeid {}").format(

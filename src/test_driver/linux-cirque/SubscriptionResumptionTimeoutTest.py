@@ -103,7 +103,7 @@ class TestSubscriptionResumptionTimeout(CHIPVirtualHome):
 
         req_device_id = req_ids[0]
 
-        self.install_package(req_device_id,CHIP_REPO)
+        self.install_package(req_device_id, CHIP_REPO)
 
         command = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
                    "--args {}/python3 {} -t 300 -a {} --paa-trust-store-path {}").format(
