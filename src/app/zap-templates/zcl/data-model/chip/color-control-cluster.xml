@@ -126,7 +126,7 @@ limitations under the License.
         <optionalConform/>
       </feature>
     </features>
-    
+
     <attribute side="server" code="0x0000" define="COLOR_CONTROL_CURRENT_HUE" type="int8u" max="0xFE" reportable="true" default="0x00" optional="true">
       <description>CurrentHue</description>
       <mandatoryConform>
@@ -675,16 +675,62 @@ limitations under the License.
   </cluster>
 
   <clusterExtension code="0x0300">
-    <attribute side="server" code="0x4000" define="COLOR_CONTROL_ENHANCED_CURRENT_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">EnhancedCurrentHue</attribute>
-    <attribute side="server" code="0x4001" define="COLOR_CONTROL_ENHANCED_COLOR_MODE" type="EnhancedColorModeEnum" writable="false" default="0x01">EnhancedColorMode</attribute>
-    <attribute side="server" code="0x4002" define="COLOR_CONTROL_COLOR_LOOP_ACTIVE" type="int8u" min="0x00" max="0x01" writable="false" default="0x00" optional="true">ColorLoopActive</attribute>
-    <attribute side="server" code="0x4003" define="COLOR_CONTROL_COLOR_LOOP_DIRECTION" type="int8u" min="0x00" max="0x01" writable="false" default="0x00" optional="true">ColorLoopDirection</attribute>
-    <attribute side="server" code="0x4004" define="COLOR_CONTROL_COLOR_LOOP_TIME" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0019" optional="true">ColorLoopTime</attribute>
-    <attribute side="server" code="0x4005" define="COLOR_CONTROL_COLOR_LOOP_START_ENHANCED_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x2300" optional="true">ColorLoopStartEnhancedHue</attribute>
-    <attribute side="server" code="0x4006" define="COLOR_CONTROL_COLOR_LOOP_STORED_ENHANCED_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">ColorLoopStoredEnhancedHue</attribute>
-    <attribute side="server" code="0x400A" define="COLOR_CONTROL_COLOR_CAPABILITIES" type="ColorCapabilitiesBitmap" min="0x0000" max="0x001F" writable="false" default="0x0000">ColorCapabilities</attribute>
-    <attribute side="server" code="0x400B" define="COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN" type="int16u" min="0x0001" max="0xFEFF" writable="false" default="0x0000" optional="true">ColorTempPhysicalMinMireds</attribute>
-    <attribute side="server" code="0x400C" define="COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX" type="int16u" min="0x0000" max="0xFEFF" writable="false" default="0xFEFF" optional="true">ColorTempPhysicalMaxMireds</attribute>
+    <attribute side="server" code="0x4000" define="COLOR_CONTROL_ENHANCED_CURRENT_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">
+      <description>EnhancedCurrentHue</description>
+      <mandatoryConform>
+        <feature name="EHUE"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x4001" define="COLOR_CONTROL_ENHANCED_COLOR_MODE" type="EnhancedColorModeEnum" writable="false" default="0x01">
+      <description>EnhancedColorMode</description>
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x4002" define="COLOR_CONTROL_COLOR_LOOP_ACTIVE" type="int8u" min="0x00" max="0x01" writable="false" default="0x00" optional="true">
+      <description>ColorLoopActive</description>
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x4003" define="COLOR_CONTROL_COLOR_LOOP_DIRECTION" type="int8u" min="0x00" max="0x01" writable="false" default="0x00" optional="true">
+      <description>ColorLoopDirection</description>
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x4004" define="COLOR_CONTROL_COLOR_LOOP_TIME" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0019" optional="true">
+      <description>ColorLoopTime</description>
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x4005" define="COLOR_CONTROL_COLOR_LOOP_START_ENHANCED_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x2300" optional="true">
+      <description>ColorLoopStartEnhancedHue</description>
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x4006" define="COLOR_CONTROL_COLOR_LOOP_STORED_ENHANCED_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">
+      <description>ColorLoopStoredEnhancedHue</description>
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x400A" define="COLOR_CONTROL_COLOR_CAPABILITIES" type="ColorCapabilitiesBitmap" min="0x0000" max="0x001F" writable="false" default="0x0000">
+      <description>ColorCapabilities</description>
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x400B" define="COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN" type="int16u" min="0x0001" max="0xFEFF" writable="false" default="0x0000" optional="true">
+      <description>ColorTempPhysicalMinMireds</description>
+      <mandatoryConform>
+        <feature name="CT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x400C" define="COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX" type="int16u" min="0x0000" max="0xFEFF" writable="false" default="0xFEFF" optional="true">
+      <description>ColorTempPhysicalMaxMireds</description>
+      <mandatoryConform>
+        <feature name="CT"/>
+      </mandatoryConform>
+    </attribute>
 
     <command source="client" code="0x40" name="EnhancedMoveToHue" optional="true" noDefaultImplementation="true" cli="zcl color-control emovetohue">
       <description>
@@ -695,6 +741,9 @@ limitations under the License.
       <arg name="TransitionTime" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="EHUE"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x41" name="EnhancedMoveHue" optional="true" noDefaultImplementation="true" cli="zcl color-control emovehue">
@@ -705,6 +754,9 @@ limitations under the License.
       <arg name="Rate" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="EHUE"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x42" name="EnhancedStepHue" optional="true" noDefaultImplementation="true" cli="zcl color-control estephue">
@@ -716,6 +768,9 @@ limitations under the License.
       <arg name="TransitionTime" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="EHUE"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x43" name="EnhancedMoveToHueAndSaturation" optional="true" noDefaultImplementation="true" cli="zcl color-control emovetohueandsat">
@@ -727,6 +782,9 @@ limitations under the License.
       <arg name="TransitionTime" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="EHUE"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x44" name="ColorLoopSet" optional="true" noDefaultImplementation="true" cli="zcl color-control loop">
@@ -740,6 +798,9 @@ limitations under the License.
       <arg name="StartHue" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x47" name="StopMoveStep" optional="true" noDefaultImplementation="true" cli="zcl color-control stopmovestep">
@@ -748,6 +809,13 @@ limitations under the License.
       </description>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="HS"/>
+          <feature name="XY"/>
+          <feature name="CT"/>
+        </orTerm>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x4B" name="MoveColorTemperature" optional="true" noDefaultImplementation="true" cli="zcl color-control movecolortemp">
@@ -760,6 +828,9 @@ limitations under the License.
       <arg name="ColorTemperatureMaximumMireds" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="CT"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x4C" name="StepColorTemperature" optional="true" noDefaultImplementation="true" cli="zcl color-control stepcolortemp">
@@ -773,6 +844,9 @@ limitations under the License.
       <arg name="ColorTemperatureMaximumMireds" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="CT"/>
+      </mandatoryConform>
     </command>
   </clusterExtension>
 </configurator>
