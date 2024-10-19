@@ -96,7 +96,7 @@ Git: 1.4-prerelease-ipr-69-ge15ff5700
     </command>
 
     <command source="client" code="0x02" name="StartTimeAdjustRequest" optional="true" apiMaturity="provisional">
-      <description>Allows a client to adjust the start time of a Forecast sequence that has not yet started operation (i.e.</description>
+      <description>Allows a client to adjust the start time of a Forecast sequence that has not yet started operation (i.e. where the current Forecast StartTime is in the future).</description>
       <arg id="0" name="RequestedStartTime" type="epoch_s"/>
       <arg id="1" name="Cause" type="AdjustmentCauseEnum" min="0x00" max="0x01"/>
     </command>
