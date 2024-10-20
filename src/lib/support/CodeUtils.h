@@ -314,31 +314,6 @@
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
 /**
- *  @def ReturnErrorCodeIf(expr, code)
- *
- *  @brief
- *    Returns a specified error code if expression evaluates to true
- *
- *  Example usage:
- *
- *  @code
- *    ReturnErrorCodeIf(state == kInitialized, CHIP_NO_ERROR);
- *    ReturnErrorCodeIf(state == kInitialized, CHIP_ERROR_INCORRECT_STATE);
- *  @endcode
- *
- *  @param[in]  expr        A Boolean expression to be evaluated.
- *  @param[in]  code        A value to return if @a expr is false.
- */
-#define ReturnErrorCodeIf(expr, code)                                                                                              \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (expr)                                                                                                                  \
-        {                                                                                                                          \
-            return code;                                                                                                           \
-        }                                                                                                                          \
-    } while (false)
-
-/**
  *  @def SuccessOrExit(error)
  *
  *  @brief

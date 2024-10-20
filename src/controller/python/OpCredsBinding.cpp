@@ -413,9 +413,9 @@ PyChipError pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(
     uint8_t * rcac, uint32_t rcacLen, const uint8_t * ipk, uint32_t ipkLen, chip::VendorId adminVendorId,
     bool enableServerInteractions)
 {
-    ReturnErrorCodeIf(nocLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
-    ReturnErrorCodeIf(icacLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
-    ReturnErrorCodeIf(rcacLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(nocLen <= Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(icacLen <= Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(rcacLen <= Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
 
     ChipLogDetail(Controller, "Creating New Device Controller");
 
@@ -507,15 +507,15 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     }
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
-    ReturnErrorCodeIf(!noc.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(noc.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
     MutableByteSpan nocSpan(noc.Get(), Controller::kMaxCHIPDERCertLength);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
-    ReturnErrorCodeIf(!icac.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(icac.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
     MutableByteSpan icacSpan(icac.Get(), Controller::kMaxCHIPDERCertLength);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
-    ReturnErrorCodeIf(!rcac.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(rcac.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
     MutableByteSpan rcacSpan(rcac.Get(), Controller::kMaxCHIPDERCertLength);
 
     CATValues catValues;
