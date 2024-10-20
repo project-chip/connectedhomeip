@@ -131,6 +131,11 @@ static void InitServer(intptr_t context)
     app::Clusters::Actions::Instance::GetInstance()->SetDefaultDelegate(&sActionsDelegateImpl);
 }
 
+void emberAfActionsClusterInitCallback(EndpointId endpoint)
+{
+    app::Clusters::Actions::Instance::GetInstance()->SetDefaultDelegate(&sActionsDelegateImpl);
+}
+
 #include <examples/all-clusters-app/all-clusters-common/include/laundry-washer-controls-delegate-impl.h>
 #include <src/app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 
