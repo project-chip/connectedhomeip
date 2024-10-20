@@ -128,6 +128,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/application-launcher-server/application-launcher-server.cpp': {'string'},
     'src/app/clusters/application-launcher-server/application-launcher-delegate.h': {'list'},
     'src/app/clusters/audio-output-server/audio-output-delegate.h': {'list'},
+    'src/app/clusters/actions-server/actions-server.h': {'vector'},
     # EcosystemInformationCluster is for Fabric Sync and is intended to run on device that are capable of handling these types.
     'src/app/clusters/ecosystem-information-server/ecosystem-information-server.h': {'map', 'string', 'vector'},
     'src/app/clusters/channel-server/channel-delegate.h': {'list'},
