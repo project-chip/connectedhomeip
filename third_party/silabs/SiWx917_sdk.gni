@@ -681,7 +681,8 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c",
-      "${wifi_sdk_root}/components/service/network_manager/si91x/sl_net_si91x.c",
+
+      # "${wifi_sdk_root}/components/service/network_manager/si91x/sl_net_si91x.c",
 
       # modified hal
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default_common_linker.c",
@@ -795,7 +796,6 @@ template("siwx917_sdk") {
     }
 
     public_deps = [
-      ":sl-net",
       "${segger_rtt_root}:segger_rtt",
       "${segger_rtt_root}:segger_rtt_printf",
     ]

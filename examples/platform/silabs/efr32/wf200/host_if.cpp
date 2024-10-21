@@ -713,8 +713,8 @@ static void wfx_wifi_hw_start(void)
     {
         /* Initialize the LwIP stack */
         ChipLogDetail(DeviceLayer, "WF200:Start LWIP");
-        wfx_lwip_start();
-        wfx_started_notify();
+        sl_matter_lwip_start();
+        sl_matter_wifi_task_started();
         wifiContext.state = SL_WFX_STARTED; /* Really this is a bit mask */
         ChipLogDetail(DeviceLayer, "WF200:ready..");
     }
@@ -1069,7 +1069,7 @@ bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
  * @returns Returns SL_STATUS_OK if successful,
  *             SL_STATUS_FAIL otherwise
  *****************************************************************************/
-sl_status_t wfx_sta_discon(void)
+sl_status_t sl_matter_wifi_disconnect(void)
 {
     ChipLogProgress(DeviceLayer, "STA-Disconnecting");
     int32_t status = sl_wfx_send_disconnect_command();

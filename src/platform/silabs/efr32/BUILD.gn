@@ -163,7 +163,7 @@ static_library("efr32") {
       "wifi/wfx_msgs.h",
     ]
 
-    if (use_wf200 || use_rs9116 || use_SiWx917) {
+    if (use_wf200 || use_rs9116) {
       sources += [
         "${silabs_platform_dir}/wifi/dhcp_client.cpp",
         "wifi/ethernetif.cpp",
