@@ -266,9 +266,64 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
     return kEmberInvalidEndpointIndex;
 }
 
+namespace {
+
+const EmberAfCluster * getClusterTypeDefinition(EndpointId endpointId, ClusterId clusterId, EmberAfClusterMask mask)
+{
+    uint16_t index = emberAfIndexFromEndpointIncludingDisabledEndpoints(endpointId);
+    if (index != kEmberInvalidEndpointIndex)
+    {
+        return emberAfFindClusterInType(emAfEndpoints[index].endpointType, clusterId, mask, nullptr);
+    }
+    // not found
+    return nullptr;
+}
+
+} // anonymous namespace
+
+void emberAfSetupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, EndpointId templateEndpointId,
+                                            const Span<const EmberAfClusterSpec> & templateClusterSpecs)
+{
+    // allocate cluster list
+    size_t clusterCount = templateClusterSpecs.size();
+    VerifyOrDieWithMsg(clusterCount <= 255, Support, "max 255 clusters per endpoint!");
+    endpointType.clusterCount = static_cast<uint8_t>(clusterCount);
+    endpointType.cluster      = new EmberAfCluster[endpointType.clusterCount];
+    endpointType.endpointSize = 0;
+    // get the actual cluster pointers and sum up memory size
+    for (size_t i = 0; i < templateClusterSpecs.size(); i++)
+    {
+        auto cluster =
+            getClusterTypeDefinition(templateEndpointId, templateClusterSpecs[i].clusterId, templateClusterSpecs[i].mask);
+        VerifyOrDieWithMsg(cluster, Support, "cluster 0x%04x with mask %x could not be found in template endpoint %u",
+                           (unsigned int) templateClusterSpecs[i].clusterId, templateClusterSpecs[i].mask,
+                           (unsigned int) templateEndpointId);
+        // for now, we need to copy the cluster definition, unfortunately.
+        // TODO: make endpointType use a pointer to a list of EmberAfCluster* instead, so we can re-use cluster definitions
+        //   instead of duplicating them here once for every instance.
+        // Note: we need const cast here, because cluster in EmberAfEndpointType is const due
+        //   to the way static cluster code generation works.
+        const_cast<EmberAfCluster &>(endpointType.cluster[i]) = *cluster;
+        // sum up the needed storage
+        endpointType.endpointSize = (uint16_t) (endpointType.endpointSize + cluster->clusterSize);
+    }
+}
+
+void emberAfResetDynamicEndpointDeclaration(EmberAfEndpointType & endpointType)
+{
+    if (endpointType.cluster)
+    {
+        delete[] endpointType.cluster;
+        endpointType.cluster = nullptr;
+    }
+    endpointType.clusterCount = 0;
+    endpointType.endpointSize = 0;
+}
+
 CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
-                                     const Span<DataVersion> & dataVersionStorage, Span<const EmberAfDeviceType> deviceTypeList,
-                                     EndpointId parentEndpointId)
+                                     const chip::Span<chip::DataVersion> & dataVersionStorage,
+                                     chip::Span<const EmberAfDeviceType> deviceTypeList, EndpointId parentEndpointId,
+                                     Span<uint8_t> dynamicAttributeStorage)
 {
     auto realIndex = index + FIXED_ENDPOINT_COUNT;
 
@@ -296,6 +351,13 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
         }
     }
 
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+    if (!dynamicAttributeStorage.empty() && dynamicAttributeStorage.size() < ep->endpointSize)
+    {
+        return CHIP_ERROR_NO_MEMORY; // not enough memory provided for dynamic attribute storage
+    }
+#endif
+
     emAfEndpoints[index].endpoint       = id;
     emAfEndpoints[index].deviceTypeList = deviceTypeList;
     emAfEndpoints[index].endpointType   = ep;
@@ -303,6 +365,9 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
     // Start the endpoint off as disabled.
     emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
     emAfEndpoints[index].parentEndpointId = parentEndpointId;
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+    emAfEndpoints[index].dynamicAttributeStorage = dynamicAttributeStorage;
+#endif
 
     emberAfSetDynamicEndpointCount(MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT);
 
@@ -316,6 +381,18 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
             memset(dataVersionStorage.data(), 0, dataSize);
         }
     }
+
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+    if (!dynamicAttributeStorage.empty() && ep->endpointSize > 0)
+    {
+        // Flag the endpoint as enabled here, because otherwise loading attributes cannot work
+        emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isEnabled);
+        // Load attributes from NVstorage or set defaults
+        emberAfInitializeAttributes(id);
+        // set disabled again, so enabling below will detect a transition
+        emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
+    }
+#endif
 
     // Now enable the endpoint.
     emberAfEndpointEnableDisable(id, true);
@@ -580,7 +657,10 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
 {
     assertChipStackLockedByCurrentThread();
 
-    uint16_t attributeOffsetIndex = 0;
+    // offset relative to the storage block, which is:
+    // - for static endpoints: attributeData[] global
+    // - for dynamic endpoints: dynamicAttributeStorage (unless nullPtr, then all attributes must be external)
+    uint16_t attributeStorageOffset = 0;
 
     for (uint16_t ep = 0; ep < emberAfEndpointCount(); ep++)
     {
@@ -588,13 +668,31 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
         bool isDynamicEndpoint = (ep >= emberAfFixedEndpointCount());
 
         if (emAfEndpoints[ep].endpoint == attRecord->endpoint)
-        {
+        { // Got the endpoint
             const EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
             uint8_t clusterIndex;
             if (!emberAfEndpointIndexIsEnabled(ep))
             {
+                // TODO: I think this is wrong, and should be a break
+                //   It does not harm because usually no other endpointindex will contain
+                //   an endpoint with the same ID, but it would cause catastrophic mess in
+                //   attribute data because attributeOffsetIndex does not get incremented -
+                //   endpoint enabling/disabling is dynamic, so enabled/disabled state
+                //   MUST NOT change the data layout!
                 continue;
             }
+
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+            bool hasDynamicAttributeStorage = !emAfEndpoints[ep].dynamicAttributeStorage.empty();
+            if (hasDynamicAttributeStorage)
+            {
+                // endpoint storage is not in the static global `attributeData`, but offset
+                // from the per-endpoint dynamicAttributeStorage pointer.
+                // Endpoint processing starts here, so reset the offset.
+                attributeStorageOffset = 0;
+            }
+#endif
+
             for (clusterIndex = 0; clusterIndex < endpointType->clusterCount; clusterIndex++)
             {
                 const EmberAfCluster * cluster = &(endpointType->cluster[clusterIndex]);
@@ -613,9 +711,26 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                             }
 
                             {
-                                uint8_t * attributeLocation =
-                                    (am->mask & ATTRIBUTE_MASK_SINGLETON ? singletonAttributeLocation(am)
-                                                                         : attributeData + attributeOffsetIndex);
+                                // attribute storage can be
+                                // - singleton: statically allocated in singletonAttributeData global
+                                // - static endpoint: statically allocated in attributeData global
+                                // - dynamic endpoint with dynamic storage: in memory block provided at endpoint instantiation
+                                uint8_t * attributeLocation;
+                                if (am->mask & ATTRIBUTE_MASK_SINGLETON)
+                                {
+                                    attributeLocation = singletonAttributeLocation(am);
+                                }
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+                                else if (hasDynamicAttributeStorage)
+                                {
+                                    attributeLocation = emAfEndpoints[ep].dynamicAttributeStorage.data();
+                                }
+#endif
+                                else
+                                {
+                                    attributeLocation = attributeData;
+                                }
+
                                 uint8_t *src, *dst;
                                 if (write)
                                 {
@@ -631,6 +746,7 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                                 {
                                     if (buffer == nullptr)
                                     {
+                                        // only getting metadata
                                         return Status::Success;
                                     }
 
@@ -653,7 +769,12 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                                 }
 
                                 // Internal storage is only supported for fixed endpoints
-                                if (!isDynamicEndpoint)
+                                // and dynamic ones with dynamicAttributeStorage assigned.
+                                if (!isDynamicEndpoint
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+                                    || hasDynamicAttributeStorage
+#endif
+                                )
                                 {
                                     return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength);
                                 }
@@ -666,7 +787,7 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                             // Increase the index if attribute is not externally stored
                             if (!(am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE) && !(am->mask & ATTRIBUTE_MASK_SINGLETON))
                             {
-                                attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emberAfAttributeSize(am));
+                                attributeStorageOffset = static_cast<uint16_t>(attributeStorageOffset + emberAfAttributeSize(am));
                             }
                         }
                     }
@@ -676,7 +797,7 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                 }
 
                 // Not the cluster we are looking for
-                attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + cluster->clusterSize);
+                attributeStorageOffset = static_cast<uint16_t>(attributeStorageOffset + cluster->clusterSize);
             }
 
             // Cluster is not in the endpoint.
@@ -684,10 +805,10 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
         }
 
         // Not the endpoint we are looking for
-        // Dynamic endpoints are external and don't factor into storage size
+        // Dynamic endpoints are external and don't factor into statically allocated global storage size
         if (!isDynamicEndpoint)
         {
-            attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emAfEndpoints[ep].endpointType->endpointSize);
+            attributeStorageOffset = static_cast<uint16_t>(attributeStorageOffset + emAfEndpoints[ep].endpointType->endpointSize);
         }
     }
     return Status::UnsupportedEndpoint; // Sorry, endpoint was not found.
@@ -1153,7 +1274,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, Optional<ClusterId> clusterI
     uint8_t attrData[ATTRIBUTE_LARGEST];
     auto * attrStorage = GetAttributePersistenceProvider();
     // Don't check whether we actually have an attrStorage here, because it's OK
-    // to have one if none of our attributes have NVM storage.
+    // to have none if none of our attributes have NVM storage.
 
     for (ep = 0; ep < epCount; ep++)
     {
