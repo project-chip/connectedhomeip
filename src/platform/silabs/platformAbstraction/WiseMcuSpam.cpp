@@ -36,7 +36,7 @@ extern "C" {
 #include "sl_event_handler.h"
 #include "sl_si91x_button.h"
 #include "sl_si91x_button_pin_config.h"
-#ifndef SI917_DEVKIT
+#ifndef SL_MATTER_RGB_LED_ENABLED
 #include "sl_si91x_led.h"
 #include "sl_si91x_led_config.h"
 #include "sl_si91x_led_instances.h"
@@ -44,7 +44,7 @@ extern "C" {
 #include "sl_si91x_rgb_led.h"
 #include "sl_si91x_rgb_led_config.h"
 #include "sl_si91x_rgb_led_instances.h"
-#endif // SI917_DEVKIT
+#endif // SL_MATTER_RGB_LED_ENABLED
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
 void soc_pll_config(void);
@@ -59,14 +59,14 @@ void soc_pll_config(void);
 #include "uart.h"
 #endif
 
-#ifdef SI917_DEVKIT
+#ifdef SL_MATTER_RGB_LED_ENABLED
 #define SL_LED_COUNT SL_SI91X_RGB_LED_COUNT
 const sl_rgb_led_t * ledPinArray[SL_LED_COUNT] = { &led_led0 };
 #define SL_RGB_LED_INSTANCE(n) (ledPinArray[n])
 #else
 #define SL_LED_COUNT SL_SI91x_LED_COUNT
 uint8_t ledPinArray[SL_LED_COUNT] = { SL_LED_LED0_PIN, SL_LED_LED1_PIN };
-#endif // SI917_DEVKIT
+#endif // SL_MATTER_RGB_LED_ENABLED
 
 namespace chip {
 namespace DeviceLayer {
@@ -119,11 +119,11 @@ void SilabsPlatform::InitLed(void)
 CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led)
 {
     VerifyOrReturnError(led < SL_LED_COUNT, CHIP_ERROR_INVALID_ARGUMENT);
-#ifndef SI917_DEVKIT
+#ifndef SL_MATTER_RGB_LED_ENABLED
     (state) ? sl_si91x_led_set(ledPinArray[led]) : sl_si91x_led_clear(ledPinArray[led]);
 #else
     (state) ? sl_si91x_simple_rgb_led_on(SL_RGB_LED_INSTANCE(led)) : sl_si91x_simple_rgb_led_off(SL_RGB_LED_INSTANCE(led));
-#endif // SI917_DEVKIT
+#endif // SL_MATTER_RGB_LED_ENABLED
     return CHIP_NO_ERROR;
 }
 
@@ -136,11 +136,11 @@ bool SilabsPlatform::GetLedState(uint8_t led)
 CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
 {
     VerifyOrReturnError(led < SL_LED_COUNT, CHIP_ERROR_INVALID_ARGUMENT);
-#ifndef SI917_DEVKIT
+#ifndef SL_MATTER_RGB_LED_ENABLED
     sl_si91x_led_toggle(ledPinArray[led]);
 #else
     sl_si91x_simple_rgb_led_toggle(SL_RGB_LED_INSTANCE(led));
-#endif // SI917_DEVKIT
+#endif // SL_MATTER_RGB_LED_ENABLED
     return CHIP_NO_ERROR;
 }
 #endif // ENABLE_WSTK_LEDS
