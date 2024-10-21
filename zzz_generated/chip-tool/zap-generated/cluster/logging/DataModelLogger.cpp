@@ -15147,16 +15147,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentMode", 1, value);
         }
-        case EnergyEvseMode::Attributes::StartUpMode::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("StartUpMode", 1, value);
-        }
-        case EnergyEvseMode::Attributes::OnMode::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("OnMode", 1, value);
-        }
         case EnergyEvseMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -15203,16 +15193,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentMode", 1, value);
-        }
-        case WaterHeaterMode::Attributes::StartUpMode::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("StartUpMode", 1, value);
-        }
-        case WaterHeaterMode::Attributes::OnMode::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("OnMode", 1, value);
         }
         case WaterHeaterMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -15261,16 +15241,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentMode", 1, value);
-        }
-        case DeviceEnergyManagementMode::Attributes::StartUpMode::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("StartUpMode", 1, value);
-        }
-        case DeviceEnergyManagementMode::Attributes::OnMode::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("OnMode", 1, value);
         }
         case DeviceEnergyManagementMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

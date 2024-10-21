@@ -5260,13 +5260,13 @@ provisional cluster DeviceEnergyManagement = 152 {
   command ModifyForecastRequest(ModifyForecastRequestRequest): DefaultSuccess = 5;
   /** Allows a client to ask the ESA to recompute its Forecast based on power and time constraints. */
   command RequestConstraintBasedForecast(RequestConstraintBasedForecastRequest): DefaultSuccess = 6;
-  /** Allows a client to request cancellation of a previous adjustment request in a StartTimeAdjustRequest, ModifyForecastRequest or RequestConstraintBasedForecast command */
+  /** Allows a client to request cancellation of a previous adjustment request in a StartTimeAdjustRequest, ModifyForecastRequest or RequestConstraintBasedForecast command. */
   command CancelRequest(): DefaultSuccess = 7;
 }
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
 cluster EnergyEvse = 153 {
-  revision 4;
+  revision 3;
 
   enum EnergyTransferStoppedReasonEnum : enum8 {
     kEVStopped = 0;
@@ -5431,9 +5431,9 @@ cluster EnergyEvse = 153 {
 
   /** Allows a client to disable the EVSE from charging and discharging. */
   timed command Disable(): DefaultSuccess = 1;
-  /** This command allows a client to enable the EVSE to charge an EV, */
+  /** This command allows a client to enable the EVSE to charge an EV, and to provide or update the maximum and minimum charge current. */
   timed command EnableCharging(EnableChargingRequest): DefaultSuccess = 2;
-  /** Upon receipt, this SHALL allow a client to enable the discharge of an EV, */
+  /** Upon receipt, this SHALL allow a client to enable the discharge of an EV, and to provide or update the maximum discharge current. */
   timed command EnableDischarging(EnableDischargingRequest): DefaultSuccess = 3;
   /** Allows a client to put the EVSE into a self-diagnostics mode. */
   timed command StartDiagnostics(): DefaultSuccess = 4;
@@ -5502,7 +5502,7 @@ cluster PowerTopology = 156 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster EnergyEvseMode = 157 {
-  revision 1;
+  revision 2;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -5518,6 +5518,7 @@ cluster EnergyEvseMode = 157 {
     kManual = 16384;
     kTimeOfUse = 16385;
     kSolarCharging = 16386;
+    kV2X = 16387;
   }
 
   bitmap Feature : bitmap32 {
@@ -5537,8 +5538,6 @@ cluster EnergyEvseMode = 157 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -5555,8 +5554,7 @@ cluster EnergyEvseMode = 157 {
     optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -5597,8 +5595,6 @@ cluster WaterHeaterMode = 158 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -5612,17 +5608,16 @@ cluster WaterHeaterMode = 158 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 provisional cluster DeviceEnergyManagementMode = 159 {
-  revision 1;
+  revision 2;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -5658,8 +5653,6 @@ provisional cluster DeviceEnergyManagementMode = 159 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -5676,8 +5669,7 @@ provisional cluster DeviceEnergyManagementMode = 159 {
     optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
