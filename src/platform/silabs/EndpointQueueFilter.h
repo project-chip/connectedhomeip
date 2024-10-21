@@ -29,6 +29,11 @@ struct EndpointFilter
                                                       const chip::System::PacketBufferHandle & pktPayload) = 0;
 };
 
+struct EndpointQueueFilterConfig
+{
+    size_t allowedQueuedPackets = 10; // Default value
+};
+
 struct HostNameFilter : EndpointFilter
 {
     static constexpr size_t kHostNameLengthMax = 13; // 6 bytes in hex and null terminator.
@@ -36,8 +41,8 @@ struct HostNameFilter : EndpointFilter
     EndpointQueueFilter::FilterOutcome Filter(const void * endpoint, const IPPacketInfo & pktInfo,
                                               const chip::System::PacketBufferHandle & pktPayload) override;
 
-    // CHIP_ERROR SetHostName(const chip::CharSpan & name);
-    CHIP_ERROR SetHostName(const chip::ByteSpan & addr);
+    CHIP_ERROR SetHostName(const chip::CharSpan & name);
+    // CHIP_ERROR SetHostName(const chip::ByteSpan & addr);
 
 private:
     uint8_t mHostName[kHostNameLengthMax] = { 0 };
@@ -49,8 +54,8 @@ namespace SilabsEndpointQueueFilter {
 class EndpointQueueFilter : public chip::Inet::EndpointQueueFilter
 {
 public:
-    static constexpr size_t kDefaultAllowedQueuedPackets = 10;
 
+    EndpointQueueFilterConfig mConfig;
     EndpointQueueFilter();
     EndpointQueueFilter(size_t maxAllowedQueuedPackets);
 
@@ -60,7 +65,12 @@ public:
     FilterOutcome FilterAfterDequeue(const void * endpoint, const IPPacketInfo & pktInfo,
                                      const chip::System::PacketBufferHandle & pktPayload);
 
-    CHIP_ERROR SetHostName(const chip::ByteSpan & addr) { return mHostNameFilter.SetHostName(addr); }
+    
+    CHIP_ERROR SetHostName(const chip::CharSpan & addr) { return mHostNameFilter.SetHostName(addr); }
+    // CHIP_ERROR SetHostName(const chip::ByteSpan & addr) { return mHostNameFilter.SetHostName(addr); }
+
+    // Method to set the configuration
+    void SetConfig(const EndpointQueueFilterConfig & config) { mConfig = config; }
 
 private:
     DropIfTooManyQueuedPacketsFilter mTooManyFilter;
