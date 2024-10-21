@@ -37,12 +37,8 @@ void BufferedReadCallback::OnReportBegin()
 void BufferedReadCallback::OnReportEnd()
 {
     CHIP_ERROR err = DispatchBufferedData(mBufferedPath, StatusIB(), true);
-    if (err != CHIP_NO_ERROR)
-    {
-        mCallback.OnError(err);
-        return;
-    }
-
+    SetFatalReportError(err);
+    ReturnOnFailure(err);
     mCallback.OnReportEnd();
 }
 
@@ -230,13 +226,12 @@ CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ConcreteAttributePat
 void BufferedReadCallback::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                            const StatusIB & aStatus)
 {
-    CHIP_ERROR err;
-
     //
     // First, let's dispatch to our registered callback any buffered up list data from previous calls.
     //
-    err = DispatchBufferedData(aPath, aStatus);
-    SuccessOrExit(err);
+    CHIP_ERROR err = DispatchBufferedData(aPath, aStatus);
+    SetFatalReportError(err);
+    ReturnOnFailure(err);
 
     //
     // We buffer up list data (only if the status was successful)
@@ -244,7 +239,8 @@ void BufferedReadCallback::OnAttributeData(const ConcreteDataAttributePath & aPa
     if (aPath.IsListOperation() && aStatus.mStatus == Protocols::InteractionModel::Status::Success)
     {
         err = BufferData(aPath, apData);
-        SuccessOrExit(err);
+        SetFatalReportError(err);
+        ReturnOnFailure(err);
     }
     else
     {
@@ -255,12 +251,6 @@ void BufferedReadCallback::OnAttributeData(const ConcreteDataAttributePath & aPa
     // Update our latched buffered path.
     //
     mBufferedPath = aPath;
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        mCallback.OnError(err);
-    }
 }
 
 } // namespace app
