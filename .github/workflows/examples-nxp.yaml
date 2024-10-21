@@ -67,10 +67,6 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             - name: Build K32W0 examples
-              # K32W has low flash and as a result some logging messages are removed
-              # to make it fit:
-              #   - lighting disables 'detail' logs by setting log-progress
-              #   - low power automatically disables all logging
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
