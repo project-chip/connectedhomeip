@@ -310,7 +310,9 @@ template("siwx917_sdk") {
     }
 
     if (sl_enable_rgb_led) {
-      defines += [ "SI917_DEVKIT" ]
+      defines += [ "SL_MATTER_RGB_LED_ENABLED=1" ]
+    } else {
+      defines += [ "SL_MATTER_RGB_LED_ENABLED=0" ]
     }
 
     if (chip_enable_icd_server) {
