@@ -98,20 +98,19 @@ public:
                                        chip_rpc_OperationStatus & response) override
     {
         VerifyOrReturnValue(request.has_id, pw::Status::InvalidArgument());
-        // TODO(#35875): OpenDeviceCommissioningWindow uses the same controller every time and doesn't currently accept
-        // FabricIndex. For now we are dropping fabric index from the scoped node id.
-        NodeId nodeId                    = request.id.node_id;
+        ScopedNodeId scopedNodeId(request.id.node_id, request.id.fabric_index);
         uint32_t iterations              = request.iterations;
         uint16_t discriminator           = request.discriminator;
         uint16_t commissioningTimeoutSec = static_cast<uint16_t>(request.commissioning_timeout);
 
         // Log the request details for debugging
         ChipLogProgress(NotSpecified,
-                        "Received OpenCommissioningWindow request: NodeId 0x%lx, Timeout: %u, Iterations: %u, Discriminator: %u",
-                        static_cast<unsigned long>(nodeId), commissioningTimeoutSec, iterations, discriminator);
+                        "Received OpenCommissioningWindow request: NodeId " ChipLogFormatX64
+                        ", Timeout: %u, Iterations: %u, Discriminator: %u",
+                        ChipLogValueX64(scopedNodeId.GetNodeId()), commissioningTimeoutSec, iterations, discriminator);
 
         // Open the device commissioning window using raw binary data for salt and verifier
-        DeviceMgr().OpenDeviceCommissioningWindow(nodeId, iterations, commissioningTimeoutSec, discriminator,
+        DeviceMgr().OpenDeviceCommissioningWindow(scopedNodeId, iterations, commissioningTimeoutSec, discriminator,
                                                   ByteSpan(request.salt.bytes, request.salt.size),
                                                   ByteSpan(request.verifier.bytes, request.verifier.size));
 
