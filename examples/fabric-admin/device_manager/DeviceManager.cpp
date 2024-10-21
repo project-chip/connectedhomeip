@@ -124,11 +124,12 @@ void DeviceManager::OpenDeviceCommissioningWindow(ScopedNodeId scopedNodeId, uin
     // the controller for. Currently no implementation need this functionality, but should they need it they will hit
     // the verify or die below and it will be the responsiblity of whoever requires that functionality to implement.
     VerifyOrDie(PairingManager::Instance().CurrentCommissioner().GetFabricIndex() == scopedNodeId.GetFabricIndex());
-    ChipLogProgress(NotSpecified, "Opening commissioning window for Node ID: " ChipLogFormatX64, ChipLogValueX64(scopedNodeId.GetNodeId()));
+    ChipLogProgress(NotSpecified, "Opening commissioning window for Node ID: " ChipLogFormatX64,
+                    ChipLogValueX64(scopedNodeId.GetNodeId()));
 
     // Open the commissioning window of a device within its own fabric.
-    CHIP_ERROR err = PairingManager::Instance().OpenCommissioningWindow(scopedNodeId.GetNodeId(), kRootEndpointId, commissioningTimeoutSec,
-                                                                        iterations, discriminator, salt, verifier);
+    CHIP_ERROR err = PairingManager::Instance().OpenCommissioningWindow(
+        scopedNodeId.GetNodeId(), kRootEndpointId, commissioningTimeoutSec, iterations, discriminator, salt, verifier);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to open commissioning window: %s", ErrorStr(err));

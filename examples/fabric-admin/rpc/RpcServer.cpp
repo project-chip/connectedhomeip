@@ -105,8 +105,9 @@ public:
 
         // Log the request details for debugging
         ChipLogProgress(NotSpecified,
-                        "Received OpenCommissioningWindow request: NodeId " ChipLogFormatX64 ", Timeout: %u, Iterations: %u, Discriminator: %u",
-                            ChipLogValueX64(scopedNodeId.GetNodeId()), commissioningTimeoutSec, iterations, discriminator);
+                        "Received OpenCommissioningWindow request: NodeId " ChipLogFormatX64
+                        ", Timeout: %u, Iterations: %u, Discriminator: %u",
+                        ChipLogValueX64(scopedNodeId.GetNodeId()), commissioningTimeoutSec, iterations, discriminator);
 
         // Open the device commissioning window using raw binary data for salt and verifier
         DeviceMgr().OpenDeviceCommissioningWindow(scopedNodeId, iterations, commissioningTimeoutSec, discriminator,
