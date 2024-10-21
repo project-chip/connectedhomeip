@@ -2635,10 +2635,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::EnergyEvseMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::EnergyEvseMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::EnergyEvseMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::EnergyEvseMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::EnergyEvseMode::Attributes::AcceptedCommandList::Id:
@@ -2662,10 +2658,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::WaterHeaterMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::WaterHeaterMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::WaterHeaterMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::WaterHeaterMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::WaterHeaterMode::Attributes::AcceptedCommandList::Id:
@@ -2689,10 +2681,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::AcceptedCommandList::Id:

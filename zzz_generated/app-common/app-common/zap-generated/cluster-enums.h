@@ -3255,6 +3255,7 @@ enum class ModeTag : uint16_t
     kManual        = 0x4000,
     kTimeOfUse     = 0x4001,
     kSolarCharging = 0x4002,
+    kV2x           = 0x4003,
     // kUnknownEnumValue intentionally not defined. This enum never goes
     // through DataModel::Decode, likely because it is a part of a derived
     // cluster. As a result having kUnknownEnumValue in this enum is error

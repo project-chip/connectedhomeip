@@ -4785,14 +4785,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
-
-        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
-
         case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -4836,14 +4828,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
-
-        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
-
         case MTRAttributeIDTypeClusterWaterHeaterModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -4885,14 +4869,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeCurrentModeID:
             result = @"CurrentMode";
-            break;
-
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
-
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeOnModeID:
-            result = @"OnMode";
             break;
 
         case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeGeneratedCommandListID:
