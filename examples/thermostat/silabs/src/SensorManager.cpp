@@ -79,6 +79,15 @@ CHIP_ERROR SensorManager::Init()
 
 void SensorManager::SensorTimerEventHandler(void * arg)
 {
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_Timer;
+    event.Handler = TemperatureUpdateEventHandler;
+
+    AppTask::GetAppTask().PostEvent(&event);
+}
+
+void SensorManager::TemperatureUpdateEventHandler(AppEvent * aEvent)
+{
     int16_t temperature            = 0;
     static int16_t lastTemperature = 0;
 
