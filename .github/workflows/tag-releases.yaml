@@ -1,0 +1,52 @@
+# Copyright (c) 2020-2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+name: "Tag Releases"
+
+on:
+  workflow_dispatch:
+    # inputs:
+    #   draft_release:
+    #     description: 'Create Draft'
+    #     required: true
+    #     default: true
+    #     type: boolean
+    #   branch:
+    #     description: 'Branch'
+    #     required: false
+    #     type: string
+jobs:
+    tag_main_release:
+        name: Tag Current Release
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout
+            uses: actions/checkout@v4
+          - name: Install gh tool
+            run: |
+                type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+                curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+                && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+                && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+                && sudo apt update \
+                && sudo apt install gh -y
+                
+          - name: Tag Release & Generate Notes
+            env:
+              GH_TOKEN: ${{ github.token }} 
+            run: |
+              export BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+              echo "Tagging against branch: $BRANCH_NAME"
+              ./scripts/tagging/tag_new_release.sh --generate-notes --target "$BRANCH_NAME" -d # Note this is a draft for now.
+
+      
