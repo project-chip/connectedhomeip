@@ -2383,6 +2383,10 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -2399,7 +2403,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 1;
     callback attribute clusterRevision;
   }
 
@@ -2438,6 +2442,10 @@ endpoint 0 {
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
     ram      attribute updateStateProgress default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
@@ -2621,6 +2629,10 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
@@ -2635,6 +2647,10 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
@@ -2657,6 +2673,10 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2724,13 +2744,18 @@ endpoint 1 {
     ram      attribute numberOfTotalUsersSupported default = 10;
     ram      attribute numberOfPINUsersSupported default = 10;
     ram      attribute numberOfRFIDUsersSupported default = 10;
+    ram      attribute numberOfWeekDaySchedulesSupportedPerUser default = 10;
+    ram      attribute numberOfYearDaySchedulesSupportedPerUser default = 10;
+    ram      attribute numberOfHolidaySchedulesSupported default = 10;
     ram      attribute maxPINCodeLength default = 8;
     ram      attribute minPINCodeLength default = 6;
     ram      attribute maxRFIDCodeLength default = 20;
     ram      attribute minRFIDCodeLength default = 10;
     ram      attribute credentialRulesSupport default = 1;
     ram      attribute numberOfCredentialsSupportedPerUser default = 5;
-    ram      attribute autoRelockTime;
+    ram      attribute language default = "en";
+    ram      attribute autoRelockTime default = 60;
+    ram      attribute soundVolume default = 0;
     ram      attribute operatingMode default = 0x00;
     ram      attribute supportedOperatingModes default = 0xFFF6;
     ram      attribute enableOneTouchLocking default = 0x00;
@@ -2738,16 +2763,49 @@ endpoint 1 {
     ram      attribute wrongCodeEntryLimit default = 3;
     ram      attribute userCodeTemporaryDisableTime default = 10;
     ram      attribute requirePINforRemoteOperation default = 0;
+    callback attribute aliroReaderVerificationKey;
+    callback attribute aliroReaderGroupIdentifier;
+    callback attribute aliroReaderGroupSubIdentifier;
+    callback attribute aliroExpeditedTransactionSupportedProtocolVersions;
+    callback attribute aliroGroupResolvingKey;
+    callback attribute aliroSupportedBLEUWBProtocolVersions;
+    callback attribute aliroBLEAdvertisingVersion;
+    callback attribute numberOfAliroCredentialIssuerKeysSupported;
+    callback attribute numberOfAliroEndpointKeysSupported;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0001;
+    ram      attribute featureMap default = 0x7DB3;
     ram      attribute clusterRevision default = 7;
 
     handle command LockDoor;
     handle command UnlockDoor;
     handle command UnlockWithTimeout;
+    handle command SetWeekDaySchedule;
+    handle command GetWeekDaySchedule;
+    handle command GetWeekDayScheduleResponse;
+    handle command ClearWeekDaySchedule;
+    handle command SetYearDaySchedule;
+    handle command GetYearDaySchedule;
+    handle command GetYearDayScheduleResponse;
+    handle command ClearYearDaySchedule;
+    handle command SetHolidaySchedule;
+    handle command GetHolidaySchedule;
+    handle command GetHolidayScheduleResponse;
+    handle command ClearHolidaySchedule;
+    handle command SetUser;
+    handle command GetUser;
+    handle command GetUserResponse;
+    handle command ClearUser;
+    handle command SetCredential;
+    handle command SetCredentialResponse;
+    handle command GetCredentialStatus;
+    handle command GetCredentialStatusResponse;
+    handle command ClearCredential;
+    handle command UnboltDoor;
+    handle command SetAliroReaderConfig;
+    handle command ClearAliroReaderConfig;
   }
 }
 
