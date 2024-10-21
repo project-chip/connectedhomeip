@@ -58,7 +58,7 @@ void soc_pll_config(void);
 #if SILABS_LOG_OUT_UART || ENABLE_CHIP_SHELL
 #include "uart.h"
 #endif
-// TODO Remove this when SI91X-16606 is addressed
+
 #ifdef SI917_DEVKIT
 #define SL_LED_COUNT SL_SI91X_RGB_LED_COUNT
 const sl_rgb_led_t * ledPinArray[SL_LED_COUNT] = { &led_led0 };
