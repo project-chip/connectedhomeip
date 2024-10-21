@@ -24,9 +24,9 @@ namespace Inet {
 
 struct EndpointFilter
 {
-    virtual ~EndpointFilter()                                                                              = default;
+    virtual ~EndpointFilter()                                                                        = default;
     virtual EndpointQueueFilter::FilterOutcome Filter(const void * endpoint, const IPPacketInfo & pktInfo,
-                                                      const chip::System::PacketBufferHandle & pktPayload) = 0;
+                                                      const System::PacketBufferHandle & pktPayload) = 0;
 };
 
 struct EndpointQueueFilterConfig
@@ -39,9 +39,9 @@ struct HostNameFilter : EndpointFilter
     static constexpr size_t kHostNameLengthMax = 13; // 6 bytes in hex and null terminator.
 
     EndpointQueueFilter::FilterOutcome Filter(const void * endpoint, const IPPacketInfo & pktInfo,
-                                              const chip::System::PacketBufferHandle & pktPayload) override;
+                                              const System::PacketBufferHandle & pktPayload) override;
 
-    CHIP_ERROR SetHostName(const chip::CharSpan & name);
+    CHIP_ERROR SetHostName(const CharSpan & name);
 
 private:
     uint8_t mHostName[kHostNameLengthMax] = { 0 };
@@ -50,7 +50,7 @@ private:
 
 namespace SilabsEndpointQueueFilter {
 
-class EndpointQueueFilter : public chip::Inet::EndpointQueueFilter
+class EndpointQueueFilter : public Inet::EndpointQueueFilter
 {
 public:
     EndpointQueueFilterConfig mConfig;
@@ -58,12 +58,12 @@ public:
     EndpointQueueFilter(size_t maxAllowedQueuedPackets);
 
     FilterOutcome FilterBeforeEnqueue(const void * endpoint, const IPPacketInfo & pktInfo,
-                                      const chip::System::PacketBufferHandle & pktPayload) override;
+                                      const System::PacketBufferHandle & pktPayload) override;
 
     FilterOutcome FilterAfterDequeue(const void * endpoint, const IPPacketInfo & pktInfo,
-                                     const chip::System::PacketBufferHandle & pktPayload);
+                                     const System::PacketBufferHandle & pktPayload);
 
-    CHIP_ERROR SetHostName(const chip::CharSpan & addr) { return mHostNameFilter.SetHostName(addr); }
+    CHIP_ERROR SetHostName(const CharSpan & addr) { return mHostNameFilter.SetHostName(addr); }
 
     // Method to set the configuration
     void SetConfig(const EndpointQueueFilterConfig & config) { mConfig = config; }
