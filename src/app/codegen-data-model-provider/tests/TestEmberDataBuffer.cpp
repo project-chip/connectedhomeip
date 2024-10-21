@@ -508,7 +508,7 @@ TEST(TestEmberAttributeBuffer, TestEncodeStrings)
         EXPECT_TRUE(tester.TryEncode<DataModel::Nullable<CharSpan>>(DataModel::NullNullable, { 0xFF, 0xFF }).IsSuccess());
     }
 
-    const uint8_t kOctetData[] = {1, 2, 3};
+    const uint8_t kOctetData[] = { 1, 2, 3 };
 
     // Binary data
     {
