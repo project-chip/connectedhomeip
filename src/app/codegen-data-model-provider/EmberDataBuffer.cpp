@@ -93,7 +93,7 @@ struct SignedDecodeInfo
         };
     }
 
-    template<size_t N>
+    template <size_t N>
     static constexpr SignedDecodeInfo OfSize()
     {
         // I specifically do not try to support "8" due to overflows.
