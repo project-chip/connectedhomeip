@@ -19,8 +19,8 @@
 
 #include <lib/support/Span.h>
 
-#include <zephyr/bluetooth/bluetooth.h>
 #include <sys/slist.h>
+#include <zephyr/bluetooth/bluetooth.h>
 
 #include <cstdint>
 
