@@ -32,10 +32,29 @@ constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
 
 constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
 
+@interface MTROTAImageTransferHandlerWrapper : NSObject
+- (instancetype)initWithMTROTAImageTransferHandler:(MTROTAImageTransferHandler *)otaImageTransferHandler;
+@property(nonatomic, nullable, readwrite, assign) MTROTAImageTransferHandler * otaImageTransferHandler;
+@end
+
+@implementation MTROTAImageTransferHandlerWrapper
+
+- (instancetype)initWithMTROTAImageTransferHandler:(MTROTAImageTransferHandler *)otaImageTransferHandler
+{
+    if (self = [super init])
+    {
+        _otaImageTransferHandler =  otaImageTransferHandler;
+    }
+    return self;
+}
+@end
+
+MTROTAImageTransferHandlerWrapper * mOTAImageTransferHandlerWrapper;
+
 MTROTAImageTransferHandler::MTROTAImageTransferHandler()
 {
-    // Increment the number of delegates handling BDX by 1.
-    MTROTAUnsolicitedBDXMessageHandler::IncrementNumberOfDelegates();
+    MTROTAUnsolicitedBDXMessageHandler::GetInstance()->OnDelegateCreated(this);
+    mOTAImageTransferHandlerWrapper = [[MTROTAImageTransferHandlerWrapper alloc] initWithMTROTAImageTransferHandler:this];
 }
 
 CHIP_ERROR MTROTAImageTransferHandler::Init(System::Layer * layer,
@@ -55,14 +74,15 @@ CHIP_ERROR MTROTAImageTransferHandler::Init(System::Layer * layer,
 
 MTROTAImageTransferHandler::~MTROTAImageTransferHandler()
 {
+    assertChipStackLockedByCurrentThread();
     mFabricIndex.ClearValue();
     mNodeId.ClearValue();
     mDelegate = nil;
     mDelegateNotificationQueue = nil;
     mSystemLayer = nil;
 
-    // Decrement the number of delegates handling BDX by 1.
-    MTROTAUnsolicitedBDXMessageHandler::DecrementNumberOfDelegates();
+    MTROTAUnsolicitedBDXMessageHandler::GetInstance()->OnDelegateDestroyed(this);
+    mOTAImageTransferHandlerWrapper.otaImageTransferHandler = nullptr;
 }
 
 CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(TransferSession::OutputEvent & event)
@@ -86,7 +106,16 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(TransferSession::O
     auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
     VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
+   MTROTAImageTransferHandlerWrapper * __weak weakWrapper =  mOTAImageTransferHandlerWrapper;
+
     auto completionHandler = ^(NSError * _Nullable error) {
+
+        // Check if the OTA image transfer handler is still valid. If not, return from the completion handler.
+        MTROTAImageTransferHandlerWrapper * strongWrapper = weakWrapper;
+        if (!strongWrapper || !strongWrapper.otaImageTransferHandler)
+        {
+            return;
+        }
         [controller
             asyncDispatchToMatterQueue:^() {
                 assertChipStackLockedByCurrentThread();
@@ -202,7 +231,17 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(TransferSession::OutputEvent
     auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
     VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
+   MTROTAImageTransferHandlerWrapper * __weak weakWrapper =  mOTAImageTransferHandlerWrapper;
+
     auto completionHandler = ^(NSData * _Nullable data, BOOL isEOF) {
+
+        // Check if the OTA image transfer handler is still valid. If not, return from the completion handler.
+        MTROTAImageTransferHandlerWrapper * strongWrapper = weakWrapper;
+        if (!strongWrapper || !strongWrapper.otaImageTransferHandler)
+        {
+            return;
+        }
+
         [controller
             asyncDispatchToMatterQueue:^() {
                 assertChipStackLockedByCurrentThread();
@@ -337,6 +376,8 @@ CHIP_ERROR MTROTAImageTransferHandler::ConfigureState(chip::FabricIndex fabricIn
 CHIP_ERROR MTROTAImageTransferHandler::OnMessageReceived(
     Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
+    assertChipStackLockedByCurrentThread();
+
     ChipLogProgress(BDX, "MTROTAImageTransferHandler: OnMessageReceived: message " ChipLogFormatMessageType " protocol " ChipLogFormatProtocolId,
         payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()));
 

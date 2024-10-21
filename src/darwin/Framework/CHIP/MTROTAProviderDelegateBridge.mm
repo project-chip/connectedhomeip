@@ -65,7 +65,6 @@ MTROTAProviderDelegateBridge::MTROTAProviderDelegateBridge()
 MTROTAProviderDelegateBridge::~MTROTAProviderDelegateBridge()
 {
     Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, nullptr);
-    Shutdown();
 }
 
 CHIP_ERROR MTROTAProviderDelegateBridge::Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeManager)

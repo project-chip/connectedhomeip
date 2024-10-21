@@ -16,6 +16,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "MTROTAImageTransferHandler.h"
 
 #include <lib/core/CHIPError.h>
 #include <messaging/ExchangeMgr.h>
@@ -38,19 +39,27 @@ public:
     MTROTAUnsolicitedBDXMessageHandler()
         : mExchangeMgr(nullptr)
     {
+        sInstance = this;
     }
-    ~MTROTAUnsolicitedBDXMessageHandler() { mExchangeMgr = nullptr; }
+
+    ~MTROTAUnsolicitedBDXMessageHandler() { mExchangeMgr = nullptr;}
+
+    static MTROTAUnsolicitedBDXMessageHandler * GetInstance();
 
     CHIP_ERROR Init(chip::Messaging::ExchangeManager * exchangeManager);
 
     // Returns the number of delegates that are currently handling BDX transfers.
     static uint8_t GetNumberOfDelegates();
 
-    // Increase the number of delegates handling BDX transfers by 1.
+
     static void IncrementNumberOfDelegates();
 
     // Decrease the number of delegates handling BDX transfers by 1.
     static void DecrementNumberOfDelegates();
+
+    void OnDelegateCreated(void * imageTransferHandler);
+
+    void OnDelegateDestroyed(void * imageTransferHandler);
 
     void Shutdown();
 
@@ -62,10 +71,15 @@ private:
 
     void OnExchangeCreationFailed(chip::Messaging::ExchangeDelegate * _Nonnull delegate) override;
 
-protected:
+    // TODO: #36181 - Have a set of MTROTAImageTransferHandler objects.
+    MTROTAImageTransferHandler * mOTAImageTransferHandler = nullptr;
+
     chip::Messaging::ExchangeManager * mExchangeMgr;
 
     static inline uint8_t mNumberOfDelegates = 0;
+
+    static MTROTAUnsolicitedBDXMessageHandler * sInstance;
+
 };
 
 NS_ASSUME_NONNULL_END

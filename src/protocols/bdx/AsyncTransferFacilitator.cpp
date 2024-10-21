@@ -21,24 +21,6 @@
 namespace chip {
 namespace bdx {
 
-/**
- * Releases the exchange, resets the transfer session and schedules calling the DestroySelf
- * virtual method implemented by the subclass to delete the subclass.
- */
-void AsyncTransferFacilitator::CleanUp()
-{
-    mExchange.Release();
-    mTransfer.Reset();
-    VerifyOrReturn(mSystemLayer != nullptr, ChipLogError(BDX, "CleanUp: mSystemLayer is null"));
-
-    mSystemLayer->ScheduleWork(
-        [](auto * systemLayer, auto * appState) -> void {
-            auto * _this = static_cast<AsyncTransferFacilitator *>(appState);
-            _this->DestroySelf();
-        },
-        this);
-}
-
 AsyncTransferFacilitator::~AsyncTransferFacilitator() {}
 
 bdx::StatusCode AsyncTransferFacilitator::GetBdxStatusCodeFromChipError(CHIP_ERROR err)
@@ -93,7 +75,30 @@ void AsyncTransferFacilitator::ProcessOutputEvents()
     {
         if (outEvent.EventType == TransferSession::OutputEventType::kMsgToSend)
         {
-            SendMessage(outEvent.msgTypeData, outEvent.MsgData);
+            CHIP_ERROR err = SendMessage(outEvent.msgTypeData, outEvent.MsgData);
+
+            // If we failed to send the message across the exchange, there is no way to let the other side know there was an
+            // error so call DestroySelf so the exchange can be released and the other side will be notified the exchange is
+            // closing and will clean up.
+            if (err != CHIP_NO_ERROR)
+            {
+                DestroySelf();
+                return;
+            }
+
+            // If we send out a status report across the exchange, schedule a call to DestroySelf() at a little bit later time
+            // since we want the message to be sent before we clean up.
+            if (outEvent.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
+            {
+                VerifyOrReturn(mSystemLayer != nullptr);
+                mSystemLayer->ScheduleWork(
+                    [](auto * systemLayer, auto * appState) -> void {
+                        auto * _this = static_cast<AsyncTransferFacilitator *>(appState);
+                        _this->DestroySelf();
+                    },
+                    this);
+                return;
+            }
         }
         else
         {
@@ -122,17 +127,7 @@ CHIP_ERROR AsyncTransferFacilitator::SendMessage(const TransferSession::MessageT
 
     // Set the response timeout on the exchange before sending the message.
     ec->SetResponseTimeout(mTimeout);
-
-    CHIP_ERROR err = ec->SendMessage(msgTypeData.ProtocolId, msgTypeData.MessageType, std::move(msgBuf), sendFlags);
-
-    // If we failed to send the message across the exchange, there is no way to let the other side know there was an error sending
-    // the message so call CleanUp to release the exchange so the other side can get notified the exchange is closing
-    // and clean up as needed. Also the CleanUp API resets the transfer session and destroys the subclass.
-    if (err != CHIP_NO_ERROR)
-    {
-        CleanUp();
-    }
-    return err;
+    return ec->SendMessage(msgTypeData.ProtocolId, msgTypeData.MessageType, std::move(msgBuf), sendFlags);
 }
 
 CHIP_ERROR AsyncTransferFacilitator::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
@@ -163,16 +158,10 @@ CHIP_ERROR AsyncTransferFacilitator::OnMessageReceived(Messaging::ExchangeContex
     return err;
 }
 
-void AsyncTransferFacilitator::OnExchangeClosing(Messaging::ExchangeContext * ec)
-{
-    ChipLogDetail(BDX, "OnExchangeClosing, ec: " ChipLogFormatExchange, ChipLogValueExchange(ec));
-    CleanUp();
-}
-
 void AsyncTransferFacilitator::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
     ChipLogDetail(BDX, "OnResponseTimeout, ec: " ChipLogFormatExchange, ChipLogValueExchange(ec));
-    CleanUp();
+    DestroySelf();
 }
 
 CHIP_ERROR AsyncResponder::Init(System::Layer * layer, Messaging::ExchangeContext * exchangeCtx, TransferRole role,
@@ -181,22 +170,21 @@ CHIP_ERROR AsyncResponder::Init(System::Layer * layer, Messaging::ExchangeContex
 {
     AsyncTransferFacilitator::Init(layer, exchangeCtx, timeout);
     ReturnErrorOnFailure(mTransfer.WaitForTransfer(role, xferControlOpts, maxBlockSize, timeout));
-
     return CHIP_NO_ERROR;
 }
 
-void AsyncResponder::NotifyEventHandled(TransferSession::OutputEvent & event, CHIP_ERROR status)
+void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEvent & event, CHIP_ERROR status)
 {
-    ChipLogDetail(BDX, "NotifyEventHandled : Event %s Error %" CHIP_ERROR_FORMAT, event.ToString(event.EventType), status.Format());
+    ChipLogDetail(BDX, "NotifyEventHandled : Event %s Error %" CHIP_ERROR_FORMAT, TransferSession::OutputEvent::TypeToString(event.EventType), status.Format());
 
     // If it's a message indicating either the end of the transfer or a timeout reported by the transfer session
-    // or an error occured, we need to call CleanUp.
+    // or an error occured, we need to call DestroySelf().
     if (event.EventType == TransferSession::OutputEventType::kAckEOFReceived ||
         event.EventType == TransferSession::OutputEventType::kInternalError ||
         event.EventType == TransferSession::OutputEventType::kTransferTimeout ||
         event.EventType == TransferSession::OutputEventType::kStatusReceived)
     {
-        CleanUp();
+        DestroySelf();
         return;
     }
 
