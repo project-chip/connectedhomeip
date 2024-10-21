@@ -57,7 +57,7 @@ declare_args() {
   # Temperature Sensor support
   sl_enable_si70xx_sensor = false
 
-  #RGB LED support
+  # RGB LED support
   sl_enable_rgb_led = false
 }
 
