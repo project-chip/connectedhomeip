@@ -52,19 +52,21 @@ def check_unit_testing():
 
 def check_manual_steps():
     # Doing this on a test-by-test basis so the log message is more obvious
-    bad_tests = set()
+    bad_test = False
     # We are operating in a VM, and although there is a checkout, it is working in a scratch directory
     # where the ownership is different than the runner.
     # Adding an exception for this directory so that git can function properly.
     subprocess.run("git config --global --add safe.directory '*'", shell=True)
     for test in AllChipToolYamlTests(use_short_run_name=False):
+
         cmd = f'git diff HEAD^..HEAD --unified=0 -- {test.run_name}'
         output = subprocess.check_output(cmd, shell=True).decode().splitlines()
         user_prompt_added = [line for line in output if re.search(r'^\+.*UserPrompt.*', line)]
         user_prompt_removed = [line for line in output if re.search(r'^\-.*UserPrompt.*', line)]
         if len(user_prompt_added) > len(user_prompt_removed):
             print(f'Found YAML test with additional manual steps: {test.name}')
-    if bad_tests:
+            bad_test = True
+    if bad_test:
         return 1
     return 0
 
