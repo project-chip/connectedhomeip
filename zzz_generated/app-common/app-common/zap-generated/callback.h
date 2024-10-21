@@ -6931,12 +6931,6 @@ bool emberAfWebRTCTransportRequestorClusterEndCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WebRTCTransportRequestor::Commands::End::DecodableType & commandData);
 /**
- * @brief Chime Cluster PlayChimeSound Command callback (from client)
- */
-bool emberAfChimeClusterPlayChimeSoundCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Chime::Commands::PlayChimeSound::DecodableType & commandData);
-/**
  * @brief Commissioner Control Cluster RequestCommissioningApproval Command callback (from client)
  */
 bool emberAfCommissionerControlClusterRequestCommissioningApprovalCallback(
