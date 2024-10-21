@@ -70,6 +70,7 @@ jobs:
                         --target linux-arm64-lit-icd-no-ble-clang \
                         --target linux-arm64-fabric-admin-clang-rpc \
                         --target linux-arm64-fabric-bridge-no-ble-clang-rpc \
+                        --target linux-arm64-fabric-sync-no-ble-clang \
                         build \
                      "
             - name: Bloat report - chip-tool
