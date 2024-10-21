@@ -2156,7 +2156,7 @@ TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNu
     ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
-TEST(TestCodegenModelViaMoceNullValueToNullables, EmberAttributeWriteBasicTypesLowestValue)
+TEST(TestCodegenModelViaMocksNullValueToNullables, EmberAttributeWriteBasicTypesLowestValue)
 {
     TestEmberScalarTypeWrite<int8_t, ZCL_INT8S_ATTRIBUTE_TYPE>(-127);
     TestEmberScalarTypeWrite<int16_t, ZCL_INT16S_ATTRIBUTE_TYPE>(-32767);
