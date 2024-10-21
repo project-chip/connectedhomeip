@@ -126,7 +126,7 @@ if [ "$skip_gn" == false ]; then
     # Generates ninja files
     EXTRA_GN_ARGS=""
     if [[ "$TESTS" == "yaml" || "$TESTS" == "all" ]]; then
-      EXTRA_GN_ARGS="$EXTRA_GN_ARGS chip_build_all_clusters_app=true"
+        EXTRA_GN_ARGS="$EXTRA_GN_ARGS chip_build_all_clusters_app=true"
     else
         EXTRA_GN_ARGS="$EXTRA_GN_ARGS chip_build_tools=false"
     fi
