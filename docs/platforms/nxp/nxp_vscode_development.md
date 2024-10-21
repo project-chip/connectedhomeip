@@ -129,3 +129,18 @@ For these actions, please refer to the official wiki:
 
 -   [Flash](https://github.com/nxp-mcuxpresso/vscode-for-mcux/wiki/Flash)
 -   [Debug](https://github.com/nxp-mcuxpresso/vscode-for-mcux/wiki/Debug)
+
+**Note** :
+
+For Rw61x platform, some additional steps are required in order to debug Matter
+applications with the extension.
+
+-   In the `launch.json` file of the project settings, disable the
+    `pre-flash actions` by setting the `mcuxSkipPreFlashActions` to true.
+
+![](images/mcuxpresso_skip_preflash_actions.png)
+
+-   Edit the `mcuxpresso-tools.json` file of the project settings, and add
+    `resetAfterLoad` as true in your `debug` configuration.
+
+![](images/mcuxpresso_debug_resetafterload.png)
