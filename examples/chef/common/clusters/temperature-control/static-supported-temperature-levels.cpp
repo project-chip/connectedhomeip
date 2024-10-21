@@ -29,8 +29,8 @@ using chip::Protocols::InteractionModel::Status;
 
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
-CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { CharSpan("Hot", 3), CharSpan("Warm", 4),
-                                                                              CharSpan("Freezing", 8) };
+CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { CharSpan("Low", 3), CharSpan("Medium", 6),
+                                                                              CharSpan("High", 4) };
 const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints
     [MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
         EndpointPair(1, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions, 3) // Options for Endpoint 1
