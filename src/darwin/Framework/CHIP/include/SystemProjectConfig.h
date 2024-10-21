@@ -1,9 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    Copyright (c) 2019-2020 Google LLC.
- *    All rights reserved.
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,9 +17,9 @@
 
 /**
  *    @file
- *      Project-specific configuration file for iOS builds.
+ *      chip::System project configuration for standalone builds.
  *
  */
-#ifndef CHIPPROJECTCONFIG_H
-#define CHIPPROJECTCONFIG_H
-#endif /* CHIPPROJECTCONFIG_H */
+#ifndef SYSTEMPROJECTCONFIG_H
+#define SYSTEMPROJECTCONFIG_H
+#endif /* SYSTEMPROJECTCONFIG_H */

@@ -122,6 +122,9 @@ declare -a args=(
     "target_cflags=$(format_gn_list "${target_cflags[@]}")"
     "target_cflags_c=$(format_gn_list "${target_cflags_c[@]}")"
     "target_cflags_cc=$(format_gn_list "${target_cflags_cc[@]}")"
+    'chip_project_config_include="<CHIPProjectConfig.h>"'
+    'chip_system_project_config_include="<SystemProjectConfig.h>"'
+    "chip_project_config_include_dirs=[\"$PWD/CHIP/include\"]"
 )
 
 case "$CONFIGURATION" in
@@ -132,7 +135,6 @@ esac
 [[ $PLATFORM_FAMILY_NAME != macOS ]] && {
     args+=(
         'target_os="ios"'
-        'import("//config/ios/args.gni")'
     )
 }
 

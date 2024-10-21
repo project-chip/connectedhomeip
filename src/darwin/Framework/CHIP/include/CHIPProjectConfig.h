@@ -1,5 +1,6 @@
 /*
- *    Copyright (c) 2023 Project CHIP Authors
+ *
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,16 +17,9 @@
 
 /**
  *    @file
- *      Project configuration for Darwin Framework Tool.
+ *      CHIP project configuration for standalone builds.
  *
  */
 #ifndef CHIPPROJECTCONFIG_H
 #define CHIPPROJECTCONFIG_H
-
-// Enable some test-only interaction model APIs.
-#define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
-
-// Allow us, for test purposes, to encode invalid enum values.
-#define CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES 1
-
 #endif /* CHIPPROJECTCONFIG_H */

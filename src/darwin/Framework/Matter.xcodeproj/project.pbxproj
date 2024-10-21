@@ -335,6 +335,8 @@
 		B2E0D7B7245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7AE245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.mm */; };
 		B2E0D7B8245B0B5C003C5B48 /* MTRSetupPayload.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7AF245B0B5C003C5B48 /* MTRSetupPayload.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B2E0D7B9245B0B5C003C5B48 /* MTRSetupPayload.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7B0245B0B5C003C5B48 /* MTRSetupPayload.mm */; };
+		B409D0A82CC6B23F00A7ED5A /* CHIPProjectConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = B409D0A52CC6B23F00A7ED5A /* CHIPProjectConfig.h */; };
+		B409D0A92CC6B23F00A7ED5A /* SystemProjectConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = B409D0A62CC6B23F00A7ED5A /* SystemProjectConfig.h */; };
 		B43B39EA2CB859A5006AA284 /* DumpMemoryGraphCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B43B39E62CB859A5006AA284 /* DumpMemoryGraphCommand.mm */; };
 		B43B39EB2CB859A5006AA284 /* LeaksTool.mm in Sources */ = {isa = PBXBuildFile; fileRef = B43B39E82CB859A5006AA284 /* LeaksTool.mm */; };
 		B43B39EC2CB859A5006AA284 /* DumpMemoryGraphCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = B43B39E52CB859A5006AA284 /* DumpMemoryGraphCommand.h */; };
@@ -798,6 +800,8 @@
 		B2E0D7AE245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRQRCodeSetupPayloadParser.mm; sourceTree = "<group>"; };
 		B2E0D7AF245B0B5C003C5B48 /* MTRSetupPayload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRSetupPayload.h; sourceTree = "<group>"; };
 		B2E0D7B0245B0B5C003C5B48 /* MTRSetupPayload.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRSetupPayload.mm; sourceTree = "<group>"; };
+		B409D0A52CC6B23F00A7ED5A /* CHIPProjectConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPProjectConfig.h; sourceTree = "<group>"; };
+		B409D0A62CC6B23F00A7ED5A /* SystemProjectConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SystemProjectConfig.h; sourceTree = "<group>"; };
 		B43B39E42CB859A5006AA284 /* Commands.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
 		B43B39E52CB859A5006AA284 /* DumpMemoryGraphCommand.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DumpMemoryGraphCommand.h; sourceTree = "<group>"; };
 		B43B39E62CB859A5006AA284 /* DumpMemoryGraphCommand.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DumpMemoryGraphCommand.mm; sourceTree = "<group>"; };
@@ -1313,6 +1317,7 @@
 		B202528F2459E34F00F97062 /* CHIP */ = {
 			isa = PBXGroup;
 			children = (
+				B409D0A72CC6B23F00A7ED5A /* include */,
 				D444F9A12C6E8058007761E5 /* XPC Protocol */,
 				9B231B032C62EF650030EB37 /* MTRDeviceController_Concrete.mm */,
 				9B0484F42C701154006C2D5F /* MTRDeviceController_Concrete.h */,
@@ -1529,6 +1534,15 @@
 				51189FC72A33ACE900184508 /* TestHelpers */,
 			);
 			path = CHIPTests;
+			sourceTree = "<group>";
+		};
+		B409D0A72CC6B23F00A7ED5A /* include */ = {
+			isa = PBXGroup;
+			children = (
+				B409D0A52CC6B23F00A7ED5A /* CHIPProjectConfig.h */,
+				B409D0A62CC6B23F00A7ED5A /* SystemProjectConfig.h */,
+			);
+			path = include;
 			sourceTree = "<group>";
 		};
 		B43B39E92CB859A5006AA284 /* memory */ = {
@@ -1769,6 +1783,8 @@
 				B2E0D7B2245B0B5C003C5B48 /* MTRManualSetupPayloadParser.h in Headers */,
 				3CF134A7289D8ADA0017A19E /* MTRCSRInfo.h in Headers */,
 				88E07D612B9A89A4005FD53E /* MTRMetricKeys.h in Headers */,
+				B409D0A82CC6B23F00A7ED5A /* CHIPProjectConfig.h in Headers */,
+				B409D0A92CC6B23F00A7ED5A /* SystemProjectConfig.h in Headers */,
 				3D4733B32BE2D1DA003DC19B /* MTRUtilities.h in Headers */,
 				B2E0D7B1245B0B5C003C5B48 /* Matter.h in Headers */,
 				7596A84428762729004DAE0E /* MTRDevice.h in Headers */,
@@ -2252,12 +2268,12 @@
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(CHIP_ROOT)/examples/darwin-framework-tool",
 					"$(CHIP_ROOT)/src",
+					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/include",
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
 					"$(CHIP_ROOT)/zzz_generated/app-common",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(CHIP_ROOT)/third_party/jsoncpp/repo/include",
 					"$(CHIP_ROOT)/zzz_generated/darwin-framework-tool",
-					"$(CHIP_ROOT)/config/ios",
 					"$(CHIP_ROOT)/third_party/editline/repo/include",
 					"$(CHIP_ROOT)/src/include",
 					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/gen/include",
@@ -2329,12 +2345,12 @@
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(CHIP_ROOT)/examples//darwin-framework-tool",
 					"$(CHIP_ROOT)/src",
+					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/include",
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
 					"$(CHIP_ROOT)/zzz_generated/darwin-framework-tool",
 					"$(CHIP_ROOT)/zzz_generated/app-common",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(CHIP_ROOT)/third_party/jsoncpp/repo/include",
-					"$(CHIP_ROOT)/config/ios",
 					"$(CHIP_ROOT)/third_party/editline/repo/include",
 					"$(CHIP_ROOT)/third_party/libwebsockets",
 					"$(CHIP_ROOT)/third_party/libwebsockets/repo/include",
@@ -2431,6 +2447,8 @@
 					"MTR_NO_AVAILABILITY=1",
 					"MTR_ENABLE_PROVISIONAL=1",
 					"MTR_ENABLE_UNSTABLE_API=1",
+					"CONFIG_BUILD_FOR_HOST_UNIT_TEST=1",
+					"CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS=1",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
@@ -2526,7 +2544,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(TEMP_DIR)/out/gen/include",
 					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
-					"$(CHIP_ROOT)/config/ios",
+					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/include",
 					"$(CHIP_ROOT)/src",
 					"$(CHIP_ROOT)/src/include",
 					"$(CHIP_ROOT)/zzz_generated/",
@@ -2698,7 +2716,7 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(TEMP_DIR)/out/gen/include",
 					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
-					"$(CHIP_ROOT)/config/ios",
+					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/include",
 					"$(CHIP_ROOT)/src",
 					"$(CHIP_ROOT)/src/include",
 					"$(CHIP_ROOT)/zzz_generated/",

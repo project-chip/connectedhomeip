@@ -71,6 +71,10 @@ if (chip_system_config_locking == "") {
   }
 }
 
+if (target_os == "mac" || target_os == "ios") {
+  chip_system_config_clock = "gettimeofday"
+}
+
 assert(
     chip_system_config_locking == "posix" ||
         chip_system_config_locking == "freertos" ||
