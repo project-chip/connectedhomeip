@@ -1,9 +1,9 @@
 #include "EndpointQueueFilter.h"
+#include <algorithm>
+#include <cctype>
 #include <string.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <algorithm>
-#include <cctype>
 namespace chip {
 namespace Inet {
 
@@ -60,10 +60,8 @@ bool PayloadContainsCaseInsensitive(const System::PacketBufferHandle & payload, 
 
     auto toLower = [](char c) { return std::tolower(static_cast<unsigned char>(c)); };
 
-    auto it = std::search(
-        payloadView.data(), payloadView.data() + payloadView.size(),
-        patternView.data(), patternView.data() + patternView.size(),
-        [&](char a, char b) { return toLower(a) == toLower(b); });
+    auto it = std::search(payloadView.data(), payloadView.data() + payloadView.size(), patternView.data(),
+                          patternView.data() + patternView.size(), [&](char a, char b) { return toLower(a) == toLower(b); });
 
     return (it != payloadView.data() + payloadView.size());
 }
