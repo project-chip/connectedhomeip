@@ -45,7 +45,7 @@ struct HostNameFilter : EndpointFilter
 
 private:
     uint8_t mHostName[kHostNameLengthMax] = { 0 };
-    static constexpr size_t kMdnsPort = 5353;
+    static constexpr size_t kMdnsPort     = 5353;
 };
 
 namespace SilabsEndpointQueueFilter {
@@ -53,7 +53,6 @@ namespace SilabsEndpointQueueFilter {
 class EndpointQueueFilter : public chip::Inet::EndpointQueueFilter
 {
 public:
-
     EndpointQueueFilterConfig mConfig;
     EndpointQueueFilter();
     EndpointQueueFilter(size_t maxAllowedQueuedPackets);
@@ -64,7 +63,6 @@ public:
     FilterOutcome FilterAfterDequeue(const void * endpoint, const IPPacketInfo & pktInfo,
                                      const chip::System::PacketBufferHandle & pktPayload);
 
-    
     CHIP_ERROR SetHostName(const chip::CharSpan & addr) { return mHostNameFilter.SetHostName(addr); }
 
     // Method to set the configuration
