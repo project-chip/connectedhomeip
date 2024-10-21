@@ -67,11 +67,8 @@ def main(search_directory, env_file):
         "TC_OCC_3_1.py",  # There are CI issues for the test cases that implements manually controlling sensor device for the occupancy state ON/OFF change
         "TC_OCC_3_2.py",  # There are CI issues for the test cases that implements manually controlling sensor device for the occupancy state ON/OFF change
         "TestCommissioningTimeSync.py",  # Code/Test not being used or not shared code for any other tests
-        "TestConformanceSupport.py",  # Unit test - does not run against an app
-        "TestChoiceConformanceSupport.py",  # Unit test - does not run against an app
         "TC_DEMTestBase.py",  # Shared code for TC_DEM, not a standalone test
         "TestConformanceTest.py",  # Unit test of the conformance test (TC_DeviceConformance) - does not run against an app
-        "TestIdChecks.py",  # Unit test - does not run against an app
         "TestSpecParsingDeviceType.py",  # Unit test - does not run against an app
         "TestConformanceTest.py",  # Unit test - does not run against an app
         "TestMatterTestingSupport.py",  # Unit test - does not run against an app
