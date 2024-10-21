@@ -66,14 +66,6 @@ bool PayloadContainsCaseInsensitive(const System::PacketBufferHandle & payload, 
         [&](char a, char b) { return toLower(a) == toLower(b); });
 
     return (it != payloadView.data() + payloadView.size());
-
-
-
-    // CharSpan payloadView((const char *)payload->Start(), payload->TotalLength());
-    // CharSpan patternView((const char *)pattern.data(), pattern.size());
-    // std::basic_string_view<uint8_t> payloadView(payload->Start(), payload->TotalLength());
-    // std::basic_string_view<uint8_t> patternView(pattern.data(), pattern.size());
-    // return (payloadView.data()).find(patternView.data()) != std::basic_string_view<uint8_t>::npos;
 }
 
 } // namespace
