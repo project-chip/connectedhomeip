@@ -469,15 +469,14 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
         event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
         event.InternetConnectivityChange.IPv6 = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
 
-#if CHIP_ENABLE_OPENTHREAD
-        // In case of boot, start the Border Router services including MDNS Server, otherwise inform of link state change
-        // The posted event will signal the application to restart the Matter mDNS server instance
-        bool bLinkState = event.InternetConnectivityChange.IPv6 == kConnectivity_Established ? true : false;
-        BrHandleStateChange(bLinkState);
-#endif
         if (haveIPv6Conn)
         {
             event.InternetConnectivityChange.ipAddress = IPAddress(*addr6);
+#if CHIP_ENABLE_OPENTHREAD
+            // In case of boot, start the Border Router services including MDNS Server
+            // The posted event will signal the application to restart the Matter mDNS server instance
+            BrHandleStateChange();
+#endif
         }
         err = PlatformMgr().PostEvent(&event);
         VerifyOrDie(err == CHIP_NO_ERROR);
@@ -485,12 +484,6 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
         ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv6", (haveIPv6Conn) ? "ESTABLISHED" : "LOST");
     }
 
-#if CHIP_ENABLE_OPENTHREAD
-    if (haveIPv6Conn && UpdateIp6AddrList())
-    {
-        UpdateMdnsHost();
-    }
-#endif
 }
 
 void ConnectivityManagerImpl::_NetifExtCallback(struct netif * netif, netif_nsc_reason_t reason,
@@ -532,107 +525,38 @@ void ConnectivityManagerImpl::StartWiFiManagement()
     }
 }
 #if CHIP_ENABLE_OPENTHREAD
-void ConnectivityManagerImpl::BrHandleStateChange(bool bLinkState)
+void ConnectivityManagerImpl::BrHandleStateChange()
 {
     if (mBorderRouterInit == false)
     {
-        if (bLinkState)
-        {
-            struct netif * extNetIfPtr = static_cast<struct netif *>(net_get_mlan_handle());
-            struct netif * thrNetIfPtr = ThreadStackMgrImpl().ThreadNetIf();
-            otInstance * thrInstancePtr;
+        struct netif * extNetIfPtr = static_cast<struct netif *>(net_get_mlan_handle());
+        struct netif * thrNetIfPtr = ThreadStackMgrImpl().ThreadNetIf();
 
-            // Need to wait for the wifi to be connected because the mlan netif can be !=null but not initialized
-            // properly. If the thread netif is !=null it means that it was fully initialized
-
-            // Lock OT task ?
-            if ((thrNetIfPtr) && (mWiFiStationState == kWiFiStationState_Connected))
-            {
-                // Initalize internal interface variables, these can be used by other modules like the DNSSD Impl to
-                // get the underlying IP interface
-                Inet::InterfaceId tmpExtIf(extNetIfPtr);
-                Inet::InterfaceId tmpThrIf(thrNetIfPtr);
-                mExternalNetIf = tmpExtIf;
-                mThreadNetIf   = tmpThrIf;
-
-                mBorderRouterInit = true;
-                // Check if OT instance is init
-                thrInstancePtr = ThreadStackMgrImpl().OTInstance();
-
-                BrInitPlatform(thrInstancePtr, extNetIfPtr, thrNetIfPtr);
-                BrInitServices();
-
-                UpdateIp6AddrList();
-                UpdateMdnsHost();
-                BorderAgentInit(thrInstancePtr, mHostname);
-            }
-        }
-    }
-    else
-    {
-        InfraIfLinkState(bLinkState);
-    }
-}
-
-void ConnectivityManagerImpl::UpdateMdnsHost()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    otMdnsHost mdnsHost;
-
-    if (strlen(mHostname) == 0)
-    {
+        otMdnsHost mdnsHost;
         uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
         MutableByteSpan mac(macBuffer);
-        err = DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
-        SuccessOrExit(err);
 
-        chip::Dnssd::MakeHostName(mHostname, sizeof(mHostname), mac);
-    }
+        // Need to wait for the wifi to be connected because the mlan netif can be !=null but not initialized
+        // properly. If the thread netif is !=null it means that it was fully initialized
 
-    mdnsHost.mAddresses       = mIp6AddrList;
-    mdnsHost.mAddressesLength = mIp6AddrNum;
-    mdnsHost.mHostName        = mHostname;
-    mdnsHost.mInfraIfIndex    = netif_get_index(mExternalNetIf.GetPlatformInterface());
-
-    // Allways use ID 0 for host
-    otMdnsRegisterHost(ThreadStackMgrImpl().OTInstance(), &mdnsHost, 0, nullptr);
-
-exit:
-    return;
-}
-
-bool ConnectivityManagerImpl::UpdateIp6AddrList()
-{
-    const ip6_addr_t * addr6   = nullptr;
-    bool bAddrChange           = false;
-    uint32_t newIp6AddrNum     = 0;
-    struct netif * extNetIfPtr = mExternalNetIf.GetPlatformInterface();
-    uint32_t lwipIterator, addrListIterator;
-
-    for (lwipIterator = 0; lwipIterator < LWIP_IPV6_NUM_ADDRESSES; lwipIterator++)
-    {
-        if (ip6_addr_ispreferred(netif_ip6_addr_state(extNetIfPtr, lwipIterator)) && (mIp6AddrNum <= kMaxIp6Addr))
+        // Lock OT task ?
+        if ((thrNetIfPtr) && (mWiFiStationState == kWiFiStationState_Connected))
         {
-            addr6 = netif_ip6_addr(extNetIfPtr, lwipIterator);
-            for (addrListIterator = 0; addrListIterator < kMaxIp6Addr; addrListIterator++)
-            {
-                if (0 == memcmp(&mIp6AddrList[addrListIterator].mFields.m32, addr6->addr, sizeof(Inet::IPAddress)))
-                {
-                    break;
-                }
-            }
-            if (addrListIterator == kMaxIp6Addr)
-            {
-                bAddrChange |= true;
-            }
-            memcpy(&mIp6AddrList[newIp6AddrNum++].mFields.m32, addr6->addr, sizeof(Inet::IPAddress));
+            // Initalize internal interface variables, these can be used by other modules like the DNSSD Impl to
+            // get the underlying IP interface
+            Inet::InterfaceId tmpExtIf(extNetIfPtr);
+            Inet::InterfaceId tmpThrIf(thrNetIfPtr);
+            mExternalNetIf    = tmpExtIf;
+            mThreadNetIf      = tmpThrIf;
+            mBorderRouterInit = true;
+
+            DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
+            chip::Dnssd::MakeHostName(mHostname, sizeof(mHostname), mac);
+
+            BrInitPlatform(ThreadStackMgrImpl().OTInstance(), extNetIfPtr, thrNetIfPtr);
+            BrInitMdnsHost(mHostname);
         }
     }
-
-    bAddrChange |= (newIp6AddrNum != mIp6AddrNum) ? true : false;
-    mIp6AddrNum = newIp6AddrNum;
-
-    return bAddrChange;
 }
 
 Inet::InterfaceId ConnectivityManagerImpl::GetThreadInterface()
