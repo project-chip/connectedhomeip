@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include "access/SubjectDescriptor.h"
+#include "app/EventPathParams.h"
 #include "lib/core/CHIPError.h"
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVWriter.h>
@@ -57,6 +59,16 @@ public:
     // event emitting, path marking and other operations
     virtual InteractionModelContext CurrentContext() const { return mContext; }
 
+    /// Validates that the given event path is supported, where path may contain wildcards.
+    ///
+    /// If any wild cards exist on the given path, the implementation is expected to validate
+    /// that an accessible event path exists on some wildcard expansion.
+    ///
+    /// At the very minimum this will validate that a valid endpoint/cluster can be expanded
+    /// from the input path and that the given descriptor has access to it.
+    virtual bool EventPathIncludesAccessibleConcretePath(const EventPathParams & path,
+                                                         const Access::SubjectDescriptor & descriptor) = 0;
+
     /// TEMPORARY/TRANSITIONAL requirement for transitioning from ember-specific code
     ///   ReadAttribute is REQUIRED to perform:
     ///     - ACL validation (see notes on OperationFlags::kInternal)
@@ -88,18 +100,20 @@ public:
     virtual ActionReturnStatus WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder) = 0;
 
     /// `handler` is used to send back the reply.
+    ///    - returning `std::nullopt` means that return value was placed in handler directly.
+    ///      This includes cases where command handling and value return will be done asynchronously.
     ///    - returning a value other than Success implies an error reply (error and data are mutually exclusive)
     ///
-    /// Returning anything other than CHIP_NO_ERROR or Status::Success (i.e. success without a return code)
-    /// means that the invoke will be considered to be returning the given path-specific status WITHOUT any data (any data
-    /// that was sent via CommandHandler is to be rolled back/discarded).
-    ///
-    /// This is because only one of the following may be encoded in a response:
-    ///    - data (as CommandDataIB) which is assumed a "response as a success"
-    ///    - status (as a CommandStatusIB) which is considered a final status, usually an error however
-    ///      cluster-specific success statuses also exist.
-    virtual ActionReturnStatus Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                                      CommandHandler * handler) = 0;
+    /// Return value expectations:
+    ///   - if a response has been placed into `handler` then std::nullopt MUST be returned. In particular
+    ///     note that CHIP_NO_ERROR is NOT the same as std::nullopt:
+    ///        > CHIP_NO_ERROR means handler had no status set and we expect the caller to AddStatus(success)
+    ///        > std::nullopt means that handler has added an appropriate data/status response
+    ///   - if a value is returned (not nullopt) then the handler response MUST NOT be filled. The caller
+    ///     will then issue `handler->AddStatus(request.path, <return_value>->GetStatusCode())`. This is a
+    ///     convenience to make writing Invoke calls easier.
+    virtual std::optional<ActionReturnStatus> Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
+                                                     CommandHandler * handler) = 0;
 
 private:
     InteractionModelContext mContext = { nullptr };

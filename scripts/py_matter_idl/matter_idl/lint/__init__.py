@@ -14,4 +14,4 @@
 
 from .lint_rules_parser import CreateParser
 
-__all__ = [CreateParser]
+__all__ = ['CreateParser']

@@ -19,6 +19,10 @@ import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
+if (current_os != "nuttx") {
+  import("//build_overrides/jsoncpp.gni")
+}
+
 declare_args() {
   chip_enable_smoke_co_trigger = false
   chip_enable_boolean_state_configuration_trigger = false
@@ -100,6 +104,10 @@ source_set("app-main") {
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/app/server",
   ]
+
+  if (current_os != "nuttx") {
+    public_deps += [ jsoncpp_root ]
+  }
 
   if (chip_enable_pw_rpc) {
     defines += [ "PW_RPC_ENABLED" ]

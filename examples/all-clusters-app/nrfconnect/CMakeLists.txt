@@ -42,7 +42,10 @@ include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 target_include_directories(app PRIVATE
                            main/include
                            ${ALL_CLUSTERS_COMMON_DIR}/include
-                           ${ENERGY_MANAGEMENT_COMMON_DIR}/include
+                           ${ENERGY_MANAGEMENT_COMMON_DIR}/common/include
+                           ${ENERGY_MANAGEMENT_COMMON_DIR}/device-energy-management/include
+                           ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/include
+                           ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-reporting/include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/all-clusters-app
                            ${NRFCONNECT_COMMON}/util/include)
@@ -62,19 +65,18 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/ChargingTargetsMemMgr.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementDelegateImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementManager.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EVSEManufacturerImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/ElectricalPowerMeasurementDelegate.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseDelegateImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseManager.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseTargetsStore.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyTimeUtils.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/common/src/EnergyTimeUtils.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/device-energy-management/src/DeviceEnergyManagementManager.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/ChargingTargetsMemMgr.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/EVSEManufacturerImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/EnergyEvseDelegateImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/EnergyEvseManager.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/EnergyEvseTargetsStore.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp               
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp)
 
 chip_configure_data_model(app
-    INCLUDE_SERVER
     ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
 )
 

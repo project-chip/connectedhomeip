@@ -17,6 +17,7 @@
 #include "AttestationKey.h"
 #include "ProvisionStorage.h"
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <em_device.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -34,7 +35,13 @@
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include <sl_si91x_common_flash_intf.h>
 #else
+#ifdef _SILICON_LABS_32B_SERIES_2
 #include <em_msc.h>
+#elif defined(_SILICON_LABS_32B_SERIES_3)
+#include "sl_se_manager.h"
+#include "sl_se_manager_types.h"
+#include <sl_se_manager_extmem.h>
+#endif // _SILICON_LABS_32B_SERIES_2
 #include <psa/crypto.h>
 #endif
 
@@ -43,6 +50,16 @@ extern void setNvm3End(uint32_t addr);
 #elif !SL_MATTER_GN_BUILD
 #include <sl_matter_provision_config.h>
 #endif
+
+#if defined(_SILICON_LABS_32B_SERIES_3)
+// To remove any ambiguities regarding the Flash aliases, use the below macro to ignore the 8 MSB.
+#define FLASH_GENERIC_MASK 0x00FFFFFF
+#define GENERIC_ADDRESS(addr) ((addr) &FLASH_GENERIC_MASK)
+
+// Transforms any address into an address using the same alias as FLASH_BASE from the CMSIS.
+#define CMSIS_CONVERTED_ADDRESS(addr) (GENERIC_ADDRESS(addr) | FLASH_BASE)
+sl_se_command_context_t cmd_ctx;
+#endif // _SILICON_LABS_32B_SERIES_3
 
 extern uint8_t linker_nvm_end[];
 
@@ -66,8 +83,18 @@ CHIP_ERROR ErasePage(uint32_t addr)
 {
 #ifdef SLI_SI91X_MCU_INTERFACE
     rsi_flash_erase_sector((uint32_t *) addr);
-#else
+#elif defined(_SILICON_LABS_32B_SERIES_2)
     MSC_ErasePage((uint32_t *) addr);
+#elif defined(_SILICON_LABS_32B_SERIES_3)
+    sl_status_t status;
+    uint32_t * data_start = NULL;
+    size_t data_size;
+
+    status = sl_se_data_region_get_location(&cmd_ctx, (void **) &data_start, &data_size);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR(status));
+    VerifyOrReturnError(GENERIC_ADDRESS(addr) > GENERIC_ADDRESS((uint32_t) data_start), CHIP_ERROR_INVALID_ADDRESS);
+    status = sl_se_data_region_erase(&cmd_ctx, (void *) addr, 1); // Erase one page
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR(status));
 #endif
     return CHIP_NO_ERROR;
 }
@@ -76,8 +103,18 @@ CHIP_ERROR WritePage(uint32_t addr, const uint8_t * data, size_t size)
 {
 #ifdef SLI_SI91X_MCU_INTERFACE
     rsi_flash_write((uint32_t *) addr, (unsigned char *) data, size);
-#else
+#elif defined(_SILICON_LABS_32B_SERIES_2)
     MSC_WriteWord((uint32_t *) addr, data, size);
+#elif defined(_SILICON_LABS_32B_SERIES_3)
+    sl_status_t status;
+    uint32_t * data_start = NULL;
+    size_t data_size;
+
+    status = sl_se_data_region_get_location(&cmd_ctx, (void **) &data_start, &data_size);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR(status));
+    VerifyOrReturnError(GENERIC_ADDRESS(addr) > GENERIC_ADDRESS((uint32_t) data_start), CHIP_ERROR_INVALID_ADDRESS);
+    status = sl_se_data_region_write(&cmd_ctx, (void *) addr, data, size);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR(status));
 #endif
     return CHIP_NO_ERROR;
 }
@@ -90,7 +127,7 @@ size_t RoundNearest(size_t n, size_t multiple)
 CHIP_ERROR WriteFile(Storage & store, SilabsConfig::Key offset_key, SilabsConfig::Key size_key, const ByteSpan & value)
 {
     uint32_t base_addr = 0;
-    ReturnErrorOnFailure(store.GetBaseAddress(base_addr));
+    ReturnErrorOnFailure(store.GetCredentialsBaseAddress(base_addr));
     if (0 == sCredentialsOffset)
     {
         ReturnErrorOnFailure(ErasePage(base_addr));
@@ -120,7 +157,7 @@ CHIP_ERROR WriteFile(Storage & store, SilabsConfig::Key offset_key, SilabsConfig
 CHIP_ERROR ReadFileByOffset(Storage & store, const char * description, uint32_t offset, uint32_t size, MutableByteSpan & value)
 {
     uint32_t base_addr = 0;
-    ReturnErrorOnFailure(store.GetBaseAddress(base_addr));
+    ReturnErrorOnFailure(store.GetCredentialsBaseAddress(base_addr));
 
     uint8_t * address = (uint8_t *) (base_addr + offset);
     ByteSpan span(address, size);
@@ -161,18 +198,21 @@ CHIP_ERROR Storage::Initialize(uint32_t flash_addr, uint32_t flash_size)
     {
 #ifndef SLI_SI91X_MCU_INTERFACE
         base_addr = (flash_addr + flash_size - FLASH_PAGE_SIZE);
+
+#ifdef _SILICON_LABS_32B_SERIES_2
         MSC_Init();
+#elif defined(_SILICON_LABS_32B_SERIES_3)
+        sl_status_t status;
+        status = sl_se_init();
+        VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
+        status = sl_se_init_command_context(&cmd_ctx);
+#endif // _SILICON_LABS_32B_SERIES
 #endif // SLI_SI91X_MCU_INTERFACE
 #ifdef SL_PROVISION_GENERATOR
         setNvm3End(base_addr);
 #endif
     }
-    return SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_Creds_Base_Addr, base_addr);
-}
-
-CHIP_ERROR Storage::GetBaseAddress(uint32_t & value)
-{
-    return SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_Creds_Base_Addr, value);
+    return SetCredentialsBaseAddress(base_addr);
 }
 
 CHIP_ERROR Storage::Commit()
@@ -624,6 +664,16 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
 //
 // Other
 //
+
+CHIP_ERROR Storage::SetCredentialsBaseAddress(uint32_t addr)
+{
+    return SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_Creds_Base_Addr, addr);
+}
+
+CHIP_ERROR Storage::GetCredentialsBaseAddress(uint32_t & addr)
+{
+    return SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_Creds_Base_Addr, addr);
+}
 
 CHIP_ERROR Storage::SetProvisionVersion(const char * value, size_t size)
 {

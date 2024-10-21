@@ -289,7 +289,7 @@ class DeviceProvisioningFragment : Fragment() {
     override fun onICDRegistrationInfoRequired() {
       Log.d(TAG, "onICDRegistrationInfoRequired")
       deviceController.updateCommissioningICDRegistrationInfo(
-        ICDRegistrationInfo.newBuilder().build()
+        ICDRegistrationInfo.newBuilder().setICDStayActiveDurationMsec(30000L).build()
       )
     }
 

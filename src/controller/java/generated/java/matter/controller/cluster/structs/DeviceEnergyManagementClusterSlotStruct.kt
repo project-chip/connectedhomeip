@@ -89,7 +89,7 @@ class DeviceEnergyManagementClusterSlotStruct(
       }
       if (manufacturerESAState.isPresent) {
         val optmanufacturerESAState = manufacturerESAState.get()
-        put(ContextSpecificTag(TAG_MANUFACTURER_E_S_A_STATE), optmanufacturerESAState)
+        put(ContextSpecificTag(TAG_MANUFACTURER_ESA_STATE), optmanufacturerESAState)
       }
       if (nominalPower.isPresent) {
         val optnominalPower = nominalPower.get()
@@ -144,7 +144,7 @@ class DeviceEnergyManagementClusterSlotStruct(
     private const val TAG_SLOT_IS_PAUSABLE = 5
     private const val TAG_MIN_PAUSE_DURATION = 6
     private const val TAG_MAX_PAUSE_DURATION = 7
-    private const val TAG_MANUFACTURER_E_S_A_STATE = 8
+    private const val TAG_MANUFACTURER_ESA_STATE = 8
     private const val TAG_NOMINAL_POWER = 9
     private const val TAG_MIN_POWER = 10
     private const val TAG_MAX_POWER = 11
@@ -181,8 +181,8 @@ class DeviceEnergyManagementClusterSlotStruct(
           Optional.empty()
         }
       val manufacturerESAState =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MANUFACTURER_E_S_A_STATE))) {
-          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MANUFACTURER_E_S_A_STATE)))
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MANUFACTURER_ESA_STATE))) {
+          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MANUFACTURER_ESA_STATE)))
         } else {
           Optional.empty()
         }

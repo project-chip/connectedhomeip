@@ -51,7 +51,7 @@ class ScenesManagementClusterAttributeValuePairStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_ATTRIBUTE_I_D), attributeID)
+      put(ContextSpecificTag(TAG_ATTRIBUTE_ID), attributeID)
       if (valueUnsigned8.isPresent) {
         val optvalueUnsigned8 = valueUnsigned8.get()
         put(ContextSpecificTag(TAG_VALUE_UNSIGNED8), optvalueUnsigned8)
@@ -89,7 +89,7 @@ class ScenesManagementClusterAttributeValuePairStruct(
   }
 
   companion object {
-    private const val TAG_ATTRIBUTE_I_D = 0
+    private const val TAG_ATTRIBUTE_ID = 0
     private const val TAG_VALUE_UNSIGNED8 = 1
     private const val TAG_VALUE_SIGNED8 = 2
     private const val TAG_VALUE_UNSIGNED16 = 3
@@ -104,7 +104,7 @@ class ScenesManagementClusterAttributeValuePairStruct(
       tlvReader: TlvReader,
     ): ScenesManagementClusterAttributeValuePairStruct {
       tlvReader.enterStructure(tlvTag)
-      val attributeID = tlvReader.getUInt(ContextSpecificTag(TAG_ATTRIBUTE_I_D))
+      val attributeID = tlvReader.getUInt(ContextSpecificTag(TAG_ATTRIBUTE_ID))
       val valueUnsigned8 =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_VALUE_UNSIGNED8))) {
           Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_VALUE_UNSIGNED8)))

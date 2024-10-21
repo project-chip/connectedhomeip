@@ -36,7 +36,10 @@
 #include "sl_power_manager.h"
 #endif
 
+#ifdef SL_BOARD_NAME
 #include "sl_board_control.h"
+#endif // SL_BOARD_NAME
+
 #include "sl_si91x_ncp_utility.h"
 #include "spi_multiplex.h"
 

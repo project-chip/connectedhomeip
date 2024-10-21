@@ -23,12 +23,16 @@
  *
  */
 
+#include <string>
+
 #include <controller/CHIPDeviceController.h>
 #include <controller/python/chip/native/PyChipError.h>
 #include <json/json.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
 #include <lib/dnssd/Resolver.h>
+#include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <setup_payload/SetupPayload.h>
 
 using namespace chip;
 
@@ -185,5 +189,32 @@ bool pychip_DeviceController_GetIPForDiscoveredDevice(Controller::DeviceCommissi
         return true;
     }
     return false;
+}
+
+PyChipError pychip_CreateManualCode(uint16_t longDiscriminator, uint32_t passcode, char * manualCodeBuffer, size_t inBufSize,
+                                    size_t * outBufSize)
+{
+    SetupPayload payload;
+    SetupDiscriminator discriminator;
+    discriminator.SetLongValue(longDiscriminator);
+    payload.discriminator = discriminator;
+    payload.setUpPINCode  = passcode;
+    std::string setupManualCode;
+
+    *outBufSize    = 0;
+    CHIP_ERROR err = ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(setupManualCode);
+    if (err == CHIP_NO_ERROR)
+    {
+        MutableCharSpan span(manualCodeBuffer, inBufSize);
+        // Plus 1 so we copy the null terminator
+        CopyCharSpanToMutableCharSpan(CharSpan(setupManualCode.c_str(), setupManualCode.length() + 1), span);
+        *outBufSize = span.size();
+        if (*outBufSize == 0)
+        {
+            err = CHIP_ERROR_NO_MEMORY;
+        }
+    }
+
+    return ToPyChipError(err);
 }
 }

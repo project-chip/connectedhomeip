@@ -72,6 +72,7 @@ ClustersWithAttributeChangedFunctions:
     - Pump Configuration and Control
     - Window Covering
     - Fan Control
+    - Thermostat
 
 ClustersWithShutdownFunctions:
     - Barrier Control

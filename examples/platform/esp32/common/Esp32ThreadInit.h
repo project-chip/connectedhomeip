@@ -84,7 +84,7 @@
         .storage_partition_name = "nvs", .netif_queue_size = 10, .task_queue_size = 10,                                            \
     }
 
-#ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
+#if defined(CONFIG_OPENTHREAD_BORDER_ROUTER) && defined(CONFIG_AUTO_UPDATE_RCP)
 #include <esp_rcp_update.h>
 #define RCP_FIRMWARE_DIR "/spiffs/ot_rcp"
 
@@ -93,7 +93,7 @@
         .rcp_type = RCP_TYPE_ESP32H2_UART, .uart_rx_pin = 17, .uart_tx_pin = 18, .uart_port = 1, .uart_baudrate = 115200,          \
         .reset_pin = 7, .boot_pin = 8, .update_baudrate = 460800, .firmware_dir = "/rcp_fw/ot_rcp", .target_chip = ESP32H2_CHIP,   \
     }
-#endif // CONFIG_OPENTHREAD_BORDER_ROUTER
+#endif // CONFIG_OPENTHREAD_BORDER_ROUTER && CONFIG_AUTO_UPDATE_RCP
 
 #endif // CONFIG_OPENTHREAD_ENABLED
 

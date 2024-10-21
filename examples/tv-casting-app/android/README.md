@@ -21,7 +21,7 @@ the TV.
 ## Requirements for building
 
 Refer to
-[this file](../../../docs/guides/android_building.md#requirements-for-building)
+[this file](../../../docs/platforms/android/android_building.md#requirements-for-building)
 to download the recommended version for the Android SDK and NDK for your
 machine. Set the `$ANDROID_HOME` environment variable to where the SDK is
 downloaded and the `$ANDROID_NDK_HOME` environment variable to point to where

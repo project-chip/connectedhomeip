@@ -198,7 +198,7 @@ ninja -C "$OUTPUT_ROOT" python_wheels
 WHEEL=("$OUTPUT_ROOT"/controller/python/chip*.whl)
 
 # Add the matter_testing_infrastructure wheel
-WHEEL+=("$OUTPUT_ROOT"/python/obj/src/python_testing/matter_testing_infrastructure/metadata_parser._build_wheel/metadata_parser-*.whl)
+WHEEL+=("$OUTPUT_ROOT"/python/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing-*.whl)
 
 if [ -n "$extra_packages" ]; then
     WHEEL+=("$extra_packages")
@@ -217,8 +217,8 @@ if [ -n "$install_virtual_env" ]; then
     fi
 
     source "$ENVIRONMENT_ROOT"/bin/activate
-    "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
-    "$ENVIRONMENT_ROOT"/bin/pip install --upgrade "${WHEEL[@]}"
+    "$ENVIRONMENT_ROOT"/bin/python -m ensurepip --upgrade
+    "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade "${WHEEL[@]}"
 
     if [ "$install_pytest_requirements" = "yes" ]; then
         YAMLTESTS_GN_LABEL="//scripts:matter_yamltests_distribution._build_wheel"

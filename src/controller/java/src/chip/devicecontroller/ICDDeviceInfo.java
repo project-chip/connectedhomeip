@@ -60,6 +60,7 @@ public class ICDDeviceInfo {
   private final long activeModeDuration;
   private final int activeModeThreshold;
   private final long icdNodeId;
+  private final long checkInNodeId;
   private final long icdCounter;
   private final long monitoredSubject;
   private final long fabricId;
@@ -73,6 +74,7 @@ public class ICDDeviceInfo {
       long activeModeDuration,
       int activeModeThreshold,
       long icdNodeId,
+      long checkInNodeId,
       long icdCounter,
       long monitoredSubject,
       long fabricId,
@@ -84,6 +86,7 @@ public class ICDDeviceInfo {
     this.activeModeDuration = activeModeDuration;
     this.activeModeThreshold = activeModeThreshold;
     this.icdNodeId = icdNodeId;
+    this.checkInNodeId = checkInNodeId;
     this.icdCounter = icdCounter;
     this.monitoredSubject = monitoredSubject;
     this.fabricId = fabricId;
@@ -98,6 +101,7 @@ public class ICDDeviceInfo {
       long activeModeDuration,
       int activeModeThreshold,
       long icdNodeId,
+      long checkInNodeId,
       long icdCounter,
       long monitoredSubject,
       long fabricId,
@@ -108,6 +112,7 @@ public class ICDDeviceInfo {
     this.activeModeDuration = activeModeDuration;
     this.activeModeThreshold = activeModeThreshold;
     this.icdNodeId = icdNodeId;
+    this.checkInNodeId = checkInNodeId;
     this.icdCounter = icdCounter;
     this.monitoredSubject = monitoredSubject;
     this.fabricId = fabricId;
@@ -152,9 +157,14 @@ public class ICDDeviceInfo {
     return activeModeThreshold;
   }
 
-  /** Returns the ICD Node Id. */
+  /** Returns the ICD peer Node Id. */
   public long getIcdNodeId() {
     return icdNodeId;
+  }
+
+  /** Returns the checkIn Node Id. */
+  public long getIcdCheckInNodeId() {
+    return checkInNodeId;
   }
 
   /** Returns the ICD Counter. */
@@ -186,6 +196,8 @@ public class ICDDeviceInfo {
         + userActiveModeTriggerInstruction
         + "\n\ticdNodeId : "
         + icdNodeId
+        + "\n\ticdCheckInNodeId : "
+        + checkInNodeId
         + "\n\ticdCounter : "
         + icdCounter
         + "\n\tmonitoredSubject : "

@@ -69,6 +69,21 @@ public:
 
 } // namespace
 
+// TODO:
+//   The overrides here do NOT provide a consistent data model view:
+//   This should be overriden with a Mock data model if using direct ember and
+//   CodegenDataModel OR a custom DataModel::Provider should be written
+//
+//   We cannot just say "every attribut exist, every device on every endpoint exists,
+//   every data version compare is the same etc.".
+//
+// The following override implementation need changing:
+//   - ServerClusterCommandExists - should have a proper data mmodel
+//   - ConcreteAttributePathExists - cannot say "Yes" on all paths when query for EP/Cluster would fail
+//   - CheckEventSupportStatus - cannot say yes for invalid endpoints/clusters
+//   - IsClusterDataVersionEqual returning true on everything is odd
+//   - IsDeviceTypeOnEndpoint returning true on every value seems odd
+
 Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
     // The Mock cluster catalog -- only have one command on one cluster on one endpoint.

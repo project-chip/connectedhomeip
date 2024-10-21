@@ -22,13 +22,7 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 from chip.clusters import Attribute
-
-try:
-    from matter_testing_support import MatterStackState, MatterTestConfig, run_tests_no_exit
-except ImportError:
-    sys.path.append(os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '..')))
-    from matter_testing_support import MatterStackState, MatterTestConfig, run_tests_no_exit
+from chip.testing.matter_testing import MatterStackState, MatterTestConfig, run_tests_no_exit
 
 
 class AsyncMock(MagicMock):
@@ -38,13 +32,14 @@ class AsyncMock(MagicMock):
 
 class MockTestRunner():
 
-    def __init__(self, filename: str, classname: str, test: str, endpoint: int = 0, pics: dict[str, bool] = None, paa_trust_store_path=None):
-        self.test = test
-        self.endpoint = endpoint
-        self.pics = pics
+    def __init__(self, filename: str, classname: str, test: str, endpoint: int = None, pics: dict[str, bool] = None, paa_trust_store_path=None):
         self.kvs_storage = 'kvs_admin.json'
-        self.paa_path = paa_trust_store_path
+        self.config = MatterTestConfig(endpoint=endpoint, paa_trust_store_path=paa_trust_store_path,
+                                       pics=pics, storage_path=self.kvs_storage)
         self.set_test(filename, classname, test)
+
+        self.set_test_config(self.config)
+
         self.stack = MatterStackState(self.config)
         self.default_controller = self.stack.certificate_authorities[0].adminList[0].NewController(
             nodeId=self.config.controller_node_id,
@@ -54,20 +49,24 @@ class MockTestRunner():
 
     def set_test(self, filename: str, classname: str, test: str):
         self.test = test
-        self.set_test_config()
-        module = importlib.import_module(Path(os.path.basename(filename)).stem)
+        self.config.tests = [self.test]
+
+        module_name = Path(os.path.basename(filename)).stem
+
+        try:
+            module = importlib.import_module(module_name)
+        except ModuleNotFoundError:
+            sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+            module = importlib.import_module(module_name)
+
         self.test_class = getattr(module, classname)
 
     def set_test_config(self, test_config: MatterTestConfig = MatterTestConfig()):
         self.config = test_config
         self.config.tests = [self.test]
-        self.config.endpoint = self.endpoint
         self.config.storage_path = self.kvs_storage
-        self.config.paa_trust_store_path = self.paa_path
         if not self.config.dut_node_ids:
             self.config.dut_node_ids = [1]
-        if self.pics:
-            self.config.pics = self.pics
 
     def Shutdown(self):
         self.stack.Shutdown()
