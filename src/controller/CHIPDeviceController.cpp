@@ -1141,11 +1141,10 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
         // for IP commissioning, we have taken a reference to the
         // operational node to send the completion command.
         ReleaseCommissioneeDevice(mDeviceInPASEEstablishment);
-
-        if (mPairingDelegate != nullptr)
-        {
-            mPairingDelegate->OnPairingComplete(status);
-        }
+    }
+    if (CHIP_NO_ERROR != status && mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnPairingComplete(status);
     }
 }
 
