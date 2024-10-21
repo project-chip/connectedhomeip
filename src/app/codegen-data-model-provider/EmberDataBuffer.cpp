@@ -36,13 +36,13 @@ namespace {
 ///
 /// the max size value (0xFF and 0xFFFF) is reserved for NULL representation so
 /// it is not available
-constexpr uint32_t MaxLength(EmberAttributeBuffer::PascalString s)
+constexpr uint32_t MaxLength(EmberAttributeBuffer::PascalStringType s)
 {
-    if (s == EmberAttributeBuffer::PascalString::kShort)
+    if (s == EmberAttributeBuffer::PascalStringType::kShort)
     {
         return std::numeric_limits<uint8_t>::max() - 1;
     }
-    // EmberAttributeBuffer::PascalString::kLong:
+    // EmberAttributeBuffer::PascalStringType::kLong:
     return std::numeric_limits<uint16_t>::max() - 1;
 }
 
@@ -212,7 +212,7 @@ CHIP_ERROR EmberAttributeBuffer::DecodeSignedInteger(chip::TLV::TLVReader & read
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EmberAttributeBuffer::DecodeAsString(chip::TLV::TLVReader & reader, PascalString stringType, TLV::TLVType tlvType,
+CHIP_ERROR EmberAttributeBuffer::DecodeAsString(chip::TLV::TLVReader & reader, PascalStringType stringType, TLV::TLVType tlvType,
                                                 EndianWriter & writer)
 {
     // Handle null first, then the actual data
@@ -221,10 +221,10 @@ CHIP_ERROR EmberAttributeBuffer::DecodeAsString(chip::TLV::TLVReader & reader, P
         // we know mIsNullable due to the check at the top of ::Decode
         switch (stringType)
         {
-        case PascalString::kShort:
+        case PascalStringType::kShort:
             writer.Put8(NumericAttributeTraits<uint8_t>::kNullValue);
             break;
-        case PascalString::kLong:
+        case PascalStringType::kLong:
             writer.Put16(NumericAttributeTraits<uint16_t>::kNullValue);
             break;
         }
@@ -239,10 +239,10 @@ CHIP_ERROR EmberAttributeBuffer::DecodeAsString(chip::TLV::TLVReader & reader, P
     // Size is a prefix, where 0xFF/0xFFFF is the null marker (if applicable)
     switch (stringType)
     {
-    case PascalString::kShort:
+    case PascalStringType::kShort:
         writer.Put8(static_cast<uint8_t>(stringLength));
         break;
-    case PascalString::kLong:
+    case PascalStringType::kLong:
         writer.Put16(static_cast<uint16_t>(stringLength));
         break;
     }
@@ -332,16 +332,16 @@ CHIP_ERROR EmberAttributeBuffer::Decode(chip::TLV::TLVReader & reader)
         break;
     }
     case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Char string
-        ReturnErrorOnFailure(DecodeAsString(reader, PascalString::kShort, TLV::kTLVType_UTF8String, endianWriter));
+        ReturnErrorOnFailure(DecodeAsString(reader, PascalStringType::kShort, TLV::kTLVType_UTF8String, endianWriter));
         break;
     case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
-        ReturnErrorOnFailure(DecodeAsString(reader, PascalString::kLong, TLV::kTLVType_UTF8String, endianWriter));
+        ReturnErrorOnFailure(DecodeAsString(reader, PascalStringType::kLong, TLV::kTLVType_UTF8String, endianWriter));
         break;
     case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string
-        ReturnErrorOnFailure(DecodeAsString(reader, PascalString::kShort, TLV::kTLVType_ByteString, endianWriter));
+        ReturnErrorOnFailure(DecodeAsString(reader, PascalStringType::kShort, TLV::kTLVType_ByteString, endianWriter));
         break;
     case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE:
-        ReturnErrorOnFailure(DecodeAsString(reader, PascalString::kLong, TLV::kTLVType_ByteString, endianWriter));
+        ReturnErrorOnFailure(DecodeAsString(reader, PascalStringType::kLong, TLV::kTLVType_ByteString, endianWriter));
         break;
     default:
         ChipLogError(DataManagement, "Attribute type 0x%x not handled", mAttributeType);
