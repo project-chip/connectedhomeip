@@ -160,16 +160,16 @@ Davis, CA 95616, USA
     <cluster id="0x0046" name="ICD Management" side="server">
       <quality singleton="true"/>
       <mandatoryConform>
-        <feature name="SIT"/>
+        <orTerm>
+          <feature name="SIT"/>
+          <feature name="LIT"/>
+        </orTerm>
       </mandatoryConform>
       <features>
         <feature code="" name="LongIdleTimeSupport">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform>
-              <feature name="LIT"/>
-            </mandatoryConform>
-          </otherwiseConform>
+          <mandatoryConform>
+            <feature name="LIT"/>
+          </mandatoryConform>
         </feature>
       </features>
     </cluster>

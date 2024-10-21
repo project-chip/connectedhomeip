@@ -1798,7 +1798,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
             entryIndex++;
         }
 
-        ReturnErrorCodeIf(alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(!alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
         mdnsService.mTextEntries   = serviceTxtEntries.mTxtEntries;
         mdnsService.mTextEntrySize = entryIndex;

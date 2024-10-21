@@ -193,6 +193,14 @@ class TestAttributeDescriptor(unittest.TestCase):
         def attribute_type(cls) -> ClusterObjects.ClusterObjectFieldDescriptor:
             return ClusterObjects.ClusterObjectFieldDescriptor(Type=int)
 
+        @chip.ChipUtility.classproperty
+        def cluster_id(cls) -> int:
+            return 0x00000000
+
+        @chip.ChipUtility.classproperty
+        def attribute_id(cls) -> int:
+            return 0x00000000
+
     def test_basic_encode(self):
         res = _encode_attribute_and_then_decode_to_native(
             42, TestAttributeDescriptor.IntAttribute)
@@ -208,6 +216,14 @@ class TestAttributeDescriptor(unittest.TestCase):
         def attribute_type(cls) -> ClusterObjects.ClusterObjectFieldDescriptor:
             return ClusterObjects.ClusterObjectFieldDescriptor(Type=TestClusterObjects.C)
 
+        @chip.ChipUtility.classproperty
+        def cluster_id(cls) -> int:
+            return 0x00000000
+
+        @chip.ChipUtility.classproperty
+        def attribute_id(cls) -> int:
+            return 0x00000000
+
     def test_struct_encode(self):
         res = _encode_attribute_and_then_decode_to_native(
             TestClusterObjects.C(X=42, Y=24), TestAttributeDescriptor.StructAttribute)
@@ -222,6 +238,14 @@ class TestAttributeDescriptor(unittest.TestCase):
         @chip.ChipUtility.classproperty
         def attribute_type(cls) -> ClusterObjects.ClusterObjectFieldDescriptor:
             return ClusterObjects.ClusterObjectFieldDescriptor(Type=typing.List[int])
+
+        @chip.ChipUtility.classproperty
+        def cluster_id(cls) -> int:
+            return 0x00000000
+
+        @chip.ChipUtility.classproperty
+        def attribute_id(cls) -> int:
+            return 0x00000000
 
     def test_array_encode(self):
         res = _encode_attribute_and_then_decode_to_native(

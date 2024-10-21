@@ -43,7 +43,7 @@ uint8_t OTAFirmwareProcessor::writeBuffer[kAlignmentBytes] __attribute__((aligne
 
 CHIP_ERROR OTAFirmwareProcessor::Init()
 {
-    ReturnErrorCodeIf(mCallbackProcessDescriptor == nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
+    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
     mAccumulator.Init(sizeof(Descriptor));
 #if OTA_ENCRYPTION_ENABLE
     mUnalignmentNum = 0;

@@ -174,8 +174,8 @@ CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & ou
 
     if (kReadFromFlash)
     {
-        ReturnErrorCodeIf(outBuffer.size() < mFactoryData.dac.cd.len, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorCodeIf(!mFactoryData.dac.cd.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        VerifyOrReturnError(outBuffer.size() >= mFactoryData.dac.cd.len, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(mFactoryData.dac.cd.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
         memcpy(outBuffer.data(), mFactoryData.dac.cd.value, mFactoryData.dac.cd.len);
 
@@ -204,8 +204,8 @@ CHIP_ERROR FactoryDataProvider::GetDeviceAttestationCert(MutableByteSpan & outBu
 
     if (kReadFromFlash)
     {
-        ReturnErrorCodeIf(outBuffer.size() < mFactoryData.dac.dac_cert.len, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorCodeIf(!mFactoryData.dac.dac_cert.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        VerifyOrReturnError(outBuffer.size() >= mFactoryData.dac.dac_cert.len, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(mFactoryData.dac.dac_cert.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
         memcpy(outBuffer.data(), mFactoryData.dac.dac_cert.value, mFactoryData.dac.dac_cert.len);
 
@@ -226,8 +226,8 @@ CHIP_ERROR FactoryDataProvider::GetProductAttestationIntermediateCert(MutableByt
 
     if (kReadFromFlash)
     {
-        ReturnErrorCodeIf(outBuffer.size() < mFactoryData.dac.pai_cert.len, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorCodeIf(!mFactoryData.dac.pai_cert.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        VerifyOrReturnError(outBuffer.size() >= mFactoryData.dac.pai_cert.len, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(mFactoryData.dac.pai_cert.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
         memcpy(outBuffer.data(), mFactoryData.dac.pai_cert.value, mFactoryData.dac.pai_cert.len);
 
@@ -254,7 +254,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     if (kReadFromFlash)
     {
 #if CONFIG_ENABLE_AMEBA_CRYPTO
-        ReturnErrorCodeIf(!mFactoryData.dac.dac_cert.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        VerifyOrReturnError(mFactoryData.dac.dac_cert.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         // Extract public key from DAC cert.
         ByteSpan dacCertSpan{ reinterpret_cast<uint8_t *>(mFactoryData.dac.dac_cert.value), mFactoryData.dac.dac_cert.len };
         chip::Crypto::P256PublicKey dacPublicKey;
@@ -266,8 +266,8 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
         err = decoder.GetSign(dacPublicKey.Bytes(), dacPublicKey.Length(), messageToSign.data(), messageToSign.size(),
                               signature.Bytes());
 #else
-        ReturnErrorCodeIf(!mFactoryData.dac.dac_cert.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-        ReturnErrorCodeIf(!mFactoryData.dac.dac_key.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        VerifyOrReturnError(mFactoryData.dac.dac_cert.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        VerifyOrReturnError(mFactoryData.dac.dac_key.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         // Extract public key from DAC cert.
         ByteSpan dacCertSpan{ reinterpret_cast<uint8_t *>(mFactoryData.dac.dac_cert.value), mFactoryData.dac.dac_cert.len };
         chip::Crypto::P256PublicKey dacPublicKey;
@@ -325,7 +325,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pIterationCount(uint32_t & iterationCou
 
     if (kReadFromFlash)
     {
-        ReturnErrorCodeIf(mFactoryData.cdata.spake2_it == 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        VerifyOrReturnError(mFactoryData.cdata.spake2_it != 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         iterationCount = mFactoryData.cdata.spake2_it;
         err            = CHIP_NO_ERROR;
     }
@@ -351,7 +351,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
     if (kReadFromFlash)
     {
         saltB64Len = mFactoryData.cdata.spake2_salt.len;
-        ReturnErrorCodeIf(saltB64Len > sizeof(saltB64), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(saltB64Len <= sizeof(saltB64), CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(saltB64, mFactoryData.cdata.spake2_salt.value, saltB64Len);
         err = CHIP_NO_ERROR;
     }
@@ -359,7 +359,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
     {
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
         saltB64Len = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT);
-        ReturnErrorCodeIf(saltB64Len > sizeof(saltB64), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(saltB64Len <= sizeof(saltB64), CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(saltB64, CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT, saltB64Len);
         err = CHIP_NO_ERROR;
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
@@ -368,7 +368,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
     ReturnErrorOnFailure(err);
     size_t saltLen = chip::Base64Decode32(saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
 
-    ReturnErrorCodeIf(saltLen > saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(saltLen <= saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(saltBuf.data(), saltB64, saltLen);
     saltBuf.reduce_size(saltLen);
 
@@ -387,7 +387,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf
     if (kReadFromFlash)
     {
         verifierB64Len = mFactoryData.cdata.spake2_verifier.len;
-        ReturnErrorCodeIf(verifierB64Len > sizeof(verifierB64), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(verifierB64Len <= sizeof(verifierB64), CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(verifierB64, mFactoryData.cdata.spake2_verifier.value, verifierB64Len);
         err = CHIP_NO_ERROR;
     }
@@ -395,7 +395,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf
     {
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
         verifierB64Len = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER);
-        ReturnErrorCodeIf(verifierB64Len > sizeof(verifierB64), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(verifierB64Len <= sizeof(verifierB64), CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(verifierB64, CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER, verifierB64Len);
         err = CHIP_NO_ERROR;
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
@@ -403,7 +403,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf
 
     ReturnErrorOnFailure(err);
     verifierLen = chip::Base64Decode32(verifierB64, verifierB64Len, reinterpret_cast<uint8_t *>(verifierB64));
-    ReturnErrorCodeIf(verifierLen > verifierBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(verifierLen <= verifierBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(verifierBuf.data(), verifierB64, verifierLen);
     verifierBuf.reduce_size(verifierLen);
 
@@ -416,7 +416,7 @@ CHIP_ERROR FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
 
     if (kReadFromFlash)
     {
-        ReturnErrorCodeIf(mFactoryData.cdata.passcode == 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        VerifyOrReturnError(mFactoryData.cdata.passcode != 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         setupPasscode = mFactoryData.cdata.passcode;
         err           = CHIP_NO_ERROR;
     }
@@ -442,15 +442,15 @@ CHIP_ERROR FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
 
     if (kReadFromFlash)
     {
-        ReturnErrorCodeIf(bufSize < mFactoryData.dii.vendor_name.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorCodeIf(!mFactoryData.dii.vendor_name.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        VerifyOrReturnError(bufSize >= mFactoryData.dii.vendor_name.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(mFactoryData.dii.vendor_name.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         memcpy(buf, mFactoryData.dii.vendor_name.value, mFactoryData.dii.vendor_name.len);
         buf[mFactoryData.dii.vendor_name.len] = 0;
         err                                   = CHIP_NO_ERROR;
     }
     else
     {
-        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
         strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
         err = CHIP_NO_ERROR;
     }
@@ -482,15 +482,15 @@ CHIP_ERROR FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
 
     if (kReadFromFlash)
     {
-        ReturnErrorCodeIf(bufSize < mFactoryData.dii.product_name.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorCodeIf(!mFactoryData.dii.product_name.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        VerifyOrReturnError(bufSize >= mFactoryData.dii.product_name.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(mFactoryData.dii.product_name.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         memcpy(buf, mFactoryData.dii.product_name.value, mFactoryData.dii.product_name.len);
         buf[mFactoryData.dii.product_name.len] = 0;
         err                                    = CHIP_NO_ERROR;
     }
     else
     {
-        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
         strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
         err = CHIP_NO_ERROR;
     }
@@ -539,8 +539,8 @@ CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 
     if (kReadFromFlash)
     {
-        ReturnErrorCodeIf(bufSize < mFactoryData.dii.serial_num.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorCodeIf(!mFactoryData.dii.serial_num.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        VerifyOrReturnError(bufSize >= mFactoryData.dii.serial_num.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(mFactoryData.dii.serial_num.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         memcpy(buf, mFactoryData.dii.serial_num.value, mFactoryData.dii.serial_num.len);
         buf[mFactoryData.dii.serial_num.len] = 0;
         err                                  = CHIP_NO_ERROR;
@@ -550,15 +550,15 @@ CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 #ifdef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
         if (CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER[0] != 0)
         {
-            ReturnErrorCodeIf(sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrReturnError(sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) <= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
             memcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER));
             serialNumLen = sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) - 1;
             err          = CHIP_NO_ERROR;
         }
 #endif // CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
 
-        ReturnErrorCodeIf(serialNumLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorCodeIf(buf[serialNumLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+        VerifyOrReturnError(serialNumLen < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(buf[serialNumLen] == 0, CHIP_ERROR_INVALID_STRING_LENGTH);
 
         err = CHIP_NO_ERROR;
     }
@@ -635,15 +635,16 @@ CHIP_ERROR FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufS
 
     if (kReadFromFlash)
     {
-        ReturnErrorCodeIf(bufSize < mFactoryData.dii.hw_ver_string.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorCodeIf(!mFactoryData.dii.hw_ver_string.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        VerifyOrReturnError(bufSize >= mFactoryData.dii.hw_ver_string.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(mFactoryData.dii.hw_ver_string.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         memcpy(buf, mFactoryData.dii.hw_ver_string.value, mFactoryData.dii.hw_ver_string.len);
         buf[mFactoryData.dii.hw_ver_string.len] = 0;
         err                                     = CHIP_NO_ERROR;
     }
     else
     {
-        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING),
+                            CHIP_ERROR_BUFFER_TOO_SMALL);
         strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
         err = CHIP_NO_ERROR;
     }
@@ -657,8 +658,8 @@ CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & un
 
     if (kReadFromFlash)
     {
-        ReturnErrorCodeIf(uniqueIdSpan.size() < mFactoryData.dii.rd_id_uid.len, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorCodeIf(!mFactoryData.dii.rd_id_uid.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        VerifyOrReturnError(uniqueIdSpan.size() >= mFactoryData.dii.rd_id_uid.len, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(mFactoryData.dii.rd_id_uid.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         memcpy(uniqueIdSpan.data(), mFactoryData.dii.rd_id_uid.value, mFactoryData.dii.rd_id_uid.len);
         err = CHIP_NO_ERROR;
     }
@@ -671,8 +672,8 @@ CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & un
                       "Length of unique ID for rotating device ID is smaller than minimum.");
         constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
 
-        ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorCodeIf(sizeof(uniqueId) != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(sizeof(uniqueId) <= uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(sizeof(uniqueId) == ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
         uniqueIdSpan.reduce_size(sizeof(uniqueId));
         err = CHIP_NO_ERROR;

@@ -31,6 +31,7 @@
 #import "MTRDeviceConnectivityMonitor.h"
 #import "MTRDeviceControllerOverXPC.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRDeviceDataValueDictionary.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -54,6 +55,12 @@
 #import <app/InteractionModelEngine.h>
 #import <platform/LockTracker.h>
 #import <platform/PlatformManager.h>
+
+static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribeLatency";
+
+// Not static, because these are public API.
+NSString * const MTRPreviousDataKey = @"previousData";
+NSString * const MTRDataVersionKey = @"dataVersion";
 
 // allow readwrite access to superclass properties
 @interface MTRDevice_Concrete ()
@@ -208,7 +215,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // whatever lock protects the time sync bits.
 @property (nonatomic, readonly) os_unfair_lock timeSyncLock;
 
-@property (nonatomic) chip::FabricIndex fabricIndex;
 @property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * unreportedEvents;
 @property (nonatomic) BOOL receivingReport;
 @property (nonatomic) BOOL receivingPrimingReport;
@@ -367,7 +373,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (self = [super initForSubclassesWithNodeID:nodeID controller:controller]) {
         _timeSyncLock = OS_UNFAIR_LOCK_INIT;
         _descriptionLock = OS_UNFAIR_LOCK_INIT;
-        _fabricIndex = controller.fabricIndex;
         _queue
             = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _expectedValueCache = [NSMutableDictionary dictionary];

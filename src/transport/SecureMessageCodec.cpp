@@ -61,7 +61,7 @@ CHIP_ERROR Encrypt(const CryptoContext & context, CryptoContext::ConstNonceView 
 CHIP_ERROR Decrypt(const CryptoContext & context, CryptoContext::ConstNonceView nonce, PayloadHeader & payloadHeader,
                    const PacketHeader & packetHeader, System::PacketBufferHandle & msg)
 {
-    ReturnErrorCodeIf(msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t * data = msg->Start();
     size_t len     = msg->DataLength();

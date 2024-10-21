@@ -39,7 +39,7 @@ namespace chip {
 
 CHIP_ERROR OTAImageProcessorImpl::Init(OTADownloader * downloader)
 {
-    ReturnErrorCodeIf(downloader == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(downloader != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mDownloader = downloader;
 
     OtaHookInit();
@@ -297,7 +297,7 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
     uint32_t targetVersion;
 
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
-    ReturnErrorCodeIf(requestor == nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(requestor != nullptr, CHIP_ERROR_INTERNAL);
 
     targetVersion = requestor->GetTargetVersion();
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));

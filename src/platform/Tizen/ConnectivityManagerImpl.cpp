@@ -115,7 +115,7 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     wifi_manager_device_state_e deviceState = WIFI_MANAGER_DEVICE_STATE_DEACTIVATED;
 
-    ReturnErrorCodeIf(mWiFiStationMode == kWiFiStationMode_ApplicationControlled, mWiFiStationMode);
+    VerifyOrReturnError(mWiFiStationMode != kWiFiStationMode_ApplicationControlled, mWiFiStationMode);
 
     err = Internal::WiFiMgr().GetDeviceState(&deviceState);
     VerifyOrReturnError(err == CHIP_NO_ERROR, mWiFiStationMode);
@@ -130,7 +130,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(ConnectivityManager::WiF
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     wifi_manager_device_state_e deviceState = WIFI_MANAGER_DEVICE_STATE_DEACTIVATED;
 
-    ReturnErrorCodeIf(val == kWiFiStationMode_NotSupported, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(val != kWiFiStationMode_NotSupported, CHIP_ERROR_INVALID_ARGUMENT);
 
     if (val != kWiFiStationMode_ApplicationControlled)
     {

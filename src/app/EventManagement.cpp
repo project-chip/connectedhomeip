@@ -563,9 +563,9 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
         Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);
     if (accessControlError != CHIP_NO_ERROR)
     {
-        ReturnErrorCodeIf((accessControlError != CHIP_ERROR_ACCESS_DENIED) &&
-                              (accessControlError != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL),
-                          accessControlError);
+        VerifyOrReturnError((accessControlError == CHIP_ERROR_ACCESS_DENIED) ||
+                                (accessControlError == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL),
+                            accessControlError);
         ret = CHIP_ERROR_UNEXPECTED_EVENT;
     }
 

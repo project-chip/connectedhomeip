@@ -238,8 +238,9 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t
     appDescription = esp_ota_get_app_description();
 #endif
 
-    ReturnErrorCodeIf(bufSize < sizeof(appDescription->version), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(sizeof(appDescription->version) > ConfigurationManager::kMaxSoftwareVersionStringLength, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(bufSize >= sizeof(appDescription->version), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(sizeof(appDescription->version) <= ConfigurationManager::kMaxSoftwareVersionStringLength,
+                        CHIP_ERROR_INTERNAL);
     strcpy(buf, appDescription->version);
     return CHIP_NO_ERROR;
 }

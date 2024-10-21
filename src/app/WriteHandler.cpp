@@ -344,7 +344,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ReturnErrorCodeIf(!mExchangeCtx, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mExchangeCtx, CHIP_ERROR_INTERNAL);
     const Access::SubjectDescriptor subjectDescriptor = mExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
 
     while (CHIP_NO_ERROR == (err = aAttributeDataIBsReader.Next()))
@@ -446,7 +446,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ReturnErrorCodeIf(!mExchangeCtx, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mExchangeCtx, CHIP_ERROR_INTERNAL);
     const Access::SubjectDescriptor subjectDescriptor =
         mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetSubjectDescriptor();
 

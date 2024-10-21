@@ -19,7 +19,9 @@
 #import <dns_sd.h>
 #import <os/lock.h>
 
+#import "MTRDeviceClusterData.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
+#import "MTRDeviceDataValueDictionary.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"

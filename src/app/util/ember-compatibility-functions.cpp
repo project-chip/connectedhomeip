@@ -302,7 +302,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
         if (err != CHIP_NO_ERROR)
         {
-            ReturnErrorCodeIf((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
+            VerifyOrReturnError((err == CHIP_ERROR_ACCESS_DENIED) || (err == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
             if (aPath.mExpanded)
             {
                 return CHIP_NO_ERROR;
@@ -324,7 +324,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
             bool triedEncode = false;
             ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor, aIsFabricFiltered, aPath, aAttributeReports,
                                                         apEncoderState, attributeOverride, &triedEncode));
-            ReturnErrorCodeIf(triedEncode, CHIP_NO_ERROR);
+            VerifyOrReturnError(!triedEncode, CHIP_NO_ERROR);
         }
     }
 
@@ -704,7 +704,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         }
         if (err != CHIP_NO_ERROR)
         {
-            ReturnErrorCodeIf((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
+            VerifyOrReturnError((err == CHIP_ERROR_ACCESS_DENIED) || (err == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
             // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
             return apWriteHandler->AddStatus(aPath,
                                              err == CHIP_ERROR_ACCESS_DENIED

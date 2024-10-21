@@ -231,7 +231,7 @@ TEST_F(TestWriteChunking, TestListChunking)
         CHIP_ERROR err = CHIP_NO_ERROR;
         TestWriteCallback writeCallback;
 
-        ChipLogDetail(DataManagement, "Running iteration %d\n", i);
+        ChipLogDetail(DataManagement, "Running iteration %d\n", static_cast<int>(i));
 
         gIterationCount = i;
 
