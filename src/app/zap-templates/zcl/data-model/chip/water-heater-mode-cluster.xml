@@ -44,7 +44,7 @@ Git: 1.4-prerelease-ipr-69-ge15ff5700
   </enum>
 
   <cluster>
-    <domain name="Energy Management"/>
+    <domain>Energy Management</domain>
     <name>Water Heater Mode</name>
     <code>0x009E</code>
     <define>WATER_HEATER_MODE_CLUSTER</define>

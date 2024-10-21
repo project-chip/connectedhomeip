@@ -45,7 +45,7 @@ Git: 1.4-prerelease-ipr-69-ge15ff5700
   </enum>
 
   <cluster apiMaturity="provisional">
-    <domain name="Energy Management"/>
+    <domain>Energy Management</domain>
     <name>Device Energy Management Mode</name>
     <code>0x009F</code>
     <define>DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER</define>

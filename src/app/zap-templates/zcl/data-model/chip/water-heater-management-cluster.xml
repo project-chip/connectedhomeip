@@ -48,7 +48,7 @@ Git: 1.4-prerelease-ipr-69-ge15ff5700
   </struct>
 
   <cluster code="0x0094" apiMaturity="provisional">
-    <domain name="Energy Management"/>
+    <domain>Energy Management</domain>
     <name>Water Heater Management</name>
     <code>0x0094</code>
     <define>WATER_HEATER_MANAGEMENT_CLUSTER</define>

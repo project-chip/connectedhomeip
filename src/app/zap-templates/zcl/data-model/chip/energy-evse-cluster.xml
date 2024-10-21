@@ -94,7 +94,7 @@ Git: 1.4-prerelease-ipr-69-ge15ff5700
 
   <cluster>
     <name>Energy EVSE</name>
-    <domain name="Energy Management"/>
+    <domain>Energy Management</domain>
     <code>0x0099</code>
     <define>ENERGY_EVSE_CLUSTER</define>
     <client init="false" tick="false">true</client>

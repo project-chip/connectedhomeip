@@ -24,7 +24,7 @@ Git: 1.4-prerelease-ipr-69-ge15ff5700
   <domain name="Energy Management"/>
   <cluster apiMaturity="provisional">
     <name>Device Energy Management</name>
-    <domain name="Energy Management"/>
+    <domain>Energy Management</domain>
     <code>0x0098</code>
     <define>DEVICE_ENERGY_MANAGEMENT_CLUSTER</define>
     <client init="false" tick="false">true</client>

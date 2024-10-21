@@ -45,7 +45,7 @@ Git: 1.4-prerelease-ipr-69-ge15ff5700
   </enum>
 
   <cluster>
-    <domain name="Energy Management"/>
+    <domain>Energy Management</domain>
     <name>Energy EVSE Mode</name>
     <code>0x009D</code>
     <define>ENERGY_EVSE_MODE_CLUSTER</define>
