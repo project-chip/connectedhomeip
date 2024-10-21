@@ -18,6 +18,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ * A data-value as defined in MTRBaseDevice.h.
+ */
 typedef NSDictionary<NSString *, id> * MTRDeviceDataValueDictionary;
 
 NS_ASSUME_NONNULL_END
