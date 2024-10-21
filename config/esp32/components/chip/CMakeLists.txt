@@ -33,7 +33,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
 
 set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash)
 
-set(CHIP_DATA_MODEL_INTERFACE "disabled" CACHE STRING "Data model interface option to use: enabled or disabled")
+set(CHIP_DATA_MODEL_INTERFACE "enabled" CACHE STRING "Data model interface option to use: enabled or disabled")
 
 if(NOT "${IDF_TARGET}" STREQUAL "esp32h2")
     list(APPEND CHIP_REQUIRE_COMPONENTS mdns)

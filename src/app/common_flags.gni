@@ -32,7 +32,7 @@ declare_args() {
   if (matter_enable_recommended && current_os == "linux") {
     chip_use_data_model_interface = "check"
   } else {
-    chip_use_data_model_interface = "disabled"
+    chip_use_data_model_interface = "enabled"
   }
 
   # Whether we call `chipDie` on DM `check` errors
