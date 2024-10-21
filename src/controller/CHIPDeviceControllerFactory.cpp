@@ -132,8 +132,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     // OperationalCertificateStore needs to be provided to init the fabric table if fabric table is
     // not provided wholesale.
-    ReturnErrorCodeIf((params.fabricTable == nullptr) && (params.opCertStore == nullptr), CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(params.sessionKeystore == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((params.fabricTable != nullptr) || (params.opCertStore != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(params.sessionKeystore != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CONFIG_NETWORK_LAYER_BLE
 #if CONFIG_DEVICE_LAYER
@@ -197,7 +197,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     {
         // TODO(#16231): Previously (and still) the objects new-ed in this entire method seem expected to last forever...
         auto newFabricTable = Platform::MakeUnique<FabricTable>();
-        ReturnErrorCodeIf(!newFabricTable, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(newFabricTable, CHIP_ERROR_NO_MEMORY);
 
         FabricTable::InitParams fabricTableInitParams;
         fabricTableInitParams.storage             = params.fabricIndependentStorage;

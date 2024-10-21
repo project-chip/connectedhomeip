@@ -136,22 +136,3 @@ private:
 
     CHIP_ERROR RunCommand(chip::EndpointId remoteId);
 };
-
-class FabricAutoSyncCommand : public CHIPCommand
-{
-public:
-    FabricAutoSyncCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("enable-auto-sync", credIssuerCommands)
-    {
-        AddArgument("state", 0, 1, &mEnableAutoSync, "Set to true to enable auto Fabric Sync, false to disable.");
-    }
-
-    /////////// CHIPCommand Interface /////////
-    CHIP_ERROR RunCommand() override { return RunCommand(mEnableAutoSync); }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(1); }
-
-private:
-    bool mEnableAutoSync;
-
-    CHIP_ERROR RunCommand(bool enableAutoSync);
-};

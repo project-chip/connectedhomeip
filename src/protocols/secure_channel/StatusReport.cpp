@@ -50,7 +50,7 @@ CHIP_ERROR StatusReport::Parse(System::PacketBufferHandle buf)
 {
     uint16_t tempGeneralCode = 0;
 
-    ReturnErrorCodeIf(buf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!buf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t * bufStart = buf->Start();
     LittleEndian::Reader bufReader(bufStart, buf->DataLength());

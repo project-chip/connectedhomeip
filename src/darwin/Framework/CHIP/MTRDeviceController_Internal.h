@@ -31,6 +31,7 @@
 #import <os/lock.h>
 
 #import "MTRBaseDevice.h"
+#import "MTRDeviceClusterData.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerDataStore.h"
 #import "MTRDeviceControllerDelegate.h"

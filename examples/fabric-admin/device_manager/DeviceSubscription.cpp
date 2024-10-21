@@ -120,7 +120,7 @@ void DeviceSubscription::OnDone(ReadClient * apReadClient)
     // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
     // DeviceSubscription.
     MoveToState(State::AwaitingDestruction);
-    mOnDoneCallback(mNodeId);
+    mOnDoneCallback(mScopedNodeId);
 }
 
 void DeviceSubscription::OnError(CHIP_ERROR error)
@@ -135,7 +135,7 @@ void DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchange
         // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
         // DeviceSubscription.
         MoveToState(State::AwaitingDestruction);
-        mOnDoneCallback(mNodeId);
+        mOnDoneCallback(mScopedNodeId);
         return;
     }
     VerifyOrDie(mState == State::Connecting);
@@ -160,7 +160,7 @@ void DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchange
         // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
         // DeviceSubscription.
         MoveToState(State::AwaitingDestruction);
-        mOnDoneCallback(mNodeId);
+        mOnDoneCallback(mScopedNodeId);
         return;
     }
     MoveToState(State::SubscriptionStarted);
@@ -203,29 +203,31 @@ void DeviceSubscription::OnDeviceConnectionFailure(const ScopedNodeId & peerId, 
     // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
     // DeviceSubscription.
     MoveToState(State::AwaitingDestruction);
-    mOnDoneCallback(mNodeId);
+    mOnDoneCallback(mScopedNodeId);
 }
 
 CHIP_ERROR DeviceSubscription::StartSubscription(OnDoneCallback onDoneCallback, Controller::DeviceController & controller,
-                                                 NodeId nodeId)
+                                                 ScopedNodeId scopedNodeId)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrDie(mState == State::Idle);
+    VerifyOrReturnError(controller.GetFabricIndex() == scopedNodeId.GetFabricIndex(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    mNodeId = nodeId;
+    mScopedNodeId = scopedNodeId;
 
 #if defined(PW_RPC_ENABLED)
     mCurrentAdministratorCommissioningAttributes                 = chip_rpc_AdministratorCommissioningChanged_init_default;
     mCurrentAdministratorCommissioningAttributes.has_id          = true;
-    mCurrentAdministratorCommissioningAttributes.id.node_id      = nodeId;
-    mCurrentAdministratorCommissioningAttributes.id.fabric_index = controller.GetFabricIndex();
+    mCurrentAdministratorCommissioningAttributes.id.node_id      = scopedNodeId.GetNodeId();
+    mCurrentAdministratorCommissioningAttributes.id.fabric_index = scopedNodeId.GetFabricIndex();
     mCurrentAdministratorCommissioningAttributes.window_status =
         static_cast<uint32_t>(Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
 #endif
 
     mOnDoneCallback = onDoneCallback;
     MoveToState(State::Connecting);
-    CHIP_ERROR err = controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err =
+        controller.GetConnectedDevice(scopedNodeId.GetNodeId(), &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         MoveToState(State::Idle);
@@ -258,5 +260,5 @@ void DeviceSubscription::StopSubscription()
     // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
     // DeviceSubscription.
     MoveToState(State::AwaitingDestruction);
-    mOnDoneCallback(mNodeId);
+    mOnDoneCallback(mScopedNodeId);
 }

@@ -326,7 +326,7 @@ static CHIP_ERROR MoveKeysAndValues()
     Platform::ScopedMemoryBuffer<uint8_t> buffer;
 
     buffer.Calloc(len);
-    ReturnErrorCodeIf(buffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(buffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
     for (uint8_t id = 0; id < kMaxNumberOfKeys; id++)
     {

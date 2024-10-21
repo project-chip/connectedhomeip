@@ -31,7 +31,6 @@ void registerCommandsFabricSync(Commands & commands, CredentialIssuerCommands * 
         make_unique<FabricSyncAddLocalBridgeCommand>(credsIssuerConfig),
         make_unique<FabricSyncRemoveLocalBridgeCommand>(credsIssuerConfig),
         make_unique<FabricSyncDeviceCommand>(credsIssuerConfig),
-        make_unique<FabricAutoSyncCommand>(credsIssuerConfig),
     };
 
     commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for fabric synchronization.");

@@ -436,7 +436,7 @@ CHIP_ERROR FabricTable::VerifyCredentials(const ByteSpan & noc, const ByteSpan &
         err = ExtractFabricIdFromCert(certificates.GetCertSet()[1], &icacFabricId);
         if (err == CHIP_NO_ERROR)
         {
-            ReturnErrorCodeIf(icacFabricId != outFabricId, CHIP_ERROR_FABRIC_MISMATCH_ON_ICA);
+            VerifyOrReturnError(icacFabricId == outFabricId, CHIP_ERROR_FABRIC_MISMATCH_ON_ICA);
         }
         // FabricId is optional field in ICAC and "not found" code is not treated as error.
         else if (err != CHIP_ERROR_NOT_FOUND)
@@ -449,7 +449,7 @@ CHIP_ERROR FabricTable::VerifyCredentials(const ByteSpan & noc, const ByteSpan &
     err                   = ExtractFabricIdFromCert(certificates.GetCertSet()[0], &rcacFabricId);
     if (err == CHIP_NO_ERROR)
     {
-        ReturnErrorCodeIf(rcacFabricId != outFabricId, CHIP_ERROR_WRONG_CERT_DN);
+        VerifyOrReturnError(rcacFabricId == outFabricId, CHIP_ERROR_WRONG_CERT_DN);
     }
     // FabricId is optional field in RCAC and "not found" code is not treated as error.
     else if (err != CHIP_ERROR_NOT_FOUND)
@@ -660,7 +660,7 @@ CHIP_ERROR FabricTable::FetchRootPubkey(FabricIndex fabricIndex, Crypto::P256Pub
 {
     MATTER_TRACE_SCOPE("FetchRootPubkey", "Fabric");
     const FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
-    ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
     return fabricInfo->FetchRootPubkey(outPublicKey);
 }
 
@@ -861,9 +861,9 @@ FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::
         Platform::ScopedMemoryBuffer<uint8_t> icacBuf;
         Platform::ScopedMemoryBuffer<uint8_t> rcacBuf;
 
-        ReturnErrorCodeIf(!nocBuf.Alloc(kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
-        ReturnErrorCodeIf(!icacBuf.Alloc(kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
-        ReturnErrorCodeIf(!rcacBuf.Alloc(kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(nocBuf.Alloc(kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(icacBuf.Alloc(kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(rcacBuf.Alloc(kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
 
         MutableByteSpan nocSpan{ nocBuf.Get(), kMaxCHIPCertLength };
         MutableByteSpan icacSpan{ icacBuf.Get(), kMaxCHIPCertLength };
@@ -1590,7 +1590,7 @@ CHIP_ERROR FabricTable::AllocatePendingOperationalKey(Optional<FabricIndex> fabr
     if (fabricIndex.HasValue())
     {
         // Check we not are trying to do an update but also change the root: forbidden
-        ReturnErrorCodeIf(mStateFlags.Has(StateFlags::kIsTrustedRootPending), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(!mStateFlags.Has(StateFlags::kIsTrustedRootPending), CHIP_ERROR_INCORRECT_STATE);
 
         // Fabric update case (e.g. UpdateNOC): we already know the fabric index
         fabricIndexToUse = fabricIndex.Value();
@@ -1621,8 +1621,8 @@ CHIP_ERROR FabricTable::AddNewPendingTrustedRootCert(const ByteSpan & rcac)
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // We should not already have pending NOC chain elements when we get here
-    ReturnErrorCodeIf(
-        mStateFlags.HasAny(StateFlags::kIsTrustedRootPending, StateFlags::kIsUpdatePending, StateFlags::kIsAddPending),
+    VerifyOrReturnError(
+        !mStateFlags.HasAny(StateFlags::kIsTrustedRootPending, StateFlags::kIsUpdatePending, StateFlags::kIsAddPending),
         CHIP_ERROR_INCORRECT_STATE);
 
     EnsureNextAvailableFabricIndexUpdated();
@@ -1738,7 +1738,7 @@ CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const By
     {
         FabricIndex collidingFabricIndex = kUndefinedFabricIndex;
         ReturnErrorOnFailure(FindExistingFabricByNocChaining(fabricIndexToUse, noc, collidingFabricIndex));
-        ReturnErrorCodeIf(collidingFabricIndex != kUndefinedFabricIndex, CHIP_ERROR_FABRIC_EXISTS);
+        VerifyOrReturnError(collidingFabricIndex == kUndefinedFabricIndex, CHIP_ERROR_FABRIC_EXISTS);
     }
 
     // We don't have a collision, handle the temp insert of NOC/ICAC
@@ -1790,7 +1790,7 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
 
     // Make sure we are updating at least an existing FabricIndex
     const auto * fabricInfo = FindFabricWithIndex(fabricIndex);
-    ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     // Check for an existing fabric matching RCAC and FabricID. We must find a correct
     // existing fabric that chains to same root. We assume the stored root is correct.
@@ -1798,7 +1798,7 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
     {
         FabricIndex collidingFabricIndex = kUndefinedFabricIndex;
         ReturnErrorOnFailure(FindExistingFabricByNocChaining(fabricIndex, noc, collidingFabricIndex));
-        ReturnErrorCodeIf(collidingFabricIndex != fabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
+        VerifyOrReturnError(collidingFabricIndex == fabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
     }
 
     // Handle the temp insert of NOC/ICAC
@@ -2110,7 +2110,7 @@ CHIP_ERROR FabricTable::SetFabricLabel(FabricIndex fabricIndex, const CharSpan &
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
-    ReturnErrorCodeIf(fabricLabel.size() > kFabricLabelMaxLengthInBytes, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(fabricLabel.size() <= kFabricLabelMaxLengthInBytes, CHIP_ERROR_INVALID_ARGUMENT);
 
     FabricInfo * fabricInfo  = GetMutableFabricByIndex(fabricIndex);
     bool fabricIsInitialized = (fabricInfo != nullptr) && fabricInfo->IsInitialized();

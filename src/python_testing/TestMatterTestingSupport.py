@@ -549,6 +549,14 @@ class TestMatterTestingSupport(MatterBaseTest):
         problems = find_tag_list_problems(roots, device_types, simple)
         asserts.assert_equal(len(problems), 0, "Unexpected problems found in list")
 
+        # Tags with mfg tags
+        tag_mfg = Clusters.Descriptor.Structs.SemanticTagStruct(mfgCode=0xFFF1, label="test")
+        tag_label = Clusters.Descriptor.Structs.SemanticTagStruct(tag=1, label="test")
+        simple[1][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [tag1, tag_mfg]
+        simple[2][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [tag1, tag_label]
+        problems = find_tag_list_problems(roots, device_types, simple)
+        asserts.assert_equal(len(problems), 0, "Unexpected problems found in list")
+
     def test_root_node_tag_list_functions(self):
         # Example topology - see comment above for the layout.
         # There are 4 direct children of root 0

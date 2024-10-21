@@ -2297,11 +2297,11 @@ CHIP_ERROR ReplaceCertIfResignedCertFound(const ByteSpan & referenceCertificate,
     MutableByteSpan referenceSKID(referenceSKIDBuf);
     MutableByteSpan candidateSKID(candidateSKIDBuf);
 
-    ReturnErrorCodeIf(referenceCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!referenceCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     outCertificate = referenceCertificate;
 
-    ReturnErrorCodeIf(candidateCertificates == nullptr || candidateCertificatesCount == 0, CHIP_NO_ERROR);
+    VerifyOrReturnError(candidateCertificates != nullptr && candidateCertificatesCount != 0, CHIP_NO_ERROR);
 
     ReturnErrorOnFailure(ExtractSKIDFromX509Cert(referenceCertificate, referenceSKID));
 

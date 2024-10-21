@@ -173,7 +173,7 @@ Davis, CA 95616, USA
       </otherwiseConform>
       <constraint type="between" from="0" to="7"/>
     </attribute>
-    <attribute id="0x0003" name="HoldTime" type="min 1">
+    <attribute id="0x0003" name="HoldTime" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>

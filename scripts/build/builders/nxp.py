@@ -51,6 +51,8 @@ class NxpBuildSystem(Enum):
 class NxpBoard(Enum):
     K32W0 = auto()
     K32W1 = auto()
+    RT1060 = auto()
+    RT1170 = auto()
     RW61X = auto()
     RW61X_ETH = auto()
     MCXW71 = auto()
@@ -60,6 +62,10 @@ class NxpBoard(Enum):
             return 'k32w0x'
         elif self == NxpBoard.K32W1:
             return 'k32w1'
+        elif self == NxpBoard.RT1060:
+            return 'rt1060'
+        elif self == NxpBoard.RT1170:
+            return 'rt1170'
         elif (self == NxpBoard.RW61X) or (self == NxpBoard.RW61X_ETH):
             if os_env == NxpOsUsed.ZEPHYR:
                 if self == NxpBoard.RW61X_ETH:
@@ -78,6 +84,10 @@ class NxpBoard(Enum):
             return 'k32w0'
         elif self == NxpBoard.K32W1:
             return 'k32w1'
+        elif self == NxpBoard.RT1060:
+            return 'rt/rt1060'
+        elif self == NxpBoard.RT1170:
+            return 'rt/rt1170'
         elif (self == NxpBoard.RW61X) or (self == NxpBoard.RW61X_ETH):
             if os_env == NxpOsUsed.ZEPHYR:
                 return 'zephyr'
@@ -92,15 +102,16 @@ class NxpBoard(Enum):
 class NxpBoardVariant(Enum):
     RD = auto()
     FRDM = auto()
+    EVKC = auto()
+    EVKB = auto()
 
     def BoardVariantName(self, board):
-        if board != NxpBoard.RW61X:
-            raise Exception('Board variants only supported for RW61X')
-
         if self == NxpBoardVariant.RD:
             return "rdrw612bga"
         elif self == NxpBoardVariant.FRDM:
             return "frdm"
+        elif self == NxpBoardVariant.EVKC:
+            return "evkcmimxrt1060"
 
 
 class NxpApp(Enum):
@@ -147,6 +158,14 @@ class NxpApp(Enum):
         return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName(os_env))
 
 
+class NxpLogLevel(Enum):
+    DEFAULT = auto()  # default everything
+    ALL = auto()  # enable all logging
+    PROGRESS = auto()  # progress and above
+    ERROR = auto()  # error and above
+    NONE = auto()  # no chip_logging at all
+
+
 class NxpBuilder(GnBuilder):
 
     def __init__(self,
@@ -173,7 +192,12 @@ class NxpBuilder(GnBuilder):
                  enable_ota: bool = False,
                  data_model_interface: Optional[str] = None,
                  enable_factory_data_build: bool = False,
-                 disable_pairing_autostart: bool = False):
+                 disable_pairing_autostart: bool = False,
+                 iw416_transceiver: bool = False,
+                 w8801_transceiver: bool = False,
+                 iwx12_transceiver: bool = False,
+                 log_level: NxpLogLevel = NxpLogLevel.DEFAULT,
+                 ):
         super(NxpBuilder, self).__init__(
             root=app.BuildRoot(root, board, os_env),
             runner=runner)
@@ -200,12 +224,19 @@ class NxpBuilder(GnBuilder):
         self.enable_factory_data_build = enable_factory_data_build
         self.disable_pairing_autostart = disable_pairing_autostart
         self.board_variant = board_variant
+        self.iw416_transceiver = iw416_transceiver
+        self.w8801_transceiver = w8801_transceiver
+        self.iwx12_transceiver = iwx12_transceiver
+        if self.low_power and log_level != NxpLogLevel.NONE:
+            logging.warning("Switching log level to 'NONE' for low power build")
+            log_level = NxpLogLevel.NONE
+        self.log_level = log_level
 
     def GnBuildArgs(self):
         args = []
 
         if self.low_power:
-            args.append('chip_with_low_power=1 chip_logging=false')
+            args.append('chip_with_low_power=1')
             if self.board == NxpBoard.K32W0:
                 args.append('chip_pw_tokenizer_logging=false chip_with_OM15082=0')
 
@@ -226,6 +257,31 @@ class NxpBuilder(GnBuilder):
 
         if self.enable_rotating_id:
             args.append('chip_enable_rotating_device_id=1 chip_enable_additional_data_advertising=1')
+
+        if self.log_level == NxpLogLevel.DEFAULT:
+            pass
+        elif self.log_level == NxpLogLevel.ALL:
+            args.append("chip_logging=true")
+            args.append("chip_error_logging=true")
+            args.append("chip_progress_logging=true")
+            args.append("chip_detail_logging=true")
+            args.append("chip_automation_logging=true")
+        elif self.log_level == NxpLogLevel.PROGRESS:
+            args.append("chip_logging=true")
+            args.append("chip_error_logging=true")
+            args.append("chip_progress_logging=true")
+            args.append("chip_detail_logging=false")
+            args.append("chip_automation_logging=false")
+        elif self.log_level == NxpLogLevel.ERROR:
+            args.append("chip_logging=true")
+            args.append("chip_error_logging=true")
+            args.append("chip_progress_logging=false")
+            args.append("chip_detail_logging=false")
+            args.append("chip_automation_logging=false")
+        elif self.log_level == NxpLogLevel.NONE:
+            args.append("chip_logging=false")
+        else:
+            raise Exception("Unknown log level: %r", self.log_level)
 
         if self.has_sw_version_2:
             args.append('nxp_software_version=2')
@@ -248,9 +304,31 @@ class NxpBuilder(GnBuilder):
             # thread is enabled by default on kw32
             if self.board == NxpBoard.RW61X:
                 args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
+            if self.board == NxpBoard.RT1060:
+                args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
+            if self.board == NxpBoard.RT1170:
+                args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
 
         if self.data_model_interface is not None:
             args.append(f'chip_use_data_model_interface="{self.data_model_interface}"')
+
+        if self.board_variant:
+            if self.board == NxpBoard.RT1060:
+                flag_board_variant = "evkname=\\\"%s\\\"" % self.board_variant.BoardVariantName(self.board)
+                args.append(flag_board_variant)
+            if self.board == NxpBoard.RW61X:
+                flag_board_variant = "board_version=\\\"%s\\\"" % self.board_variant.BoardVariantName(self.board)
+                args.append(flag_board_variant)
+
+        if self.iw416_transceiver:
+            args.append('iw416_transceiver=true')
+
+        if self.w8801_transceiver:
+            # BLE not supported on this transceiver
+            args.append('w8801_transceiver=true chip_enable_ble=false')
+
+        if self.iwx12_transceiver:
+            args.append('iwx12_transceiver=true')
 
         return args
 

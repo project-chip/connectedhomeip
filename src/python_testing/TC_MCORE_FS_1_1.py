@@ -199,14 +199,24 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         await self.send_single_cmd(cmd, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, timedRequestTimeoutMs=5000)
 
         self.step("3c")
-        if not self.is_pics_sdk_ci_only:
-            time.sleep(30)
+        max_wait_time_sec = 30
+        start_time = time.time()
+        elapsed = 0
+        time_remaining = max_wait_time_sec
+        previous_number_th_server_fabrics = len(th_fsa_server_fabrics)
 
-        th_fsa_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
-        # TODO: this should be mocked too.
-        if not self.is_pics_sdk_ci_only:
-            asserts.assert_equal(len(th_fsa_server_fabrics) + 1, len(th_fsa_server_fabrics_new),
-                                 "Unexpected number of fabrics on TH_SERVER")
+        th_fsa_server_fabrics_new = None
+        while time_remaining > 0:
+            time.sleep(2)
+            th_fsa_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
+            if previous_number_th_server_fabrics != len(th_fsa_server_fabrics_new):
+                break
+            elapsed = time.time() - start_time
+            time_remaining = max_wait_time_sec - elapsed
+
+        asserts.assert_not_equal(th_fsa_server_fabrics_new, None, "Failed to read Fabrics attribute")
+        asserts.assert_equal(previous_number_th_server_fabrics + 1, len(th_fsa_server_fabrics_new),
+                             "Unexpected number of fabrics on TH_SERVER")
 
 
 if __name__ == "__main__":
