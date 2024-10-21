@@ -229,16 +229,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
 };
 } // namespace AcceptedCommandList
 
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-namespace EventList {
-static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-};
-} // namespace EventList
-#endif
-
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
