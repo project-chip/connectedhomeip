@@ -40,7 +40,17 @@ source_set("fabric-bridge-common") {
 source_set("fabric-bridge-lib") {
   public_configs = [ ":config" ]
 
-  sources = [ "include/CHIPProjectAppConfig.h" ]
+  sources = [
+    "include/BridgedAdministratorCommissioning.h",
+    "include/BridgedDevice.h",
+    "include/BridgedDeviceBasicInformationImpl.h",
+    "include/BridgedDeviceManager.h",
+    "include/CHIPProjectAppConfig.h",
+    "src/BridgedAdministratorCommissioning.cpp",
+    "src/BridgedDevice.cpp",
+    "src/BridgedDeviceBasicInformationImpl.cpp",
+    "src/BridgedDeviceManager.cpp",
+  ]
 
   deps = [
     "${chip_root}/examples/fabric-sync/bridge:fabric-bridge-common",
