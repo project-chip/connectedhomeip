@@ -288,7 +288,7 @@ public:
         /*
         * return the internal fatal error in callback
         */
-        virtual CHIP_ERROR CheckInternalError() { return CHIP_NO_ERROR; } 
+        virtual CHIP_ERROR CheckInternalError() { return CHIP_NO_ERROR; }
 
     };
 

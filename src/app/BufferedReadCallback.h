@@ -47,10 +47,10 @@ private:
     /*
      * Retrieve the internal error in BufferedReadCallback
      */
-    CHIP_ERROR CheckInternalError() override 
-    { 
-        return mError; 
-    } 
+    CHIP_ERROR CheckInternalError() override
+    {
+        return mError;
+    }
 
     /*
      * Generates the reconsistuted TLV array from the stored individual list elements
