@@ -39,7 +39,7 @@ namespace Ember {
 class EmberAttributeBuffer
 {
 public:
-    enum class PascalString
+    enum class PascalStringType
     {
         kShort,
         kLong,
@@ -78,7 +78,7 @@ private:
     /// Takes into account internal mIsNullable.
     ///
     /// The string in `reader` is expected to be of type `tlvType`
-    CHIP_ERROR DecodeAsString(chip::TLV::TLVReader & reader, PascalString stringType, TLV::TLVType tlvType, EndianWriter & writer);
+    CHIP_ERROR DecodeAsString(chip::TLV::TLVReader & reader, PascalStringType stringType, TLV::TLVType tlvType, EndianWriter & writer);
 
     const bool mIsNullable;                    // Contains if the attribute metadata marks the field as NULLABLE
     const EmberAfAttributeType mAttributeType; // Initialized with the attribute type from the metadata

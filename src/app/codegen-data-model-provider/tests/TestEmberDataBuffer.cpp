@@ -241,10 +241,26 @@ TEST(TestEmberAttributeBuffer, TestEncodeUnsignedTypes)
         EXPECT_TRUE(tester.TryEncode<uint64_t>(0, { 0, 0, 0, 0, 0, 0, 0, 0 }).IsSuccess());
         EXPECT_TRUE(tester.TryEncode<uint64_t>(0x1234567, { 0x67, 0x45, 0x23, 0x01, 0, 0, 0, 0 }).IsSuccess());
         EXPECT_TRUE(tester.TryEncode<uint64_t>(0xAABBCCDDEEFF1122, { 0x22, 0x11, 0xFF, 0xEE, 0xDD, 0xCC, 0xBB, 0xAA }).IsSuccess());
+        EXPECT_TRUE(
+            tester.TryEncode<uint64_t>(std::numeric_limits<uint64_t>::max() - 1, { 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF })
+                .IsSuccess());
+
         EXPECT_TRUE(tester
                         .TryEncode<DataModel::Nullable<uint64_t>>(DataModel::NullNullable,
                                                                   { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF })
                         .IsSuccess());
+
+        EXPECT_EQ(
+            tester.TryEncode<uint64_t>(std::numeric_limits<uint64_t>::max(), { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }),
+            CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    }
+    {
+        EncodeTester tester(CreateFakeMeta(ZCL_INT64U_ATTRIBUTE_TYPE, false /* nullable */));
+
+        // we should be able to encode the maximum value
+        EXPECT_TRUE(
+            tester.TryEncode<uint64_t>(std::numeric_limits<uint64_t>::max(), { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF })
+                .IsSuccess());
     }
 
     /// Odd sized integers
@@ -424,6 +440,34 @@ TEST(TestEmberAttributeBuffer, TestEncodeSignedTypes)
     {
         EncodeTester tester(CreateFakeMeta(ZCL_INT64S_ATTRIBUTE_TYPE, true /* nullable */));
         EXPECT_TRUE(tester.TryEncode<int64_t>(-1234, { 0x2E, 0xFB, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }).IsSuccess());
+
+        // min/max ranges too
+        EXPECT_TRUE(
+            tester.TryEncode<int64_t>(std::numeric_limits<int64_t>::min() + 1, { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 })
+                .IsSuccess());
+        EXPECT_TRUE(
+            tester.TryEncode<int64_t>(std::numeric_limits<int64_t>::max(), { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F })
+                .IsSuccess());
+
+        // Reserved value for NULL
+        EXPECT_EQ(
+            tester.TryEncode<int64_t>(std::numeric_limits<int64_t>::min(), { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 }),
+            CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    }
+
+    {
+        EncodeTester tester(CreateFakeMeta(ZCL_INT64S_ATTRIBUTE_TYPE, false /* nullable */));
+        EXPECT_TRUE(tester.TryEncode<int64_t>(-1234, { 0x2E, 0xFB, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }).IsSuccess());
+
+        EXPECT_TRUE(
+            tester.TryEncode<int64_t>(std::numeric_limits<int64_t>::min(), { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 })
+                .IsSuccess());
+        EXPECT_TRUE(
+            tester.TryEncode<int64_t>(std::numeric_limits<int64_t>::min() + 1, { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 })
+                .IsSuccess());
+        EXPECT_TRUE(
+            tester.TryEncode<int64_t>(std::numeric_limits<int64_t>::max(), { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F })
+                .IsSuccess());
     }
 }
 
