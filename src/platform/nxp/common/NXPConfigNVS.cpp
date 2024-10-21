@@ -24,7 +24,7 @@
 #include <settings.h>
 
 /* Only for flash init, to be move to sdk framework */
-#include "port/nvs_port.h"
+#include "nvs_port.h"
 #if (CHIP_DEVICE_CONFIG_KVS_WEAR_STATS == 1)
 #include "fwk_nvs_stats.h"
 #endif /* CHIP_DEVICE_CONFIG_KVS_WEAR_STATS */
