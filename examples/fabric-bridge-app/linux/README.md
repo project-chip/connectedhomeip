@@ -130,13 +130,6 @@ defined:
     scp ./fabric-bridge-app ubuntu@xxx.xxx.xxx.xxx:/home/ubuntu
     ```
 
--   To delete generated executable, libraries and object files use:
-
-    ```sh
-    cd ~/connectedhomeip/examples/fabric-bridge-app/linux
-    rm -rf out/
-    ```
-
 ## Running the Complete Example on Ubuntu
 
 -   Building
