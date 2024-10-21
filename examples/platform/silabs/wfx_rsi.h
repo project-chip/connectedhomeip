@@ -102,6 +102,10 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_rsi_reset_count();
 int32_t sl_wifi_platform_disconnect();
 
+// TODO : this needs to be extern otherwise we get a linking error. We need to figure out why in the header clean up
+extern "C" {
+sl_status_t sl_matter_wifi_platform_init(void);
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #if SLI_SI91X_MCU_INTERFACE
 void sl_si91x_invoke_btn_press_event();
@@ -112,9 +116,7 @@ int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_
 int32_t wfx_rsi_power_save();
 #endif /* SLI_SI917 */
 #endif /* SL_ICD_ENABLED */
-
-// TODO : this needs to be extern otherwise we get a linking error. We need to figure out why in the header clean up
-extern "C" sl_status_t sl_matter_wifi_platform_init(void);
+}
 
 /**
  * @brief Posts an event to the Wi-Fi task

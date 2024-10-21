@@ -501,7 +501,7 @@ void sl_si91x_invoke_btn_press_event(void)
     // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
     if (!RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN) && !btn0_pressed)
     {
-        sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_PRESSED);
+        sl_button_on_change(SL_BUTTON_BTN0_NUMBER, 1 /* Button Pressed */);
         btn0_pressed = true;
     }
     if (RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN))
