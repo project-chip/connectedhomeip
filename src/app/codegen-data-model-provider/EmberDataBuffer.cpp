@@ -96,8 +96,8 @@ struct SignedDecodeInfo
     {
         return SignedDecodeInfo{
             n,
-            -(1LL << (8 * n - 1)),
-            ((1LL << (8 * n - 1)) - 1),
+            -static_cast<int64_t>(1LL << (8 * n - 1)),
+            (static_cast<int64_t>((1LL << (8 * n - 1))) - 1),
         };
     }
 };
