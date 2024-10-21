@@ -43,6 +43,15 @@ public:
     BufferedReadCallback(Callback & callback) : mCallback(callback) {}
 
 private:
+
+    /*
+     * Retrieve the internal error in BufferedReadCallback
+     */
+    CHIP_ERROR CheckInternalError() override 
+    { 
+        return mError; 
+    } 
+
     /*
      * Generates the reconsistuted TLV array from the stored individual list elements
      */
@@ -74,6 +83,7 @@ private:
     void OnError(CHIP_ERROR aError) override
     {
         mBufferedList.clear();
+        mError = CHIP_NO_ERROR;
         return mCallback.OnError(aError);
     }
 
@@ -131,6 +141,7 @@ private:
     ConcreteDataAttributePath mBufferedPath;
     std::vector<System::PacketBufferHandle> mBufferedList;
     Callback & mCallback;
+    CHIP_ERROR mError = CHIP_NO_ERROR;
 };
 
 } // namespace app

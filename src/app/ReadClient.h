@@ -284,6 +284,12 @@ public:
          * things like min/max intervals based on the session parameters).
          */
         virtual void OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams) {}
+
+        /*
+        * return the internal fatal error in callback
+        */
+        virtual CHIP_ERROR CheckInternalError() { return CHIP_NO_ERROR; } 
+
     };
 
     enum class InteractionType : uint8_t

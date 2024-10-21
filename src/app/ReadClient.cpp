@@ -805,6 +805,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             ReturnErrorOnFailure(errorStatus.DecodeStatusIB(statusIB));
             NoteReportingData();
             mpCallback.OnAttributeData(attributePath, nullptr, statusIB);
+            ReturnErrorOnFailure(mpCallback.CheckInternalError());
         }
         else if (CHIP_END_OF_TLV == err)
         {
