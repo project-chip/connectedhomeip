@@ -3354,12 +3354,6 @@ static BOOL AttributeIsSpecifiedInEnergyEVSEModeCluster(AttributeId aAttributeId
     case Attributes::CurrentMode::Id: {
         return YES;
     }
-    case Attributes::StartUpMode::Id: {
-        return YES;
-    }
-    case Attributes::OnMode::Id: {
-        return YES;
-    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -3393,12 +3387,6 @@ static BOOL AttributeIsSpecifiedInWaterHeaterModeCluster(AttributeId aAttributeI
     case Attributes::CurrentMode::Id: {
         return YES;
     }
-    case Attributes::StartUpMode::Id: {
-        return YES;
-    }
-    case Attributes::OnMode::Id: {
-        return YES;
-    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -3430,12 +3418,6 @@ static BOOL AttributeIsSpecifiedInDeviceEnergyManagementModeCluster(AttributeId 
         return YES;
     }
     case Attributes::CurrentMode::Id: {
-        return YES;
-    }
-    case Attributes::StartUpMode::Id: {
-        return YES;
-    }
-    case Attributes::OnMode::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
