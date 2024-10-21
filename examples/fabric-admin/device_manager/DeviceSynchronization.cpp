@@ -283,8 +283,8 @@ void DeviceSynchronizer::SynchronizationCompleteAddDevice()
         {
             ChipLogError(NotSpecified, "Failed start subscription to NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
             chip_rpc_ReachabilityChanged reachabilityChanged;
-            reachabilityChanged.has_id = true;
-            reachabilityChanged.id = mCurrentDeviceData.id;
+            reachabilityChanged.has_id       = true;
+            reachabilityChanged.id           = mCurrentDeviceData.id;
             reachabilityChanged.reachability = false;
             DeviceReachableChanged(reachabilityChanged);
         }

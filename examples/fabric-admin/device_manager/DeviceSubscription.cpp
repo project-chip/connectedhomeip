@@ -129,8 +129,8 @@ void DeviceSubscription::OnError(CHIP_ERROR error)
     if (error == CHIP_ERROR_TIMEOUT && mState == State::SubscriptionStarted)
     {
         chip_rpc_ReachabilityChanged reachabilityChanged;
-        reachabilityChanged.has_id = true;
-        reachabilityChanged.id = mCurrentAdministratorCommissioningAttributes.id;
+        reachabilityChanged.has_id       = true;
+        reachabilityChanged.id           = mCurrentAdministratorCommissioningAttributes.id;
         reachabilityChanged.reachability = false;
         DeviceReachableChanged(reachabilityChanged);
     }
@@ -212,11 +212,10 @@ void DeviceSubscription::OnDeviceConnectionFailure(const ScopedNodeId & peerId, 
     if (mState == State::Connecting)
     {
         chip_rpc_ReachabilityChanged reachabilityChanged;
-        reachabilityChanged.has_id = true;
-        reachabilityChanged.id = mCurrentAdministratorCommissioningAttributes.id;
+        reachabilityChanged.has_id       = true;
+        reachabilityChanged.id           = mCurrentAdministratorCommissioningAttributes.id;
         reachabilityChanged.reachability = false;
         DeviceReachableChanged(reachabilityChanged);
-
     }
 #endif
 
