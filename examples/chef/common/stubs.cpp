@@ -62,9 +62,21 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]   
 #include "chef-dishwasher-mode-delegate-impl.h"
 #endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
 
+#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
+#include "chef-laundry-washer-mode.h"
+#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_CONTROLS_SERVER
+#include "chef-laundry-washer-controls-delegate-impl.h"
+#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_CONTROLS_SERVER
+
 #ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
 #include "chef-operational-state-delegate-impl.h"
 #endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
+#include "temperature-control/static-supported-temperature-levels.h"
+#endif // MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
 
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
@@ -124,6 +136,10 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
     case chip::app::Clusters::DishwasherMode::Id:
         return chefDishwasherModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 #endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
+#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
+    case chip::app::Clusters::LaundryWasherMode::Id:
+        return chefLaundryWasherModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
 #ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::OperationalState::Id:
         return chefOperationalStateReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
@@ -202,6 +218,10 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     case chip::app::Clusters::DishwasherMode::Id:
         return chefDishwasherModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
 #endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
+#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
+    case chip::app::Clusters::LaundryWasherMode::Id:
+        return chefLaundryWasherModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
 #ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::OperationalState::Id:
         return chefOperationalStateWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
