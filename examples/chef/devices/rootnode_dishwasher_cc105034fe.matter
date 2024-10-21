@@ -1671,7 +1671,6 @@ endpoint 0 {
     callback attribute supportedLocales;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -1859,7 +1858,6 @@ endpoint 1 {
     ram      attribute onOff default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 6;
@@ -1888,7 +1886,6 @@ endpoint 1 {
     ram      attribute step default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 5;
     ram      attribute clusterRevision default = 1;
@@ -1901,7 +1898,6 @@ endpoint 1 {
     callback attribute currentMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     ram      attribute clusterRevision default = 2;
@@ -1918,7 +1914,6 @@ endpoint 1 {
     ram      attribute supported default = 0x3F;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
