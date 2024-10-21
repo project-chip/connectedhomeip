@@ -34,15 +34,16 @@ namespace {
 
 /// Maximum length of a string, inclusive
 ///
-/// For nullable strings, the maximum length marker is used as a "NULL" marker
-constexpr uint32_t MaxLength(EmberAttributeBuffer::PascalString s, bool nullable)
+/// the max size value (0xFF and 0xFFFF) is reserved for NULL representation so
+/// it is not available
+constexpr uint32_t MaxLength(EmberAttributeBuffer::PascalString s)
 {
     if (s == EmberAttributeBuffer::PascalString::kShort)
     {
-        return nullable ? std::numeric_limits<uint8_t>::max() - 1 : std::numeric_limits<uint8_t>::max();
+        return std::numeric_limits<uint8_t>::max() - 1;
     }
     // EmberAttributeBuffer::PascalString::kLong:
-    return nullable ? std::numeric_limits<uint16_t>::max() - 1 : std::numeric_limits<uint16_t>::max();
+    return std::numeric_limits<uint16_t>::max() - 1;
 }
 
 struct UnsignedDecodeInfo
@@ -92,12 +93,15 @@ struct SignedDecodeInfo
         };
     }
 
-    static constexpr SignedDecodeInfo OfSize(unsigned n)
+    template<size_t N>
+    static constexpr SignedDecodeInfo OfSize()
     {
+        // I specifically do not try to support "8" due to overflows.
+        static_assert(N > 0 && N < 8, "This covers mostly odd-sized integers only");
         return SignedDecodeInfo{
-            n,
-            -static_cast<int64_t>(1LL << (8 * n - 1)),
-            (static_cast<int64_t>((1LL << (8 * n - 1))) - 1),
+            N,
+            -static_cast<int64_t>(1LL << (8 * N - 1)),
+            (static_cast<int64_t>((1LL << (8 * N - 1))) - 1),
         };
     }
 };
@@ -112,15 +116,15 @@ constexpr SignedDecodeInfo GetSignedDecodeInfo(EmberAfAttributeType type)
     case ZCL_INT16S_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
         return SignedDecodeInfo::From<int16_t>();
     case ZCL_INT24S_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
-        return SignedDecodeInfo::OfSize(3);
+        return SignedDecodeInfo::OfSize<3>();
     case ZCL_INT32S_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
         return SignedDecodeInfo::From<int32_t>();
     case ZCL_INT40S_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
-        return SignedDecodeInfo::OfSize(5);
+        return SignedDecodeInfo::OfSize<5>();
     case ZCL_INT48S_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
-        return SignedDecodeInfo::OfSize(6);
+        return SignedDecodeInfo::OfSize<6>();
     case ZCL_INT56S_ATTRIBUTE_TYPE: // Unsigned 56-bit integer
-        return SignedDecodeInfo::OfSize(7);
+        return SignedDecodeInfo::OfSize<7>();
     case ZCL_INT64S_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
         return SignedDecodeInfo::From<int64_t>();
     }
@@ -162,7 +166,8 @@ CHIP_ERROR EmberAttributeBuffer::DecodeUnsignedInteger(chip::TLV::TLVReader & re
     if (reader.GetType() == TLV::kTLVType_Null)
     {
         // we know mIsNullable due to the check at the top of ::Decode
-        value = ~(0ULL); // Null value is ALWAYS negative-fill
+        // NULL is alwayx 0xFFFFF....FFF so we just set to max
+        value = std::numeric_limits<uint64_t>::max();
     }
     else
     {
@@ -217,10 +222,10 @@ CHIP_ERROR EmberAttributeBuffer::DecodeAsString(chip::TLV::TLVReader & reader, P
         switch (stringType)
         {
         case PascalString::kShort:
-            writer.Put8(0xFF);
+            writer.Put8(NumericAttributeTraits<uint8_t>::kNullValue);
             break;
         case PascalString::kLong:
-            writer.Put16(0xFFFF);
+            writer.Put16(NumericAttributeTraits<uint16_t>::kNullValue);
             break;
         }
         return CHIP_NO_ERROR;
@@ -229,7 +234,7 @@ CHIP_ERROR EmberAttributeBuffer::DecodeAsString(chip::TLV::TLVReader & reader, P
     const uint32_t stringLength = reader.GetLength();
 
     VerifyOrReturnError(reader.GetType() == tlvType, CHIP_ERROR_WRONG_TLV_TYPE);
-    VerifyOrReturnError(reader.GetLength() <= MaxLength(stringType, mIsNullable), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(stringLength <= MaxLength(stringType), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Size is a prefix, where 0xFF/0xFFFF is the null marker (if applicable)
     switch (stringType)
@@ -268,7 +273,7 @@ CHIP_ERROR EmberAttributeBuffer::Decode(chip::TLV::TLVReader & reader)
         if (reader.GetType() == TLV::kTLVType_Null)
         {
             // we know mIsNullable due to the check at the top of ::Decode
-            endianWriter.Put8(0xFF);
+            endianWriter.Put8(NumericAttributeTraits<bool>::kNullValue);
         }
         else
         {
