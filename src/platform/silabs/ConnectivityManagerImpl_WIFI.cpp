@@ -431,7 +431,13 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
         {
             sl_wfx_mac_address_t macaddr;
             wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &macaddr);
-            if (mEndpointQueueFilter.SetHostName(ByteSpan(macaddr.octet)) == CHIP_NO_ERROR)
+            char macaddrString[13]; // 12 characters + null terminator
+            sprintf(macaddrString,"%02X%02X%02X%02X%02X%02X", macaddr.octet[0], macaddr.octet[1], macaddr.octet[2], macaddr.octet[3], macaddr.octet[4], macaddr.octet[5]);
+            EndpointQueueFilterConfig config;
+            config.allowedQueuedPackets = 20; // Set the desired value
+
+            mEndpointQueueFilter.SetConfig(config);
+            if (mEndpointQueueFilter.SetHostName(chip::CharSpan(macaddrString)) == CHIP_NO_ERROR)
             {
                 chip::Inet::UDPEndPointImpl::SetQueueFilter(&mEndpointQueueFilter);
             } else {
