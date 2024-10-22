@@ -86,7 +86,7 @@ class TC_OPCREDS_3_2(MatterBaseTest):
 
         cr2_new_admin_ctrl = cr2_new_fabric_admin.NewController(
             nodeId=cr2_nodeid)
-        success, nocResp, nocBytes, rcacResp, icacBytes = await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(
+        success, nocResp, rcacResp = await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(
             commissionerDevCtrl=dev_ctrl, newFabricDevCtrl=cr2_new_admin_ctrl,
             existingNodeId=self.dut_node_id, newNodeId=cr2_dut_node_id
         )
@@ -106,7 +106,7 @@ class TC_OPCREDS_3_2(MatterBaseTest):
 
         cr3_new_admin_ctrl = cr3_new_fabric_admin.NewController(
             nodeId=cr3_nodeid)
-        success, nocResp, nocBytes, rcacResp, icacBytes = await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(
+        success, nocResp, rcacResp = await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(
             commissionerDevCtrl=dev_ctrl, newFabricDevCtrl=cr3_new_admin_ctrl,
             existingNodeId=self.dut_node_id, newNodeId=cr3_dut_node_id
         )
