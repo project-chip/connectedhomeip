@@ -78,6 +78,75 @@
 #endif
 @end
 
+#pragma mark - MTRAttributeValueWaiter
+
+static NSString * const MTRValueSatisfiedKey = @"valueSatisfied";
+
+// Represents the data passed to waitForAttributeValues:
+@interface MTRAttributeValueWaiter : NSObject
+// Each entry of "valueExpectations" has two keys:
+// * MTRValueSatisfiedKey: whether that value has been satisfied by observed
+//                         attribute values.
+// * MTRValueKey: the response-value we are trying to wait for.
+@property (nonatomic, retain) NSArray<NSMutableDictionary<NSString *, id> *> * valueExpectations;
+@property (nonatomic, retain) dispatch_queue_t queue;
+@property (nonatomic) MTRStatusCompletion completion;
+
+@property (nonatomic, readonly) BOOL allValuesSatisfied;
+
+- (instancetype)initWithValues:(NSArray<NSDictionary<NSString *, id> *> *)values queue:(dispatch_queue_t)queue completion:(MTRStatusCompletion)completion;
+
+// Returns YES if after this report the waiter might be done waiting, NO otherwise.
+- (BOOL)attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path byDevice:(MTRDevice *)device;
+
+@end
+
+@implementation MTRAttributeValueWaiter
+- (instancetype)initWithValues:(NSArray<NSDictionary<NSString *, id> *> *)values queue:(dispatch_queue_t)queue completion:(MTRStatusCompletion)completion
+{
+    if (self = [super init]) {
+        auto * valueExpectations = [NSMutableArray arrayWithCapacity:values.count];
+        for (NSDictionary<NSString *, id> * value in values) {
+            auto * valueExpectation = [NSMutableDictionary dictionaryWithCapacity:2];
+            valueExpectation[MTRValueSatisfiedKey] = @(NO);
+            valueExpectation[MTRValueKey] = value;
+            [valueExpectations addObject:valueExpectation];
+        }
+        _valueExpectations = valueExpectations;
+        _queue = queue;
+        _completion = completion;
+    }
+
+    return self;
+}
+
+- (BOOL)attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path byDevice:(MTRDevice *)device
+{
+    for (NSMutableDictionary<NSString *, id> * valueExpectation in self.valueExpectations) {
+        NSDictionary<NSString *, id> * expectedValue = valueExpectation[MTRValueKey];
+        if ([path isEqual:expectedValue[MTRAttributePathKey]]) {
+            BOOL valueSatisfiesExpectation = [device _attributeDataValue:value satisfiesValueExpectation:expectedValue[MTRDataKey]];
+            valueExpectation[MTRValueSatisfiedKey] = @(valueSatisfiesExpectation);
+            return valueSatisfiesExpectation;
+        }
+    }
+
+    return NO;
+}
+
+- (BOOL)allValuesSatisfied
+{
+    for (NSMutableDictionary<NSString *, id> * valueExpectation in self.valueExpectations) {
+        if (![valueExpectation[MTRValueSatisfiedKey] boolValue]) {
+            return NO;
+        }
+    }
+
+    return YES;
+}
+
+@end
+
 #pragma mark - MTRDevice
 
 // Declaring selector so compiler won't complain about testing and calling it in _handleReportEnd
@@ -96,6 +165,10 @@
 @end
 #endif
 
+@interface MTRDevice ()
+@property (nonatomic, readonly) NSMutableSet<MTRAttributeValueWaiter *> * attributeValueWaiters;
+@end
+
 @implementation MTRDevice
 
 - (instancetype)initForSubclassesWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -106,6 +179,7 @@
         _deviceController = controller;
         _nodeID = nodeID;
         _state = MTRDeviceStateUnknown;
+        _attributeValueWaiters = [NSMutableSet set];
     }
 
     return self;
@@ -631,7 +705,15 @@
                 return NO;
             }
 
-            if (![self _attributeDataValue:observedEntry[MTRDataKey] satisfiesValueExpectation:expectedEntry[MTRDataKey]]) {
+            MTRDeviceDataValueDictionary observedDataValue = observedEntry[MTRDataKey];
+            MTRDeviceDataValueDictionary expectedDataValue = expectedEntry[MTRDataKey];
+
+            if (![observedDataValue isKindOfClass:NSDictionary.class] || ![expectedDataValue isKindOfClass:NSDictionary.class]) {
+                MTR_LOG_ERROR("%@ expected or observed data-value id not an NSDictionary: %@, %@", self, observedDataValue, expectedDataValue);
+                return NO;
+            }
+
+            if (![self _attributeDataValue:observedDataValue satisfiesValueExpectation:expectedDataValue]) {
                 return NO;
             }
         }
@@ -661,7 +743,7 @@
     }
 
     for (NSDictionary<NSString *, id> * expectedField in expectedArray) {
-        if (![expectedField[MTRContextTagKey] isKindOfClass:NSNumber.class] || ![expectedField[MTRDataKey] isKindOfClass:NSDictionary.class]) {
+        if (![expectedField isKindOfClass:NSDictionary.class] || ![expectedField[MTRContextTagKey] isKindOfClass:NSNumber.class] || ![expectedField[MTRDataKey] isKindOfClass:NSDictionary.class]) {
             MTR_LOG_ERROR("%@ expected structure-value contains invalid field %@", self, expectedField);
             return NO;
         }
@@ -672,7 +754,7 @@
         // pretty small arrays, so the O(N^2) behavior here is ok.
         BOOL found = NO;
         for (NSDictionary<NSString *, id> * observedField in observedArray) {
-            if (![observedField[MTRContextTagKey] isKindOfClass:NSNumber.class] || ![observedField[MTRDataKey] isKindOfClass:NSDictionary.class]) {
+            if (![observedField isKindOfClass:NSDictionary.class] || ![observedField[MTRContextTagKey] isKindOfClass:NSNumber.class] || ![observedField[MTRDataKey] isKindOfClass:NSDictionary.class]) {
                 MTR_LOG_ERROR("%@ observed structure-value contains invalid field %@", self, observedField);
                 return NO;
             }
@@ -708,6 +790,109 @@
     // clear what "equivalent" should mean for such malformed TLV, expecially if
     // the same context tag maps to different values in one of the structs.
     return YES;
+}
+
+#pragma mark - Handling of waits for attribute values
+
+- (void)waitForAttributeValues:(NSArray<NSDictionary<NSString *, id> *> *)values timeout:(NSNumber * _Nullable)timeout queue:(dispatch_queue_t)queue completion:(void (^)(NSError * _Nullable error))completion
+{
+    // Check that all the values are in fact attribute response-values.
+    for (NSDictionary<NSString *, id> * value in values) {
+        if (!value[MTRAttributePathKey] || !value[MTRDataKey]) {
+            MTR_LOG_ERROR("%@ waitForAttributeValues passed a non-attribute value %@", self, value);
+            dispatch_async(queue, ^{
+                completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+            });
+            return;
+        }
+    }
+
+    // Check whether we have all these values already.
+    NSMutableArray<MTRAttributeRequestPath *> * requestPaths = [NSMutableArray arrayWithCapacity:values.count];
+    for (NSDictionary<NSString *, id> * value in values) {
+        MTRAttributePath * path = value[MTRAttributePathKey];
+        [requestPaths addObject:[MTRAttributeRequestPath requestPathWithEndpointID:path.endpoint clusterID:path.cluster attributeID:path.attribute]];
+    }
+
+    NSArray<NSDictionary<NSString *, id> *> * currentValues = [self readAttributePaths:requestPaths];
+
+    std::lock_guard lock(_lock);
+    auto * attributeWaiter = [[MTRAttributeValueWaiter alloc] initWithValues:values queue:queue completion:completion];
+
+    for (NSDictionary<NSString *, id> * currentValue in currentValues) {
+        // Pretend as if this got reported, for purposes of the attribute
+        // waiter.
+        [attributeWaiter attributeValue:currentValue[MTRDataKey] reportedForPath:currentValue[MTRAttributePathKey] byDevice:self];
+    }
+
+    if (attributeWaiter.allValuesSatisfied) {
+        MTR_LOG("%@ waitForAttributeValues no need to wait, values already match: %@", self, values);
+        dispatch_async(queue, ^{
+            completion(nil);
+        });
+        return;
+    }
+
+    // Otherwise, wait for the values to arrive or our timeout.
+    [self.attributeValueWaiters addObject:attributeWaiter];
+
+    if (timeout != nil) {
+        mtr_weakify(attributeWaiter);
+        mtr_weakify(self);
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, static_cast<uint64_t>(timeout.doubleValue * NSEC_PER_SEC)), self.queue, ^{
+            mtr_strongify(self);
+            mtr_strongify(attributeWaiter);
+            if (self != nil && attributeWaiter != nil) {
+                [self _attributeWaitTimedOut:attributeWaiter];
+            }
+        });
+    }
+}
+
+- (void)_attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    // Check whether anyone was waiting for this attribute.  Iterate over a copy
+    // of the set, so we can remove waiters that are done waiting.
+    for (MTRAttributeValueWaiter * attributeValueWaiter in [self.attributeValueWaiters copy]) {
+        if ([attributeValueWaiter attributeValue:value reportedForPath:path byDevice:self] && attributeValueWaiter.allValuesSatisfied) {
+            [self _handleAttributeWaitComplete:attributeValueWaiter];
+        }
+    }
+}
+
+- (void)_handleAttributeWaitComplete:(MTRAttributeValueWaiter *)attributeValueWaiter
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    MTR_LOG("%@ wait for attribute values complete: %@", self, attributeValueWaiter.valueExpectations);
+
+    [self _notifyAttributeValueWaiter:attributeValueWaiter withError:nil];
+}
+
+- (void)_attributeWaitTimedOut:(MTRAttributeValueWaiter *)attributeValueWaiter
+{
+    std::lock_guard lock(_lock);
+
+    if (![self.attributeValueWaiters containsObject:attributeValueWaiter]) {
+        // Nothing to do here anymore.
+        return;
+    }
+
+    MTR_LOG("%@ wait for attribute values timed out: %@", self, attributeValueWaiter.valueExpectations);
+
+    [self _notifyAttributeValueWaiter:attributeValueWaiter withError:[MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT]];
+}
+
+- (void)_notifyAttributeValueWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter withError:(NSError * _Nullable)error
+{
+    [self.attributeValueWaiters removeObject:attributeValueWaiter];
+
+    auto completion = attributeValueWaiter.completion;
+    dispatch_async(attributeValueWaiter.queue, ^{
+        completion(error);
+    });
 }
 
 @end

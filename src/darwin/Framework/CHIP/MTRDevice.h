@@ -337,6 +337,25 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                     queue:(dispatch_queue_t)queue
                completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
     MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+
+/**
+ * Wait until a set of attributes reaches certain values or the provided timeout
+ * (if any) is reached.  The completion is called at that point, with an error
+ * if a timeout occurred.
+ *
+ * The completion is also called with an error on input errors.
+ *
+ * The values to wait for are represented as an array of response-values which
+ * have an MTRAttributePathKey and MTRDataKey.
+ *
+ * The timeout argument can be nil to indicate no timeout. Otherwise it must
+ * be an NSTimeInterval wrapped in NSNumber.
+ */
+- (void)waitForAttributeValues:(NSArray<NSDictionary<NSString *, id> *> *)values
+                       timeout:(NSNumber * _Nullable)timeout
+                         queue:(dispatch_queue_t)queue
+                    completion:(void (^)(NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
 @end
 
 MTR_EXTERN NSString * const MTRPreviousDataKey MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));

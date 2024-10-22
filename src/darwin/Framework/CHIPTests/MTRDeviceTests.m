@@ -1586,6 +1586,34 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertEqualObjects([NSSet setWithArray:variousThings],
         [[NSSet setWithArray:clusterRevisions] setByAddingObjectsFromSet:[NSSet setWithArray:basicInformationAllRootAttributes]]);
 
+    // Some quick tests for waitForAttributeValues.  First, values that we know
+    // are already there:
+    XCTestExpectation * deviceTypesWaitExpectation = [self expectationWithDescription:@"deviceTypes is already the value we expect"];
+    [device waitForAttributeValues:deviceTypes timeout:nil queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [deviceTypesWaitExpectation fulfill];
+    }];
+    [self waitForExpectations:@[ deviceTypesWaitExpectation ] timeout:kTimeoutInSeconds];
+
+    // Now values that we know will never be there (the type is wrong).
+    __auto_type * bogusDeviceTypes = @[
+        @{
+            MTRAttributePathKey : deviceTypes[0][MTRAttributePathKey],
+            MTRDataKey : @ {
+                MTRTypeKey : MTROctetStringValueType,
+                MTRValueKey : @"abc",
+            },
+        },
+    ];
+    XCTestExpectation * bogusDeviceTypesWaitExpectation = [self expectationWithDescription:@"bogusDeviceTypes wait should time out"];
+    [device waitForAttributeValues:bogusDeviceTypes timeout:@(0.5) queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+        [bogusDeviceTypesWaitExpectation fulfill];
+    }];
+    [self waitForExpectations:@[ bogusDeviceTypesWaitExpectation ] timeout:kTimeoutInSeconds];
+
     // Before resubscribe, first test write failure and expected value effects
     NSNumber * testEndpointID = @(1);
     NSNumber * testClusterID = @(8);
@@ -1610,6 +1638,24 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     NSDictionary * writeValue = [NSDictionary
         dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type", [NSNumber numberWithUnsignedInteger:200], @"value", nil];
+
+    // Also test that waitForAttributeValues does not pick up the transition to
+    // the expected value.
+    XCTestExpectation * nonexistentAttributeValueWaitExpectation = [self expectationWithDescription:@"waiting for a value for an attribute that does not exist should time out"];
+    [device waitForAttributeValues:@[
+        @{
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:testEndpointID clusterID:testClusterID attributeID:testAttributeID],
+            MTRDataKey : writeValue,
+        }
+    ]
+                           timeout:@(0.5)
+                             queue:queue completion:^(NSError * _Nullable error) {
+                                 XCTAssertNotNil(error);
+                                 XCTAssertEqual(error.domain, MTRErrorDomain);
+                                 XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+                                 [nonexistentAttributeValueWaitExpectation fulfill];
+                             }];
+
     [device writeAttributeWithEndpointID:testEndpointID
                                clusterID:testClusterID
                              attributeID:testAttributeID
@@ -1619,10 +1665,20 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // expected value interval is 20s but expect it get reverted immediately as the write fails because it's writing to a
     // nonexistent attribute
-    [self waitForExpectations:@[ expectedValueReportedExpectation, expectedValueRemovedExpectation ] timeout:5 enforceOrder:YES];
+    [self waitForExpectations:@[ expectedValueReportedExpectation, expectedValueRemovedExpectation, nonexistentAttributeValueWaitExpectation ] timeout:5 enforceOrder:YES];
 
-    // Test if previous value is reported on a write
-    uint16_t testOnTimeValue = 10;
+    // Get the current OnTime value, to make sure we are writing a different one.
+    __auto_type * currentOnTimeValueDictionary = [device readAttributeWithEndpointID:@(1)
+                                                                           clusterID:@(MTRClusterIDTypeOnOffID)
+                                                                         attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)
+                                                                              params:nil];
+    XCTAssertNotNil(currentOnTimeValueDictionary);
+    XCTAssertEqualObjects(currentOnTimeValueDictionary[MTRTypeKey], MTRUnsignedIntegerValueType);
+    uint16_t currentOnTimeValue = [currentOnTimeValueDictionary[MTRValueKey] unsignedShortValue];
+
+    // Test if previous value is reported on a write.  Make sure to write a
+    // value different from the current one.
+    uint16_t testOnTimeValue = currentOnTimeValue > 10 ? currentOnTimeValue - 1 : currentOnTimeValue + 1;
     XCTestExpectation * onTimeWriteSuccess = [self expectationWithDescription:@"OnTime write success"];
     XCTestExpectation * onTimePreviousValue = [self expectationWithDescription:@"OnTime previous value"];
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
@@ -1643,7 +1699,35 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             }
         }
     };
-    NSDictionary * writeOnTimeValue = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(testOnTimeValue) };
+    __auto_type * writeOnTimeValue = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(testOnTimeValue) };
+
+    // Also set up a few attribute value waits to see what happens.
+    __auto_type * onTimeValueToWaitFor = @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeOnOffID)
+                                                                attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)],
+        MTRDataKey : writeOnTimeValue,
+    };
+
+    XCTestExpectation * waitingForOnTimeValue1Expectation = [self expectationWithDescription:@"OnTime value is now the expected value"];
+    [device waitForAttributeValues:@[ onTimeValueToWaitFor ] timeout:nil queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [waitingForOnTimeValue1Expectation fulfill];
+    }];
+
+    XCTestExpectation * waitingForOnTimeValue2Expectation = [self expectationWithDescription:@"OnTime value is now the expected value and first device type is the expected value"];
+    [device waitForAttributeValues:@[ onTimeValueToWaitFor, deviceTypes[0] ] timeout:nil queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [waitingForOnTimeValue2Expectation fulfill];
+    }];
+
+    XCTestExpectation * waitingForOnTimeValue3Expectation = [self expectationWithDescription:@"OnTime value is now the expected value and first device type is bogus, or we timed out"];
+    [device waitForAttributeValues:@[ onTimeValueToWaitFor, bogusDeviceTypes[0] ] timeout:@(0.5) queue:queue completion:^(NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+        [waitingForOnTimeValue3Expectation fulfill];
+    }];
+
     [device writeAttributeWithEndpointID:@(1)
                                clusterID:@(MTRClusterIDTypeOnOffID)
                              attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)
@@ -1651,7 +1735,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                    expectedValueInterval:@(10000)
                        timedWriteTimeout:nil];
 
-    [self waitForExpectations:@[ onTimeWriteSuccess, onTimePreviousValue ] timeout:10];
+    [self waitForExpectations:@[
+        onTimeWriteSuccess,
+        onTimePreviousValue,
+        waitingForOnTimeValue1Expectation,
+        waitingForOnTimeValue2Expectation,
+        waitingForOnTimeValue3Expectation,
+    ]
+                      timeout:10];
 
     __auto_type getOnOffValue = ^{
         return [device readAttributeWithEndpointID:@(1)

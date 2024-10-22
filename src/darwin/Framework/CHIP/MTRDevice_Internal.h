@@ -168,6 +168,9 @@ MTR_DIRECT_MEMBERS
 - (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)one isEqualToDataValue:(MTRDeviceDataValueDictionary)theOther;
 - (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)observed satisfiesValueExpectation:(MTRDeviceDataValueDictionary)expected;
 
+// Hook for subclasses to notify us that an attribute value has been reported.
+- (void)_attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path;
+
 @end
 
 #pragma mark - MTRDevice internal state monitoring
