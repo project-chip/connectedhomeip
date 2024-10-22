@@ -809,6 +809,7 @@ def BuildTelinkTarget():
     target.AppendModifier('4mb', enable_4mb_flash=True)
     target.AppendModifier('mars', mars_board_config=True)
     target.AppendModifier('usb', usb_board_config=True)
+    target.AppendModifier('compress_lzma', compress_lzma_config=True)
     target.AppendModifier('data-model-disabled', use_data_model_interface=False).ExceptIfRe('-data-model-enabled')
     target.AppendModifier('data-model-enabled', use_data_model_interface=True).ExceptIfRe('-data-model-disabled')
 
