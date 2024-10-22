@@ -138,7 +138,8 @@ inline constexpr int64_t MinSignedValue(unsigned ByteSize)
 /// Readability-method to express that the maximum signed value is a null value
 ///
 /// Our encoding states that min int value is the NULL value
-inline constexpr int64_t SignedMinValueToNullValue(int64_t value) {
+inline constexpr int64_t SignedMinValueToNullValue(int64_t value)
+{
     return value;
 }
 
