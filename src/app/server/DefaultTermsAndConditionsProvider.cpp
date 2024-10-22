@@ -45,7 +45,7 @@ constexpr size_t kEstimatedTlvBufferSize = chip::TLV::EstimateStructOverhead(siz
                                                                              sizeof(uint16_t), // AcceptedAcknowledgements
                                                                              sizeof(uint16_t)  // AcceptedAcknowledgementsVersion
                                                                              ) *
-    4 * sizeof(uint16_t); // Extra space for rollback compatibility
+    4; // Extra space for rollback compatibility
 } // namespace
 
 CHIP_ERROR chip::app::DefaultTermsAndConditionsStorageDelegate::Init(PersistentStorageDelegate * const inPersistentStorageDelegate)
@@ -82,7 +82,7 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsStorageDelegate::Get(Optional<Ter
     uint16_t bufferSize                     = sizeof(buffer);
 
     const chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::TermsAndConditionsAcceptance();
-    CHIP_ERROR err = mStorageDelegate->SyncGetKeyValue(kStorageKey.KeyName(), &buffer, bufferSize);
+    CHIP_ERROR err                         = mStorageDelegate->SyncGetKeyValue(kStorageKey.KeyName(), &buffer, bufferSize);
     if (CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == err)
     {
         outTermsAndConditions.ClearValue();
