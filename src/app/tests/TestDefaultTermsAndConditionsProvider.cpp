@@ -361,7 +361,7 @@ TEST(DefaultTermsAndConditionsProvider, TestAcceptanceCommitCheckSetRevertCheckE
     EXPECT_EQ(outTermsAndConditions.Value().version, acceptedTermsAndConditions.Value().version);
 }
 
-TEST(DefaultTermsAndConditionsProvider, TestRevertAcceptenceWhileMissing)
+TEST(DefaultTermsAndConditionsProvider, TestRevertAcceptanceWhileMissing)
 {
     CHIP_ERROR err;
 
@@ -398,7 +398,7 @@ TEST(DefaultTermsAndConditionsProvider, TestRevertAcceptenceWhileMissing)
     EXPECT_FALSE(outTermsAndConditions.HasValue());
 }
 
-TEST(DefaultTermsAndConditionsProvider, TestRevertAcceptenceWhenPreviouslyAccepted)
+TEST(DefaultTermsAndConditionsProvider, TestRevertAcceptanceWhenPreviouslyAccepted)
 {
     CHIP_ERROR err;
 
@@ -432,7 +432,7 @@ TEST(DefaultTermsAndConditionsProvider, TestRevertAcceptenceWhenPreviouslyAccept
     EXPECT_EQ(outTermsAndConditions.Value().version, 1);
 }
 
-TEST(DefaultTermsAndConditionsProvider, TestRevertAcceptenceWhenPreviouslyAcceptedThenUpdatedUnderFailsafe)
+TEST(DefaultTermsAndConditionsProvider, TestRevertAcceptanceWhenPreviouslyAcceptedThenUpdatedUnderFailsafe)
 {
     CHIP_ERROR err;
 

@@ -36,7 +36,6 @@
 #define VerifyNotNullOrReturnUninitialized(expr, ...) VerifyOrReturnValue(nullptr != expr, CHIP_ERROR_UNINITIALIZED, ##__VA_ARGS__)
 
 namespace {
-const chip::StorageKeyName kStorageKey                       = chip::DefaultStorageKeyAllocator::TermsAndConditionsAcceptance();
 constexpr chip::TLV::Tag kSerializationVersionTag            = chip::TLV::ContextTag(1);
 constexpr chip::TLV::Tag kAcceptedAcknowledgementsTag        = chip::TLV::ContextTag(2);
 constexpr chip::TLV::Tag kAcceptedAcknowledgementsVersionTag = chip::TLV::ContextTag(3);
@@ -46,7 +45,7 @@ constexpr size_t kEstimatedTlvBufferSize = chip::TLV::EstimateStructOverhead(siz
                                                                              sizeof(uint16_t), // AcceptedAcknowledgements
                                                                              sizeof(uint16_t)  // AcceptedAcknowledgementsVersion
                                                                              ) *
-    8 * sizeof(uint16_t); // Extra space for rollback compatibility
+    4 * sizeof(uint16_t); // Extra space for rollback compatibility
 } // namespace
 
 CHIP_ERROR chip::app::DefaultTermsAndConditionsStorageDelegate::Init(PersistentStorageDelegate * const inPersistentStorageDelegate)
@@ -62,6 +61,7 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsStorageDelegate::Delete()
 {
     VerifyNotNullOrReturnUninitialized(mStorageDelegate);
 
+    const chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::TermsAndConditionsAcceptance();
     VerifyNoErrorOrReturnInternal(mStorageDelegate->SyncDeleteKeyValue(kStorageKey.KeyName()));
 
     return CHIP_NO_ERROR;
@@ -81,6 +81,7 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsStorageDelegate::Get(Optional<Ter
     uint8_t buffer[kEstimatedTlvBufferSize] = { 0 };
     uint16_t bufferSize                     = sizeof(buffer);
 
+    const chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::TermsAndConditionsAcceptance();
     CHIP_ERROR err = mStorageDelegate->SyncGetKeyValue(kStorageKey.KeyName(), &buffer, bufferSize);
     if (CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == err)
     {
@@ -132,6 +133,7 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsStorageDelegate::Set(const TermsA
     VerifyOrReturnInternal(CanCastTo<uint16_t>(lengthWritten));
     VerifyOrReturnInternal(lengthWritten <= kEstimatedTlvBufferSize);
 
+    const chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::TermsAndConditionsAcceptance();
     VerifyNoErrorOrReturnInternal(
         mStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), buffer, static_cast<uint16_t>(lengthWritten)));
 

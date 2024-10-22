@@ -101,72 +101,65 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
     case TCAcceptedVersion::Id: {
         TermsAndConditionsProvider * const termsAndConditionsProvider = Server::GetInstance().GetTermsAndConditionsProvider();
         Optional<TermsAndConditions> outTermsAndConditions;
-        CHIP_ERROR err;
 
         if (nullptr == termsAndConditionsProvider)
         {
             return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
         }
 
-        err = termsAndConditionsProvider->GetAcceptance(outTermsAndConditions);
+        CHIP_ERROR err = termsAndConditionsProvider->GetAcceptance(outTermsAndConditions);
         if (CHIP_NO_ERROR != err)
         {
             return CHIP_ERROR_INTERNAL;
         }
 
-        return !outTermsAndConditions.HasValue() ? aEncoder.Encode(static_cast<uint16_t>(0))
-                                                 : aEncoder.Encode(outTermsAndConditions.Value().version);
+        return aEncoder.Encode(outTermsAndConditions.ValueOr((TermsAndConditions){ .value = 0, .version = 0 }).version);
     }
     case TCMinRequiredVersion::Id: {
         TermsAndConditionsProvider * const termsAndConditionsProvider = Server::GetInstance().GetTermsAndConditionsProvider();
         Optional<TermsAndConditions> outTermsAndConditions;
-        CHIP_ERROR err;
 
         if (nullptr == termsAndConditionsProvider)
         {
             return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
         }
 
-        err = termsAndConditionsProvider->GetRequirements(outTermsAndConditions);
+        CHIP_ERROR err = termsAndConditionsProvider->GetRequirements(outTermsAndConditions);
         if (CHIP_NO_ERROR != err)
         {
             return CHIP_ERROR_INTERNAL;
         }
 
-        return !outTermsAndConditions.HasValue() ? aEncoder.Encode(static_cast<uint16_t>(0))
-                                                 : aEncoder.Encode(outTermsAndConditions.Value().version);
+        return aEncoder.Encode(outTermsAndConditions.ValueOr((TermsAndConditions){ .value = 0, .version = 0 }).version);
     }
     case TCAcknowledgements::Id: {
         TermsAndConditionsProvider * const termsAndConditionsProvider = Server::GetInstance().GetTermsAndConditionsProvider();
         Optional<TermsAndConditions> outTermsAndConditions;
-        CHIP_ERROR err;
 
         if (nullptr == termsAndConditionsProvider)
         {
             return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
         }
 
-        err = termsAndConditionsProvider->GetAcceptance(outTermsAndConditions);
+        CHIP_ERROR err = termsAndConditionsProvider->GetAcceptance(outTermsAndConditions);
         if (CHIP_NO_ERROR != err)
         {
             return CHIP_ERROR_INTERNAL;
         }
 
-        return !outTermsAndConditions.HasValue() ? aEncoder.Encode(static_cast<uint16_t>(0))
-                                                 : aEncoder.Encode(outTermsAndConditions.Value().value);
+        return aEncoder.Encode(outTermsAndConditions.ValueOr((TermsAndConditions){ .value = 0, .version = 0 }).value);
     }
     case TCAcknowledgementsRequired::Id: {
         TermsAndConditionsProvider * const termsAndConditionsProvider = Server::GetInstance().GetTermsAndConditionsProvider();
         Optional<TermsAndConditions> outTermsAndConditions;
         TermsAndConditionsState termsAndConditionsState;
-        CHIP_ERROR err;
 
         if (nullptr == termsAndConditionsProvider)
         {
             return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
         }
 
-        err = termsAndConditionsProvider->GetAcceptance(outTermsAndConditions);
+        CHIP_ERROR err = termsAndConditionsProvider->GetAcceptance(outTermsAndConditions);
         if (CHIP_NO_ERROR != err)
         {
             return CHIP_ERROR_INTERNAL;
@@ -273,9 +266,8 @@ CommissioningErrorEnum CheckTermsAndConditionsAcknowledgements(TermsAndCondition
 {
     Optional<TermsAndConditions> acceptedTermsAndConditions;
     TermsAndConditionsState termsAndConditionsState;
-    CHIP_ERROR err;
 
-    err = termsAndConditionsProvider->GetAcceptance(acceptedTermsAndConditions);
+    CHIP_ERROR err = termsAndConditionsProvider->GetAcceptance(acceptedTermsAndConditions);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(FailSafe, "GeneralCommissioning: Failed to get terms and conditions acceptance: %" CHIP_ERROR_FORMAT,
@@ -398,9 +390,9 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
 
     // Ensure it's a valid CASE session
-    if (handle->GetSessionType() != Session::SessionType::kSecure ||
-        handle->AsSecureSession()->GetSecureSessionType() != SecureSession::Type::kCASE ||
-        !failSafe.MatchesFabricIndex(commandObj->GetAccessingFabricIndex()))
+    if ((handle->GetSessionType() != Session::SessionType::kSecure) ||
+        (handle->AsSecureSession()->GetSecureSessionType() != SecureSession::Type::kCASE) ||
+        (!failSafe.MatchesFabricIndex(commandObj->GetAccessingFabricIndex())))
     {
         response.errorCode = CommissioningErrorEnum::kInvalidAuthentication;
         ChipLogError(FailSafe, "GeneralCommissioning: Got commissioning complete in invalid security context");
@@ -601,12 +593,10 @@ public:
 #if CHIP_CONFIG_TC_REQUIRED
             TermsAndConditionsProvider * const termsAndConditionsProvider = Server::GetInstance().GetTermsAndConditionsProvider();
 
-            if (nullptr == termsAndConditionsProvider)
+            if (nullptr != termsAndConditionsProvider)
             {
-                return;
+                termsAndConditionsProvider->ResetAcceptance();
             }
-
-            termsAndConditionsProvider->ResetAcceptance();
 #endif // CHIP_CONFIG_TC_REQUIRED
         }
     }
