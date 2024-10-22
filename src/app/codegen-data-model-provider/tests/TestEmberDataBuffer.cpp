@@ -420,6 +420,7 @@ TEST(TestEmberAttributeBuffer, TestEncodeSignedTypes)
         EXPECT_EQ(tester.TryEncode<int64_t>(0x10011001100, { 0 }), CHIP_ERROR_INVALID_ARGUMENT);
         // cannot encode null equivalent value
         EXPECT_EQ(tester.TryEncode<int64_t>(-(1LL << 40) - 1, { 0 }), CHIP_ERROR_INVALID_ARGUMENT);
+        // negative out of range
         EXPECT_EQ(tester.TryEncode<int64_t>(-0x10000000000, { 0 }), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
