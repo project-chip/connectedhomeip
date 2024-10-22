@@ -288,19 +288,55 @@ endif # CHIP_FACTORY_DATA_NRFCONNECT_BACKEND
 
 # See config/zephyr/Kconfig for full definition
 config CHIP_FACTORY_RESET_ERASE_SETTINGS
-	default y
-	depends on !CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
+	default y if !CHIP_CRYPTO_PSA_DAC_PRIV_KEY_ITS || BUILD_WITH_TFM
 
 config CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
-	bool "Migrate DAC private key from factory data to PSA ITS"
+	bool "Migrate DAC private key from factory data to a secure storage"
+	default y
 	depends on CHIP_CRYPTO_PSA
 	depends on CHIP_FACTORY_DATA
-	select EXPERIMENTAL
+
+if CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
+
+choice CHIP_CRYPTO_PSA_DAC_PRIV_KEY_MIGRATION_DEST
+	prompt "Destination for DAC private key migration"
+	default CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU if CRACEN_LIB_KMU
+	default CHIP_CRYPTO_PSA_DAC_PRIV_KEY_ITS
+
+config CHIP_CRYPTO_PSA_DAC_PRIV_KEY_ITS
+	bool "Migrate DAC private key from factory data to PSA ITS"
 	help
 	  Move DAC private key from the factory data set to the PSA ITS secure storage
 	  and remove it. After the first boot of the device the DAC private key will be moved
 	  to the PSA ITS secure storage and will not be available in the factory data anymore.
 	  It will be overwritten in the factory data set by zeros.
+
+config CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU
+	bool "Migrate DAC private key from factory data to CRACEN KMU"
+	depends on CRACEN_LIB_KMU
+	help
+	  Move DAC private key from the factory data set to the CRACEN Key Management Unit (KMU) secure
+	  storage and remove it. After the first boot of the device the DAC private key will be
+	  moved to the CRACEN KMU secure storage and will not be available in the factory data anymore.
+	  It will be overwritten in the factory data set by zeros.
+
+endchoice
+
+config CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU_SLOT_ID
+	int "Destination DAC private key slot ID inside CRACEN KMU"
+	depends on CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU
+	range 0 179 # Allow using the application usage space only
+	default 176 if CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU_ENCRYPTED
+	default 178
+
+config CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU_ENCRYPTED
+	bool "Encrypt DAC private key in CRACEN KMU"
+	default y
+	depends on CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU
+	help
+	  Encrypt the DAC private key in the CRACEN KMU secure storage.
+
+endif # CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
 
 config CHIP_STORE_KEYS_IN_KMU
 	bool "Use KMU to store crypto keys"
