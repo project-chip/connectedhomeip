@@ -16,8 +16,6 @@ name: Data model directory checks
 
 on:
   pull_request:
-    paths:
-      - "data_model/**"
 permissions:
   contents: read
 
