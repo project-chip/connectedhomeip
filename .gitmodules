@@ -218,7 +218,7 @@
 [submodule "third_party/silabs/wiseconnect-wifi-bt-sdk"]
 	path = third_party/silabs/wiseconnect-wifi-bt-sdk
 	url = https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git
-	branch = 2.10.0
+	branch = 2.10.3
 	platforms = silabs
 [submodule "third_party/silabs/wifi_sdk"]
 	path = third_party/silabs/wifi_sdk
