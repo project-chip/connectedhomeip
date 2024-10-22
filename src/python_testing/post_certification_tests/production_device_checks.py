@@ -31,8 +31,8 @@
 # files, then add the extra dependencies. From the root:
 #
 # . scripts/activate.sh
-# ./scripts/build_python.sh -i py
-# source py/bin/activate
+# ./scripts/build_python.sh -i out/python_env
+# source out/python_env/bin/activate
 # pip install opencv-python requests click_option_group
 # python src/python_testing/post_certification_tests/production_device_checks.py
 
@@ -59,15 +59,15 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
 try:
-    from basic_composition_support import BasicCompositionTests
-    from matter_testing_support import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
-                                        run_tests_no_exit)
+    from chip.testing.basic_composition import BasicCompositionTests
+    from chip.testing.matter_testing import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
+                                             run_tests_no_exit)
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from basic_composition_support import BasicCompositionTests
-    from matter_testing_support import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
-                                        run_tests_no_exit)
+    from chip.testing.basic_composition import BasicCompositionTests
+    from chip.testing.matter_testing import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
+                                             run_tests_no_exit)
 
 try:
     import fetch_paa_certs_from_dcl

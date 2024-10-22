@@ -19,8 +19,10 @@
 
 #include <access/examples/ExampleAccessControlDelegate.h>
 
+#include <app/AppConfig.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/EchoHandler.h>
 #include <app/util/DataModelHandler.h>
@@ -81,6 +83,33 @@ using chip::Transport::TcpListenParameters;
 
 namespace {
 
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
+{
+public:
+    bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
+    {
+        chip::app::DataModel::Provider * model = chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+
+        for (auto type = model->FirstDeviceType(endpoint); type.has_value(); type = model->NextDeviceType(endpoint, *type))
+        {
+            if (type->deviceTypeId == deviceType)
+            {
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+                VerifyOrDie(chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint));
+#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL
+                return true;
+            }
+        }
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
+        VerifyOrDie(!chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint));
+#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL
+        return false;
+    }
+} sDeviceTypeResolver;
+#else // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+
+// Ember implementation of the device type resolver
 class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
 {
 public:
@@ -89,6 +118,7 @@ public:
         return chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
     }
 } sDeviceTypeResolver;
+#endif
 
 } // namespace
 

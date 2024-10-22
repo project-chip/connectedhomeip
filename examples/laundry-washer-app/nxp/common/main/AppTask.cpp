@@ -37,7 +37,14 @@ using namespace chip::Shell;
 using namespace chip;
 using namespace chip::app::Clusters;
 
+/*
+ * Enable temperature level delegate of temperature control cluster
+ */
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
+{
+    TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+}
 
 #ifdef ENABLE_CHIP_SHELL
 const static std::map<std::string, uint8_t> map_cmd_errstate{
@@ -119,8 +126,6 @@ void LaundryWasherApp::AppTask::PreInitMatterStack()
 void LaundryWasherApp::AppTask::PostInitMatterStack()
 {
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&chip::NXP::App::GetICDUtil());
-
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 void LaundryWasherApp::AppTask::AppMatter_RegisterCustomCliCommands()

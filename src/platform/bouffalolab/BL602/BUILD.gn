@@ -64,6 +64,8 @@ static_library("BL602") {
 
   if (bouffalo_sdk_component_easyflash_enabled) {
     sources += [ "../common/BLConfig.cpp" ]
+  } else {
+    sources += [ "../common/BLConfig_littlefs.cpp" ]
   }
 
   deps = [

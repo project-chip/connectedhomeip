@@ -1,0 +1,71 @@
+/src/platform/ASR/               @tx2rx
+asr/                             @tx2rx
+chip-build-asr/                  @tx2rx
+
+/src/platform/Ameba/             @pankore
+ameba/                           @pankore
+chip-build-ameba/                @pankore
+
+/src/platform/Beken/             @zhengyaohan
+
+*.mm                             @project-chip/reviewers-apple
+darwin/                          @project-chip/reviewers-apple
+/src/darwin/                     @project-chip/reviewers-apple
+/src/platform/Darwin/            @project-chip/reviewers-apple
+/examples/darwin-framework-tool/ @project-chip/reviewers-apple
+
+/src/platform/ESP32/             @project-chip/reviewers-espressif
+esp32/                           @project-chip/reviewers-espressif
+chip-build-esp32/                @project-chip/reviewers-espressif
+chip-build-esp32-qemu/           @project-chip/reviewers-espressif
+
+/src/platform/Infineon/          @ifyall
+infineon/                        @ifyall
+chip-build-infineon/             @ifyall
+
+/src/platform/NuttX/             @zhhyu7
+chip-build-nuttx/                @zhhyu7
+
+/src/platform/Tizen/             @arkq
+tizen/                           @arkq
+chip-build-tizen/                @arkq
+chip-build-tizen-qemu/           @arkq
+
+*.java                           @project-chip/reviewers-google
+*.kt                             @project-chip/reviewers-google
+android/                         @project-chip/reviewers-google
+/src/examples/chef/              @project-chip/reviewers-google
+/integrations/appengine/         @project-chip/reviewers-google
+/integrations/cloudbuild/        @project-chip/reviewers-google
+/integrations/compute_engine/    @project-chip/reviewers-google
+chip-build-java/                 @project-chip/reviewers-google
+chip-build-android/              @project-chip/reviewers-google
+
+/src/platform/bouffalolab/       @wy-hh
+chip-build-bouffalolab/          @wy-hh
+
+cc13xx_26xx/                     @s-jain2022
+cc32xx/                          @s-jain2022
+
+/src/platform/mt793x/            @pakls
+nrfconnect/                      @project-chip/reviewers-nordic
+chip-build-nrf-platform/                      @project-chip/reviewers-nordic
+Zephyr/                            @project-chip/reviewers-nordic @project-chip/reviewers-nxp @s07641069
+
+
+nxp/                             @project-chip/reviewers-nxp
+chip-build-nxp/                  @project-chip/reviewers-nxp
+chip-build-nxp-zephyr/           @project-chip/reviewers-nxp
+chip-build-k32w/                 @project-chip/reviewers-nxp
+
+qpg/                             @dvdm-qorvo
+
+silabs/                          @project-chip/reviewers-silabs
+chip-build-efr32/                @project-chip/reviewers-silabs
+
+stm32/                           @STYoannZamaron
+
+telink/                          @s07641069
+chip-build-telink/               @s07641069
+
+webos/                           @joonhaengHeo

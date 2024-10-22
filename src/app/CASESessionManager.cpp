@@ -104,8 +104,8 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
 
             if (onSetupFailure != nullptr)
             {
-                OperationalSessionSetup::ConnnectionFailureInfo failureInfo(peerId, CHIP_ERROR_NO_MEMORY,
-                                                                            SessionEstablishmentStage::kUnknown);
+                OperationalSessionSetup::ConnectionFailureInfo failureInfo(peerId, CHIP_ERROR_NO_MEMORY,
+                                                                           SessionEstablishmentStage::kUnknown);
                 onSetupFailure->mCall(onSetupFailure->mContext, failureInfo);
             }
             return;
@@ -146,7 +146,7 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(const ScopedNodeId & peerId, Trans
 {
     ReturnErrorOnFailure(mConfig.sessionInitParams.Validate());
     auto optionalSessionHandle = FindExistingSession(peerId, transportPayloadCapability);
-    ReturnErrorCodeIf(!optionalSessionHandle.HasValue(), CHIP_ERROR_NOT_CONNECTED);
+    VerifyOrReturnError(optionalSessionHandle.HasValue(), CHIP_ERROR_NOT_CONNECTED);
     addr = optionalSessionHandle.Value()->AsSecureSession()->GetPeerAddress();
     return CHIP_NO_ERROR;
 }

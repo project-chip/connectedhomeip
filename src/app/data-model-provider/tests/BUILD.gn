@@ -30,3 +30,30 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/core:string-builder-adapters",
   ]
 }
+
+source_set("encode-decode") {
+  # Handles the conversions between Raw data (usually byte buffers backed by TLV encoders
+  # and `*IBs::Builder` classes) and data used by by Providers like AttributeValueEncoder
+  # or AttributeValueDecoder.
+  #
+  # Intended to make writing tests simpler and focusing less on encoding and more on
+  # "Assume you receive an int" or "Check that the encoded value was the string 'abc'"
+  # and so on
+  sources = [
+    "ReadTesting.cpp",
+    "ReadTesting.h",
+    "TestConstants.h",
+    "WriteTesting.cpp",
+    "WriteTesting.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/app:attribute-access",
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:types",
+  ]
+}

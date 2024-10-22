@@ -280,12 +280,6 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         EXPECT_EQ(v.ComputeSize(&arraySize), CHIP_NO_ERROR);
         EXPECT_EQ(arraySize, 0u);
     }
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-    else if (aPath.mAttributeId == Globals::Attributes::EventList::Id)
-    {
-        // Nothing to check for this one; depends on the endpoint.
-    }
-#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     else if (aPath.mAttributeId == Globals::Attributes::AttributeList::Id)
     {
         // Nothing to check for this one; depends on the endpoint.
@@ -582,7 +576,7 @@ TEST_F(TestReadChunking, TestListChunking)
     {
         TestReadCallback readCallback;
 
-        ChipLogDetail(DataManagement, "Running iteration %d\n", packetSize);
+        ChipLogDetail(DataManagement, "Running iteration %d\n", static_cast<int>(packetSize));
 
         gIterationCount = packetSize;
 

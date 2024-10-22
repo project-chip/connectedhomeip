@@ -238,6 +238,9 @@ class TelinkBuilder(Builder):
 
         cmd = self.get_cmd_prefixes() + ("ninja -C %s" % self.output_dir)
 
+        if self.ninja_jobs is not None:
+            cmd += " -j%s" % str(self.ninja_jobs)
+
         self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 
     def build_outputs(self):

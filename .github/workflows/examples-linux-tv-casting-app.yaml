@@ -16,8 +16,9 @@ name: Test TV Casting Example
 
 on:
     push:
-        branches-ignore:
-            - "dependabot/**"
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
 
@@ -36,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:77
+            image: ghcr.io/project-chip/chip-build:81
 
         steps:
             - name: Checkout

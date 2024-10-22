@@ -401,7 +401,11 @@ Tests will be located in:
 `chip_pw_fuzztest` is the name of the toolchain used.
 
 -   Details on How To Run Fuzz Tests in
-    [Running FuzzTests](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md)
+    [Running FuzzTests](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#running-fuzztests)
+
+FAQ: In the event of a build failure related to missing files or dependencies
+for pw_fuzzer, check the
+[FuzzTest FAQ](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#FAQ)
 
 ## Build custom configuration
 

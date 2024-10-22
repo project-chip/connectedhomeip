@@ -260,7 +260,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             }
             else
             {
-                ipv6_addr_count = static_cast<uint8_t>(min(addr_count, static_cast<int>(kMaxIPv6AddrCount)));
+                ipv6_addr_count = static_cast<uint8_t>(std::min(addr_count, static_cast<int>(kMaxIPv6AddrCount)));
             }
             for (uint8_t idx = 0; idx < ipv6_addr_count; ++idx)
             {

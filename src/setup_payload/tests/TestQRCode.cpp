@@ -32,7 +32,6 @@
 #include <lib/support/Span.h>
 
 using namespace chip;
-using namespace std;
 
 namespace {
 
@@ -121,7 +120,7 @@ TEST(TestQRCode, TestPayloadByteArrayRep)
 {
     SetupPayload payload = GetDefaultPayload();
 
-    string expected = " 0000 000000000000000100000000000 000010000000 00000001 00 0000000000000001 0000000000001100 000";
+    std::string expected = " 0000 000000000000000100000000000 000010000000 00000001 00 0000000000000001 0000000000001100 000";
     EXPECT_TRUE(CompareBinary(payload, expected));
 }
 
@@ -130,7 +129,7 @@ TEST(TestQRCode, TestPayloadBase38Rep)
     SetupPayload payload = GetDefaultPayload();
 
     QRCodeSetupPayloadGenerator generator(payload);
-    string result;
+    std::string result;
     CHIP_ERROR err  = generator.payloadBase38Representation(result);
     bool didSucceed = err == CHIP_NO_ERROR;
     EXPECT_EQ(didSucceed, true);
@@ -241,10 +240,10 @@ TEST(TestQRCode, TestBase38)
     base38Encode(ByteSpan((uint8_t *) "Hello World!", sizeof("Hello World!") - 1), encodedSpan);
     EXPECT_STREQ(encodedBuf, "KKHF3W2S013OPM3EJX11");
 
-    vector<uint8_t> decoded = vector<uint8_t>();
+    std::vector<uint8_t> decoded = std::vector<uint8_t>();
     EXPECT_EQ(base38Decode("KKHF3W2S013OPM3EJX11", decoded), CHIP_NO_ERROR);
 
-    string hello_world;
+    std::string hello_world;
     for (uint8_t b : decoded)
     {
         hello_world += static_cast<char>(b);
@@ -347,8 +346,8 @@ TEST(TestQRCode, TestSetupPayloadVerify)
 
 TEST(TestQRCode, TestInvalidQRCodePayload_WrongCharacterSet)
 {
-    string invalidString = kDefaultPayloadQRCode;
-    invalidString.back() = ' '; // space is not contained in the base38 alphabet
+    std::string invalidString = kDefaultPayloadQRCode;
+    invalidString.back()      = ' '; // space is not contained in the base38 alphabet
 
     QRCodeSetupPayloadParser parser = QRCodeSetupPayloadParser(invalidString);
     SetupPayload payload;
@@ -360,7 +359,7 @@ TEST(TestQRCode, TestInvalidQRCodePayload_WrongCharacterSet)
 
 TEST(TestQRCode, TestInvalidQRCodePayload_WrongLength)
 {
-    string invalidString = kDefaultPayloadQRCode;
+    std::string invalidString = kDefaultPayloadQRCode;
     invalidString.pop_back();
 
     QRCodeSetupPayloadParser parser = QRCodeSetupPayloadParser(invalidString);
@@ -395,7 +394,7 @@ TEST(TestQRCode, TestQRCodeToPayloadGeneration)
     SetupPayload payload = GetDefaultPayload();
 
     QRCodeSetupPayloadGenerator generator(payload);
-    string base38Rep;
+    std::string base38Rep;
     CHIP_ERROR err  = generator.payloadBase38Representation(base38Rep);
     bool didSucceed = err == CHIP_NO_ERROR;
     EXPECT_EQ(didSucceed, true);
@@ -422,7 +421,7 @@ TEST(TestQRCode, TestGenerateWithShortDiscriminatorInvalid)
     EXPECT_FALSE(payload.isValidQRCodePayload());
 
     // QRCodeSetupPayloadGenerator should therefore return an error
-    string base38Rep;
+    std::string base38Rep;
     QRCodeSetupPayloadGenerator generator(payload);
     EXPECT_EQ(generator.payloadBase38Representation(base38Rep), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -441,7 +440,7 @@ TEST(TestQRCode, TestGenerateWithoutRendezvousInformation)
     EXPECT_FALSE(payload.isValidQRCodePayload());
 
     // QRCodeSetupPayloadGenerator should therefore return an error
-    string base38Rep;
+    std::string base38Rep;
     QRCodeSetupPayloadGenerator generator(payload);
     EXPECT_EQ(generator.payloadBase38Representation(base38Rep), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -452,23 +451,23 @@ TEST(TestQRCode, TestGenerateWithoutRendezvousInformation)
 
 TEST(TestQRCode, TestExtractPayload)
 {
-    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("MT:ABC")), string("ABC"));
-    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("MT:")), string(""));
-    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("H:")), string(""));
-    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("ASMT:")), string(""));
-    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("Z%MT:ABC%")), string("ABC"));
-    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("Z%MT:ABC")), string("ABC"));
-    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("%Z%MT:ABC")), string("ABC"));
-    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("%Z%MT:ABC%")), string("ABC"));
-    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("%Z%MT:ABC%DDD")), string("ABC"));
-    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("MT:ABC%DDD")), string("ABC"));
-    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("MT:ABC%")), string("ABC"));
-    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("%MT:")), string(""));
-    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("%MT:%")), string(""));
-    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("A%")), string(""));
-    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("MT:%")), string(""));
-    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("%MT:ABC")), string("ABC"));
-    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("ABC")), string(""));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("MT:ABC")), std::string("ABC"));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("MT:")), std::string(""));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("H:")), std::string(""));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("ASMT:")), std::string(""));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("Z%MT:ABC%")), std::string("ABC"));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("Z%MT:ABC")), std::string("ABC"));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("%Z%MT:ABC")), std::string("ABC"));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("%Z%MT:ABC%")), std::string("ABC"));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("%Z%MT:ABC%DDD")), std::string("ABC"));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("MT:ABC%DDD")), std::string("ABC"));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("MT:ABC%")), std::string("ABC"));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("%MT:")), std::string(""));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("%MT:%")), std::string(""));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("A%")), std::string(""));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("MT:%")), std::string(""));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("%MT:ABC")), std::string("ABC"));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("ABC")), std::string(""));
 }
 
 } // namespace

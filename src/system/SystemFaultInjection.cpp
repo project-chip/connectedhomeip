@@ -25,7 +25,6 @@
 /* module header, also carries config, comes first */
 #include <system/SystemFaultInjection.h>
 
-#include <nlassert.h>
 #include <string.h>
 
 namespace chip {

@@ -26,7 +26,7 @@
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
 
-static const uint16_t kPairingTimeoutInSeconds = 10;
+static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static uint64_t sDeviceId = 100000000;
 static NSString * kOnboardingPayload = @"MT:Y.K90SO527JA0648G00";

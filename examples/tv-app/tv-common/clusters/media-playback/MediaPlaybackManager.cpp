@@ -21,7 +21,6 @@
 
 #include <string>
 
-using namespace std;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::MediaPlayback;
 using namespace chip::Uint8;

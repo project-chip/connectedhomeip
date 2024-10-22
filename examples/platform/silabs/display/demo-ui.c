@@ -167,6 +167,5 @@ void demoUIClearMainScreen(uint8_t * name)
 {
     GLIB_clear(&glibContext);
     demoUIDisplayHeader((char *) name);
-    demoUIDisplayApp(false);
     demoUIDisplayProtocols();
 }

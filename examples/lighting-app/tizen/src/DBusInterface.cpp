@@ -42,9 +42,12 @@ class CommandHandlerImplCallback : public CommandHandlerImpl::Callback
 {
 public:
     using Status = Protocols::InteractionModel::Status;
-    void OnDone(CommandHandlerImpl & apCommandObj) {}
-    void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & apPayload) {}
-    Status CommandExists(const ConcreteCommandPath & aCommandPath) { return Status::Success; }
+
+    void OnDone(CommandHandlerImpl & apCommandObj) override {}
+    void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
+                         TLV::TLVReader & apPayload) override
+    {}
+    Status ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request) override { return Status::Success; }
 };
 
 DBusInterface::DBusInterface(chip::EndpointId endpointId) : mEndpointId(endpointId)

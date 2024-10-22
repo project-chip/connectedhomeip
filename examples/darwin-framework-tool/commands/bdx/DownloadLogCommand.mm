@@ -31,7 +31,7 @@ CHIP_ERROR DownloadLogCommand::RunCommand()
     auto * device = [MTRDevice deviceWithNodeID:@(mNodeId) controller:commissioner];
 
     auto logType = static_cast<MTRDiagnosticLogType>(mLogType);
-    auto queue = dispatch_queue_create("com.chip.bdx.downloader", DISPATCH_QUEUE_SERIAL);
+    auto queue = dispatch_queue_create("com.chip.bdx.downloader", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
 
     bool shouldWaitForDownload = !mIsAsyncCommand.ValueOr(false);
     mIsAsyncCommand.ClearValue();

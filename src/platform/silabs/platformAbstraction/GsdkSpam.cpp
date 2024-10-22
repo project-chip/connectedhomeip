@@ -21,7 +21,7 @@
 #include "em_rmu.h"
 #else
 #include "sl_hal_emu.h"
-#endif
+#endif // _SILICON_LABS_32B_SERIES_2
 #include "sl_system_kernel.h"
 
 #ifdef ENABLE_WSTK_LEDS

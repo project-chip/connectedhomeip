@@ -92,6 +92,14 @@ mcxw71_k32w1_sdk("sdk") {
       "${example_platform_dir}/board/peripherals.h",
     ]
   }
+
+  if (nxp_multiple_ble_connections) {
+    include_dirs += [ "${example_platform_dir}/app_ble/include" ]
+    defines += [
+      "EXTRA_GATT_DB_HEADER=\"extra_gatt_db.h\"",
+      "EXTRA_GATT_UUID_HEADER=\"extra_gatt_uuid128.h\"",
+    ]
+  }
 }
 
 mcxw71_k32w1_executable("lock_app") {
@@ -140,11 +148,17 @@ mcxw71_k32w1_executable("lock_app") {
     "${common_example_dir}/low_power/include",
     "${common_example_dir}/operational_keystore/include",
     "${common_example_dir}/ui_feedback/include",
+    "${common_example_dir}/app_ble/include",
   ]
 
   sources += [
     "${common_example_dir}/app_task/source/AppTaskBase.cpp",
     "${common_example_dir}/app_task/source/AppTaskFreeRTOS.cpp",
+    "${common_example_dir}/matter_button/source/ButtonApp.cpp",
+    "${common_example_dir}/matter_button/source/ButtonBle.cpp",
+    "${common_example_dir}/matter_button/source/ButtonManager.cpp",
+    "${common_example_dir}/matter_button/source/ButtonRegistrationAppAndBle.cpp",
+    "${common_example_dir}/matter_button/source/ButtonWithTimer.cpp",
 
     #"${common_example_dir}/clusters/source/ZclCallbacks.cpp",
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
@@ -189,6 +203,15 @@ mcxw71_k32w1_executable("lock_app") {
     deps += [ "${chip_root}/src/platform/nxp:nxp_ota" ]
   }
 
+  if (nxp_multiple_ble_connections) {
+    sources +=
+        [ "${example_platform_dir}/app_ble/source/BLEApplicationManager.cpp" ]
+  } else {
+    sources += [
+      "${common_example_dir}/app_ble/source/BLEApplicationManagerEmpty.cpp",
+    ]
+  }
+
   if (chip_with_diag_logs_demo) {
     sources += [
       "${common_example_dir}/diagnostic_logs/source/DiagnosticLogsDemo.cpp",
@@ -203,10 +226,7 @@ mcxw71_k32w1_executable("lock_app") {
     "${example_platform_dir}/button",
   ]
 
-  sources += [
-    "${example_platform_dir}/button/ButtonManager.cpp",
-    "${example_platform_dir}/clusters/Identify.cpp",
-  ]
+  sources += [ "${example_platform_dir}/clusters/Identify.cpp" ]
 
   if (chip_enable_ota_requestor) {
     sources += [ "${example_platform_dir}/ota/OtaUtils.cpp" ]

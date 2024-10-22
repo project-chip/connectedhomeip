@@ -37,6 +37,7 @@ RUN apt-get update \
     valgrind \
     docker.io \
     iputils-ping \
+    icecc \
     && :
 
 RUN groupadd -g $USER_GID $USERNAME \
@@ -80,3 +81,13 @@ ENV TIZEN_ROOTFS /tizen_rootfs
 
 # Fast Model GDB plugins path for debugging support
 ENV FAST_MODEL_PLUGINS_PATH /opt/FastModelsPortfolio_11.16/plugins/Linux64_GCC-9.3
+
+# Set up ccache as a pigweed command launcher when using the scripts/build/build_examples.py
+# script. Also, set up icecc as the command prefix for ccache. Such setup allows to benefit
+# from compilation caching and distributed compilation at the same time.
+#
+# NOTE: In order to use distributed compilation with icecc, one should run
+#       "scripts/icecc.sh start" before starting the build.
+ENV CHIP_PW_COMMAND_LAUNCHER ccache
+ENV CCACHE_PREFIX icecc
+ENV PATH /usr/lib/ccache:$PATH

@@ -61,6 +61,16 @@ efr32_sdk("sdk") {
   ]
 }
 
+config("efr32_ldflags") {
+  _ldscript =
+      "${chip_root}/examples/platform/silabs/ldscripts/${silabs_family}.ld"
+
+  ldflags = [
+    "-T" + rebase_path(_ldscript, root_build_dir),
+    "-Wl,--no-warn-rwx-segment",
+  ]
+}
+
 # This is the test runner.  `pw_test` will dep this for each `silabs_executable` target.
 source_set("efr32_test_main") {
   defines = [ "PW_RPC_ENABLED" ]
@@ -103,6 +113,7 @@ source_set("efr32_test_main") {
   ]
 
   include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
+  public_configs = [ ":efr32_ldflags" ]
 }
 
 # This target is referred to by BuildRoot in scripts/build/builders/efr32.py, as well as the example in README.md.

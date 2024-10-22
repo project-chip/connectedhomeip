@@ -19,6 +19,7 @@
 #import <Matter/Matter.h>
 
 #include "../common/CHIPCommandBridge.h"
+#include "../common/CertificateIssuer.h"
 #include "DeviceControllerDelegateBridge.h"
 #include "PairingCommandBridge.h"
 #include <lib/support/logging/CHIPLogging.h>
@@ -52,6 +53,12 @@ void PairingCommandBridge::SetUpDeviceControllerDelegate()
     [deviceControllerDelegate setCommandBridge:this];
     [deviceControllerDelegate setDeviceID:mNodeId];
 
+    // With per-controller storage, the certificate issuer creates the operational certificate.
+    // When using shared storage, this step is a no-op.
+    auto * certificateIssuer = [CertificateIssuer sharedInstance];
+    certificateIssuer.nextNodeID = @(mNodeId);
+    certificateIssuer.fabricID = CurrentCommissionerFabricId();
+
     if (mCommissioningType != CommissioningType::None) {
         MTRCommissioningParameters * params = [[MTRCommissioningParameters alloc] init];
         switch (mCommissioningType) {
@@ -83,7 +90,7 @@ void PairingCommandBridge::SetUpDeviceControllerDelegate()
 
     MTRDeviceController * commissioner = CurrentCommissioner();
     [deviceControllerDelegate setCommissioner:commissioner];
-    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     [commissioner setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
 }
 
@@ -156,7 +163,7 @@ void PairingCommandBridge::PairWithPayload(NSError * __autoreleasing * error)
 
 void PairingCommandBridge::Unpair()
 {
-    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip-tool.command", DISPATCH_QUEUE_SERIAL);
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip-tool.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     auto * device = BaseDeviceWithNodeId(mNodeId);
 
     ChipLogProgress(chipTool, "Attempting to unpair device %llu", mNodeId);

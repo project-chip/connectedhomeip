@@ -22,13 +22,7 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 from chip.clusters import Attribute
-
-try:
-    from matter_testing_support import MatterStackState, MatterTestConfig, run_tests_no_exit
-except ImportError:
-    sys.path.append(os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '..')))
-    from matter_testing_support import MatterStackState, MatterTestConfig, run_tests_no_exit
+from chip.testing.matter_testing import MatterStackState, MatterTestConfig, run_tests_no_exit
 
 
 class AsyncMock(MagicMock):
@@ -56,7 +50,15 @@ class MockTestRunner():
     def set_test(self, filename: str, classname: str, test: str):
         self.test = test
         self.config.tests = [self.test]
-        module = importlib.import_module(Path(os.path.basename(filename)).stem)
+
+        module_name = Path(os.path.basename(filename)).stem
+
+        try:
+            module = importlib.import_module(module_name)
+        except ModuleNotFoundError:
+            sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+            module = importlib.import_module(module_name)
+
         self.test_class = getattr(module, classname)
 
     def set_test_config(self, test_config: MatterTestConfig = MatterTestConfig()):

@@ -934,10 +934,10 @@ Status EnergyEvseDelegate::ComputeMaxChargeCurrentLimit()
 
     oldValue                    = mActualChargingCurrentLimit;
     mActualChargingCurrentLimit = mMaxHardwareCurrentLimit;
-    mActualChargingCurrentLimit = min(mActualChargingCurrentLimit, mCircuitCapacity);
-    mActualChargingCurrentLimit = min(mActualChargingCurrentLimit, mCableAssemblyCurrentLimit);
-    mActualChargingCurrentLimit = min(mActualChargingCurrentLimit, mMaximumChargingCurrentLimitFromCommand);
-    mActualChargingCurrentLimit = min(mActualChargingCurrentLimit, mUserMaximumChargeCurrent);
+    mActualChargingCurrentLimit = std::min(mActualChargingCurrentLimit, mCircuitCapacity);
+    mActualChargingCurrentLimit = std::min(mActualChargingCurrentLimit, mCableAssemblyCurrentLimit);
+    mActualChargingCurrentLimit = std::min(mActualChargingCurrentLimit, mMaximumChargingCurrentLimitFromCommand);
+    mActualChargingCurrentLimit = std::min(mActualChargingCurrentLimit, mUserMaximumChargeCurrent);
 
     /* Set the actual max charging current attribute */
     mMaximumChargeCurrent = mActualChargingCurrentLimit;

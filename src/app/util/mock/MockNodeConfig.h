@@ -101,7 +101,8 @@ private:
 
 struct MockEndpointConfig
 {
-    MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters = {});
+    MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters = {},
+                       std::initializer_list<EmberAfDeviceType> aDeviceTypes = {});
 
     // Endpoint-config is self-referential: mEmberEndpoint.clusters references  mEmberClusters.data()
     MockEndpointConfig(const MockEndpointConfig & other);
@@ -109,12 +110,17 @@ struct MockEndpointConfig
 
     const MockClusterConfig * clusterById(ClusterId clusterId, ptrdiff_t * outIndex = nullptr) const;
     const EmberAfEndpointType * emberEndpoint() const { return &mEmberEndpoint; }
+    Span<const EmberAfDeviceType> deviceTypes() const
+    {
+        return Span<const EmberAfDeviceType>(mDeviceTypes.data(), mDeviceTypes.size());
+    }
 
     const EndpointId id;
     const std::vector<MockClusterConfig> clusters;
 
 private:
     std::vector<EmberAfCluster> mEmberClusters;
+    std::vector<EmberAfDeviceType> mDeviceTypes;
     EmberAfEndpointType mEmberEndpoint;
 };
 

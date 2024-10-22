@@ -29,3 +29,11 @@ public:
 
     CHIP_ERROR Run() override;
 };
+
+class StorageViewAll : public Command
+{
+public:
+    StorageViewAll() : Command("view-all") {}
+
+    CHIP_ERROR Run() override;
+};

@@ -922,6 +922,9 @@ MCORE.BDX.Sender=0
 MCORE.BDX.SynchronousReceiver=0
 MCORE.BDX.SynchronousSender=0
 
+# Fabric Synchronization
+MCORE.FS=1
+
 # General Diagnostics Cluster
 
 DGGEN.S=1

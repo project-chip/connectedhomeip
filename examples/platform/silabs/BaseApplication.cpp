@@ -259,7 +259,7 @@ CHIP_ERROR BaseApplication::Init()
     ChipLogProgress(AppServer, "APP: Wait WiFi Init");
     while (!wfx_hw_ready())
     {
-        vTaskDelay(pdMS_TO_TICKS(10));
+        osDelay(pdMS_TO_TICKS(10));
     }
     ChipLogProgress(AppServer, "APP: Done WiFi Init");
     /* We will init server when we get IP */

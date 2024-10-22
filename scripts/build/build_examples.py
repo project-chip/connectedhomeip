@@ -105,6 +105,13 @@ def ValidateTargetNames(context, parameter, values):
     type=click.Path(file_okay=False, resolve_path=True),
     help='Prefix for the generated file output.')
 @click.option(
+    '--ninja-jobs',
+    type=int,
+    is_flag=False,
+    flag_value=0,
+    default=None,
+    help='Number of ninja jobs')
+@click.option(
     '--pregen-dir',
     default=None,
     type=click.Path(file_okay=False, resolve_path=True),
@@ -136,8 +143,8 @@ def ValidateTargetNames(context, parameter, values):
         'for using ccache when building examples.'))
 @click.pass_context
 def main(context, log_level, target, enable_link_map_file, repo,
-         out_prefix, pregen_dir, clean, dry_run, dry_run_output, enable_flashbundle,
-         no_log_timestamps, pw_command_launcher):
+         out_prefix, ninja_jobs, pregen_dir, clean, dry_run, dry_run_output,
+         enable_flashbundle, no_log_timestamps, pw_command_launcher):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -161,7 +168,7 @@ before running this script.
     logging.info('Building targets: %s', CommaSeparate(requested_targets))
 
     context.obj = build.Context(
-        repository_path=repo, output_prefix=out_prefix, runner=runner)
+        repository_path=repo, output_prefix=out_prefix, ninja_jobs=ninja_jobs, runner=runner)
     context.obj.SetupBuilders(targets=requested_targets, options=BuilderOptions(
         enable_link_map_file=enable_link_map_file,
         enable_flashbundle=enable_flashbundle,

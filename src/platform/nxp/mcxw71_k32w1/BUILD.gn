@@ -90,10 +90,15 @@ config("nxp_platform_config") {
 
 static_library("nxp_platform") {
   deps = []
-  defines = [ "CHIP_DEVICE_K32W1=1" ]
+  defines = [
+    "CHIP_DEVICE_K32W1=1",
+    "NXP_USE_MML=1",
+  ]
 
   sources = [
     "../../SingletonConfigurationManager.cpp",
+    "../common/DiagnosticDataProviderImpl.cpp",
+    "../common/DiagnosticDataProviderImpl.h",
     "../common/ble/BLEManagerCommon.cpp",
     "../common/ble/BLEManagerCommon.h",
     "../common/ble/BLEManagerImpl.cpp",
@@ -104,8 +109,6 @@ static_library("nxp_platform") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "DiagnosticDataProviderImpl.cpp",
-    "DiagnosticDataProviderImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",

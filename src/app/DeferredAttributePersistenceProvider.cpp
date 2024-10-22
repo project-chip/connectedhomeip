@@ -28,7 +28,7 @@ CHIP_ERROR DeferredAttribute::PrepareWrite(System::Clock::Timestamp flushTime, c
     if (mValue.AllocatedSize() != value.size())
     {
         mValue.Alloc(value.size());
-        ReturnErrorCodeIf(!mValue, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(mValue, CHIP_ERROR_NO_MEMORY);
     }
 
     memcpy(mValue.Get(), value.data(), value.size());
@@ -81,7 +81,7 @@ void DeferredAttributePersistenceProvider::FlushAndScheduleNext()
         }
         else
         {
-            nextFlushTime = chip::min(nextFlushTime, da.GetFlushTime());
+            nextFlushTime = std::min(nextFlushTime, da.GetFlushTime());
         }
     }
 

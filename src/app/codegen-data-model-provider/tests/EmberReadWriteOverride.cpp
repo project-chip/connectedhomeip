@@ -16,6 +16,8 @@
  */
 #include "EmberReadWriteOverride.h"
 
+#include <app/AttributePathParams.h>
+#include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/ember-io-storage.h>
@@ -116,8 +118,14 @@ Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path,
     // copy over as much data as possible
     // NOTE: we do NOT use (*metadata)->size since it is unclear if our mocks set that correctly
     size_t len = std::min<size_t>(sizeof(gEmberIoBuffer), chip::app::Compatibility::Internal::gEmberAttributeIOBufferSpan.size());
+
     memcpy(gEmberIoBuffer, input.dataPtr, len);
     gEmberIoBufferFill = len;
+
+    if (input.changeListener != nullptr)
+    {
+        input.changeListener->MarkDirty(chip::app::AttributePathParams(path.mEndpointId, path.mClusterId, path.mAttributeId));
+    }
 
     return Status::Success;
 }
@@ -127,4 +135,9 @@ Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
 {
     return emAfWriteAttributeExternal(chip::app::ConcreteAttributePath(endpoint, cluster, attributeID),
                                       EmberAfWriteDataInput(dataPtr, dataType));
+}
+
+Status emberAfWriteAttribute(const chip::app::ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
+{
+    return emAfWriteAttributeExternal(path, input);
 }

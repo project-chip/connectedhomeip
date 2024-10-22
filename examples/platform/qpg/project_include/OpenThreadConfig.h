@@ -80,6 +80,8 @@
 #define OPENTHREAD_EXAMPLES_SIMULATION 0
 #define OPENTHREAD_CONFIG_PLATFORM_BOOTLOADER_MODE_ENABLE 0
 
+#define OPENTHREAD_PLATFORM_NEXUS 0
+
 // Use the Qorvo-supplied default platform configuration for remainder
 // of OpenThread config options.
 //

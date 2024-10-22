@@ -18,19 +18,19 @@
 
 #include <pw_unit_test/framework.h>
 
-#include "app-common/zap-generated/ids/Attributes.h"
-#include "app-common/zap-generated/ids/Clusters.h"
-#include "app/ConcreteAttributePath.h"
-#include "protocols/interaction_model/Constants.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/BufferedReadCallback.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
+#include <app/codegen-data-model-provider/Instance.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/DataModelHandler.h>
@@ -42,6 +42,7 @@
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -178,12 +179,6 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         EXPECT_EQ(v.ComputeSize(&arraySize), CHIP_NO_ERROR);
         EXPECT_EQ(arraySize, 0u);
     }
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-    else if (aPath.mAttributeId == Globals::Attributes::EventList::Id)
-    {
-        // Nothing to check for this one; depends on the endpoint.
-    }
-#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     else if (aPath.mAttributeId == Globals::Attributes::AttributeList::Id)
     {
         // Nothing to check for this one; depends on the endpoint.
@@ -293,6 +288,7 @@ TEST_F(TestEventChunking, TestEventChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
+    CodegenDataModelProviderInstance()->Shutdown();
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -359,6 +355,7 @@ TEST_F(TestEventChunking, TestMixedEventsAndAttributesChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
+    CodegenDataModelProviderInstance()->Shutdown();
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -435,6 +432,7 @@ TEST_F(TestEventChunking, TestMixedEventsAndLargeAttributesChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
+    CodegenDataModelProviderInstance()->Shutdown();
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.

@@ -56,10 +56,10 @@ public:
     jsize size() const { return mDataLength; }
 
 private:
-    JNIEnv * mEnv;
-    jstring mString;
-    const char * mChars;
-    jsize mDataLength;
+    JNIEnv * mEnv       = nullptr;
+    jstring mString     = nullptr;
+    const char * mChars = nullptr;
+    jsize mDataLength   = 0;
 };
 
 /// Exposes the underlying binary data from a jni byte array

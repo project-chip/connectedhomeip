@@ -111,6 +111,8 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
 
 void CommissioningWindowManager::Shutdown()
 {
+    VerifyOrReturn(nullptr != mServer);
+
     StopAdvertisement(/* aShuttingDown = */ true);
 
     ResetState();

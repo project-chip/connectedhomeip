@@ -662,30 +662,30 @@ CHIP_ERROR CompareEntry(const Entry & entry, const EntryData & entryData)
 {
     AuthMode authMode = AuthMode::kNone;
     ReturnErrorOnFailure(entry.GetAuthMode(authMode));
-    ReturnErrorCodeIf(authMode != entryData.authMode, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(authMode == entryData.authMode, CHIP_ERROR_INCORRECT_STATE);
     FabricIndex fabricIndex = kUndefinedFabricIndex;
     ReturnErrorOnFailure(entry.GetFabricIndex(fabricIndex));
-    ReturnErrorCodeIf(fabricIndex != entryData.fabricIndex, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(fabricIndex == entryData.fabricIndex, CHIP_ERROR_INCORRECT_STATE);
     Privilege privilege = Privilege::kView;
     ReturnErrorOnFailure(entry.GetPrivilege(privilege));
-    ReturnErrorCodeIf(privilege != entryData.privilege, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(privilege == entryData.privilege, CHIP_ERROR_INCORRECT_STATE);
     size_t subjectCount = 0;
     ReturnErrorOnFailure(entry.GetSubjectCount(subjectCount));
-    ReturnErrorCodeIf(subjectCount != entryData.GetSubjectCount(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(subjectCount == entryData.GetSubjectCount(), CHIP_ERROR_INCORRECT_STATE);
     for (size_t i = 0; i < subjectCount; ++i)
     {
         NodeId subject = kUndefinedNodeId;
         ReturnErrorOnFailure(entry.GetSubject(i, subject));
-        ReturnErrorCodeIf(subject != entryData.subjects[i], CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(subject == entryData.subjects[i], CHIP_ERROR_INCORRECT_STATE);
     }
     size_t targetCount = 0;
     ReturnErrorOnFailure(entry.GetTargetCount(targetCount));
-    ReturnErrorCodeIf(targetCount != entryData.GetTargetCount(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(targetCount == entryData.GetTargetCount(), CHIP_ERROR_INCORRECT_STATE);
     for (size_t i = 0; i < targetCount; ++i)
     {
         Target target;
         ReturnErrorOnFailure(entry.GetTarget(i, target));
-        ReturnErrorCodeIf(target != entryData.targets[i], CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(target == entryData.targets[i], CHIP_ERROR_INCORRECT_STATE);
     }
     return CHIP_NO_ERROR;
 }
@@ -724,7 +724,7 @@ CHIP_ERROR CompareAccessControl(AccessControl & ac, const EntryData * entryData,
         ReturnErrorOnFailure(ac.ReadEntry(i, entry));
         ReturnErrorOnFailure(CompareEntry(entry, *entryData));
     }
-    ReturnErrorCodeIf(ac.ReadEntry(count, entry) == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(ac.ReadEntry(count, entry) != CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 

@@ -214,7 +214,7 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
                 }
                 else
                 {
-                    lastRssi.SetNonNull(min(static_cast<int8_t>(0), neighInfo.mLastRssi));
+                    lastRssi.SetNonNull(std::min(static_cast<int8_t>(0), neighInfo.mLastRssi));
                 }
 
                 neighborTable.averageRssi      = averageRssi;

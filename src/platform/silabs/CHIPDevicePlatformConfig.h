@@ -23,6 +23,8 @@
  */
 
 #pragma once
+#include <cmsis_os2.h>
+#include <sl_cmsis_os2_common.h>
 
 // ==================== Platform Adaptations ====================
 
@@ -128,6 +130,10 @@
 // These can be overridden by the application as needed.
 
 // ========== Platform-specific Configuration Overrides =========
+
+#ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY osPriorityHigh
+#endif
 
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
 #if SLI_SI91X_MCU_INTERFACE

@@ -1093,7 +1093,7 @@ void ColorControlServer::SetHSVRemainingTime(chip::EndpointId endpoint)
     {
         bool hsvTransitionStart = (hueTransitionState->stepsRemaining == hueTransitionState->stepsTotal) ||
             (saturationTransitionState->stepsRemaining == saturationTransitionState->stepsTotal);
-        SetQuietReportRemainingTime(endpoint, max(hueTransitionState->timeRemaining, saturationTransitionState->timeRemaining),
+        SetQuietReportRemainingTime(endpoint, std::max(hueTransitionState->timeRemaining, saturationTransitionState->timeRemaining),
                                     hsvTransitionStart);
     }
 }
@@ -1283,7 +1283,7 @@ Status ColorControlServer::moveToSaturation(uint8_t saturation, uint16_t transit
     // now, kick off the state machine.
     initSaturationTransitionState(endpoint, colorSaturationTransitionState);
     colorSaturationTransitionState->finalValue     = saturation;
-    colorSaturationTransitionState->stepsRemaining = max<uint16_t>(transitionTime, 1);
+    colorSaturationTransitionState->stepsRemaining = std::max<uint16_t>(transitionTime, 1);
     colorSaturationTransitionState->stepsTotal     = colorSaturationTransitionState->stepsRemaining;
     colorSaturationTransitionState->timeRemaining  = transitionTime;
     colorSaturationTransitionState->transitionTime = transitionTime;
@@ -1363,7 +1363,7 @@ Status ColorControlServer::moveToHueAndSaturation(uint16_t hue, uint8_t saturati
     }
 
     colorHueTransitionState->up             = moveUp;
-    colorHueTransitionState->stepsRemaining = max<uint16_t>(transitionTime, 1);
+    colorHueTransitionState->stepsRemaining = std::max<uint16_t>(transitionTime, 1);
     colorHueTransitionState->stepsTotal     = colorHueTransitionState->stepsRemaining;
     colorHueTransitionState->timeRemaining  = transitionTime;
     colorHueTransitionState->transitionTime = transitionTime;
@@ -1614,7 +1614,7 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
         colorHueTransitionState->finalHue = static_cast<uint8_t>(hue);
     }
 
-    colorHueTransitionState->stepsRemaining = max<uint16_t>(transitionTime, 1);
+    colorHueTransitionState->stepsRemaining = std::max<uint16_t>(transitionTime, 1);
     colorHueTransitionState->stepsTotal     = colorHueTransitionState->stepsRemaining;
     colorHueTransitionState->timeRemaining  = transitionTime;
     colorHueTransitionState->transitionTime = transitionTime;
@@ -1758,7 +1758,7 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
         }
     }
 
-    colorHueTransitionState->stepsRemaining = max<uint16_t>(transitionTime, 1);
+    colorHueTransitionState->stepsRemaining = std::max<uint16_t>(transitionTime, 1);
     colorHueTransitionState->stepsTotal     = colorHueTransitionState->stepsRemaining;
     colorHueTransitionState->timeRemaining  = transitionTime;
     colorHueTransitionState->transitionTime = transitionTime;
@@ -1934,7 +1934,7 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
     {
         colorSaturationTransitionState->finalValue = subtractSaturation(currentSaturation, stepSize);
     }
-    colorSaturationTransitionState->stepsRemaining = max<uint8_t>(transitionTime, 1);
+    colorSaturationTransitionState->stepsRemaining = std::max<uint8_t>(transitionTime, 1);
     colorSaturationTransitionState->stepsTotal     = colorSaturationTransitionState->stepsRemaining;
     colorSaturationTransitionState->timeRemaining  = transitionTime;
     colorSaturationTransitionState->transitionTime = transitionTime;
@@ -2276,7 +2276,7 @@ Status ColorControlServer::moveToColor(uint16_t colorX, uint16_t colorY, uint16_
     Attributes::CurrentX::Get(endpoint, &(colorXTransitionState->initialValue));
     Attributes::CurrentX::Get(endpoint, &(colorXTransitionState->currentValue));
     colorXTransitionState->finalValue     = colorX;
-    colorXTransitionState->stepsRemaining = max<uint16_t>(transitionTime, 1);
+    colorXTransitionState->stepsRemaining = std::max<uint16_t>(transitionTime, 1);
     colorXTransitionState->stepsTotal     = colorXTransitionState->stepsRemaining;
     colorXTransitionState->timeRemaining  = transitionTime;
     colorXTransitionState->transitionTime = transitionTime;
@@ -2402,7 +2402,7 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
     colorYTransitionState->lowLimit       = MIN_CIE_XY_VALUE;
     colorYTransitionState->highLimit      = MAX_CIE_XY_VALUE;
 
-    SetQuietReportRemainingTime(endpoint, max(transitionTimeX, transitionTimeY), true /* isNewTransition */);
+    SetQuietReportRemainingTime(endpoint, std::max(transitionTimeX, transitionTimeY), true /* isNewTransition */);
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureXYEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
@@ -2463,7 +2463,7 @@ bool ColorControlServer::stepColorCommand(app::CommandHandler * commandObj, cons
     colorXTransitionState->initialValue   = currentColorX;
     colorXTransitionState->currentValue   = currentColorX;
     colorXTransitionState->finalValue     = colorX;
-    colorXTransitionState->stepsRemaining = max<uint16_t>(transitionTime, 1);
+    colorXTransitionState->stepsRemaining = std::max<uint16_t>(transitionTime, 1);
     colorXTransitionState->stepsTotal     = colorXTransitionState->stepsRemaining;
     colorXTransitionState->timeRemaining  = transitionTime;
     colorXTransitionState->transitionTime = transitionTime;
@@ -2507,7 +2507,7 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
     bool isXTransitionDone = computeNewColor16uValue(colorXTransitionState);
     bool isYTransitionDone = computeNewColor16uValue(colorYTransitionState);
 
-    SetQuietReportRemainingTime(endpoint, max(colorXTransitionState->timeRemaining, colorYTransitionState->timeRemaining));
+    SetQuietReportRemainingTime(endpoint, std::max(colorXTransitionState->timeRemaining, colorYTransitionState->timeRemaining));
 
     if (isXTransitionDone && isYTransitionDone)
     {
@@ -2607,7 +2607,7 @@ Status ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorT
     Attributes::ColorTemperatureMireds::Get(endpoint, &(colorTempTransitionState->currentValue));
 
     colorTempTransitionState->finalValue     = colorTemperature;
-    colorTempTransitionState->stepsRemaining = max<uint16_t>(transitionTime, 1);
+    colorTempTransitionState->stepsRemaining = std::max<uint16_t>(transitionTime, 1);
     colorTempTransitionState->stepsTotal     = colorTempTransitionState->stepsRemaining;
     colorTempTransitionState->timeRemaining  = transitionTime;
     colorTempTransitionState->transitionTime = transitionTime;
@@ -2990,7 +2990,7 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
             colorTempTransitionState->finalValue = static_cast<uint16_t>(finalValue32u);
         }
     }
-    colorTempTransitionState->stepsRemaining = max<uint16_t>(transitionTime, 1);
+    colorTempTransitionState->stepsRemaining = std::max<uint16_t>(transitionTime, 1);
     colorTempTransitionState->stepsTotal     = colorTempTransitionState->stepsRemaining;
     colorTempTransitionState->timeRemaining  = transitionTime;
     colorTempTransitionState->transitionTime = transitionTime;

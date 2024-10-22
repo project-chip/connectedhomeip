@@ -25,6 +25,9 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     snprintf(tag, sizeof(tag), "chip[%s]", module);
     tag[sizeof(tag) - 1] = 0;
 
+    // We intentionally added the printf statements to ensure we could apply colors to logs redirected to the console.
+    // The printf statements are not bypassing the log level, rather, they are intentionally designed to print the
+    // initial and later parts of the log.
     switch (category)
     {
     case kLogCategory_Error: {

@@ -14,7 +14,9 @@ load "../src/app/zap-templates/zcl/data-model/chip/binding-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/boolean-state-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/actions-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/camera-av-stream-management-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/chip-ota.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/chip-types.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/clusters-extensions.xml";
@@ -107,6 +109,8 @@ load "../src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/washer-controls-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/water-heater-management-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/water-heater-mode-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/webrtc-requestor-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/webrtc-provider-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/wifi-network-diagnostics-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/wifi-network-management-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/window-covering.xml";
@@ -117,6 +121,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/resource-monitoring-cluster.x
 load "../src/app/zap-templates/zcl/data-model/chip/sample-mei-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/electrical-energy-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/electrical-power-measurement-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/zone-management-cluster.xml";
 
 all endpoints {
     // These attributes follow a different code path and do not have to be

@@ -88,7 +88,7 @@ MediaTek platform.
     Chip tool standalone, Android or iOS app
 
     [CHIP
-    Tool]](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/chip_tool_guide.md)
+    Tool]](https://github.com/project-chip/connectedhomeip/blob/master/docs/development_controllers/chip-tool/chip_tool_guide.md)
 
 -   First of all, you have to commission with the light-switch-app (nodeID 1)
     and the lighting-app (nodeID 2) with the CHIP tool by following commands.

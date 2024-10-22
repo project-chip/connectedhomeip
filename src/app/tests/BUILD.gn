@@ -154,6 +154,18 @@ source_set("thread-border-router-management-test-srcs") {
   ]
 }
 
+source_set("ecosystem-information-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/ecosystem-information-server/ecosystem-information-server.cpp",
+    "${chip_root}/src/app/clusters/ecosystem-information-server/ecosystem-information-server.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
 source_set("app-test-stubs") {
   sources = [
     "test-ember-api.cpp",
@@ -194,6 +206,7 @@ chip_test_suite("tests") {
     "TestBasicCommandPathRegistry.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
+    "TestCheckInHandler.cpp",
     "TestCommandHandlerInterfaceRegistry.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
@@ -201,6 +214,7 @@ chip_test_suite("tests") {
     "TestDataModelSerialization.cpp",
     "TestDefaultOTARequestorStorage.cpp",
     "TestDefaultThreadNetworkDirectoryStorage.cpp",
+    "TestEcosystemInformationCluster.cpp",
     "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
@@ -228,6 +242,7 @@ chip_test_suite("tests") {
   public_deps = [
     ":app-test-stubs",
     ":binding-test-srcs",
+    ":ecosystem-information-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
     ":power-cluster-test-srcs",
@@ -236,6 +251,8 @@ chip_test_suite("tests") {
     "${chip_root}/src/app",
     "${chip_root}/src/app/codegen-data-model-provider:instance-header",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/data-model-provider/tests:encode-decode",
+    "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",

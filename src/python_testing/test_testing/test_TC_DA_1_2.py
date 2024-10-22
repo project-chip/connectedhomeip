@@ -30,7 +30,7 @@ def run_single_test(dac_provider: str, product_id: int, factory_reset: bool = Fa
 
     reset = ""
     if factory_reset:
-        reset = ' --factoryreset'
+        reset = ' --factory-reset'
 
     app = os.path.join(
         CHIP_ROOT, 'out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app')

@@ -17,18 +17,43 @@
  */
 
 #include "../common/CHIPCommandStorageDelegate.h"
+#include "../common/ControllerStorage.h"
+#include "../common/PreferencesStorage.h"
 
 #include "StorageManagementCommand.h"
 
 #import <Matter/Matter.h>
 
-static CHIPToolPersistentStorageDelegate * storage = nil;
+namespace {
+NSArray<NSString *> * GetDomains()
+{
+    __auto_type * domains = @[
+        kDarwinFrameworkToolCertificatesDomain,
+        kDarwinFrameworkToolControllerDomain
+    ];
+
+    return domains;
+}
+}
 
 CHIP_ERROR StorageClearAll::Run()
 {
-    storage = [[CHIPToolPersistentStorageDelegate alloc] init];
-    if (![storage deleteAllStorage]) {
-        return CHIP_ERROR_INTERNAL;
+    __auto_type * domains = GetDomains();
+    for (NSString * domain in domains) {
+        __auto_type * storage = [[PreferencesStorage alloc] initWithDomain:domain];
+        VerifyOrReturnError([storage reset], CHIP_ERROR_INTERNAL);
     }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR StorageViewAll::Run()
+{
+    __auto_type * domains = GetDomains();
+    for (NSString * domain in domains) {
+        __auto_type * storage = [[PreferencesStorage alloc] initWithDomain:domain];
+        [storage print];
+    }
+
     return CHIP_NO_ERROR;
 }

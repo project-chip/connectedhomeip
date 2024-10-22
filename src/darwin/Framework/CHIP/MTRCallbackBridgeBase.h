@@ -81,6 +81,9 @@ protected:
     {
         LogRequestStart();
 
+        // TODO: Figure out whether we can usefully get an MTRDeviceController_Concrete in here, so
+        // we can move getSessionForCommissioneeDevice off of MTRDeviceController_Internal.  Ideally
+        // without bloating this inline method too much.
         [device.deviceController getSessionForCommissioneeDevice:device.nodeID
                                                       completion:^(chip::Messaging::ExchangeManager * exchangeManager,
                                                           const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
@@ -92,6 +95,8 @@ protected:
     {
         LogRequestStart();
 
+        // TODO: Figure out whether we can usefully get an MTRDeviceController_Concrete in here, so
+        // we can move getSessionForNode off of MTRDeviceController_Internal.
         [controller getSessionForNode:nodeID
                            completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
                                const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {

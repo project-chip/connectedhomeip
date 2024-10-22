@@ -1,12 +1,13 @@
 syntax = "proto3";
 
 import 'pw_protobuf_protos/common.proto';
+import 'fabric_sync_common/fabric_sync_common.proto';
 
 package chip.rpc;
 
 // Define the message for a synchronized end device with necessary fields
 message DeviceCommissioningWindowInfo {
-  uint64 node_id = 1;
+  ScopedNode id = 1;
   uint32 commissioning_timeout = 2;
   uint32 discriminator = 3;
   uint32 iterations = 4;
@@ -25,7 +26,7 @@ message DeviceCommissioningInfo {
 }
 
 message KeepActiveParameters {
-  uint64 node_id = 1;
+  ScopedNode id = 1;
   uint32 stay_active_duration_ms = 2;
   uint32 timeout_ms = 3;
 }

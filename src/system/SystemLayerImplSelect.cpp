@@ -427,7 +427,7 @@ CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingRead(SocketWatchToken token)
         {
             watch->mRdSource =
                 dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, static_cast<uintptr_t>(watch->mFD), 0, dispatchQueue);
-            ReturnErrorCodeIf(watch->mRdSource == nullptr, CHIP_ERROR_NO_MEMORY);
+            VerifyOrReturnError(watch->mRdSource != nullptr, CHIP_ERROR_NO_MEMORY);
             dispatch_source_set_event_handler(watch->mRdSource, ^{
                 if (watch->mPendingIO.Has(SocketEventFlags::kRead) && watch->mCallback != nullptr)
                 {
@@ -487,7 +487,7 @@ CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingWrite(SocketWatchToken token
         {
             watch->mWrSource =
                 dispatch_source_create(DISPATCH_SOURCE_TYPE_WRITE, static_cast<uintptr_t>(watch->mFD), 0, dispatchQueue);
-            ReturnErrorCodeIf(watch->mWrSource == nullptr, CHIP_ERROR_NO_MEMORY);
+            VerifyOrReturnError(watch->mWrSource != nullptr, CHIP_ERROR_NO_MEMORY);
             dispatch_source_set_event_handler(watch->mWrSource, ^{
                 if (watch->mPendingIO.Has(SocketEventFlags::kWrite) && watch->mCallback != nullptr)
                 {

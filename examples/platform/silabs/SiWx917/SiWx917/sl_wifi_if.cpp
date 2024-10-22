@@ -94,10 +94,6 @@ bool ps_requirement_added = false;
 // TODO: Figure out why we actually need this, we are already handling failure and retries somewhere else.
 #define WIFI_SCAN_TIMEOUT_TICK 10000
 
-#if !defined(MIN)
-#define MIN(A, B) ((A) < (B) ? (A) : (B))
-#endif
-
 WfxRsi_t wfx_rsi;
 
 bool hasNotifiedIPV6 = false;
@@ -541,12 +537,12 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
         memset(&cur_scan_result, 0, sizeof(cur_scan_result));
 
         cur_scan_result.ssid_length = strnlen((char *) scan_result->scan_info[idx].ssid,
-                                              chip::min<size_t>(sizeof(scan_result->scan_info[idx].ssid), WFX_MAX_SSID_LENGTH));
+                                              std::min<size_t>(sizeof(scan_result->scan_info[idx].ssid), WFX_MAX_SSID_LENGTH));
         chip::Platform::CopyString(cur_scan_result.ssid, cur_scan_result.ssid_length, (char *) scan_result->scan_info[idx].ssid);
 
         // if user has provided ssid, then check if the current scan result ssid matches the user provided ssid
         if (wfx_rsi.scan_ssid != NULL &&
-            (strncmp(wfx_rsi.scan_ssid, cur_scan_result.ssid, MIN(strlen(wfx_rsi.scan_ssid), strlen(cur_scan_result.ssid))) ==
+            (strncmp(wfx_rsi.scan_ssid, cur_scan_result.ssid, std::min(strlen(wfx_rsi.scan_ssid), strlen(cur_scan_result.ssid))) ==
              CMP_SUCCESS))
         {
             continue;
@@ -623,7 +619,7 @@ static void wfx_rsi_save_ap_info(void) // translation
  **********************************************************************************************/
 static sl_status_t wfx_rsi_do_join(void)
 {
-    ReturnErrorCodeIf((wfx_rsi.dev_state & (WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED)), SL_STATUS_IN_PROGRESS);
+    VerifyOrReturnError(!(wfx_rsi.dev_state & (WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED)), SL_STATUS_IN_PROGRESS);
     sl_status_t status = SL_STATUS_OK;
     sl_wifi_client_configuration_t ap;
     memset(&ap, 0, sizeof(ap));
@@ -684,7 +680,7 @@ static sl_status_t wfx_rsi_do_join(void)
     status = sl_wifi_connect(SL_WIFI_CLIENT_INTERFACE, &ap, timeout_ms);
     // sl_wifi_connect returns SL_STATUS_IN_PROGRESS if join is in progress
     // after the initial scan is done, the scan does not check for SSID
-    ReturnErrorCodeIf((status == SL_STATUS_OK || status == SL_STATUS_IN_PROGRESS), status);
+    VerifyOrReturnError(status != SL_STATUS_OK && status != SL_STATUS_IN_PROGRESS, status);
 
     // failure only happens when the firmware returns an error
     ChipLogError(DeviceLayer, "wfx_rsi_do_join: sl_wifi_connect failed: 0x%lx", static_cast<uint32_t>(status));

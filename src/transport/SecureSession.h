@@ -158,7 +158,11 @@ public:
 
     bool IsCommissioningSession() const override;
 
-    bool AllowsMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
+    bool AllowsMRP() const override
+    {
+        return ((GetPeerAddress().GetTransportType() == Transport::Type::kUdp) ||
+                (GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF));
+    }
 
     bool AllowsLargePayload() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kTcp; }
 

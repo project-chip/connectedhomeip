@@ -24,10 +24,40 @@ if (current_os == "mac" || current_os == "ios") {
   import("${build_root}/config/mac/mac_sdk.gni")
 }
 
+# To use different sanitizer options, use `gn args .` in the out folder and
+# use settings like:
+#
+#   is_clang=true
+#   is_debug=true
+#   optimize_for_size=false
+#   is_asan=true
+#   is_sanitize_fatal=false
+#
+
 declare_args() {
   # Enable -Werror. This can be disabled if using a different compiler
   # with unfixed or unsupported wanings.
   treat_warnings_as_errors = true
+
+  # Enable Thread sanitizer
+  is_tsan = false
+
+  # Enable memory sanitizer
+  is_msan = false
+
+  # enable undefined behavior sanitizer
+  is_ubsan = false
+
+  # Exit on sanitize error. Generally standard libraries may get errors
+  # so not stopping on the first error is often useful
+  is_sanitize_fatal = true
+
+  # Enable or disable Runtime Type Information (RTTI).
+  # Defaults true on darwin because Darwin.framework uses it.
+  enable_rtti = current_os == "mac" || current_os == "ios"
+
+  # Enable or disable support for C++ exceptions.
+  enable_exceptions = false
 }
 
 if (current_cpu == "arm" || current_cpu == "arm64") {
@@ -397,21 +427,6 @@ config("runtime_default") {
 #   is_sanitize_fatal=false
 #
 
-declare_args() {
-  # Enable Thread sanitizer
-  is_tsan = false
-
-  # Enable memory sanitizer
-  is_msan = false
-
-  # enable undefined behavior sanitizer
-  is_ubsan = false
-
-  # Exit on sanitize error. Generally standard libraries may get errors
-  # so not stopping on the first error is often useful
-  is_sanitize_fatal = true
-}
-
 config("sanitize_address") {
   defines = []
   cflags = [
@@ -452,8 +467,12 @@ config("sanitize_undefined_behavior") {
       "-fsanitize=unsigned-integer-overflow",
       "-fsanitize=implicit-conversion",
       "-fsanitize=nullability",
-      "-fno-sanitize=vptr,function",
     ]
+  }
+
+  #According to the LLVM UBSan documentation, sanitizing vptr is incompatible with the -fno-rtti flag.
+  if (!enable_rtti) {
+    cflags += [ "-fno-sanitize=vptr" ]
   }
 
   ldflags = cflags
@@ -520,15 +539,6 @@ config("coverage_default") {
   if (use_coverage) {
     configs += [ ":coverage" ]
   }
-}
-
-declare_args() {
-  # Enable or disable Runtime Type Information (RTTI).
-  # Defaults true on darwin because Darwin.framework uses it.
-  enable_rtti = current_os == "mac" || current_os == "ios"
-
-  # Enable or disable support for C++ exceptions.
-  enable_exceptions = false
 }
 
 config("no_rtti") {

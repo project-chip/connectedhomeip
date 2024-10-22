@@ -77,6 +77,10 @@ limitations under the License.
       <description>TCAcknowledgementsRequired</description>
       <access op="read" privilege="administer"/>
     </attribute>
+    <attribute side="server" code="0x09" define="TC_UPDATE_DEADLINE" type="int32u" writable="false" optional="true" apiMaturity="provisional">
+      <description>TCUpdateDeadline</description>
+      <access op="read" privilege="administer"/>
+    </attribute>
     <command source="client" code="0x00" name="ArmFailSafe" response="ArmFailSafeResponse" optional="false" cli="chip fabric_commissioning armfailsafe">
       <description>Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock</description>
       <arg name="ExpiryLengthSeconds" type="int16u"/>

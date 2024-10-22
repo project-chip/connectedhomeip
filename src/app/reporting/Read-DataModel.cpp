@@ -14,13 +14,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/data-model-provider/ActionReturnStatus.h"
-#include "lib/support/logging/TextOnlyLogging.h"
 #include <app/reporting/Read-DataModel.h>
 
 #include <app/AppConfig.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/util/MatterCallbacks.h>
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -99,6 +100,17 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
         ChipLogError(DataManagement, "Failed to read attribute: %s", status.c_str(storage));
     }
     return status;
+}
+
+bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion)
+{
+    std::optional<DataModel::ClusterInfo> info = dataModel->GetClusterInfo(path);
+    if (!info.has_value())
+    {
+        return false;
+    }
+
+    return (info->dataVersion == dataVersion);
 }
 
 } // namespace DataModelImpl

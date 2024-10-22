@@ -26,14 +26,15 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 
-#ifdef USE_TEMP_SENSOR
-#include "TemperatureSensor.h"
-#endif
+#if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
+#include "Si70xxSensor.h"
+#endif // defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 /**********************************************************
  * Defines and Constants
  *********************************************************/
 
 using namespace chip;
+using namespace chip::app;
 using namespace ::chip::DeviceLayer;
 
 constexpr EndpointId kThermostatEndpoint = 1;
@@ -45,10 +46,10 @@ constexpr uint16_t kMinTemperatureDelta  = 50;    // 0.5 degree Celcius
  *********************************************************/
 SensorManager SensorManager::sSensorManager;
 
-#ifndef USE_TEMP_SENSOR
+#if !(defined(SL_MATTER_USE_SI70XX_SENSOR) && (SL_MATTER_USE_SI70XX_SENSOR))
 constexpr uint16_t kSimulatedReadingFrequency = (60000 / kSensorTImerPeriodMs); // Change Simulated number at each minutes
 static int16_t mSimulatedTemp[]               = { 2300, 2400, 2800, 2550, 2200, 2125, 2100, 2600, 1800, 2700 };
-#endif
+#endif // !(defined(SL_MATTER_USE_SI70XX_SENSOR) && (SL_MATTER_USE_SI70XX_SENSOR))
 
 CHIP_ERROR SensorManager::Init()
 {
@@ -61,13 +62,13 @@ CHIP_ERROR SensorManager::Init()
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
-#ifdef USE_TEMP_SENSOR
-    if (SL_STATUS_OK != TemperatureSensor::Init())
+#if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
+    if (SL_STATUS_OK != Si70xxSensor::Init())
     {
         SILABS_LOG("Failed to Init Sensor");
         return CHIP_ERROR_INTERNAL;
     }
-#endif
+#endif // defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 
     // Update Temp immediatly at bootup
     SensorTimerEventHandler(nullptr);
@@ -81,19 +82,20 @@ void SensorManager::SensorTimerEventHandler(void * arg)
     int16_t temperature            = 0;
     static int16_t lastTemperature = 0;
 
-#ifdef USE_TEMP_SENSOR
+#if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
     int32_t tempSum   = 0;
-    uint32_t humidity = 0;
+    uint16_t humidity = 0;
 
     for (uint8_t i = 0; i < 100; i++)
     {
-        if (SL_STATUS_OK != TemperatureSensor::GetTemp(&humidity, &temperature))
+        if (SL_STATUS_OK != Si70xxSensor::GetSensorData(humidity, temperature))
         {
             SILABS_LOG("Failed to read Temperature !!!");
         }
         tempSum += temperature;
     }
     temperature = static_cast<int16_t>(tempSum / 100);
+
 #else
     static uint8_t nbOfRepetition = 0;
     static uint8_t simulatedIndex = 0;
@@ -109,18 +111,20 @@ void SensorManager::SensorTimerEventHandler(void * arg)
         simulatedIndex++;
         nbOfRepetition = 0;
     }
-#endif // USE_TEMP_SENSOR
+#endif // defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 
     SILABS_LOG("Sensor Temp is : %d", temperature);
 
+    MarkAttributeDirty reportState = MarkAttributeDirty::kNo;
     if ((temperature >= (lastTemperature + kMinTemperatureDelta)) || temperature <= (lastTemperature - kMinTemperatureDelta))
     {
-        lastTemperature = temperature;
-        PlatformMgr().LockChipStack();
-        // The SensorMagager shouldn't be aware of the Endpoint ID TODO Fix this.
-        // TODO Per Spec we should also apply the Offset stored in the same cluster before saving the temp
-
-        app::Clusters::Thermostat::Attributes::LocalTemperature::Set(kThermostatEndpoint, temperature);
-        PlatformMgr().UnlockChipStack();
+        reportState = MarkAttributeDirty::kIfChanged;
     }
+
+    lastTemperature = temperature;
+    PlatformMgr().LockChipStack();
+    // The SensorMagager shouldn't be aware of the Endpoint ID TODO Fix this.
+    // TODO Per Spec we should also apply the Offset stored in the same cluster before saving the temp
+    app::Clusters::Thermostat::Attributes::LocalTemperature::Set(kThermostatEndpoint, temperature, reportState);
+    PlatformMgr().UnlockChipStack();
 }

@@ -46,8 +46,6 @@
 #include <LEDWidget.h>
 #include <plat.h>
 
-#include <easyflash.h>
-
 extern "C" {
 #include <bl_gpio.h>
 #include <hal_gpio.h>

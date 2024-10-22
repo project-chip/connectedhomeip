@@ -32,9 +32,6 @@ namespace app {
 constexpr AttributeId GlobalAttributesNotInMetadata[] = {
     Clusters::Globals::Attributes::GeneratedCommandList::Id,
     Clusters::Globals::Attributes::AcceptedCommandList::Id,
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-    Clusters::Globals::Attributes::EventList::Id,
-#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     Clusters::Globals::Attributes::AttributeList::Id,
 };
 

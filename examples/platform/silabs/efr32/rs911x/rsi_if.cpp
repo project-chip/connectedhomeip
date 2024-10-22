@@ -752,7 +752,7 @@ void ProcessEvent(WfxEvent_t inEvent)
             // clear structure and calculate size of SSID
             memset(&ap, 0, sizeof(ap));
             ap.ssid_length =
-                strnlen(reinterpret_cast<char *>(scan->ssid), chip::min<size_t>(sizeof(scan->ssid), WFX_MAX_SSID_LENGTH));
+                strnlen(reinterpret_cast<char *>(scan->ssid), std::min<size_t>(sizeof(scan->ssid), WFX_MAX_SSID_LENGTH));
             chip::Platform::CopyString(ap.ssid, ap.ssid_length, reinterpret_cast<char *>(scan->ssid));
 
             // check if the scanned ssid is the one we are looking for

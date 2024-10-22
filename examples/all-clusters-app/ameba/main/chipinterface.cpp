@@ -24,6 +24,9 @@
 #include "Globals.h"
 #include "LEDWidget.h"
 #include "chip_porting.h"
+#if CHIP_AMEBA_APP_TASK
+#include "ameba_main_task.h"
+#endif
 #include <DeviceInfoProviderImpl.h>
 
 #include <app/clusters/identify-server/identify-server.h>
@@ -170,7 +173,9 @@ static void InitServer(intptr_t context)
 #if CONFIG_ENABLE_CHIP_SHELL
     InitBindingHandler();
 #endif
-
+#if CHIP_AMEBA_APP_TASK
+    AppTaskInit();
+#endif
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
 }
 

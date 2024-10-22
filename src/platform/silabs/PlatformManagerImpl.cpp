@@ -28,7 +28,7 @@
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
+#include <platform/internal/GenericPlatformManagerImpl_CMSISOS.ipp>
 #include <platform/silabs/DiagnosticDataProviderImpl.h>
 
 #if defined(SL_MBEDTLS_USE_TINYCRYPT)
@@ -104,7 +104,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+    err = Internal::GenericPlatformManagerImpl_CMSISOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
     // Start timer to increment TotalOperationalHours every hour
@@ -129,9 +129,10 @@ void PlatformManagerImpl::UpdateOperationalHours(System::Layer * systemLayer, vo
 
     SystemLayer().StartTimer(System::Clock::Seconds32(kSecondsPerHour), UpdateOperationalHours, NULL);
 }
+
 void PlatformManagerImpl::_Shutdown()
 {
-    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
+    Internal::GenericPlatformManagerImpl_CMSISOS<PlatformManagerImpl>::_Shutdown();
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION

@@ -380,10 +380,10 @@ chip::Inet::IPAddress * CastingPlayer::GetIpAddressForUDCRequest()
 void CastingPlayer::FindOrEstablishSession(void * clientContext, chip::OnDeviceConnected onDeviceConnected,
                                            chip::OnDeviceConnectionFailure onDeviceConnectionFailure)
 {
-    ChipLogProgress(AppServer, "CastingPlayer.FindOrEstablishSession called on nodeId=0x" ChipLogFormatX64 " fabricIndex=%d",
+    ChipLogProgress(AppServer, "CastingPlayer::FindOrEstablishSession() called on nodeId=0x" ChipLogFormatX64 " fabricIndex=%d",
                     ChipLogValueX64(mAttributes.nodeId), mAttributes.fabricIndex);
     VerifyOrReturn(mAttributes.nodeId != 0 && mAttributes.fabricIndex != 0,
-                   ChipLogError(AppServer, "CastingPlayer.FindOrEstablishSession called on invalid nodeId/fabricIndex"));
+                   ChipLogError(AppServer, "CastingPlayer::FindOrEstablishSession() called on invalid nodeId/fabricIndex"));
 
     ConnectionContext * connectionContext =
         new ConnectionContext(clientContext, this, onDeviceConnected, onDeviceConnectionFailure);

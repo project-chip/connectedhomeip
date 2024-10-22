@@ -507,7 +507,7 @@ void BLEManagerImpl::OnDeviceScanned(const bt_adapter_le_device_scan_result_info
     /* Initiate Connect */
     auto params = std::make_pair(this, scanInfo.remote_address);
     PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](typeof(params) * aParams) { return aParams->first->ConnectChipThing(aParams->second); }, &params);
+        +[](decltype(params) * aParams) { return aParams->first->ConnectChipThing(aParams->second); }, &params);
 }
 
 void BLEManagerImpl::OnScanComplete()

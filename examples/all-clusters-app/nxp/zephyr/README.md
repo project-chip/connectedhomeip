@@ -201,14 +201,14 @@ the partition address: please refer to `factory_partition` defined in
 #### Manually
 
 See
-[Guide for writing manufacturing data on NXP devices](../../../../docs/guides/nxp/nxp_manufacturing_flow.md)
+[Guide for writing manufacturing data on NXP devices](../../../../docs/platforms/nxp/nxp_manufacturing_flow.md)
 
 <a name="ota-software-update"></a>
 
 ## OTA Software Update
 
 See
-[Guide for OTA Software Update on NXP devices using Zephyr SDK](../../../../docs/guides/nxp/nxp_zephyr_ota_software_update.md)
+[Guide for OTA Software Update on NXP devices using Zephyr SDK](../../../../docs/platforms/nxp/nxp_zephyr_ota_software_update.md)
 
 <a name="testing-the-example"></a>
 

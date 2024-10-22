@@ -16,21 +16,27 @@
 #
 
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
 import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -55,6 +61,7 @@ class TC_VALCC_4_2(MatterBaseTest):
             TestStep(8, "Send Close command"),
             TestStep(9, "Read OpenDuration attribute"),
             TestStep(10, "Read RemainingDuration attribute"),
+            TestStep(11, "Write DefaultOpenDuration back to original value")
         ]
         return steps
 
@@ -73,16 +80,11 @@ class TC_VALCC_4_2(MatterBaseTest):
         attributes = Clusters.ValveConfigurationAndControl.Attributes
 
         self.step("2a")
-        defaultOpenDuration = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultOpenDuration)
+        originalDefaultOpenDuration = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultOpenDuration)
 
         self.step("2b")
-        if defaultOpenDuration is NullValue:
-            defaultOpenDuration = 60
-
-            result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.DefaultOpenDuration(defaultOpenDuration))])
-            asserts.assert_equal(result[0].Status, Status.Success, "DefaultOpenDuration write failed")
-        else:
-            logging.info("Test step skipped")
+        defaultOpenDuration = 60
+        await self.write_single_attribute(attributes.DefaultOpenDuration(defaultOpenDuration), endpoint_id=endpoint)
 
         self.step(3)
         try:
@@ -128,6 +130,9 @@ class TC_VALCC_4_2(MatterBaseTest):
         self.step(10)
         remaining_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
         asserts.assert_true(remaining_duration_dut is NullValue, "RemainingDuration is not null")
+
+        self.step(11)
+        await self.write_single_attribute(attributes.DefaultOpenDuration(originalDefaultOpenDuration), endpoint_id=endpoint)
 
 
 if __name__ == "__main__":

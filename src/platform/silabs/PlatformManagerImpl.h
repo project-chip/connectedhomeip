@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
+#include <platform/internal/GenericPlatformManagerImpl_CMSISOS.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #include "wfx_host_events.h"
 #endif
@@ -36,7 +36,7 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the PlatformManager singleton object for the SILABS platform.
  */
-class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>
+class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl_CMSISOS<PlatformManagerImpl>
 {
     // Allow the PlatformManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -57,7 +57,7 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
     // Allow the generic implementation base class to call helper methods on
     // this class.
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-    friend Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
+    friend Internal::GenericPlatformManagerImpl_CMSISOS<PlatformManagerImpl>;
 #endif
 
 public:
@@ -87,8 +87,6 @@ private:
     System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
     static PlatformManagerImpl sInstance;
-
-    using Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::PostEventFromISR;
 };
 
 /**

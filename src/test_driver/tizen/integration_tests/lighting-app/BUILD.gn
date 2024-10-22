@@ -17,32 +17,27 @@ import("//build_overrides/tizen.gni")
 
 import("${tizen_sdk_build_root}/tizen_sdk.gni")
 
-tizen_qemu_mkisofs("lighting-app-runner") {
-  runner = "runner.sh"
-
-  # Build applications used in the test.
-  deps = [
-    "${chip_root}/examples/chip-tool:chip-tool",
-    "${chip_root}/examples/lighting-app/tizen:chip-lighting-app:tpk",
-  ]
-
-  # Use artifacts created by the dependencies.
-  assets = [
-    rebase_path("${root_out_dir}/chip-tool"),
-    rebase_path(
-        "${root_out_dir}/org.tizen.matter.example.lighting/out/org.tizen.matter.example.lighting-1.0.0.tpk"),
-  ]
-}
-
 tizen_qemu_run("lighting-app") {
   # Enable network support, so Tizen can obtain current date/time from the
   # network. Correct date/time is required for the commissioning process -
   # attestation will fail otherwise.
   virtio_net = true
 
-  deps = [ ":lighting-app-runner" ]
-  mkisofs_outputs = get_target_outputs(":lighting-app-runner")
-  iso_image = rebase_path(mkisofs_outputs[0])
+  # Share output directory.
+  share = "${root_out_dir}"
+
+  # Copy runner script to shared directory.
+  copy("${target_name}:runner") {
+    sources = [ "runner.sh" ]
+    outputs = [ share + "/runner.sh" ]
+  }
+
+  # Build applications used in the test.
+  deps = [
+    ":${target_name}:runner",
+    "${chip_root}/examples/chip-tool:chip-tool",
+    "${chip_root}/examples/lighting-app/tizen:chip-lighting-app:tpk",
+  ]
 }
 
 group("check") {

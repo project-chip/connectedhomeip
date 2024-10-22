@@ -16,8 +16,9 @@ name: ZAP
 
 on:
     push:
-        branches-ignore:
-            - 'dependabot/**'
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
 
@@ -34,7 +35,7 @@ jobs:
 
         runs-on: ubuntu-20.04
         container:
-            image: ghcr.io/project-chip/chip-build:77
+            image: ghcr.io/project-chip/chip-build:81
         defaults:
             run:
                 shell: sh

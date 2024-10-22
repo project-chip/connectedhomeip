@@ -120,6 +120,8 @@ public:
         StopWaiting();
     }
 
+    static chip::app::DefaultICDClientStorage sICDClientStorage;
+
 protected:
     // Will be called in a setting in which it's safe to touch the CHIP
     // stack. The rules for Run() are as follows:
@@ -167,7 +169,6 @@ protected:
     static chip::Crypto::RawKeySessionKeystore sSessionKeystore;
 
     static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
-    static chip::app::DefaultICDClientStorage sICDClientStorage;
     static chip::app::CheckInHandler sCheckInHandler;
     CredentialIssuerCommands * mCredIssuerCmds;
 

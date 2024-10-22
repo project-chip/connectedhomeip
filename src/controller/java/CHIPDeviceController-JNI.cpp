@@ -1382,7 +1382,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "GetConnectedDevice failed: %" CHIP_ERROR_FORMAT, err.Format());
-        OperationalSessionSetup::ConnnectionFailureInfo failureInfo(
+        OperationalSessionSetup::ConnectionFailureInfo failureInfo(
             chip::ScopedNodeId(static_cast<chip::NodeId>(nodeId), wrapper->Controller()->GetFabricIndex()), err,
             SessionEstablishmentStage::kUnknown);
         connectedDeviceCallback->mOnFailure.mCall(&connectedDeviceCallback->mOnFailure.mContext, failureInfo);
@@ -1807,7 +1807,7 @@ JNI_METHOD(jobject, getNetworkLocation)(JNIEnv * env, jobject self, jlong handle
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     Transport::PeerAddress addr;
-    jobject networkLocation;
+    jobject networkLocation = nullptr;
     char addrStr[50];
 
     CHIP_ERROR err = wrapper->Controller()->GetPeerAddress(static_cast<chip::NodeId>(deviceId), addr);

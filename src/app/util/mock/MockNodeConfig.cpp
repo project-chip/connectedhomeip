@@ -16,10 +16,12 @@
  *    limitations under the License.
  */
 
+#include "app/util/af-types.h"
 #include <app/util/mock/MockNodeConfig.h>
 
 #include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
+#include <initializer_list>
 #include <lib/support/CodeUtils.h>
 
 #include <utility>
@@ -174,8 +176,10 @@ const MockAttributeConfig * MockClusterConfig::attributeById(AttributeId attribu
     return findById(attributes, attributeId, outIndex);
 }
 
-MockEndpointConfig::MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters) :
-    id(aId), clusters(aClusters), mEmberEndpoint{}
+MockEndpointConfig::MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters,
+                                       std::initializer_list<EmberAfDeviceType> aDeviceTypes) :
+    id(aId),
+    clusters(aClusters), mDeviceTypes(aDeviceTypes), mEmberEndpoint{}
 {
     VerifyOrDie(aClusters.size() < UINT8_MAX);
 
@@ -189,7 +193,8 @@ MockEndpointConfig::MockEndpointConfig(EndpointId aId, std::initializer_list<Moc
 }
 
 MockEndpointConfig::MockEndpointConfig(const MockEndpointConfig & other) :
-    id(other.id), clusters(other.clusters), mEmberClusters(other.mEmberClusters), mEmberEndpoint(other.mEmberEndpoint)
+    id(other.id), clusters(other.clusters), mEmberClusters(other.mEmberClusters), mDeviceTypes(other.mDeviceTypes),
+    mEmberEndpoint(other.mEmberEndpoint)
 {
     // fix self-referencing pointers
     mEmberEndpoint.cluster = mEmberClusters.data();

@@ -219,7 +219,7 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::SetPendingDataset(const Thread
     datasetTlvs.mLength = pendingDataset.AsByteSpan().size();
     {
         ScopedThreadLock threadLock;
-        ReturnErrorCodeIf(otDatasetSetPendingTlvs(otInst, &datasetTlvs) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(otDatasetSetPendingTlvs(otInst, &datasetTlvs) == OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
     }
     return CHIP_NO_ERROR;
 }

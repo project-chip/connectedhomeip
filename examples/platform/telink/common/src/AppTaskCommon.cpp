@@ -407,20 +407,22 @@ void AppTaskCommon::InitPwms()
 
 #if CONFIG_WS2812_STRIP
     pwmManager.linkBackend(Ws2812Strip::getInstance());
-#else
+#elif CONFIG_PWM
     pwmManager.linkBackend(PwmPool::getInstance());
-#endif // CONFIG_WS2812_STRIP
+#else
+    pwmManager.linkBackend(PwmDummy::getInstance());
+#endif
 }
 
 void AppTaskCommon::LinkPwms(PwmManager & pwmManager)
 {
-#if CONFIG_BOARD_TLSR9118BDK40D // TLSR9118BDK40D EVK supports only 1 PWM channel connected to LED
+#if CONFIG_BOARD_TLSR9118BDK40D_V1 && CONFIG_PWM // TLSR9118BDK40D_V1 EVK supports single LED PWM channel
     pwmManager.linkPwm(PwmManager::EAppPwm_Red, 0);
 #elif CONFIG_WS2812_STRIP
     pwmManager.linkPwm(PwmManager::EAppPwm_Red, 0);
     pwmManager.linkPwm(PwmManager::EAppPwm_Green, 1);
     pwmManager.linkPwm(PwmManager::EAppPwm_Blue, 2);
-#else
+#elif CONFIG_PWM
     pwmManager.linkPwm(PwmManager::EAppPwm_Indication, 0);
     pwmManager.linkPwm(PwmManager::EAppPwm_Red, 1);
     pwmManager.linkPwm(PwmManager::EAppPwm_Green, 2);
