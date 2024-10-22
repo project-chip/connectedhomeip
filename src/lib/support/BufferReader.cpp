@@ -31,18 +31,13 @@ BufferReader & BufferReader::ReadBytes(uint8_t * dest, size_t size)
 {
     static_assert(CHAR_BIT == 8, "Our various sizeof checks rely on bytes and octets being the same thing");
 
-    if ((size > UINT16_MAX) || (mAvailable < size))
+    if (EnsureAvailable(size))
     {
-        mStatus = CHIP_ERROR_BUFFER_TOO_SMALL;
-        // Ensure that future reads all fail.
-        mAvailable = 0;
-        return *this;
+        memcpy(dest, mReadPtr, size);
+        mReadPtr += size;
+        mAvailable -= size;
     }
 
-    memcpy(dest, mReadPtr, size);
-
-    mReadPtr += size;
-    mAvailable = static_cast<uint16_t>(mAvailable - size);
     return *this;
 }
 
@@ -80,18 +75,12 @@ void Reader::RawReadLowLevelBeCareful(T * retval)
 
     constexpr size_t data_size = sizeof(T);
 
-    if (mAvailable < data_size)
+    if (EnsureAvailable(data_size))
     {
-        mStatus = CHIP_ERROR_BUFFER_TOO_SMALL;
-        // Ensure that future reads all fail.
-        mAvailable = 0;
-        return;
+        ReadHelper(mReadPtr, retval);
+        mReadPtr += data_size;
+        mAvailable -= data_size;
     }
-
-    ReadHelper(mReadPtr, retval);
-    mReadPtr += data_size;
-
-    mAvailable = static_cast<uint16_t>(mAvailable - data_size);
 }
 
 // Explicit Read instantiations for the data types we want to support.
