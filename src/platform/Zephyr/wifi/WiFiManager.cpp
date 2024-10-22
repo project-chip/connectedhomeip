@@ -316,16 +316,10 @@ CHIP_ERROR WiFiManager::GetNetworkStatistics(NetworkStatistics & stats) const
 
     stats.mPacketMulticastRxCount = data.multicast.rx;
     stats.mPacketMulticastTxCount = data.multicast.tx;
-#if CONFIG_CHIP_NXP_PLATFORM
-    /* Zephyr 3.6 doesn't support the unicast stat in net_stats_wifi struct */
-    stats.mPacketUnicastRxCount = data.pkts.rx - data.multicast.rx - data.broadcast.rx;
-    stats.mPacketUnicastRxCount = data.pkts.tx - data.multicast.tx - data.broadcast.tx;
-#else
-    stats.mPacketUnicastRxCount = data.unicast.rx;
-    stats.mPacketUnicastTxCount = data.unicast.tx;
-#endif
-    stats.mBeaconsSuccessCount = data.sta_mgmt.beacons_rx;
-    stats.mBeaconsLostCount    = data.sta_mgmt.beacons_miss;
+    stats.mPacketUnicastRxCount   = data.unicast.rx;
+    stats.mPacketUnicastTxCount   = data.unicast.tx;
+    stats.mBeaconsSuccessCount    = data.sta_mgmt.beacons_rx;
+    stats.mBeaconsLostCount       = data.sta_mgmt.beacons_miss;
 
     return CHIP_NO_ERROR;
 }

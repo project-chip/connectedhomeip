@@ -328,7 +328,7 @@ Please use the following build args:
 ## Manufacturing data
 
 See
-[Guide for writing manufacturing data on NXP devices](../../../../docs/guides/nxp/nxp_manufacturing_flow.md).
+[Guide for writing manufacturing data on NXP devices](../../../../docs/platforms/nxp/nxp_manufacturing_flow.md).
 
 There are factory data generated binaries available in
 `third_party/nxp/nxp_matter_support/examples/platform/k32w0/scripts/demo_generated_factory_data`
@@ -595,7 +595,7 @@ internal flash space can be found in the
 The steps for building the SSBL binary with appropriate configuration and
 writing to the board the binary and other OTA related configurations are
 described in the
-[K32W0x1 OTA guide](../../../../docs/guides/nxp/nxp_k32w0_ota_guide.md).
+[K32W0x1 OTA guide](../../../../docs/platforms/nxp/nxp_k32w0_ota_guide.md).
 
 Note that the application needs to be built using the
 `chip_enable_ota_requestor=true` option. This is enabled in the configuration by

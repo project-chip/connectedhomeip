@@ -191,4 +191,4 @@ Run -> Debug Configurations... -> C/C++ Application
 ## OTA
 
 Please see
-[mcxw71 OTA guide](../../../../docs/guides/nxp/nxp_mcxw71_ota_guide.md).
+[mcxw71 OTA guide](../../../../docs/platforms/nxp/nxp_mcxw71_ota_guide.md).

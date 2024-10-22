@@ -65,6 +65,8 @@ public:
     const Access::SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
 
 private:
+    friend class TestOnlyAttributeValueDecoderAccessor;
+
     TLV::TLVReader & mReader;
     bool mTriedDecode = false;
     const Access::SubjectDescriptor mSubjectDescriptor;

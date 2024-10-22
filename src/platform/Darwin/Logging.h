@@ -31,7 +31,7 @@
         ChipPlatformValidateLogFormat(MSG, ##__VA_ARGS__); /* validate once and ignore warnings from os_log() / Log() */           \
         _Pragma("clang diagnostic push");                                                                                          \
         _Pragma("clang diagnostic ignored \"-Wformat\"");                                                                          \
-        os_log_with_type(chip::Logging::Platform::LoggerForModule(chip::Logging::kLogModule_##MOD, #MOD),                          \
+        os_log_with_type(ChipPlatformLogger(::chip::Logging::Platform::LoggerForModule(chip::Logging::kLogModule_##MOD, #MOD)),    \
                          static_cast<os_log_type_t>(chip::Logging::Platform::kOSLogCategory_##CAT), MSG, ##__VA_ARGS__);           \
         ChipInternalLogImpl(MOD, CHIP_LOG_CATEGORY_##CAT, MSG, ##__VA_ARGS__);                                                     \
         _Pragma("clang diagnostic pop");                                                                                           \
@@ -40,8 +40,8 @@
 #define ChipPlatformLogByteSpan(MOD, CAT, DATA)                                                                                    \
     do                                                                                                                             \
     {                                                                                                                              \
-        chip::Logging::Platform::LogByteSpan(chip::Logging::kLogModule_##MOD, #MOD,                                                \
-                                             static_cast<os_log_type_t>(chip::Logging::Platform::kOSLogCategory_##CAT), DATA);     \
+        ::chip::Logging::Platform::LogByteSpan(chip::Logging::kLogModule_##MOD, #MOD,                                              \
+                                               static_cast<os_log_type_t>(chip::Logging::Platform::kOSLogCategory_##CAT), DATA);   \
         ChipInternalLogByteSpanImpl(MOD, CHIP_LOG_CATEGORY_##CAT, DATA);                                                           \
     } while (0)
 
@@ -64,7 +64,15 @@ enum OSLogCategory
     kOSLogCategory_AUTOMATION = OS_LOG_TYPE_DEFAULT,
 };
 
-os_log_t LoggerForModule(chip::Logging::LogModule moduleId, char const * moduleName);
+// Note: A raw pointer is used here instead of os_log_t to avoid an unwanted retain/autorelease
+// in the function itself, as well as unnecessary code to rescue the object from the ARP in callers.
+struct os_log_s * LoggerForModule(chip::Logging::LogModule moduleId, char const * moduleName);
+#ifdef __OBJC__
+#define ChipPlatformLogger(log) ((__bridge os_log_t)(log))
+#else
+#define ChipPlatformLogger(log) (log)
+#endif
+
 void LogByteSpan(chip::Logging::LogModule moduleId, char const * moduleName, os_log_type_t type, const chip::ByteSpan & span);
 
 // Helper constructs for compile-time validation of format strings for C++ / ObjC++ contexts.

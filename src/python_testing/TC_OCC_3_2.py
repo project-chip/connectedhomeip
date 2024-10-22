@@ -18,12 +18,21 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --endpoint 1 --bool-arg simulate_occupancy:true
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#       --bool-arg simulate_occupancy:true
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 #  There are CI integration for the test cases below that implements manually controlling sensor device for
@@ -35,8 +44,8 @@ import logging
 import time
 
 import chip.clusters as Clusters
-from matter_testing_support import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
-                                    await_sequence_of_reports, default_matter_test_main)
+from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
+                                         async_test_body, await_sequence_of_reports, default_matter_test_main)
 from mobly import asserts
 
 

@@ -14,14 +14,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/util/config.h>
 #include <chef-operational-state-delegate-impl.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::RvcOperationalState;
+using chip::Protocols::InteractionModel::Status;
 
 static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data);
 
@@ -201,6 +205,91 @@ void OperationalState::Shutdown()
     }
 }
 
+chip::Protocols::InteractionModel::Status chefOperationalStateWriteCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
+                                                                            const EmberAfAttributeMetadata * attributeMetadata,
+                                                                            uint8_t * buffer)
+{
+    chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(gOperationalStateInstance != nullptr);
+    chip::AttributeId attributeId = attributeMetadata->attributeId;
+
+    switch (attributeId)
+    {
+    case chip::app::Clusters::OperationalState::Attributes::CurrentPhase::Id: {
+        uint8_t m = static_cast<uint8_t>(buffer[0]);
+        DataModel::Nullable<uint8_t> aPhase(m);
+        CHIP_ERROR err = gOperationalStateInstance->SetCurrentPhase(aPhase);
+        if (CHIP_NO_ERROR == err)
+        {
+            break;
+        }
+        ret = chip::Protocols::InteractionModel::Status::ConstraintError;
+        ChipLogError(DeviceLayer, "Invalid Attribute Update status: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    break;
+    case chip::app::Clusters::OperationalState::Attributes::OperationalState::Id: {
+        uint8_t currentState = gOperationalStateInstance->GetCurrentOperationalState();
+        uint8_t m            = static_cast<uint8_t>(buffer[0]);
+        CHIP_ERROR err       = gOperationalStateInstance->SetOperationalState(m);
+
+        if (currentState == to_underlying(OperationalState::OperationalStateEnum::kStopped) &&
+            m == to_underlying(OperationalState::OperationalStateEnum::kRunning))
+        {
+            gOperationalStateDelegate->mCountDownTime.SetNonNull(
+                static_cast<uint32_t>(gOperationalStateDelegate->kExampleCountDown));
+            (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick,
+                                                         gOperationalStateDelegate);
+        }
+
+        if (CHIP_NO_ERROR == err)
+        {
+            break;
+        }
+        ret = chip::Protocols::InteractionModel::Status::ConstraintError;
+        ChipLogError(DeviceLayer, "Invalid Attribute Update status: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    break;
+    default:
+        ret = chip::Protocols::InteractionModel::Status::UnsupportedAttribute;
+        ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
+        break;
+    }
+
+    return ret;
+}
+
+chip::Protocols::InteractionModel::Status chefOperationalStateReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                           const EmberAfAttributeMetadata * attributeMetadata,
+                                                                           uint8_t * buffer, uint16_t maxReadLength)
+{
+    chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
+    chip::AttributeId attributeId                 = attributeMetadata->attributeId;
+    switch (attributeId)
+    {
+    case chip::app::Clusters::OperationalState::Attributes::CurrentPhase::Id: {
+
+        app::DataModel::Nullable<uint8_t> currentPhase = gOperationalStateInstance->GetCurrentPhase();
+        if (currentPhase.IsNull())
+        {
+            ret = chip::Protocols::InteractionModel::Status::UnsupportedAttribute;
+            break;
+        }
+        *buffer = currentPhase.Value();
+    }
+    break;
+    case chip::app::Clusters::OperationalState::Attributes::OperationalState::Id: {
+        *buffer = gOperationalStateInstance->GetCurrentOperationalState();
+    }
+    break;
+    default:
+        ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
+        break;
+    }
+
+    return ret;
+}
+
 void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
@@ -214,3 +303,5 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 
     gOperationalStateInstance->Init();
 }
+
+#endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER

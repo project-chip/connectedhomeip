@@ -491,6 +491,7 @@ limitations under the License.
             <arg name="CreatorFabricIndex" type="fabric_idx" isNullable="true" />
             <arg name="LastModifiedFabricIndex" type="fabric_idx" isNullable="true" />
             <arg name="NextCredentialIndex" type="int16u" isNullable="true" />
+            <arg name="CredentialData" type="octet_string" isNullable="true" optional="true" />
         </command>
         <!-- Conformance feature USR - for now optional -->
         <command source="client" code="38" name="ClearCredential" mustUseTimedInvoke="true" optional="true">
