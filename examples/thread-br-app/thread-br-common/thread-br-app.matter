@@ -1592,7 +1592,6 @@ endpoint 1 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -1618,7 +1617,6 @@ endpoint 1 {
     callback attribute activeNetworkFaultsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
@@ -1633,7 +1631,6 @@ endpoint 1 {
     callback attribute pendingDatasetTimestamp;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
