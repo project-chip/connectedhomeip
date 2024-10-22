@@ -360,7 +360,7 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
     if (!isDelegateNull(delegate))
     {
         DataModel::Nullable<Percent> cLevel = delegate->HandleOpenValve(level);
-        if (!cLevel.IsNull())
+        if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel) && !cLevel.IsNull())
         {
             UpdateCurrentLevel(ep, cLevel.Value());
         }
