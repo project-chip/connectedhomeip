@@ -75,12 +75,15 @@ class TC_VALCC_3_1(MatterBaseTest):
         await attribute_subscription.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(3)
+        # Wait for the entire duration of the test because this valve may be slow. The test will time out before this does. That's fine.
+        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
         await self.send_single_cmd(cmd=cluster.Commands.Close(), endpoint=endpoint)
         current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
         if current_state_dut != cluster.Enums.ValveStateEnum.kClosed:
             current_state_closed = AttributeValue(
                 endpoint_id=endpoint, attribute=attributes.CurrentState, value=cluster.Enums.ValveStateEnum.kClosed)
-            attribute_subscription.await_all_final_values_reported(expected_final_values=[current_state_closed])
+            attribute_subscription.await_all_final_values_reported(
+                expected_final_values=[current_state_closed], timeout_sec=timeout)
 
         self.step(4)
         attribute_subscription.reset()
@@ -88,8 +91,6 @@ class TC_VALCC_3_1(MatterBaseTest):
 
         self.step(5)
         # Wait until the current state is open and the target state is Null.
-        # Wait for the entire duration of the test because this valve may be slow. The test will time out before this does. That's fine.
-        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
         expected_final_state = [AttributeValue(endpoint_id=endpoint, attribute=attributes.TargetState, value=NullValue), AttributeValue(
             endpoint_id=endpoint, attribute=attributes.CurrentState, value=cluster.Enums.ValveStateEnum.kOpen)]
         attribute_subscription.await_all_final_values_reported(expected_final_values=expected_final_state, timeout_sec=timeout)
