@@ -408,8 +408,10 @@ def create_stream():
 def list_streams():
     dirs = [d for d in pathlib.Path(wd.path("streams")).iterdir() if d.is_dir()]
 
-    # TODO Files can be multiple directory deep, need to reconstruct the tree here
-    streams = [{"id": d.name, "files": [f.name for f in d.iterdir()]} for d in dirs]
+    def stream_files(dir: Path):
+        return [f.relative_to(dir) for f in dir.glob("**/*") if f.is_file()]
+
+    streams = [{"id": d.name, "files": stream_files(d)} for d in dirs]
 
     return {"streams": streams}
 
