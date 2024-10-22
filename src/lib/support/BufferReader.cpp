@@ -108,10 +108,7 @@ Reader & Reader::Read16(uint16_t * dest)
 
     static_assert(sizeof(*dest) == 2);
 
-    *dest = mReadPtr[0];
-    *dest <<= 8;
-    *dest += mReadPtr[1];
-
+    *dest = static_cast<uint16_t>((mReadPtr[0] << 8) + mReadPtr[1]);
     mReadPtr += 2;
     mAvailable -= 2;
     return *this;
