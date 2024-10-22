@@ -33,19 +33,19 @@ class ThermostatClusterAtomicAttributeStatusStruct(val attributeID: UInt, val st
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_ATTRIBUTE_I_D), attributeID)
+      put(ContextSpecificTag(TAG_ATTRIBUTE_ID), attributeID)
       put(ContextSpecificTag(TAG_STATUS_CODE), statusCode)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_ATTRIBUTE_I_D = 0
+    private const val TAG_ATTRIBUTE_ID = 0
     private const val TAG_STATUS_CODE = 1
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterAtomicAttributeStatusStruct {
       tlvReader.enterStructure(tlvTag)
-      val attributeID = tlvReader.getUInt(ContextSpecificTag(TAG_ATTRIBUTE_I_D))
+      val attributeID = tlvReader.getUInt(ContextSpecificTag(TAG_ATTRIBUTE_ID))
       val statusCode = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS_CODE))
 
       tlvReader.exitContainer()

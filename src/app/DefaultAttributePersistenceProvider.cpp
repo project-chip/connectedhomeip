@@ -41,7 +41,7 @@ CHIP_ERROR DefaultAttributePersistenceProvider::InternalReadValue(const StorageK
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    uint16_t size = static_cast<uint16_t>(min(aValue.size(), static_cast<size_t>(UINT16_MAX)));
+    uint16_t size = static_cast<uint16_t>(std::min(aValue.size(), static_cast<size_t>(UINT16_MAX)));
     ReturnErrorOnFailure(mStorage->SyncGetKeyValue(aKey.KeyName(), aValue.data(), size));
     aValue.reduce_size(size);
     return CHIP_NO_ERROR;

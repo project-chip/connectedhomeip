@@ -116,8 +116,8 @@ class MessagesCluster(private val controller: MatterController, private val endp
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_MESSAGE_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_MESSAGE_I_D_REQ), messageID)
+    val TAG_MESSAGE_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_MESSAGE_ID_REQ), messageID)
 
     val TAG_PRIORITY_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_PRIORITY_REQ), priority)

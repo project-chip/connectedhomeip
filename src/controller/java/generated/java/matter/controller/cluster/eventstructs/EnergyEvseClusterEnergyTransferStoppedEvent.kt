@@ -43,7 +43,7 @@ class EnergyEvseClusterEnergyTransferStoppedEvent(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_SESSION_I_D), sessionID)
+      put(ContextSpecificTag(TAG_SESSION_ID), sessionID)
       put(ContextSpecificTag(TAG_STATE), state)
       put(ContextSpecificTag(TAG_REASON), reason)
       put(ContextSpecificTag(TAG_ENERGY_TRANSFERRED), energyTransferred)
@@ -56,7 +56,7 @@ class EnergyEvseClusterEnergyTransferStoppedEvent(
   }
 
   companion object {
-    private const val TAG_SESSION_I_D = 0
+    private const val TAG_SESSION_ID = 0
     private const val TAG_STATE = 1
     private const val TAG_REASON = 2
     private const val TAG_ENERGY_TRANSFERRED = 4
@@ -64,7 +64,7 @@ class EnergyEvseClusterEnergyTransferStoppedEvent(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterEnergyTransferStoppedEvent {
       tlvReader.enterStructure(tlvTag)
-      val sessionID = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_I_D))
+      val sessionID = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_ID))
       val state = tlvReader.getUByte(ContextSpecificTag(TAG_STATE))
       val reason = tlvReader.getUByte(ContextSpecificTag(TAG_REASON))
       val energyTransferred = tlvReader.getLong(ContextSpecificTag(TAG_ENERGY_TRANSFERRED))

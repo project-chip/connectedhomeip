@@ -21,7 +21,7 @@
 #include <app/clusters/service-area-server/service-area-server.h>
 #include <app/util/config.h>
 #include <cstring>
-#include <utility>
+#include <vector>
 
 namespace chip {
 namespace app {
@@ -30,7 +30,7 @@ namespace Clusters {
 class RvcDevice;
 
 typedef bool (RvcDevice::*IsSetSelectedAreasAllowedCallback)(MutableCharSpan & statusText);
-typedef bool (RvcDevice::*HandleSkipCurrentAreaCallback)(uint32_t skippedArea, MutableCharSpan & skipStatusText);
+typedef bool (RvcDevice::*HandleSkipAreaCallback)(uint32_t skippedArea, MutableCharSpan & skipStatusText);
 typedef bool (RvcDevice::*IsChangeAllowedSimpleCallback)();
 
 namespace ServiceArea {
@@ -38,16 +38,10 @@ namespace ServiceArea {
 class RvcServiceAreaDelegate : public Delegate
 {
 private:
-    // containers for array attributes.
-    std::vector<ServiceArea::AreaStructureWrapper> mSupportedAreas;
-    std::vector<ServiceArea::MapStructureWrapper> mSupportedMaps;
-    std::vector<uint32_t> mSelectedAreas;
-    std::vector<ServiceArea::Structs::ProgressStruct::Type> mProgressList;
-
     RvcDevice * mIsSetSelectedAreasAllowedDeviceInstance;
     IsSetSelectedAreasAllowedCallback mIsSetSelectedAreasAllowedCallback;
-    RvcDevice * mHandleSkipCurrentAreaDeviceInstance;
-    HandleSkipCurrentAreaCallback mHandleSkipCurrentAreaCallback;
+    RvcDevice * mHandleSkipAreaDeviceInstance;
+    HandleSkipAreaCallback mHandleSkipAreaCallback;
     RvcDevice * mIsSupportedAreasChangeAllowedDeviceInstance;
     IsChangeAllowedSimpleCallback mIsSupportedAreasChangeAllowedCallback;
     RvcDevice * mIsSupportedMapChangeAllowedDeviceInstance;
@@ -63,6 +57,7 @@ private:
     const uint32_t supportedAreaID_C = 10050;
     const uint32_t supportedAreaID_D = 0x88888888;
 
+public:
     /**
      * Set the SupportedMaps and SupportedAreas where the SupportedMaps is not null.
      */
@@ -73,78 +68,19 @@ private:
      */
     void SetNoMapTopology();
 
-public:
     CHIP_ERROR Init() override;
 
     // command support
     bool IsSetSelectedAreasAllowed(MutableCharSpan & statusText) override;
 
-    bool IsValidSelectAreasSet(const ServiceArea::Commands::SelectAreas::DecodableType & req,
-                               ServiceArea::SelectAreasStatus & areaStatus, MutableCharSpan & statusText) override;
+    bool IsValidSelectAreasSet(const Span<const uint32_t> & selectedAreas, ServiceArea::SelectAreasStatus & areaStatus,
+                               MutableCharSpan & statusText) override;
 
-    bool HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText) override;
-
-    //*************************************************************************
-    // Supported Areas accessors
+    bool HandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText) override;
 
     bool IsSupportedAreasChangeAllowed() override;
 
-    uint32_t GetNumberOfSupportedAreas() override;
-
-    bool GetSupportedAreaByIndex(uint32_t listIndex, AreaStructureWrapper & supportedArea) override;
-
-    bool GetSupportedAreaById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & supportedArea) override;
-
-    bool AddSupportedArea(const AreaStructureWrapper & newArea, uint32_t & listIndex) override;
-
-    bool ModifySupportedArea(uint32_t listIndex, const AreaStructureWrapper & modifiedArea) override;
-
-    bool ClearSupportedAreas() override;
-
-    //*************************************************************************
-    // Supported Maps accessors
-
     bool IsSupportedMapChangeAllowed() override;
-
-    uint32_t GetNumberOfSupportedMaps() override;
-
-    bool GetSupportedMapByIndex(uint32_t listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
-
-    bool GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
-
-    bool AddSupportedMap(const ServiceArea::MapStructureWrapper & newMap, uint32_t & listIndex) override;
-
-    bool ModifySupportedMap(uint32_t listIndex, const ServiceArea::MapStructureWrapper & newMap) override;
-
-    bool ClearSupportedMaps() override;
-
-    //*************************************************************************
-    // Selected Areas accessors
-
-    uint32_t GetNumberOfSelectedAreas() override;
-
-    bool GetSelectedAreaByIndex(uint32_t listIndex, uint32_t & selectedArea) override;
-
-    bool AddSelectedArea(uint32_t aAreaId, uint32_t & listIndex) override;
-
-    bool ClearSelectedAreas() override;
-
-    //*************************************************************************
-    // Progress accessors
-
-    uint32_t GetNumberOfProgressElements() override;
-
-    bool GetProgressElementByIndex(uint32_t listIndex, ServiceArea::Structs::ProgressStruct::Type & aProgressElement) override;
-
-    bool GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex,
-                                ServiceArea::Structs::ProgressStruct::Type & aProgressElement) override;
-
-    bool AddProgressElement(const ServiceArea::Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex) override;
-
-    bool ModifyProgressElement(uint32_t listIndex,
-                               const ServiceArea::Structs::ProgressStruct::Type & modifiedProgressElement) override;
-
-    bool ClearProgress() override;
 
     //*************************************************************************
     // RVC device callback setters
@@ -155,10 +91,10 @@ public:
         mIsSetSelectedAreasAllowedDeviceInstance = instance;
     }
 
-    void SetHandleSkipCurrentAreaCallback(HandleSkipCurrentAreaCallback callback, RvcDevice * instance)
+    void SetHandleSkipAreaCallback(HandleSkipAreaCallback callback, RvcDevice * instance)
     {
-        mHandleSkipCurrentAreaCallback       = callback;
-        mHandleSkipCurrentAreaDeviceInstance = instance;
+        mHandleSkipAreaCallback       = callback;
+        mHandleSkipAreaDeviceInstance = instance;
     }
 
     void SetIsSupportedAreasChangeAllowedCallback(IsChangeAllowedSimpleCallback callback, RvcDevice * instance)

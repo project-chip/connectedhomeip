@@ -20,8 +20,8 @@ limitations under the License.
   Data types
   <struct name="LandmarkInfoStruct" apiMaturity="provisional">
     <cluster code="0x0150"/>
-    <item name="LandmarkTag" type="LandmarkTag"         optional="false" isNullable="false"/>
-    <item name="PositionTag" type="RelativePositionTag" optional="false" isNullable="true"/>
+    <item name="LandmarkTag" type="LandmarkTag"                 optional="false" isNullable="false"/>
+    <item name="RelativePositionTag" type="RelativePositionTag" optional="false" isNullable="true"/>
   </struct>
 
   <struct name="AreaInfoStruct" apiMaturity="provisional">
@@ -40,7 +40,7 @@ limitations under the License.
     <cluster code="0x0150"/>
     <item name="AreaID"   type="int32u"         optional="false" isNullable="false"/>
     <item name="MapID"    type="int32u"         optional="false" isNullable="true"/>
-    <item name="AreaDesc" type="AreaInfoStruct" optional="false" isNullable="false"/>
+    <item name="AreaInfo" type="AreaInfoStruct" optional="false" isNullable="false"/>
   </struct>
 
   <struct name="ProgressStruct">
@@ -63,9 +63,8 @@ limitations under the License.
     <cluster code="0x0150"/>
     <item value="0x00" name="Success"/>
     <item value="0x01" name="UnsupportedArea"/>
-    <item value="0x02" name="DuplicatedAreas"/>
-    <item value="0x03" name="InvalidInMode"/>
-    <item value="0x04" name="InvalidSet"/>
+    <item value="0x02" name="InvalidInMode"/>
+    <item value="0x03" name="InvalidSet"/>
   </enum>
 
   <enum name="SkipAreaStatus" type="enum8">

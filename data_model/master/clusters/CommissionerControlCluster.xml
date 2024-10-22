@@ -80,13 +80,13 @@ Davis, CA 95616, USA
     <command id="0x00" name="RequestCommissioningApproval" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform/>
-      <field id="0" name="RequestId" type="uint64">
+      <field id="0" name="RequestID" type="uint64">
         <mandatoryConform/>
       </field>
-      <field id="1" name="VendorId" type="vendor-id">
+      <field id="1" name="VendorID" type="vendor-id">
         <mandatoryConform/>
       </field>
-      <field id="2" name="ProductId" type="uint16">
+      <field id="2" name="ProductID" type="uint16">
         <mandatoryConform/>
       </field>
       <field id="3" name="Label" type="string">
@@ -97,22 +97,15 @@ Davis, CA 95616, USA
     <command id="0x01" name="CommissionNode" direction="commandToServer" response="ReverseOpenCommissioningWindow">
       <access invokePrivilege="manage"/>
       <mandatoryConform/>
-      <field id="0" name="RequestId" type="uint64">
+      <field id="0" name="RequestID" type="uint64">
         <mandatoryConform/>
       </field>
-      <field id="2" name="ResponseTimeoutSeconds" type="uint16" default="30">
+      <field id="1" name="ResponseTimeoutSeconds" type="uint16" default="30">
         <mandatoryConform/>
         <constraint type="between" from="30" to="120"/>
       </field>
-      <field id="3" name="IpAddress" type="ipadr">
-        <optionalConform/>
-      </field>
-      <field id="4" name="Port" type="uint16">
-        <optionalConform/>
-      </field>
     </command>
-    <command id="0x02" name="ReverseOpenCommissioningWindow" direction="commandToClient" response="Y">
-      <access invokePrivilege="manage"/>
+    <command id="0x02" name="ReverseOpenCommissioningWindow" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="CommissioningTimeout" type="uint16">
         <mandatoryConform/>
@@ -139,15 +132,15 @@ Davis, CA 95616, USA
     <event id="0x00" name="CommissioningRequestResult" priority="info">
       <access readPrivilege="manage" fabricSensitive="true"/>
       <mandatoryConform/>
-      <field id="0" name="RequestId" type="uint64">
+      <field id="0" name="RequestID" type="uint64">
         <mandatoryConform/>
       </field>
-      <field id="1" name="ClientNodeId" type="node-id">
+      <field id="1" name="ClientNodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="2" name="StatusCode" type="enum8">
+      <field id="2" name="StatusCode" type="status">
         <mandatoryConform/>
-        <constraint type="allowed" value="Status Codes"/>
+        <constraint type="desc"/>
       </field>
     </event>
   </events>

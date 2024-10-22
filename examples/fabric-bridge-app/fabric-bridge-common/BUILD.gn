@@ -22,7 +22,6 @@ config("config") {
 chip_data_model("fabric-bridge-common-zap") {
   zap_file = "fabric-bridge-app.zap"
   is_server = true
-  cflags = [ "-DDYNAMIC_ENDPOINT_COUNT=16" ]
 }
 
 # This includes all the clusters that only exist on the dynamic endpoint.
@@ -41,16 +40,15 @@ source_set("fabric-bridge-lib") {
   public_configs = [ ":config" ]
 
   sources = [
+    "include/BridgedAdministratorCommissioning.h",
     "include/BridgedDevice.h",
     "include/BridgedDeviceBasicInformationImpl.h",
     "include/BridgedDeviceManager.h",
     "include/CHIPProjectAppConfig.h",
-    "include/CommissionerControl.h",
+    "src/BridgedAdministratorCommissioning.cpp",
     "src/BridgedDevice.cpp",
     "src/BridgedDeviceBasicInformationImpl.cpp",
     "src/BridgedDeviceManager.cpp",
-    "src/CommissionerControl.cpp",
-    "src/ZCLCallbacks.cpp",
   ]
 
   deps = [

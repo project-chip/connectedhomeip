@@ -1,0 +1,52 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Cancel workflows on failing CI
+on:
+    workflow_dispatch:
+    schedule:
+        - cron: "*/10 * * * *"
+
+jobs:
+    cancel_workflow:
+        name: Cancel CI on failing pull requests
+
+        runs-on: ubuntu-latest
+
+        # Don't run on forked repos
+        if: github.repository_owner == 'project-chip'
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - uses: actions/setup-python@v5
+              with:
+                python-version: '3.12'
+            - name: Setup pip modules we use
+              run: |
+                  pip install         \
+                      click           \
+                      coloredlogs     \
+                      python-dateutil \
+                      pygithub        \
+                      && echo "DONE installint python prerequisites"
+            - name: Cancel runs
+              run: |
+                  scripts/tools/cancel_workflows_for_pr.py       \
+                    --gh-api-token "${{ secrets.GITHUB_TOKEN }}" \
+                    --require "Restyled"       \
+                    --require "Lint Code Base" \
+                    --require "ZAP"            \
+                    --require "Run misspell"   \
+                    --max-pr-age-minutes 20

@@ -225,7 +225,7 @@ tests:
     - label: "Step 1: DUT issues a C_ADD_SCENE command to the Test Harness."
       PICS: S.C.C00.Tx
       verification: |
-          ./chip-tool scenesmanagement add-scene 0x0001 0x01 20 "scene name" '[{"clusterID": "0x0300", "attributeValueList":[{"attributeID": "0x4001", "attributeValue": "0x01"}]}]' 1 1
+          ./chip-tool scenesmanagement add-scene 0x0001 0x01 20 "scene name" '[{"clusterID": "0x0300", "attributeValueList":[{"attributeID": "0x4000", "valueUnsigned16": "0x01"}]}]' 1 1
 
           Verify  TH recieves "AddScene(0x0)" command with following parameters:
           - ID 0 (GroupID): the type is a group-id.

@@ -96,7 +96,7 @@ public:
     CompressedFabricId GetCompressedFabricId() const { return mCompressedFabricId; }
     CHIP_ERROR GetCompressedFabricIdBytes(MutableByteSpan & compressedFabricId) const
     {
-        ReturnErrorCodeIf(compressedFabricId.size() != sizeof(uint64_t), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(compressedFabricId.size() == sizeof(uint64_t), CHIP_ERROR_INVALID_ARGUMENT);
         Encoding::BigEndian::Put64(compressedFabricId.data(), GetCompressedFabricId());
         return CHIP_NO_ERROR;
     }
@@ -211,6 +211,8 @@ private:
         mFabricIndex = kUndefinedFabricIndex;
         mNodeId      = kUndefinedNodeId;
     }
+
+    void SetShouldAdvertiseIdentity(bool advertiseIdentity) { mShouldAdvertiseIdentity = advertiseIdentity; }
 
     static constexpr size_t MetadataTLVMaxSize()
     {
@@ -737,6 +739,18 @@ public:
     bool HasOperationalKeyForFabric(FabricIndex fabricIndex) const;
 
     /**
+     * @brief If a newly-added fabric is pending, this returns its index, or kUndefinedFabricIndex if none are pending.
+     *
+     * A newly-added fabric is pending if AddNOC has been previously called successfully but the
+     * fabric is not yet fully committed by CommissioningComplete.
+     *
+     * NOTE: that this never returns a value other than kUndefinedFabricIndex when UpdateNOC is pending.
+     *
+     * @return the fabric index of the pending fabric, or kUndefinedFabricIndex if no fabrics are pending.
+     */
+    FabricIndex GetPendingNewFabricIndex() const;
+
+    /**
      * @brief Returns the operational keystore. This is used for
      *        CASE and the only way the keystore should be used.
      *
@@ -968,6 +982,11 @@ public:
     CHIP_ERROR AddNewFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
                                    const ByteSpan & opKeySpan, FabricIndex * outFabricIndex);
 
+    // Add a new fabric for testing. The Operational Key is a raw P256Keypair (public key and private key raw bits) that will
+    // get copied (directly) into the fabric table. The fabric will NOT be committed, and will remain pending.
+    CHIP_ERROR AddNewUncommittedFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
+                                              const ByteSpan & opKeySpan, FabricIndex * outFabricIndex);
+
     // Same as AddNewFabricForTest, but ignore if we are colliding with same <Root Public Key, Fabric Id>, so
     // that a single fabric table can have N nodes for same fabric. This usually works, but is bad form.
     CHIP_ERROR AddNewFabricForTestIgnoringCollisions(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
@@ -1009,6 +1028,18 @@ public:
      * Returns an error if the |fabricIndex| is already in use.
      */
     CHIP_ERROR SetFabricIndexForNextAddition(FabricIndex fabricIndex);
+
+    /**
+     * @brief Set the advertising behavior for the fabric identified by `fabricIndex`.
+     *
+     * It is the caller's responsibility to actually restart DNS-SD advertising
+     * as needed after updating this state.
+     *
+     * @param fabricIndex - Fabric Index for which to set the label
+     * @param advertiseIdentity - whether the identity for this fabric should be advertised.
+     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if fabricIndex does not refer to a fabric in the table
+     */
+    CHIP_ERROR SetShouldAdvertiseIdentity(FabricIndex fabricIndex, AdvertiseIdentity advertiseIdentity);
 
 private:
     enum class StateFlags : uint16_t

@@ -20,19 +20,28 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${LIT_ICD_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${LIT_ICD_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
 import time
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
+                                         default_matter_test_main)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -62,7 +71,7 @@ class TC_ICDM_3_4(MatterBaseTest):
         steps = [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads from the DUT the ICDCounter attribute."),
-            TestStep("2a", "Reboot DUT."),
+            TestStep("2a", "Power cycle DUT."),
             TestStep("2b", "TH waits for {PIXIT.WAITTIME.REBOOT}"),
             TestStep(3, "Verify that the DUT response contains value of ICDCounter and stores in IcdCounter2. \
                             IcdCounter2 is greater or equal to IcdCounter1. \
@@ -110,6 +119,16 @@ class TC_ICDM_3_4(MatterBaseTest):
             time.sleep(wait_time_reboot)
 
         self.step(3)
+        if not is_ci:
+            # since device has rebooted, force establishing a new CASE session by closing it
+            self.config = MatterTestConfig()
+            self.stack = MatterStackState(self.config)
+            devCtrl = self.stack.certificate_authorities[0].adminList[0].NewController(
+                nodeId=self.config.controller_node_id,
+                paaTrustStorePath=str(self.config.paa_trust_store_path),
+                catTags=self.config.controller_cat_tags
+            )
+            devCtrl.CloseSession(self.dut_node_id)
         icdCounter2 = await self._read_icdm_attribute_expect_success(attribute=attributes.ICDCounter)
         asserts.assert_greater_equal(icdCounter2, icdCounter1,
                                      "ICDCounter have reboot is not greater or equal to the ICDCounter read before the reboot.")

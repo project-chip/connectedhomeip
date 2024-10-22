@@ -19,11 +19,18 @@ import logging
 import os
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 
 # Absolute path to Tizen Studio CLI tool.
-tizen_sdk_root = os.environ["TIZEN_SDK_ROOT"]
+tizen_sdk_root = os.environ.get("TIZEN_SDK_ROOT", "")
+
+# Pigweed installation directory.
+pw_install_dir = os.environ.get("PW_PIGWEED_CIPD_INSTALL_DIR", "")
+
+# Absolute path to default qemu-system-arm binary.
+qemu_system_arm = shutil.which("qemu-system-arm")
 
 # Setup basic logging capabilities.
 logging.basicConfig(level=logging.DEBUG)
@@ -58,18 +65,40 @@ parser.add_argument(
     help=("path to the system data image; "
           "default: $TIZEN_SDK_ROOT/iot-sysdata.img"))
 parser.add_argument(
-    '--image-iso', metavar='IMAGE',
-    help=("path to the ISO image with the runner script; the ISO image "
-          "should have 'CHIP' label and a file named 'runner.sh' at the "
-          "root directory"))
+    '--share', type=str,
+    help=("host directory to share with the guest; if file named 'runner.sh' "
+          "is present at the root of that directory, it will be executed "
+          "automatically after boot"))
 parser.add_argument(
     '--output', metavar='FILE', default="/dev/null",
     help="store the QEMU output in a FILE")
 
 args = parser.parse_args()
 
+
+def whereis(binary_name):
+    # Get the PATH environment variable.
+    path_dirs = os.environ.get('PATH', '').split(os.pathsep)
+
+    # List to store found paths.
+    found_paths = []
+
+    # Search for the binary in each directory.
+    for directory in path_dirs:
+        if found := shutil.which(binary_name, path=directory):
+            found_paths.append(found)
+
+    return found_paths
+
+
+# If qemu-system-arm binary is from Pigweed prefer the next one in PATH if there is one.
+if pw_install_dir != "" and qemu_system_arm.startswith(pw_install_dir):
+    binaries = whereis("qemu-system-arm")
+    if len(binaries) > 1:
+        qemu_system_arm = binaries[1]
+
 qemu_args = [
-    'qemu-system-arm',
+    qemu_system_arm,
     '-monitor', 'null',
     '-serial', 'stdio',
     '-display', 'none',
@@ -78,18 +107,18 @@ qemu_args = [
     '-m', str(args.memory),
 ]
 
+if args.share:
+    # Add directory sharing.
+    qemu_args += [
+        '-virtfs',
+        'local,path=%s,mount_tag=host0,security_model=none' % args.share
+    ]
+
 if args.virtio_net:
     # Add network support.
     qemu_args += [
         '-device', 'virtio-net-device,netdev=virtio-net',
         '-netdev', 'user,id=virtio-net',
-    ]
-
-if args.image_iso:
-    # Add a block device for the runner ISO image.
-    qemu_args += [
-        '-device', 'virtio-blk-device,drive=virtio-blk3',
-        '-drive', 'file=%s,id=virtio-blk3,if=none,format=raw' % args.image_iso,
     ]
 
 # Add Tizen image block devices.

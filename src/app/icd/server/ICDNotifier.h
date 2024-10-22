@@ -71,6 +71,20 @@ public:
      */
     virtual void OnKeepActiveRequest(KeepActiveFlags request) = 0;
 
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+    /**
+     * @brief This function is called for all subscribers of the ICDNotifier when it calls NotifySITModeRequestNotification.
+     * It informs the subscriber that the ICD must be kept in SIT mode.
+     */
+    virtual void OnSITModeRequest() = 0;
+
+    /**
+     * @brief This function is called for all subscribers of the ICDNotifier when it calls NotifySITModeRequestWithdrawal.
+     * It informs the subscriber that a previous request no longer needs ICD to be kept in SIT mode.
+     */
+    virtual void OnSITModeRequestWithdrawal() = 0;
+#endif // CHIP_CONFIG_ENABLE_ICD_DSLS
+
     /**
      * @brief This function is called for all subscribers of the ICDNotifier when it calls NotifyActiveRequestWithdrawal.
      * It informs the subscriber that a previous request no longer needs ICD to maintain its Active Mode.
@@ -109,6 +123,10 @@ public:
     void NotifyNetworkActivityNotification();
     void NotifyActiveRequestNotification(ICDListener::KeepActiveFlags request);
     void NotifyActiveRequestWithdrawal(ICDListener::KeepActiveFlags request);
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+    void NotifySITModeRequestNotification();
+    void NotifySITModeRequestWithdrawal();
+#endif // CHIP_CONFIG_ENABLE_ICD_DSLS
     void NotifyICDManagementEvent(ICDListener::ICDManagementEvents event);
     void NotifySubscriptionReport();
 

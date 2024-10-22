@@ -46,6 +46,15 @@ Instruments devices.
 | Red LED On State                                 | Lock state locked                        |
 | Red & Green LED Off State                        | Lock state unlocked                      |
 
+When the device has LIT ICD functionality enabled (`chip_enable_icd_lit` set to
+true in args.gni), the functionality of the short button presses changes as
+described below:
+
+| Action                                           | Functionality            |
+| ------------------------------------------------ | ------------------------ |
+| Left Button (`BTN-1`) Press (less than 1000 ms)  | User Active Mode Trigger |
+| Right Button (`BTN-2`) Press (less than 1000 ms) | Lock state is toggled    |
+
 ## Building
 
 ### Preparation

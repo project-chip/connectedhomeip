@@ -84,14 +84,6 @@ public:
         if (data != nullptr)
         {
             LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, data));
-
-            error = DataModelLogger::LogCommand(path, data);
-            if (CHIP_NO_ERROR != error)
-            {
-                ChipLogError(NotSpecified, "Response Failure: Can not decode Data");
-                mError = error;
-                return;
-            }
         }
     }
 

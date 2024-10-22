@@ -16,31 +16,51 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements reporting engine for CHIP
- *      Data Model profile.
- *
- */
-
-#include "app/data-model-provider/ActionReturnStatus.h"
+#include <app/AppConfig.h>
+#include <app/ConcreteEventPath.h>
+#include <app/InteractionModelEngine.h>
+#include <app/RequiredPrivilege.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
+#include <app/reporting/Engine.h>
+#include <app/reporting/Read-Checked.h>
+#include <app/reporting/Read.h>
+#include <app/reporting/reporting.h>
+#include <app/util/MatterCallbacks.h>
+#include <app/util/ember-compatibility-functions.h>
+#include <lib/core/DataModelTypes.h>
+#include <protocols/interaction_model/StatusCode.h>
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
-#include <app/AppConfig.h>
-#include <app/InteractionModelEngine.h>
-#include <app/RequiredPrivilege.h>
-#include <app/reporting/Engine.h>
-#include <app/reporting/Read.h>
-#include <app/util/MatterCallbacks.h>
-#include <app/util/ember-compatibility-functions.h>
 
 using namespace chip::Access;
 
 namespace chip {
 namespace app {
 namespace reporting {
+namespace {
+
+using Protocols::InteractionModel::Status;
+
+Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eventPath)
+{
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+
+    if (!model->GetClusterInfo(eventPath).has_value())
+    {
+        return model->EndpointExists(eventPath.mEndpointId) ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
+    }
+
+    return Status::Success;
+#else
+    return CheckEventSupportStatus(eventPath);
+#endif
+}
+
+} // namespace
 
 Engine::Engine(InteractionModelEngine * apImEngine) : mpImEngine(apImEngine) {}
 
@@ -71,8 +91,10 @@ bool Engine::IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFil
         if (aPath.mEndpointId == filter->mValue.mEndpointId && aPath.mClusterId == filter->mValue.mClusterId)
         {
             existPathMatch = true;
-            if (!IsClusterDataVersionEqual(ConcreteClusterPath(filter->mValue.mEndpointId, filter->mValue.mClusterId),
-                                           filter->mValue.mDataVersion.Value()))
+
+            if (!Impl::IsClusterDataVersionEqualTo(mpImEngine->GetDataModelProvider(),
+                                                   ConcreteClusterPath(filter->mValue.mEndpointId, filter->mValue.mClusterId),
+                                                   filter->mValue.mDataVersion.Value()))
             {
                 existVersionMismatch = true;
             }
@@ -326,7 +348,8 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
         }
 
         ConcreteEventPath path(current->mValue.mEndpointId, current->mValue.mClusterId, current->mValue.mEventId);
-        Status status = CheckEventSupportStatus(path);
+        Status status = EventPathValid(mpImEngine->GetDataModelProvider(), path);
+
         if (status != Status::Success)
         {
             TLV::TLVWriter checkpoint = aWriter;
@@ -341,28 +364,31 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
 
         Access::RequestPath requestPath{ .cluster     = current->mValue.mClusterId,
                                          .endpoint    = current->mValue.mEndpointId,
-                                         .requestType = RequestType::kEventReadOrSubscribeRequest,
+                                         .requestType = RequestType::kEventReadRequest,
                                          .entityId    = current->mValue.mEventId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
 
         err = Access::GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege);
-        if (err != CHIP_ERROR_ACCESS_DENIED)
+        if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
         {
             ReturnErrorOnFailure(err);
         }
         else
         {
             TLV::TLVWriter checkpoint = aWriter;
-            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path, StatusIB(Status::UnsupportedAccess));
+            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path,
+                                                        err == CHIP_ERROR_ACCESS_DENIED ? StatusIB(Status::UnsupportedAccess)
+                                                                                                              : StatusIB(Status::AccessRestricted));
+
             if (err != CHIP_NO_ERROR)
             {
                 aWriter = checkpoint;
                 break;
             }
             aHasEncodedData = true;
-            ChipLogDetail(InteractionModel, "Access to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by ACL",
+            ChipLogDetail(InteractionModel, "Access to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by %s",
                           current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId),
-                          ChipLogValueMEI(current->mValue.mEventId));
+                          ChipLogValueMEI(current->mValue.mEventId), err == CHIP_ERROR_ACCESS_DENIED ? "ACL" : "ARL");
         }
         current = current->mpNext;
     }
@@ -826,7 +852,7 @@ bool Engine::MergeDirtyPathsUnderSameEndpoint()
 
 CHIP_ERROR Engine::InsertPathIntoDirtySet(const AttributePathParams & aAttributePath)
 {
-    ReturnErrorCodeIf(MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
+    VerifyOrReturnError(!MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
 
     if (mGlobalDirtySet.Exhausted() && !MergeDirtyPathsUnderSameCluster() && !MergeDirtyPathsUnderSameEndpoint())
     {
@@ -836,7 +862,7 @@ CHIP_ERROR Engine::InsertPathIntoDirtySet(const AttributePathParams & aAttribute
         object->mGeneration = GetDirtySetGeneration();
     }
 
-    ReturnErrorCodeIf(MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
+    VerifyOrReturnError(!MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
     ChipLogDetail(DataManagement, "Cannot merge the new path into any existing path, create one.");
 
     auto object = mGlobalDirtySet.CreateObject();
@@ -852,7 +878,7 @@ CHIP_ERROR Engine::InsertPathIntoDirtySet(const AttributePathParams & aAttribute
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
+CHIP_ERROR Engine::SetDirty(const AttributePathParams & aAttributePath)
 {
     BumpDirtySetGeneration();
 
@@ -1007,7 +1033,16 @@ void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
     Run();
 }
 
-}; // namespace reporting
+void Engine::MarkDirty(const AttributePathParams & path)
+{
+    CHIP_ERROR err = SetDirty(path);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Failed to set path dirty: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+} // namespace reporting
 } // namespace app
 } // namespace chip
 

@@ -42,7 +42,7 @@ enum ID : uint16_t
     kFlashAddress  = 0x0101,
     kFlashSize     = 0x0102,
     kFlashPageSize = 0x0103,
-    kBaseAddress   = 0x0104,
+    kCredsAddress  = 0x0104,
     kCsrFile       = 0x0105,
     // Options,
     kVersion       = 0x0111,
@@ -175,7 +175,6 @@ public:
 
     CHIP_ERROR Initialize(uint32_t flash_addr = 0, uint32_t flash_size = 0);
     CHIP_ERROR Commit();
-    CHIP_ERROR GetBaseAddress(uint32_t & value);
 
     //
     // Generic Interface
@@ -233,6 +232,8 @@ public:
     // Other
     //
 
+    CHIP_ERROR SetCredentialsBaseAddress(uint32_t addr);
+    CHIP_ERROR GetCredentialsBaseAddress(uint32_t & addr);
     CHIP_ERROR GetSetupPayload(chip::MutableCharSpan & value);
     CHIP_ERROR SetProvisionRequest(bool value);
     CHIP_ERROR GetProvisionRequest(bool & value);

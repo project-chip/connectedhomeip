@@ -61,4 +61,11 @@ config MBEDTLS_ECDH_C
 config MBEDTLS_ECDSA_C
     default y
 
+config MBEDTLS_X509_CSR_WRITE_C
+    default y
+
+config MBEDTLS_PK_WRITE_C
+    default y
+
 endif #CHIP
+

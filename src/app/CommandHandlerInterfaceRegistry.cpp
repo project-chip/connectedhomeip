@@ -68,8 +68,11 @@ void CommandHandlerInterfaceRegistry::UnregisterAllCommandHandlersForEndpoint(En
 {
     CommandHandlerInterface * prev = nullptr;
 
-    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
+    for (auto * cur = mCommandHandlerList; cur;)
     {
+        // Fetch next node in the list before we remove this one.
+        auto * next = cur->GetNext();
+
         if (cur->MatchesEndpoint(endpointId))
         {
             if (prev == nullptr)
@@ -87,6 +90,8 @@ void CommandHandlerInterfaceRegistry::UnregisterAllCommandHandlersForEndpoint(En
         {
             prev = cur;
         }
+
+        cur = next;
     }
 }
 

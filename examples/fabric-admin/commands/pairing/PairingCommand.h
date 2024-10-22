@@ -45,20 +45,6 @@ enum class PairingNetworkType
     Thread,
 };
 
-class CommissioningDelegate
-{
-public:
-    virtual void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err) = 0;
-    virtual ~CommissioningDelegate()                                            = default;
-};
-
-class PairingDelegate
-{
-public:
-    virtual void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) = 0;
-    virtual ~PairingDelegate()                                          = default;
-};
-
 class PairingCommand : public CHIPCommand,
                        public chip::Controller::DevicePairingDelegate,
                        public chip::Controller::DeviceDiscoveryDelegate,
@@ -225,15 +211,6 @@ public:
                                       const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
                                       chip::Credentials::AttestationVerificationResult attestationResult) override;
 
-    /////////// CommissioningDelegate /////////
-    void RegisterCommissioningDelegate(CommissioningDelegate * delegate) { mCommissioningDelegate = delegate; }
-    void UnregisterCommissioningDelegate() { mCommissioningDelegate = nullptr; }
-
-    /////////// PairingDelegate /////////
-    void RegisterPairingDelegate(PairingDelegate * delegate) { mPairingDelegate = delegate; }
-    void UnregisterPairingDelegate() { mPairingDelegate = nullptr; }
-    PairingDelegate * GetPairingDelegate() { return mPairingDelegate; }
-
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
     CHIP_ERROR Pair(NodeId remoteId, PeerAddress address);
@@ -249,7 +226,7 @@ private:
     const PairingNetworkType mNetworkType;
     const chip::Dnssd::DiscoveryFilterType mFilterType;
     Command::AddressWithInterface mRemoteAddr;
-    NodeId mNodeId;
+    NodeId mNodeId = chip::kUndefinedNodeId;
     chip::Optional<uint16_t> mTimeout;
     chip::Optional<bool> mDiscoverOnce;
     chip::Optional<bool> mUseOnlyOnNetworkDiscovery;
@@ -271,26 +248,23 @@ private:
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>>
         mComplex_DSTOffsets;
 
-    uint16_t mRemotePort;
-    uint16_t mDiscriminator;
-    uint32_t mSetupPINCode;
-    uint16_t mIndex;
+    uint16_t mRemotePort    = 0;
+    uint16_t mDiscriminator = 0;
+    uint32_t mSetupPINCode  = 0;
+    uint16_t mIndex         = 0;
     chip::ByteSpan mOperationalDataset;
     chip::ByteSpan mSSID;
     chip::ByteSpan mPassword;
-    char * mOnboardingPayload;
-    uint64_t mDiscoveryFilterCode;
-    char * mDiscoveryFilterInstanceName;
+    char * mOnboardingPayload           = nullptr;
+    uint64_t mDiscoveryFilterCode       = 0;
+    char * mDiscoveryFilterInstanceName = nullptr;
 
-    bool mDeviceIsICD;
+    bool mDeviceIsICD = false;
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
     // For unpair
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;
     chip::Callback::Callback<chip::Controller::OnCurrentFabricRemove> mCurrentFabricRemoveCallback;
-
-    CommissioningDelegate * mCommissioningDelegate = nullptr;
-    PairingDelegate * mPairingDelegate             = nullptr;
 
     static void OnCurrentFabricRemove(void * context, NodeId remoteNodeId, CHIP_ERROR status);
     void PersistIcdInfo();

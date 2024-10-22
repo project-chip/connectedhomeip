@@ -108,8 +108,8 @@ extern "C" {
 #include "RTE_Components.h"
 #include CMSIS_device_header
 
-#include "em_assert.h"
 #include "em_device.h"
+#include "sl_assert.h"
 
 #if defined(SL_COMPONENT_CATALOG_PRESENT)
 #include "sl_component_catalog.h"

@@ -143,7 +143,7 @@ void NrfWiFiDriver::OnNetworkConnStatusChanged(const wifi_conn_status & connStat
             ssid    = WiFiManager::Instance().GetWantedNetwork().ssid;
             ssidLen = WiFiManager::Instance().GetWantedNetwork().ssidLen;
         }
-        mpNetworkStatusChangeCallback->OnNetworkingStatusChange(status, MakeOptional(ByteSpan(wifiInfo.mSsid, wifiInfo.mSsidLen)),
+        mpNetworkStatusChangeCallback->OnNetworkingStatusChange(status, MakeOptional(ByteSpan(ssid, ssidLen)),
                                                                 connStatus ? MakeOptional(static_cast<int32_t>(connStatus))
                                                                            : NullOptional);
     }
