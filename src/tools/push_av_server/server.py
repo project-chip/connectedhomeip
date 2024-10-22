@@ -385,8 +385,6 @@ device_hierarchy: CAHierarchy = None
 
 @app.get("/", response_class=HTMLResponse)
 def root():
-    # TODO Include the UI here
-
     with open("index.html", "r") as f:
         return f.read()
 
@@ -474,8 +472,8 @@ def ffprobe_check(file_path: str, stream_id: int):
 
 @app.get("/certs", status_code=200)
 def list_certs():
-    server = [f.name for f in pathlib.Path(wd.path("server")).iterdir()]
-    device = [f.name for f in pathlib.Path(wd.path("device")).iterdir()]
+    server = [f.name for f in pathlib.Path(wd.path("certs", "server")).iterdir()]
+    device = [f.name for f in pathlib.Path(wd.path("certs", "device")).iterdir()]
 
     return {"server": server, "device": device}
 
@@ -502,8 +500,10 @@ def sign_client_certificate(
 
 def run(host: Optional[str], port: Optional[int], working_directory: Optional[str], dns: Optional[str]):
     global wd, device_hierarchy
-    # For the Test Harness implementation, will need to find a way to return a reference
-    # to the server running in the background. This function currently doesn't return.
+    """Run the reference server. This function will not return.
+        In the context where a background server is required, the multiprocessing.Process object
+        can be used.
+    """
     with WorkingDirectory(working_directory) as directory:
 
         # Sharing state with the various endpoints

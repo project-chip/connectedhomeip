@@ -1,5 +1,6 @@
 import push_av_server
 
+from multiprocessing import Process
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
@@ -13,6 +14,18 @@ class TC_PAVS_1_0(MatterBaseTest):
     NOTE: this class is only a guide to understand what APIs I'd need to integrate in the push av server
     for a better integration. It is not designed to be merged nor does it actually run.
     """
+
+    def setup_class(self):
+        super().setup_class()
+
+        self.proc = Process(target=push_av_server.run,
+                            args=("127.0.0.1", 1234, None, "localhost"),
+                            daemon=True)
+        self.proc.start()
+
+    def teardown_class(self):
+        super().teardown_class()
+        self.proc.terminate()
 
     def steps_TC_PAVS_1_0(self):
         return [TestStep(1, "Commissioning, already done", is_commissioning=True),
