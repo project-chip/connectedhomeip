@@ -67,22 +67,26 @@ typedef struct {} variable_hidden_by_mtr_hide;
 
 #pragma mark - XPC Defines
 
-#define MTR_SIMPLE_REMOTE_XPC_GETTER(XPC_CONNECTION, NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, PREFIX) \
-                                                                                                     \
-    -(TYPE) NAME                                                                                     \
-    {                                                                                                \
-        __block TYPE outValue = DEFAULT_VALUE;                                                       \
-                                                                                                     \
-        NSXPCConnection * xpcConnection = XPC_CONNECTION;                                            \
-                                                                                                     \
-        [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {   \
-            MTR_LOG_ERROR("Error: %@", error);                                                       \
-        }] PREFIX                                                                                    \
-            GETTER_NAME:^(TYPE returnValue) {                                                        \
-                outValue = returnValue;                                                              \
-            }];                                                                                      \
-                                                                                                     \
-        return outValue;                                                                             \
+#define MTR_SIMPLE_REMOTE_XPC_GETTER(XPC_CONNECTION, NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, PREFIX)   \
+                                                                                                       \
+    -(TYPE) NAME                                                                                       \
+    {                                                                                                  \
+        __block TYPE outValue = DEFAULT_VALUE;                                                         \
+                                                                                                       \
+        NSXPCConnection * xpcConnection = XPC_CONNECTION;                                              \
+                                                                                                       \
+        @try {                                                                                         \
+            [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) { \
+                MTR_LOG_ERROR("Error: %@", error);                                                     \
+            }] PREFIX                                                                                  \
+                GETTER_NAME:^(TYPE returnValue) {                                                      \
+                    outValue = returnValue;                                                            \
+                }];                                                                                    \
+        } @catch (NSException * exception) {                                                           \
+            MTR_LOG_ERROR("Exception sending XPC messsage: %@", exception);                            \
+            outValue = DEFAULT_VALUE;                                                                  \
+        }                                                                                              \
+        return outValue;                                                                               \
     }
 
 #define MTR_SIMPLE_REMOTE_XPC_COMMAND(XPC_CONNECTION, METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, PREFIX) \
@@ -91,9 +95,13 @@ typedef struct {} variable_hidden_by_mtr_hide;
     {                                                                                                 \
         NSXPCConnection * xpcConnection = XPC_CONNECTION;                                             \
                                                                                                       \
-        [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {               \
-            MTR_LOG_ERROR("Error: %@", error);                                                        \
-        }] PREFIX ADDITIONAL_ARGUMENTS];                                                              \
+        @try {                                                                                        \
+            [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {           \
+                MTR_LOG_ERROR("Error: %@", error);                                                    \
+            }] PREFIX ADDITIONAL_ARGUMENTS];                                                          \
+        } @catch (NSException * exception) {                                                          \
+            MTR_LOG_ERROR("Exception sending XPC messsage: %@", exception);                           \
+        }                                                                                             \
     }
 
 #define MTR_COMPLEX_REMOTE_XPC_GETTER(XPC_CONNECTION, SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS, PREFIX) \
@@ -103,11 +111,16 @@ typedef struct {} variable_hidden_by_mtr_hide;
                                                                                                                     \
         NSXPCConnection * xpcConnection = XPC_CONNECTION;                                                           \
                                                                                                                     \
-        [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {                  \
-            MTR_LOG_ERROR("Error: %@", error);                                                                      \
-        }] PREFIX ADDITIONAL_ARGUMENTS:^(TYPE returnValue) {                                                        \
-            outValue = returnValue;                                                                                 \
-        }];                                                                                                         \
+        @try {                                                                                                      \
+            [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {              \
+                MTR_LOG_ERROR("Error: %@", error);                                                                  \
+            }] PREFIX ADDITIONAL_ARGUMENTS:^(TYPE returnValue) {                                                    \
+                outValue = returnValue;                                                                             \
+            }];                                                                                                     \
+        } @catch (NSException * exception) {                                                                        \
+            MTR_LOG_ERROR("Exception sending XPC messsage: %@", exception);                                         \
+            outValue = DEFAULT_VALUE;                                                                               \
+        }                                                                                                           \
                                                                                                                     \
         return outValue;                                                                                            \
     }

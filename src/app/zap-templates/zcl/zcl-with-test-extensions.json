@@ -27,6 +27,8 @@
         "boolean-state-configuration-cluster.xml",
         "actions-cluster.xml",
         "bridged-device-basic-information.xml",
+        "camera-av-stream-management-cluster.xml",
+        "chime-cluster.xml",
         "chip-ota.xml",
         "channel-cluster.xml",
         "clusters-extensions.xml",
@@ -130,6 +132,8 @@
         "washer-controls-cluster.xml",
         "water-heater-management-cluster.xml",
         "water-heater-mode-cluster.xml",
+        "webrtc-provider-cluster.xml",
+        "webrtc-requestor-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "wifi-network-management-cluster.xml",
         "window-covering.xml",
@@ -137,7 +141,8 @@
         "sample-mei-cluster.xml",
         "types/door-lock.xml",
         "types/occupancy-sensing.xml",
-        "types/thermostat-user-interface-configuration.xml"
+        "types/thermostat-user-interface-configuration.xml",
+        "zone-management-cluster.xml"
     ],
     "manufacturersXml": "../../../../src/app/zap-templates/zcl/data-model/manufacturers.xml",
     "options": {
@@ -285,8 +290,7 @@
             "ActiveModeThreshold",
             "RegisteredClients",
             "ICDCounter",
-            "ClientsSupportedPerFabric",
-            "MaximumCheckInBackOff"
+            "ClientsSupportedPerFabric"
         ],
         "Occupancy Sensing": ["HoldTimeLimits", "HoldTime", "FeatureMap"],
         "Operational Credentials": [
@@ -415,13 +419,7 @@
             "DSTOffsetListMaxSize"
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
-        "Dishwasher Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "StartUpMode",
-            "OnMode",
-            "FeatureMap"
-        ],
+        "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Control": [
             "CookTime",
@@ -435,18 +433,10 @@
             "WattRating",
             "FeatureMap"
         ],
-        "Laundry Washer Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "StartUpMode",
-            "OnMode",
-            "FeatureMap"
-        ],
+        "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
             "SupportedModes",
             "CurrentMode",
-            "StartUpMode",
-            "OnMode",
             "FeatureMap"
         ],
         "RVC Clean Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
@@ -679,7 +669,15 @@
             "ThreadNetworks",
             "ThreadNetworkTableSize"
         ],
-        "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"]
+        "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"],
+        "Camera AV Stream Management": [
+            "VideoSensorParams",
+            "MinViewport",
+            "MicrophoneCapabilities",
+            "SpeakerCapabilities",
+            "CurrentSnapshotConfig",
+            "Viewport"
+        ]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",
