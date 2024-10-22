@@ -65,7 +65,7 @@ osSemaphoreId_t sl_rs_ble_init_sem;
 osTimerId_t sbleAdvTimeoutTimer;
 
 static osThreadId_t sBleThread;
-constexpr uint32_t kBleTaskSize = 2048;
+constexpr uint32_t kBleTaskSize = 2560;
 static uint8_t bleStack[kBleTaskSize];
 static osThread_t sBleTaskControlBlock;
 constexpr osThreadAttr_t kBleTaskAttr = { .name       = "rsi_ble",
@@ -120,39 +120,39 @@ void BLEManagerImpl::ProcessEvent(SilabsBleWrapper::BleEvent_t inEvent)
     switch (inEvent.eventType)
     {
     case SilabsBleWrapper::BleEventType::RSI_BLE_CONN_EVENT: {
-        BLEMgrImpl().HandleConnectEvent((inEvent.eventData));
+        BLEMgrImpl().HandleConnectEvent(&inEvent.eventData);
         // Requests the connection parameters change with the remote device
-        rsi_ble_conn_params_update(inEvent.eventData->resp_enh_conn.dev_addr, BLE_MIN_CONNECTION_INTERVAL_MS,
+        rsi_ble_conn_params_update(inEvent.eventData.resp_enh_conn.dev_addr, BLE_MIN_CONNECTION_INTERVAL_MS,
                                    BLE_MAX_CONNECTION_INTERVAL_MS, BLE_SLAVE_LATENCY_MS, BLE_TIMEOUT_MS);
-        rsi_ble_set_data_len(inEvent.eventData->resp_enh_conn.dev_addr, RSI_BLE_TX_OCTETS, RSI_BLE_TX_TIME);
+        rsi_ble_set_data_len(inEvent.eventData.resp_enh_conn.dev_addr, RSI_BLE_TX_OCTETS, RSI_BLE_TX_TIME);
 
         // Used to send the Indication confirmation
-        memcpy(dev_address, inEvent.eventData->resp_enh_conn.dev_addr, RSI_DEV_ADDR_LEN);
-        ble_measurement_hndl = inEvent.eventData->rsi_ble_measurement_hndl;
+        memcpy(dev_address, inEvent.eventData.resp_enh_conn.dev_addr, RSI_DEV_ADDR_LEN);
+        ble_measurement_hndl = inEvent.eventData.rsi_ble_measurement_hndl;
     }
     break;
     case SilabsBleWrapper::BleEventType::RSI_BLE_DISCONN_EVENT: {
         // event invokes when disconnection was completed
-        BLEMgrImpl().HandleConnectionCloseEvent(inEvent.eventData);
+        BLEMgrImpl().HandleConnectionCloseEvent(&inEvent.eventData);
     }
     break;
     case SilabsBleWrapper::BleEventType::RSI_BLE_MTU_EVENT: {
         // event invokes when write/notification events received
-        BLEMgrImpl().UpdateMtu(inEvent.eventData);
+        BLEMgrImpl().UpdateMtu(&inEvent.eventData);
     }
     break;
     case SilabsBleWrapper::BleEventType::RSI_BLE_EVENT_GATT_RD: {
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-        if (inEvent.eventData->rsi_ble_read_req->type == 0)
+        if (inEvent.eventData.rsi_ble_read_req->type == 0)
         {
-            BLEMgrImpl().HandleC3ReadRequest(inEvent.eventData);
+            BLEMgrImpl().HandleC3ReadRequest(&inEvent.eventData);
         }
 #endif // CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     }
     break;
     case SilabsBleWrapper::BleEventType::RSI_BLE_GATT_WRITE_EVENT: {
         // event invokes when write/notification events received
-        BLEMgrImpl().HandleWriteEvent(inEvent.eventData);
+        BLEMgrImpl().HandleWriteEvent(&inEvent.eventData);
     }
     break;
     case SilabsBleWrapper::BleEventType::RSI_BLE_GATT_INDICATION_CONFIRMATION: {
@@ -223,7 +223,7 @@ void BLEManagerImpl::sl_ble_init()
     SilabsBleWrapper::rsi_ble_add_matter_service();
     rsi_ble_set_random_address_with_value(randomAddrBLE);
 
-    sInstance.sBleEventQueue = osMessageQueueNew(WFX_QUEUE_SIZE, sizeof(WfxEvent_t), NULL);
+    sInstance.sBleEventQueue = osMessageQueueNew(WFX_QUEUE_SIZE, sizeof(SilabsBleWrapper::BleEvent_t), NULL);
     VerifyOrDie(sInstance.sBleEventQueue != nullptr);
 
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleBootEvent();

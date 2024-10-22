@@ -112,7 +112,7 @@ public:
     struct BleEvent_t
     {
         BleEventType eventType;
-        sl_wfx_msg_t * eventData;
+        sl_wfx_msg_t eventData;
     };
 
     // ALL Ble functions

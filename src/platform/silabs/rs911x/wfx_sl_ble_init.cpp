@@ -23,7 +23,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/silabs/BLEManagerImpl.h>
-
+#include "silabs_utils.h"
 using namespace chip::DeviceLayer::Internal;
 
 // Global Variables
@@ -41,7 +41,7 @@ SilabsBleWrapper::BleEvent_t bleEvent;
 void SilabsBleWrapper::rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu)
 {
     bleEvent.eventType = BleEventType::RSI_BLE_MTU_EVENT;
-    memcpy(&bleEvent.eventData->rsi_ble_mtu, rsi_ble_mtu, sizeof(rsi_ble_event_mtu_t));
+    memcpy(&bleEvent.eventData.rsi_ble_mtu, rsi_ble_mtu, sizeof(rsi_ble_event_mtu_t));
     BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
@@ -58,8 +58,8 @@ void SilabsBleWrapper::rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu)
 void SilabsBleWrapper::rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t * rsi_ble_write)
 {
     bleEvent.eventType           = BleEventType::RSI_BLE_GATT_WRITE_EVENT;
-    bleEvent.eventData->event_id = event_id;
-    memcpy(&bleEvent.eventData->rsi_ble_write, rsi_ble_write, sizeof(rsi_ble_event_write_t));
+    bleEvent.eventData.event_id = event_id;
+    memcpy(&bleEvent.eventData.rsi_ble_write, rsi_ble_write, sizeof(rsi_ble_event_write_t));
     BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
@@ -75,9 +75,9 @@ void SilabsBleWrapper::rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_ev
 void SilabsBleWrapper::rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * resp_enh_conn)
 {
     bleEvent.eventType                   = BleEventType::RSI_BLE_CONN_EVENT;
-    bleEvent.eventData->connectionHandle = 1;
-    bleEvent.eventData->bondingHandle    = 255;
-    memcpy(bleEvent.eventData->resp_enh_conn.dev_addr, resp_enh_conn->dev_addr, RSI_DEV_ADDR_LEN);
+    bleEvent.eventData.connectionHandle = 1;
+    bleEvent.eventData.bondingHandle    = 255;
+    memcpy(bleEvent.eventData.resp_enh_conn.dev_addr, resp_enh_conn->dev_addr, RSI_DEV_ADDR_LEN);
     BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
@@ -94,7 +94,7 @@ void SilabsBleWrapper::rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhanc
 void SilabsBleWrapper::rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, uint16_t reason)
 {
     bleEvent.eventType         = BleEventType::RSI_BLE_DISCONN_EVENT;
-    bleEvent.eventData->reason = reason;
+    bleEvent.eventData.reason = reason;
     BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
@@ -111,8 +111,8 @@ void SilabsBleWrapper::rsi_ble_on_event_indication_confirmation(uint16_t resp_st
                                                                 rsi_ble_set_att_resp_t * rsi_ble_event_set_att_rsp)
 {
     bleEvent.eventType              = BleEventType::RSI_BLE_GATT_INDICATION_CONFIRMATION;
-    bleEvent.eventData->resp_status = resp_status;
-    memcpy(&bleEvent.eventData->rsi_ble_event_set_att_rsp, rsi_ble_event_set_att_rsp, sizeof(rsi_ble_set_att_resp_t));
+    bleEvent.eventData.resp_status = resp_status;
+    memcpy(&bleEvent.eventData.rsi_ble_event_set_att_rsp, rsi_ble_event_set_att_rsp, sizeof(rsi_ble_set_att_resp_t));
     BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
@@ -129,8 +129,8 @@ void SilabsBleWrapper::rsi_ble_on_event_indication_confirmation(uint16_t resp_st
 void SilabsBleWrapper::rsi_ble_on_read_req_event(uint16_t event_id, rsi_ble_read_req_t * rsi_ble_read_req)
 {
     bleEvent.eventType           = BleEventType::RSI_BLE_EVENT_GATT_RD;
-    bleEvent.eventData->event_id = event_id;
-    memcpy(&bleEvent.eventData->rsi_ble_read_req, rsi_ble_read_req, sizeof(rsi_ble_read_req_t));
+    bleEvent.eventData.event_id = event_id;
+    memcpy(&bleEvent.eventData.rsi_ble_read_req, rsi_ble_read_req, sizeof(rsi_ble_read_req_t));
     BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
@@ -340,14 +340,14 @@ uint32_t SilabsBleWrapper::rsi_ble_add_matter_service(void)
         new_serv_resp.start_handle + RSI_BLE_CHARACTERISTIC_TX_MEASUREMENT_HANDLE_LOCATION, custom_characteristic_TX);
 
     // Adding characteristic value attribute to the service
-    bleEvent.eventData->rsi_ble_measurement_hndl =
+    bleEvent.eventData.rsi_ble_measurement_hndl =
         new_serv_resp.start_handle + RSI_BLE_CHARACTERISTIC_TX_MEASUREMENT_HANDLE_LOCATION;
 
     // Adding characteristic value attribute to the service
-    bleEvent.eventData->rsi_ble_gatt_server_client_config_hndl =
+    bleEvent.eventData.rsi_ble_gatt_server_client_config_hndl =
         new_serv_resp.start_handle + RSI_BLE_CHARACTERISTIC_TX_GATT_SERVER_CLIENT_HANDLE_LOCATION;
 
-    rsi_ble_add_char_val_att(new_serv_resp.serv_handler, bleEvent.eventData->rsi_ble_measurement_hndl, custom_characteristic_TX,
+    rsi_ble_add_char_val_att(new_serv_resp.serv_handler, bleEvent.eventData.rsi_ble_measurement_hndl, custom_characteristic_TX,
                              RSI_BLE_ATT_PROPERTY_WRITE_NO_RESPONSE | RSI_BLE_ATT_PROPERTY_WRITE | RSI_BLE_ATT_PROPERTY_READ |
                                  RSI_BLE_ATT_PROPERTY_NOTIFY |
                                  RSI_BLE_ATT_PROPERTY_INDICATE, // Set read, write, write without response
