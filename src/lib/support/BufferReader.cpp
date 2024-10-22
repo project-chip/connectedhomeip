@@ -16,11 +16,11 @@
  */
 
 #include "BufferReader.h"
-#include "lib/core/CHIPError.h"
 
-#include <cstdint>
+#include <lib/core/CHIPError.h>
 #include <lib/core/CHIPEncoding.h>
 
+#include <cstdint>
 #include <string.h>
 #include <type_traits>
 
