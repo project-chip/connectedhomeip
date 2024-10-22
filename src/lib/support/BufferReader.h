@@ -142,7 +142,6 @@ protected:
     /// Our current status.
     CHIP_ERROR mStatus = CHIP_NO_ERROR;
 
-
     /// Make sure we have at least the given number of bytes available (does not consume them)
     bool EnsureAvailable(size_t size)
     {
