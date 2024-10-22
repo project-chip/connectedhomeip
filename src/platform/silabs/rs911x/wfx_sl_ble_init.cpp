@@ -37,14 +37,8 @@ using namespace chip::DeviceLayer::Internal;
  */
 void SilabsBleWrapper::rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu)
 {
-
-    SilabsBleWrapper::BleEvent_t bleEvent = {
-	    .eventType = BleEventType::RSI_BLE_MTU_EVENT,
-	    .eventData = {
-	        .connectionHandle = 1,
-	        .rsi_ble_mtu = *rsi_ble_mtu
-	    }
-	};
+    SilabsBleWrapper::BleEvent_t bleEvent = { .eventType = BleEventType::RSI_BLE_MTU_EVENT,
+                                              .eventData = { .connectionHandle = 1, .rsi_ble_mtu = *rsi_ble_mtu } };
 
     BLEMgrImpl().BlePostEvent(&bleEvent);
 }
@@ -79,13 +73,11 @@ void SilabsBleWrapper::rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_ev
  */
 void SilabsBleWrapper::rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * resp_enh_conn)
 {
-    SilabsBleWrapper::BleEvent_t bleEvent = {
-	    .eventType = BleEventType::RSI_BLE_CONN_EVENT,
-	    .eventData = {
-	        .connectionHandle = 1,
-            .bondingHandle = 255,
-	    }
-	};
+    SilabsBleWrapper::BleEvent_t bleEvent = { .eventType = BleEventType::RSI_BLE_CONN_EVENT,
+                                              .eventData = {
+                                                  .connectionHandle = 1,
+                                                  .bondingHandle    = 255,
+                                              } };
     memcpy(bleEvent.eventData.resp_enh_conn.dev_addr, resp_enh_conn->dev_addr, RSI_DEV_ADDR_LEN);
     BLEMgrImpl().BlePostEvent(&bleEvent);
 }
@@ -102,12 +94,7 @@ void SilabsBleWrapper::rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhanc
  */
 void SilabsBleWrapper::rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, uint16_t reason)
 {
-    SilabsBleWrapper::BleEvent_t bleEvent = {
-	    .eventType = BleEventType::RSI_BLE_DISCONN_EVENT,
-	    .eventData = {
-	        .reason = reason
-	    }
-	};
+    SilabsBleWrapper::BleEvent_t bleEvent = { .eventType = BleEventType::RSI_BLE_DISCONN_EVENT, .eventData = { .reason = reason } };
     BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
@@ -123,13 +110,9 @@ void SilabsBleWrapper::rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * 
 void SilabsBleWrapper::rsi_ble_on_event_indication_confirmation(uint16_t resp_status,
                                                                 rsi_ble_set_att_resp_t * rsi_ble_event_set_att_rsp)
 {
-    SilabsBleWrapper::BleEvent_t bleEvent = {
-	    .eventType = BleEventType::RSI_BLE_GATT_INDICATION_CONFIRMATION,
-	    .eventData = {
-	        .resp_status = resp_status,
-            .rsi_ble_event_set_att_rsp = *rsi_ble_event_set_att_rsp
-	    }
-	};
+    SilabsBleWrapper::BleEvent_t bleEvent = { .eventType = BleEventType::RSI_BLE_GATT_INDICATION_CONFIRMATION,
+                                              .eventData = { .resp_status               = resp_status,
+                                                             .rsi_ble_event_set_att_rsp = *rsi_ble_event_set_att_rsp } };
     BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
@@ -145,13 +128,8 @@ void SilabsBleWrapper::rsi_ble_on_event_indication_confirmation(uint16_t resp_st
  */
 void SilabsBleWrapper::rsi_ble_on_read_req_event(uint16_t event_id, rsi_ble_read_req_t * rsi_ble_read_req)
 {
-    SilabsBleWrapper::BleEvent_t bleEvent = {
-	    .eventType = BleEventType::RSI_BLE_EVENT_GATT_RD,
-	    .eventData = {
-	        .event_id = event_id,
-            .rsi_ble_read_req = rsi_ble_read_req
-	    }
-	};
+    SilabsBleWrapper::BleEvent_t bleEvent = { .eventType = BleEventType::RSI_BLE_EVENT_GATT_RD,
+                                              .eventData = { .event_id = event_id, .rsi_ble_read_req = rsi_ble_read_req } };
     BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 

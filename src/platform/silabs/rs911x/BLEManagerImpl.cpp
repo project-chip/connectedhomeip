@@ -120,14 +120,13 @@ void rsi_ble_add_matter_service(void)
     custom_service.val.val16                                = RSI_BLE_MATTER_CUSTOM_SERVICE_VALUE_16;
     uint8_t data[RSI_BLE_MATTER_CUSTOM_SERVICE_DATA_LENGTH] = { RSI_BLE_MATTER_CUSTOM_SERVICE_DATA };
 
-    const uuid_t custom_characteristic_RX = {
-        .size     = RSI_BLE_CUSTOM_CHARACTERISTIC_RX_SIZE,
-        .reserved = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_RESERVED },
-        .val      = { .val128 = { .data1 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_1 },
-                                  .data2 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_2 },
-                                  .data3 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_3 },
-                                  .data4 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_4 } } }
-    };
+    const uuid_t custom_characteristic_RX = { .size     = RSI_BLE_CUSTOM_CHARACTERISTIC_RX_SIZE,
+                                              .reserved = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_RESERVED },
+                                              .val      = {
+                                                       .val128 = { .data1 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_1 },
+                                                                   .data2 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_2 },
+                                                                   .data3 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_3 },
+                                                                   .data4 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_4 } } } };
 
     rsi_ble_resp_add_serv_t new_serv_resp = { 0 };
     rsi_ble_add_service(custom_service, &new_serv_resp);
@@ -145,14 +144,13 @@ void rsi_ble_add_matter_service(void)
         RSI_BLE_ATT_PROPERTY_WRITE | RSI_BLE_ATT_PROPERTY_READ, // Set read, write, write without response
         data, sizeof(data), ATT_REC_IN_HOST);
 
-    const uuid_t custom_characteristic_TX = {
-        .size     = RSI_BLE_CUSTOM_CHARACTERISTIC_TX_SIZE,
-        .reserved = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_RESERVED },
-        .val      = { .val128 = { .data1 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_1 },
-                                  .data2 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_2 },
-                                  .data3 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_3 },
-                                  .data4 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_4 } } }
-    };
+    const uuid_t custom_characteristic_TX = { .size     = RSI_BLE_CUSTOM_CHARACTERISTIC_TX_SIZE,
+                                              .reserved = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_RESERVED },
+                                              .val      = {
+                                                       .val128 = { .data1 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_1 },
+                                                                   .data2 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_2 },
+                                                                   .data3 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_3 },
+                                                                   .data4 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_4 } } } };
 
     // Adding custom characteristic declaration to the custom service
     SilabsBleWrapper::rsi_ble_add_char_serv_att(
