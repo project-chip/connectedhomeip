@@ -46,6 +46,7 @@
 #include <EnergyManagementAppCmdLineOptions.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
+#include <app/util/endpoint-config-api.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/ESP32Utils.h>
@@ -173,10 +174,14 @@ void ApplicationInit()
 #if CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
     EvseApplicationInit(kEvseEndpoint);
+    // Disable Water Heater Endpoint
+    emberAfEndpointEnableDisable(kWaterHeaterEndpoint, false);
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
     FullWhmApplicationInit(kWaterHeaterEndpoint);
+    // Disable EVSE Endpoint
+    emberAfEndpointEnableDisable(kEvseEndpoint, false);
 #endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
 }
 

@@ -36,6 +36,7 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <assert.h>
 #include <lib/support/BitMask.h>
 
@@ -148,12 +149,16 @@ void ApplicationInit()
     SILABS_LOG("energy-management-example EVSE starting. featureMap 0x%08lx", DeviceEnergyManagement::sFeatureMap.Raw());
 
     EvseApplicationInit(kEvseEndpoint);
+    // Disable Water Heater Endpoint
+    emberAfEndpointEnableDisable(kWaterHeaterEndpoint, false);
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #if SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
     SILABS_LOG("energy-management-example WaterHeater starting. featureMap 0x%08lx", DeviceEnergyManagement::sFeatureMap.Raw());
 
     FullWhmApplicationInit(kWaterHeaterEndpoint);
+    // Disable EVSE Endpoint
+    emberAfEndpointEnableDisable(kEvseEndpoint, false);
 #endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
     SILABS_LOG("==================================================");
 
