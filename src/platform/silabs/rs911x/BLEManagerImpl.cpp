@@ -59,7 +59,8 @@ extern "C" {
 
 // Used to send the Indication Confirmation
 uint8_t dev_address[RSI_DEV_ADDR_LEN];
-uint16_t ble_measurement_hndl;
+uint16_t rsi_ble_measurement_hndl;
+uint16_t rsi_ble_gatt_server_client_config_hndl;
 
 osSemaphoreId_t sl_rs_ble_init_sem;
 osTimerId_t sbleAdvTimeoutTimer;
@@ -128,7 +129,6 @@ void BLEManagerImpl::ProcessEvent(SilabsBleWrapper::BleEvent_t inEvent)
 
         // Used to send the Indication confirmation
         memcpy(dev_address, inEvent.eventData.resp_enh_conn.dev_addr, RSI_DEV_ADDR_LEN);
-        ble_measurement_hndl = inEvent.eventData.rsi_ble_measurement_hndl;
     }
     break;
     case SilabsBleWrapper::BleEventType::RSI_BLE_DISCONN_EVENT: {
@@ -200,6 +200,71 @@ void BLEManagerImpl::sl_ble_event_handling_task(void * args)
     }
 }
 
+uint32_t rsi_ble_add_matter_service(void)
+{
+    uuid_t custom_service                                   = { RSI_BLE_MATTER_CUSTOM_SERVICE_UUID };
+    custom_service.size                                     = RSI_BLE_MATTER_CUSTOM_SERVICE_SIZE;
+    custom_service.val.val16                                = RSI_BLE_MATTER_CUSTOM_SERVICE_VALUE_16;
+    uint8_t data[RSI_BLE_MATTER_CUSTOM_SERVICE_DATA_LENGTH] = { RSI_BLE_MATTER_CUSTOM_SERVICE_DATA };
+
+    static const uuid_t custom_characteristic_RX = {
+        .size     = RSI_BLE_CUSTOM_CHARACTERISTIC_RX_SIZE,
+        .reserved = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_RESERVED },
+        .val      = { .val128 = { .data1 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_1 },
+                                  .data2 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_2 },
+                                  .data3 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_3 },
+                                  .data4 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_4 } } }
+    };
+
+    rsi_ble_resp_add_serv_t new_serv_resp = { 0 };
+    rsi_ble_add_service(custom_service, &new_serv_resp);
+
+    // Adding custom characteristic declaration to the custom service
+    SilabsBleWrapper::rsi_ble_add_char_serv_att(
+        new_serv_resp.serv_handler, new_serv_resp.start_handle + RSI_BLE_CHARACTERISTIC_RX_ATTRIBUTE_HANDLE_LOCATION,
+        RSI_BLE_ATT_PROPERTY_WRITE | RSI_BLE_ATT_PROPERTY_READ, // Set read, write, write without response
+        new_serv_resp.start_handle + RSI_BLE_CHARACTERISTIC_RX_VALUE_HANDLE_LOCATION, custom_characteristic_RX);
+
+    // Adding characteristic value attribute to the service
+    SilabsBleWrapper::rsi_ble_add_char_val_att(
+        new_serv_resp.serv_handler, new_serv_resp.start_handle + RSI_BLE_CHARACTERISTIC_RX_VALUE_HANDLE_LOCATION,
+        custom_characteristic_RX,
+        RSI_BLE_ATT_PROPERTY_WRITE | RSI_BLE_ATT_PROPERTY_READ, // Set read, write, write without response
+        data, sizeof(data), ATT_REC_IN_HOST);
+
+    static const uuid_t custom_characteristic_TX = {
+        .size     = RSI_BLE_CUSTOM_CHARACTERISTIC_TX_SIZE,
+        .reserved = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_RESERVED },
+        .val      = { .val128 = { .data1 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_1 },
+                                  .data2 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_2 },
+                                  .data3 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_3 },
+                                  .data4 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_4 } } }
+    };
+
+    // Adding custom characteristic declaration to the custom service
+    SilabsBleWrapper::rsi_ble_add_char_serv_att(
+        new_serv_resp.serv_handler, new_serv_resp.start_handle + RSI_BLE_CHARACTERISTIC_TX_ATTRIBUTE_HANDLE_LOCATION,
+        RSI_BLE_ATT_PROPERTY_WRITE_NO_RESPONSE | RSI_BLE_ATT_PROPERTY_WRITE | RSI_BLE_ATT_PROPERTY_READ |
+            RSI_BLE_ATT_PROPERTY_NOTIFY | RSI_BLE_ATT_PROPERTY_INDICATE, // Set read, write, write without response
+        new_serv_resp.start_handle + RSI_BLE_CHARACTERISTIC_TX_MEASUREMENT_HANDLE_LOCATION, custom_characteristic_TX);
+
+    // Adding characteristic value attribute to the service
+    rsi_ble_measurement_hndl = new_serv_resp.start_handle + RSI_BLE_CHARACTERISTIC_TX_MEASUREMENT_HANDLE_LOCATION;
+
+    // Adding characteristic value attribute to the service
+    rsi_ble_gatt_server_client_config_hndl =
+        new_serv_resp.start_handle + RSI_BLE_CHARACTERISTIC_TX_GATT_SERVER_CLIENT_HANDLE_LOCATION;
+
+    SilabsBleWrapper::rsi_ble_add_char_val_att(new_serv_resp.serv_handler, rsi_ble_measurement_hndl, custom_characteristic_TX,
+                                               RSI_BLE_ATT_PROPERTY_WRITE_NO_RESPONSE | RSI_BLE_ATT_PROPERTY_WRITE |
+                                                   RSI_BLE_ATT_PROPERTY_READ | RSI_BLE_ATT_PROPERTY_NOTIFY |
+                                                   RSI_BLE_ATT_PROPERTY_INDICATE, // Set read, write, write without response
+                                               data, sizeof(data), ATT_REC_MAINTAIN_IN_HOST);
+
+    memset(&data, 0, sizeof(data));
+    return 0;
+}
+
 void BLEManagerImpl::sl_ble_init()
 {
     uint8_t randomAddrBLE[RSI_BLE_ADDR_LENGTH] = { 0 };
@@ -220,7 +285,7 @@ void BLEManagerImpl::sl_ble_init()
                                     SilabsBleWrapper::rsi_ble_on_event_indication_confirmation, NULL);
 
     //  Exchange of GATT info with BLE stack
-    SilabsBleWrapper::rsi_ble_add_matter_service();
+    rsi_ble_add_matter_service();
     rsi_ble_set_random_address_with_value(randomAddrBLE);
 
     sInstance.sBleEventQueue = osMessageQueueNew(WFX_QUEUE_SIZE, sizeof(SilabsBleWrapper::BleEvent_t), NULL);
@@ -440,7 +505,7 @@ CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Chi
                                           PacketBufferHandle data)
 {
     int32_t status = 0;
-    status         = rsi_ble_indicate_value(dev_address, ble_measurement_hndl, data->DataLength(), data->Start());
+    status         = rsi_ble_indicate_value(dev_address, rsi_ble_measurement_hndl, data->DataLength(), data->Start());
     if (status != RSI_SUCCESS)
     {
         ChipLogProgress(DeviceLayer, "indication failed with error code %lx ", status);
@@ -808,7 +873,7 @@ void BLEManagerImpl::HandleWriteEvent(SilabsBleWrapper::sl_wfx_msg_t * evt)
 {
     ChipLogProgress(DeviceLayer, "Char Write Req, packet type %d", evt->rsi_ble_write.pkt_type);
 
-    if (evt->rsi_ble_write.handle[0] == (uint8_t) evt->rsi_ble_gatt_server_client_config_hndl) // TODO:: compare the handle exactly
+    if (evt->rsi_ble_write.handle[0] == (uint8_t) rsi_ble_gatt_server_client_config_hndl) // TODO:: compare the handle exactly
     {
         HandleTXCharCCCDWrite(evt);
     }
