@@ -90,10 +90,11 @@ class TC_OPCREDS_3_4(MatterBaseTest):
             asserts.assert_true(False, "Unexpected fail reading ICAC Value on NOCs response")
 
         self.step(3)
-        trusted_root_original = await self.read_single_attribute_check_success(
+        trusted_root_list_original = await self.read_single_attribute_check_success(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id, cluster=opcreds,
             attribute=opcreds.Attributes.TrustedRootCertificates)
+        asserts.assert_equal(len(trusted_root_list_original), 1, "Unexpected number of entries in the TrustedRootCertificates table")
 
         self.step(4)
         cmd = opcreds.Commands.UpdateNOC(NOCValue=noc_original, ICACValue=icac_original)
@@ -230,6 +231,12 @@ class TC_OPCREDS_3_4(MatterBaseTest):
 
         self.step(25)
         new_noc_chain = await self.default_controller.IssueNOCChain(csr_pase, self.dut_node_id)
+        # cmd = opcreds.Commands.AddTrustedRootCertificate(trusted_root_original)
+        # try:
+        #     await self.send_single_cmd(dev_ctrl=th1_new, node_id=self.default_controller.nodeId+1, cmd=cmd)
+        #     asserts.fail("Success when adding trusted root certificate")
+        # except InteractionModelError as e:
+        #     asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected when adding trusted root certificate")
         noc_pase = csr_pase.NOCSRElements
         icac_pase = new_noc_chain.icacBytes
 
