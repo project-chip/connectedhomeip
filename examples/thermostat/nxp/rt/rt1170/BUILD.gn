@@ -169,7 +169,7 @@ rt_executable("thermostat") {
 
   deps = [ "${chip_root}/examples/${app_common_folder}" ]
 
-  if (chip_enable_matter_cli) {
+  if (nxp_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]
     deps += [
       "${chip_root}/examples/shell/shell_common:shell_common",

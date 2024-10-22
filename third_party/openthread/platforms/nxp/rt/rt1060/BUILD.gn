@@ -56,8 +56,8 @@ config("openthread_rt1060_config") {
       "OPENTHREAD_CONFIG_MULTICAST_DNS_PUBLIC_API_ENABLE=1",
       "OT_APP_BR_LWIP_HOOKS_EN=1",
     ]
-
-    if (chip_enable_matter_cli) {
+    
+    if (nxp_enable_matter_cli) {
       defines += [
         "OPENTHREAD_CONFIG_BORDER_AGENT_EPHEMERAL_KEY_ENABLE=1",
         "OT_APP_CLI_EPHEMERAL_KEY_ADDON=1",
