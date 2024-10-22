@@ -1,8 +1,8 @@
 #include "EndpointQueueFilter.h"
 #include <algorithm>
 #include <cctype>
-#include <lib/support/CodeUtils.h>
 #include <string.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 namespace chip {
 namespace Inet {
@@ -83,7 +83,7 @@ FilterOutcome HostNameFilter::Filter(const void * endpoint, const IPPacketInfo &
 
 CHIP_ERROR HostNameFilter::SetHostName(const CharSpan & hostName)
 {
-    ReturnErrorCodeIf(!IsValidMdnsHostName(hostName), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsValidMdnsHostName(hostName), CHIP_ERROR_INVALID_ARGUMENT);
     memcpy(mHostName, hostName.data(), hostName.size());
     return CHIP_NO_ERROR;
 }
