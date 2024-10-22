@@ -101,10 +101,10 @@ uint16_t rsi_ble_gatt_server_client_config_hndl;
 
 osTimerId_t sbleAdvTimeoutTimer;
 
-static osThreadId_t sBleThread;
+osThreadId_t sBleThread;
 constexpr uint32_t kBleTaskSize = 2560;
-static uint8_t bleStack[kBleTaskSize];
-static osThread_t sBleTaskControlBlock;
+uint8_t bleStack[kBleTaskSize];
+osThread_t sBleTaskControlBlock;
 constexpr osThreadAttr_t kBleTaskAttr = { .name       = "rsi_ble",
                                           .attr_bits  = osThreadDetached,
                                           .cb_mem     = &sBleTaskControlBlock,
@@ -120,7 +120,7 @@ void rsi_ble_add_matter_service(void)
     custom_service.val.val16                                = RSI_BLE_MATTER_CUSTOM_SERVICE_VALUE_16;
     uint8_t data[RSI_BLE_MATTER_CUSTOM_SERVICE_DATA_LENGTH] = { RSI_BLE_MATTER_CUSTOM_SERVICE_DATA };
 
-    static const uuid_t custom_characteristic_RX = {
+    const uuid_t custom_characteristic_RX = {
         .size     = RSI_BLE_CUSTOM_CHARACTERISTIC_RX_SIZE,
         .reserved = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_RESERVED },
         .val      = { .val128 = { .data1 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_1 },
@@ -145,7 +145,7 @@ void rsi_ble_add_matter_service(void)
         RSI_BLE_ATT_PROPERTY_WRITE | RSI_BLE_ATT_PROPERTY_READ, // Set read, write, write without response
         data, sizeof(data), ATT_REC_IN_HOST);
 
-    static const uuid_t custom_characteristic_TX = {
+    const uuid_t custom_characteristic_TX = {
         .size     = RSI_BLE_CUSTOM_CHARACTERISTIC_TX_SIZE,
         .reserved = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_RESERVED },
         .val      = { .val128 = { .data1 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_1 },
