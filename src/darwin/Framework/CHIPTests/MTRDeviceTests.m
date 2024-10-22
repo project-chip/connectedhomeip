@@ -4467,6 +4467,358 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }
 }
 
+- (void)test040_AttributeValueExpectationSatisfaction
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+
+    __auto_type * testData = @[
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(7),
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(7)
+            },
+            // Equal unsigned integer should satisfy expectation.
+            @"expectedComparison" : @(YES),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(7),
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(9),
+            },
+            // Unequal unsigned integer should not satisfy expectation
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(7),
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRSignedIntegerValueType,
+                MTRValueKey : @(7),
+            },
+            // A signed integer does not satisfy expectation for an unsigned integer.
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRNullValueType,
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRNullValueType,
+            },
+            // Null satisfies expectation for null.
+            @"expectedComparison" : @(YES),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(7),
+                        }
+                    },
+                ],
+            },
+            // A longer list does not satisfy expectation for a shorter array.
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(7),
+                        }
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                ],
+            },
+            // A shorter list does not satisfy expectation for a longer array.
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                ],
+            },
+            // An observed array identical to an expected one satisfies the expectation.
+            @"expectedComparison" : @(YES),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(5),
+                        }
+                    },
+                ],
+            },
+            // An array with entries in a different order does not satisfy the expectation.
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abc"),
+                        },
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abc"),
+                        },
+                    },
+                ],
+            },
+            // A struct that has the same fields in the same order satisfiess the
+            // expectation.
+            @"expectedComparison" : @(YES),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abc"),
+                        },
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abcd"),
+                        },
+                    },
+                ],
+            },
+            // A struct that has different fields in the same order does not
+            // satisfy the expectation.
+            @"expectedComparison" : @(NO),
+        },
+        @{
+            @"expected" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abc"),
+                        },
+                    },
+                ],
+            },
+            @"observed" : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @(2),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUTF8StringValueType,
+                            MTRValueKey : @("abc"),
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @(1),
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @(6),
+                        },
+                    },
+                ],
+            },
+            // A struct that has the same fields in a different order satisfies
+            // the expectation.
+            @"expectedComparison" : @(YES),
+        },
+    ];
+
+    for (NSDictionary * test in testData) {
+        XCTAssertEqual([device _attributeDataValue:test[@"observed"] satisfiesValueExpectation:test[@"expected"]], [test[@"expectedComparison"] boolValue],
+            "observed: %@, expected: %@", test[@"observed"], test[@"expected"]);
+    }
+}
+
 @end
 
 @interface MTRDeviceEncoderTests : XCTestCase
