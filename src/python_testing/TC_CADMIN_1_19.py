@@ -55,7 +55,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
     async def CommissionAttempt(
             self, setupPinCode: int, thnum: int, th: str, fail: bool):
 
-        logging.info(f"-----------------Commissioning with TH_CR{str(thnum)}-------------------------")
+        logging.info(f"-----------------Commissioning with TH_CR{thnum}-------------------------")
         if fail:
             ctx = asserts.assert_raises(ChipStackError)
             with ctx:
