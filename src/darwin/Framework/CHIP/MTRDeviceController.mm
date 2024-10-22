@@ -714,7 +714,7 @@ using namespace chip::Tracing::DarwinFramework;
     }
 }
 
-- (void)_callDelegatesWithBlock:(void (^_Nullable)(id<MTRDeviceControllerDelegate> delegate))block logString:(const char *)logString;
+- (void)_callDelegatesWithBlock:(void (^_Nullable)(id<MTRDeviceControllerDelegate> delegate))block logString:(const char *)logString
 {
     NSUInteger delegatesCalled = [self _iterateDelegateInfoWithBlock:^(MTRDeviceControllerDelegateInfo * delegateInfo) {
         id<MTRDeviceControllerDelegate> strongDelegate = delegateInfo.delegate;
