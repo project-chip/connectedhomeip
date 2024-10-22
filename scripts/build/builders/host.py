@@ -72,6 +72,7 @@ class HostApp(Enum):
     BRIDGE = auto()
     FABRIC_ADMIN = auto()
     FABRIC_BRIDGE = auto()
+    FABRIC_SYNC = auto()
     JAVA_MATTER_CONTROLLER = auto()
     KOTLIN_MATTER_CONTROLLER = auto()
     CONTACT_SENSOR = auto()
@@ -131,6 +132,8 @@ class HostApp(Enum):
             return 'fabric-admin'
         elif self == HostApp.FABRIC_BRIDGE:
             return 'fabric-bridge-app/linux'
+        elif self == HostApp.FABRIC_SYNC:
+            return 'fabric-sync'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             return 'java-matter-controller'
         elif self == HostApp.KOTLIN_MATTER_CONTROLLER:
@@ -236,6 +239,9 @@ class HostApp(Enum):
         elif self == HostApp.FABRIC_BRIDGE:
             yield 'fabric-bridge-app'
             yield 'fabric-bridge-app.map'
+        elif self == HostApp.FABRIC_SYNC:
+            yield 'fabric-sync'
+            yield 'fabric-sync.map'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             yield 'java-matter-controller'
             yield 'java-matter-controller.map'

@@ -46,7 +46,7 @@ CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiBssId(MutableByteSpan & value)
 {
     WiFiManager::WiFiInfo info;
     ReturnErrorOnFailure(WiFiManager::Instance().GetWiFiInfo(info));
-    ReturnErrorCodeIf(sizeof(info.mBssId) >= value.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(sizeof(info.mBssId) < value.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     memcpy(value.data(), info.mBssId, sizeof(info.mBssId));
     value.reduce_size(sizeof(info.mBssId));
