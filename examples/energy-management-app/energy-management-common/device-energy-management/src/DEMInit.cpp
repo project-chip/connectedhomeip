@@ -40,8 +40,12 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 
-static std::unique_ptr<DeviceEnergyManagementDelegate> gDEMDelegate;
-static std::unique_ptr<DeviceEnergyManagementManager> gDEMInstance;
+namespace {
+
+std::unique_ptr<DeviceEnergyManagementDelegate> gDEMDelegate;
+std::unique_ptr<DeviceEnergyManagementManager> gDEMInstance;
+
+} // namespace
 
 DeviceEnergyManagement::DeviceEnergyManagementDelegate * GetDEMDelegate()
 {

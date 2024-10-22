@@ -29,8 +29,12 @@ template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
+namespace {
+
 static std::unique_ptr<DeviceEnergyManagementModeDelegate> gDeviceEnergyManagementModeDelegate;
 static std::unique_ptr<ModeBase::Instance> gDeviceEnergyManagementModeInstance;
+
+} // namespace
 
 CHIP_ERROR DeviceEnergyManagementModeDelegate::Init()
 {

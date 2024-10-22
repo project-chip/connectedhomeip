@@ -36,14 +36,18 @@ using namespace chip::app::Clusters::ElectricalPowerMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 using namespace chip::app::Clusters::PowerTopology;
 
-static std::unique_ptr<ElectricalPowerMeasurementDelegate> gEPMDelegate;
-static std::unique_ptr<ElectricalPowerMeasurementInstance> gEPMInstance;
+namespace {
+
+std::unique_ptr<ElectricalPowerMeasurementDelegate> gEPMDelegate;
+std::unique_ptr<ElectricalPowerMeasurementInstance> gEPMInstance;
 
 // Electrical Energy Measurement cluster uses ember to initialise
-static std::unique_ptr<ElectricalEnergyMeasurementAttrAccess> gEEMAttrAccess;
+std::unique_ptr<ElectricalEnergyMeasurementAttrAccess> gEEMAttrAccess;
 
-static std::unique_ptr<PowerTopologyDelegate> gPTDelegate;
-static std::unique_ptr<PowerTopologyInstance> gPTInstance;
+std::unique_ptr<PowerTopologyDelegate> gPTDelegate;
+std::unique_ptr<PowerTopologyInstance> gPTInstance;
+
+} // namespace
 
 PowerTopologyInstance * GetPTInstance()
 {
