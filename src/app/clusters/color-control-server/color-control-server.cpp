@@ -474,10 +474,6 @@ Status ColorControlServer::stopMoveStepCommand(EndpointId endpoint, const Comman
 {
     Status status = Status::Success;
 
-    // Command parameters constraint checks:
-    VerifyOrReturnValue(commandData.optionsMask <= kMaxOptionValue, Status::ConstraintError);
-    VerifyOrReturnValue(commandData.optionsOverride <= kMaxOptionValue, Status::ConstraintError);
-
     // StopMoveStep command has no effect on an active color loop.
     // Fetch if it is supported and active.
     uint8_t isColorLoopActive = 0;
@@ -1421,10 +1417,6 @@ Status ColorControlServer::moveHueCommand(EndpointId endpoint, HueMoveMode moveM
     VerifyOrReturnValue(moveMode != HueMoveMode::kUnknownEnumValue, Status::InvalidCommand);
     VerifyOrReturnValue((rate != 0 || moveMode == HueMoveMode::kStop), Status::InvalidCommand);
 
-    // Command Parameters constraint checks:
-    VerifyOrReturnValue(optionsMask <= kMaxOptionValue, Status::ConstraintError);
-    VerifyOrReturnValue(optionsOverride <= kMaxOptionValue, Status::ConstraintError);
-
     uint16_t epIndex                                  = getEndpointIndex(endpoint);
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionStateByIndex(epIndex);
     VerifyOrReturnValue(colorHueTransitionState != nullptr, Status::UnsupportedEndpoint);
@@ -1523,8 +1515,6 @@ Status ColorControlServer::moveToHueCommand(EndpointId endpoint, uint16_t hue, D
     // Command Parameters constraint checks:
     VerifyOrReturnValue((isEnhanced || hue <= MAX_HUE_VALUE), Status::ConstraintError);
     VerifyOrReturnValue(transitionTime <= kMaxtransitionTime, Status::ConstraintError);
-    VerifyOrReturnValue(optionsMask <= kMaxOptionValue, Status::ConstraintError);
-    VerifyOrReturnValue(optionsOverride <= kMaxOptionValue, Status::ConstraintError);
 
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
     VerifyOrReturnValue(colorHueTransitionState != nullptr, Status::UnsupportedEndpoint);
@@ -1642,8 +1632,6 @@ Status ColorControlServer::moveToHueAndSaturationCommand(EndpointId endpoint, ui
     VerifyOrReturnValue((isEnhanced || hue <= MAX_HUE_VALUE), Status::ConstraintError);
     VerifyOrReturnValue(saturation <= MAX_SATURATION_VALUE, Status::ConstraintError);
     VerifyOrReturnValue(transitionTime <= kMaxtransitionTime, Status::ConstraintError);
-    VerifyOrReturnValue(optionsMask <= kMaxOptionValue, Status::ConstraintError);
-    VerifyOrReturnValue(optionsOverride <= kMaxOptionValue, Status::ConstraintError);
 
     VerifyOrReturnValue(shouldExecuteIfOff(endpoint, optionsMask, optionsOverride), Status::Success);
 
@@ -1688,8 +1676,6 @@ Status ColorControlServer::stepHueCommand(EndpointId endpoint, HueStepMode stepM
     {
         VerifyOrReturnValue(transitionTime <= UINT8_MAX, Status::ConstraintError);
     }
-    VerifyOrReturnValue(optionsMask <= kMaxOptionValue, Status::ConstraintError);
-    VerifyOrReturnValue(optionsOverride <= kMaxOptionValue, Status::ConstraintError);
 
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
     VerifyOrReturnValue(colorHueTransitionState != nullptr, Status::UnsupportedEndpoint);
@@ -1777,10 +1763,6 @@ Status ColorControlServer::moveSaturationCommand(EndpointId endpoint, const Comm
     VerifyOrReturnValue(moveMode != SaturationMoveMode::kUnknownEnumValue, Status::InvalidCommand);
     VerifyOrReturnValue(rate != 0 || moveMode == SaturationMoveMode::kStop, Status::InvalidCommand);
 
-    // Command Parameters constraint checks
-    VerifyOrReturnValue(optionsMask <= kMaxOptionValue, Status::ConstraintError);
-    VerifyOrReturnValue(optionsOverride <= kMaxOptionValue, Status::ConstraintError);
-
     uint16_t epIndex                                         = getEndpointIndex(endpoint);
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionStateByIndex(epIndex);
     VerifyOrReturnValue(colorSaturationTransitionState != nullptr, Status::UnsupportedEndpoint);
@@ -1841,8 +1823,6 @@ Status ColorControlServer::moveToSaturationCommand(EndpointId endpoint,
     // Command Parameters constraint checks:
     VerifyOrReturnValue(commandData.saturation <= MAX_SATURATION_VALUE, Status::ConstraintError);
     VerifyOrReturnValue(commandData.transitionTime <= kMaxtransitionTime, Status::ConstraintError);
-    VerifyOrReturnValue(commandData.optionsMask <= kMaxOptionValue, Status::ConstraintError);
-    VerifyOrReturnValue(commandData.optionsOverride <= kMaxOptionValue, Status::ConstraintError);
 
     VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
     Status status = moveToSaturation(endpoint, commandData.saturation, commandData.transitionTime);
@@ -1875,8 +1855,6 @@ Status ColorControlServer::stepSaturationCommand(EndpointId endpoint, const Comm
     VerifyOrReturnValue(stepSize != 0, Status::InvalidCommand);
     // Command Parameters constraint checks:
     VerifyOrReturnValue(transitionTime <= UINT8_MAX, Status::ConstraintError);
-    VerifyOrReturnValue(optionsMask <= kMaxOptionValue, Status::ConstraintError);
-    VerifyOrReturnValue(optionsOverride <= kMaxOptionValue, Status::ConstraintError);
 
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
     VerifyOrReturnValue(colorSaturationTransitionState != nullptr, Status::UnsupportedEndpoint);
@@ -1943,8 +1921,6 @@ Status ColorControlServer::colorLoopCommand(EndpointId endpoint, const Commands:
     VerifyOrReturnValue(direction != ColorLoopDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
     VerifyOrReturnValue(updateFlags <= maxUpdateFlagsValue, Status::ConstraintError);
-    VerifyOrReturnValue(optionsMask <= kMaxOptionValue, Status::ConstraintError);
-    VerifyOrReturnValue(optionsOverride <= kMaxOptionValue, Status::ConstraintError);
 
     uint16_t epIndex                                  = getEndpointIndex(endpoint);
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionStateByIndex(epIndex);
@@ -2282,8 +2258,6 @@ Status ColorControlServer::moveToColorCommand(EndpointId endpoint, const Command
 {
     // Command Parameters constraint checks:
     VerifyOrReturnValue(commandData.transitionTime <= kMaxtransitionTime, Status::ConstraintError);
-    VerifyOrReturnValue(commandData.optionsMask <= kMaxOptionValue, Status::ConstraintError);
-    VerifyOrReturnValue(commandData.optionsOverride <= kMaxOptionValue, Status::ConstraintError);
 
     VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
 
@@ -2309,9 +2283,6 @@ Status ColorControlServer::moveColorCommand(EndpointId endpoint, const Commands:
     auto & rateY           = commandData.rateY;
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
-
-    VerifyOrReturnValue(optionsMask <= kMaxOptionValue, Status::ConstraintError);
-    VerifyOrReturnValue(optionsOverride <= kMaxOptionValue, Status::ConstraintError);
 
     uint16_t epIndex                                = getEndpointIndex(endpoint);
     Color16uTransitionState * colorXTransitionState = getXTransitionStateByIndex(epIndex);
@@ -2407,8 +2378,6 @@ Status ColorControlServer::stepColorCommand(EndpointId endpoint, const Commands:
 
     // Command Parameters constraint checks:
     VerifyOrReturnValue(transitionTime <= kMaxtransitionTime, Status::ConstraintError);
-    VerifyOrReturnValue(optionsMask <= kMaxOptionValue, Status::ConstraintError);
-    VerifyOrReturnValue(optionsOverride <= kMaxOptionValue, Status::ConstraintError);
 
     uint16_t epIndex                                = getEndpointIndex(endpoint);
     Color16uTransitionState * colorXTransitionState = getXTransitionStateByIndex(epIndex);
@@ -2757,10 +2726,6 @@ Status ColorControlServer::moveColorTempCommand(EndpointId endpoint,
     VerifyOrReturnValue(moveMode != HueMoveMode::kUnknownEnumValue, Status::InvalidCommand);
     VerifyOrReturnValue((rate != 0 || moveMode == HueMoveMode::kStop), Status::InvalidCommand);
 
-    // Command Parameters constraint checks:
-    VerifyOrReturnValue(optionsMask <= kMaxOptionValue, Status::ConstraintError);
-    VerifyOrReturnValue(optionsOverride <= kMaxOptionValue, Status::ConstraintError);
-
     Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
     VerifyOrReturnValue(colorTempTransitionState != nullptr, Status::UnsupportedEndpoint);
 
@@ -2853,8 +2818,6 @@ Status ColorControlServer::moveToColorTempCommand(EndpointId endpoint,
 {
     // Command Parameters constraint checks:
     VerifyOrReturnValue(commandData.transitionTime <= kMaxtransitionTime, Status::ConstraintError);
-    VerifyOrReturnValue(commandData.optionsMask <= kMaxOptionValue, Status::ConstraintError);
-    VerifyOrReturnValue(commandData.optionsOverride <= kMaxOptionValue, Status::ConstraintError);
 
     VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
 
@@ -2891,8 +2854,6 @@ Status ColorControlServer::stepColorTempCommand(EndpointId endpoint,
 
     // Command Parameters constraint checks:
     VerifyOrReturnValue(transitionTime <= kMaxtransitionTime, Status::ConstraintError);
-    VerifyOrReturnValue(optionsMask <= kMaxOptionValue, Status::ConstraintError);
-    VerifyOrReturnValue(optionsOverride <= kMaxOptionValue, Status::ConstraintError);
 
     Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
     VerifyOrReturnValue(colorTempTransitionState != nullptr, Status::UnsupportedEndpoint);

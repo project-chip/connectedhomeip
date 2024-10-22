@@ -239,9 +239,10 @@ private:
     uint16_t getEndpointIndex(chip::EndpointId);
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
-    chip::Protocols::InteractionModel::Status moveToSaturation(chip::EndpointId endpoint, uint8_t saturation, uint16_t transitionTime);
-    chip::Protocols::InteractionModel::Status moveToHueAndSaturation(chip::EndpointId endpoint, uint16_t hue, uint8_t saturation, uint16_t transitionTime,
-                                                                     bool isEnhanced);
+    chip::Protocols::InteractionModel::Status moveToSaturation(chip::EndpointId endpoint, uint8_t saturation,
+                                                               uint16_t transitionTime);
+    chip::Protocols::InteractionModel::Status moveToHueAndSaturation(chip::EndpointId endpoint, uint16_t hue, uint8_t saturation,
+                                                                     uint16_t transitionTime, bool isEnhanced);
     ColorHueTransitionState * getColorHueTransitionState(chip::EndpointId endpoint);
     Color16uTransitionState * getSaturationTransitionState(chip::EndpointId endpoint);
     ColorHueTransitionState * getColorHueTransitionStateByIndex(uint16_t index);
@@ -262,7 +263,8 @@ private:
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
-    chip::Protocols::InteractionModel::Status moveToColor(chip::EndpointId endpoint, uint16_t colorX, uint16_t colorY, uint16_t transitionTime);
+    chip::Protocols::InteractionModel::Status moveToColor(chip::EndpointId endpoint, uint16_t colorX, uint16_t colorY,
+                                                          uint16_t transitionTime);
     Color16uTransitionState * getXTransitionState(chip::EndpointId endpoint);
     Color16uTransitionState * getYTransitionState(chip::EndpointId endpoint);
     Color16uTransitionState * getXTransitionStateByIndex(uint16_t index);
@@ -289,8 +291,6 @@ private:
     static_assert(kColorControlClusterServerMaxEndpointCount <= kEmberInvalidEndpointIndex, "ColorControl endpoint count error");
 
     static constexpr uint16_t kMaxtransitionTime = 65534; // Max value as defined by the spec.
-    static constexpr chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> kMaxOptionValue =
-        chip::app::Clusters::ColorControl::OptionsBitmap::kExecuteIfOff; // add any new bitmap field to this value!
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
     ColorHueTransitionState colorHueTransitionStates[kColorControlClusterServerMaxEndpointCount];
