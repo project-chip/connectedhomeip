@@ -277,12 +277,16 @@ void DeviceSynchronizer::SynchronizationCompleteAddDevice()
     if (!mCurrentDeviceData.is_icd)
     {
         VerifyOrDie(mController);
-        // TODO(#35333) Figure out how we should recover in this circumstance.
         ScopedNodeId scopedNodeId(mNodeId, mController->GetFabricIndex());
         CHIP_ERROR err = DeviceSubscriptionManager::Instance().StartSubscription(*mController, scopedNodeId);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(NotSpecified, "Failed start subscription to NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
+            chip_rpc_ReachabilityChanged reachabilityChanged;
+            reachabilityChanged.has_id       = true;
+            reachabilityChanged.id           = mCurrentDeviceData.id;
+            reachabilityChanged.reachability = false;
+            DeviceReachableChanged(reachabilityChanged);
         }
     }
 #endif
