@@ -396,6 +396,10 @@ TEST(TestEmberAttributeBuffer, TestEncodeSignedTypes)
         // cannot encode null equivalent value - this is the minimum negative value
         // for 24-bit
         EXPECT_EQ(tester.TryEncode<int32_t>(-(1 << 24) - 1, { 0x56, 0x34, 0x12 }), CHIP_ERROR_INVALID_ARGUMENT);
+
+        // Out of range for signed - these are unsigned values that are larger
+        EXPECT_EQ(tester.TryEncode<int32_t>(0xFFFFFF, { 0x56, 0x34, 0x12 }), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(tester.TryEncode<int32_t>(0x800000, { 0x56, 0x34, 0x12 }), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     {
