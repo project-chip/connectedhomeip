@@ -99,6 +99,10 @@ public:
      *                            ownership of the exchangeCtxt to PASESession object. PASESession
      *                            will close the exchange on (successful/failed) handshake completion.
      * @param delegate            Callback object
+     *                            Note: The delegate will not be notified if a failure occurs at this stage.
+     *                            The delegate will only be notified of an error during session establishment
+     *                            if it happens after the Pair() call succeeds and the PBKDFParamRequest
+     *                            is sent; i.e., after the session establishment process has started.
      *
      * @return CHIP_ERROR      The result of initialization
      */
