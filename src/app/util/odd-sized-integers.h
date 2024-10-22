@@ -123,7 +123,7 @@ inline constexpr int64_t MaxSignedValue(unsigned ByteSize)
     {
         return std::numeric_limits<int64_t>::max();
     }
-    return (1LL << (8 * ByteSize - 1)) - 1;
+    return (static_cast<int64_t>(1) << (8 * ByteSize - 1)) - 1;
 }
 
 inline constexpr int64_t MinSignedValue(unsigned ByteSize)
@@ -132,7 +132,7 @@ inline constexpr int64_t MinSignedValue(unsigned ByteSize)
     {
         return std::numeric_limits<int64_t>::min();
     }
-    return -(1LL << (8 * ByteSize - 1));
+    return -(static_cast<int64_t>(1) << (8 * ByteSize - 1));
 }
 
 /// Readability-method to express that the maximum signed value is a null value
