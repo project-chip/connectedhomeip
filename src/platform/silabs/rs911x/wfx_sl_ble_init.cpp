@@ -294,6 +294,7 @@ void SilabsBleWrapper::rsi_ble_add_char_val_att(void * serv_handler, uint16_t ha
 
 uint32_t SilabsBleWrapper::rsi_ble_add_matter_service(void)
 {
+    bleEvent.eventData                                      = new SilabsBleWrapper::sl_wfx_msg_t();
     uuid_t custom_service                                   = { RSI_BLE_MATTER_CUSTOM_SERVICE_UUID };
     custom_service.size                                     = RSI_BLE_MATTER_CUSTOM_SERVICE_SIZE;
     custom_service.val.val16                                = RSI_BLE_MATTER_CUSTOM_SERVICE_VALUE_16;
