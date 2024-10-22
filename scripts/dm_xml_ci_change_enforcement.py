@@ -14,10 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-import re
 import subprocess
 import sys
-from pathlib import Path
 
 import click
 
