@@ -259,6 +259,9 @@ class CAHierarchy:
             ]
         )
 
+        extended_key_usage = [x509.ExtendedKeyUsageOID.CLIENT_AUTH] if self.name == "device" else [
+            x509.ExtendedKeyUsageOID.SERVER_AUTH]
+
         return (
             x509.CertificateBuilder()
             .subject_name(subject)
@@ -299,12 +302,7 @@ class CAHierarchy:
                 critical=True,
             )
             .add_extension(
-                x509.ExtendedKeyUsage(
-                    [
-                        x509.ExtendedKeyUsageOID.CLIENT_AUTH,
-                        x509.ExtendedKeyUsageOID.SERVER_AUTH,
-                    ]
-                ),
+                x509.ExtendedKeyUsage(extended_key_usage),
                 critical=False,
             )
             .add_extension(
