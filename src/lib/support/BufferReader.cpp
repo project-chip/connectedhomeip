@@ -16,7 +16,9 @@
  */
 
 #include "BufferReader.h"
+#include "lib/core/CHIPError.h"
 
+#include <cstdint>
 #include <lib/core/CHIPEncoding.h>
 
 #include <string.h>
@@ -24,6 +26,26 @@
 
 namespace chip {
 namespace Encoding {
+
+BufferReader & BufferReader::ReadBytes(uint8_t * dest, size_t size)
+{
+    static_assert(CHAR_BIT == 8, "Our various sizeof checks rely on bytes and octets being the same thing");
+
+    if ((size > UINT16_MAX) || (mAvailable < size))
+    {
+        mStatus = CHIP_ERROR_BUFFER_TOO_SMALL;
+        // Ensure that future reads all fail.
+        mAvailable = 0;
+        return *this;
+    }
+
+    memcpy(dest, mReadPtr, size);
+
+    mReadPtr += size;
+    mAvailable = static_cast<uint16_t>(mAvailable - size);
+    return *this;
+}
+
 namespace LittleEndian {
 
 namespace {
@@ -72,25 +94,6 @@ void Reader::RawReadLowLevelBeCareful(T * retval)
     mAvailable = static_cast<uint16_t>(mAvailable - data_size);
 }
 
-Reader & Reader::ReadBytes(uint8_t * dest, size_t size)
-{
-    static_assert(CHAR_BIT == 8, "Our various sizeof checks rely on bytes and octets being the same thing");
-
-    if ((size > UINT16_MAX) || (mAvailable < size))
-    {
-        mStatus = CHIP_ERROR_BUFFER_TOO_SMALL;
-        // Ensure that future reads all fail.
-        mAvailable = 0;
-        return *this;
-    }
-
-    memcpy(dest, mReadPtr, size);
-
-    mReadPtr += size;
-    mAvailable = static_cast<uint16_t>(mAvailable - size);
-    return *this;
-}
-
 // Explicit Read instantiations for the data types we want to support.
 template void Reader::RawReadLowLevelBeCareful(char *);
 template void Reader::RawReadLowLevelBeCareful(bool *);
@@ -104,5 +107,49 @@ template void Reader::RawReadLowLevelBeCareful(uint32_t *);
 template void Reader::RawReadLowLevelBeCareful(uint64_t *);
 
 } // namespace LittleEndian
+
+namespace BigEndian {
+
+Reader & Reader::Read16(uint16_t * dest)
+{
+    if (!EnsureAvailable(sizeof(uint16_t)))
+    {
+        return *this;
+    }
+
+    static_assert(sizeof(*dest) == 2);
+
+    *dest = mReadPtr[0];
+    *dest <<= 8;
+    *dest += mReadPtr[1];
+
+    mReadPtr += 2;
+    mAvailable -= 2;
+    return *this;
+}
+
+Reader & Reader::Read32(uint32_t * dest)
+{
+    if (!EnsureAvailable(sizeof(uint32_t)))
+    {
+        return *this;
+    }
+
+    static_assert(sizeof(*dest) == 4);
+
+    *dest = 0;
+    for (unsigned i = 0; i < sizeof(uint32_t); i++)
+    {
+        *dest <<= 8;
+        *dest += mReadPtr[i];
+    }
+
+    mReadPtr += sizeof(uint32_t);
+    mAvailable -= sizeof(uint32_t);
+    return *this;
+}
+
+} // namespace BigEndian
+
 } // namespace Encoding
 } // namespace chip
