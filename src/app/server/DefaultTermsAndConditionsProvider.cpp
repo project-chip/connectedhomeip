@@ -203,15 +203,13 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::CommitAcceptance()
 {
     VerifyNotNullOrReturnUninitialized(mTermsAndConditionsStorageDelegate);
 
-    CHIP_ERROR err;
-
     if (!mTemporalAcceptance.HasValue())
     {
         ChipLogError(AppServer, "No terms and conditions to commit");
         return CHIP_NO_ERROR;
     }
 
-    err = mTermsAndConditionsStorageDelegate->Set(mTemporalAcceptance.Value());
+    CHIP_ERROR err = mTermsAndConditionsStorageDelegate->Set(mTemporalAcceptance.Value());
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(AppServer, "Failed storage delegate Set(): %" CHIP_ERROR_FORMAT, err.Format());
@@ -227,8 +225,6 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::GetAcceptance(Optional<
 {
     VerifyNotNullOrReturnUninitialized(mTermsAndConditionsStorageDelegate);
 
-    CHIP_ERROR err;
-
     // Return the in-memory acceptance state
     if (mTemporalAcceptance.HasValue())
     {
@@ -237,7 +233,7 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::GetAcceptance(Optional<
     }
 
     // Otherwise, try to get the persisted acceptance state
-    err = mTermsAndConditionsStorageDelegate->Get(outTermsAndConditions);
+    CHIP_ERROR err = mTermsAndConditionsStorageDelegate->Get(outTermsAndConditions);
     if (CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == err)
     {
         ChipLogError(AppServer, "No terms and conditions have been accepted");
@@ -267,9 +263,7 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::ResetAcceptance()
 {
     VerifyNotNullOrReturnUninitialized(mTermsAndConditionsStorageDelegate);
 
-    CHIP_ERROR err;
-
-    err = mTermsAndConditionsStorageDelegate->Delete();
+    CHIP_ERROR err = mTermsAndConditionsStorageDelegate->Delete();
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(AppServer, "Failed storage delegate Delete(): %" CHIP_ERROR_FORMAT, err.Format());
@@ -294,9 +288,7 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::SetAcceptance(const Opt
 
     TermsAndConditionsState termsAndConditionsState = TermsAndConditionsState::OK;
 
-    CHIP_ERROR err;
-
-    err = CheckAcceptance(inTermsAndConditions, termsAndConditionsState);
+    CHIP_ERROR err = CheckAcceptance(inTermsAndConditions, termsAndConditionsState);
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(AppServer, "Failed to check acceptance state: %" CHIP_ERROR_FORMAT, err.Format());
