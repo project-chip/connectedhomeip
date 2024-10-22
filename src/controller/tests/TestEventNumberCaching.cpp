@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "app/ClusterStateCache.h"
@@ -31,9 +31,9 @@
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <messaging/tests/MessagingContext.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -46,8 +46,6 @@ static uint8_t gInfoEventBuffer[4096];
 static uint8_t gCritEventBuffer[4096];
 static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
-using TestContext = chip::Test::AppContext;
-
 //
 // The generated endpoint_config for the controller app has Endpoint 1
 // already used in the fixed endpoint set of size 1. Consequently, let's use the next
@@ -55,31 +53,8 @@ using TestContext = chip::Test::AppContext;
 //
 constexpr EndpointId kTestEndpointId = 2;
 
-class TestEventNumberCaching : public ::testing::Test
+class TestEventNumberCaching : public chip::Test::AppContext
 {
-public:
-    // Performs shared setup for all tests in the test suite
-    static void SetUpTestSuite()
-    {
-        if (mpContext == nullptr)
-        {
-            mpContext = new TestContext();
-            ASSERT_NE(mpContext, nullptr);
-        }
-        mpContext->SetUpTestSuite();
-    }
-
-    // Performs shared teardown for all tests in the test suite
-    static void TearDownTestSuite()
-    {
-        mpContext->TearDownTestSuite();
-        if (mpContext != nullptr)
-        {
-            delete mpContext;
-            mpContext = nullptr;
-        }
-    }
-
 protected:
     // Performs setup for each test in the suite
     void SetUp()
@@ -90,13 +65,13 @@ protected:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
-        mpContext->SetUp();
+        AppContext::SetUp();
 
         CHIP_ERROR err = CHIP_NO_ERROR;
         // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
         VerifyOrDieWithMsg((err = mEventCounter.Init(0)) == CHIP_NO_ERROR, AppServer,
                            "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format());
-        chip::app::EventManagement::CreateEventManagement(&mpContext->GetExchangeManager(), ArraySize(logStorageResources),
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
@@ -104,15 +79,12 @@ protected:
     void TearDown()
     {
         chip::app::EventManagement::DestroyEventManagement();
-        mpContext->TearDown();
+        AppContext::TearDown();
     }
-
-    static TestContext * mpContext;
 
 private:
     MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
 };
-TestContext * TestEventNumberCaching::mpContext = nullptr;
 
 //clang-format off
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrs)
@@ -168,7 +140,7 @@ void GenerateEvents(chip::EventNumber & firstEventNumber, chip::EventNumber & la
  */
 TEST_F(TestEventNumberCaching, TestEventNumberCaching)
 {
-    auto sessionHandle                   = mpContext->GetSessionBobToAlice();
+    auto sessionHandle                   = GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
@@ -199,12 +171,12 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
         Optional<EventNumber> highestEventNumber;
         readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
         EXPECT_FALSE(highestEventNumber.HasValue());
-        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(),
-                                   readCallback.mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mClusterCacheAdapter.GetBufferedCallback(),
+                                   app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
-        mpContext->DrainAndServiceIO();
+        DrainAndServiceIO();
 
         EXPECT_EQ(readCallback.mEventsSeen, lastEventNumber - firstEventNumber + 1);
 
@@ -223,8 +195,8 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
     // we don't receive events except ones larger than that value.
     //
     {
-        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(),
-                                   readCallback.mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mClusterCacheAdapter.GetBufferedCallback(),
+                                   app::ReadClient::InteractionType::Read);
 
         readCallback.mClusterCacheAdapter.ClearEventCache(true);
         Optional<EventNumber> highestEventNumber;
@@ -242,7 +214,7 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
         EXPECT_FALSE(readParams.mEventNumber.HasValue());
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
-        mpContext->DrainAndServiceIO();
+        DrainAndServiceIO();
 
         // We should only get events with event numbers larger than kHighestEventNumberSeen.
         EXPECT_EQ(readCallback.mEventsSeen, lastEventNumber - kHighestEventNumberSeen);
@@ -256,7 +228,7 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
         readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
         EXPECT_TRUE(highestEventNumber.HasValue() && highestEventNumber.Value() == lastEventNumber);
     }
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     emberAfClearDynamicEndpoint(0);
 }

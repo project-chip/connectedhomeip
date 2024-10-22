@@ -31,6 +31,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/FailSafeContext.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -65,12 +66,9 @@ public:
 
 TEST_F(TestFailSafeContext, TestFailSafeContext_ArmFailSafe)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     chip::app::FailSafeContext failSafeContext;
 
-    err = failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1)), CHIP_NO_ERROR);
     EXPECT_TRUE(failSafeContext.IsFailSafeArmed());
     EXPECT_EQ(failSafeContext.GetFabricIndex(), kTestAccessingFabricIndex1);
     EXPECT_TRUE(failSafeContext.IsFailSafeArmed(kTestAccessingFabricIndex1));
@@ -82,12 +80,9 @@ TEST_F(TestFailSafeContext, TestFailSafeContext_ArmFailSafe)
 
 TEST_F(TestFailSafeContext, TestFailSafeContext_NocCommandInvoked)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     chip::app::FailSafeContext failSafeContext;
 
-    err = failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1)), CHIP_NO_ERROR);
     EXPECT_EQ(failSafeContext.GetFabricIndex(), kTestAccessingFabricIndex1);
 
     failSafeContext.SetAddNocCommandInvoked(kTestAccessingFabricIndex2);

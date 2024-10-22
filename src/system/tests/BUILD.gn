@@ -21,6 +21,7 @@ chip_test_suite("tests") {
   output_name = "libSystemLayerTests"
 
   test_sources = [
+    "TestEventLoopHandler.cpp",
     "TestSystemClock.cpp",
     "TestSystemErrorStr.cpp",
     "TestSystemPacketBuffer.cpp",
@@ -46,6 +47,7 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/inet",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support/tests:pw-test-macros",
     "${chip_root}/src/platform",
     "${chip_root}/src/system",

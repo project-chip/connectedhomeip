@@ -176,7 +176,7 @@ template("ti_simplelink_executable") {
           "--align",
           "4",
           "--slot-size",
-          "0x000F6000",  # must match the flash_map_backend definitions
+          "0x000F2000",  # must match the flash_map_backend definitions
           "--version",
           matter_software_ver_str,
           "--pad-header",
@@ -484,6 +484,9 @@ template("ti_simplelink_executable") {
     } else {
       # The executable is the final target.
       data_deps = [ ":${simplelink_target_name}.out" ]
+      if (ti_simplelink_device_family == "cc13x4_26x4" && custom_factory_data) {
+        data_deps += [ ":${simplelink_target_name}-and-factory-data.hex" ]
+      }
     }
 
     if (defined(invoker.data_deps)) {

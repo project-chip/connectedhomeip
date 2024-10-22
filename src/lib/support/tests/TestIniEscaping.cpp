@@ -16,9 +16,12 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
-#include <lib/support/IniEscaping.h>
 #include <string>
+
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/IniEscaping.h>
 
 using namespace chip;
 using namespace chip::IniEscaping;

@@ -18,9 +18,9 @@
 
 #include <string>
 
-#include <lib/core/CHIPError.h>
+#include <pw_unit_test/framework.h>
 
-#include <gtest/gtest.h>
+#include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace {

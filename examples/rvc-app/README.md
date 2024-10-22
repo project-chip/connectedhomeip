@@ -20,6 +20,46 @@ must have a `"Name"` key that contains the command name. This name is shown in
 the state machine diagram above. Example
 `echo '{"Name": "Charged"}' > /tmp/chip_rvc_fifo_42`.
 
+### ServiceArea related messages
+
+#### `AddMap` message
+
+This message adds a map to the SupportedMaps attribute of the Service Area
+cluster. This message requires the following extra keys.
+
+-   `MapId` This is an `int` setting the ID of the new map.
+-   `MapName` This is a `string` setting the name of the new map.
+
+#### `AddArea` message
+
+This message adds a new area to the SupportedAreas attribute of the Service Area
+cluster. This message requires the following extra keys, most of which are
+optional. Consult the `SupportedAreas` attribute spec for more information on
+what are valid areas.
+
+-   `AreaId` This is an `int` setting the ID of the area.
+-   `MapId` This is an `int` sitting the map ID the area is associated with.
+-   `LocationName` This is a `string` setting the location's name.
+-   `FloorNumber` This is an `int` setting the floor number of the area.
+-   `AreaType` This is an `int` setting the area type tag.
+-   `LandmarkTag` This is an `int` setting the landmark tag.
+-   `PositianTag` This is an `int` setting the position tag.
+
+#### `RemoveMap` message
+
+This message removes a map with the given map ID. This message requires the
+`int` key `MapId`.
+
+#### `RemoveArea` message
+
+This message removes an area with the given area ID. This message requires the
+`int` key `AreaId`.
+
+#### `AreaComplete` message
+
+This indicates that the area currently being serviced as indicated by the
+service area cluster is now complete.
+
 ### `ErrorEvent` message
 
 The error event message requires the additional key `"Error"` which specifies
@@ -37,10 +77,14 @@ and setting up the testing environment, python tests can be executed with
 `./scripts/tests/run_python_test.py --script src/python_testing/<script_name>.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt --int-arg <PIXIT_Definitions:1>"`
 
 **Note:** If the testing environment has not been commissioned with the RVC app,
-use chip-tool to switch on the commissioning window
-`chip-tool pairing open-commissioning-window`, and add the following flags to
-the `--script-args` above.
-`--commissioning-method on-network --discriminator XXXX --passcode XXXX`.
+
+1. use chip-tool to switch on the commissioning window
+   `out/debug/chip-tool pairing open-commissioning-window 0x1230 1 180 1000 42`
+2. Get the manual pairing code. This will look something like
+   `Manual pairing code: [01073112097]`.
+3. Run any one of the tests with the `--commission-only` and `--manual-code`
+   flags:
+   `./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCCLEANM_1_2.py --script-args "--commissioning-method on-network --manual-code 01073112097 --commission-only"`
 
 Below are the PIXIT definitions required for the different python tests.
 
@@ -127,3 +171,30 @@ to transition to the required states.
 After commissioning the device, all the yaml tests can be run by running the
 `run_all_yaml_tests.sh` script from the root dir with the node ID that the
 device was commissioned with.
+
+### Service Area Cluster
+
+### TC 1.2
+
+Example command:
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_SEAR_1_2.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1"`
+
+### TC 1.3
+
+PIXIT: `PIXIT.SEAR.VALID_AREAS:'[7, 1234567]'` Example command:
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_SEAR_1_3.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --json-arg PIXIT.SEAR.VALID_AREAS:'[7, 1234567]'`
+
+### TC 1.4
+
+Example command:
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_SEAR_1_4.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1`
+
+#### TC 1.5
+
+Example command:
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_SEAR_1_5.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1"`
+
+#### TC 1.6
+
+Example command:
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_SEAR_1_6.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1`

@@ -364,6 +364,8 @@ using ByteSpan        = Span<const uint8_t>;
 using MutableByteSpan = Span<uint8_t>;
 template <size_t N>
 using FixedByteSpan = FixedSpan<const uint8_t, N>;
+template <size_t N>
+using MutableFixedByteSpan = FixedSpan<uint8_t, N>;
 
 using CharSpan        = Span<const char>;
 using MutableCharSpan = Span<char>;
@@ -386,6 +388,20 @@ inline CHIP_ERROR CopyCharSpanToMutableCharSpan(CharSpan cspan_to_copy, MutableC
     out_buf.reduce_size(cspan_to_copy.size());
 
     return CHIP_NO_ERROR;
+}
+
+/**
+ * Copies a CharSpan into a MutableCharSpan.
+ * If the span_to_copy does not fit in out_span, span_to_copy is truncated to fit in out_span.
+ * @param span_to_copy The CharSpan to copy.
+ * @param out_span The MutableCharSpan in which span_to_copy is to be copied.
+ */
+inline void CopyCharSpanToMutableCharSpanWithTruncation(CharSpan span_to_copy, MutableCharSpan & out_span)
+{
+    size_t size_to_copy = std::min(span_to_copy.size(), out_span.size());
+
+    memcpy(out_span.data(), span_to_copy.data(), size_to_copy);
+    out_span.reduce_size(size_to_copy);
 }
 
 } // namespace chip

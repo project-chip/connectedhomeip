@@ -50,7 +50,10 @@ target_include_directories(${APP_TARGET} PRIVATE
                            main/include/
                            ${MBED_COMMON}/util/include
                            ${ALL_CLUSTERS_COMMON}/include
-                           ${ENERGY_MANAGEMENT_COMMON}/include
+                           ${ENERGY_MANAGEMENT_COMMON}/common/include
+                           ${ENERGY_MANAGEMENT_COMMON}/device-energy-management/include
+                           ${ENERGY_MANAGEMENT_COMMON}/energy-evse/include
+                           ${ENERGY_MANAGEMENT_COMMON}/energy-reporting/include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/all-clusters-app
                            ${NLIO_ROOT}
@@ -72,16 +75,18 @@ target_sources(${APP_TARGET} PRIVATE
                ${ALL_CLUSTERS_COMMON}/src/smco-stub.cpp
                ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
                ${ALL_CLUSTERS_COMMON}/src/static-supported-temperature-levels.cpp
-               ${ENERGY_MANAGEMENT_COMMON}/src/ElectricalPowerMeasurementDelegate.cpp
-               ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseDelegateImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseManager.cpp
-               ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementDelegateImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementManager.cpp
-
+               ${ENERGY_MANAGEMENT_COMMON}/common/src/EnergyTimeUtils.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/device-energy-management/src/DeviceEnergyManagementManager.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/energy-evse/src/ChargingTargetsMemMgr.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/energy-evse/src/EVSEManufacturerImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/energy-evse/src/EnergyEvseDelegateImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/energy-evse/src/EnergyEvseManager.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/energy-evse/src/EnergyEvseTargetsStore.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp
 )
 
 chip_configure_data_model(${APP_TARGET}
-    INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../all-clusters-common/all-clusters-app.zap
 )
 

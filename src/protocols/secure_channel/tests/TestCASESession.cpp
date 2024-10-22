@@ -21,16 +21,20 @@
  *      This file implements unit tests for the CASESession implementation.
  */
 
+#include <stdarg.h>
+
+#include <pw_unit_test/framework.h>
+
 #include <credentials/CHIPCert.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <errno.h>
-#include <gtest/gtest.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
@@ -39,7 +43,6 @@
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/CASESession.h>
-#include <stdarg.h>
 
 #include "credentials/tests/CHIPCert_test_vectors.h"
 
@@ -56,7 +59,7 @@ using namespace chip::Crypto;
 namespace chip {
 class TestCASESecurePairingDelegate;
 
-class TestCASESession : public Test::LoopbackMessagingContext, public ::testing::Test
+class TestCASESession : public Test::LoopbackMessagingContext
 {
 public:
     // Performs shared setup for all tests in the test suite
@@ -69,8 +72,6 @@ public:
         ConfigInitializeNodes(false);
         chip::Test::LoopbackMessagingContext::SetUp();
     }
-
-    virtual void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
 
     void ServiceEvents();
     void SecurePairingHandshakeTestCommon(SessionManager & sessionManager, CASESession & pairingCommissioner,

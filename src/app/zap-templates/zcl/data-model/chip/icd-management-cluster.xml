@@ -39,17 +39,24 @@ limitations under the License.
         <field name="AppDefinedButton" mask="0x10000"/>
     </bitmap>
 
+    <enum name="ClientTypeEnum" type="enum8">
+        <cluster code="0x0046"/>
+        <item value="0" name="Permanent"/>
+        <item value="1" name="Ephemeral"/>
+    </enum>
+
     <struct name = "MonitoringRegistrationStruct" isFabricScoped="true">
         <cluster code="0x0046"/>
         <item fieldId="1" name="CheckInNodeID" type="node_id" isFabricSensitive="true"/>
         <item fieldId="2" name="MonitoredSubject" type="int64u" isFabricSensitive="true"/>
         <!-- RESERVED = 0x03 -->
+        <item fieldId="4" name="ClientType" type="ClientTypeEnum" isFabricSensitive="true" default="0"/>
     </struct>
 
     <enum name="OperatingModeEnum" type="enum8">
-    <cluster code="0x0046" />
-    <item value="0" name="SIT" />
-    <item value="1" name="LIT" />
+        <cluster code="0x0046" />
+        <item value="0" name="SIT" />
+        <item value="1" name="LIT" />
     </enum>
 
     <cluster>
@@ -62,7 +69,7 @@ limitations under the License.
         <!-- Cluster feature map -->
         <globalAttribute side="server" code="0xFFFC" value="0x0000"/>
         <!-- Current cluster version -->
-        <globalAttribute side="either" code="0xFFFD" value="2"/>
+        <globalAttribute side="either" code="0xFFFD" value="3"/>
 
         <features>
             <feature bit="0" code="CIP" name="CheckInProtocolSupport" summary="Device supports attributes and commands for the Check-In Protocol support.">
@@ -89,7 +96,16 @@ limitations under the License.
                 <optionalConform/>
             </otherwiseConform>
             </feature>
+            <feature bit="3" code="DSLS" name="DynamicSitLitSupport" summary="Device supports dynamic switching from SIT to LIT operating modes.">
+>               <otherwiseConform>
+>                   <provisionalConform/>
+>                   <optionalConform>
+>                       <feature name="LITS"/>
+>                   </optionalConform>
+                </otherwiseConform>
+            </feature>
         </features>
+
 
         <attribute side="server" code="0x00" define="IDLE_MODE_DURATION" type="int32u" min="1" max="64800" default="1" writable="false" optional="false" isNullable="false">IdleModeDuration</attribute>
         <attribute side="server" code="0x01" define="ACTIVE_MODE_DURATION" type="int32u" default="300" writable="false" optional="false" isNullable="false">ActiveModeDuration</attribute>
@@ -106,6 +122,7 @@ limitations under the License.
         <attribute side="server" code="0x06" define="USER_ACTIVE_MODE_TRIGGER_HINT" type="UserActiveModeTriggerBitmap" writable="false" optional="true" isNullable="false" apiMaturity="provisional">UserActiveModeTriggerHint</attribute>
         <attribute side="server" code="0x07" define="USER_ACTIVE_MODE_TRIGGER_INSTRUCTION" type="char_string" length="128" writable="false" optional="true" isNullable="false" apiMaturity="provisional">UserActiveModeTriggerInstruction</attribute>
         <attribute side="server" code="0x08" define="OPERATING_MODE" type="OperatingModeEnum" default="0" writable="false" optional="true" isNullable="false" apiMaturity="provisional">OperatingMode</attribute>
+        <attribute side="server" code="0x09" define="MAXIMUM_CHECK_IN_BACK_OFF" type="int32u" default="1" max="64800" optional="true" isNullable="false" apiMaturity="provisional">MaximumCheckInBackOff</attribute>
 
         <command source="client" code="0x00" name="RegisterClient" response="RegisterClientResponse" isFabricScoped="true" optional="true">
             <description>Register a client to the end device</description>
@@ -113,6 +130,7 @@ limitations under the License.
             <arg name="MonitoredSubject" type="int64u" optional="false"/>
             <arg name="Key" type="octet_string" length="16" optional="false"/>
             <arg name="VerificationKey" type="octet_string" length="16" optional="true"/>
+            <arg name="ClientType" type="ClientTypeEnum" optional="false"/>
             <access op="invoke" privilege="manage"/>
         </command>
 

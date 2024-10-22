@@ -47,7 +47,6 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <app/util/af-types.h>
@@ -62,8 +61,9 @@ using namespace Clusters::Globals::Attributes;
 
 namespace {
 
-DataVersion dataVersion           = 0;
-const MockNodeConfig * mockConfig = nullptr;
+unsigned metadataStructureGeneration = 0;
+DataVersion dataVersion              = 0;
+const MockNodeConfig * mockConfig    = nullptr;
 
 const MockNodeConfig & DefaultMockNodeConfig()
 {
@@ -114,12 +114,17 @@ const MockNodeConfig & GetMockNodeConfig()
     return (mockConfig != nullptr) ? *mockConfig : DefaultMockNodeConfig();
 }
 
-uint16_t mockClusterRevision = 1;
-uint32_t mockFeatureMap      = 0x1234;
-bool mockAttribute1          = true;
-int16_t mockAttribute2       = 42;
-uint64_t mockAttribute3      = 0xdeadbeef0000cafe;
-uint8_t mockAttribute4[256]  = {
+} // namespace
+
+namespace chip {
+namespace Test {
+
+const uint16_t mockClusterRevision = 1;
+const uint32_t mockFeatureMap      = 0x1234;
+const bool mockAttribute1          = true;
+const int16_t mockAttribute2       = 42;
+const uint64_t mockAttribute3      = 0xdeadbeef0000cafe;
+const uint8_t mockAttribute4[256]  = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
@@ -130,7 +135,8 @@ uint8_t mockAttribute4[256]  = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
 };
 
-} // namespace
+} // namespace Test
+} // namespace chip
 
 uint16_t emberAfEndpointCount()
 {
@@ -308,6 +314,40 @@ DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & a
     return &dataVersion;
 }
 
+chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpointId, CHIP_ERROR & err)
+{
+    auto endpoint = GetMockNodeConfig().endpointById(endpointId);
+
+    if (endpoint == nullptr)
+    {
+        return chip::Span<const EmberAfDeviceType>();
+    }
+
+    return endpoint->deviceTypes();
+}
+
+chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsigned index, CHIP_ERROR & err)
+{
+    if (index >= GetMockNodeConfig().endpoints.size())
+    {
+        return chip::Span<const EmberAfDeviceType>();
+    }
+
+    return GetMockNodeConfig().endpoints[index].deviceTypes();
+}
+
+void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                             AttributesChangedListener * listener)
+{
+    dataVersion++;
+    listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
+}
+
+unsigned emberAfMetadataStructureGeneration()
+{
+    return metadataStructureGeneration;
+}
+
 namespace chip {
 namespace app {
 
@@ -362,6 +402,11 @@ void BumpVersion()
 DataVersion GetVersion()
 {
     return dataVersion;
+}
+
+void SetVersionTo(DataVersion version)
+{
+    dataVersion = version;
 }
 
 CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
@@ -455,12 +500,14 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
 
 void SetMockNodeConfig(const MockNodeConfig & config)
 {
+    metadataStructureGeneration++;
     mockConfig = &config;
 }
 
 /// Resets the mock attribute storage to the default configuration.
 void ResetMockNodeConfig()
 {
+    metadataStructureGeneration++;
     mockConfig = nullptr;
 }
 

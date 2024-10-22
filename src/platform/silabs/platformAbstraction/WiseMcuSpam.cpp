@@ -16,14 +16,17 @@
  */
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+#include <sl_si91x_button_pin_config.h>
 
 #include <FreeRTOS.h>
 #include <task.h>
 
 #include <app/icd/server/ICDServerConfig.h>
 
+#include <lib/support/CodeUtils.h>
 #if SILABS_LOG_ENABLED
 #include "silabs_utils.h"
+
 #endif // SILABS_LOG_ENABLED
 
 // TODO add includes ?
@@ -43,6 +46,18 @@ void soc_pll_config(void);
 
 #ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
 #include "SEGGER_SYSVIEW.h"
+#endif
+
+#if SILABS_LOG_OUT_UART || ENABLE_CHIP_SHELL
+#include "uart.h"
+#endif
+// TODO Remove this when SI91X-16606 is addressed
+#ifdef SI917_DEVKIT
+#define SL_LED_COUNT 1
+uint8_t ledPinArray[SL_LED_COUNT] = { SL_LED_LEDB_PIN };
+#else
+#define SL_LED_COUNT SL_SI91x_LED_COUNT
+uint8_t ledPinArray[SL_LED_COUNT] = { SL_LED_LED0_PIN, SL_LED_LED1_PIN };
 #endif
 
 namespace chip {
@@ -74,6 +89,10 @@ CHIP_ERROR SilabsPlatform::Init(void)
     silabsInitLog();
 #endif
 
+#if SILABS_LOG_OUT_UART || ENABLE_CHIP_SHELL
+    uartConsoleInit();
+#endif
+
 #ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
     SEGGER_SYSVIEW_Conf();
 #endif
@@ -91,9 +110,8 @@ void SilabsPlatform::InitLed(void)
 
 CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led)
 {
-    // TODO add range check
-    (state) ? sl_si91x_led_set(led ? SL_LED_LED1_PIN : SL_LED_LED0_PIN)
-            : sl_si91x_led_clear(led ? SL_LED_LED1_PIN : SL_LED_LED0_PIN);
+    VerifyOrReturnError(led < SL_LED_COUNT, CHIP_ERROR_INVALID_ARGUMENT);
+    (state) ? sl_si91x_led_set(ledPinArray[led]) : sl_si91x_led_clear(ledPinArray[led]);
     return CHIP_NO_ERROR;
 }
 
@@ -105,8 +123,8 @@ bool SilabsPlatform::GetLedState(uint8_t led)
 
 CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
 {
-    // TODO add range check
-    sl_si91x_led_toggle(led ? SL_LED_LED1_PIN : SL_LED_LED0_PIN);
+    VerifyOrReturnError(led < SL_LED_COUNT, CHIP_ERROR_INVALID_ARGUMENT);
+    sl_si91x_led_toggle(ledPinArray[led]);
     return CHIP_NO_ERROR;
 }
 #endif // ENABLE_WSTK_LEDS
@@ -151,6 +169,11 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction)
     }
     Silabs::GetPlatform().mButtonCallback(btn, btnAction);
 }
+}
+
+uint8_t SilabsPlatform::GetButtonState(uint8_t button)
+{
+    return (button < SL_SI91x_BUTTON_COUNT) ? sButtonStates[button] : 0;
 }
 
 } // namespace Silabs

@@ -21,9 +21,14 @@
  *      This file implements unit tests for the MessageCounterManager implementation.
  */
 
-#include <lib/core/CHIPCore.h>
-#include <lib/support/CodeUtils.h>
+#include <errno.h>
 
+#include <nlbyteorder.h>
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -33,11 +38,6 @@
 #include <protocols/echo/Echo.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
-
-#include <gtest/gtest.h>
-#include <nlbyteorder.h>
-
-#include <errno.h>
 
 namespace {
 
@@ -64,14 +64,7 @@ public:
     int ReceiveHandlerCallCount = 0;
 };
 
-struct TestMessageCounterManager : public chip::Test::LoopbackMessagingContext, public ::testing::Test
-{
-    static void SetUpTestSuite() { chip::Test::LoopbackMessagingContext::SetUpTestSuite(); }
-    static void TearDownTestSuite() { chip::Test::LoopbackMessagingContext::TearDownTestSuite(); }
-
-    void SetUp() override { chip::Test::LoopbackMessagingContext::SetUp(); }
-    void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
-};
+using TestMessageCounterManager = chip::Test::LoopbackMessagingContext;
 
 TEST_F(TestMessageCounterManager, MessageCounterSyncProcess)
 {

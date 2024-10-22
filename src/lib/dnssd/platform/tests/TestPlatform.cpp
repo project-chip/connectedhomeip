@@ -16,14 +16,14 @@
  *    limitations under the License.
  */
 
-#include <lib/core/PeerId.h>
-#include <lib/dnssd/Discovery_ImplPlatform.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/PeerId.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/dnssd/Discovery_ImplPlatform.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/fake/DnssdImpl.h>
-
-#include <gtest/gtest.h>
 
 #if CHIP_DEVICE_LAYER_TARGET_FAKE != 1
 #error "This test is designed for use only with the fake platform"

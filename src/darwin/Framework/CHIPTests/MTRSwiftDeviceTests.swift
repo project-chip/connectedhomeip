@@ -10,7 +10,7 @@ struct DeviceConstants {
     static let onboardingPayload = "MT:-24J0AFN00KA0648G00"
     static let deviceID = 0x12344321
     static let timeoutInSeconds : Double = 3
-    static let pairingTimeoutInSeconds : Double = 10
+    static let pairingTimeoutInSeconds : Double = 30
 }
 
 var sConnectedDevice: MTRBaseDevice? = nil
@@ -92,6 +92,14 @@ class MTRSwiftDeviceTestDelegate : NSObject, MTRDeviceDelegate {
       return 2; // seconds
     }
 
+    @objc func unitTestSuppressTimeBasedReachabilityChanges(_ device : MTRDevice) -> Bool
+    {
+      // Allowing time-based reachability changes just makes the tests
+      // non-deterministic and can lead to random failures.  Suppress them
+      // unconditionally for now.  If we ever add tests that try to exercise that
+      // codepath, we can make this configurable.
+      return true;
+    }
 }
 
 class MTRSwiftDeviceTests : XCTestCase {
@@ -406,12 +414,8 @@ class MTRSwiftDeviceTests : XCTestCase {
         
         wait(for: [ resubscriptionReachableExpectation, resubscriptionGotReportsExpectation ], timeout:60)
         
-        // Now make sure we ignore later tests.  Ideally we would just unsubscribe
-        // or remove the delegate, but there's no good way to do that.
-        delegate.onReachable = { () -> Void in }
-        delegate.onNotReachable = nil
-        delegate.onAttributeDataReceived = nil
-        delegate.onEventDataReceived = nil
+        // Now make sure we ignore later tests.
+        device.remove(_: delegate)
         
         // Make sure we got no updated reports (because we had a cluster state cache
         // with data versions) during the resubscribe.

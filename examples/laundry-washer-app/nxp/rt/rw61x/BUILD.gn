@@ -35,26 +35,18 @@ assert(target_os == "freertos")
 assert(nxp_platform == "rt/rw61x")
 
 declare_args() {
-  # Allows to start the tcp download test app
-  tcp_download = false
-
-  # Allows to start the wifi connect test app
-  wifi_connect = false
-
-  # The 2 params below are used only if tcp_download or wifi_connect are true, otherwise they're unused.
-  wifi_ssid = ""
-  wifi_password = ""
+  # Allows to connect to a predefine Wi-Fi network at boot
+  wifi_auto_connect_at_boot = false
+  wifi_auto_connect_at_boot_ssid = ""
+  wifi_auto_connect_at_boot_password = ""
 
   # Setup discriminator as argument
   setup_discriminator = 3840
 }
 
-example_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
+example_platform_dir =
+    "${nxp_sdk_matter_support_root}/examples/platform/${nxp_platform}"
 common_example_dir = "${chip_root}/examples/platform/nxp/common"
-
-if (tcp_download == true && wifi_connect == true) {
-  assert("Cannot enable tcp_download and wifi_connect at the same time!")
-}
 
 # Use NXP custom zap files for laundry-washer device-type
 app_common_folder = "laundry-washer-app/nxp/zap"
@@ -65,7 +57,8 @@ rt_sdk("sdk") {
   defines = []
 
   # To be moved, temporary mbedtls config fix to build app with factory data
-  if (chip_enable_secure_dac_private_key_storage == 1) {
+  if (chip_enable_secure_dac_private_key_storage ||
+      chip_enable_secure_whole_factory_data) {
     defines += [
       "MBEDTLS_NIST_KW_C",
       "MBEDTLS_PSA_CRYPTO_CLIENT",
@@ -82,9 +75,17 @@ rt_sdk("sdk") {
   include_dirs += [ "${example_platform_dir}/board/" ]
   sources += [ "${example_platform_dir}/board/pin_mux.c" ]
   sources += [ "${example_platform_dir}/board/hardware_init.c" ]
-  sources += [ "${example_platform_dir}/board/clock_config.c" ]
-  sources += [ "${example_platform_dir}/board/board.c" ]
   sources += [ "${example_platform_dir}/board/peripherals.c" ]
+
+  if (board_version == "frdm") {
+    include_dirs += [ "${example_platform_dir}/board/frdmrw612/" ]
+    sources += [ "${example_platform_dir}/board/frdmrw612/clock_config.c" ]
+    sources += [ "${example_platform_dir}/board/frdmrw612/board.c" ]
+  } else {
+    include_dirs += [ "${example_platform_dir}/board/rdrw612bga/" ]
+    sources += [ "${example_platform_dir}/board/rdrw612bga/clock_config.c" ]
+    sources += [ "${example_platform_dir}/board/rdrw612bga/board.c" ]
+  }
 
   # Indicate the path to CHIPProjectConfig.h
   include_dirs += [ "include/config" ]
@@ -97,7 +98,7 @@ rt_sdk("sdk") {
 
   # For matter with BR feature, increase FreeRTOS heap size
   if (chip_enable_wifi && chip_enable_openthread) {
-    defines += [ "configTOTAL_HEAP_SIZE=(size_t)(160 * 1024)" ]
+    defines += [ "configTOTAL_HEAP_SIZE=(size_t)(170 * 1024)" ]
   }
 
   defines += [
@@ -141,10 +142,12 @@ rt_executable("laundry-washer") {
     "../../common/main/main.cpp",
   ]
 
-  if (chip_enable_secure_dac_private_key_storage == 1) {
-    sources += [
-      "${example_platform_dir}/factory_data/source/AppFactoryDataExample.cpp",
-    ]
+  if (chip_enable_secure_dac_private_key_storage ||
+      chip_enable_secure_whole_factory_data) {
+    sources += [ "${chip_root}/examples/platform/nxp/${nxp_platform}/factory_data/source/AppFactoryDataExample.cpp" ]
+    if (chip_enable_secure_whole_factory_data) {
+      defines += [ "ENABLE_SECURE_WHOLE_FACTORY_DATA" ]
+    }
   } else {
     sources += [
       "${common_example_dir}/factory_data/source/AppFactoryDataDefaultImpl.cpp",
@@ -168,19 +171,21 @@ rt_executable("laundry-washer") {
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/icd/source/ICDUtil.cpp",
-    "${common_example_dir}/matter_button/source/AppMatterButtonEmpty.cpp",
-    "${common_example_dir}/matter_cli/source/AppMatterCli.cpp",
+    "${common_example_dir}/matter_button/source/ButtonRegistrationEmpty.cpp",
   ]
 
-  deps = [ "${chip_root}/examples/${app_common_folder}" ]
+  deps = [
+    "${chip_root}/examples/${app_common_folder}",
+    "${chip_root}/src/platform/logging:default",
+  ]
 
   sources += [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
+    "../../common/main/laundry-washer-mode.cpp",
     "../../common/main/operational-state-delegate-impl.cpp",
   ]
 
@@ -189,6 +194,10 @@ rt_executable("laundry-washer") {
     deps += [
       "${chip_root}/examples/shell/shell_common:shell_common",
       "${chip_root}/src/lib/shell:shell",
+    ]
+    sources += [
+      "${common_example_dir}/matter_cli/source/AppCLIBase.cpp",
+      "${common_example_dir}/matter_cli/source/AppCLIFreeRTOS.cpp",
     ]
   }
 
@@ -200,40 +209,19 @@ rt_executable("laundry-washer") {
     ]
   }
 
-  if (wifi_connect) {
+  if (wifi_auto_connect_at_boot) {
+    assert(wifi_auto_connect_at_boot_ssid != "" &&
+               wifi_auto_connect_at_boot_password != "",
+           "WiFi SSID and password must be specified at build time!")
+
     defines += [
-      "WIFI_CONNECT_TASK=1",
-      "WIFI_CONNECT=1",
+      "CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT=1",
+      "CONFIG_CHIP_APP_WIFI_SSID=\"${wifi_auto_connect_at_boot_ssid}\"",
+      "CONFIG_CHIP_APP_WIFI_PASSWORD=\"${wifi_auto_connect_at_boot_password}\"",
     ]
-
-    if (!chip_enable_matter_cli) {
-      assert(wifi_ssid != "" && wifi_password != "",
-             "WiFi SSID and password must be specified at build time!")
-    }
-
-    if (wifi_ssid != "") {
-      defines += [ "WIFI_SSID=\"${wifi_ssid}\"" ]
-    }
-
-    if (wifi_password != "") {
-      defines += [ "WIFI_PASSWORD=\"${wifi_password}\"" ]
-    }
 
     include_dirs += [ "${common_example_dir}/wifi_connect/include" ]
     sources += [ "${common_example_dir}/wifi_connect/source/WifiConnect.cpp" ]
-  }
-
-  if (tcp_download) {
-    defines += [ "CONFIG_CHIP_TCP_DOWNLOAD=1" ]
-    defines += [
-      "WIFI_CONNECT=1",
-      "WIFI_SSID=\"${wifi_ssid}\"",
-      "WIFI_PASSWORD=\"${wifi_password}\"",
-    ]
-
-    include_dirs += [ "${common_example_dir}/tcp_download_test/include" ]
-    sources +=
-        [ "${common_example_dir}/tcp_download_test/source/TcpDownload.cpp" ]
   }
 
   # In case a dedicated assert function needs to be supported the flag sdk_fsl_assert_support should be set to false

@@ -102,6 +102,18 @@ public:
      * Called by CommandHandler to relay this information to the requester.
      */
     virtual void ResponseDropped() = 0;
+
+    /**
+     * @brief Gets the maximum size of a packet buffer to encode a Command
+     * Response message. This size depends on the underlying session used
+     * by the exchange.
+     *
+     * The size returned here is the size not including the prepended headers.
+     *
+     * Called by CommandHandler when allocating buffer for encoding the Command
+     * response.
+     */
+    virtual size_t GetCommandResponseMaxBufferSize() = 0;
 };
 
 } // namespace app

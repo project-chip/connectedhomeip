@@ -16,9 +16,10 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <controller/CHIPCommissionableNodeController.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMemString.h>
 
 using namespace chip;

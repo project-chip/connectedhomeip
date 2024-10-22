@@ -133,10 +133,16 @@ _bootstrap_or_activate() {
     export PW_DOCTOR_SKIP_CIPD_CHECKS=1
     export PATH # https://bugs.chromium.org/p/pigweed/issues/detail?id=281
 
-    local _PIGWEED_CIPD_JSON="$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json"
+    local _PIGWEED_CIPD_JSON_ROOT="$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup"
+    local _PIGWEED_CIPD_JSON="$_PIGWEED_CIPD_JSON_ROOT/pigweed.json"
+    local _PYTHON_CIPD_JSON="$_PIGWEED_CIPD_JSON_ROOT/python311.json"
     mkdir -p "$_PW_ACTUAL_ENVIRONMENT_ROOT"
     local _GENERATED_PIGWEED_CIPD_JSON="$_PW_ACTUAL_ENVIRONMENT_ROOT/pigweed.json"
-    $_CHIP_ROOT/scripts/setup/gen_pigweed_cipd_json.py -i $_PIGWEED_CIPD_JSON -o $_GENERATED_PIGWEED_CIPD_JSON
+    $_CHIP_ROOT/scripts/setup/gen_pigweed_cipd_json.py \
+        -i $_PIGWEED_CIPD_JSON                         \
+        -o $_GENERATED_PIGWEED_CIPD_JSON               \
+        -e darwin:$_PYTHON_CIPD_JSON                   \
+        -e windows:$_PYTHON_CIPD_JSON
 
     if test -n "$GITHUB_ACTION"; then
         tee <<EOF >"${_PW_ACTUAL_ENVIRONMENT_ROOT}/pip.conf"
@@ -207,7 +213,7 @@ if _submodules_need_updating; then
   echo "For a clean checkout, consider running:"
   echo "   ./scripts/checkout_submodules.py --shallow --platform <your-platform>"
   echo "OR for a full checkout:"
-  echo "   git submodules update -f --init --recursive"
+  echo "   git submodule update -f --init --recursive"
 
   # reset output
   if which tput >/dev/null; then tput sgr0; fi

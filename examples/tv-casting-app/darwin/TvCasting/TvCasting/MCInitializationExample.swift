@@ -19,10 +19,39 @@ import Foundation
 import Security
 import os.log
 
+// This class needs to be imlemented by the client.
 class MCAppParametersDataSource : NSObject, MCDataSource
 {    
     let Log = Logger(subsystem: "com.matter.casting",
                      category: "MCAppParametersDataSource")
+    
+    // Dummy values for demonstration only.
+    private var commissionableData: MCCommissionableData = MCCommissionableData(
+        passcode: 20202021,
+        discriminator: 3874,
+        // Default to the minimum PBKDF iterations (1,000) for this example implementation. For TV devices and TV casting app production
+        // implementations, you should use a higher number of PBKDF iterations to enhance security. The default minimum iterations are
+        // not sufficient against brute-force and rainbow table attacks. Increasing the number of iterations will increase the
+        // computational time required to derive the key. This can slow down the authentication process, especially on devices with
+        // limited processing power like a Raspberry Pi 4. For a production implementation, you should measure the actual performance on
+        // the target device.
+        //
+        // 1,000 - Hypothetical key derivation time: ~20 milliseconds (ms).
+        // 100,000 - Hypothetical key derivation time: ~2 seconds.
+        spake2pIterationCount: 1000,
+        spake2pVerifier: nil,
+        spake2pSalt: nil
+    )
+
+    /**
+    * This function needs to be implemented by the client in use cases where the MCCommissionableData needs to be updated
+    * post-initialization. For example, when the Commissioner-Generated Passcode feature is used.
+    */
+    func update(_ newCommissionableData: MCCommissionableData) {
+        Log.info("MCAppParametersDataSource.update() - Before update, passcode: \(self.commissionableData.passcode)")
+        self.commissionableData = newCommissionableData
+        Log.info("MCAppParametersDataSource.update() - After update, passcode: \(self.commissionableData.passcode)")
+    }
     
     func clientQueue() -> DispatchQueue {
         return DispatchQueue.main;
@@ -34,13 +63,8 @@ class MCAppParametersDataSource : NSObject, MCDataSource
     }
     
     func castingAppDidReceiveRequestForCommissionableData(_ sender: Any) -> MCCommissionableData {
-        // dummy values for demonstration only
-        return MCCommissionableData(
-            passcode: 20202021,
-            discriminator: 3874,
-            spake2pIterationCount: 1000,
-            spake2pVerifier: nil,
-            spake2pSalt: nil)
+        Log.info("MCAppParametersDataSource castingAppDidReceiveRequestForCommissionableData()")
+        return commissionableData
     }
     
     // dummy DAC values for demonstration only
@@ -96,18 +120,41 @@ class MCAppParametersDataSource : NSObject, MCDataSource
     }
 }
 
+// This class is a singleton
 class MCInitializationExample {
+    static let shared = MCInitializationExample()
+
     let Log = Logger(subsystem: "com.matter.casting",
                      category: "MCInitializationExample")
-    
+
+    // We store the client defined instance of the MCAppParametersDataSource passed to CastingApp.initialize().
+    // MCAppParametersDataSource may need to be updated by the client in case of the Casting 
+    // Player/Commissioner-Generated passcode commissioning flow.
+    private var appParametersDataSource: MCAppParametersDataSource?
+
+    private init() {
+        // Private initialization to ensure just one instance is created.
+    }
+
     func initialize() -> Error? {
         if let castingApp = MCCastingApp.getSharedInstance()
         {
-            return castingApp.initialize(with: MCAppParametersDataSource())
+            Log.info("MCInitializationExample.initialize() calling MCCastingApp.initializeWithDataSource()")
+
+            let dataSource = MCAppParametersDataSource()
+            appParametersDataSource = dataSource
+
+            return castingApp.initialize(with: dataSource)
         }
         else
         {
             return NSError(domain: "com.matter.casting", code: Int(MATTER_ERROR_INCORRECT_STATE.code))
         }
+    }
+
+    // Getter method for the stored instance of MCAppParametersDataSource
+    func getAppParametersDataSource() -> MCAppParametersDataSource? {
+        Log.info("MCInitializationExample.getAppParametersDataSource()")
+        return appParametersDataSource
     }
 }

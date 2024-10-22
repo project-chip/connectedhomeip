@@ -18,8 +18,8 @@
 
 /**
  *    @file
- *      Compile-time configuration for LwIP on P6 platforms using the
- *      P6 SDK.
+ *      Compile-time configuration for LwIP on PSOC6 platforms using the
+ *      PSOC6 SDK.
  *
  */
 

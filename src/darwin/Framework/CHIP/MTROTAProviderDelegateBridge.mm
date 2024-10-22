@@ -104,7 +104,7 @@ public:
         VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id);
-        ResetState();
+        ResetState(CHIP_ERROR_CANCELLED);
 
         mExchangeMgr = nullptr;
         mSystemLayer = nullptr;
@@ -117,11 +117,11 @@ public:
         assertChipStackLockedByCurrentThread();
 
         if (mInitialized && mFabricIndex.Value() == controller.fabricIndex) {
-            ResetState();
+            ResetState(CHIP_ERROR_CANCELLED);
         }
     }
 
-    void ResetState()
+    void ResetState(CHIP_ERROR error)
     {
         assertChipStackLockedByCurrentThread();
         if (mNodeId.HasValue() && mFabricIndex.HasValue()) {
@@ -129,6 +129,23 @@ public:
                 "Resetting state for OTA Provider; no longer providing an update for node id 0x" ChipLogFormatX64
                 ", fabric index %u",
                 ChipLogValueX64(mNodeId.Value()), mFabricIndex.Value());
+
+            if (mTransferStarted) {
+                auto controller = [MTRDeviceControllerFactory.sharedInstance runningControllerForFabricIndex:mFabricIndex.Value()];
+                if (controller) {
+                    auto nodeId = @(mNodeId.Value());
+                    auto strongDelegate = mDelegate;
+                    if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionEndForNodeID:controller:error:)]) {
+                        dispatch_async(mDelegateNotificationQueue, ^{
+                            [strongDelegate handleBDXTransferSessionEndForNodeID:nodeId
+                                                                      controller:controller
+                                                                           error:[MTRError errorForCHIPErrorCode:error]];
+                        });
+                    }
+                } else {
+                    ChipLogError(Controller, "Not notifying delegate of BDX Transfer Session End, controller is not running");
+                }
+            }
         } else {
             ChipLogProgress(Controller, "Resetting state for OTA Provider");
         }
@@ -153,6 +170,7 @@ public:
         mDelegateNotificationQueue = nil;
 
         mInitialized = false;
+        mTransferStarted = false;
     }
 
 private:
@@ -162,7 +180,7 @@ private:
     static void HandleBdxInitReceivedTimeoutExpired(chip::System::Layer * systemLayer, void * state)
     {
         VerifyOrReturn(state != nullptr);
-        static_cast<BdxOTASender *>(state)->ResetState();
+        static_cast<BdxOTASender *>(state)->ResetState(CHIP_ERROR_TIMEOUT);
     }
 
     CHIP_ERROR OnMessageToSend(TransferSession::OutputEvent & event)
@@ -188,12 +206,12 @@ private:
         if (err != CHIP_NO_ERROR) {
             mExchangeCtx->Close();
             mExchangeCtx = nullptr;
-            ResetState();
-        } else if (event.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport)) {
+            ResetState(err);
+        } else if (msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport)) {
             // If the send was successful for a status report, since we are not expecting a response the exchange context is
             // already closed. We need to null out the reference to avoid having a dangling pointer.
             mExchangeCtx = nullptr;
-            ResetState();
+            ResetState(CHIP_ERROR_INTERNAL);
         }
         return err;
     }
@@ -258,8 +276,8 @@ private:
                               }];
         };
 
+        mTransferStarted = true;
         auto nodeId = @(mNodeId.Value());
-
         auto strongDelegate = mDelegate;
         dispatch_async(mDelegateNotificationQueue, ^{
             if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]) {
@@ -294,20 +312,7 @@ private:
             error = CHIP_ERROR_INTERNAL;
         }
 
-        auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
-        VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
-        auto nodeId = @(mNodeId.Value());
-
-        auto strongDelegate = mDelegate;
-        if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionEndForNodeID:controller:error:)]) {
-            dispatch_async(mDelegateNotificationQueue, ^{
-                [strongDelegate handleBDXTransferSessionEndForNodeID:nodeId
-                                                          controller:controller
-                                                               error:[MTRError errorForCHIPErrorCode:error]];
-            });
-        }
-
-        ResetState();
+        ResetState(error); // will notify the delegate
         return CHIP_NO_ERROR;
     }
 
@@ -438,7 +443,7 @@ private:
             VerifyOrReturnError(mFabricIndex.Value() == fabricIndex && mNodeId.Value() == nodeId, CHIP_ERROR_BUSY);
 
             // Reset stale connection from the same Node if exists.
-            ResetState();
+            ResetState(CHIP_ERROR_CANCELLED);
         }
 
         auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:fabricIndex];
@@ -466,6 +471,7 @@ private:
     }
 
     bool mInitialized = false;
+    bool mTransferStarted = false;
     Optional<FabricIndex> mFabricIndex;
     Optional<NodeId> mNodeId;
     id<MTROTAProviderDelegate> mDelegate = nil;
@@ -489,7 +495,7 @@ MTROTAProviderDelegateBridge::MTROTAProviderDelegateBridge() { Clusters::OTAProv
 
 MTROTAProviderDelegateBridge::~MTROTAProviderDelegateBridge()
 {
-    gOtaSender->ResetState();
+    gOtaSender->ResetState(CHIP_ERROR_CANCELLED);
     Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, nullptr);
 }
 
@@ -685,7 +691,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                     handle.Release();
                     // We need to reset state here to clean up any initialization we might have done including starting the BDX
                     // timeout timer while preparing for transfer if any failure occurs afterwards.
-                    gOtaSender->ResetState();
+                    gOtaSender->ResetState(err);
                     return;
                 }
 
@@ -696,7 +702,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                     LogErrorOnFailure(err);
                     handler->AddStatus(cachedCommandPath, StatusIB(err).mStatus);
                     handle.Release();
-                    gOtaSender->ResetState();
+                    gOtaSender->ResetState(err);
                     return;
                 }
                 delegateResponse.imageURI.SetValue(uri);

@@ -76,3 +76,7 @@ def remove_fabric(index_var: str, controller: str):
 
 def verify_commissioning_successful() -> str:
     return 'Verify the commissioning is successful.'
+
+
+def if_feature_supported(feature: str) -> str:
+    return f"If the {feature} is supported"

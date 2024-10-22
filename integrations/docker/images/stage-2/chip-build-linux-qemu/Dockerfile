@@ -1,6 +1,6 @@
 ARG VERSION=latest
 ARG UBUNTU_QEMU_DIR_DEFAULT="/opt/ubuntu-qemu"
-ARG UBUNTU_QEMU_IMG_DEFAULT="${UBUNTU_QEMU_DIR_DEFAULT}/ubuntu-20.04.img"
+ARG UBUNTU_QEMU_IMG_DEFAULT="${UBUNTU_QEMU_DIR_DEFAULT}/ubuntu-24.04.img"
 
 FROM ghcr.io/project-chip/chip-build:${VERSION} as build-env
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
@@ -13,6 +13,8 @@ ARG UBUNTU_QEMU_IMG_DEFAULT
 
 ENV UBUNTU_QEMU_DIR=${UBUNTU_QEMU_DIR_DEFAULT}
 ENV UBUNTU_QEMU_IMG=${UBUNTU_QEMU_IMG_DEFAULT}
+ENV KERNEL_PATH="${UBUNTU_QEMU_DIR_DEFAULT}/bzImage"
+
 
 RUN mkdir -p /tmp/workdir/linux
 COPY files/linux/0001-Bluetooth-MGMT-Synchronize-scan-start-and-LE-Meta-ev.patch /tmp/workdir/linux/0001-Bluetooth-MGMT-Synchronize-scan-start-and-LE-Meta-ev.patch
@@ -32,7 +34,8 @@ RUN set -x \
 	libguestfs-tools \
 	linux-image-generic \
 	ncurses-dev \
-	qemu \
+	patch \
+	qemu-system \
 	xz-utils \
 	zstd \
 	&& apt-get clean \
@@ -119,36 +122,26 @@ RUN mkdir -p /tmp/workdir/linux \
 	&& make \
 	&& make install DESTDIR=/opt/ubuntu-qemu/rootfs && mkdir -p /opt/ubuntu-qemu/rootfs/usr/bin && cp /tmp/workdir/bluez/emulator/btvirt /opt/ubuntu-qemu/rootfs/usr/bin \
 	# Download Ubuntu image for QEMU
-	&& curl https://cloud-images.ubuntu.com/minimal/releases/focal/release/ubuntu-20.04-minimal-cloudimg-amd64.img \
-	-o /tmp/workdir/ubuntu-20.04-minimal-cloudimg-amd64.img \
+	&& curl https://cloud-images.ubuntu.com/minimal/releases/noble/release/ubuntu-24.04-minimal-cloudimg-amd64.img \
+	-o /tmp/workdir/ubuntu-24.04-minimal-cloudimg-amd64.img
 	# Prepare ubuntu image
-	&& qemu-img create -f qcow2 -o preallocation=off $UBUNTU_QEMU_IMG 10G \
-	&& virt-resize --expand /dev/sda1 /tmp/workdir/ubuntu-20.04-minimal-cloudimg-amd64.img $UBUNTU_QEMU_IMG \
+RUN qemu-img create -f qcow2 -o preallocation=off $UBUNTU_QEMU_IMG 10G \
+	&& virt-resize --expand /dev/sda1 /tmp/workdir/ubuntu-24.04-minimal-cloudimg-amd64.img $UBUNTU_QEMU_IMG \
 	&& guestfish -a $UBUNTU_QEMU_IMG \
-	--mount /dev/sda3:/ \
+	--mount /dev/sda4:/ \
 	--network \
 	copy-in /opt/ubuntu-qemu/rootfs/lib /usr : \
 	copy-in /opt/ubuntu-qemu/rootfs/usr / : \
 	sh 'apt-get remove -y snapd' : \
-	sh 'apt-get update' : \
-	sh 'DEBIAN_FRONTEND=noninteractive apt-get install -y dnsmasq hostapd wpasupplicant iw libdw1 rfkill' : \
 	sh '/usr/bin/systemctl enable bluetooth.service' : \
 	sh '/usr/bin/systemctl disable cloud-init.service' : \
-	sh '/usr/bin/systemctl disable dbus-fi.w1.wpa_supplicant1.service' : \
-	sh '/usr/bin/systemctl disable dnsmasq.service' : \
-	sh '/usr/bin/systemctl disable hostapd.service' : \
 	sh '/usr/bin/systemctl disable lxd-agent.service' : \
 	sh '/usr/bin/systemctl disable systemd-networkd-wait-online.service' : \
 	sh '/usr/bin/systemctl disable systemd-timesyncd.service' : \
-	sh '/usr/bin/systemctl disable wpa_supplicant.service' : \
 	sh '/usr/bin/systemctl mask cloud-init.service' : \
-	sh '/usr/bin/systemctl mask dbus-fi.w1.wpa_supplicant1.service' : \
-	sh '/usr/bin/systemctl mask dnsmasq.service' : \
-	sh '/usr/bin/systemctl mask hostapd.service' : \
 	sh '/usr/bin/systemctl mask lxd-agent.service' : \
 	sh '/usr/bin/systemctl mask systemd-networkd-wait-online.service' : \
 	sh '/usr/bin/systemctl mask systemd-timesyncd.service' : \
-	sh '/usr/bin/systemctl mask wpa_supplicant.service' : \
 	sh 'passwd -d root' : \
 	sh 'ssh-keygen -A' : \
 	sh '/bin/echo -e "PermitRootLogin yes\nPasswordAuthentication yes\nPermitEmptyPasswords yes" > /etc/ssh/sshd_config' : \
@@ -161,13 +154,63 @@ RUN mkdir -p /tmp/workdir/linux \
 	sh 'sed -i "s#^ExecStart=.*#ExecStart=-/usr/libexec/bluetooth/bluetoothd -E#" /lib/systemd/system/bluetooth.service' : \
 	sh 'rm -f /etc/resolv.conf && /bin/echo -e "nameserver 8.8.8.8" > /etc/resolv.conf' : \
 	sh '/bin/echo -e "host0 /chip 9p trans=virtio,version=9p2000.L 0 0" >> /etc/fstab' : \
-	sh '/bin/echo -e "export PW_ENVIRONMENT_ROOT=/root/pw_root\n[ -x /launcher.sh ] && /launcher.sh\n" >> /root/.profile' : \
-	sh 'DEBIAN_FRONTEND=noninteractive apt-get -y install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3 python3-venv python3-dev python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev' : \
-	sh 'git config --file /root/.gitconfig  --add safe.directory "*"' : \
-	sh 'apt-get clean' : \
-	sh 'rm -rf /var/lib/apt/lists/*' : \
-	sh 'rm -rf /var/cache/apt/*' : \
-	sh 'echo Configuration completed.' \
+	sh '/bin/echo -e "[ -x /init.sh ] && /init.sh && rm -f /init.sh && sync && systemctl poweroff\n" >> /root/.profile' : \
+	sh '/bin/echo -e "export PW_ENVIRONMENT_ROOT=/root/pw_root\n[ -x /launcher.sh ] && /launcher.sh\n" >> /root/.profile' \
+	&& echo -n \
+	"#!/bin/bash\n" \
+	"set -e \n" \
+	"export DEBIAN_FRONTEND=noninteractive \n" \
+	"apt-get update\n" \
+	"apt-get install -y apt-utils\n" \
+	"apt-get install -y dnsmasq hostapd wpasupplicant iw libdw1 rfkill\n" \
+	"DEBIAN_FRONTEND=noninteractive apt-get -y install " \
+	"	g++ " \
+	"	gcc " \
+	"	git " \
+	"	libavahi-client-dev " \
+	"	libcairo2-dev " \
+	"	libdbus-1-dev " \
+	"	libgirepository1.0-dev " \
+	"	libglib2.0-dev " \
+	"	libreadline-dev " \
+	"	libssl-dev " \
+	"	ninja-build " \
+	"	pkg-config " \
+	"	python3 " \
+	"	python3-dev " \
+	"	python3-pip " \
+	"	python3-venv " \
+	"	unzip \n" \
+	"/usr/bin/systemctl disable dbus-fi.w1.wpa_supplicant1.service\n" \
+	"/usr/bin/systemctl disable dnsmasq.service\n" \
+	"/usr/bin/systemctl disable hostapd.service\n" \
+	"/usr/bin/systemctl disable wpa_supplicant.service\n" \
+	"/usr/bin/systemctl mask dnsmasq.service\n" \
+	"/usr/bin/systemctl mask hostapd.service\n" \
+	"/usr/bin/systemctl mask dbus-fi.w1.wpa_supplicant1.service\n" \
+	"/usr/bin/systemctl mask wpa_supplicant.service\n" \
+	"git config --file /root/.gitconfig  --add safe.directory \"*\"\n" \
+	"apt-get clean\n" \
+	"rm -rf /var/lib/apt/lists/*\n" \
+	"rm -rf /var/cache/apt/*\n" \
+	"echo Configuration completed\n " \
+	| guestfish --rw -a $UBUNTU_QEMU_IMG -m /dev/sda4:/ upload - /init.sh : chmod 0755 /init.sh \
+	&& qemu-system-x86_64 \
+	-machine ubuntu \
+	-smp 4 \
+	-m 2048 \
+	-nographic \
+	-monitor null \
+	-serial stdio \
+	-display none \
+	-device virtio-blk-pci,drive=virtio-blk1 \
+	-drive file="${UBUNTU_QEMU_IMG}",id=virtio-blk1,if=none,format=qcow2,readonly=off \
+	-kernel "${KERNEL_PATH}" \
+	-append 'console=ttyS0 root=/dev/vda4' \
+	-netdev user,id=network0 \
+	-device e1000,netdev=network0,mac=52:54:00:12:34:56 \
+    -virtfs "local,path=/tmp,mount_tag=host0,security_model=passthrough,id=host0" \
+# tmp folder is mounted only to preserve error during boot
 	&& mkdir -p /chip \
 	&& rm -rf /opt/ubuntu-qemu/rootfs \
 	&& echo -n \
@@ -185,7 +228,7 @@ RUN mkdir -p /tmp/workdir/linux \
 	"fi\n" \
 	"echo 'Shutting down emulated system...'\n" \
 	"echo o > /proc/sysrq-trigger\n" \
-	| guestfish --rw -a $UBUNTU_QEMU_IMG -m /dev/sda3:/ upload - /launcher.sh : chmod 0755 /launcher.sh \
+	| guestfish --rw -a $UBUNTU_QEMU_IMG -m /dev/sda4:/ upload - /launcher.sh : chmod 0755 /launcher.sh \
 	&& virt-sparsify --compress ${UBUNTU_QEMU_IMG} ${UBUNTU_QEMU_IMG}.compressed \
 	&& mv ${UBUNTU_QEMU_IMG}.compressed ${UBUNTU_QEMU_IMG} \
 	&& rm -rf /var/tmp/.guestfs-0/* \
@@ -205,7 +248,7 @@ RUN set -x \
 	&& apt-get update \
 	&& DEBIAN_FRONTEND=noninteractive apt-get install -fy \
 	cpu-checker \
-	qemu \
+	libgirepository-1.0-1 \
 	qemu-system-x86 \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* \

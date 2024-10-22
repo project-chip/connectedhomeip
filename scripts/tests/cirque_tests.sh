@@ -37,13 +37,18 @@ OT_SIMULATION_CACHE="$CIRQUE_CACHE_PATH/ot-simulation-cmake.tgz"
 OT_SIMULATION_CACHE_STAMP_FILE="$CIRQUE_CACHE_PATH/ot-simulation.commit"
 
 # Append test name here to add more tests for run_all_tests
+#
+# NOTE:
+#   "InteractionModelTest" is currently disabled due to it overriding
+#   internal data model methods (for example it says "CommandExists" for
+#   paths where endpoint/cluster do not)
 CIRQUE_TESTS=(
     "EchoTest"
     "EchoOverTcpTest"
     "FailsafeTest"
     "MobileDeviceTest"
     "CommissioningTest"
-    "InteractionModelTest"
+    "IcdWaitForActiveTest"
     "SplitCommissioningTest"
     "CommissioningFailureTest"
     "CommissioningFailureOnReportTest"
@@ -114,9 +119,7 @@ function cirquetest_bootstrap() {
     set -ex
 
     cd "$REPO_DIR"/third_party/cirque/repo
-    pip3 uninstall -y setuptools
-    pip3 install setuptools==65.7.0
-    pip3 install pycodestyle==2.5.0 wheel
+    pip3 install --break-system-packages pycodestyle==2.5.0 wheel
 
     make NO_GRPC=1 install -j
 
@@ -125,7 +128,7 @@ function cirquetest_bootstrap() {
     "$REPO_DIR"/integrations/docker/images/stage-2/chip-cirque-device-base/build.sh --build-arg OT_BR_POSIX_CHECKOUT="$OT_BR_POSIX_CHECKOUT"
 
     __cirquetest_build_ot_lazy
-    pip3 install -r requirements_nogrpc.txt
+    pip3 install --break-system-packages -r requirements_nogrpc.txt
 
     echo "OpenThread Version: $OPENTHREAD_CHECKOUT"
     echo "ot-br-posix Version: $OT_BR_POSIX_CHECKOUT"

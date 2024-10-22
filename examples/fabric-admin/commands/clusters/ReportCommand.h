@@ -32,69 +32,10 @@ public:
 
     /////////// ReadClient Callback Interface /////////
     void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data,
-                         const chip::app::StatusIB & status) override
-    {
-        CHIP_ERROR error = status.ToChipError();
-        if (CHIP_NO_ERROR != error)
-        {
-            LogErrorOnFailure(RemoteDataModelLogger::LogErrorAsJSON(path, status));
-
-            ChipLogError(NotSpecified, "Response Failure: %s", chip::ErrorStr(error));
-            mError = error;
-            return;
-        }
-
-        if (data == nullptr)
-        {
-            ChipLogError(NotSpecified, "Response Failure: No Data");
-            mError = CHIP_ERROR_INTERNAL;
-            return;
-        }
-
-        LogErrorOnFailure(RemoteDataModelLogger::LogAttributeAsJSON(path, data));
-
-        error = DataModelLogger::LogAttribute(path, data);
-        if (CHIP_NO_ERROR != error)
-        {
-            ChipLogError(NotSpecified, "Response Failure: Can not decode Data");
-            mError = error;
-            return;
-        }
-    }
+                         const chip::app::StatusIB & status) override;
 
     void OnEventData(const chip::app::EventHeader & eventHeader, chip::TLV::TLVReader * data,
-                     const chip::app::StatusIB * status) override
-    {
-        if (status != nullptr)
-        {
-            CHIP_ERROR error = status->ToChipError();
-            if (CHIP_NO_ERROR != error)
-            {
-                LogErrorOnFailure(RemoteDataModelLogger::LogErrorAsJSON(eventHeader, *status));
-
-                ChipLogError(NotSpecified, "Response Failure: %s", chip::ErrorStr(error));
-                mError = error;
-                return;
-            }
-        }
-
-        if (data == nullptr)
-        {
-            ChipLogError(NotSpecified, "Response Failure: No Data");
-            mError = CHIP_ERROR_INTERNAL;
-            return;
-        }
-
-        LogErrorOnFailure(RemoteDataModelLogger::LogEventAsJSON(eventHeader, data));
-
-        CHIP_ERROR error = DataModelLogger::LogEvent(eventHeader, data);
-        if (CHIP_NO_ERROR != error)
-        {
-            ChipLogError(NotSpecified, "Response Failure: Can not decode Data");
-            mError = error;
-            return;
-        }
-    }
+                     const chip::app::StatusIB * status) override;
 
     void OnError(CHIP_ERROR error) override
     {

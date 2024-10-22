@@ -18,10 +18,11 @@
 
 #include <vector>
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
-
-#include <gtest/gtest.h>
 
 namespace {
 

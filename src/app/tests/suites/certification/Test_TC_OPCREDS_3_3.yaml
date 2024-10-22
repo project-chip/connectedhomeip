@@ -35,11 +35,10 @@ tests:
       disabled: true
 
     - label:
-          "Step 1: Factory Reset DUT (to ensure NOC list is empty at the
+          "Step 1: Factory Reset TH (to ensure NOC list is empty at the
           beginning of the following steps)"
-      PICS: MCORE.UI.FACTORYRESET
       verification: |
-          On both DUT and TH side, on Raspi we do factory reset with the below command. The DUT for cert should follow vendor specific procedure for factory reset
+          On Raspi factory reset with the below command.
           sudo rm -rf /tmp/chip_*
       disabled: true
 

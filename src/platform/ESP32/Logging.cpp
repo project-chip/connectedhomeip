@@ -3,7 +3,6 @@
 #include <platform/logging/LogV.h>
 
 #include <lib/core/CHIPConfig.h>
-#include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 
 #include <stdio.h>
@@ -19,13 +18,16 @@ namespace chip {
 namespace Logging {
 namespace Platform {
 
-void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
+void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     char tag[11];
 
     snprintf(tag, sizeof(tag), "chip[%s]", module);
     tag[sizeof(tag) - 1] = 0;
 
+    // We intentionally added the printf statements to ensure we could apply colors to logs redirected to the console.
+    // The printf statements are not bypassing the log level, rather, they are intentionally designed to print the
+    // initial and later parts of the log.
     switch (category)
     {
     case kLogCategory_Error: {

@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class RvcCleanModeClusterModeOptionStruct(
   val label: String,
   val mode: UInt,
-  val modeTags: List<RvcCleanModeClusterModeTagStruct>
+  val modeTags: List<RvcCleanModeClusterModeTagStruct>,
 ) {
   override fun toString(): String = buildString {
     append("RvcCleanModeClusterModeOptionStruct {\n")

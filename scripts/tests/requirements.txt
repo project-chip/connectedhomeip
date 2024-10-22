@@ -1,5 +1,9 @@
 # Python requirements for scripts in this location
+alive_progress
 click
 colorama
+coloredlogs
 diskcache
+mypy==1.10.1
+tabulate
 websockets

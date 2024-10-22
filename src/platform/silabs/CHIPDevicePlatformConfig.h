@@ -23,6 +23,8 @@
  */
 
 #pragma once
+#include <cmsis_os2.h>
+#include <sl_cmsis_os2_common.h>
 
 // ==================== Platform Adaptations ====================
 
@@ -67,6 +69,15 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
 #define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+ *
+ * Unique ID length in bytes. The value should be 16-bytes or longer.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+#define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH 32
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
@@ -120,8 +131,16 @@
 
 // ========== Platform-specific Configuration Overrides =========
 
+#ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY osPriorityHigh
+#endif
+
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
+#if SLI_SI91X_MCU_INTERFACE
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (7 * 1024)
+#else
 #define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (6 * 1024)
+#endif
 #endif // CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
 
 #ifndef CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE
@@ -142,7 +161,7 @@
 
 #define CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE 25
 
-#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING SL_MATTER_BLE_EXTENDED_ADV
+#define CHIP_DEVICE_CONFIG_EXT_ADVERTISING SL_MATTER_BLE_EXTENDED_ADV
 
 /*
     ICD Configuration Defines

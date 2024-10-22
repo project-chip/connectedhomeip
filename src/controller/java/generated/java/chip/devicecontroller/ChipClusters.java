@@ -1504,262 +1504,6 @@ public class ChipClusters {
     }
   }
 
-  public static class OnOffSwitchConfigurationCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 7L;
-
-    private static final long SWITCH_TYPE_ATTRIBUTE_ID = 0L;
-    private static final long SWITCH_ACTIONS_ATTRIBUTE_ID = 16L;
-    private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
-    private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
-    private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
-    private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
-    private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
-
-    public OnOffSwitchConfigurationCluster(long devicePtr, int endpointId) {
-      super(devicePtr, endpointId, CLUSTER_ID);
-    }
-
-    @Override
-    @Deprecated
-    public long initWithDevice(long devicePtr, int endpointId) {
-      return 0L;
-    }
-
-    public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface AttributeListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public void readSwitchTypeAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SWITCH_TYPE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, SWITCH_TYPE_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeSwitchTypeAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SWITCH_TYPE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, SWITCH_TYPE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readSwitchActionsAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SWITCH_ACTIONS_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, SWITCH_ACTIONS_ATTRIBUTE_ID, true);
-    }
-
-    public void writeSwitchActionsAttribute(DefaultClusterCallback callback, Integer value) {
-      writeSwitchActionsAttribute(callback, value, 0);
-    }
-
-    public void writeSwitchActionsAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), SWITCH_ACTIONS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeSwitchActionsAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SWITCH_ACTIONS_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, SWITCH_ACTIONS_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readGeneratedCommandListAttribute(
-        GeneratedCommandListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeGeneratedCommandListAttribute(
-        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAcceptedCommandListAttribute(
-        AcceptedCommandListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAcceptedCommandListAttribute(
-        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAttributeListAttribute(
-        AttributeListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAttributeListAttribute(
-        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readFeatureMapAttribute(
-        LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, FEATURE_MAP_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeFeatureMapAttribute(
-        LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, FEATURE_MAP_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readClusterRevisionAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, CLUSTER_REVISION_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeClusterRevisionAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, CLUSTER_REVISION_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-  }
-
   public static class LevelControlCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 8L;
 
@@ -2527,496 +2271,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, START_UP_CURRENT_LEVEL_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readGeneratedCommandListAttribute(
-        GeneratedCommandListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeGeneratedCommandListAttribute(
-        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAcceptedCommandListAttribute(
-        AcceptedCommandListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAcceptedCommandListAttribute(
-        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAttributeListAttribute(
-        AttributeListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAttributeListAttribute(
-        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readFeatureMapAttribute(
-        LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, FEATURE_MAP_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeFeatureMapAttribute(
-        LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, FEATURE_MAP_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readClusterRevisionAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, CLUSTER_REVISION_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeClusterRevisionAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, CLUSTER_REVISION_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-  }
-
-  public static class BinaryInputBasicCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 15L;
-
-    private static final long ACTIVE_TEXT_ATTRIBUTE_ID = 4L;
-    private static final long DESCRIPTION_ATTRIBUTE_ID = 28L;
-    private static final long INACTIVE_TEXT_ATTRIBUTE_ID = 46L;
-    private static final long OUT_OF_SERVICE_ATTRIBUTE_ID = 81L;
-    private static final long POLARITY_ATTRIBUTE_ID = 84L;
-    private static final long PRESENT_VALUE_ATTRIBUTE_ID = 85L;
-    private static final long RELIABILITY_ATTRIBUTE_ID = 103L;
-    private static final long STATUS_FLAGS_ATTRIBUTE_ID = 111L;
-    private static final long APPLICATION_TYPE_ATTRIBUTE_ID = 256L;
-    private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
-    private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
-    private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
-    private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
-    private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
-
-    public BinaryInputBasicCluster(long devicePtr, int endpointId) {
-      super(devicePtr, endpointId, CLUSTER_ID);
-    }
-
-    @Override
-    @Deprecated
-    public long initWithDevice(long devicePtr, int endpointId) {
-      return 0L;
-    }
-
-    public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface AttributeListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public void readActiveTextAttribute(
-        CharStringAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_TEXT_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACTIVE_TEXT_ATTRIBUTE_ID, true);
-    }
-
-    public void writeActiveTextAttribute(DefaultClusterCallback callback, String value) {
-      writeActiveTextAttribute(callback, value, 0);
-    }
-
-    public void writeActiveTextAttribute(DefaultClusterCallback callback, String value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new StringType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), ACTIVE_TEXT_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeActiveTextAttribute(
-        CharStringAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_TEXT_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACTIVE_TEXT_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readDescriptionAttribute(
-        CharStringAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DESCRIPTION_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DESCRIPTION_ATTRIBUTE_ID, true);
-    }
-
-    public void writeDescriptionAttribute(DefaultClusterCallback callback, String value) {
-      writeDescriptionAttribute(callback, value, 0);
-    }
-
-    public void writeDescriptionAttribute(DefaultClusterCallback callback, String value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new StringType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), DESCRIPTION_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeDescriptionAttribute(
-        CharStringAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DESCRIPTION_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DESCRIPTION_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readInactiveTextAttribute(
-        CharStringAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INACTIVE_TEXT_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, INACTIVE_TEXT_ATTRIBUTE_ID, true);
-    }
-
-    public void writeInactiveTextAttribute(DefaultClusterCallback callback, String value) {
-      writeInactiveTextAttribute(callback, value, 0);
-    }
-
-    public void writeInactiveTextAttribute(DefaultClusterCallback callback, String value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new StringType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), INACTIVE_TEXT_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeInactiveTextAttribute(
-        CharStringAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INACTIVE_TEXT_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, INACTIVE_TEXT_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readOutOfServiceAttribute(
-        BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OUT_OF_SERVICE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, OUT_OF_SERVICE_ATTRIBUTE_ID, true);
-    }
-
-    public void writeOutOfServiceAttribute(DefaultClusterCallback callback, Boolean value) {
-      writeOutOfServiceAttribute(callback, value, 0);
-    }
-
-    public void writeOutOfServiceAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new BooleanType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), OUT_OF_SERVICE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeOutOfServiceAttribute(
-        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OUT_OF_SERVICE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, OUT_OF_SERVICE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readPolarityAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, POLARITY_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, POLARITY_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribePolarityAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, POLARITY_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, POLARITY_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readPresentValueAttribute(
-        BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRESENT_VALUE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, PRESENT_VALUE_ATTRIBUTE_ID, true);
-    }
-
-    public void writePresentValueAttribute(DefaultClusterCallback callback, Boolean value) {
-      writePresentValueAttribute(callback, value, 0);
-    }
-
-    public void writePresentValueAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new BooleanType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), PRESENT_VALUE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribePresentValueAttribute(
-        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRESENT_VALUE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, PRESENT_VALUE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readReliabilityAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RELIABILITY_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RELIABILITY_ATTRIBUTE_ID, true);
-    }
-
-    public void writeReliabilityAttribute(DefaultClusterCallback callback, Integer value) {
-      writeReliabilityAttribute(callback, value, 0);
-    }
-
-    public void writeReliabilityAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), RELIABILITY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeReliabilityAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RELIABILITY_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RELIABILITY_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readStatusFlagsAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, STATUS_FLAGS_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, STATUS_FLAGS_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeStatusFlagsAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, STATUS_FLAGS_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, STATUS_FLAGS_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readApplicationTypeAttribute(
-        LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, APPLICATION_TYPE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, APPLICATION_TYPE_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeApplicationTypeAttribute(
-        LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, APPLICATION_TYPE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, APPLICATION_TYPE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -3963,6 +3217,8 @@ public class ChipClusters {
     private static final long SUBJECTS_PER_ACCESS_CONTROL_ENTRY_ATTRIBUTE_ID = 2L;
     private static final long TARGETS_PER_ACCESS_CONTROL_ENTRY_ATTRIBUTE_ID = 3L;
     private static final long ACCESS_CONTROL_ENTRIES_PER_FABRIC_ATTRIBUTE_ID = 4L;
+    private static final long COMMISSIONING_ARL_ATTRIBUTE_ID = 5L;
+    private static final long ARL_ATTRIBUTE_ID = 6L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -3980,12 +3236,54 @@ public class ChipClusters {
       return 0L;
     }
 
+    public void reviewFabricRestrictions(ReviewFabricRestrictionsResponseCallback callback, ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> arl) {
+      reviewFabricRestrictions(callback, arl, 0);
+    }
+
+    public void reviewFabricRestrictions(ReviewFabricRestrictionsResponseCallback callback, ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> arl, int timedInvokeTimeoutMs) {
+      final long commandId = 0L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long arlFieldID = 0L;
+      BaseTLVType arltlvValue = ArrayType.generateArrayType(arl, (elementarl) -> elementarl.encodeTlv());
+      elements.add(new StructElement(arlFieldID, arltlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long tokenFieldID = 0L;
+          Long token = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == tokenFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                token = castingValue.value(Long.class);
+              }
+            }
+          }
+          callback.onSuccess(token);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface ReviewFabricRestrictionsResponseCallback extends BaseClusterCallback {
+      void onSuccess(Long token);
+    }
+
     public interface AclAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.AccessControlClusterAccessControlEntryStruct> value);
     }
 
     public interface ExtensionAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.AccessControlClusterAccessControlExtensionStruct> value);
+    }
+
+    public interface CommissioningARLAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> value);
+    }
+
+    public interface ArlAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.AccessControlClusterAccessRestrictionEntryStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -4162,6 +3460,63 @@ public class ChipClusters {
         }, ACCESS_CONTROL_ENTRIES_PER_FABRIC_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
+    public void readCommissioningARLAttribute(
+        CommissioningARLAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COMMISSIONING_ARL_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, COMMISSIONING_ARL_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeCommissioningARLAttribute(
+        CommissioningARLAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COMMISSIONING_ARL_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, COMMISSIONING_ARL_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readArlAttribute(
+        ArlAttributeCallback callback) {
+      readArlAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readArlAttributeWithFabricFilter(
+        ArlAttributeCallback callback, boolean isFabricFiltered) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ARL_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.AccessControlClusterAccessRestrictionEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ARL_ATTRIBUTE_ID, isFabricFiltered);
+    }
+
+    public void subscribeArlAttribute(
+        ArlAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ARL_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.AccessControlClusterAccessRestrictionEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ARL_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(
         GeneratedCommandListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
@@ -4324,7 +3679,7 @@ public class ChipClusters {
 
     private static final long ACTION_LIST_ATTRIBUTE_ID = 0L;
     private static final long ENDPOINT_LISTS_ATTRIBUTE_ID = 1L;
-    private static final long SETUP_U_R_L_ATTRIBUTE_ID = 2L;
+    private static final long SETUP_URL_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -4728,7 +4083,7 @@ public class ChipClusters {
 
     public void readSetupURLAttribute(
         CharStringAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SETUP_U_R_L_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SETUP_URL_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -4736,12 +4091,12 @@ public class ChipClusters {
             String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, SETUP_U_R_L_ATTRIBUTE_ID, true);
+        }, SETUP_URL_ATTRIBUTE_ID, true);
     }
 
     public void subscribeSetupURLAttribute(
         CharStringAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SETUP_U_R_L_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SETUP_URL_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -4749,7 +4104,7 @@ public class ChipClusters {
             String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, SETUP_U_R_L_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, SETUP_URL_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -4914,9 +4269,9 @@ public class ChipClusters {
 
     private static final long DATA_MODEL_REVISION_ATTRIBUTE_ID = 0L;
     private static final long VENDOR_NAME_ATTRIBUTE_ID = 1L;
-    private static final long VENDOR_I_D_ATTRIBUTE_ID = 2L;
+    private static final long VENDOR_ID_ATTRIBUTE_ID = 2L;
     private static final long PRODUCT_NAME_ATTRIBUTE_ID = 3L;
-    private static final long PRODUCT_I_D_ATTRIBUTE_ID = 4L;
+    private static final long PRODUCT_ID_ATTRIBUTE_ID = 4L;
     private static final long NODE_LABEL_ATTRIBUTE_ID = 5L;
     private static final long LOCATION_ATTRIBUTE_ID = 6L;
     private static final long HARDWARE_VERSION_ATTRIBUTE_ID = 7L;
@@ -4925,12 +4280,12 @@ public class ChipClusters {
     private static final long SOFTWARE_VERSION_STRING_ATTRIBUTE_ID = 10L;
     private static final long MANUFACTURING_DATE_ATTRIBUTE_ID = 11L;
     private static final long PART_NUMBER_ATTRIBUTE_ID = 12L;
-    private static final long PRODUCT_U_R_L_ATTRIBUTE_ID = 13L;
+    private static final long PRODUCT_URL_ATTRIBUTE_ID = 13L;
     private static final long PRODUCT_LABEL_ATTRIBUTE_ID = 14L;
     private static final long SERIAL_NUMBER_ATTRIBUTE_ID = 15L;
     private static final long LOCAL_CONFIG_DISABLED_ATTRIBUTE_ID = 16L;
     private static final long REACHABLE_ATTRIBUTE_ID = 17L;
-    private static final long UNIQUE_I_D_ATTRIBUTE_ID = 18L;
+    private static final long UNIQUE_ID_ATTRIBUTE_ID = 18L;
     private static final long CAPABILITY_MINIMA_ATTRIBUTE_ID = 19L;
     private static final long PRODUCT_APPEARANCE_ATTRIBUTE_ID = 20L;
     private static final long SPECIFICATION_VERSION_ATTRIBUTE_ID = 21L;
@@ -5046,7 +4401,7 @@ public class ChipClusters {
 
     public void readVendorIDAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VENDOR_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VENDOR_ID_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -5054,12 +4409,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, VENDOR_I_D_ATTRIBUTE_ID, true);
+        }, VENDOR_ID_ATTRIBUTE_ID, true);
     }
 
     public void subscribeVendorIDAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VENDOR_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VENDOR_ID_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -5067,7 +4422,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, VENDOR_I_D_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, VENDOR_ID_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readProductNameAttribute(
@@ -5098,7 +4453,7 @@ public class ChipClusters {
 
     public void readProductIDAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_ID_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -5106,12 +4461,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PRODUCT_I_D_ATTRIBUTE_ID, true);
+        }, PRODUCT_ID_ATTRIBUTE_ID, true);
     }
 
     public void subscribeProductIDAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_ID_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -5119,7 +4474,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PRODUCT_I_D_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, PRODUCT_ID_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readNodeLabelAttribute(
@@ -5350,7 +4705,7 @@ public class ChipClusters {
 
     public void readProductURLAttribute(
         CharStringAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_U_R_L_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_URL_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -5358,12 +4713,12 @@ public class ChipClusters {
             String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PRODUCT_U_R_L_ATTRIBUTE_ID, true);
+        }, PRODUCT_URL_ATTRIBUTE_ID, true);
     }
 
     public void subscribeProductURLAttribute(
         CharStringAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_U_R_L_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_URL_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -5371,7 +4726,7 @@ public class ChipClusters {
             String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PRODUCT_U_R_L_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, PRODUCT_URL_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readProductLabelAttribute(
@@ -5489,7 +4844,7 @@ public class ChipClusters {
 
     public void readUniqueIDAttribute(
         CharStringAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNIQUE_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNIQUE_ID_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -5497,12 +4852,12 @@ public class ChipClusters {
             String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, UNIQUE_I_D_ATTRIBUTE_ID, true);
+        }, UNIQUE_ID_ATTRIBUTE_ID, true);
     }
 
     public void subscribeUniqueIDAttribute(
         CharStringAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNIQUE_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNIQUE_ID_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -5510,7 +4865,7 @@ public class ChipClusters {
             String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, UNIQUE_I_D_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, UNIQUE_ID_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readCapabilityMinimaAttribute(
@@ -6150,7 +5505,7 @@ public class ChipClusters {
   public static class OtaSoftwareUpdateRequestorCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 42L;
 
-    private static final long DEFAULT_O_T_A_PROVIDERS_ATTRIBUTE_ID = 0L;
+    private static final long DEFAULT_OTA_PROVIDERS_ATTRIBUTE_ID = 0L;
     private static final long UPDATE_POSSIBLE_ATTRIBUTE_ID = 1L;
     private static final long UPDATE_STATE_ATTRIBUTE_ID = 2L;
     private static final long UPDATE_STATE_PROGRESS_ATTRIBUTE_ID = 3L;
@@ -6238,7 +5593,7 @@ public class ChipClusters {
 
     public void readDefaultOTAProvidersAttributeWithFabricFilter(
         DefaultOTAProvidersAttributeCallback callback, boolean isFabricFiltered) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEFAULT_O_T_A_PROVIDERS_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEFAULT_OTA_PROVIDERS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -6246,7 +5601,7 @@ public class ChipClusters {
             List<ChipStructs.OtaSoftwareUpdateRequestorClusterProviderLocation> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, DEFAULT_O_T_A_PROVIDERS_ATTRIBUTE_ID, isFabricFiltered);
+        }, DEFAULT_OTA_PROVIDERS_ATTRIBUTE_ID, isFabricFiltered);
     }
 
     public void writeDefaultOTAProvidersAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.OtaSoftwareUpdateRequestorClusterProviderLocation> value) {
@@ -6255,12 +5610,12 @@ public class ChipClusters {
 
     public void writeDefaultOTAProvidersAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.OtaSoftwareUpdateRequestorClusterProviderLocation> value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = ArrayType.generateArrayType(value, (elementvalue) -> elementvalue.encodeTlv());
-      writeAttribute(new WriteAttributesCallbackImpl(callback), DEFAULT_O_T_A_PROVIDERS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), DEFAULT_OTA_PROVIDERS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeDefaultOTAProvidersAttribute(
         DefaultOTAProvidersAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEFAULT_O_T_A_PROVIDERS_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEFAULT_OTA_PROVIDERS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -6268,7 +5623,7 @@ public class ChipClusters {
             List<ChipStructs.OtaSoftwareUpdateRequestorClusterProviderLocation> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, DEFAULT_O_T_A_PROVIDERS_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, DEFAULT_OTA_PROVIDERS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readUpdatePossibleAttribute(
@@ -7539,8 +6894,8 @@ public class ChipClusters {
     private static final long ACTIVE_BAT_FAULTS_ATTRIBUTE_ID = 18L;
     private static final long BAT_REPLACEMENT_DESCRIPTION_ATTRIBUTE_ID = 19L;
     private static final long BAT_COMMON_DESIGNATION_ATTRIBUTE_ID = 20L;
-    private static final long BAT_A_N_S_I_DESIGNATION_ATTRIBUTE_ID = 21L;
-    private static final long BAT_I_E_C_DESIGNATION_ATTRIBUTE_ID = 22L;
+    private static final long BAT_ANSI_DESIGNATION_ATTRIBUTE_ID = 21L;
+    private static final long BAT_IEC_DESIGNATION_ATTRIBUTE_ID = 22L;
     private static final long BAT_APPROVED_CHEMISTRY_ATTRIBUTE_ID = 23L;
     private static final long BAT_CAPACITY_ATTRIBUTE_ID = 24L;
     private static final long BAT_QUANTITY_ATTRIBUTE_ID = 25L;
@@ -8179,7 +7534,7 @@ public class ChipClusters {
 
     public void readBatANSIDesignationAttribute(
         CharStringAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BAT_A_N_S_I_DESIGNATION_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BAT_ANSI_DESIGNATION_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -8187,12 +7542,12 @@ public class ChipClusters {
             String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BAT_A_N_S_I_DESIGNATION_ATTRIBUTE_ID, true);
+        }, BAT_ANSI_DESIGNATION_ATTRIBUTE_ID, true);
     }
 
     public void subscribeBatANSIDesignationAttribute(
         CharStringAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BAT_A_N_S_I_DESIGNATION_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BAT_ANSI_DESIGNATION_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -8200,12 +7555,12 @@ public class ChipClusters {
             String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BAT_A_N_S_I_DESIGNATION_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, BAT_ANSI_DESIGNATION_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readBatIECDesignationAttribute(
         CharStringAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BAT_I_E_C_DESIGNATION_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BAT_IEC_DESIGNATION_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -8213,12 +7568,12 @@ public class ChipClusters {
             String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BAT_I_E_C_DESIGNATION_ATTRIBUTE_ID, true);
+        }, BAT_IEC_DESIGNATION_ATTRIBUTE_ID, true);
     }
 
     public void subscribeBatIECDesignationAttribute(
         CharStringAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BAT_I_E_C_DESIGNATION_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BAT_IEC_DESIGNATION_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -8226,7 +7581,7 @@ public class ChipClusters {
             String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BAT_I_E_C_DESIGNATION_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, BAT_IEC_DESIGNATION_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readBatApprovedChemistryAttribute(
@@ -8628,6 +7983,11 @@ public class ChipClusters {
     private static final long REGULATORY_CONFIG_ATTRIBUTE_ID = 2L;
     private static final long LOCATION_CAPABILITY_ATTRIBUTE_ID = 3L;
     private static final long SUPPORTS_CONCURRENT_CONNECTION_ATTRIBUTE_ID = 4L;
+    private static final long TC_ACCEPTED_VERSION_ATTRIBUTE_ID = 5L;
+    private static final long TC_MIN_REQUIRED_VERSION_ATTRIBUTE_ID = 6L;
+    private static final long TC_ACKNOWLEDGEMENTS_ATTRIBUTE_ID = 7L;
+    private static final long TC_ACKNOWLEDGEMENTS_REQUIRED_ATTRIBUTE_ID = 8L;
+    private static final long TC_UPDATE_DEADLINE_ATTRIBUTE_ID = 9L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -8764,6 +8124,40 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void setTCAcknowledgements(SetTCAcknowledgementsResponseCallback callback, Integer TCVersion, Integer TCUserResponse) {
+      setTCAcknowledgements(callback, TCVersion, TCUserResponse, 0);
+    }
+
+    public void setTCAcknowledgements(SetTCAcknowledgementsResponseCallback callback, Integer TCVersion, Integer TCUserResponse, int timedInvokeTimeoutMs) {
+      final long commandId = 6L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long TCVersionFieldID = 0L;
+      BaseTLVType TCVersiontlvValue = new UIntType(TCVersion);
+      elements.add(new StructElement(TCVersionFieldID, TCVersiontlvValue));
+
+      final long TCUserResponseFieldID = 1L;
+      BaseTLVType TCUserResponsetlvValue = new UIntType(TCUserResponse);
+      elements.add(new StructElement(TCUserResponseFieldID, TCUserResponsetlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long errorCodeFieldID = 0L;
+          Integer errorCode = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == errorCodeFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                errorCode = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(errorCode);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public interface ArmFailSafeResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer errorCode, String debugText);
     }
@@ -8774,6 +8168,10 @@ public class ChipClusters {
 
     public interface CommissioningCompleteResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer errorCode, String debugText);
+    }
+
+    public interface SetTCAcknowledgementsResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer errorCode);
     }
 
     public interface BasicCommissioningInfoAttributeCallback extends BaseAttributeCallback {
@@ -8933,6 +8331,136 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, SUPPORTS_CONCURRENT_CONNECTION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTCAcceptedVersionAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TC_ACCEPTED_VERSION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TC_ACCEPTED_VERSION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTCAcceptedVersionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TC_ACCEPTED_VERSION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TC_ACCEPTED_VERSION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTCMinRequiredVersionAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TC_MIN_REQUIRED_VERSION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TC_MIN_REQUIRED_VERSION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTCMinRequiredVersionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TC_MIN_REQUIRED_VERSION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TC_MIN_REQUIRED_VERSION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTCAcknowledgementsAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TC_ACKNOWLEDGEMENTS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TC_ACKNOWLEDGEMENTS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTCAcknowledgementsAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TC_ACKNOWLEDGEMENTS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TC_ACKNOWLEDGEMENTS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTCAcknowledgementsRequiredAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TC_ACKNOWLEDGEMENTS_REQUIRED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TC_ACKNOWLEDGEMENTS_REQUIRED_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTCAcknowledgementsRequiredAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TC_ACKNOWLEDGEMENTS_REQUIRED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TC_ACKNOWLEDGEMENTS_REQUIRED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTCUpdateDeadlineAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TC_UPDATE_DEADLINE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TC_UPDATE_DEADLINE_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTCUpdateDeadlineAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TC_UPDATE_DEADLINE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TC_UPDATE_DEADLINE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -9101,7 +8629,7 @@ public class ChipClusters {
     private static final long CONNECT_MAX_TIME_SECONDS_ATTRIBUTE_ID = 3L;
     private static final long INTERFACE_ENABLED_ATTRIBUTE_ID = 4L;
     private static final long LAST_NETWORKING_STATUS_ATTRIBUTE_ID = 5L;
-    private static final long LAST_NETWORK_I_D_ATTRIBUTE_ID = 6L;
+    private static final long LAST_NETWORK_ID_ATTRIBUTE_ID = 6L;
     private static final long LAST_CONNECT_ERROR_VALUE_ATTRIBUTE_ID = 7L;
     private static final long SUPPORTED_WI_FI_BANDS_ATTRIBUTE_ID = 8L;
     private static final long SUPPORTED_THREAD_FEATURES_ATTRIBUTE_ID = 9L;
@@ -9754,7 +9282,7 @@ public class ChipClusters {
 
     public void readLastNetworkIDAttribute(
         LastNetworkIDAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LAST_NETWORK_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LAST_NETWORK_ID_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -9762,12 +9290,12 @@ public class ChipClusters {
             @Nullable byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, LAST_NETWORK_I_D_ATTRIBUTE_ID, true);
+        }, LAST_NETWORK_ID_ATTRIBUTE_ID, true);
     }
 
     public void subscribeLastNetworkIDAttribute(
         LastNetworkIDAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LAST_NETWORK_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LAST_NETWORK_ID_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -9775,7 +9303,7 @@ public class ChipClusters {
             @Nullable byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, LAST_NETWORK_I_D_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, LAST_NETWORK_ID_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readLastConnectErrorValueAttribute(
@@ -13776,7 +13304,7 @@ public class ChipClusters {
   public static class EthernetNetworkDiagnosticsCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 55L;
 
-    private static final long P_H_Y_RATE_ATTRIBUTE_ID = 0L;
+    private static final long PHY_RATE_ATTRIBUTE_ID = 0L;
     private static final long FULL_DUPLEX_ATTRIBUTE_ID = 1L;
     private static final long PACKET_RX_COUNT_ATTRIBUTE_ID = 2L;
     private static final long PACKET_TX_COUNT_ATTRIBUTE_ID = 3L;
@@ -13848,7 +13376,7 @@ public class ChipClusters {
 
     public void readPHYRateAttribute(
         PHYRateAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, P_H_Y_RATE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PHY_RATE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -13856,12 +13384,12 @@ public class ChipClusters {
             @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, P_H_Y_RATE_ATTRIBUTE_ID, true);
+        }, PHY_RATE_ATTRIBUTE_ID, true);
     }
 
     public void subscribePHYRateAttribute(
         PHYRateAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, P_H_Y_RATE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PHY_RATE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -13869,7 +13397,7 @@ public class ChipClusters {
             @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, P_H_Y_RATE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, PHY_RATE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readFullDuplexAttribute(
@@ -14240,19 +13768,19 @@ public class ChipClusters {
   public static class TimeSynchronizationCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 56L;
 
-    private static final long U_T_C_TIME_ATTRIBUTE_ID = 0L;
+    private static final long UTC_TIME_ATTRIBUTE_ID = 0L;
     private static final long GRANULARITY_ATTRIBUTE_ID = 1L;
     private static final long TIME_SOURCE_ATTRIBUTE_ID = 2L;
     private static final long TRUSTED_TIME_SOURCE_ATTRIBUTE_ID = 3L;
-    private static final long DEFAULT_N_T_P_ATTRIBUTE_ID = 4L;
+    private static final long DEFAULT_NTP_ATTRIBUTE_ID = 4L;
     private static final long TIME_ZONE_ATTRIBUTE_ID = 5L;
-    private static final long D_S_T_OFFSET_ATTRIBUTE_ID = 6L;
+    private static final long DST_OFFSET_ATTRIBUTE_ID = 6L;
     private static final long LOCAL_TIME_ATTRIBUTE_ID = 7L;
     private static final long TIME_ZONE_DATABASE_ATTRIBUTE_ID = 8L;
-    private static final long N_T_P_SERVER_AVAILABLE_ATTRIBUTE_ID = 9L;
+    private static final long NTP_SERVER_AVAILABLE_ATTRIBUTE_ID = 9L;
     private static final long TIME_ZONE_LIST_MAX_SIZE_ATTRIBUTE_ID = 10L;
-    private static final long D_S_T_OFFSET_LIST_MAX_SIZE_ATTRIBUTE_ID = 11L;
-    private static final long SUPPORTS_D_N_S_RESOLVE_ATTRIBUTE_ID = 12L;
+    private static final long DST_OFFSET_LIST_MAX_SIZE_ATTRIBUTE_ID = 11L;
+    private static final long SUPPORTS_DNS_RESOLVE_ATTRIBUTE_ID = 12L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -14434,7 +13962,7 @@ public class ChipClusters {
 
     public void readUTCTimeAttribute(
         UTCTimeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, U_T_C_TIME_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UTC_TIME_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -14442,12 +13970,12 @@ public class ChipClusters {
             @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, U_T_C_TIME_ATTRIBUTE_ID, true);
+        }, UTC_TIME_ATTRIBUTE_ID, true);
     }
 
     public void subscribeUTCTimeAttribute(
         UTCTimeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, U_T_C_TIME_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UTC_TIME_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -14455,7 +13983,7 @@ public class ChipClusters {
             @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, U_T_C_TIME_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, UTC_TIME_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGranularityAttribute(
@@ -14538,7 +14066,7 @@ public class ChipClusters {
 
     public void readDefaultNTPAttribute(
         DefaultNTPAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEFAULT_N_T_P_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEFAULT_NTP_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -14546,12 +14074,12 @@ public class ChipClusters {
             @Nullable String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, DEFAULT_N_T_P_ATTRIBUTE_ID, true);
+        }, DEFAULT_NTP_ATTRIBUTE_ID, true);
     }
 
     public void subscribeDefaultNTPAttribute(
         DefaultNTPAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEFAULT_N_T_P_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEFAULT_NTP_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -14559,7 +14087,7 @@ public class ChipClusters {
             @Nullable String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, DEFAULT_N_T_P_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, DEFAULT_NTP_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readTimeZoneAttribute(
@@ -14590,7 +14118,7 @@ public class ChipClusters {
 
     public void readDSTOffsetAttribute(
         DSTOffsetAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, D_S_T_OFFSET_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DST_OFFSET_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -14598,12 +14126,12 @@ public class ChipClusters {
             List<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, D_S_T_OFFSET_ATTRIBUTE_ID, true);
+        }, DST_OFFSET_ATTRIBUTE_ID, true);
     }
 
     public void subscribeDSTOffsetAttribute(
         DSTOffsetAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, D_S_T_OFFSET_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DST_OFFSET_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -14611,7 +14139,7 @@ public class ChipClusters {
             List<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, D_S_T_OFFSET_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, DST_OFFSET_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readLocalTimeAttribute(
@@ -14668,7 +14196,7 @@ public class ChipClusters {
 
     public void readNTPServerAvailableAttribute(
         BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, N_T_P_SERVER_AVAILABLE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NTP_SERVER_AVAILABLE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -14676,12 +14204,12 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, N_T_P_SERVER_AVAILABLE_ATTRIBUTE_ID, true);
+        }, NTP_SERVER_AVAILABLE_ATTRIBUTE_ID, true);
     }
 
     public void subscribeNTPServerAvailableAttribute(
         BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, N_T_P_SERVER_AVAILABLE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NTP_SERVER_AVAILABLE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -14689,7 +14217,7 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, N_T_P_SERVER_AVAILABLE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, NTP_SERVER_AVAILABLE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readTimeZoneListMaxSizeAttribute(
@@ -14720,7 +14248,7 @@ public class ChipClusters {
 
     public void readDSTOffsetListMaxSizeAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, D_S_T_OFFSET_LIST_MAX_SIZE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DST_OFFSET_LIST_MAX_SIZE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -14728,12 +14256,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, D_S_T_OFFSET_LIST_MAX_SIZE_ATTRIBUTE_ID, true);
+        }, DST_OFFSET_LIST_MAX_SIZE_ATTRIBUTE_ID, true);
     }
 
     public void subscribeDSTOffsetListMaxSizeAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, D_S_T_OFFSET_LIST_MAX_SIZE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DST_OFFSET_LIST_MAX_SIZE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -14741,12 +14269,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, D_S_T_OFFSET_LIST_MAX_SIZE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, DST_OFFSET_LIST_MAX_SIZE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readSupportsDNSResolveAttribute(
         BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTS_D_N_S_RESOLVE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTS_DNS_RESOLVE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -14754,12 +14282,12 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, SUPPORTS_D_N_S_RESOLVE_ATTRIBUTE_ID, true);
+        }, SUPPORTS_DNS_RESOLVE_ATTRIBUTE_ID, true);
     }
 
     public void subscribeSupportsDNSResolveAttribute(
         BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTS_D_N_S_RESOLVE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTS_DNS_RESOLVE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -14767,7 +14295,7 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, SUPPORTS_D_N_S_RESOLVE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, SUPPORTS_DNS_RESOLVE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -14931,8 +14459,9 @@ public class ChipClusters {
     public static final long CLUSTER_ID = 57L;
 
     private static final long VENDOR_NAME_ATTRIBUTE_ID = 1L;
-    private static final long VENDOR_I_D_ATTRIBUTE_ID = 2L;
+    private static final long VENDOR_ID_ATTRIBUTE_ID = 2L;
     private static final long PRODUCT_NAME_ATTRIBUTE_ID = 3L;
+    private static final long PRODUCT_ID_ATTRIBUTE_ID = 4L;
     private static final long NODE_LABEL_ATTRIBUTE_ID = 5L;
     private static final long HARDWARE_VERSION_ATTRIBUTE_ID = 7L;
     private static final long HARDWARE_VERSION_STRING_ATTRIBUTE_ID = 8L;
@@ -14940,11 +14469,11 @@ public class ChipClusters {
     private static final long SOFTWARE_VERSION_STRING_ATTRIBUTE_ID = 10L;
     private static final long MANUFACTURING_DATE_ATTRIBUTE_ID = 11L;
     private static final long PART_NUMBER_ATTRIBUTE_ID = 12L;
-    private static final long PRODUCT_U_R_L_ATTRIBUTE_ID = 13L;
+    private static final long PRODUCT_URL_ATTRIBUTE_ID = 13L;
     private static final long PRODUCT_LABEL_ATTRIBUTE_ID = 14L;
     private static final long SERIAL_NUMBER_ATTRIBUTE_ID = 15L;
     private static final long REACHABLE_ATTRIBUTE_ID = 17L;
-    private static final long UNIQUE_I_D_ATTRIBUTE_ID = 18L;
+    private static final long UNIQUE_ID_ATTRIBUTE_ID = 18L;
     private static final long PRODUCT_APPEARANCE_ATTRIBUTE_ID = 20L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
@@ -14961,6 +14490,30 @@ public class ChipClusters {
     @Deprecated
     public long initWithDevice(long devicePtr, int endpointId) {
       return 0L;
+    }
+
+    public void keepActive(DefaultClusterCallback callback, Long stayActiveDuration, Long timeoutMs) {
+      keepActive(callback, stayActiveDuration, timeoutMs, 0);
+    }
+
+    public void keepActive(DefaultClusterCallback callback, Long stayActiveDuration, Long timeoutMs, int timedInvokeTimeoutMs) {
+      final long commandId = 128L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long stayActiveDurationFieldID = 0L;
+      BaseTLVType stayActiveDurationtlvValue = new UIntType(stayActiveDuration);
+      elements.add(new StructElement(stayActiveDurationFieldID, stayActiveDurationtlvValue));
+
+      final long timeoutMsFieldID = 1L;
+      BaseTLVType timeoutMstlvValue = new UIntType(timeoutMs);
+      elements.add(new StructElement(timeoutMsFieldID, timeoutMstlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ProductAppearanceAttributeCallback extends BaseAttributeCallback {
@@ -15011,7 +14564,7 @@ public class ChipClusters {
 
     public void readVendorIDAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VENDOR_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VENDOR_ID_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -15019,12 +14572,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, VENDOR_I_D_ATTRIBUTE_ID, true);
+        }, VENDOR_ID_ATTRIBUTE_ID, true);
     }
 
     public void subscribeVendorIDAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VENDOR_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VENDOR_ID_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -15032,7 +14585,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, VENDOR_I_D_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, VENDOR_ID_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readProductNameAttribute(
@@ -15059,6 +14612,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, PRODUCT_NAME_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readProductIDAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_ID_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PRODUCT_ID_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeProductIDAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_ID_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PRODUCT_ID_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readNodeLabelAttribute(
@@ -15254,7 +14833,7 @@ public class ChipClusters {
 
     public void readProductURLAttribute(
         CharStringAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_U_R_L_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_URL_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -15262,12 +14841,12 @@ public class ChipClusters {
             String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PRODUCT_U_R_L_ATTRIBUTE_ID, true);
+        }, PRODUCT_URL_ATTRIBUTE_ID, true);
     }
 
     public void subscribeProductURLAttribute(
         CharStringAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_U_R_L_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_URL_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -15275,7 +14854,7 @@ public class ChipClusters {
             String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PRODUCT_U_R_L_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, PRODUCT_URL_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readProductLabelAttribute(
@@ -15358,7 +14937,7 @@ public class ChipClusters {
 
     public void readUniqueIDAttribute(
         CharStringAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNIQUE_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNIQUE_ID_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -15366,12 +14945,12 @@ public class ChipClusters {
             String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, UNIQUE_I_D_ATTRIBUTE_ID, true);
+        }, UNIQUE_ID_ATTRIBUTE_ID, true);
     }
 
     public void subscribeUniqueIDAttribute(
         CharStringAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNIQUE_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNIQUE_ID_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -15379,7 +14958,7 @@ public class ChipClusters {
             String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, UNIQUE_I_D_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, UNIQUE_ID_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readProductAppearanceAttribute(
@@ -16187,7 +15766,7 @@ public class ChipClusters {
   public static class OperationalCredentialsCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 62L;
 
-    private static final long N_O_CS_ATTRIBUTE_ID = 0L;
+    private static final long NO_CS_ATTRIBUTE_ID = 0L;
     private static final long FABRICS_ATTRIBUTE_ID = 1L;
     private static final long SUPPORTED_FABRICS_ATTRIBUTE_ID = 2L;
     private static final long COMMISSIONED_FABRICS_ATTRIBUTE_ID = 3L;
@@ -16585,7 +16164,7 @@ public class ChipClusters {
 
     public void readNOCsAttributeWithFabricFilter(
         NOCsAttributeCallback callback, boolean isFabricFiltered) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, N_O_CS_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NO_CS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -16593,12 +16172,12 @@ public class ChipClusters {
             List<ChipStructs.OperationalCredentialsClusterNOCStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, N_O_CS_ATTRIBUTE_ID, isFabricFiltered);
+        }, NO_CS_ATTRIBUTE_ID, isFabricFiltered);
     }
 
     public void subscribeNOCsAttribute(
         NOCsAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, N_O_CS_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NO_CS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -16606,7 +16185,7 @@ public class ChipClusters {
             List<ChipStructs.OperationalCredentialsClusterNOCStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, N_O_CS_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, NO_CS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readFabricsAttribute(
@@ -18596,11 +18175,12 @@ public class ChipClusters {
     private static final long ACTIVE_MODE_DURATION_ATTRIBUTE_ID = 1L;
     private static final long ACTIVE_MODE_THRESHOLD_ATTRIBUTE_ID = 2L;
     private static final long REGISTERED_CLIENTS_ATTRIBUTE_ID = 3L;
-    private static final long I_C_D_COUNTER_ATTRIBUTE_ID = 4L;
+    private static final long ICD_COUNTER_ATTRIBUTE_ID = 4L;
     private static final long CLIENTS_SUPPORTED_PER_FABRIC_ATTRIBUTE_ID = 5L;
     private static final long USER_ACTIVE_MODE_TRIGGER_HINT_ATTRIBUTE_ID = 6L;
     private static final long USER_ACTIVE_MODE_TRIGGER_INSTRUCTION_ATTRIBUTE_ID = 7L;
     private static final long OPERATING_MODE_ATTRIBUTE_ID = 8L;
+    private static final long MAXIMUM_CHECK_IN_BACK_OFF_ATTRIBUTE_ID = 9L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -18618,11 +18198,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void registerClient(RegisterClientResponseCallback callback, Long checkInNodeID, Long monitoredSubject, byte[] key, Optional<byte[]> verificationKey) {
-      registerClient(callback, checkInNodeID, monitoredSubject, key, verificationKey, 0);
+    public void registerClient(RegisterClientResponseCallback callback, Long checkInNodeID, Long monitoredSubject, byte[] key, Optional<byte[]> verificationKey, Integer clientType) {
+      registerClient(callback, checkInNodeID, monitoredSubject, key, verificationKey, clientType, 0);
     }
 
-    public void registerClient(RegisterClientResponseCallback callback, Long checkInNodeID, Long monitoredSubject, byte[] key, Optional<byte[]> verificationKey, int timedInvokeTimeoutMs) {
+    public void registerClient(RegisterClientResponseCallback callback, Long checkInNodeID, Long monitoredSubject, byte[] key, Optional<byte[]> verificationKey, Integer clientType, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -18641,6 +18221,10 @@ public class ChipClusters {
       final long verificationKeyFieldID = 3L;
       BaseTLVType verificationKeytlvValue = verificationKey.<BaseTLVType>map((nonOptionalverificationKey) -> new ByteArrayType(nonOptionalverificationKey)).orElse(new EmptyType());
       elements.add(new StructElement(verificationKeyFieldID, verificationKeytlvValue));
+
+      final long clientTypeFieldID = 4L;
+      BaseTLVType clientTypetlvValue = new UIntType(clientType);
+      elements.add(new StructElement(clientTypeFieldID, clientTypetlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -18853,7 +18437,7 @@ public class ChipClusters {
 
     public void readICDCounterAttribute(
         LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, I_C_D_COUNTER_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ICD_COUNTER_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -18861,12 +18445,12 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, I_C_D_COUNTER_ATTRIBUTE_ID, true);
+        }, ICD_COUNTER_ATTRIBUTE_ID, true);
     }
 
     public void subscribeICDCounterAttribute(
         LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, I_C_D_COUNTER_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ICD_COUNTER_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -18874,7 +18458,7 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, I_C_D_COUNTER_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ICD_COUNTER_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readClientsSupportedPerFabricAttribute(
@@ -18979,6 +18563,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, OPERATING_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMaximumCheckInBackOffAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAXIMUM_CHECK_IN_BACK_OFF_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAXIMUM_CHECK_IN_BACK_OFF_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMaximumCheckInBackOffAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAXIMUM_CHECK_IN_BACK_OFF_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAXIMUM_CHECK_IN_BACK_OFF_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -23929,14 +23539,14 @@ public class ChipClusters {
 
     private static final long EXPRESSED_STATE_ATTRIBUTE_ID = 0L;
     private static final long SMOKE_STATE_ATTRIBUTE_ID = 1L;
-    private static final long C_O_STATE_ATTRIBUTE_ID = 2L;
+    private static final long CO_STATE_ATTRIBUTE_ID = 2L;
     private static final long BATTERY_ALERT_ATTRIBUTE_ID = 3L;
     private static final long DEVICE_MUTED_ATTRIBUTE_ID = 4L;
     private static final long TEST_IN_PROGRESS_ATTRIBUTE_ID = 5L;
     private static final long HARDWARE_FAULT_ALERT_ATTRIBUTE_ID = 6L;
     private static final long END_OF_SERVICE_ALERT_ATTRIBUTE_ID = 7L;
     private static final long INTERCONNECT_SMOKE_ALARM_ATTRIBUTE_ID = 8L;
-    private static final long INTERCONNECT_C_O_ALARM_ATTRIBUTE_ID = 9L;
+    private static final long INTERCONNECT_CO_ALARM_ATTRIBUTE_ID = 9L;
     private static final long CONTAMINATION_STATE_ATTRIBUTE_ID = 10L;
     private static final long SMOKE_SENSITIVITY_LEVEL_ATTRIBUTE_ID = 11L;
     private static final long EXPIRY_DATE_ATTRIBUTE_ID = 12L;
@@ -24043,7 +23653,7 @@ public class ChipClusters {
 
     public void readCOStateAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, C_O_STATE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CO_STATE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -24051,12 +23661,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, C_O_STATE_ATTRIBUTE_ID, true);
+        }, CO_STATE_ATTRIBUTE_ID, true);
     }
 
     public void subscribeCOStateAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, C_O_STATE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CO_STATE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -24064,7 +23674,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, C_O_STATE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, CO_STATE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readBatteryAlertAttribute(
@@ -24225,7 +23835,7 @@ public class ChipClusters {
 
     public void readInterconnectCOAlarmAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INTERCONNECT_C_O_ALARM_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INTERCONNECT_CO_ALARM_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -24233,12 +23843,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, INTERCONNECT_C_O_ALARM_ATTRIBUTE_ID, true);
+        }, INTERCONNECT_CO_ALARM_ATTRIBUTE_ID, true);
     }
 
     public void subscribeInterconnectCOAlarmAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INTERCONNECT_C_O_ALARM_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INTERCONNECT_CO_ALARM_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -24246,7 +23856,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, INTERCONNECT_C_O_ALARM_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, INTERCONNECT_CO_ALARM_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readContaminationStateAttribute(
@@ -29065,9 +28675,9 @@ public class ChipClusters {
     private static final long ACTIVE_POWER_ATTRIBUTE_ID = 8L;
     private static final long REACTIVE_POWER_ATTRIBUTE_ID = 9L;
     private static final long APPARENT_POWER_ATTRIBUTE_ID = 10L;
-    private static final long R_M_S_VOLTAGE_ATTRIBUTE_ID = 11L;
-    private static final long R_M_S_CURRENT_ATTRIBUTE_ID = 12L;
-    private static final long R_M_S_POWER_ATTRIBUTE_ID = 13L;
+    private static final long RMS_VOLTAGE_ATTRIBUTE_ID = 11L;
+    private static final long RMS_CURRENT_ATTRIBUTE_ID = 12L;
+    private static final long RMS_POWER_ATTRIBUTE_ID = 13L;
     private static final long FREQUENCY_ATTRIBUTE_ID = 14L;
     private static final long HARMONIC_CURRENTS_ATTRIBUTE_ID = 15L;
     private static final long HARMONIC_PHASES_ATTRIBUTE_ID = 16L;
@@ -29462,7 +29072,7 @@ public class ChipClusters {
 
     public void readRMSVoltageAttribute(
         RMSVoltageAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, R_M_S_VOLTAGE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -29470,12 +29080,12 @@ public class ChipClusters {
             @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, R_M_S_VOLTAGE_ATTRIBUTE_ID, true);
+        }, RMS_VOLTAGE_ATTRIBUTE_ID, true);
     }
 
     public void subscribeRMSVoltageAttribute(
         RMSVoltageAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, R_M_S_VOLTAGE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -29483,12 +29093,12 @@ public class ChipClusters {
             @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, R_M_S_VOLTAGE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, RMS_VOLTAGE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readRMSCurrentAttribute(
         RMSCurrentAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, R_M_S_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -29496,12 +29106,12 @@ public class ChipClusters {
             @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, R_M_S_CURRENT_ATTRIBUTE_ID, true);
+        }, RMS_CURRENT_ATTRIBUTE_ID, true);
     }
 
     public void subscribeRMSCurrentAttribute(
         RMSCurrentAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, R_M_S_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -29509,12 +29119,12 @@ public class ChipClusters {
             @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, R_M_S_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, RMS_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readRMSPowerAttribute(
         RMSPowerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, R_M_S_POWER_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_POWER_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -29522,12 +29132,12 @@ public class ChipClusters {
             @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, R_M_S_POWER_ATTRIBUTE_ID, true);
+        }, RMS_POWER_ATTRIBUTE_ID, true);
     }
 
     public void subscribeRMSPowerAttribute(
         RMSPowerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, R_M_S_POWER_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_POWER_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -29535,7 +29145,7 @@ public class ChipClusters {
             @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, R_M_S_POWER_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, RMS_POWER_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readFrequencyAttribute(
@@ -30045,6 +29655,397 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, CUMULATIVE_ENERGY_RESET_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(
+        EventListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(
+        AttributeListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+  }
+
+  public static class WaterHeaterManagementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 148L;
+
+    private static final long HEATER_TYPES_ATTRIBUTE_ID = 0L;
+    private static final long HEAT_DEMAND_ATTRIBUTE_ID = 1L;
+    private static final long TANK_VOLUME_ATTRIBUTE_ID = 2L;
+    private static final long ESTIMATED_HEAT_REQUIRED_ATTRIBUTE_ID = 3L;
+    private static final long TANK_PERCENTAGE_ATTRIBUTE_ID = 4L;
+    private static final long BOOST_STATE_ATTRIBUTE_ID = 5L;
+    private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
+    private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
+    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
+    private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
+    private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
+    private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
+
+    public WaterHeaterManagementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId, CLUSTER_ID);
+    }
+
+    @Override
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
+
+    public void boost(DefaultClusterCallback callback, ChipStructs.WaterHeaterManagementClusterWaterHeaterBoostInfoStruct boostInfo) {
+      boost(callback, boostInfo, 0);
+    }
+
+    public void boost(DefaultClusterCallback callback, ChipStructs.WaterHeaterManagementClusterWaterHeaterBoostInfoStruct boostInfo, int timedInvokeTimeoutMs) {
+      final long commandId = 0L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long boostInfoFieldID = 0L;
+      BaseTLVType boostInfotlvValue = boostInfo.encodeTlv();
+      elements.add(new StructElement(boostInfoFieldID, boostInfotlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void cancelBoost(DefaultClusterCallback callback) {
+      cancelBoost(callback, 0);
+    }
+
+    public void cancelBoost(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
+      final long commandId = 1L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface EventListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AttributeListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public void readHeaterTypesAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HEATER_TYPES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, HEATER_TYPES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeHeaterTypesAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HEATER_TYPES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, HEATER_TYPES_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readHeatDemandAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HEAT_DEMAND_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, HEAT_DEMAND_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeHeatDemandAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HEAT_DEMAND_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, HEAT_DEMAND_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTankVolumeAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TANK_VOLUME_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TANK_VOLUME_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTankVolumeAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TANK_VOLUME_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TANK_VOLUME_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readEstimatedHeatRequiredAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ESTIMATED_HEAT_REQUIRED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ESTIMATED_HEAT_REQUIRED_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeEstimatedHeatRequiredAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ESTIMATED_HEAT_REQUIRED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ESTIMATED_HEAT_REQUIRED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTankPercentageAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TANK_PERCENTAGE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TANK_PERCENTAGE_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTankPercentageAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TANK_PERCENTAGE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TANK_PERCENTAGE_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readBoostStateAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BOOST_STATE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BOOST_STATE_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeBoostStateAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BOOST_STATE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BOOST_STATE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -31065,9 +31066,9 @@ public class ChipClusters {
   public static class DeviceEnergyManagementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 152L;
 
-    private static final long E_S_A_TYPE_ATTRIBUTE_ID = 0L;
-    private static final long E_S_A_CAN_GENERATE_ATTRIBUTE_ID = 1L;
-    private static final long E_S_A_STATE_ATTRIBUTE_ID = 2L;
+    private static final long ESA_TYPE_ATTRIBUTE_ID = 0L;
+    private static final long ESA_CAN_GENERATE_ATTRIBUTE_ID = 1L;
+    private static final long ESA_STATE_ATTRIBUTE_ID = 2L;
     private static final long ABS_MIN_POWER_ATTRIBUTE_ID = 3L;
     private static final long ABS_MAX_POWER_ATTRIBUTE_ID = 4L;
     private static final long POWER_ADJUSTMENT_CAPABILITY_ATTRIBUTE_ID = 5L;
@@ -31198,17 +31199,17 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void modifyForecastRequest(DefaultClusterCallback callback, Long forecastId, ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotAdjustmentStruct> slotAdjustments, Integer cause) {
-      modifyForecastRequest(callback, forecastId, slotAdjustments, cause, 0);
+    public void modifyForecastRequest(DefaultClusterCallback callback, Long forecastID, ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotAdjustmentStruct> slotAdjustments, Integer cause) {
+      modifyForecastRequest(callback, forecastID, slotAdjustments, cause, 0);
     }
 
-    public void modifyForecastRequest(DefaultClusterCallback callback, Long forecastId, ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotAdjustmentStruct> slotAdjustments, Integer cause, int timedInvokeTimeoutMs) {
+    public void modifyForecastRequest(DefaultClusterCallback callback, Long forecastID, ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotAdjustmentStruct> slotAdjustments, Integer cause, int timedInvokeTimeoutMs) {
       final long commandId = 5L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long forecastIdFieldID = 0L;
-      BaseTLVType forecastIdtlvValue = new UIntType(forecastId);
-      elements.add(new StructElement(forecastIdFieldID, forecastIdtlvValue));
+      final long forecastIDFieldID = 0L;
+      BaseTLVType forecastIDtlvValue = new UIntType(forecastID);
+      elements.add(new StructElement(forecastIDFieldID, forecastIDtlvValue));
 
       final long slotAdjustmentsFieldID = 1L;
       BaseTLVType slotAdjustmentstlvValue = ArrayType.generateArrayType(slotAdjustments, (elementslotAdjustments) -> elementslotAdjustments.encodeTlv());
@@ -31267,7 +31268,7 @@ public class ChipClusters {
     }
 
     public interface PowerAdjustmentCapabilityAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable List<ChipStructs.DeviceEnergyManagementClusterPowerAdjustStruct> value);
+      void onSuccess(@Nullable ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct value);
     }
 
     public interface ForecastAttributeCallback extends BaseAttributeCallback {
@@ -31292,7 +31293,7 @@ public class ChipClusters {
 
     public void readESATypeAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, E_S_A_TYPE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ESA_TYPE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -31300,12 +31301,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, E_S_A_TYPE_ATTRIBUTE_ID, true);
+        }, ESA_TYPE_ATTRIBUTE_ID, true);
     }
 
     public void subscribeESATypeAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, E_S_A_TYPE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ESA_TYPE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -31313,12 +31314,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, E_S_A_TYPE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ESA_TYPE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readESACanGenerateAttribute(
         BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, E_S_A_CAN_GENERATE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ESA_CAN_GENERATE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -31326,12 +31327,12 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, E_S_A_CAN_GENERATE_ATTRIBUTE_ID, true);
+        }, ESA_CAN_GENERATE_ATTRIBUTE_ID, true);
     }
 
     public void subscribeESACanGenerateAttribute(
         BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, E_S_A_CAN_GENERATE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ESA_CAN_GENERATE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -31339,12 +31340,12 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, E_S_A_CAN_GENERATE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ESA_CAN_GENERATE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readESAStateAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, E_S_A_STATE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ESA_STATE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -31352,12 +31353,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, E_S_A_STATE_ATTRIBUTE_ID, true);
+        }, ESA_STATE_ATTRIBUTE_ID, true);
     }
 
     public void subscribeESAStateAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, E_S_A_STATE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ESA_STATE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -31365,7 +31366,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, E_S_A_STATE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ESA_STATE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAbsMinPowerAttribute(
@@ -31427,7 +31428,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.DeviceEnergyManagementClusterPowerAdjustStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, POWER_ADJUSTMENT_CAPABILITY_ATTRIBUTE_ID, true);
@@ -31440,7 +31441,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.DeviceEnergyManagementClusterPowerAdjustStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, POWER_ADJUSTMENT_CAPABILITY_ATTRIBUTE_ID, minInterval, maxInterval);
@@ -31673,11 +31674,11 @@ public class ChipClusters {
     private static final long NEXT_CHARGE_TARGET_TIME_ATTRIBUTE_ID = 36L;
     private static final long NEXT_CHARGE_REQUIRED_ENERGY_ATTRIBUTE_ID = 37L;
     private static final long NEXT_CHARGE_TARGET_SO_C_ATTRIBUTE_ID = 38L;
-    private static final long APPROXIMATE_E_V_EFFICIENCY_ATTRIBUTE_ID = 39L;
+    private static final long APPROXIMATE_EV_EFFICIENCY_ATTRIBUTE_ID = 39L;
     private static final long STATE_OF_CHARGE_ATTRIBUTE_ID = 48L;
     private static final long BATTERY_CAPACITY_ATTRIBUTE_ID = 49L;
-    private static final long VEHICLE_I_D_ATTRIBUTE_ID = 50L;
-    private static final long SESSION_I_D_ATTRIBUTE_ID = 64L;
+    private static final long VEHICLE_ID_ATTRIBUTE_ID = 50L;
+    private static final long SESSION_ID_ATTRIBUTE_ID = 64L;
     private static final long SESSION_DURATION_ATTRIBUTE_ID = 65L;
     private static final long SESSION_ENERGY_CHARGED_ATTRIBUTE_ID = 66L;
     private static final long SESSION_ENERGY_DISCHARGED_ATTRIBUTE_ID = 67L;
@@ -32313,7 +32314,7 @@ public class ChipClusters {
 
     public void readApproximateEVEfficiencyAttribute(
         ApproximateEVEfficiencyAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, APPROXIMATE_E_V_EFFICIENCY_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, APPROXIMATE_EV_EFFICIENCY_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -32321,7 +32322,7 @@ public class ChipClusters {
             @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, APPROXIMATE_E_V_EFFICIENCY_ATTRIBUTE_ID, true);
+        }, APPROXIMATE_EV_EFFICIENCY_ATTRIBUTE_ID, true);
     }
 
     public void writeApproximateEVEfficiencyAttribute(DefaultClusterCallback callback, Integer value) {
@@ -32330,12 +32331,12 @@ public class ChipClusters {
 
     public void writeApproximateEVEfficiencyAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), APPROXIMATE_E_V_EFFICIENCY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), APPROXIMATE_EV_EFFICIENCY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeApproximateEVEfficiencyAttribute(
         ApproximateEVEfficiencyAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, APPROXIMATE_E_V_EFFICIENCY_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, APPROXIMATE_EV_EFFICIENCY_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -32343,7 +32344,7 @@ public class ChipClusters {
             @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, APPROXIMATE_E_V_EFFICIENCY_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, APPROXIMATE_EV_EFFICIENCY_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readStateOfChargeAttribute(
@@ -32400,7 +32401,7 @@ public class ChipClusters {
 
     public void readVehicleIDAttribute(
         VehicleIDAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VEHICLE_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VEHICLE_ID_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -32408,12 +32409,12 @@ public class ChipClusters {
             @Nullable String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, VEHICLE_I_D_ATTRIBUTE_ID, true);
+        }, VEHICLE_ID_ATTRIBUTE_ID, true);
     }
 
     public void subscribeVehicleIDAttribute(
         VehicleIDAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VEHICLE_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VEHICLE_ID_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -32421,12 +32422,12 @@ public class ChipClusters {
             @Nullable String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, VEHICLE_I_D_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, VEHICLE_ID_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readSessionIDAttribute(
         SessionIDAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SESSION_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SESSION_ID_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -32434,12 +32435,12 @@ public class ChipClusters {
             @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, SESSION_I_D_ATTRIBUTE_ID, true);
+        }, SESSION_ID_ATTRIBUTE_ID, true);
     }
 
     public void subscribeSessionIDAttribute(
         SessionIDAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SESSION_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SESSION_ID_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -32447,7 +32448,7 @@ public class ChipClusters {
             @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, SESSION_I_D_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, SESSION_ID_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readSessionDurationAttribute(
@@ -33303,8 +33304,6 @@ public class ChipClusters {
 
     private static final long SUPPORTED_MODES_ATTRIBUTE_ID = 0L;
     private static final long CURRENT_MODE_ATTRIBUTE_ID = 1L;
-    private static final long START_UP_MODE_ATTRIBUTE_ID = 2L;
-    private static final long ON_MODE_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -33365,14 +33364,6 @@ public class ChipClusters {
 
     public interface SupportedModesAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.EnergyEvseModeClusterModeOptionStruct> value);
-    }
-
-    public interface StartUpModeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-    }
-
-    public interface OnModeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -33443,74 +33434,296 @@ public class ChipClusters {
         }, CURRENT_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readStartUpModeAttribute(
-        StartUpModeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, START_UP_MODE_ATTRIBUTE_ID);
+    public void readGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, START_UP_MODE_ATTRIBUTE_ID, true);
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, true);
     }
 
-    public void writeStartUpModeAttribute(DefaultClusterCallback callback, Integer value) {
-      writeStartUpModeAttribute(callback, value, 0);
-    }
-
-    public void writeStartUpModeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), START_UP_MODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeStartUpModeAttribute(
-        StartUpModeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, START_UP_MODE_ATTRIBUTE_ID);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, START_UP_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readOnModeAttribute(
-        OnModeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ON_MODE_ATTRIBUTE_ID);
+    public void readAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ON_MODE_ATTRIBUTE_ID, true);
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, true);
     }
 
-    public void writeOnModeAttribute(DefaultClusterCallback callback, Integer value) {
-      writeOnModeAttribute(callback, value, 0);
-    }
-
-    public void writeOnModeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), ON_MODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeOnModeAttribute(
-        OnModeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ON_MODE_ATTRIBUTE_ID);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ON_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(
+        EventListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(
+        AttributeListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+  }
+
+  public static class WaterHeaterModeCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 158L;
+
+    private static final long SUPPORTED_MODES_ATTRIBUTE_ID = 0L;
+    private static final long CURRENT_MODE_ATTRIBUTE_ID = 1L;
+    private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
+    private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
+    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
+    private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
+    private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
+    private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
+
+    public WaterHeaterModeCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId, CLUSTER_ID);
+    }
+
+    @Override
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
+
+    public void changeToMode(ChangeToModeResponseCallback callback, Integer newMode) {
+      changeToMode(callback, newMode, 0);
+    }
+
+    public void changeToMode(ChangeToModeResponseCallback callback, Integer newMode, int timedInvokeTimeoutMs) {
+      final long commandId = 0L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long newModeFieldID = 0L;
+      BaseTLVType newModetlvValue = new UIntType(newMode);
+      elements.add(new StructElement(newModeFieldID, newModetlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long statusFieldID = 0L;
+          Integer status = null;
+          final long statusTextFieldID = 1L;
+          Optional<String> statusText = Optional.empty();
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == statusFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                status = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == statusTextFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.String) {
+                StringType castingValue = element.value(StringType.class);
+                statusText = Optional.of(castingValue.value(String.class));
+              }
+            }
+          }
+          callback.onSuccess(status, statusText);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface ChangeToModeResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer status, Optional<String> statusText);
+    }
+
+    public interface SupportedModesAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.WaterHeaterModeClusterModeOptionStruct> value);
+    }
+
+    public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface EventListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AttributeListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public void readSupportedModesAttribute(
+        SupportedModesAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_MODES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.WaterHeaterModeClusterModeOptionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_MODES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeSupportedModesAttribute(
+        SupportedModesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_MODES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.WaterHeaterModeClusterModeOptionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_MODES_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readCurrentModeAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_MODE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_MODE_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeCurrentModeAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_MODE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -33675,8 +33888,6 @@ public class ChipClusters {
 
     private static final long SUPPORTED_MODES_ATTRIBUTE_ID = 0L;
     private static final long CURRENT_MODE_ATTRIBUTE_ID = 1L;
-    private static final long START_UP_MODE_ATTRIBUTE_ID = 2L;
-    private static final long ON_MODE_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -33737,14 +33948,6 @@ public class ChipClusters {
 
     public interface SupportedModesAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.DeviceEnergyManagementModeClusterModeOptionStruct> value);
-    }
-
-    public interface StartUpModeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-    }
-
-    public interface OnModeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -33813,76 +34016,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, CURRENT_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readStartUpModeAttribute(
-        StartUpModeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, START_UP_MODE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, START_UP_MODE_ATTRIBUTE_ID, true);
-    }
-
-    public void writeStartUpModeAttribute(DefaultClusterCallback callback, Integer value) {
-      writeStartUpModeAttribute(callback, value, 0);
-    }
-
-    public void writeStartUpModeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), START_UP_MODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeStartUpModeAttribute(
-        StartUpModeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, START_UP_MODE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, START_UP_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readOnModeAttribute(
-        OnModeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ON_MODE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ON_MODE_ATTRIBUTE_ID, true);
-    }
-
-    public void writeOnModeAttribute(DefaultClusterCallback callback, Integer value) {
-      writeOnModeAttribute(callback, value, 0);
-    }
-
-    public void writeOnModeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), ON_MODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeOnModeAttribute(
-        OnModeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ON_MODE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ON_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -34053,19 +34186,19 @@ public class ChipClusters {
     private static final long DOOR_CLOSED_EVENTS_ATTRIBUTE_ID = 5L;
     private static final long OPEN_PERIOD_ATTRIBUTE_ID = 6L;
     private static final long NUMBER_OF_TOTAL_USERS_SUPPORTED_ATTRIBUTE_ID = 17L;
-    private static final long NUMBER_OF_P_I_N_USERS_SUPPORTED_ATTRIBUTE_ID = 18L;
-    private static final long NUMBER_OF_R_F_I_D_USERS_SUPPORTED_ATTRIBUTE_ID = 19L;
+    private static final long NUMBER_OF_PIN_USERS_SUPPORTED_ATTRIBUTE_ID = 18L;
+    private static final long NUMBER_OF_RFID_USERS_SUPPORTED_ATTRIBUTE_ID = 19L;
     private static final long NUMBER_OF_WEEK_DAY_SCHEDULES_SUPPORTED_PER_USER_ATTRIBUTE_ID = 20L;
     private static final long NUMBER_OF_YEAR_DAY_SCHEDULES_SUPPORTED_PER_USER_ATTRIBUTE_ID = 21L;
     private static final long NUMBER_OF_HOLIDAY_SCHEDULES_SUPPORTED_ATTRIBUTE_ID = 22L;
-    private static final long MAX_P_I_N_CODE_LENGTH_ATTRIBUTE_ID = 23L;
-    private static final long MIN_P_I_N_CODE_LENGTH_ATTRIBUTE_ID = 24L;
-    private static final long MAX_R_F_I_D_CODE_LENGTH_ATTRIBUTE_ID = 25L;
-    private static final long MIN_R_F_I_D_CODE_LENGTH_ATTRIBUTE_ID = 26L;
+    private static final long MAX_PIN_CODE_LENGTH_ATTRIBUTE_ID = 23L;
+    private static final long MIN_PIN_CODE_LENGTH_ATTRIBUTE_ID = 24L;
+    private static final long MAX_RFID_CODE_LENGTH_ATTRIBUTE_ID = 25L;
+    private static final long MIN_RFID_CODE_LENGTH_ATTRIBUTE_ID = 26L;
     private static final long CREDENTIAL_RULES_SUPPORT_ATTRIBUTE_ID = 27L;
     private static final long NUMBER_OF_CREDENTIALS_SUPPORTED_PER_USER_ATTRIBUTE_ID = 28L;
     private static final long LANGUAGE_ATTRIBUTE_ID = 33L;
-    private static final long L_E_D_SETTINGS_ATTRIBUTE_ID = 34L;
+    private static final long LED_SETTINGS_ATTRIBUTE_ID = 34L;
     private static final long AUTO_RELOCK_TIME_ATTRIBUTE_ID = 35L;
     private static final long SOUND_VOLUME_ATTRIBUTE_ID = 36L;
     private static final long OPERATING_MODE_ATTRIBUTE_ID = 37L;
@@ -34073,21 +34206,21 @@ public class ChipClusters {
     private static final long DEFAULT_CONFIGURATION_REGISTER_ATTRIBUTE_ID = 39L;
     private static final long ENABLE_LOCAL_PROGRAMMING_ATTRIBUTE_ID = 40L;
     private static final long ENABLE_ONE_TOUCH_LOCKING_ATTRIBUTE_ID = 41L;
-    private static final long ENABLE_INSIDE_STATUS_L_E_D_ATTRIBUTE_ID = 42L;
+    private static final long ENABLE_INSIDE_STATUS_LED_ATTRIBUTE_ID = 42L;
     private static final long ENABLE_PRIVACY_MODE_BUTTON_ATTRIBUTE_ID = 43L;
     private static final long LOCAL_PROGRAMMING_FEATURES_ATTRIBUTE_ID = 44L;
     private static final long WRONG_CODE_ENTRY_LIMIT_ATTRIBUTE_ID = 48L;
     private static final long USER_CODE_TEMPORARY_DISABLE_TIME_ATTRIBUTE_ID = 49L;
-    private static final long SEND_P_I_N_OVER_THE_AIR_ATTRIBUTE_ID = 50L;
-    private static final long REQUIRE_P_I_NFOR_REMOTE_OPERATION_ATTRIBUTE_ID = 51L;
+    private static final long SEND_PIN_OVER_THE_AIR_ATTRIBUTE_ID = 50L;
+    private static final long REQUIRE_PI_NFOR_REMOTE_OPERATION_ATTRIBUTE_ID = 51L;
     private static final long EXPIRING_USER_TIMEOUT_ATTRIBUTE_ID = 53L;
     private static final long ALIRO_READER_VERIFICATION_KEY_ATTRIBUTE_ID = 128L;
     private static final long ALIRO_READER_GROUP_IDENTIFIER_ATTRIBUTE_ID = 129L;
     private static final long ALIRO_READER_GROUP_SUB_IDENTIFIER_ATTRIBUTE_ID = 130L;
     private static final long ALIRO_EXPEDITED_TRANSACTION_SUPPORTED_PROTOCOL_VERSIONS_ATTRIBUTE_ID = 131L;
     private static final long ALIRO_GROUP_RESOLVING_KEY_ATTRIBUTE_ID = 132L;
-    private static final long ALIRO_SUPPORTED_B_L_E_U_W_B_PROTOCOL_VERSIONS_ATTRIBUTE_ID = 133L;
-    private static final long ALIRO_B_L_E_ADVERTISING_VERSION_ATTRIBUTE_ID = 134L;
+    private static final long ALIRO_SUPPORTED_BLEUWB_PROTOCOL_VERSIONS_ATTRIBUTE_ID = 133L;
+    private static final long ALIRO_BLE_ADVERTISING_VERSION_ATTRIBUTE_ID = 134L;
     private static final long NUMBER_OF_ALIRO_CREDENTIAL_ISSUER_KEYS_SUPPORTED_ATTRIBUTE_ID = 135L;
     private static final long NUMBER_OF_ALIRO_ENDPOINT_KEYS_SUPPORTED_ATTRIBUTE_ID = 136L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
@@ -34779,6 +34912,8 @@ public class ChipClusters {
           @Nullable Integer lastModifiedFabricIndex = null;
           final long nextCredentialIndexFieldID = 4L;
           @Nullable Integer nextCredentialIndex = null;
+          final long credentialDataFieldID = 5L;
+          @Nullable Optional<byte[]> credentialData = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == credentialExistsFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
@@ -34805,9 +34940,14 @@ public class ChipClusters {
                 UIntType castingValue = element.value(UIntType.class);
                 nextCredentialIndex = castingValue.value(Integer.class);
               }
+            } else if (element.contextTagNum() == credentialDataFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                credentialData = Optional.of(castingValue.value(byte[].class));
+              }
             }
           }
-          callback.onSuccess(credentialExists, userIndex, creatorFabricIndex, lastModifiedFabricIndex, nextCredentialIndex);
+          callback.onSuccess(credentialExists, userIndex, creatorFabricIndex, lastModifiedFabricIndex, nextCredentialIndex, credentialData);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
@@ -34908,7 +35048,7 @@ public class ChipClusters {
     }
 
     public interface GetCredentialStatusResponseCallback extends BaseClusterCallback {
-      void onSuccess(Boolean credentialExists, @Nullable Integer userIndex, @Nullable Integer creatorFabricIndex, @Nullable Integer lastModifiedFabricIndex, @Nullable Integer nextCredentialIndex);
+      void onSuccess(Boolean credentialExists, @Nullable Integer userIndex, @Nullable Integer creatorFabricIndex, @Nullable Integer lastModifiedFabricIndex, @Nullable Integer nextCredentialIndex, @Nullable Optional<byte[]> credentialData);
     }
 
     public interface LockStateAttributeCallback extends BaseAttributeCallback {
@@ -35192,7 +35332,7 @@ public class ChipClusters {
 
     public void readNumberOfPINUsersSupportedAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_P_I_N_USERS_SUPPORTED_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_PIN_USERS_SUPPORTED_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35200,12 +35340,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, NUMBER_OF_P_I_N_USERS_SUPPORTED_ATTRIBUTE_ID, true);
+        }, NUMBER_OF_PIN_USERS_SUPPORTED_ATTRIBUTE_ID, true);
     }
 
     public void subscribeNumberOfPINUsersSupportedAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_P_I_N_USERS_SUPPORTED_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_PIN_USERS_SUPPORTED_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35213,12 +35353,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, NUMBER_OF_P_I_N_USERS_SUPPORTED_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, NUMBER_OF_PIN_USERS_SUPPORTED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readNumberOfRFIDUsersSupportedAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_R_F_I_D_USERS_SUPPORTED_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_RFID_USERS_SUPPORTED_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35226,12 +35366,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, NUMBER_OF_R_F_I_D_USERS_SUPPORTED_ATTRIBUTE_ID, true);
+        }, NUMBER_OF_RFID_USERS_SUPPORTED_ATTRIBUTE_ID, true);
     }
 
     public void subscribeNumberOfRFIDUsersSupportedAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_R_F_I_D_USERS_SUPPORTED_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_RFID_USERS_SUPPORTED_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35239,7 +35379,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, NUMBER_OF_R_F_I_D_USERS_SUPPORTED_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, NUMBER_OF_RFID_USERS_SUPPORTED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readNumberOfWeekDaySchedulesSupportedPerUserAttribute(
@@ -35322,7 +35462,7 @@ public class ChipClusters {
 
     public void readMaxPINCodeLengthAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_P_I_N_CODE_LENGTH_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_PIN_CODE_LENGTH_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35330,12 +35470,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MAX_P_I_N_CODE_LENGTH_ATTRIBUTE_ID, true);
+        }, MAX_PIN_CODE_LENGTH_ATTRIBUTE_ID, true);
     }
 
     public void subscribeMaxPINCodeLengthAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_P_I_N_CODE_LENGTH_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_PIN_CODE_LENGTH_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35343,12 +35483,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MAX_P_I_N_CODE_LENGTH_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MAX_PIN_CODE_LENGTH_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readMinPINCodeLengthAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MIN_P_I_N_CODE_LENGTH_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MIN_PIN_CODE_LENGTH_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35356,12 +35496,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MIN_P_I_N_CODE_LENGTH_ATTRIBUTE_ID, true);
+        }, MIN_PIN_CODE_LENGTH_ATTRIBUTE_ID, true);
     }
 
     public void subscribeMinPINCodeLengthAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MIN_P_I_N_CODE_LENGTH_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MIN_PIN_CODE_LENGTH_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35369,12 +35509,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MIN_P_I_N_CODE_LENGTH_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MIN_PIN_CODE_LENGTH_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readMaxRFIDCodeLengthAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_R_F_I_D_CODE_LENGTH_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_RFID_CODE_LENGTH_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35382,12 +35522,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MAX_R_F_I_D_CODE_LENGTH_ATTRIBUTE_ID, true);
+        }, MAX_RFID_CODE_LENGTH_ATTRIBUTE_ID, true);
     }
 
     public void subscribeMaxRFIDCodeLengthAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_R_F_I_D_CODE_LENGTH_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_RFID_CODE_LENGTH_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35395,12 +35535,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MAX_R_F_I_D_CODE_LENGTH_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MAX_RFID_CODE_LENGTH_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readMinRFIDCodeLengthAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MIN_R_F_I_D_CODE_LENGTH_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MIN_RFID_CODE_LENGTH_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35408,12 +35548,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MIN_R_F_I_D_CODE_LENGTH_ATTRIBUTE_ID, true);
+        }, MIN_RFID_CODE_LENGTH_ATTRIBUTE_ID, true);
     }
 
     public void subscribeMinRFIDCodeLengthAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MIN_R_F_I_D_CODE_LENGTH_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MIN_RFID_CODE_LENGTH_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35421,7 +35561,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MIN_R_F_I_D_CODE_LENGTH_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MIN_RFID_CODE_LENGTH_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readCredentialRulesSupportAttribute(
@@ -35513,7 +35653,7 @@ public class ChipClusters {
 
     public void readLEDSettingsAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, L_E_D_SETTINGS_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LED_SETTINGS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35521,7 +35661,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, L_E_D_SETTINGS_ATTRIBUTE_ID, true);
+        }, LED_SETTINGS_ATTRIBUTE_ID, true);
     }
 
     public void writeLEDSettingsAttribute(DefaultClusterCallback callback, Integer value) {
@@ -35530,12 +35670,12 @@ public class ChipClusters {
 
     public void writeLEDSettingsAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), L_E_D_SETTINGS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), LED_SETTINGS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeLEDSettingsAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, L_E_D_SETTINGS_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LED_SETTINGS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35543,7 +35683,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, L_E_D_SETTINGS_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, LED_SETTINGS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAutoRelockTimeAttribute(
@@ -35775,7 +35915,7 @@ public class ChipClusters {
 
     public void readEnableInsideStatusLEDAttribute(
         BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ENABLE_INSIDE_STATUS_L_E_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ENABLE_INSIDE_STATUS_LED_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35783,7 +35923,7 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ENABLE_INSIDE_STATUS_L_E_D_ATTRIBUTE_ID, true);
+        }, ENABLE_INSIDE_STATUS_LED_ATTRIBUTE_ID, true);
     }
 
     public void writeEnableInsideStatusLEDAttribute(DefaultClusterCallback callback, Boolean value) {
@@ -35792,12 +35932,12 @@ public class ChipClusters {
 
     public void writeEnableInsideStatusLEDAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new BooleanType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), ENABLE_INSIDE_STATUS_L_E_D_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), ENABLE_INSIDE_STATUS_LED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeEnableInsideStatusLEDAttribute(
         BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ENABLE_INSIDE_STATUS_L_E_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ENABLE_INSIDE_STATUS_LED_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35805,7 +35945,7 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ENABLE_INSIDE_STATUS_L_E_D_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ENABLE_INSIDE_STATUS_LED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readEnablePrivacyModeButtonAttribute(
@@ -35950,7 +36090,7 @@ public class ChipClusters {
 
     public void readSendPINOverTheAirAttribute(
         BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SEND_P_I_N_OVER_THE_AIR_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SEND_PIN_OVER_THE_AIR_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35958,7 +36098,7 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, SEND_P_I_N_OVER_THE_AIR_ATTRIBUTE_ID, true);
+        }, SEND_PIN_OVER_THE_AIR_ATTRIBUTE_ID, true);
     }
 
     public void writeSendPINOverTheAirAttribute(DefaultClusterCallback callback, Boolean value) {
@@ -35967,12 +36107,12 @@ public class ChipClusters {
 
     public void writeSendPINOverTheAirAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new BooleanType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), SEND_P_I_N_OVER_THE_AIR_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), SEND_PIN_OVER_THE_AIR_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeSendPINOverTheAirAttribute(
         BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SEND_P_I_N_OVER_THE_AIR_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SEND_PIN_OVER_THE_AIR_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35980,12 +36120,12 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, SEND_P_I_N_OVER_THE_AIR_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, SEND_PIN_OVER_THE_AIR_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readRequirePINforRemoteOperationAttribute(
         BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REQUIRE_P_I_NFOR_REMOTE_OPERATION_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REQUIRE_PI_NFOR_REMOTE_OPERATION_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -35993,7 +36133,7 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, REQUIRE_P_I_NFOR_REMOTE_OPERATION_ATTRIBUTE_ID, true);
+        }, REQUIRE_PI_NFOR_REMOTE_OPERATION_ATTRIBUTE_ID, true);
     }
 
     public void writeRequirePINforRemoteOperationAttribute(DefaultClusterCallback callback, Boolean value) {
@@ -36002,12 +36142,12 @@ public class ChipClusters {
 
     public void writeRequirePINforRemoteOperationAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new BooleanType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), REQUIRE_P_I_NFOR_REMOTE_OPERATION_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), REQUIRE_PI_NFOR_REMOTE_OPERATION_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeRequirePINforRemoteOperationAttribute(
         BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REQUIRE_P_I_NFOR_REMOTE_OPERATION_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REQUIRE_PI_NFOR_REMOTE_OPERATION_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -36015,7 +36155,7 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, REQUIRE_P_I_NFOR_REMOTE_OPERATION_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, REQUIRE_PI_NFOR_REMOTE_OPERATION_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readExpiringUserTimeoutAttribute(
@@ -36185,7 +36325,7 @@ public class ChipClusters {
 
     public void readAliroSupportedBLEUWBProtocolVersionsAttribute(
         AliroSupportedBLEUWBProtocolVersionsAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALIRO_SUPPORTED_B_L_E_U_W_B_PROTOCOL_VERSIONS_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALIRO_SUPPORTED_BLEUWB_PROTOCOL_VERSIONS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -36193,12 +36333,12 @@ public class ChipClusters {
             List<byte[]> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ALIRO_SUPPORTED_B_L_E_U_W_B_PROTOCOL_VERSIONS_ATTRIBUTE_ID, true);
+        }, ALIRO_SUPPORTED_BLEUWB_PROTOCOL_VERSIONS_ATTRIBUTE_ID, true);
     }
 
     public void subscribeAliroSupportedBLEUWBProtocolVersionsAttribute(
         AliroSupportedBLEUWBProtocolVersionsAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALIRO_SUPPORTED_B_L_E_U_W_B_PROTOCOL_VERSIONS_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALIRO_SUPPORTED_BLEUWB_PROTOCOL_VERSIONS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -36206,12 +36346,12 @@ public class ChipClusters {
             List<byte[]> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ALIRO_SUPPORTED_B_L_E_U_W_B_PROTOCOL_VERSIONS_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ALIRO_SUPPORTED_BLEUWB_PROTOCOL_VERSIONS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAliroBLEAdvertisingVersionAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALIRO_B_L_E_ADVERTISING_VERSION_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALIRO_BLE_ADVERTISING_VERSION_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -36219,12 +36359,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ALIRO_B_L_E_ADVERTISING_VERSION_ATTRIBUTE_ID, true);
+        }, ALIRO_BLE_ADVERTISING_VERSION_ATTRIBUTE_ID, true);
     }
 
     public void subscribeAliroBLEAdvertisingVersionAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALIRO_B_L_E_ADVERTISING_VERSION_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALIRO_BLE_ADVERTISING_VERSION_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -36232,7 +36372,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ALIRO_B_L_E_ADVERTISING_VERSION_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ALIRO_BLE_ADVERTISING_VERSION_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readNumberOfAliroCredentialIssuerKeysSupportedAttribute(
@@ -37400,19 +37540,15 @@ public class ChipClusters {
     }
   }
 
-  public static class BarrierControlCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 259L;
+  public static class ServiceAreaCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 336L;
 
-    private static final long BARRIER_MOVING_STATE_ATTRIBUTE_ID = 1L;
-    private static final long BARRIER_SAFETY_STATUS_ATTRIBUTE_ID = 2L;
-    private static final long BARRIER_CAPABILITIES_ATTRIBUTE_ID = 3L;
-    private static final long BARRIER_OPEN_EVENTS_ATTRIBUTE_ID = 4L;
-    private static final long BARRIER_CLOSE_EVENTS_ATTRIBUTE_ID = 5L;
-    private static final long BARRIER_COMMAND_OPEN_EVENTS_ATTRIBUTE_ID = 6L;
-    private static final long BARRIER_COMMAND_CLOSE_EVENTS_ATTRIBUTE_ID = 7L;
-    private static final long BARRIER_OPEN_PERIOD_ATTRIBUTE_ID = 8L;
-    private static final long BARRIER_CLOSE_PERIOD_ATTRIBUTE_ID = 9L;
-    private static final long BARRIER_POSITION_ATTRIBUTE_ID = 10L;
+    private static final long SUPPORTED_AREAS_ATTRIBUTE_ID = 0L;
+    private static final long SUPPORTED_MAPS_ATTRIBUTE_ID = 1L;
+    private static final long SELECTED_AREAS_ATTRIBUTE_ID = 2L;
+    private static final long CURRENT_AREA_ATTRIBUTE_ID = 3L;
+    private static final long ESTIMATED_END_TIME_ATTRIBUTE_ID = 4L;
+    private static final long PROGRESS_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -37420,7 +37556,7 @@ public class ChipClusters {
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
 
-    public BarrierControlCluster(long devicePtr, int endpointId) {
+    public ServiceAreaCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId, CLUSTER_ID);
     }
 
@@ -37430,40 +37566,110 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void barrierControlGoToPercent(DefaultClusterCallback callback, Integer percentOpen) {
-      barrierControlGoToPercent(callback, percentOpen, 0);
+    public void selectAreas(SelectAreasResponseCallback callback, ArrayList<Long> newAreas) {
+      selectAreas(callback, newAreas, 0);
     }
 
-    public void barrierControlGoToPercent(DefaultClusterCallback callback, Integer percentOpen, int timedInvokeTimeoutMs) {
+    public void selectAreas(SelectAreasResponseCallback callback, ArrayList<Long> newAreas, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long percentOpenFieldID = 0L;
-      BaseTLVType percentOpentlvValue = new UIntType(percentOpen);
-      elements.add(new StructElement(percentOpenFieldID, percentOpentlvValue));
+      final long newAreasFieldID = 0L;
+      BaseTLVType newAreastlvValue = ArrayType.generateArrayType(newAreas, (elementnewAreas) -> new UIntType(elementnewAreas));
+      elements.add(new StructElement(newAreasFieldID, newAreastlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
+          final long statusFieldID = 0L;
+          Integer status = null;
+          final long statusTextFieldID = 1L;
+          String statusText = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == statusFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                status = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == statusTextFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.String) {
+                StringType castingValue = element.value(StringType.class);
+                statusText = castingValue.value(String.class);
+              }
+            }
+          }
+          callback.onSuccess(status, statusText);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void barrierControlStop(DefaultClusterCallback callback) {
-      barrierControlStop(callback, 0);
+    public void skipArea(SkipAreaResponseCallback callback, Long skippedArea) {
+      skipArea(callback, skippedArea, 0);
     }
 
-    public void barrierControlStop(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
-      final long commandId = 1L;
+    public void skipArea(SkipAreaResponseCallback callback, Long skippedArea, int timedInvokeTimeoutMs) {
+      final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
+      final long skippedAreaFieldID = 0L;
+      BaseTLVType skippedAreatlvValue = new UIntType(skippedArea);
+      elements.add(new StructElement(skippedAreaFieldID, skippedAreatlvValue));
+
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
+          final long statusFieldID = 0L;
+          Integer status = null;
+          final long statusTextFieldID = 1L;
+          String statusText = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == statusFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                status = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == statusTextFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.String) {
+                StringType castingValue = element.value(StringType.class);
+                statusText = castingValue.value(String.class);
+              }
+            }
+          }
+          callback.onSuccess(status, statusText);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface SelectAreasResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer status, String statusText);
+    }
+
+    public interface SkipAreaResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer status, String statusText);
+    }
+
+    public interface SupportedAreasAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.ServiceAreaClusterAreaStruct> value);
+    }
+
+    public interface SupportedMapsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.ServiceAreaClusterMapStruct> value);
+    }
+
+    public interface SelectedAreasAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface CurrentAreaAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Long value);
+    }
+
+    public interface EstimatedEndTimeAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Long value);
+    }
+
+    public interface ProgressAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.ServiceAreaClusterProgressStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -37482,318 +37688,160 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public void readBarrierMovingStateAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_MOVING_STATE_ATTRIBUTE_ID);
+    public void readSupportedAreasAttribute(
+        SupportedAreasAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_AREAS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ServiceAreaClusterAreaStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BARRIER_MOVING_STATE_ATTRIBUTE_ID, true);
+        }, SUPPORTED_AREAS_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeBarrierMovingStateAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_MOVING_STATE_ATTRIBUTE_ID);
+    public void subscribeSupportedAreasAttribute(
+        SupportedAreasAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_AREAS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ServiceAreaClusterAreaStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BARRIER_MOVING_STATE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, SUPPORTED_AREAS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readBarrierSafetyStatusAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_SAFETY_STATUS_ATTRIBUTE_ID);
+    public void readSupportedMapsAttribute(
+        SupportedMapsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_MAPS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ServiceAreaClusterMapStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BARRIER_SAFETY_STATUS_ATTRIBUTE_ID, true);
+        }, SUPPORTED_MAPS_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeBarrierSafetyStatusAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_SAFETY_STATUS_ATTRIBUTE_ID);
+    public void subscribeSupportedMapsAttribute(
+        SupportedMapsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_MAPS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ServiceAreaClusterMapStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BARRIER_SAFETY_STATUS_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, SUPPORTED_MAPS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readBarrierCapabilitiesAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_CAPABILITIES_ATTRIBUTE_ID);
+    public void readSelectedAreasAttribute(
+        SelectedAreasAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SELECTED_AREAS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BARRIER_CAPABILITIES_ATTRIBUTE_ID, true);
+        }, SELECTED_AREAS_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeBarrierCapabilitiesAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_CAPABILITIES_ATTRIBUTE_ID);
+    public void subscribeSelectedAreasAttribute(
+        SelectedAreasAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SELECTED_AREAS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BARRIER_CAPABILITIES_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, SELECTED_AREAS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readBarrierOpenEventsAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_OPEN_EVENTS_ATTRIBUTE_ID);
+    public void readCurrentAreaAttribute(
+        CurrentAreaAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_AREA_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BARRIER_OPEN_EVENTS_ATTRIBUTE_ID, true);
+        }, CURRENT_AREA_ATTRIBUTE_ID, true);
     }
 
-    public void writeBarrierOpenEventsAttribute(DefaultClusterCallback callback, Integer value) {
-      writeBarrierOpenEventsAttribute(callback, value, 0);
-    }
-
-    public void writeBarrierOpenEventsAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), BARRIER_OPEN_EVENTS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeBarrierOpenEventsAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_OPEN_EVENTS_ATTRIBUTE_ID);
+    public void subscribeCurrentAreaAttribute(
+        CurrentAreaAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_AREA_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BARRIER_OPEN_EVENTS_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, CURRENT_AREA_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readBarrierCloseEventsAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_CLOSE_EVENTS_ATTRIBUTE_ID);
+    public void readEstimatedEndTimeAttribute(
+        EstimatedEndTimeAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ESTIMATED_END_TIME_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BARRIER_CLOSE_EVENTS_ATTRIBUTE_ID, true);
+        }, ESTIMATED_END_TIME_ATTRIBUTE_ID, true);
     }
 
-    public void writeBarrierCloseEventsAttribute(DefaultClusterCallback callback, Integer value) {
-      writeBarrierCloseEventsAttribute(callback, value, 0);
-    }
-
-    public void writeBarrierCloseEventsAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), BARRIER_CLOSE_EVENTS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeBarrierCloseEventsAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_CLOSE_EVENTS_ATTRIBUTE_ID);
+    public void subscribeEstimatedEndTimeAttribute(
+        EstimatedEndTimeAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ESTIMATED_END_TIME_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BARRIER_CLOSE_EVENTS_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ESTIMATED_END_TIME_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readBarrierCommandOpenEventsAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_COMMAND_OPEN_EVENTS_ATTRIBUTE_ID);
+    public void readProgressAttribute(
+        ProgressAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PROGRESS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ServiceAreaClusterProgressStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BARRIER_COMMAND_OPEN_EVENTS_ATTRIBUTE_ID, true);
+        }, PROGRESS_ATTRIBUTE_ID, true);
     }
 
-    public void writeBarrierCommandOpenEventsAttribute(DefaultClusterCallback callback, Integer value) {
-      writeBarrierCommandOpenEventsAttribute(callback, value, 0);
-    }
-
-    public void writeBarrierCommandOpenEventsAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), BARRIER_COMMAND_OPEN_EVENTS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeBarrierCommandOpenEventsAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_COMMAND_OPEN_EVENTS_ATTRIBUTE_ID);
+    public void subscribeProgressAttribute(
+        ProgressAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PROGRESS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ServiceAreaClusterProgressStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BARRIER_COMMAND_OPEN_EVENTS_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readBarrierCommandCloseEventsAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_COMMAND_CLOSE_EVENTS_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, BARRIER_COMMAND_CLOSE_EVENTS_ATTRIBUTE_ID, true);
-    }
-
-    public void writeBarrierCommandCloseEventsAttribute(DefaultClusterCallback callback, Integer value) {
-      writeBarrierCommandCloseEventsAttribute(callback, value, 0);
-    }
-
-    public void writeBarrierCommandCloseEventsAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), BARRIER_COMMAND_CLOSE_EVENTS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeBarrierCommandCloseEventsAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_COMMAND_CLOSE_EVENTS_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, BARRIER_COMMAND_CLOSE_EVENTS_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readBarrierOpenPeriodAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_OPEN_PERIOD_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, BARRIER_OPEN_PERIOD_ATTRIBUTE_ID, true);
-    }
-
-    public void writeBarrierOpenPeriodAttribute(DefaultClusterCallback callback, Integer value) {
-      writeBarrierOpenPeriodAttribute(callback, value, 0);
-    }
-
-    public void writeBarrierOpenPeriodAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), BARRIER_OPEN_PERIOD_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeBarrierOpenPeriodAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_OPEN_PERIOD_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, BARRIER_OPEN_PERIOD_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readBarrierClosePeriodAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_CLOSE_PERIOD_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, BARRIER_CLOSE_PERIOD_ATTRIBUTE_ID, true);
-    }
-
-    public void writeBarrierClosePeriodAttribute(DefaultClusterCallback callback, Integer value) {
-      writeBarrierClosePeriodAttribute(callback, value, 0);
-    }
-
-    public void writeBarrierClosePeriodAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), BARRIER_CLOSE_PERIOD_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeBarrierClosePeriodAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_CLOSE_PERIOD_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, BARRIER_CLOSE_PERIOD_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readBarrierPositionAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_POSITION_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, BARRIER_POSITION_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeBarrierPositionAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BARRIER_POSITION_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, BARRIER_POSITION_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, PROGRESS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -38885,9 +38933,9 @@ public class ChipClusters {
     private static final long ABS_MAX_HEAT_SETPOINT_LIMIT_ATTRIBUTE_ID = 4L;
     private static final long ABS_MIN_COOL_SETPOINT_LIMIT_ATTRIBUTE_ID = 5L;
     private static final long ABS_MAX_COOL_SETPOINT_LIMIT_ATTRIBUTE_ID = 6L;
-    private static final long P_I_COOLING_DEMAND_ATTRIBUTE_ID = 7L;
-    private static final long P_I_HEATING_DEMAND_ATTRIBUTE_ID = 8L;
-    private static final long H_V_A_C_SYSTEM_TYPE_CONFIGURATION_ATTRIBUTE_ID = 9L;
+    private static final long PI_COOLING_DEMAND_ATTRIBUTE_ID = 7L;
+    private static final long PI_HEATING_DEMAND_ATTRIBUTE_ID = 8L;
+    private static final long HVAC_SYSTEM_TYPE_CONFIGURATION_ATTRIBUTE_ID = 9L;
     private static final long LOCAL_TEMPERATURE_CALIBRATION_ATTRIBUTE_ID = 16L;
     private static final long OCCUPIED_COOLING_SETPOINT_ATTRIBUTE_ID = 17L;
     private static final long OCCUPIED_HEATING_SETPOINT_ATTRIBUTE_ID = 18L;
@@ -38919,14 +38967,14 @@ public class ChipClusters {
     private static final long UNOCCUPIED_SETBACK_MIN_ATTRIBUTE_ID = 56L;
     private static final long UNOCCUPIED_SETBACK_MAX_ATTRIBUTE_ID = 57L;
     private static final long EMERGENCY_HEAT_DELTA_ATTRIBUTE_ID = 58L;
-    private static final long A_C_TYPE_ATTRIBUTE_ID = 64L;
-    private static final long A_C_CAPACITY_ATTRIBUTE_ID = 65L;
-    private static final long A_C_REFRIGERANT_TYPE_ATTRIBUTE_ID = 66L;
-    private static final long A_C_COMPRESSOR_TYPE_ATTRIBUTE_ID = 67L;
-    private static final long A_C_ERROR_CODE_ATTRIBUTE_ID = 68L;
-    private static final long A_C_LOUVER_POSITION_ATTRIBUTE_ID = 69L;
-    private static final long A_C_COIL_TEMPERATURE_ATTRIBUTE_ID = 70L;
-    private static final long A_C_CAPACITYFORMAT_ATTRIBUTE_ID = 71L;
+    private static final long AC_TYPE_ATTRIBUTE_ID = 64L;
+    private static final long AC_CAPACITY_ATTRIBUTE_ID = 65L;
+    private static final long AC_REFRIGERANT_TYPE_ATTRIBUTE_ID = 66L;
+    private static final long AC_COMPRESSOR_TYPE_ATTRIBUTE_ID = 67L;
+    private static final long AC_ERROR_CODE_ATTRIBUTE_ID = 68L;
+    private static final long AC_LOUVER_POSITION_ATTRIBUTE_ID = 69L;
+    private static final long AC_COIL_TEMPERATURE_ATTRIBUTE_ID = 70L;
+    private static final long AC_CAPACITYFORMAT_ATTRIBUTE_ID = 71L;
     private static final long PRESET_TYPES_ATTRIBUTE_ID = 72L;
     private static final long SCHEDULE_TYPES_ATTRIBUTE_ID = 73L;
     private static final long NUMBER_OF_PRESETS_ATTRIBUTE_ID = 74L;
@@ -38937,10 +38985,7 @@ public class ChipClusters {
     private static final long ACTIVE_SCHEDULE_HANDLE_ATTRIBUTE_ID = 79L;
     private static final long PRESETS_ATTRIBUTE_ID = 80L;
     private static final long SCHEDULES_ATTRIBUTE_ID = 81L;
-    private static final long PRESETS_SCHEDULES_EDITABLE_ATTRIBUTE_ID = 82L;
-    private static final long TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID = 83L;
-    private static final long SETPOINT_HOLD_EXPIRY_TIMESTAMP_ATTRIBUTE_ID = 84L;
-    private static final long QUEUED_PRESET_ATTRIBUTE_ID = 85L;
+    private static final long SETPOINT_HOLD_EXPIRY_TIMESTAMP_ATTRIBUTE_ID = 82L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -39105,22 +39150,18 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void setActivePresetRequest(DefaultClusterCallback callback, byte[] presetHandle, Optional<Integer> delayMinutes) {
-      setActivePresetRequest(callback, presetHandle, delayMinutes, 0);
+    public void setActivePresetRequest(DefaultClusterCallback callback, @Nullable byte[] presetHandle) {
+      setActivePresetRequest(callback, presetHandle, 0);
     }
 
-    public void setActivePresetRequest(DefaultClusterCallback callback, byte[] presetHandle, Optional<Integer> delayMinutes, int timedInvokeTimeoutMs) {
+    public void setActivePresetRequest(DefaultClusterCallback callback, @Nullable byte[] presetHandle, int timedInvokeTimeoutMs) {
       final long commandId = 6L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long presetHandleFieldID = 0L;
-      BaseTLVType presetHandletlvValue = new ByteArrayType(presetHandle);
+      BaseTLVType presetHandletlvValue = presetHandle != null ? new ByteArrayType(presetHandle) : new NullType();
       elements.add(new StructElement(presetHandleFieldID, presetHandletlvValue));
 
-      final long delayMinutesFieldID = 1L;
-      BaseTLVType delayMinutestlvValue = delayMinutes.<BaseTLVType>map((nonOptionaldelayMinutes) -> new UIntType(nonOptionaldelayMinutes)).orElse(new EmptyType());
-      elements.add(new StructElement(delayMinutesFieldID, delayMinutestlvValue));
-
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
@@ -39129,96 +39170,64 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void startPresetsSchedulesEditRequest(DefaultClusterCallback callback, Integer timeoutSeconds) {
-      startPresetsSchedulesEditRequest(callback, timeoutSeconds, 0);
+    public void atomicRequest(AtomicResponseCallback callback, Integer requestType, ArrayList<Long> attributeRequests, Optional<Integer> timeout) {
+      atomicRequest(callback, requestType, attributeRequests, timeout, 0);
     }
 
-    public void startPresetsSchedulesEditRequest(DefaultClusterCallback callback, Integer timeoutSeconds, int timedInvokeTimeoutMs) {
-      final long commandId = 7L;
+    public void atomicRequest(AtomicResponseCallback callback, Integer requestType, ArrayList<Long> attributeRequests, Optional<Integer> timeout, int timedInvokeTimeoutMs) {
+      final long commandId = 254L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long timeoutSecondsFieldID = 0L;
-      BaseTLVType timeoutSecondstlvValue = new UIntType(timeoutSeconds);
-      elements.add(new StructElement(timeoutSecondsFieldID, timeoutSecondstlvValue));
+      final long requestTypeFieldID = 0L;
+      BaseTLVType requestTypetlvValue = new UIntType(requestType);
+      elements.add(new StructElement(requestTypeFieldID, requestTypetlvValue));
+
+      final long attributeRequestsFieldID = 1L;
+      BaseTLVType attributeRequeststlvValue = ArrayType.generateArrayType(attributeRequests, (elementattributeRequests) -> new UIntType(elementattributeRequests));
+      elements.add(new StructElement(attributeRequestsFieldID, attributeRequeststlvValue));
+
+      final long timeoutFieldID = 2L;
+      BaseTLVType timeouttlvValue = timeout.<BaseTLVType>map((nonOptionaltimeout) -> new UIntType(nonOptionaltimeout)).orElse(new EmptyType());
+      elements.add(new StructElement(timeoutFieldID, timeouttlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void cancelPresetsSchedulesEditRequest(DefaultClusterCallback callback) {
-      cancelPresetsSchedulesEditRequest(callback, 0);
-    }
-
-    public void cancelPresetsSchedulesEditRequest(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
-      final long commandId = 8L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void commitPresetsSchedulesRequest(DefaultClusterCallback callback) {
-      commitPresetsSchedulesRequest(callback, 0);
-    }
-
-    public void commitPresetsSchedulesRequest(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
-      final long commandId = 9L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void cancelSetActivePresetRequest(DefaultClusterCallback callback) {
-      cancelSetActivePresetRequest(callback, 0);
-    }
-
-    public void cancelSetActivePresetRequest(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
-      final long commandId = 10L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void setTemperatureSetpointHoldPolicy(DefaultClusterCallback callback, Integer temperatureSetpointHoldPolicy) {
-      setTemperatureSetpointHoldPolicy(callback, temperatureSetpointHoldPolicy, 0);
-    }
-
-    public void setTemperatureSetpointHoldPolicy(DefaultClusterCallback callback, Integer temperatureSetpointHoldPolicy, int timedInvokeTimeoutMs) {
-      final long commandId = 11L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long temperatureSetpointHoldPolicyFieldID = 0L;
-      BaseTLVType temperatureSetpointHoldPolicytlvValue = new UIntType(temperatureSetpointHoldPolicy);
-      elements.add(new StructElement(temperatureSetpointHoldPolicyFieldID, temperatureSetpointHoldPolicytlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
+          final long statusCodeFieldID = 0L;
+          Integer statusCode = null;
+          final long attributeStatusFieldID = 1L;
+          ArrayList<ChipStructs.ThermostatClusterAtomicAttributeStatusStruct> attributeStatus = null;
+          final long timeoutFieldID = 2L;
+          Optional<Integer> timeout = Optional.empty();
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == statusCodeFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                statusCode = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == attributeStatusFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+                ArrayType castingValue = element.value(ArrayType.class);
+                attributeStatus = castingValue.map((elementcastingValue) -> ChipStructs.ThermostatClusterAtomicAttributeStatusStruct.decodeTlv(elementcastingValue));
+              }
+            } else if (element.contextTagNum() == timeoutFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                timeout = Optional.of(castingValue.value(Integer.class));
+              }
+            }
+          }
+          callback.onSuccess(statusCode, attributeStatus, timeout);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface GetWeeklyScheduleResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer numberOfTransitionsForSequence, Integer dayOfWeekForSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct> transitions);
+    }
+
+    public interface AtomicResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer statusCode, ArrayList<ChipStructs.ThermostatClusterAtomicAttributeStatusStruct> attributeStatus, Optional<Integer> timeout);
     }
 
     public interface LocalTemperatureAttributeCallback extends BaseAttributeCallback {
@@ -39295,10 +39304,6 @@ public class ChipClusters {
 
     public interface SetpointHoldExpiryTimestampAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Long value);
-    }
-
-    public interface QueuedPresetAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable ChipStructs.ThermostatClusterQueuedPresetStruct value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -39501,7 +39506,7 @@ public class ChipClusters {
 
     public void readPICoolingDemandAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, P_I_COOLING_DEMAND_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PI_COOLING_DEMAND_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -39509,12 +39514,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, P_I_COOLING_DEMAND_ATTRIBUTE_ID, true);
+        }, PI_COOLING_DEMAND_ATTRIBUTE_ID, true);
     }
 
     public void subscribePICoolingDemandAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, P_I_COOLING_DEMAND_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PI_COOLING_DEMAND_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -39522,12 +39527,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, P_I_COOLING_DEMAND_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, PI_COOLING_DEMAND_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readPIHeatingDemandAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, P_I_HEATING_DEMAND_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PI_HEATING_DEMAND_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -39535,12 +39540,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, P_I_HEATING_DEMAND_ATTRIBUTE_ID, true);
+        }, PI_HEATING_DEMAND_ATTRIBUTE_ID, true);
     }
 
     public void subscribePIHeatingDemandAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, P_I_HEATING_DEMAND_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PI_HEATING_DEMAND_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -39548,12 +39553,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, P_I_HEATING_DEMAND_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, PI_HEATING_DEMAND_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readHVACSystemTypeConfigurationAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, H_V_A_C_SYSTEM_TYPE_CONFIGURATION_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HVAC_SYSTEM_TYPE_CONFIGURATION_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -39561,7 +39566,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, H_V_A_C_SYSTEM_TYPE_CONFIGURATION_ATTRIBUTE_ID, true);
+        }, HVAC_SYSTEM_TYPE_CONFIGURATION_ATTRIBUTE_ID, true);
     }
 
     public void writeHVACSystemTypeConfigurationAttribute(DefaultClusterCallback callback, Integer value) {
@@ -39570,12 +39575,12 @@ public class ChipClusters {
 
     public void writeHVACSystemTypeConfigurationAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), H_V_A_C_SYSTEM_TYPE_CONFIGURATION_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), HVAC_SYSTEM_TYPE_CONFIGURATION_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeHVACSystemTypeConfigurationAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, H_V_A_C_SYSTEM_TYPE_CONFIGURATION_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HVAC_SYSTEM_TYPE_CONFIGURATION_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -39583,7 +39588,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, H_V_A_C_SYSTEM_TYPE_CONFIGURATION_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, HVAC_SYSTEM_TYPE_CONFIGURATION_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readLocalTemperatureCalibrationAttribute(
@@ -40565,7 +40570,7 @@ public class ChipClusters {
 
     public void readACTypeAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_TYPE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_TYPE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -40573,7 +40578,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_TYPE_ATTRIBUTE_ID, true);
+        }, AC_TYPE_ATTRIBUTE_ID, true);
     }
 
     public void writeACTypeAttribute(DefaultClusterCallback callback, Integer value) {
@@ -40582,12 +40587,12 @@ public class ChipClusters {
 
     public void writeACTypeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), A_C_TYPE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), AC_TYPE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeACTypeAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_TYPE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_TYPE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -40595,12 +40600,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_TYPE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, AC_TYPE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readACCapacityAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_CAPACITY_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_CAPACITY_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -40608,7 +40613,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_CAPACITY_ATTRIBUTE_ID, true);
+        }, AC_CAPACITY_ATTRIBUTE_ID, true);
     }
 
     public void writeACCapacityAttribute(DefaultClusterCallback callback, Integer value) {
@@ -40617,12 +40622,12 @@ public class ChipClusters {
 
     public void writeACCapacityAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), A_C_CAPACITY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), AC_CAPACITY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeACCapacityAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_CAPACITY_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_CAPACITY_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -40630,12 +40635,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_CAPACITY_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, AC_CAPACITY_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readACRefrigerantTypeAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_REFRIGERANT_TYPE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_REFRIGERANT_TYPE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -40643,7 +40648,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_REFRIGERANT_TYPE_ATTRIBUTE_ID, true);
+        }, AC_REFRIGERANT_TYPE_ATTRIBUTE_ID, true);
     }
 
     public void writeACRefrigerantTypeAttribute(DefaultClusterCallback callback, Integer value) {
@@ -40652,12 +40657,12 @@ public class ChipClusters {
 
     public void writeACRefrigerantTypeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), A_C_REFRIGERANT_TYPE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), AC_REFRIGERANT_TYPE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeACRefrigerantTypeAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_REFRIGERANT_TYPE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_REFRIGERANT_TYPE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -40665,12 +40670,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_REFRIGERANT_TYPE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, AC_REFRIGERANT_TYPE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readACCompressorTypeAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_COMPRESSOR_TYPE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_COMPRESSOR_TYPE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -40678,7 +40683,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_COMPRESSOR_TYPE_ATTRIBUTE_ID, true);
+        }, AC_COMPRESSOR_TYPE_ATTRIBUTE_ID, true);
     }
 
     public void writeACCompressorTypeAttribute(DefaultClusterCallback callback, Integer value) {
@@ -40687,12 +40692,12 @@ public class ChipClusters {
 
     public void writeACCompressorTypeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), A_C_COMPRESSOR_TYPE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), AC_COMPRESSOR_TYPE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeACCompressorTypeAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_COMPRESSOR_TYPE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_COMPRESSOR_TYPE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -40700,12 +40705,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_COMPRESSOR_TYPE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, AC_COMPRESSOR_TYPE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readACErrorCodeAttribute(
         LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_ERROR_CODE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_ERROR_CODE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -40713,7 +40718,7 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_ERROR_CODE_ATTRIBUTE_ID, true);
+        }, AC_ERROR_CODE_ATTRIBUTE_ID, true);
     }
 
     public void writeACErrorCodeAttribute(DefaultClusterCallback callback, Long value) {
@@ -40722,12 +40727,12 @@ public class ChipClusters {
 
     public void writeACErrorCodeAttribute(DefaultClusterCallback callback, Long value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), A_C_ERROR_CODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), AC_ERROR_CODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeACErrorCodeAttribute(
         LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_ERROR_CODE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_ERROR_CODE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -40735,12 +40740,12 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_ERROR_CODE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, AC_ERROR_CODE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readACLouverPositionAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_LOUVER_POSITION_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_LOUVER_POSITION_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -40748,7 +40753,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_LOUVER_POSITION_ATTRIBUTE_ID, true);
+        }, AC_LOUVER_POSITION_ATTRIBUTE_ID, true);
     }
 
     public void writeACLouverPositionAttribute(DefaultClusterCallback callback, Integer value) {
@@ -40757,12 +40762,12 @@ public class ChipClusters {
 
     public void writeACLouverPositionAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), A_C_LOUVER_POSITION_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), AC_LOUVER_POSITION_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeACLouverPositionAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_LOUVER_POSITION_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_LOUVER_POSITION_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -40770,12 +40775,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_LOUVER_POSITION_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, AC_LOUVER_POSITION_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readACCoilTemperatureAttribute(
         ACCoilTemperatureAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_COIL_TEMPERATURE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_COIL_TEMPERATURE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -40783,12 +40788,12 @@ public class ChipClusters {
             @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_COIL_TEMPERATURE_ATTRIBUTE_ID, true);
+        }, AC_COIL_TEMPERATURE_ATTRIBUTE_ID, true);
     }
 
     public void subscribeACCoilTemperatureAttribute(
         ACCoilTemperatureAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_COIL_TEMPERATURE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_COIL_TEMPERATURE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -40796,12 +40801,12 @@ public class ChipClusters {
             @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_COIL_TEMPERATURE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, AC_COIL_TEMPERATURE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readACCapacityformatAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_CAPACITYFORMAT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_CAPACITYFORMAT_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -40809,7 +40814,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_CAPACITYFORMAT_ATTRIBUTE_ID, true);
+        }, AC_CAPACITYFORMAT_ATTRIBUTE_ID, true);
     }
 
     public void writeACCapacityformatAttribute(DefaultClusterCallback callback, Integer value) {
@@ -40818,12 +40823,12 @@ public class ChipClusters {
 
     public void writeACCapacityformatAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), A_C_CAPACITYFORMAT_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), AC_CAPACITYFORMAT_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeACCapacityformatAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_CAPACITYFORMAT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_CAPACITYFORMAT_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -40831,7 +40836,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_CAPACITYFORMAT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, AC_CAPACITYFORMAT_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readPresetTypesAttribute(
@@ -41112,58 +41117,6 @@ public class ChipClusters {
         }, SCHEDULES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readPresetsSchedulesEditableAttribute(
-        BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRESETS_SCHEDULES_EDITABLE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, PRESETS_SCHEDULES_EDITABLE_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribePresetsSchedulesEditableAttribute(
-        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRESETS_SCHEDULES_EDITABLE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, PRESETS_SCHEDULES_EDITABLE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readTemperatureSetpointHoldPolicyAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeTemperatureSetpointHoldPolicyAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readSetpointHoldExpiryTimestampAttribute(
         SetpointHoldExpiryTimestampAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SETPOINT_HOLD_EXPIRY_TIMESTAMP_ATTRIBUTE_ID);
@@ -41188,32 +41141,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, SETPOINT_HOLD_EXPIRY_TIMESTAMP_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readQueuedPresetAttribute(
-        QueuedPresetAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, QUEUED_PRESET_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable ChipStructs.ThermostatClusterQueuedPresetStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, QUEUED_PRESET_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeQueuedPresetAttribute(
-        QueuedPresetAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, QUEUED_PRESET_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable ChipStructs.ThermostatClusterQueuedPresetStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, QUEUED_PRESET_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -42315,14 +42242,14 @@ public class ChipClusters {
     private static final long PRIMARY6_INTENSITY_ATTRIBUTE_ID = 42L;
     private static final long WHITE_POINT_X_ATTRIBUTE_ID = 48L;
     private static final long WHITE_POINT_Y_ATTRIBUTE_ID = 49L;
-    private static final long COLOR_POINT_R_X_ATTRIBUTE_ID = 50L;
-    private static final long COLOR_POINT_R_Y_ATTRIBUTE_ID = 51L;
+    private static final long COLOR_POINT_RX_ATTRIBUTE_ID = 50L;
+    private static final long COLOR_POINT_RY_ATTRIBUTE_ID = 51L;
     private static final long COLOR_POINT_R_INTENSITY_ATTRIBUTE_ID = 52L;
-    private static final long COLOR_POINT_G_X_ATTRIBUTE_ID = 54L;
-    private static final long COLOR_POINT_G_Y_ATTRIBUTE_ID = 55L;
+    private static final long COLOR_POINT_GX_ATTRIBUTE_ID = 54L;
+    private static final long COLOR_POINT_GY_ATTRIBUTE_ID = 55L;
     private static final long COLOR_POINT_G_INTENSITY_ATTRIBUTE_ID = 56L;
-    private static final long COLOR_POINT_B_X_ATTRIBUTE_ID = 58L;
-    private static final long COLOR_POINT_B_Y_ATTRIBUTE_ID = 59L;
+    private static final long COLOR_POINT_BX_ATTRIBUTE_ID = 58L;
+    private static final long COLOR_POINT_BY_ATTRIBUTE_ID = 59L;
     private static final long COLOR_POINT_B_INTENSITY_ATTRIBUTE_ID = 60L;
     private static final long ENHANCED_CURRENT_HUE_ATTRIBUTE_ID = 16384L;
     private static final long ENHANCED_COLOR_MODE_ATTRIBUTE_ID = 16385L;
@@ -43916,7 +43843,7 @@ public class ChipClusters {
 
     public void readColorPointRXAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_R_X_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_RX_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -43924,7 +43851,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, COLOR_POINT_R_X_ATTRIBUTE_ID, true);
+        }, COLOR_POINT_RX_ATTRIBUTE_ID, true);
     }
 
     public void writeColorPointRXAttribute(DefaultClusterCallback callback, Integer value) {
@@ -43933,12 +43860,12 @@ public class ChipClusters {
 
     public void writeColorPointRXAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_R_X_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_RX_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeColorPointRXAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_R_X_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_RX_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -43946,12 +43873,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, COLOR_POINT_R_X_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, COLOR_POINT_RX_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readColorPointRYAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_R_Y_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_RY_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -43959,7 +43886,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, COLOR_POINT_R_Y_ATTRIBUTE_ID, true);
+        }, COLOR_POINT_RY_ATTRIBUTE_ID, true);
     }
 
     public void writeColorPointRYAttribute(DefaultClusterCallback callback, Integer value) {
@@ -43968,12 +43895,12 @@ public class ChipClusters {
 
     public void writeColorPointRYAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_R_Y_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_RY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeColorPointRYAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_R_Y_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_RY_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -43981,7 +43908,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, COLOR_POINT_R_Y_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, COLOR_POINT_RY_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readColorPointRIntensityAttribute(
@@ -44021,7 +43948,7 @@ public class ChipClusters {
 
     public void readColorPointGXAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_G_X_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_GX_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -44029,7 +43956,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, COLOR_POINT_G_X_ATTRIBUTE_ID, true);
+        }, COLOR_POINT_GX_ATTRIBUTE_ID, true);
     }
 
     public void writeColorPointGXAttribute(DefaultClusterCallback callback, Integer value) {
@@ -44038,12 +43965,12 @@ public class ChipClusters {
 
     public void writeColorPointGXAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_G_X_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_GX_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeColorPointGXAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_G_X_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_GX_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -44051,12 +43978,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, COLOR_POINT_G_X_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, COLOR_POINT_GX_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readColorPointGYAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_G_Y_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_GY_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -44064,7 +43991,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, COLOR_POINT_G_Y_ATTRIBUTE_ID, true);
+        }, COLOR_POINT_GY_ATTRIBUTE_ID, true);
     }
 
     public void writeColorPointGYAttribute(DefaultClusterCallback callback, Integer value) {
@@ -44073,12 +44000,12 @@ public class ChipClusters {
 
     public void writeColorPointGYAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_G_Y_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_GY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeColorPointGYAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_G_Y_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_GY_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -44086,7 +44013,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, COLOR_POINT_G_Y_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, COLOR_POINT_GY_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readColorPointGIntensityAttribute(
@@ -44126,7 +44053,7 @@ public class ChipClusters {
 
     public void readColorPointBXAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_B_X_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_BX_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -44134,7 +44061,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, COLOR_POINT_B_X_ATTRIBUTE_ID, true);
+        }, COLOR_POINT_BX_ATTRIBUTE_ID, true);
     }
 
     public void writeColorPointBXAttribute(DefaultClusterCallback callback, Integer value) {
@@ -44143,12 +44070,12 @@ public class ChipClusters {
 
     public void writeColorPointBXAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_B_X_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_BX_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeColorPointBXAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_B_X_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_BX_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -44156,12 +44083,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, COLOR_POINT_B_X_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, COLOR_POINT_BX_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readColorPointBYAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_B_Y_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_BY_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -44169,7 +44096,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, COLOR_POINT_B_Y_ATTRIBUTE_ID, true);
+        }, COLOR_POINT_BY_ATTRIBUTE_ID, true);
     }
 
     public void writeColorPointBYAttribute(DefaultClusterCallback callback, Integer value) {
@@ -44178,12 +44105,12 @@ public class ChipClusters {
 
     public void writeColorPointBYAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_B_Y_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_BY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeColorPointBYAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_B_Y_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_BY_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -44191,7 +44118,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, COLOR_POINT_B_Y_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, COLOR_POINT_BY_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readColorPointBIntensityAttribute(
@@ -47137,9 +47064,11 @@ public class ChipClusters {
     private static final long OCCUPANCY_ATTRIBUTE_ID = 0L;
     private static final long OCCUPANCY_SENSOR_TYPE_ATTRIBUTE_ID = 1L;
     private static final long OCCUPANCY_SENSOR_TYPE_BITMAP_ATTRIBUTE_ID = 2L;
-    private static final long P_I_R_OCCUPIED_TO_UNOCCUPIED_DELAY_ATTRIBUTE_ID = 16L;
-    private static final long P_I_R_UNOCCUPIED_TO_OCCUPIED_DELAY_ATTRIBUTE_ID = 17L;
-    private static final long P_I_R_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ATTRIBUTE_ID = 18L;
+    private static final long HOLD_TIME_ATTRIBUTE_ID = 3L;
+    private static final long HOLD_TIME_LIMITS_ATTRIBUTE_ID = 4L;
+    private static final long PIR_OCCUPIED_TO_UNOCCUPIED_DELAY_ATTRIBUTE_ID = 16L;
+    private static final long PIR_UNOCCUPIED_TO_OCCUPIED_DELAY_ATTRIBUTE_ID = 17L;
+    private static final long PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ATTRIBUTE_ID = 18L;
     private static final long ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY_ATTRIBUTE_ID = 32L;
     private static final long ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY_ATTRIBUTE_ID = 33L;
     private static final long ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ATTRIBUTE_ID = 34L;
@@ -47161,6 +47090,10 @@ public class ChipClusters {
     @Deprecated
     public long initWithDevice(long devicePtr, int endpointId) {
       return 0L;
+    }
+
+    public interface HoldTimeLimitsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(ChipStructs.OccupancySensingClusterHoldTimeLimitsStruct value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -47257,9 +47190,9 @@ public class ChipClusters {
         }, OCCUPANCY_SENSOR_TYPE_BITMAP_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readPIROccupiedToUnoccupiedDelayAttribute(
+    public void readHoldTimeAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, P_I_R_OCCUPIED_TO_UNOCCUPIED_DELAY_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HOLD_TIME_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -47267,7 +47200,68 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, P_I_R_OCCUPIED_TO_UNOCCUPIED_DELAY_ATTRIBUTE_ID, true);
+        }, HOLD_TIME_ATTRIBUTE_ID, true);
+    }
+
+    public void writeHoldTimeAttribute(DefaultClusterCallback callback, Integer value) {
+      writeHoldTimeAttribute(callback, value, 0);
+    }
+
+    public void writeHoldTimeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), HOLD_TIME_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeHoldTimeAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HOLD_TIME_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, HOLD_TIME_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readHoldTimeLimitsAttribute(
+        HoldTimeLimitsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HOLD_TIME_LIMITS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.OccupancySensingClusterHoldTimeLimitsStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, HOLD_TIME_LIMITS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeHoldTimeLimitsAttribute(
+        HoldTimeLimitsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HOLD_TIME_LIMITS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.OccupancySensingClusterHoldTimeLimitsStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, HOLD_TIME_LIMITS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readPIROccupiedToUnoccupiedDelayAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PIR_OCCUPIED_TO_UNOCCUPIED_DELAY_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PIR_OCCUPIED_TO_UNOCCUPIED_DELAY_ATTRIBUTE_ID, true);
     }
 
     public void writePIROccupiedToUnoccupiedDelayAttribute(DefaultClusterCallback callback, Integer value) {
@@ -47276,12 +47270,12 @@ public class ChipClusters {
 
     public void writePIROccupiedToUnoccupiedDelayAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), P_I_R_OCCUPIED_TO_UNOCCUPIED_DELAY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), PIR_OCCUPIED_TO_UNOCCUPIED_DELAY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribePIROccupiedToUnoccupiedDelayAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, P_I_R_OCCUPIED_TO_UNOCCUPIED_DELAY_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PIR_OCCUPIED_TO_UNOCCUPIED_DELAY_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -47289,12 +47283,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, P_I_R_OCCUPIED_TO_UNOCCUPIED_DELAY_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, PIR_OCCUPIED_TO_UNOCCUPIED_DELAY_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readPIRUnoccupiedToOccupiedDelayAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, P_I_R_UNOCCUPIED_TO_OCCUPIED_DELAY_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PIR_UNOCCUPIED_TO_OCCUPIED_DELAY_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -47302,7 +47296,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, P_I_R_UNOCCUPIED_TO_OCCUPIED_DELAY_ATTRIBUTE_ID, true);
+        }, PIR_UNOCCUPIED_TO_OCCUPIED_DELAY_ATTRIBUTE_ID, true);
     }
 
     public void writePIRUnoccupiedToOccupiedDelayAttribute(DefaultClusterCallback callback, Integer value) {
@@ -47311,12 +47305,12 @@ public class ChipClusters {
 
     public void writePIRUnoccupiedToOccupiedDelayAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), P_I_R_UNOCCUPIED_TO_OCCUPIED_DELAY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), PIR_UNOCCUPIED_TO_OCCUPIED_DELAY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribePIRUnoccupiedToOccupiedDelayAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, P_I_R_UNOCCUPIED_TO_OCCUPIED_DELAY_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PIR_UNOCCUPIED_TO_OCCUPIED_DELAY_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -47324,12 +47318,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, P_I_R_UNOCCUPIED_TO_OCCUPIED_DELAY_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, PIR_UNOCCUPIED_TO_OCCUPIED_DELAY_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readPIRUnoccupiedToOccupiedThresholdAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, P_I_R_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -47337,7 +47331,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, P_I_R_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ATTRIBUTE_ID, true);
+        }, PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ATTRIBUTE_ID, true);
     }
 
     public void writePIRUnoccupiedToOccupiedThresholdAttribute(DefaultClusterCallback callback, Integer value) {
@@ -47346,12 +47340,12 @@ public class ChipClusters {
 
     public void writePIRUnoccupiedToOccupiedThresholdAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), P_I_R_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribePIRUnoccupiedToOccupiedThresholdAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, P_I_R_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -47359,7 +47353,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, P_I_R_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readUltrasonicOccupiedToUnoccupiedDelayAttribute(
@@ -52832,7 +52826,8 @@ public class ChipClusters {
   public static class WiFiNetworkManagementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1105L;
 
-    private static final long SSID_ATTRIBUTE_ID = 1L;
+    private static final long SSID_ATTRIBUTE_ID = 0L;
+    private static final long PASSPHRASE_SURROGATE_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -52884,6 +52879,10 @@ public class ChipClusters {
       void onSuccess(@Nullable byte[] value);
     }
 
+    public interface PassphraseSurrogateAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Long value);
+    }
+
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -52924,6 +52923,495 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, SSID_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readPassphraseSurrogateAttribute(
+        PassphraseSurrogateAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PASSPHRASE_SURROGATE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PASSPHRASE_SURROGATE_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribePassphraseSurrogateAttribute(
+        PassphraseSurrogateAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PASSPHRASE_SURROGATE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PASSPHRASE_SURROGATE_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(
+        EventListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(
+        AttributeListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+  }
+
+  public static class ThreadBorderRouterManagementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1106L;
+
+    private static final long BORDER_ROUTER_NAME_ATTRIBUTE_ID = 0L;
+    private static final long BORDER_AGENT_ID_ATTRIBUTE_ID = 1L;
+    private static final long THREAD_VERSION_ATTRIBUTE_ID = 2L;
+    private static final long INTERFACE_ENABLED_ATTRIBUTE_ID = 3L;
+    private static final long ACTIVE_DATASET_TIMESTAMP_ATTRIBUTE_ID = 4L;
+    private static final long PENDING_DATASET_TIMESTAMP_ATTRIBUTE_ID = 5L;
+    private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
+    private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
+    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
+    private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
+    private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
+    private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
+
+    public ThreadBorderRouterManagementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId, CLUSTER_ID);
+    }
+
+    @Override
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
+
+    public void getActiveDatasetRequest(DatasetResponseCallback callback) {
+      getActiveDatasetRequest(callback, 0);
+    }
+
+    public void getActiveDatasetRequest(DatasetResponseCallback callback, int timedInvokeTimeoutMs) {
+      final long commandId = 0L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long datasetFieldID = 0L;
+          byte[] dataset = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == datasetFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                dataset = castingValue.value(byte[].class);
+              }
+            }
+          }
+          callback.onSuccess(dataset);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void getPendingDatasetRequest(DatasetResponseCallback callback) {
+      getPendingDatasetRequest(callback, 0);
+    }
+
+    public void getPendingDatasetRequest(DatasetResponseCallback callback, int timedInvokeTimeoutMs) {
+      final long commandId = 1L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long datasetFieldID = 0L;
+          byte[] dataset = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == datasetFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                dataset = castingValue.value(byte[].class);
+              }
+            }
+          }
+          callback.onSuccess(dataset);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void setActiveDatasetRequest(DefaultClusterCallback callback, byte[] activeDataset, Optional<Long> breadcrumb) {
+      setActiveDatasetRequest(callback, activeDataset, breadcrumb, 0);
+    }
+
+    public void setActiveDatasetRequest(DefaultClusterCallback callback, byte[] activeDataset, Optional<Long> breadcrumb, int timedInvokeTimeoutMs) {
+      final long commandId = 3L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long activeDatasetFieldID = 0L;
+      BaseTLVType activeDatasettlvValue = new ByteArrayType(activeDataset);
+      elements.add(new StructElement(activeDatasetFieldID, activeDatasettlvValue));
+
+      final long breadcrumbFieldID = 1L;
+      BaseTLVType breadcrumbtlvValue = breadcrumb.<BaseTLVType>map((nonOptionalbreadcrumb) -> new UIntType(nonOptionalbreadcrumb)).orElse(new EmptyType());
+      elements.add(new StructElement(breadcrumbFieldID, breadcrumbtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void setPendingDatasetRequest(DefaultClusterCallback callback, byte[] pendingDataset) {
+      setPendingDatasetRequest(callback, pendingDataset, 0);
+    }
+
+    public void setPendingDatasetRequest(DefaultClusterCallback callback, byte[] pendingDataset, int timedInvokeTimeoutMs) {
+      final long commandId = 4L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long pendingDatasetFieldID = 0L;
+      BaseTLVType pendingDatasettlvValue = new ByteArrayType(pendingDataset);
+      elements.add(new StructElement(pendingDatasetFieldID, pendingDatasettlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface DatasetResponseCallback extends BaseClusterCallback {
+      void onSuccess(byte[] dataset);
+    }
+
+    public interface ActiveDatasetTimestampAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Long value);
+    }
+
+    public interface PendingDatasetTimestampAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Long value);
+    }
+
+    public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface EventListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AttributeListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public void readBorderRouterNameAttribute(
+        CharStringAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BORDER_ROUTER_NAME_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BORDER_ROUTER_NAME_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeBorderRouterNameAttribute(
+        CharStringAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BORDER_ROUTER_NAME_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BORDER_ROUTER_NAME_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readBorderAgentIDAttribute(
+        OctetStringAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BORDER_AGENT_ID_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BORDER_AGENT_ID_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeBorderAgentIDAttribute(
+        OctetStringAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BORDER_AGENT_ID_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BORDER_AGENT_ID_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readThreadVersionAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, THREAD_VERSION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, THREAD_VERSION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeThreadVersionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, THREAD_VERSION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, THREAD_VERSION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readInterfaceEnabledAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INTERFACE_ENABLED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, INTERFACE_ENABLED_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeInterfaceEnabledAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INTERFACE_ENABLED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, INTERFACE_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readActiveDatasetTimestampAttribute(
+        ActiveDatasetTimestampAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_DATASET_TIMESTAMP_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACTIVE_DATASET_TIMESTAMP_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeActiveDatasetTimestampAttribute(
+        ActiveDatasetTimestampAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_DATASET_TIMESTAMP_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACTIVE_DATASET_TIMESTAMP_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readPendingDatasetTimestampAttribute(
+        PendingDatasetTimestampAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PENDING_DATASET_TIMESTAMP_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PENDING_DATASET_TIMESTAMP_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribePendingDatasetTimestampAttribute(
+        PendingDatasetTimestampAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PENDING_DATASET_TIMESTAMP_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PENDING_DATASET_TIMESTAMP_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -53086,7 +53574,7 @@ public class ChipClusters {
   public static class ThreadNetworkDirectoryCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1107L;
 
-    private static final long PREFERRED_EXTENDED_PAN_I_D_ATTRIBUTE_ID = 0L;
+    private static final long PREFERRED_EXTENDED_PAN_ID_ATTRIBUTE_ID = 0L;
     private static final long THREAD_NETWORKS_ATTRIBUTE_ID = 1L;
     private static final long THREAD_NETWORK_TABLE_SIZE_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
@@ -53124,12 +53612,12 @@ public class ChipClusters {
     }
 
 
-    public void removeNetwork(DefaultClusterCallback callback, Long extendedPanID, int timedInvokeTimeoutMs) {
+    public void removeNetwork(DefaultClusterCallback callback, byte[] extendedPanID, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long extendedPanIDFieldID = 0L;
-      BaseTLVType extendedPanIDtlvValue = new UIntType(extendedPanID);
+      BaseTLVType extendedPanIDtlvValue = new ByteArrayType(extendedPanID);
       elements.add(new StructElement(extendedPanIDFieldID, extendedPanIDtlvValue));
 
       StructType commandArgs = new StructType(elements);
@@ -53140,13 +53628,16 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void getOperationalDataset(OperationalDatasetResponseCallback callback, byte[] extendedPanID) {
+      getOperationalDataset(callback, extendedPanID, 0);
+    }
 
-    public void getOperationalDataset(OperationalDatasetResponseCallback callback, Long extendedPanID, int timedInvokeTimeoutMs) {
+    public void getOperationalDataset(OperationalDatasetResponseCallback callback, byte[] extendedPanID, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long extendedPanIDFieldID = 0L;
-      BaseTLVType extendedPanIDtlvValue = new UIntType(extendedPanID);
+      BaseTLVType extendedPanIDtlvValue = new ByteArrayType(extendedPanID);
       elements.add(new StructElement(extendedPanIDFieldID, extendedPanIDtlvValue));
 
       StructType commandArgs = new StructType(elements);
@@ -53172,7 +53663,7 @@ public class ChipClusters {
     }
 
     public interface PreferredExtendedPanIDAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Long value);
+      void onSuccess(@Nullable byte[] value);
     }
 
     public interface ThreadNetworksAttributeCallback extends BaseAttributeCallback {
@@ -53197,37 +53688,37 @@ public class ChipClusters {
 
     public void readPreferredExtendedPanIDAttribute(
         PreferredExtendedPanIDAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PREFERRED_EXTENDED_PAN_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PREFERRED_EXTENDED_PAN_ID_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PREFERRED_EXTENDED_PAN_I_D_ATTRIBUTE_ID, true);
+        }, PREFERRED_EXTENDED_PAN_ID_ATTRIBUTE_ID, true);
     }
 
-    public void writePreferredExtendedPanIDAttribute(DefaultClusterCallback callback, Long value) {
+    public void writePreferredExtendedPanIDAttribute(DefaultClusterCallback callback, byte[] value) {
       writePreferredExtendedPanIDAttribute(callback, value, 0);
     }
 
-    public void writePreferredExtendedPanIDAttribute(DefaultClusterCallback callback, Long value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), PREFERRED_EXTENDED_PAN_I_D_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    public void writePreferredExtendedPanIDAttribute(DefaultClusterCallback callback, byte[] value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = value != null ? new ByteArrayType(value) : new NullType();
+      writeAttribute(new WriteAttributesCallbackImpl(callback), PREFERRED_EXTENDED_PAN_ID_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribePreferredExtendedPanIDAttribute(
         PreferredExtendedPanIDAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PREFERRED_EXTENDED_PAN_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PREFERRED_EXTENDED_PAN_ID_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PREFERRED_EXTENDED_PAN_I_D_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, PREFERRED_EXTENDED_PAN_ID_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readThreadNetworksAttribute(
@@ -53442,7 +53933,7 @@ public class ChipClusters {
   public static class WakeOnLanCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1283L;
 
-    private static final long M_A_C_ADDRESS_ATTRIBUTE_ID = 0L;
+    private static final long MAC_ADDRESS_ATTRIBUTE_ID = 0L;
     private static final long LINK_LOCAL_ADDRESS_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
@@ -53479,7 +53970,7 @@ public class ChipClusters {
 
     public void readMACAddressAttribute(
         CharStringAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, M_A_C_ADDRESS_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAC_ADDRESS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -53487,12 +53978,12 @@ public class ChipClusters {
             String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, M_A_C_ADDRESS_ATTRIBUTE_ID, true);
+        }, MAC_ADDRESS_ATTRIBUTE_ID, true);
     }
 
     public void subscribeMACAddressAttribute(
         CharStringAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, M_A_C_ADDRESS_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAC_ADDRESS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -53500,7 +53991,7 @@ public class ChipClusters {
             String value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, M_A_C_ADDRESS_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MAC_ADDRESS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readLinkLocalAddressAttribute(
@@ -57244,9 +57735,9 @@ public class ChipClusters {
     public static final long CLUSTER_ID = 1293L;
 
     private static final long VENDOR_NAME_ATTRIBUTE_ID = 0L;
-    private static final long VENDOR_I_D_ATTRIBUTE_ID = 1L;
+    private static final long VENDOR_ID_ATTRIBUTE_ID = 1L;
     private static final long APPLICATION_NAME_ATTRIBUTE_ID = 2L;
-    private static final long PRODUCT_I_D_ATTRIBUTE_ID = 3L;
+    private static final long PRODUCT_ID_ATTRIBUTE_ID = 3L;
     private static final long APPLICATION_ATTRIBUTE_ID = 4L;
     private static final long STATUS_ATTRIBUTE_ID = 5L;
     private static final long APPLICATION_VERSION_ATTRIBUTE_ID = 6L;
@@ -57320,7 +57811,7 @@ public class ChipClusters {
 
     public void readVendorIDAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VENDOR_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VENDOR_ID_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -57328,12 +57819,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, VENDOR_I_D_ATTRIBUTE_ID, true);
+        }, VENDOR_ID_ATTRIBUTE_ID, true);
     }
 
     public void subscribeVendorIDAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VENDOR_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VENDOR_ID_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -57341,7 +57832,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, VENDOR_I_D_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, VENDOR_ID_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readApplicationNameAttribute(
@@ -57372,7 +57863,7 @@ public class ChipClusters {
 
     public void readProductIDAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_ID_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -57380,12 +57871,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PRODUCT_I_D_ATTRIBUTE_ID, true);
+        }, PRODUCT_ID_ATTRIBUTE_ID, true);
     }
 
     public void subscribeProductIDAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_I_D_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_ID_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -57393,7 +57884,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PRODUCT_I_D_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, PRODUCT_ID_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readApplicationAttribute(
@@ -58787,137 +59278,13 @@ public class ChipClusters {
     }
   }
 
-  public static class ElectricalMeasurementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 2820L;
+  public static class ZoneManagementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1360L;
 
-    private static final long MEASUREMENT_TYPE_ATTRIBUTE_ID = 0L;
-    private static final long DC_VOLTAGE_ATTRIBUTE_ID = 256L;
-    private static final long DC_VOLTAGE_MIN_ATTRIBUTE_ID = 257L;
-    private static final long DC_VOLTAGE_MAX_ATTRIBUTE_ID = 258L;
-    private static final long DC_CURRENT_ATTRIBUTE_ID = 259L;
-    private static final long DC_CURRENT_MIN_ATTRIBUTE_ID = 260L;
-    private static final long DC_CURRENT_MAX_ATTRIBUTE_ID = 261L;
-    private static final long DC_POWER_ATTRIBUTE_ID = 262L;
-    private static final long DC_POWER_MIN_ATTRIBUTE_ID = 263L;
-    private static final long DC_POWER_MAX_ATTRIBUTE_ID = 264L;
-    private static final long DC_VOLTAGE_MULTIPLIER_ATTRIBUTE_ID = 512L;
-    private static final long DC_VOLTAGE_DIVISOR_ATTRIBUTE_ID = 513L;
-    private static final long DC_CURRENT_MULTIPLIER_ATTRIBUTE_ID = 514L;
-    private static final long DC_CURRENT_DIVISOR_ATTRIBUTE_ID = 515L;
-    private static final long DC_POWER_MULTIPLIER_ATTRIBUTE_ID = 516L;
-    private static final long DC_POWER_DIVISOR_ATTRIBUTE_ID = 517L;
-    private static final long AC_FREQUENCY_ATTRIBUTE_ID = 768L;
-    private static final long AC_FREQUENCY_MIN_ATTRIBUTE_ID = 769L;
-    private static final long AC_FREQUENCY_MAX_ATTRIBUTE_ID = 770L;
-    private static final long NEUTRAL_CURRENT_ATTRIBUTE_ID = 771L;
-    private static final long TOTAL_ACTIVE_POWER_ATTRIBUTE_ID = 772L;
-    private static final long TOTAL_REACTIVE_POWER_ATTRIBUTE_ID = 773L;
-    private static final long TOTAL_APPARENT_POWER_ATTRIBUTE_ID = 774L;
-    private static final long MEASURED1ST_HARMONIC_CURRENT_ATTRIBUTE_ID = 775L;
-    private static final long MEASURED3RD_HARMONIC_CURRENT_ATTRIBUTE_ID = 776L;
-    private static final long MEASURED5TH_HARMONIC_CURRENT_ATTRIBUTE_ID = 777L;
-    private static final long MEASURED7TH_HARMONIC_CURRENT_ATTRIBUTE_ID = 778L;
-    private static final long MEASURED9TH_HARMONIC_CURRENT_ATTRIBUTE_ID = 779L;
-    private static final long MEASURED11TH_HARMONIC_CURRENT_ATTRIBUTE_ID = 780L;
-    private static final long MEASURED_PHASE1ST_HARMONIC_CURRENT_ATTRIBUTE_ID = 781L;
-    private static final long MEASURED_PHASE3RD_HARMONIC_CURRENT_ATTRIBUTE_ID = 782L;
-    private static final long MEASURED_PHASE5TH_HARMONIC_CURRENT_ATTRIBUTE_ID = 783L;
-    private static final long MEASURED_PHASE7TH_HARMONIC_CURRENT_ATTRIBUTE_ID = 784L;
-    private static final long MEASURED_PHASE9TH_HARMONIC_CURRENT_ATTRIBUTE_ID = 785L;
-    private static final long MEASURED_PHASE11TH_HARMONIC_CURRENT_ATTRIBUTE_ID = 786L;
-    private static final long AC_FREQUENCY_MULTIPLIER_ATTRIBUTE_ID = 1024L;
-    private static final long AC_FREQUENCY_DIVISOR_ATTRIBUTE_ID = 1025L;
-    private static final long POWER_MULTIPLIER_ATTRIBUTE_ID = 1026L;
-    private static final long POWER_DIVISOR_ATTRIBUTE_ID = 1027L;
-    private static final long HARMONIC_CURRENT_MULTIPLIER_ATTRIBUTE_ID = 1028L;
-    private static final long PHASE_HARMONIC_CURRENT_MULTIPLIER_ATTRIBUTE_ID = 1029L;
-    private static final long INSTANTANEOUS_VOLTAGE_ATTRIBUTE_ID = 1280L;
-    private static final long INSTANTANEOUS_LINE_CURRENT_ATTRIBUTE_ID = 1281L;
-    private static final long INSTANTANEOUS_ACTIVE_CURRENT_ATTRIBUTE_ID = 1282L;
-    private static final long INSTANTANEOUS_REACTIVE_CURRENT_ATTRIBUTE_ID = 1283L;
-    private static final long INSTANTANEOUS_POWER_ATTRIBUTE_ID = 1284L;
-    private static final long RMS_VOLTAGE_ATTRIBUTE_ID = 1285L;
-    private static final long RMS_VOLTAGE_MIN_ATTRIBUTE_ID = 1286L;
-    private static final long RMS_VOLTAGE_MAX_ATTRIBUTE_ID = 1287L;
-    private static final long RMS_CURRENT_ATTRIBUTE_ID = 1288L;
-    private static final long RMS_CURRENT_MIN_ATTRIBUTE_ID = 1289L;
-    private static final long RMS_CURRENT_MAX_ATTRIBUTE_ID = 1290L;
-    private static final long ACTIVE_POWER_ATTRIBUTE_ID = 1291L;
-    private static final long ACTIVE_POWER_MIN_ATTRIBUTE_ID = 1292L;
-    private static final long ACTIVE_POWER_MAX_ATTRIBUTE_ID = 1293L;
-    private static final long REACTIVE_POWER_ATTRIBUTE_ID = 1294L;
-    private static final long APPARENT_POWER_ATTRIBUTE_ID = 1295L;
-    private static final long POWER_FACTOR_ATTRIBUTE_ID = 1296L;
-    private static final long AVERAGE_RMS_VOLTAGE_MEASUREMENT_PERIOD_ATTRIBUTE_ID = 1297L;
-    private static final long AVERAGE_RMS_UNDER_VOLTAGE_COUNTER_ATTRIBUTE_ID = 1299L;
-    private static final long RMS_EXTREME_OVER_VOLTAGE_PERIOD_ATTRIBUTE_ID = 1300L;
-    private static final long RMS_EXTREME_UNDER_VOLTAGE_PERIOD_ATTRIBUTE_ID = 1301L;
-    private static final long RMS_VOLTAGE_SAG_PERIOD_ATTRIBUTE_ID = 1302L;
-    private static final long RMS_VOLTAGE_SWELL_PERIOD_ATTRIBUTE_ID = 1303L;
-    private static final long AC_VOLTAGE_MULTIPLIER_ATTRIBUTE_ID = 1536L;
-    private static final long AC_VOLTAGE_DIVISOR_ATTRIBUTE_ID = 1537L;
-    private static final long AC_CURRENT_MULTIPLIER_ATTRIBUTE_ID = 1538L;
-    private static final long AC_CURRENT_DIVISOR_ATTRIBUTE_ID = 1539L;
-    private static final long AC_POWER_MULTIPLIER_ATTRIBUTE_ID = 1540L;
-    private static final long AC_POWER_DIVISOR_ATTRIBUTE_ID = 1541L;
-    private static final long OVERLOAD_ALARMS_MASK_ATTRIBUTE_ID = 1792L;
-    private static final long VOLTAGE_OVERLOAD_ATTRIBUTE_ID = 1793L;
-    private static final long CURRENT_OVERLOAD_ATTRIBUTE_ID = 1794L;
-    private static final long AC_OVERLOAD_ALARMS_MASK_ATTRIBUTE_ID = 2048L;
-    private static final long AC_VOLTAGE_OVERLOAD_ATTRIBUTE_ID = 2049L;
-    private static final long AC_CURRENT_OVERLOAD_ATTRIBUTE_ID = 2050L;
-    private static final long AC_ACTIVE_POWER_OVERLOAD_ATTRIBUTE_ID = 2051L;
-    private static final long AC_REACTIVE_POWER_OVERLOAD_ATTRIBUTE_ID = 2052L;
-    private static final long AVERAGE_RMS_OVER_VOLTAGE_ATTRIBUTE_ID = 2053L;
-    private static final long AVERAGE_RMS_UNDER_VOLTAGE_ATTRIBUTE_ID = 2054L;
-    private static final long RMS_EXTREME_OVER_VOLTAGE_ATTRIBUTE_ID = 2055L;
-    private static final long RMS_EXTREME_UNDER_VOLTAGE_ATTRIBUTE_ID = 2056L;
-    private static final long RMS_VOLTAGE_SAG_ATTRIBUTE_ID = 2057L;
-    private static final long RMS_VOLTAGE_SWELL_ATTRIBUTE_ID = 2058L;
-    private static final long LINE_CURRENT_PHASE_B_ATTRIBUTE_ID = 2305L;
-    private static final long ACTIVE_CURRENT_PHASE_B_ATTRIBUTE_ID = 2306L;
-    private static final long REACTIVE_CURRENT_PHASE_B_ATTRIBUTE_ID = 2307L;
-    private static final long RMS_VOLTAGE_PHASE_B_ATTRIBUTE_ID = 2309L;
-    private static final long RMS_VOLTAGE_MIN_PHASE_B_ATTRIBUTE_ID = 2310L;
-    private static final long RMS_VOLTAGE_MAX_PHASE_B_ATTRIBUTE_ID = 2311L;
-    private static final long RMS_CURRENT_PHASE_B_ATTRIBUTE_ID = 2312L;
-    private static final long RMS_CURRENT_MIN_PHASE_B_ATTRIBUTE_ID = 2313L;
-    private static final long RMS_CURRENT_MAX_PHASE_B_ATTRIBUTE_ID = 2314L;
-    private static final long ACTIVE_POWER_PHASE_B_ATTRIBUTE_ID = 2315L;
-    private static final long ACTIVE_POWER_MIN_PHASE_B_ATTRIBUTE_ID = 2316L;
-    private static final long ACTIVE_POWER_MAX_PHASE_B_ATTRIBUTE_ID = 2317L;
-    private static final long REACTIVE_POWER_PHASE_B_ATTRIBUTE_ID = 2318L;
-    private static final long APPARENT_POWER_PHASE_B_ATTRIBUTE_ID = 2319L;
-    private static final long POWER_FACTOR_PHASE_B_ATTRIBUTE_ID = 2320L;
-    private static final long AVERAGE_RMS_VOLTAGE_MEASUREMENT_PERIOD_PHASE_B_ATTRIBUTE_ID = 2321L;
-    private static final long AVERAGE_RMS_OVER_VOLTAGE_COUNTER_PHASE_B_ATTRIBUTE_ID = 2322L;
-    private static final long AVERAGE_RMS_UNDER_VOLTAGE_COUNTER_PHASE_B_ATTRIBUTE_ID = 2323L;
-    private static final long RMS_EXTREME_OVER_VOLTAGE_PERIOD_PHASE_B_ATTRIBUTE_ID = 2324L;
-    private static final long RMS_EXTREME_UNDER_VOLTAGE_PERIOD_PHASE_B_ATTRIBUTE_ID = 2325L;
-    private static final long RMS_VOLTAGE_SAG_PERIOD_PHASE_B_ATTRIBUTE_ID = 2326L;
-    private static final long RMS_VOLTAGE_SWELL_PERIOD_PHASE_B_ATTRIBUTE_ID = 2327L;
-    private static final long LINE_CURRENT_PHASE_C_ATTRIBUTE_ID = 2561L;
-    private static final long ACTIVE_CURRENT_PHASE_C_ATTRIBUTE_ID = 2562L;
-    private static final long REACTIVE_CURRENT_PHASE_C_ATTRIBUTE_ID = 2563L;
-    private static final long RMS_VOLTAGE_PHASE_C_ATTRIBUTE_ID = 2565L;
-    private static final long RMS_VOLTAGE_MIN_PHASE_C_ATTRIBUTE_ID = 2566L;
-    private static final long RMS_VOLTAGE_MAX_PHASE_C_ATTRIBUTE_ID = 2567L;
-    private static final long RMS_CURRENT_PHASE_C_ATTRIBUTE_ID = 2568L;
-    private static final long RMS_CURRENT_MIN_PHASE_C_ATTRIBUTE_ID = 2569L;
-    private static final long RMS_CURRENT_MAX_PHASE_C_ATTRIBUTE_ID = 2570L;
-    private static final long ACTIVE_POWER_PHASE_C_ATTRIBUTE_ID = 2571L;
-    private static final long ACTIVE_POWER_MIN_PHASE_C_ATTRIBUTE_ID = 2572L;
-    private static final long ACTIVE_POWER_MAX_PHASE_C_ATTRIBUTE_ID = 2573L;
-    private static final long REACTIVE_POWER_PHASE_C_ATTRIBUTE_ID = 2574L;
-    private static final long APPARENT_POWER_PHASE_C_ATTRIBUTE_ID = 2575L;
-    private static final long POWER_FACTOR_PHASE_C_ATTRIBUTE_ID = 2576L;
-    private static final long AVERAGE_RMS_VOLTAGE_MEASUREMENT_PERIOD_PHASE_C_ATTRIBUTE_ID = 2577L;
-    private static final long AVERAGE_RMS_OVER_VOLTAGE_COUNTER_PHASE_C_ATTRIBUTE_ID = 2578L;
-    private static final long AVERAGE_RMS_UNDER_VOLTAGE_COUNTER_PHASE_C_ATTRIBUTE_ID = 2579L;
-    private static final long RMS_EXTREME_OVER_VOLTAGE_PERIOD_PHASE_C_ATTRIBUTE_ID = 2580L;
-    private static final long RMS_EXTREME_UNDER_VOLTAGE_PERIOD_PHASE_C_ATTRIBUTE_ID = 2581L;
-    private static final long RMS_VOLTAGE_SAG_PERIOD_PHASE_C_ATTRIBUTE_ID = 2582L;
-    private static final long RMS_VOLTAGE_SWELL_PERIOD_PHASE_C_ATTRIBUTE_ID = 2583L;
+    private static final long SUPPORTED_ZONE_SOURCES_ATTRIBUTE_ID = 0L;
+    private static final long ZONES_ATTRIBUTE_ID = 1L;
+    private static final long TIME_CONTROL_ATTRIBUTE_ID = 2L;
+    private static final long SENSITIVITY_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -58925,7 +59292,7 @@ public class ChipClusters {
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
 
-    public ElectricalMeasurementCluster(long devicePtr, int endpointId) {
+    public ZoneManagementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId, CLUSTER_ID);
     }
 
@@ -58935,41 +59302,51 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void getProfileInfoCommand(DefaultClusterCallback callback) {
-      getProfileInfoCommand(callback, 0);
+    public void createTwoDCartesianZone(CreateTwoDCartesianZoneResponseCallback callback, ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct zone) {
+      createTwoDCartesianZone(callback, zone, 0);
     }
 
-    public void getProfileInfoCommand(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
+    public void createTwoDCartesianZone(CreateTwoDCartesianZoneResponseCallback callback, ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct zone, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
+      final long zoneFieldID = 0L;
+      BaseTLVType zonetlvValue = zone.encodeTlv();
+      elements.add(new StructElement(zoneFieldID, zonetlvValue));
+
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
+          final long zoneIDFieldID = 0L;
+          Integer zoneID = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == zoneIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                zoneID = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(zoneID);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void getMeasurementProfileCommand(DefaultClusterCallback callback, Integer attributeId, Long startTime, Integer numberOfIntervals) {
-      getMeasurementProfileCommand(callback, attributeId, startTime, numberOfIntervals, 0);
+    public void updateTwoDCartesianZone(DefaultClusterCallback callback, Integer zoneID, ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct zone) {
+      updateTwoDCartesianZone(callback, zoneID, zone, 0);
     }
 
-    public void getMeasurementProfileCommand(DefaultClusterCallback callback, Integer attributeId, Long startTime, Integer numberOfIntervals, int timedInvokeTimeoutMs) {
-      final long commandId = 1L;
+    public void updateTwoDCartesianZone(DefaultClusterCallback callback, Integer zoneID, ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct zone, int timedInvokeTimeoutMs) {
+      final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long attributeIdFieldID = 0L;
-      BaseTLVType attributeIdtlvValue = new UIntType(attributeId);
-      elements.add(new StructElement(attributeIdFieldID, attributeIdtlvValue));
+      final long zoneIDFieldID = 0L;
+      BaseTLVType zoneIDtlvValue = new UIntType(zoneID);
+      elements.add(new StructElement(zoneIDFieldID, zoneIDtlvValue));
 
-      final long startTimeFieldID = 1L;
-      BaseTLVType startTimetlvValue = new UIntType(startTime);
-      elements.add(new StructElement(startTimeFieldID, startTimetlvValue));
-
-      final long numberOfIntervalsFieldID = 2L;
-      BaseTLVType numberOfIntervalstlvValue = new UIntType(numberOfIntervals);
-      elements.add(new StructElement(numberOfIntervalsFieldID, numberOfIntervalstlvValue));
+      final long zoneFieldID = 1L;
+      BaseTLVType zonetlvValue = zone.encodeTlv();
+      elements.add(new StructElement(zoneFieldID, zonetlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -58977,6 +59354,76 @@ public class ChipClusters {
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void getTwoDCartesianZone(GetTwoDCartesianZoneResponseCallback callback, @Nullable Optional<Integer> zoneID) {
+      getTwoDCartesianZone(callback, zoneID, 0);
+    }
+
+    public void getTwoDCartesianZone(GetTwoDCartesianZoneResponseCallback callback, @Nullable Optional<Integer> zoneID, int timedInvokeTimeoutMs) {
+      final long commandId = 3L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long zoneIDFieldID = 0L;
+      BaseTLVType zoneIDtlvValue = zoneID != null ? zoneID.<BaseTLVType>map((nonOptionalzoneID) -> new UIntType(nonOptionalzoneID)).orElse(new EmptyType()) : new NullType();
+      elements.add(new StructElement(zoneIDFieldID, zoneIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long zonesFieldID = 0L;
+          ArrayList<ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct> zones = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == zonesFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+                ArrayType castingValue = element.value(ArrayType.class);
+                zones = castingValue.map((elementcastingValue) -> ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct.decodeTlv(elementcastingValue));
+              }
+            }
+          }
+          callback.onSuccess(zones);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void removeZone(DefaultClusterCallback callback, Integer zoneID) {
+      removeZone(callback, zoneID, 0);
+    }
+
+    public void removeZone(DefaultClusterCallback callback, Integer zoneID, int timedInvokeTimeoutMs) {
+      final long commandId = 5L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long zoneIDFieldID = 0L;
+      BaseTLVType zoneIDtlvValue = new UIntType(zoneID);
+      elements.add(new StructElement(zoneIDFieldID, zoneIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface CreateTwoDCartesianZoneResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer zoneID);
+    }
+
+    public interface GetTwoDCartesianZoneResponseCallback extends BaseClusterCallback {
+      void onSuccess(ArrayList<ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct> zones);
+    }
+
+    public interface SupportedZoneSourcesAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Integer> value);
+    }
+
+    public interface ZonesAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.ZoneManagementClusterZoneInformationStruct> value);
+    }
+
+    public interface TimeControlAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.ZoneManagementClusterZoneTriggeringTimeControlStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -58995,9 +59442,235 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public void readMeasurementTypeAttribute(
+    public void readSupportedZoneSourcesAttribute(
+        SupportedZoneSourcesAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_ZONE_SOURCES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_ZONE_SOURCES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeSupportedZoneSourcesAttribute(
+        SupportedZoneSourcesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_ZONE_SOURCES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_ZONE_SOURCES_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readZonesAttribute(
+        ZonesAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ZONES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.ZoneManagementClusterZoneInformationStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ZONES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeZonesAttribute(
+        ZonesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ZONES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.ZoneManagementClusterZoneInformationStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ZONES_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTimeControlAttribute(
+        TimeControlAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TIME_CONTROL_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.ZoneManagementClusterZoneTriggeringTimeControlStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TIME_CONTROL_ATTRIBUTE_ID, true);
+    }
+
+    public void writeTimeControlAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.ZoneManagementClusterZoneTriggeringTimeControlStruct> value) {
+      writeTimeControlAttribute(callback, value, 0);
+    }
+
+    public void writeTimeControlAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.ZoneManagementClusterZoneTriggeringTimeControlStruct> value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = ArrayType.generateArrayType(value, (elementvalue) -> elementvalue.encodeTlv());
+      writeAttribute(new WriteAttributesCallbackImpl(callback), TIME_CONTROL_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeTimeControlAttribute(
+        TimeControlAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TIME_CONTROL_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.ZoneManagementClusterZoneTriggeringTimeControlStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TIME_CONTROL_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSensitivityAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SENSITIVITY_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SENSITIVITY_ATTRIBUTE_ID, true);
+    }
+
+    public void writeSensitivityAttribute(DefaultClusterCallback callback, Integer value) {
+      writeSensitivityAttribute(callback, value, 0);
+    }
+
+    public void writeSensitivityAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), SENSITIVITY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeSensitivityAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SENSITIVITY_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SENSITIVITY_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(
+        EventListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(
+        AttributeListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(
         LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASUREMENT_TYPE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59005,12 +59678,12 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASUREMENT_TYPE_ATTRIBUTE_ID, true);
+        }, FEATURE_MAP_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMeasurementTypeAttribute(
+    public void subscribeFeatureMapAttribute(
         LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASUREMENT_TYPE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59018,12 +59691,12 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASUREMENT_TYPE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, FEATURE_MAP_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readDcVoltageAttribute(
+    public void readClusterRevisionAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_VOLTAGE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59031,12 +59704,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, DC_VOLTAGE_ATTRIBUTE_ID, true);
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeDcVoltageAttribute(
+    public void subscribeClusterRevisionAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_VOLTAGE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59044,12 +59717,554 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, DC_VOLTAGE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+  }
+
+  public static class CameraAvStreamManagementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1361L;
+
+    private static final long MAX_CONCURRENT_VIDEO_ENCODERS_ATTRIBUTE_ID = 0L;
+    private static final long MAX_ENCODED_PIXEL_RATE_ATTRIBUTE_ID = 1L;
+    private static final long VIDEO_SENSOR_PARAMS_ATTRIBUTE_ID = 2L;
+    private static final long NIGHT_VISION_CAPABLE_ATTRIBUTE_ID = 3L;
+    private static final long MIN_VIEWPORT_ATTRIBUTE_ID = 4L;
+    private static final long RATE_DISTORTION_TRADE_OFF_POINTS_ATTRIBUTE_ID = 5L;
+    private static final long MAX_PRE_ROLL_BUFFER_SIZE_ATTRIBUTE_ID = 6L;
+    private static final long MICROPHONE_CAPABILITIES_ATTRIBUTE_ID = 7L;
+    private static final long SPEAKER_CAPABILITIES_ATTRIBUTE_ID = 8L;
+    private static final long TWO_WAY_TALK_SUPPORT_ATTRIBUTE_ID = 9L;
+    private static final long SUPPORTED_SNAPSHOT_PARAMS_ATTRIBUTE_ID = 10L;
+    private static final long MAX_NETWORK_BANDWIDTH_ATTRIBUTE_ID = 11L;
+    private static final long CURRENT_FRAME_RATE_ATTRIBUTE_ID = 12L;
+    private static final long HDR_MODE_ENABLED_ATTRIBUTE_ID = 13L;
+    private static final long CURRENT_VIDEO_CODECS_ATTRIBUTE_ID = 14L;
+    private static final long CURRENT_SNAPSHOT_CONFIG_ATTRIBUTE_ID = 15L;
+    private static final long FABRICS_USING_CAMERA_ATTRIBUTE_ID = 16L;
+    private static final long ALLOCATED_VIDEO_STREAMS_ATTRIBUTE_ID = 17L;
+    private static final long ALLOCATED_AUDIO_STREAMS_ATTRIBUTE_ID = 18L;
+    private static final long ALLOCATED_SNAPSHOT_STREAMS_ATTRIBUTE_ID = 19L;
+    private static final long RANKED_VIDEO_STREAM_PRIORITIES_LIST_ATTRIBUTE_ID = 20L;
+    private static final long SOFT_RECORDING_PRIVACY_MODE_ENABLED_ATTRIBUTE_ID = 21L;
+    private static final long SOFT_LIVESTREAM_PRIVACY_MODE_ENABLED_ATTRIBUTE_ID = 22L;
+    private static final long HARD_PRIVACY_MODE_ON_ATTRIBUTE_ID = 23L;
+    private static final long NIGHT_VISION_ATTRIBUTE_ID = 24L;
+    private static final long NIGHT_VISION_ILLUM_ATTRIBUTE_ID = 25L;
+    private static final long AWB_ENABLED_ATTRIBUTE_ID = 26L;
+    private static final long AUTO_SHUTTER_SPEED_ENABLED_ATTRIBUTE_ID = 27L;
+    private static final long AUTO_ISO_ENABLED_ATTRIBUTE_ID = 28L;
+    private static final long VIEWPORT_ATTRIBUTE_ID = 29L;
+    private static final long SPEAKER_MUTED_ATTRIBUTE_ID = 30L;
+    private static final long SPEAKER_VOLUME_LEVEL_ATTRIBUTE_ID = 31L;
+    private static final long SPEAKER_MAX_LEVEL_ATTRIBUTE_ID = 32L;
+    private static final long SPEAKER_MIN_LEVEL_ATTRIBUTE_ID = 33L;
+    private static final long MICROPHONE_MUTED_ATTRIBUTE_ID = 34L;
+    private static final long MICROPHONE_VOLUME_LEVEL_ATTRIBUTE_ID = 35L;
+    private static final long MICROPHONE_MAX_LEVEL_ATTRIBUTE_ID = 36L;
+    private static final long MICROPHONE_MIN_LEVEL_ATTRIBUTE_ID = 37L;
+    private static final long MICROPHONE_AGC_ENABLED_ATTRIBUTE_ID = 38L;
+    private static final long IMAGE_ROTATION_ATTRIBUTE_ID = 39L;
+    private static final long IMAGE_FLIP_HORIZONTAL_ATTRIBUTE_ID = 40L;
+    private static final long IMAGE_FLIP_VERTICAL_ATTRIBUTE_ID = 41L;
+    private static final long LOCAL_VIDEO_RECORDING_ENABLED_ATTRIBUTE_ID = 42L;
+    private static final long LOCAL_SNAPSHOT_RECORDING_ENABLED_ATTRIBUTE_ID = 43L;
+    private static final long STATUS_LIGHT_ENABLED_ATTRIBUTE_ID = 44L;
+    private static final long STATUS_LIGHT_BRIGHTNESS_ATTRIBUTE_ID = 45L;
+    private static final long DEPTH_SENSOR_STATUS_ATTRIBUTE_ID = 46L;
+    private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
+    private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
+    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
+    private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
+    private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
+    private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
+
+    public CameraAvStreamManagementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId, CLUSTER_ID);
     }
 
-    public void readDcVoltageMinAttribute(
+    @Override
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
+
+    public void audioStreamAllocate(AudioStreamAllocateResponseCallback callback, Integer streamType, Integer audioCodec, Integer channelCount, Long sampleRate, Long bitRate, Integer bitDepth) {
+      audioStreamAllocate(callback, streamType, audioCodec, channelCount, sampleRate, bitRate, bitDepth, 0);
+    }
+
+    public void audioStreamAllocate(AudioStreamAllocateResponseCallback callback, Integer streamType, Integer audioCodec, Integer channelCount, Long sampleRate, Long bitRate, Integer bitDepth, int timedInvokeTimeoutMs) {
+      final long commandId = 0L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long streamTypeFieldID = 0L;
+      BaseTLVType streamTypetlvValue = new UIntType(streamType);
+      elements.add(new StructElement(streamTypeFieldID, streamTypetlvValue));
+
+      final long audioCodecFieldID = 1L;
+      BaseTLVType audioCodectlvValue = new UIntType(audioCodec);
+      elements.add(new StructElement(audioCodecFieldID, audioCodectlvValue));
+
+      final long channelCountFieldID = 2L;
+      BaseTLVType channelCounttlvValue = new UIntType(channelCount);
+      elements.add(new StructElement(channelCountFieldID, channelCounttlvValue));
+
+      final long sampleRateFieldID = 3L;
+      BaseTLVType sampleRatetlvValue = new UIntType(sampleRate);
+      elements.add(new StructElement(sampleRateFieldID, sampleRatetlvValue));
+
+      final long bitRateFieldID = 4L;
+      BaseTLVType bitRatetlvValue = new UIntType(bitRate);
+      elements.add(new StructElement(bitRateFieldID, bitRatetlvValue));
+
+      final long bitDepthFieldID = 5L;
+      BaseTLVType bitDepthtlvValue = new UIntType(bitDepth);
+      elements.add(new StructElement(bitDepthFieldID, bitDepthtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long audioStreamIDFieldID = 0L;
+          Integer audioStreamID = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == audioStreamIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                audioStreamID = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(audioStreamID);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void audioStreamDeallocate(DefaultClusterCallback callback, Integer audioStreamID) {
+      audioStreamDeallocate(callback, audioStreamID, 0);
+    }
+
+    public void audioStreamDeallocate(DefaultClusterCallback callback, Integer audioStreamID, int timedInvokeTimeoutMs) {
+      final long commandId = 2L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long audioStreamIDFieldID = 0L;
+      BaseTLVType audioStreamIDtlvValue = new UIntType(audioStreamID);
+      elements.add(new StructElement(audioStreamIDFieldID, audioStreamIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void videoStreamAllocate(VideoStreamAllocateResponseCallback callback, Integer streamType, Integer videoCodec, Integer minFrameRate, Integer maxFrameRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Long minBitRate, Long maxBitRate, Integer minFragmentLen, Integer maxFragmentLen, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled) {
+      videoStreamAllocate(callback, streamType, videoCodec, minFrameRate, maxFrameRate, minResolution, maxResolution, minBitRate, maxBitRate, minFragmentLen, maxFragmentLen, watermarkEnabled, OSDEnabled, 0);
+    }
+
+    public void videoStreamAllocate(VideoStreamAllocateResponseCallback callback, Integer streamType, Integer videoCodec, Integer minFrameRate, Integer maxFrameRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Long minBitRate, Long maxBitRate, Integer minFragmentLen, Integer maxFragmentLen, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled, int timedInvokeTimeoutMs) {
+      final long commandId = 3L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long streamTypeFieldID = 0L;
+      BaseTLVType streamTypetlvValue = new UIntType(streamType);
+      elements.add(new StructElement(streamTypeFieldID, streamTypetlvValue));
+
+      final long videoCodecFieldID = 1L;
+      BaseTLVType videoCodectlvValue = new UIntType(videoCodec);
+      elements.add(new StructElement(videoCodecFieldID, videoCodectlvValue));
+
+      final long minFrameRateFieldID = 2L;
+      BaseTLVType minFrameRatetlvValue = new UIntType(minFrameRate);
+      elements.add(new StructElement(minFrameRateFieldID, minFrameRatetlvValue));
+
+      final long maxFrameRateFieldID = 3L;
+      BaseTLVType maxFrameRatetlvValue = new UIntType(maxFrameRate);
+      elements.add(new StructElement(maxFrameRateFieldID, maxFrameRatetlvValue));
+
+      final long minResolutionFieldID = 4L;
+      BaseTLVType minResolutiontlvValue = minResolution.encodeTlv();
+      elements.add(new StructElement(minResolutionFieldID, minResolutiontlvValue));
+
+      final long maxResolutionFieldID = 5L;
+      BaseTLVType maxResolutiontlvValue = maxResolution.encodeTlv();
+      elements.add(new StructElement(maxResolutionFieldID, maxResolutiontlvValue));
+
+      final long minBitRateFieldID = 6L;
+      BaseTLVType minBitRatetlvValue = new UIntType(minBitRate);
+      elements.add(new StructElement(minBitRateFieldID, minBitRatetlvValue));
+
+      final long maxBitRateFieldID = 7L;
+      BaseTLVType maxBitRatetlvValue = new UIntType(maxBitRate);
+      elements.add(new StructElement(maxBitRateFieldID, maxBitRatetlvValue));
+
+      final long minFragmentLenFieldID = 8L;
+      BaseTLVType minFragmentLentlvValue = new UIntType(minFragmentLen);
+      elements.add(new StructElement(minFragmentLenFieldID, minFragmentLentlvValue));
+
+      final long maxFragmentLenFieldID = 9L;
+      BaseTLVType maxFragmentLentlvValue = new UIntType(maxFragmentLen);
+      elements.add(new StructElement(maxFragmentLenFieldID, maxFragmentLentlvValue));
+
+      final long watermarkEnabledFieldID = 10L;
+      BaseTLVType watermarkEnabledtlvValue = watermarkEnabled.<BaseTLVType>map((nonOptionalwatermarkEnabled) -> new BooleanType(nonOptionalwatermarkEnabled)).orElse(new EmptyType());
+      elements.add(new StructElement(watermarkEnabledFieldID, watermarkEnabledtlvValue));
+
+      final long OSDEnabledFieldID = 11L;
+      BaseTLVType OSDEnabledtlvValue = OSDEnabled.<BaseTLVType>map((nonOptionalOSDEnabled) -> new BooleanType(nonOptionalOSDEnabled)).orElse(new EmptyType());
+      elements.add(new StructElement(OSDEnabledFieldID, OSDEnabledtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long videoStreamIDFieldID = 0L;
+          Integer videoStreamID = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == videoStreamIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                videoStreamID = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(videoStreamID);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void videoStreamModify(DefaultClusterCallback callback, Integer videoStreamID, Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct> resolution, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled) {
+      videoStreamModify(callback, videoStreamID, resolution, watermarkEnabled, OSDEnabled, 0);
+    }
+
+    public void videoStreamModify(DefaultClusterCallback callback, Integer videoStreamID, Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct> resolution, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled, int timedInvokeTimeoutMs) {
+      final long commandId = 5L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long videoStreamIDFieldID = 0L;
+      BaseTLVType videoStreamIDtlvValue = new UIntType(videoStreamID);
+      elements.add(new StructElement(videoStreamIDFieldID, videoStreamIDtlvValue));
+
+      final long resolutionFieldID = 1L;
+      BaseTLVType resolutiontlvValue = resolution.<BaseTLVType>map((nonOptionalresolution) -> nonOptionalresolution.encodeTlv()).orElse(new EmptyType());
+      elements.add(new StructElement(resolutionFieldID, resolutiontlvValue));
+
+      final long watermarkEnabledFieldID = 2L;
+      BaseTLVType watermarkEnabledtlvValue = watermarkEnabled.<BaseTLVType>map((nonOptionalwatermarkEnabled) -> new BooleanType(nonOptionalwatermarkEnabled)).orElse(new EmptyType());
+      elements.add(new StructElement(watermarkEnabledFieldID, watermarkEnabledtlvValue));
+
+      final long OSDEnabledFieldID = 3L;
+      BaseTLVType OSDEnabledtlvValue = OSDEnabled.<BaseTLVType>map((nonOptionalOSDEnabled) -> new BooleanType(nonOptionalOSDEnabled)).orElse(new EmptyType());
+      elements.add(new StructElement(OSDEnabledFieldID, OSDEnabledtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void videoStreamDeallocate(DefaultClusterCallback callback, Integer videoStreamID) {
+      videoStreamDeallocate(callback, videoStreamID, 0);
+    }
+
+    public void videoStreamDeallocate(DefaultClusterCallback callback, Integer videoStreamID, int timedInvokeTimeoutMs) {
+      final long commandId = 6L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long videoStreamIDFieldID = 0L;
+      BaseTLVType videoStreamIDtlvValue = new UIntType(videoStreamID);
+      elements.add(new StructElement(videoStreamIDFieldID, videoStreamIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void snapshotStreamAllocate(SnapshotStreamAllocateResponseCallback callback, Integer imageCodec, Integer frameRate, Long bitRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Integer quality) {
+      snapshotStreamAllocate(callback, imageCodec, frameRate, bitRate, minResolution, maxResolution, quality, 0);
+    }
+
+    public void snapshotStreamAllocate(SnapshotStreamAllocateResponseCallback callback, Integer imageCodec, Integer frameRate, Long bitRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Integer quality, int timedInvokeTimeoutMs) {
+      final long commandId = 7L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long imageCodecFieldID = 0L;
+      BaseTLVType imageCodectlvValue = new UIntType(imageCodec);
+      elements.add(new StructElement(imageCodecFieldID, imageCodectlvValue));
+
+      final long frameRateFieldID = 1L;
+      BaseTLVType frameRatetlvValue = new UIntType(frameRate);
+      elements.add(new StructElement(frameRateFieldID, frameRatetlvValue));
+
+      final long bitRateFieldID = 2L;
+      BaseTLVType bitRatetlvValue = new UIntType(bitRate);
+      elements.add(new StructElement(bitRateFieldID, bitRatetlvValue));
+
+      final long minResolutionFieldID = 3L;
+      BaseTLVType minResolutiontlvValue = minResolution.encodeTlv();
+      elements.add(new StructElement(minResolutionFieldID, minResolutiontlvValue));
+
+      final long maxResolutionFieldID = 4L;
+      BaseTLVType maxResolutiontlvValue = maxResolution.encodeTlv();
+      elements.add(new StructElement(maxResolutionFieldID, maxResolutiontlvValue));
+
+      final long qualityFieldID = 5L;
+      BaseTLVType qualitytlvValue = new UIntType(quality);
+      elements.add(new StructElement(qualityFieldID, qualitytlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long snapshotStreamIDFieldID = 0L;
+          Integer snapshotStreamID = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == snapshotStreamIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                snapshotStreamID = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(snapshotStreamID);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void snapshotStreamDeallocate(DefaultClusterCallback callback, Integer snapshotStreamID) {
+      snapshotStreamDeallocate(callback, snapshotStreamID, 0);
+    }
+
+    public void snapshotStreamDeallocate(DefaultClusterCallback callback, Integer snapshotStreamID, int timedInvokeTimeoutMs) {
+      final long commandId = 9L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long snapshotStreamIDFieldID = 0L;
+      BaseTLVType snapshotStreamIDtlvValue = new UIntType(snapshotStreamID);
+      elements.add(new StructElement(snapshotStreamIDFieldID, snapshotStreamIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void setStreamPriorities(DefaultClusterCallback callback, ArrayList<Integer> streamPriorities) {
+      setStreamPriorities(callback, streamPriorities, 0);
+    }
+
+    public void setStreamPriorities(DefaultClusterCallback callback, ArrayList<Integer> streamPriorities, int timedInvokeTimeoutMs) {
+      final long commandId = 10L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long streamPrioritiesFieldID = 0L;
+      BaseTLVType streamPrioritiestlvValue = ArrayType.generateArrayType(streamPriorities, (elementstreamPriorities) -> new UIntType(elementstreamPriorities));
+      elements.add(new StructElement(streamPrioritiesFieldID, streamPrioritiestlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void captureSnapshot(DefaultClusterCallback callback, Integer snapshotStreamID, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct requestedResolution) {
+      captureSnapshot(callback, snapshotStreamID, requestedResolution, 0);
+    }
+
+    public void captureSnapshot(DefaultClusterCallback callback, Integer snapshotStreamID, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct requestedResolution, int timedInvokeTimeoutMs) {
+      final long commandId = 11L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long snapshotStreamIDFieldID = 0L;
+      BaseTLVType snapshotStreamIDtlvValue = new UIntType(snapshotStreamID);
+      elements.add(new StructElement(snapshotStreamIDFieldID, snapshotStreamIDtlvValue));
+
+      final long requestedResolutionFieldID = 1L;
+      BaseTLVType requestedResolutiontlvValue = requestedResolution.encodeTlv();
+      elements.add(new StructElement(requestedResolutionFieldID, requestedResolutiontlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void setViewport(DefaultClusterCallback callback, ChipStructs.CameraAvStreamManagementClusterViewportStruct viewport) {
+      setViewport(callback, viewport, 0);
+    }
+
+    public void setViewport(DefaultClusterCallback callback, ChipStructs.CameraAvStreamManagementClusterViewportStruct viewport, int timedInvokeTimeoutMs) {
+      final long commandId = 13L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long viewportFieldID = 0L;
+      BaseTLVType viewporttlvValue = viewport.encodeTlv();
+      elements.add(new StructElement(viewportFieldID, viewporttlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void setImageRotation(DefaultClusterCallback callback, Integer angle) {
+      setImageRotation(callback, angle, 0);
+    }
+
+    public void setImageRotation(DefaultClusterCallback callback, Integer angle, int timedInvokeTimeoutMs) {
+      final long commandId = 14L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long angleFieldID = 0L;
+      BaseTLVType angletlvValue = new UIntType(angle);
+      elements.add(new StructElement(angleFieldID, angletlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void setImageFlipHorizontal(DefaultClusterCallback callback, Boolean enabled) {
+      setImageFlipHorizontal(callback, enabled, 0);
+    }
+
+    public void setImageFlipHorizontal(DefaultClusterCallback callback, Boolean enabled, int timedInvokeTimeoutMs) {
+      final long commandId = 15L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long enabledFieldID = 0L;
+      BaseTLVType enabledtlvValue = new BooleanType(enabled);
+      elements.add(new StructElement(enabledFieldID, enabledtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void setImageFlipVertical(DefaultClusterCallback callback, Boolean enabled) {
+      setImageFlipVertical(callback, enabled, 0);
+    }
+
+    public void setImageFlipVertical(DefaultClusterCallback callback, Boolean enabled, int timedInvokeTimeoutMs) {
+      final long commandId = 16L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long enabledFieldID = 0L;
+      BaseTLVType enabledtlvValue = new BooleanType(enabled);
+      elements.add(new StructElement(enabledFieldID, enabledtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface AudioStreamAllocateResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer audioStreamID);
+    }
+
+    public interface VideoStreamAllocateResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer videoStreamID);
+    }
+
+    public interface SnapshotStreamAllocateResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer snapshotStreamID);
+    }
+
+    public interface VideoSensorParamsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(ChipStructs.CameraAvStreamManagementClusterVideoSensorParamsStruct value);
+    }
+
+    public interface MinViewportAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct value);
+    }
+
+    public interface RateDistortionTradeOffPointsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct> value);
+    }
+
+    public interface MicrophoneCapabilitiesAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(ChipStructs.CameraAvStreamManagementClusterAudioCapabilitiesStruct value);
+    }
+
+    public interface SpeakerCapabilitiesAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(ChipStructs.CameraAvStreamManagementClusterAudioCapabilitiesStruct value);
+    }
+
+    public interface SupportedSnapshotParamsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct> value);
+    }
+
+    public interface CurrentVideoCodecsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Integer> value);
+    }
+
+    public interface CurrentSnapshotConfigAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct value);
+    }
+
+    public interface FabricsUsingCameraAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Integer> value);
+    }
+
+    public interface AllocatedVideoStreamsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterVideoStreamStruct> value);
+    }
+
+    public interface AllocatedAudioStreamsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterAudioStreamStruct> value);
+    }
+
+    public interface AllocatedSnapshotStreamsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterSnapshotStreamStruct> value);
+    }
+
+    public interface RankedVideoStreamPrioritiesListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Integer> value);
+    }
+
+    public interface ViewportAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(ChipStructs.CameraAvStreamManagementClusterViewportStruct value);
+    }
+
+    public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface EventListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AttributeListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public void readMaxConcurrentVideoEncodersAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_VOLTAGE_MIN_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_CONCURRENT_VIDEO_ENCODERS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59057,12 +60272,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, DC_VOLTAGE_MIN_ATTRIBUTE_ID, true);
+        }, MAX_CONCURRENT_VIDEO_ENCODERS_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeDcVoltageMinAttribute(
+    public void subscribeMaxConcurrentVideoEncodersAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_VOLTAGE_MIN_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_CONCURRENT_VIDEO_ENCODERS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59070,454 +60285,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, DC_VOLTAGE_MIN_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MAX_CONCURRENT_VIDEO_ENCODERS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readDcVoltageMaxAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_VOLTAGE_MAX_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_VOLTAGE_MAX_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeDcVoltageMaxAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_VOLTAGE_MAX_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_VOLTAGE_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readDcCurrentAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_CURRENT_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_CURRENT_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeDcCurrentAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_CURRENT_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readDcCurrentMinAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_CURRENT_MIN_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_CURRENT_MIN_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeDcCurrentMinAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_CURRENT_MIN_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_CURRENT_MIN_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readDcCurrentMaxAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_CURRENT_MAX_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_CURRENT_MAX_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeDcCurrentMaxAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_CURRENT_MAX_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_CURRENT_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readDcPowerAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_POWER_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_POWER_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeDcPowerAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_POWER_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_POWER_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readDcPowerMinAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_POWER_MIN_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_POWER_MIN_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeDcPowerMinAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_POWER_MIN_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_POWER_MIN_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readDcPowerMaxAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_POWER_MAX_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_POWER_MAX_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeDcPowerMaxAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_POWER_MAX_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_POWER_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readDcVoltageMultiplierAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_VOLTAGE_MULTIPLIER_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_VOLTAGE_MULTIPLIER_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeDcVoltageMultiplierAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_VOLTAGE_MULTIPLIER_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_VOLTAGE_MULTIPLIER_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readDcVoltageDivisorAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_VOLTAGE_DIVISOR_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_VOLTAGE_DIVISOR_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeDcVoltageDivisorAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_VOLTAGE_DIVISOR_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_VOLTAGE_DIVISOR_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readDcCurrentMultiplierAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_CURRENT_MULTIPLIER_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_CURRENT_MULTIPLIER_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeDcCurrentMultiplierAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_CURRENT_MULTIPLIER_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_CURRENT_MULTIPLIER_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readDcCurrentDivisorAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_CURRENT_DIVISOR_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_CURRENT_DIVISOR_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeDcCurrentDivisorAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_CURRENT_DIVISOR_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_CURRENT_DIVISOR_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readDcPowerMultiplierAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_POWER_MULTIPLIER_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_POWER_MULTIPLIER_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeDcPowerMultiplierAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_POWER_MULTIPLIER_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_POWER_MULTIPLIER_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readDcPowerDivisorAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_POWER_DIVISOR_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_POWER_DIVISOR_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeDcPowerDivisorAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DC_POWER_DIVISOR_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DC_POWER_DIVISOR_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAcFrequencyAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_FREQUENCY_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_FREQUENCY_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAcFrequencyAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_FREQUENCY_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_FREQUENCY_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAcFrequencyMinAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_FREQUENCY_MIN_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_FREQUENCY_MIN_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAcFrequencyMinAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_FREQUENCY_MIN_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_FREQUENCY_MIN_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAcFrequencyMaxAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_FREQUENCY_MAX_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_FREQUENCY_MAX_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAcFrequencyMaxAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_FREQUENCY_MAX_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_FREQUENCY_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readNeutralCurrentAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NEUTRAL_CURRENT_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, NEUTRAL_CURRENT_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeNeutralCurrentAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NEUTRAL_CURRENT_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, NEUTRAL_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readTotalActivePowerAttribute(
+    public void readMaxEncodedPixelRateAttribute(
         LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TOTAL_ACTIVE_POWER_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_ENCODED_PIXEL_RATE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59525,12 +60298,12 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, TOTAL_ACTIVE_POWER_ATTRIBUTE_ID, true);
+        }, MAX_ENCODED_PIXEL_RATE_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeTotalActivePowerAttribute(
+    public void subscribeMaxEncodedPixelRateAttribute(
         LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TOTAL_ACTIVE_POWER_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_ENCODED_PIXEL_RATE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59538,12 +60311,116 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, TOTAL_ACTIVE_POWER_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MAX_ENCODED_PIXEL_RATE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readTotalReactivePowerAttribute(
+    public void readVideoSensorParamsAttribute(
+        VideoSensorParamsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VIDEO_SENSOR_PARAMS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.CameraAvStreamManagementClusterVideoSensorParamsStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, VIDEO_SENSOR_PARAMS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeVideoSensorParamsAttribute(
+        VideoSensorParamsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VIDEO_SENSOR_PARAMS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.CameraAvStreamManagementClusterVideoSensorParamsStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, VIDEO_SENSOR_PARAMS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readNightVisionCapableAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NIGHT_VISION_CAPABLE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, NIGHT_VISION_CAPABLE_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeNightVisionCapableAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NIGHT_VISION_CAPABLE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, NIGHT_VISION_CAPABLE_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMinViewportAttribute(
+        MinViewportAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MIN_VIEWPORT_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MIN_VIEWPORT_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMinViewportAttribute(
+        MinViewportAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MIN_VIEWPORT_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MIN_VIEWPORT_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readRateDistortionTradeOffPointsAttribute(
+        RateDistortionTradeOffPointsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RATE_DISTORTION_TRADE_OFF_POINTS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, RATE_DISTORTION_TRADE_OFF_POINTS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeRateDistortionTradeOffPointsAttribute(
+        RateDistortionTradeOffPointsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RATE_DISTORTION_TRADE_OFF_POINTS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, RATE_DISTORTION_TRADE_OFF_POINTS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMaxPreRollBufferSizeAttribute(
         LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TOTAL_REACTIVE_POWER_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_PRE_ROLL_BUFFER_SIZE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59551,12 +60428,12 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, TOTAL_REACTIVE_POWER_ATTRIBUTE_ID, true);
+        }, MAX_PRE_ROLL_BUFFER_SIZE_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeTotalReactivePowerAttribute(
+    public void subscribeMaxPreRollBufferSizeAttribute(
         LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TOTAL_REACTIVE_POWER_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_PRE_ROLL_BUFFER_SIZE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59564,12 +60441,116 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, TOTAL_REACTIVE_POWER_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MAX_PRE_ROLL_BUFFER_SIZE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readTotalApparentPowerAttribute(
+    public void readMicrophoneCapabilitiesAttribute(
+        MicrophoneCapabilitiesAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MICROPHONE_CAPABILITIES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.CameraAvStreamManagementClusterAudioCapabilitiesStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MICROPHONE_CAPABILITIES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMicrophoneCapabilitiesAttribute(
+        MicrophoneCapabilitiesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MICROPHONE_CAPABILITIES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.CameraAvStreamManagementClusterAudioCapabilitiesStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MICROPHONE_CAPABILITIES_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSpeakerCapabilitiesAttribute(
+        SpeakerCapabilitiesAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SPEAKER_CAPABILITIES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.CameraAvStreamManagementClusterAudioCapabilitiesStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SPEAKER_CAPABILITIES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeSpeakerCapabilitiesAttribute(
+        SpeakerCapabilitiesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SPEAKER_CAPABILITIES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.CameraAvStreamManagementClusterAudioCapabilitiesStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SPEAKER_CAPABILITIES_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTwoWayTalkSupportAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TWO_WAY_TALK_SUPPORT_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TWO_WAY_TALK_SUPPORT_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTwoWayTalkSupportAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TWO_WAY_TALK_SUPPORT_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TWO_WAY_TALK_SUPPORT_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSupportedSnapshotParamsAttribute(
+        SupportedSnapshotParamsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_SNAPSHOT_PARAMS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_SNAPSHOT_PARAMS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeSupportedSnapshotParamsAttribute(
+        SupportedSnapshotParamsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_SNAPSHOT_PARAMS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_SNAPSHOT_PARAMS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMaxNetworkBandwidthAttribute(
         LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TOTAL_APPARENT_POWER_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_NETWORK_BANDWIDTH_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59577,12 +60558,12 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, TOTAL_APPARENT_POWER_ATTRIBUTE_ID, true);
+        }, MAX_NETWORK_BANDWIDTH_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeTotalApparentPowerAttribute(
+    public void subscribeMaxNetworkBandwidthAttribute(
         LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TOTAL_APPARENT_POWER_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_NETWORK_BANDWIDTH_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59590,12 +60571,12 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, TOTAL_APPARENT_POWER_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MAX_NETWORK_BANDWIDTH_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMeasured1stHarmonicCurrentAttribute(
+    public void readCurrentFrameRateAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED1ST_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_FRAME_RATE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59603,12 +60584,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED1ST_HARMONIC_CURRENT_ATTRIBUTE_ID, true);
+        }, CURRENT_FRAME_RATE_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMeasured1stHarmonicCurrentAttribute(
+    public void subscribeCurrentFrameRateAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED1ST_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_FRAME_RATE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59616,12 +60597,334 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED1ST_HARMONIC_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, CURRENT_FRAME_RATE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMeasured3rdHarmonicCurrentAttribute(
+    public void readHDRModeEnabledAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HDR_MODE_ENABLED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, HDR_MODE_ENABLED_ATTRIBUTE_ID, true);
+    }
+
+    public void writeHDRModeEnabledAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeHDRModeEnabledAttribute(callback, value, 0);
+    }
+
+    public void writeHDRModeEnabledAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), HDR_MODE_ENABLED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeHDRModeEnabledAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HDR_MODE_ENABLED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, HDR_MODE_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readCurrentVideoCodecsAttribute(
+        CurrentVideoCodecsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_VIDEO_CODECS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_VIDEO_CODECS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeCurrentVideoCodecsAttribute(
+        CurrentVideoCodecsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_VIDEO_CODECS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_VIDEO_CODECS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readCurrentSnapshotConfigAttribute(
+        CurrentSnapshotConfigAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_SNAPSHOT_CONFIG_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_SNAPSHOT_CONFIG_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeCurrentSnapshotConfigAttribute(
+        CurrentSnapshotConfigAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_SNAPSHOT_CONFIG_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_SNAPSHOT_CONFIG_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readFabricsUsingCameraAttribute(
+        FabricsUsingCameraAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FABRICS_USING_CAMERA_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FABRICS_USING_CAMERA_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeFabricsUsingCameraAttribute(
+        FabricsUsingCameraAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FABRICS_USING_CAMERA_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FABRICS_USING_CAMERA_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAllocatedVideoStreamsAttribute(
+        AllocatedVideoStreamsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALLOCATED_VIDEO_STREAMS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.CameraAvStreamManagementClusterVideoStreamStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ALLOCATED_VIDEO_STREAMS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAllocatedVideoStreamsAttribute(
+        AllocatedVideoStreamsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALLOCATED_VIDEO_STREAMS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.CameraAvStreamManagementClusterVideoStreamStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ALLOCATED_VIDEO_STREAMS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAllocatedAudioStreamsAttribute(
+        AllocatedAudioStreamsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALLOCATED_AUDIO_STREAMS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.CameraAvStreamManagementClusterAudioStreamStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ALLOCATED_AUDIO_STREAMS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAllocatedAudioStreamsAttribute(
+        AllocatedAudioStreamsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALLOCATED_AUDIO_STREAMS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.CameraAvStreamManagementClusterAudioStreamStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ALLOCATED_AUDIO_STREAMS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAllocatedSnapshotStreamsAttribute(
+        AllocatedSnapshotStreamsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALLOCATED_SNAPSHOT_STREAMS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.CameraAvStreamManagementClusterSnapshotStreamStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ALLOCATED_SNAPSHOT_STREAMS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAllocatedSnapshotStreamsAttribute(
+        AllocatedSnapshotStreamsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALLOCATED_SNAPSHOT_STREAMS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.CameraAvStreamManagementClusterSnapshotStreamStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ALLOCATED_SNAPSHOT_STREAMS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readRankedVideoStreamPrioritiesListAttribute(
+        RankedVideoStreamPrioritiesListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RANKED_VIDEO_STREAM_PRIORITIES_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, RANKED_VIDEO_STREAM_PRIORITIES_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void writeRankedVideoStreamPrioritiesListAttribute(DefaultClusterCallback callback, ArrayList<Integer> value) {
+      writeRankedVideoStreamPrioritiesListAttribute(callback, value, 0);
+    }
+
+    public void writeRankedVideoStreamPrioritiesListAttribute(DefaultClusterCallback callback, ArrayList<Integer> value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = ArrayType.generateArrayType(value, (elementvalue) -> new UIntType(elementvalue));
+      writeAttribute(new WriteAttributesCallbackImpl(callback), RANKED_VIDEO_STREAM_PRIORITIES_LIST_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeRankedVideoStreamPrioritiesListAttribute(
+        RankedVideoStreamPrioritiesListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RANKED_VIDEO_STREAM_PRIORITIES_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, RANKED_VIDEO_STREAM_PRIORITIES_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSoftRecordingPrivacyModeEnabledAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SOFT_RECORDING_PRIVACY_MODE_ENABLED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SOFT_RECORDING_PRIVACY_MODE_ENABLED_ATTRIBUTE_ID, true);
+    }
+
+    public void writeSoftRecordingPrivacyModeEnabledAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeSoftRecordingPrivacyModeEnabledAttribute(callback, value, 0);
+    }
+
+    public void writeSoftRecordingPrivacyModeEnabledAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), SOFT_RECORDING_PRIVACY_MODE_ENABLED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeSoftRecordingPrivacyModeEnabledAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SOFT_RECORDING_PRIVACY_MODE_ENABLED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SOFT_RECORDING_PRIVACY_MODE_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSoftLivestreamPrivacyModeEnabledAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SOFT_LIVESTREAM_PRIVACY_MODE_ENABLED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SOFT_LIVESTREAM_PRIVACY_MODE_ENABLED_ATTRIBUTE_ID, true);
+    }
+
+    public void writeSoftLivestreamPrivacyModeEnabledAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeSoftLivestreamPrivacyModeEnabledAttribute(callback, value, 0);
+    }
+
+    public void writeSoftLivestreamPrivacyModeEnabledAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), SOFT_LIVESTREAM_PRIVACY_MODE_ENABLED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeSoftLivestreamPrivacyModeEnabledAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SOFT_LIVESTREAM_PRIVACY_MODE_ENABLED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SOFT_LIVESTREAM_PRIVACY_MODE_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readHardPrivacyModeOnAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HARD_PRIVACY_MODE_ON_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, HARD_PRIVACY_MODE_ON_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeHardPrivacyModeOnAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HARD_PRIVACY_MODE_ON_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, HARD_PRIVACY_MODE_ON_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readNightVisionAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED3RD_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NIGHT_VISION_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59629,12 +60932,21 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED3RD_HARMONIC_CURRENT_ATTRIBUTE_ID, true);
+        }, NIGHT_VISION_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMeasured3rdHarmonicCurrentAttribute(
+    public void writeNightVisionAttribute(DefaultClusterCallback callback, Integer value) {
+      writeNightVisionAttribute(callback, value, 0);
+    }
+
+    public void writeNightVisionAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), NIGHT_VISION_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeNightVisionAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED3RD_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NIGHT_VISION_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59642,12 +60954,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED3RD_HARMONIC_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, NIGHT_VISION_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMeasured5thHarmonicCurrentAttribute(
+    public void readNightVisionIllumAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED5TH_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NIGHT_VISION_ILLUM_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59655,12 +60967,21 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED5TH_HARMONIC_CURRENT_ATTRIBUTE_ID, true);
+        }, NIGHT_VISION_ILLUM_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMeasured5thHarmonicCurrentAttribute(
+    public void writeNightVisionIllumAttribute(DefaultClusterCallback callback, Integer value) {
+      writeNightVisionIllumAttribute(callback, value, 0);
+    }
+
+    public void writeNightVisionIllumAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), NIGHT_VISION_ILLUM_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeNightVisionIllumAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED5TH_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NIGHT_VISION_ILLUM_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59668,12 +60989,178 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED5TH_HARMONIC_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, NIGHT_VISION_ILLUM_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMeasured7thHarmonicCurrentAttribute(
+    public void readAWBEnabledAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AWB_ENABLED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, AWB_ENABLED_ATTRIBUTE_ID, true);
+    }
+
+    public void writeAWBEnabledAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeAWBEnabledAttribute(callback, value, 0);
+    }
+
+    public void writeAWBEnabledAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), AWB_ENABLED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeAWBEnabledAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AWB_ENABLED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, AWB_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAutoShutterSpeedEnabledAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AUTO_SHUTTER_SPEED_ENABLED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, AUTO_SHUTTER_SPEED_ENABLED_ATTRIBUTE_ID, true);
+    }
+
+    public void writeAutoShutterSpeedEnabledAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeAutoShutterSpeedEnabledAttribute(callback, value, 0);
+    }
+
+    public void writeAutoShutterSpeedEnabledAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), AUTO_SHUTTER_SPEED_ENABLED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeAutoShutterSpeedEnabledAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AUTO_SHUTTER_SPEED_ENABLED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, AUTO_SHUTTER_SPEED_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAutoISOEnabledAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AUTO_ISO_ENABLED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, AUTO_ISO_ENABLED_ATTRIBUTE_ID, true);
+    }
+
+    public void writeAutoISOEnabledAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeAutoISOEnabledAttribute(callback, value, 0);
+    }
+
+    public void writeAutoISOEnabledAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), AUTO_ISO_ENABLED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeAutoISOEnabledAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AUTO_ISO_ENABLED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, AUTO_ISO_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readViewportAttribute(
+        ViewportAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VIEWPORT_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.CameraAvStreamManagementClusterViewportStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, VIEWPORT_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeViewportAttribute(
+        ViewportAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VIEWPORT_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.CameraAvStreamManagementClusterViewportStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, VIEWPORT_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSpeakerMutedAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SPEAKER_MUTED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SPEAKER_MUTED_ATTRIBUTE_ID, true);
+    }
+
+    public void writeSpeakerMutedAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeSpeakerMutedAttribute(callback, value, 0);
+    }
+
+    public void writeSpeakerMutedAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), SPEAKER_MUTED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeSpeakerMutedAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SPEAKER_MUTED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SPEAKER_MUTED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSpeakerVolumeLevelAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED7TH_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SPEAKER_VOLUME_LEVEL_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59681,12 +61168,21 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED7TH_HARMONIC_CURRENT_ATTRIBUTE_ID, true);
+        }, SPEAKER_VOLUME_LEVEL_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMeasured7thHarmonicCurrentAttribute(
+    public void writeSpeakerVolumeLevelAttribute(DefaultClusterCallback callback, Integer value) {
+      writeSpeakerVolumeLevelAttribute(callback, value, 0);
+    }
+
+    public void writeSpeakerVolumeLevelAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), SPEAKER_VOLUME_LEVEL_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeSpeakerVolumeLevelAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED7TH_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SPEAKER_VOLUME_LEVEL_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59694,12 +61190,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED7TH_HARMONIC_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, SPEAKER_VOLUME_LEVEL_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMeasured9thHarmonicCurrentAttribute(
+    public void readSpeakerMaxLevelAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED9TH_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SPEAKER_MAX_LEVEL_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59707,12 +61203,21 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED9TH_HARMONIC_CURRENT_ATTRIBUTE_ID, true);
+        }, SPEAKER_MAX_LEVEL_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMeasured9thHarmonicCurrentAttribute(
+    public void writeSpeakerMaxLevelAttribute(DefaultClusterCallback callback, Integer value) {
+      writeSpeakerMaxLevelAttribute(callback, value, 0);
+    }
+
+    public void writeSpeakerMaxLevelAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), SPEAKER_MAX_LEVEL_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeSpeakerMaxLevelAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED9TH_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SPEAKER_MAX_LEVEL_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59720,12 +61225,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED9TH_HARMONIC_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, SPEAKER_MAX_LEVEL_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMeasured11thHarmonicCurrentAttribute(
+    public void readSpeakerMinLevelAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED11TH_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SPEAKER_MIN_LEVEL_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59733,12 +61238,21 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED11TH_HARMONIC_CURRENT_ATTRIBUTE_ID, true);
+        }, SPEAKER_MIN_LEVEL_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMeasured11thHarmonicCurrentAttribute(
+    public void writeSpeakerMinLevelAttribute(DefaultClusterCallback callback, Integer value) {
+      writeSpeakerMinLevelAttribute(callback, value, 0);
+    }
+
+    public void writeSpeakerMinLevelAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), SPEAKER_MIN_LEVEL_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeSpeakerMinLevelAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED11TH_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SPEAKER_MIN_LEVEL_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59746,12 +61260,47 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED11TH_HARMONIC_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, SPEAKER_MIN_LEVEL_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMeasuredPhase1stHarmonicCurrentAttribute(
+    public void readMicrophoneMutedAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MICROPHONE_MUTED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MICROPHONE_MUTED_ATTRIBUTE_ID, true);
+    }
+
+    public void writeMicrophoneMutedAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeMicrophoneMutedAttribute(callback, value, 0);
+    }
+
+    public void writeMicrophoneMutedAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), MICROPHONE_MUTED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeMicrophoneMutedAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MICROPHONE_MUTED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MICROPHONE_MUTED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMicrophoneVolumeLevelAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED_PHASE1ST_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MICROPHONE_VOLUME_LEVEL_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59759,12 +61308,21 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED_PHASE1ST_HARMONIC_CURRENT_ATTRIBUTE_ID, true);
+        }, MICROPHONE_VOLUME_LEVEL_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMeasuredPhase1stHarmonicCurrentAttribute(
+    public void writeMicrophoneVolumeLevelAttribute(DefaultClusterCallback callback, Integer value) {
+      writeMicrophoneVolumeLevelAttribute(callback, value, 0);
+    }
+
+    public void writeMicrophoneVolumeLevelAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), MICROPHONE_VOLUME_LEVEL_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeMicrophoneVolumeLevelAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED_PHASE1ST_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MICROPHONE_VOLUME_LEVEL_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59772,12 +61330,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED_PHASE1ST_HARMONIC_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MICROPHONE_VOLUME_LEVEL_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMeasuredPhase3rdHarmonicCurrentAttribute(
+    public void readMicrophoneMaxLevelAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED_PHASE3RD_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MICROPHONE_MAX_LEVEL_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59785,12 +61343,21 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED_PHASE3RD_HARMONIC_CURRENT_ATTRIBUTE_ID, true);
+        }, MICROPHONE_MAX_LEVEL_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMeasuredPhase3rdHarmonicCurrentAttribute(
+    public void writeMicrophoneMaxLevelAttribute(DefaultClusterCallback callback, Integer value) {
+      writeMicrophoneMaxLevelAttribute(callback, value, 0);
+    }
+
+    public void writeMicrophoneMaxLevelAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), MICROPHONE_MAX_LEVEL_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeMicrophoneMaxLevelAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED_PHASE3RD_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MICROPHONE_MAX_LEVEL_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59798,12 +61365,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED_PHASE3RD_HARMONIC_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MICROPHONE_MAX_LEVEL_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMeasuredPhase5thHarmonicCurrentAttribute(
+    public void readMicrophoneMinLevelAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED_PHASE5TH_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MICROPHONE_MIN_LEVEL_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59811,12 +61378,21 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED_PHASE5TH_HARMONIC_CURRENT_ATTRIBUTE_ID, true);
+        }, MICROPHONE_MIN_LEVEL_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMeasuredPhase5thHarmonicCurrentAttribute(
+    public void writeMicrophoneMinLevelAttribute(DefaultClusterCallback callback, Integer value) {
+      writeMicrophoneMinLevelAttribute(callback, value, 0);
+    }
+
+    public void writeMicrophoneMinLevelAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), MICROPHONE_MIN_LEVEL_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeMicrophoneMinLevelAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED_PHASE5TH_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MICROPHONE_MIN_LEVEL_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59824,12 +61400,47 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED_PHASE5TH_HARMONIC_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MICROPHONE_MIN_LEVEL_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMeasuredPhase7thHarmonicCurrentAttribute(
+    public void readMicrophoneAGCEnabledAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MICROPHONE_AGC_ENABLED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MICROPHONE_AGC_ENABLED_ATTRIBUTE_ID, true);
+    }
+
+    public void writeMicrophoneAGCEnabledAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeMicrophoneAGCEnabledAttribute(callback, value, 0);
+    }
+
+    public void writeMicrophoneAGCEnabledAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), MICROPHONE_AGC_ENABLED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeMicrophoneAGCEnabledAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MICROPHONE_AGC_ENABLED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MICROPHONE_AGC_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readImageRotationAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED_PHASE7TH_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, IMAGE_ROTATION_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59837,12 +61448,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED_PHASE7TH_HARMONIC_CURRENT_ATTRIBUTE_ID, true);
+        }, IMAGE_ROTATION_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMeasuredPhase7thHarmonicCurrentAttribute(
+    public void subscribeImageRotationAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED_PHASE7TH_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, IMAGE_ROTATION_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59850,12 +61461,169 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED_PHASE7TH_HARMONIC_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, IMAGE_ROTATION_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMeasuredPhase9thHarmonicCurrentAttribute(
+    public void readImageFlipHorizontalAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, IMAGE_FLIP_HORIZONTAL_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, IMAGE_FLIP_HORIZONTAL_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeImageFlipHorizontalAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, IMAGE_FLIP_HORIZONTAL_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, IMAGE_FLIP_HORIZONTAL_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readImageFlipVerticalAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, IMAGE_FLIP_VERTICAL_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, IMAGE_FLIP_VERTICAL_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeImageFlipVerticalAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, IMAGE_FLIP_VERTICAL_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, IMAGE_FLIP_VERTICAL_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readLocalVideoRecordingEnabledAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LOCAL_VIDEO_RECORDING_ENABLED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, LOCAL_VIDEO_RECORDING_ENABLED_ATTRIBUTE_ID, true);
+    }
+
+    public void writeLocalVideoRecordingEnabledAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeLocalVideoRecordingEnabledAttribute(callback, value, 0);
+    }
+
+    public void writeLocalVideoRecordingEnabledAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), LOCAL_VIDEO_RECORDING_ENABLED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeLocalVideoRecordingEnabledAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LOCAL_VIDEO_RECORDING_ENABLED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, LOCAL_VIDEO_RECORDING_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readLocalSnapshotRecordingEnabledAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LOCAL_SNAPSHOT_RECORDING_ENABLED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, LOCAL_SNAPSHOT_RECORDING_ENABLED_ATTRIBUTE_ID, true);
+    }
+
+    public void writeLocalSnapshotRecordingEnabledAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeLocalSnapshotRecordingEnabledAttribute(callback, value, 0);
+    }
+
+    public void writeLocalSnapshotRecordingEnabledAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), LOCAL_SNAPSHOT_RECORDING_ENABLED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeLocalSnapshotRecordingEnabledAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LOCAL_SNAPSHOT_RECORDING_ENABLED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, LOCAL_SNAPSHOT_RECORDING_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readStatusLightEnabledAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, STATUS_LIGHT_ENABLED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, STATUS_LIGHT_ENABLED_ATTRIBUTE_ID, true);
+    }
+
+    public void writeStatusLightEnabledAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeStatusLightEnabledAttribute(callback, value, 0);
+    }
+
+    public void writeStatusLightEnabledAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), STATUS_LIGHT_ENABLED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeStatusLightEnabledAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, STATUS_LIGHT_ENABLED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, STATUS_LIGHT_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readStatusLightBrightnessAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED_PHASE9TH_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, STATUS_LIGHT_BRIGHTNESS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59863,12 +61631,21 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED_PHASE9TH_HARMONIC_CURRENT_ATTRIBUTE_ID, true);
+        }, STATUS_LIGHT_BRIGHTNESS_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMeasuredPhase9thHarmonicCurrentAttribute(
+    public void writeStatusLightBrightnessAttribute(DefaultClusterCallback callback, Integer value) {
+      writeStatusLightBrightnessAttribute(callback, value, 0);
+    }
+
+    public void writeStatusLightBrightnessAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), STATUS_LIGHT_BRIGHTNESS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeStatusLightBrightnessAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED_PHASE9TH_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, STATUS_LIGHT_BRIGHTNESS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59876,12 +61653,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED_PHASE9TH_HARMONIC_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, STATUS_LIGHT_BRIGHTNESS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMeasuredPhase11thHarmonicCurrentAttribute(
+    public void readDepthSensorStatusAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED_PHASE11TH_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEPTH_SENSOR_STATUS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59889,12 +61666,21 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED_PHASE11TH_HARMONIC_CURRENT_ATTRIBUTE_ID, true);
+        }, DEPTH_SENSOR_STATUS_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMeasuredPhase11thHarmonicCurrentAttribute(
+    public void writeDepthSensorStatusAttribute(DefaultClusterCallback callback, Integer value) {
+      writeDepthSensorStatusAttribute(callback, value, 0);
+    }
+
+    public void writeDepthSensorStatusAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), DEPTH_SENSOR_STATUS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeDepthSensorStatusAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASURED_PHASE11TH_HARMONIC_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEPTH_SENSOR_STATUS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59902,64 +61688,116 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASURED_PHASE11TH_HARMONIC_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, DEPTH_SENSOR_STATUS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readAcFrequencyMultiplierAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_FREQUENCY_MULTIPLIER_ATTRIBUTE_ID);
+    public void readGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, AC_FREQUENCY_MULTIPLIER_ATTRIBUTE_ID, true);
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeAcFrequencyMultiplierAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_FREQUENCY_MULTIPLIER_ATTRIBUTE_ID);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, AC_FREQUENCY_MULTIPLIER_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readAcFrequencyDivisorAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_FREQUENCY_DIVISOR_ATTRIBUTE_ID);
+    public void readAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, AC_FREQUENCY_DIVISOR_ATTRIBUTE_ID, true);
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeAcFrequencyDivisorAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_FREQUENCY_DIVISOR_ATTRIBUTE_ID);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, AC_FREQUENCY_DIVISOR_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readPowerMultiplierAttribute(
+    public void readEventListAttribute(
+        EventListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(
+        AttributeListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(
         LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, POWER_MULTIPLIER_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59967,12 +61805,12 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, POWER_MULTIPLIER_ATTRIBUTE_ID, true);
+        }, FEATURE_MAP_ATTRIBUTE_ID, true);
     }
 
-    public void subscribePowerMultiplierAttribute(
+    public void subscribeFeatureMapAttribute(
         LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, POWER_MULTIPLIER_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59980,12 +61818,433 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, POWER_MULTIPLIER_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, FEATURE_MAP_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readPowerDivisorAttribute(
+    public void readClusterRevisionAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+  }
+
+  public static class WebRTCTransportProviderCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1363L;
+
+    private static final long CURRENT_SESSIONS_ATTRIBUTE_ID = 0L;
+    private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
+    private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
+    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
+    private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
+    private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
+    private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
+
+    public WebRTCTransportProviderCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId, CLUSTER_ID);
+    }
+
+    @Override
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
+
+    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamType, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions) {
+      solicitOffer(callback, streamType, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataOptions, 0);
+    }
+
+    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamType, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions, int timedInvokeTimeoutMs) {
+      final long commandId = 1L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long streamTypeFieldID = 0L;
+      BaseTLVType streamTypetlvValue = new UIntType(streamType);
+      elements.add(new StructElement(streamTypeFieldID, streamTypetlvValue));
+
+      final long videoStreamIDFieldID = 1L;
+      BaseTLVType videoStreamIDtlvValue = videoStreamID != null ? videoStreamID.<BaseTLVType>map((nonOptionalvideoStreamID) -> new UIntType(nonOptionalvideoStreamID)).orElse(new EmptyType()) : new NullType();
+      elements.add(new StructElement(videoStreamIDFieldID, videoStreamIDtlvValue));
+
+      final long audioStreamIDFieldID = 2L;
+      BaseTLVType audioStreamIDtlvValue = audioStreamID != null ? audioStreamID.<BaseTLVType>map((nonOptionalaudioStreamID) -> new UIntType(nonOptionalaudioStreamID)).orElse(new EmptyType()) : new NullType();
+      elements.add(new StructElement(audioStreamIDFieldID, audioStreamIDtlvValue));
+
+      final long ICEServersFieldID = 3L;
+      BaseTLVType ICEServerstlvValue = ICEServers.<BaseTLVType>map((nonOptionalICEServers) -> ArrayType.generateArrayType(nonOptionalICEServers, (elementnonOptionalICEServers) -> elementnonOptionalICEServers.encodeTlv())).orElse(new EmptyType());
+      elements.add(new StructElement(ICEServersFieldID, ICEServerstlvValue));
+
+      final long ICETransportPolicyFieldID = 4L;
+      BaseTLVType ICETransportPolicytlvValue = ICETransportPolicy.<BaseTLVType>map((nonOptionalICETransportPolicy) -> new StringType(nonOptionalICETransportPolicy)).orElse(new EmptyType());
+      elements.add(new StructElement(ICETransportPolicyFieldID, ICETransportPolicytlvValue));
+
+      final long metadataOptionsFieldID = 5L;
+      BaseTLVType metadataOptionstlvValue = metadataOptions.<BaseTLVType>map((nonOptionalmetadataOptions) -> new UIntType(nonOptionalmetadataOptions)).orElse(new EmptyType());
+      elements.add(new StructElement(metadataOptionsFieldID, metadataOptionstlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long webRTCSessionIDFieldID = 0L;
+          Integer webRTCSessionID = null;
+          final long deferredOfferFieldID = 1L;
+          Boolean deferredOffer = null;
+          final long videoStreamIDFieldID = 2L;
+          @Nullable Optional<Integer> videoStreamID = null;
+          final long audioStreamIDFieldID = 3L;
+          @Nullable Optional<Integer> audioStreamID = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == webRTCSessionIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                webRTCSessionID = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == deferredOfferFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+                BooleanType castingValue = element.value(BooleanType.class);
+                deferredOffer = castingValue.value(Boolean.class);
+              }
+            } else if (element.contextTagNum() == videoStreamIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                videoStreamID = Optional.of(castingValue.value(Integer.class));
+              }
+            } else if (element.contextTagNum() == audioStreamIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                audioStreamID = Optional.of(castingValue.value(Integer.class));
+              }
+            }
+          }
+          callback.onSuccess(webRTCSessionID, deferredOffer, videoStreamID, audioStreamID);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamType, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions) {
+      provideOffer(callback, webRTCSessionID, sdp, streamType, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataOptions, 0);
+    }
+
+    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamType, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions, int timedInvokeTimeoutMs) {
+      final long commandId = 3L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long webRTCSessionIDFieldID = 0L;
+      BaseTLVType webRTCSessionIDtlvValue = webRTCSessionID != null ? new UIntType(webRTCSessionID) : new NullType();
+      elements.add(new StructElement(webRTCSessionIDFieldID, webRTCSessionIDtlvValue));
+
+      final long sdpFieldID = 1L;
+      BaseTLVType sdptlvValue = new StringType(sdp);
+      elements.add(new StructElement(sdpFieldID, sdptlvValue));
+
+      final long streamTypeFieldID = 2L;
+      BaseTLVType streamTypetlvValue = new UIntType(streamType);
+      elements.add(new StructElement(streamTypeFieldID, streamTypetlvValue));
+
+      final long videoStreamIDFieldID = 3L;
+      BaseTLVType videoStreamIDtlvValue = videoStreamID != null ? videoStreamID.<BaseTLVType>map((nonOptionalvideoStreamID) -> new UIntType(nonOptionalvideoStreamID)).orElse(new EmptyType()) : new NullType();
+      elements.add(new StructElement(videoStreamIDFieldID, videoStreamIDtlvValue));
+
+      final long audioStreamIDFieldID = 4L;
+      BaseTLVType audioStreamIDtlvValue = audioStreamID != null ? audioStreamID.<BaseTLVType>map((nonOptionalaudioStreamID) -> new UIntType(nonOptionalaudioStreamID)).orElse(new EmptyType()) : new NullType();
+      elements.add(new StructElement(audioStreamIDFieldID, audioStreamIDtlvValue));
+
+      final long ICEServersFieldID = 5L;
+      BaseTLVType ICEServerstlvValue = ICEServers.<BaseTLVType>map((nonOptionalICEServers) -> ArrayType.generateArrayType(nonOptionalICEServers, (elementnonOptionalICEServers) -> elementnonOptionalICEServers.encodeTlv())).orElse(new EmptyType());
+      elements.add(new StructElement(ICEServersFieldID, ICEServerstlvValue));
+
+      final long ICETransportPolicyFieldID = 6L;
+      BaseTLVType ICETransportPolicytlvValue = ICETransportPolicy.<BaseTLVType>map((nonOptionalICETransportPolicy) -> new StringType(nonOptionalICETransportPolicy)).orElse(new EmptyType());
+      elements.add(new StructElement(ICETransportPolicyFieldID, ICETransportPolicytlvValue));
+
+      final long metadataOptionsFieldID = 7L;
+      BaseTLVType metadataOptionstlvValue = metadataOptions.<BaseTLVType>map((nonOptionalmetadataOptions) -> new UIntType(nonOptionalmetadataOptions)).orElse(new EmptyType());
+      elements.add(new StructElement(metadataOptionsFieldID, metadataOptionstlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long webRTCSessionIDFieldID = 0L;
+          Integer webRTCSessionID = null;
+          final long videoStreamIDFieldID = 1L;
+          Integer videoStreamID = null;
+          final long audioStreamIDFieldID = 2L;
+          Integer audioStreamID = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == webRTCSessionIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                webRTCSessionID = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == videoStreamIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                videoStreamID = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == audioStreamIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                audioStreamID = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(webRTCSessionID, videoStreamID, audioStreamID);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void provideAnswer(DefaultClusterCallback callback, Integer webRTCSessionID, String sdp) {
+      provideAnswer(callback, webRTCSessionID, sdp, 0);
+    }
+
+    public void provideAnswer(DefaultClusterCallback callback, Integer webRTCSessionID, String sdp, int timedInvokeTimeoutMs) {
+      final long commandId = 5L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long webRTCSessionIDFieldID = 0L;
+      BaseTLVType webRTCSessionIDtlvValue = new UIntType(webRTCSessionID);
+      elements.add(new StructElement(webRTCSessionIDFieldID, webRTCSessionIDtlvValue));
+
+      final long sdpFieldID = 1L;
+      BaseTLVType sdptlvValue = new StringType(sdp);
+      elements.add(new StructElement(sdpFieldID, sdptlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void provideICECandidate(DefaultClusterCallback callback, Integer webRTCSessionID, String ICECandidate) {
+      provideICECandidate(callback, webRTCSessionID, ICECandidate, 0);
+    }
+
+    public void provideICECandidate(DefaultClusterCallback callback, Integer webRTCSessionID, String ICECandidate, int timedInvokeTimeoutMs) {
+      final long commandId = 6L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long webRTCSessionIDFieldID = 0L;
+      BaseTLVType webRTCSessionIDtlvValue = new UIntType(webRTCSessionID);
+      elements.add(new StructElement(webRTCSessionIDFieldID, webRTCSessionIDtlvValue));
+
+      final long ICECandidateFieldID = 1L;
+      BaseTLVType ICECandidatetlvValue = new StringType(ICECandidate);
+      elements.add(new StructElement(ICECandidateFieldID, ICECandidatetlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void endSession(DefaultClusterCallback callback, Integer webRTCSessionID, Integer reason) {
+      endSession(callback, webRTCSessionID, reason, 0);
+    }
+
+    public void endSession(DefaultClusterCallback callback, Integer webRTCSessionID, Integer reason, int timedInvokeTimeoutMs) {
+      final long commandId = 7L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long webRTCSessionIDFieldID = 0L;
+      BaseTLVType webRTCSessionIDtlvValue = new UIntType(webRTCSessionID);
+      elements.add(new StructElement(webRTCSessionIDFieldID, webRTCSessionIDtlvValue));
+
+      final long reasonFieldID = 1L;
+      BaseTLVType reasontlvValue = new UIntType(reason);
+      elements.add(new StructElement(reasonFieldID, reasontlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface SolicitOfferResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer webRTCSessionID, Boolean deferredOffer, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID);
+    }
+
+    public interface ProvideOfferResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer webRTCSessionID, Integer videoStreamID, Integer audioStreamID);
+    }
+
+    public interface CurrentSessionsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.WebRTCTransportProviderClusterWebRTCSessionStruct> value);
+    }
+
+    public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface EventListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AttributeListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public void readCurrentSessionsAttribute(
+        CurrentSessionsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_SESSIONS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.WebRTCTransportProviderClusterWebRTCSessionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_SESSIONS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeCurrentSessionsAttribute(
+        CurrentSessionsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_SESSIONS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.WebRTCTransportProviderClusterWebRTCSessionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_SESSIONS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(
+        EventListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(
+        AttributeListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(
         LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, POWER_DIVISOR_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -59993,12 +62252,12 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, POWER_DIVISOR_ATTRIBUTE_ID, true);
+        }, FEATURE_MAP_ATTRIBUTE_ID, true);
     }
 
-    public void subscribePowerDivisorAttribute(
+    public void subscribeFeatureMapAttribute(
         LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, POWER_DIVISOR_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -60006,12 +62265,12 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, POWER_DIVISOR_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, FEATURE_MAP_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readHarmonicCurrentMultiplierAttribute(
+    public void readClusterRevisionAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HARMONIC_CURRENT_MULTIPLIER_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -60019,12 +62278,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, HARMONIC_CURRENT_MULTIPLIER_ATTRIBUTE_ID, true);
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeHarmonicCurrentMultiplierAttribute(
+    public void subscribeClusterRevisionAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HARMONIC_CURRENT_MULTIPLIER_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -60032,12 +62291,314 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, HARMONIC_CURRENT_MULTIPLIER_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+  }
+
+  public static class WebRTCTransportRequestorCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1364L;
+
+    private static final long CURRENT_SESSIONS_ATTRIBUTE_ID = 0L;
+    private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
+    private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
+    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
+    private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
+    private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
+    private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
+
+    public WebRTCTransportRequestorCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId, CLUSTER_ID);
     }
 
-    public void readPhaseHarmonicCurrentMultiplierAttribute(
+    @Override
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
+
+    public void offer(DefaultClusterCallback callback, Integer webRTCSessionID, String sdp, Optional<ArrayList<ChipStructs.WebRTCTransportRequestorClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy) {
+      offer(callback, webRTCSessionID, sdp, ICEServers, ICETransportPolicy, 0);
+    }
+
+    public void offer(DefaultClusterCallback callback, Integer webRTCSessionID, String sdp, Optional<ArrayList<ChipStructs.WebRTCTransportRequestorClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, int timedInvokeTimeoutMs) {
+      final long commandId = 1L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long webRTCSessionIDFieldID = 0L;
+      BaseTLVType webRTCSessionIDtlvValue = new UIntType(webRTCSessionID);
+      elements.add(new StructElement(webRTCSessionIDFieldID, webRTCSessionIDtlvValue));
+
+      final long sdpFieldID = 1L;
+      BaseTLVType sdptlvValue = new StringType(sdp);
+      elements.add(new StructElement(sdpFieldID, sdptlvValue));
+
+      final long ICEServersFieldID = 2L;
+      BaseTLVType ICEServerstlvValue = ICEServers.<BaseTLVType>map((nonOptionalICEServers) -> ArrayType.generateArrayType(nonOptionalICEServers, (elementnonOptionalICEServers) -> elementnonOptionalICEServers.encodeTlv())).orElse(new EmptyType());
+      elements.add(new StructElement(ICEServersFieldID, ICEServerstlvValue));
+
+      final long ICETransportPolicyFieldID = 3L;
+      BaseTLVType ICETransportPolicytlvValue = ICETransportPolicy.<BaseTLVType>map((nonOptionalICETransportPolicy) -> new StringType(nonOptionalICETransportPolicy)).orElse(new EmptyType());
+      elements.add(new StructElement(ICETransportPolicyFieldID, ICETransportPolicytlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void answer(DefaultClusterCallback callback, Integer webRTCSessionID, String sdp) {
+      answer(callback, webRTCSessionID, sdp, 0);
+    }
+
+    public void answer(DefaultClusterCallback callback, Integer webRTCSessionID, String sdp, int timedInvokeTimeoutMs) {
+      final long commandId = 2L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long webRTCSessionIDFieldID = 0L;
+      BaseTLVType webRTCSessionIDtlvValue = new UIntType(webRTCSessionID);
+      elements.add(new StructElement(webRTCSessionIDFieldID, webRTCSessionIDtlvValue));
+
+      final long sdpFieldID = 1L;
+      BaseTLVType sdptlvValue = new StringType(sdp);
+      elements.add(new StructElement(sdpFieldID, sdptlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void ICECandidate(DefaultClusterCallback callback, Integer webRTCSessionID, String ICECandidate) {
+      ICECandidate(callback, webRTCSessionID, ICECandidate, 0);
+    }
+
+    public void ICECandidate(DefaultClusterCallback callback, Integer webRTCSessionID, String ICECandidate, int timedInvokeTimeoutMs) {
+      final long commandId = 3L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long webRTCSessionIDFieldID = 0L;
+      BaseTLVType webRTCSessionIDtlvValue = new UIntType(webRTCSessionID);
+      elements.add(new StructElement(webRTCSessionIDFieldID, webRTCSessionIDtlvValue));
+
+      final long ICECandidateFieldID = 1L;
+      BaseTLVType ICECandidatetlvValue = new StringType(ICECandidate);
+      elements.add(new StructElement(ICECandidateFieldID, ICECandidatetlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void end(DefaultClusterCallback callback, Integer webRTCSessionID, Integer reason) {
+      end(callback, webRTCSessionID, reason, 0);
+    }
+
+    public void end(DefaultClusterCallback callback, Integer webRTCSessionID, Integer reason, int timedInvokeTimeoutMs) {
+      final long commandId = 4L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long webRTCSessionIDFieldID = 0L;
+      BaseTLVType webRTCSessionIDtlvValue = new UIntType(webRTCSessionID);
+      elements.add(new StructElement(webRTCSessionIDFieldID, webRTCSessionIDtlvValue));
+
+      final long reasonFieldID = 1L;
+      BaseTLVType reasontlvValue = new UIntType(reason);
+      elements.add(new StructElement(reasonFieldID, reasontlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface CurrentSessionsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.WebRTCTransportRequestorClusterWebRTCSessionStruct> value);
+    }
+
+    public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface EventListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AttributeListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public void readCurrentSessionsAttribute(
+        CurrentSessionsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_SESSIONS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.WebRTCTransportRequestorClusterWebRTCSessionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_SESSIONS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeCurrentSessionsAttribute(
+        CurrentSessionsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_SESSIONS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.WebRTCTransportRequestorClusterWebRTCSessionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_SESSIONS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(
+        EventListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(
+        AttributeListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PHASE_HARMONIC_CURRENT_MULTIPLIER_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -60045,12 +62606,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PHASE_HARMONIC_CURRENT_MULTIPLIER_ATTRIBUTE_ID, true);
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, true);
     }
 
-    public void subscribePhaseHarmonicCurrentMultiplierAttribute(
+    public void subscribeClusterRevisionAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PHASE_HARMONIC_CURRENT_MULTIPLIER_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -60058,38 +62619,98 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PHASE_HARMONIC_CURRENT_MULTIPLIER_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+  }
+
+  public static class ChimeCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1366L;
+
+    private static final long INSTALLED_CHIME_SOUNDS_ATTRIBUTE_ID = 0L;
+    private static final long ACTIVE_CHIME_ID_ATTRIBUTE_ID = 1L;
+    private static final long ENABLED_ATTRIBUTE_ID = 2L;
+    private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
+    private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
+    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
+    private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
+    private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
+    private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
+
+    public ChimeCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId, CLUSTER_ID);
     }
 
-    public void readInstantaneousVoltageAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTANTANEOUS_VOLTAGE_ATTRIBUTE_ID);
+    @Override
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
+
+    public void playChimeSound(DefaultClusterCallback callback) {
+      playChimeSound(callback, 0);
+    }
+
+    public void playChimeSound(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
+      final long commandId = 0L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface InstalledChimeSoundsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.ChimeClusterChimeSoundStruct> value);
+    }
+
+    public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface EventListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AttributeListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public void readInstalledChimeSoundsAttribute(
+        InstalledChimeSoundsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTALLED_CHIME_SOUNDS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ChimeClusterChimeSoundStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, INSTANTANEOUS_VOLTAGE_ATTRIBUTE_ID, true);
+        }, INSTALLED_CHIME_SOUNDS_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeInstantaneousVoltageAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTANTANEOUS_VOLTAGE_ATTRIBUTE_ID);
+    public void subscribeInstalledChimeSoundsAttribute(
+        InstalledChimeSoundsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTALLED_CHIME_SOUNDS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ChimeClusterChimeSoundStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, INSTANTANEOUS_VOLTAGE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, INSTALLED_CHIME_SOUNDS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readInstantaneousLineCurrentAttribute(
+    public void readActiveChimeIDAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTANTANEOUS_LINE_CURRENT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_CHIME_ID_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -60097,437 +62718,21 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, INSTANTANEOUS_LINE_CURRENT_ATTRIBUTE_ID, true);
+        }, ACTIVE_CHIME_ID_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeInstantaneousLineCurrentAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTANTANEOUS_LINE_CURRENT_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, INSTANTANEOUS_LINE_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
+    public void writeActiveChimeIDAttribute(DefaultClusterCallback callback, Integer value) {
+      writeActiveChimeIDAttribute(callback, value, 0);
     }
 
-    public void readInstantaneousActiveCurrentAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTANTANEOUS_ACTIVE_CURRENT_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, INSTANTANEOUS_ACTIVE_CURRENT_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeInstantaneousActiveCurrentAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTANTANEOUS_ACTIVE_CURRENT_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, INSTANTANEOUS_ACTIVE_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readInstantaneousReactiveCurrentAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTANTANEOUS_REACTIVE_CURRENT_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, INSTANTANEOUS_REACTIVE_CURRENT_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeInstantaneousReactiveCurrentAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTANTANEOUS_REACTIVE_CURRENT_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, INSTANTANEOUS_REACTIVE_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readInstantaneousPowerAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTANTANEOUS_POWER_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, INSTANTANEOUS_POWER_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeInstantaneousPowerAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTANTANEOUS_POWER_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, INSTANTANEOUS_POWER_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsVoltageAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRmsVoltageAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsVoltageMinAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_MIN_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_MIN_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRmsVoltageMinAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_MIN_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_MIN_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsVoltageMaxAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_MAX_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_MAX_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRmsVoltageMaxAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_MAX_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsCurrentAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_CURRENT_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRmsCurrentAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_CURRENT_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsCurrentMinAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_MIN_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_CURRENT_MIN_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRmsCurrentMinAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_MIN_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_CURRENT_MIN_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsCurrentMaxAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_MAX_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_CURRENT_MAX_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRmsCurrentMaxAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_MAX_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_CURRENT_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readActivePowerAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACTIVE_POWER_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeActivePowerAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACTIVE_POWER_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readActivePowerMinAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_MIN_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACTIVE_POWER_MIN_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeActivePowerMinAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_MIN_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACTIVE_POWER_MIN_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readActivePowerMaxAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_MAX_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACTIVE_POWER_MAX_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeActivePowerMaxAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_MAX_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACTIVE_POWER_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readReactivePowerAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REACTIVE_POWER_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, REACTIVE_POWER_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeReactivePowerAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REACTIVE_POWER_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, REACTIVE_POWER_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readApparentPowerAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, APPARENT_POWER_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, APPARENT_POWER_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeApparentPowerAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, APPARENT_POWER_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, APPARENT_POWER_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readPowerFactorAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, POWER_FACTOR_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, POWER_FACTOR_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribePowerFactorAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, POWER_FACTOR_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, POWER_FACTOR_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAverageRmsVoltageMeasurementPeriodAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_VOLTAGE_MEASUREMENT_PERIOD_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AVERAGE_RMS_VOLTAGE_MEASUREMENT_PERIOD_ATTRIBUTE_ID, true);
-    }
-
-    public void writeAverageRmsVoltageMeasurementPeriodAttribute(DefaultClusterCallback callback, Integer value) {
-      writeAverageRmsVoltageMeasurementPeriodAttribute(callback, value, 0);
-    }
-
-    public void writeAverageRmsVoltageMeasurementPeriodAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+    public void writeActiveChimeIDAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), AVERAGE_RMS_VOLTAGE_MEASUREMENT_PERIOD_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), ACTIVE_CHIME_ID_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
-    public void subscribeAverageRmsVoltageMeasurementPeriodAttribute(
+    public void subscribeActiveChimeIDAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_VOLTAGE_MEASUREMENT_PERIOD_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_CHIME_ID_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -60535,1323 +62740,177 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, AVERAGE_RMS_VOLTAGE_MEASUREMENT_PERIOD_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ACTIVE_CHIME_ID_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readAverageRmsUnderVoltageCounterAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_UNDER_VOLTAGE_COUNTER_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AVERAGE_RMS_UNDER_VOLTAGE_COUNTER_ATTRIBUTE_ID, true);
-    }
-
-    public void writeAverageRmsUnderVoltageCounterAttribute(DefaultClusterCallback callback, Integer value) {
-      writeAverageRmsUnderVoltageCounterAttribute(callback, value, 0);
-    }
-
-    public void writeAverageRmsUnderVoltageCounterAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), AVERAGE_RMS_UNDER_VOLTAGE_COUNTER_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeAverageRmsUnderVoltageCounterAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_UNDER_VOLTAGE_COUNTER_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AVERAGE_RMS_UNDER_VOLTAGE_COUNTER_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsExtremeOverVoltagePeriodAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_EXTREME_OVER_VOLTAGE_PERIOD_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_EXTREME_OVER_VOLTAGE_PERIOD_ATTRIBUTE_ID, true);
-    }
-
-    public void writeRmsExtremeOverVoltagePeriodAttribute(DefaultClusterCallback callback, Integer value) {
-      writeRmsExtremeOverVoltagePeriodAttribute(callback, value, 0);
-    }
-
-    public void writeRmsExtremeOverVoltagePeriodAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), RMS_EXTREME_OVER_VOLTAGE_PERIOD_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeRmsExtremeOverVoltagePeriodAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_EXTREME_OVER_VOLTAGE_PERIOD_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_EXTREME_OVER_VOLTAGE_PERIOD_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsExtremeUnderVoltagePeriodAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_EXTREME_UNDER_VOLTAGE_PERIOD_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_EXTREME_UNDER_VOLTAGE_PERIOD_ATTRIBUTE_ID, true);
-    }
-
-    public void writeRmsExtremeUnderVoltagePeriodAttribute(DefaultClusterCallback callback, Integer value) {
-      writeRmsExtremeUnderVoltagePeriodAttribute(callback, value, 0);
-    }
-
-    public void writeRmsExtremeUnderVoltagePeriodAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), RMS_EXTREME_UNDER_VOLTAGE_PERIOD_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeRmsExtremeUnderVoltagePeriodAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_EXTREME_UNDER_VOLTAGE_PERIOD_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_EXTREME_UNDER_VOLTAGE_PERIOD_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsVoltageSagPeriodAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_SAG_PERIOD_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_SAG_PERIOD_ATTRIBUTE_ID, true);
-    }
-
-    public void writeRmsVoltageSagPeriodAttribute(DefaultClusterCallback callback, Integer value) {
-      writeRmsVoltageSagPeriodAttribute(callback, value, 0);
-    }
-
-    public void writeRmsVoltageSagPeriodAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), RMS_VOLTAGE_SAG_PERIOD_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeRmsVoltageSagPeriodAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_SAG_PERIOD_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_SAG_PERIOD_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsVoltageSwellPeriodAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_SWELL_PERIOD_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_SWELL_PERIOD_ATTRIBUTE_ID, true);
-    }
-
-    public void writeRmsVoltageSwellPeriodAttribute(DefaultClusterCallback callback, Integer value) {
-      writeRmsVoltageSwellPeriodAttribute(callback, value, 0);
-    }
-
-    public void writeRmsVoltageSwellPeriodAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), RMS_VOLTAGE_SWELL_PERIOD_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeRmsVoltageSwellPeriodAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_SWELL_PERIOD_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_SWELL_PERIOD_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAcVoltageMultiplierAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_VOLTAGE_MULTIPLIER_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_VOLTAGE_MULTIPLIER_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAcVoltageMultiplierAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_VOLTAGE_MULTIPLIER_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_VOLTAGE_MULTIPLIER_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAcVoltageDivisorAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_VOLTAGE_DIVISOR_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_VOLTAGE_DIVISOR_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAcVoltageDivisorAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_VOLTAGE_DIVISOR_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_VOLTAGE_DIVISOR_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAcCurrentMultiplierAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_CURRENT_MULTIPLIER_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_CURRENT_MULTIPLIER_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAcCurrentMultiplierAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_CURRENT_MULTIPLIER_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_CURRENT_MULTIPLIER_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAcCurrentDivisorAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_CURRENT_DIVISOR_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_CURRENT_DIVISOR_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAcCurrentDivisorAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_CURRENT_DIVISOR_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_CURRENT_DIVISOR_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAcPowerMultiplierAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_POWER_MULTIPLIER_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_POWER_MULTIPLIER_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAcPowerMultiplierAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_POWER_MULTIPLIER_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_POWER_MULTIPLIER_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAcPowerDivisorAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_POWER_DIVISOR_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_POWER_DIVISOR_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAcPowerDivisorAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_POWER_DIVISOR_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_POWER_DIVISOR_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readOverloadAlarmsMaskAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OVERLOAD_ALARMS_MASK_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, OVERLOAD_ALARMS_MASK_ATTRIBUTE_ID, true);
-    }
-
-    public void writeOverloadAlarmsMaskAttribute(DefaultClusterCallback callback, Integer value) {
-      writeOverloadAlarmsMaskAttribute(callback, value, 0);
-    }
-
-    public void writeOverloadAlarmsMaskAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), OVERLOAD_ALARMS_MASK_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeOverloadAlarmsMaskAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OVERLOAD_ALARMS_MASK_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, OVERLOAD_ALARMS_MASK_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readVoltageOverloadAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VOLTAGE_OVERLOAD_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, VOLTAGE_OVERLOAD_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeVoltageOverloadAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, VOLTAGE_OVERLOAD_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, VOLTAGE_OVERLOAD_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readCurrentOverloadAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_OVERLOAD_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, CURRENT_OVERLOAD_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeCurrentOverloadAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_OVERLOAD_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, CURRENT_OVERLOAD_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAcOverloadAlarmsMaskAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_OVERLOAD_ALARMS_MASK_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_OVERLOAD_ALARMS_MASK_ATTRIBUTE_ID, true);
-    }
-
-    public void writeAcOverloadAlarmsMaskAttribute(DefaultClusterCallback callback, Integer value) {
-      writeAcOverloadAlarmsMaskAttribute(callback, value, 0);
-    }
-
-    public void writeAcOverloadAlarmsMaskAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), AC_OVERLOAD_ALARMS_MASK_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeAcOverloadAlarmsMaskAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_OVERLOAD_ALARMS_MASK_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_OVERLOAD_ALARMS_MASK_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAcVoltageOverloadAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_VOLTAGE_OVERLOAD_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_VOLTAGE_OVERLOAD_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAcVoltageOverloadAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_VOLTAGE_OVERLOAD_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_VOLTAGE_OVERLOAD_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAcCurrentOverloadAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_CURRENT_OVERLOAD_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_CURRENT_OVERLOAD_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAcCurrentOverloadAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_CURRENT_OVERLOAD_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_CURRENT_OVERLOAD_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAcActivePowerOverloadAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_ACTIVE_POWER_OVERLOAD_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_ACTIVE_POWER_OVERLOAD_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAcActivePowerOverloadAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_ACTIVE_POWER_OVERLOAD_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_ACTIVE_POWER_OVERLOAD_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAcReactivePowerOverloadAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_REACTIVE_POWER_OVERLOAD_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_REACTIVE_POWER_OVERLOAD_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAcReactivePowerOverloadAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_REACTIVE_POWER_OVERLOAD_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AC_REACTIVE_POWER_OVERLOAD_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAverageRmsOverVoltageAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_OVER_VOLTAGE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AVERAGE_RMS_OVER_VOLTAGE_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAverageRmsOverVoltageAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_OVER_VOLTAGE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AVERAGE_RMS_OVER_VOLTAGE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAverageRmsUnderVoltageAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_UNDER_VOLTAGE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AVERAGE_RMS_UNDER_VOLTAGE_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAverageRmsUnderVoltageAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_UNDER_VOLTAGE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AVERAGE_RMS_UNDER_VOLTAGE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsExtremeOverVoltageAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_EXTREME_OVER_VOLTAGE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_EXTREME_OVER_VOLTAGE_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRmsExtremeOverVoltageAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_EXTREME_OVER_VOLTAGE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_EXTREME_OVER_VOLTAGE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsExtremeUnderVoltageAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_EXTREME_UNDER_VOLTAGE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_EXTREME_UNDER_VOLTAGE_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRmsExtremeUnderVoltageAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_EXTREME_UNDER_VOLTAGE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_EXTREME_UNDER_VOLTAGE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsVoltageSagAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_SAG_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_SAG_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRmsVoltageSagAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_SAG_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_SAG_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsVoltageSwellAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_SWELL_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_SWELL_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRmsVoltageSwellAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_SWELL_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_SWELL_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readLineCurrentPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LINE_CURRENT_PHASE_B_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, LINE_CURRENT_PHASE_B_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeLineCurrentPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LINE_CURRENT_PHASE_B_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, LINE_CURRENT_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readActiveCurrentPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_CURRENT_PHASE_B_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACTIVE_CURRENT_PHASE_B_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeActiveCurrentPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_CURRENT_PHASE_B_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACTIVE_CURRENT_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readReactiveCurrentPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REACTIVE_CURRENT_PHASE_B_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, REACTIVE_CURRENT_PHASE_B_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeReactiveCurrentPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REACTIVE_CURRENT_PHASE_B_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, REACTIVE_CURRENT_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsVoltagePhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_PHASE_B_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_PHASE_B_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRmsVoltagePhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_PHASE_B_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsVoltageMinPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_MIN_PHASE_B_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_MIN_PHASE_B_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRmsVoltageMinPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_MIN_PHASE_B_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_MIN_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsVoltageMaxPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_MAX_PHASE_B_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_MAX_PHASE_B_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRmsVoltageMaxPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_MAX_PHASE_B_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_MAX_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsCurrentPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_PHASE_B_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_CURRENT_PHASE_B_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRmsCurrentPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_PHASE_B_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_CURRENT_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsCurrentMinPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_MIN_PHASE_B_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_CURRENT_MIN_PHASE_B_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRmsCurrentMinPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_MIN_PHASE_B_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_CURRENT_MIN_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readRmsCurrentMaxPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_MAX_PHASE_B_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_CURRENT_MAX_PHASE_B_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRmsCurrentMaxPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_MAX_PHASE_B_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_CURRENT_MAX_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readActivePowerPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_PHASE_B_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACTIVE_POWER_PHASE_B_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeActivePowerPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_PHASE_B_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACTIVE_POWER_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readActivePowerMinPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_MIN_PHASE_B_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACTIVE_POWER_MIN_PHASE_B_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeActivePowerMinPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_MIN_PHASE_B_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACTIVE_POWER_MIN_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readActivePowerMaxPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_MAX_PHASE_B_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACTIVE_POWER_MAX_PHASE_B_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeActivePowerMaxPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_MAX_PHASE_B_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, ACTIVE_POWER_MAX_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readReactivePowerPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REACTIVE_POWER_PHASE_B_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, REACTIVE_POWER_PHASE_B_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeReactivePowerPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REACTIVE_POWER_PHASE_B_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, REACTIVE_POWER_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readApparentPowerPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, APPARENT_POWER_PHASE_B_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, APPARENT_POWER_PHASE_B_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeApparentPowerPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, APPARENT_POWER_PHASE_B_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, APPARENT_POWER_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readPowerFactorPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, POWER_FACTOR_PHASE_B_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, POWER_FACTOR_PHASE_B_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribePowerFactorPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, POWER_FACTOR_PHASE_B_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, POWER_FACTOR_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAverageRmsVoltageMeasurementPeriodPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_VOLTAGE_MEASUREMENT_PERIOD_PHASE_B_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AVERAGE_RMS_VOLTAGE_MEASUREMENT_PERIOD_PHASE_B_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeAverageRmsVoltageMeasurementPeriodPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_VOLTAGE_MEASUREMENT_PERIOD_PHASE_B_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AVERAGE_RMS_VOLTAGE_MEASUREMENT_PERIOD_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readAverageRmsOverVoltageCounterPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_OVER_VOLTAGE_COUNTER_PHASE_B_ATTRIBUTE_ID);
+    public void readEnabledAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ENABLED_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, AVERAGE_RMS_OVER_VOLTAGE_COUNTER_PHASE_B_ATTRIBUTE_ID, true);
+        }, ENABLED_ATTRIBUTE_ID, true);
     }
-
-    public void subscribeAverageRmsOverVoltageCounterPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_OVER_VOLTAGE_COUNTER_PHASE_B_ATTRIBUTE_ID);
 
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AVERAGE_RMS_OVER_VOLTAGE_COUNTER_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
+    public void writeEnabledAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeEnabledAttribute(callback, value, 0);
     }
-
-    public void readAverageRmsUnderVoltageCounterPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_UNDER_VOLTAGE_COUNTER_PHASE_B_ATTRIBUTE_ID);
 
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AVERAGE_RMS_UNDER_VOLTAGE_COUNTER_PHASE_B_ATTRIBUTE_ID, true);
+    public void writeEnabledAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), ENABLED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
-    public void subscribeAverageRmsUnderVoltageCounterPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_UNDER_VOLTAGE_COUNTER_PHASE_B_ATTRIBUTE_ID);
+    public void subscribeEnabledAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ENABLED_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, AVERAGE_RMS_UNDER_VOLTAGE_COUNTER_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readRmsExtremeOverVoltagePeriodPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_EXTREME_OVER_VOLTAGE_PERIOD_PHASE_B_ATTRIBUTE_ID);
+    public void readGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, RMS_EXTREME_OVER_VOLTAGE_PERIOD_PHASE_B_ATTRIBUTE_ID, true);
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeRmsExtremeOverVoltagePeriodPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_EXTREME_OVER_VOLTAGE_PERIOD_PHASE_B_ATTRIBUTE_ID);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, RMS_EXTREME_OVER_VOLTAGE_PERIOD_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readRmsExtremeUnderVoltagePeriodPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_EXTREME_UNDER_VOLTAGE_PERIOD_PHASE_B_ATTRIBUTE_ID);
+    public void readAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, RMS_EXTREME_UNDER_VOLTAGE_PERIOD_PHASE_B_ATTRIBUTE_ID, true);
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeRmsExtremeUnderVoltagePeriodPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_EXTREME_UNDER_VOLTAGE_PERIOD_PHASE_B_ATTRIBUTE_ID);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, RMS_EXTREME_UNDER_VOLTAGE_PERIOD_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readRmsVoltageSagPeriodPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_SAG_PERIOD_PHASE_B_ATTRIBUTE_ID);
+    public void readEventListAttribute(
+        EventListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, RMS_VOLTAGE_SAG_PERIOD_PHASE_B_ATTRIBUTE_ID, true);
+        }, EVENT_LIST_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeRmsVoltageSagPeriodPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_SAG_PERIOD_PHASE_B_ATTRIBUTE_ID);
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, RMS_VOLTAGE_SAG_PERIOD_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readRmsVoltageSwellPeriodPhaseBAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_SWELL_PERIOD_PHASE_B_ATTRIBUTE_ID);
+    public void readAttributeListAttribute(
+        AttributeListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, RMS_VOLTAGE_SWELL_PERIOD_PHASE_B_ATTRIBUTE_ID, true);
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeRmsVoltageSwellPeriodPhaseBAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_SWELL_PERIOD_PHASE_B_ATTRIBUTE_ID);
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, RMS_VOLTAGE_SWELL_PERIOD_PHASE_B_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readLineCurrentPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LINE_CURRENT_PHASE_C_ATTRIBUTE_ID);
+    public void readFeatureMapAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, LINE_CURRENT_PHASE_C_ATTRIBUTE_ID, true);
+        }, FEATURE_MAP_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeLineCurrentPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LINE_CURRENT_PHASE_C_ATTRIBUTE_ID);
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, LINE_CURRENT_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, FEATURE_MAP_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readActiveCurrentPhaseCAttribute(
+    public void readClusterRevisionAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_CURRENT_PHASE_C_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -61859,12 +62918,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ACTIVE_CURRENT_PHASE_C_ATTRIBUTE_ID, true);
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeActiveCurrentPhaseCAttribute(
+    public void subscribeClusterRevisionAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_CURRENT_PHASE_C_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -61872,324 +62931,251 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ACTIVE_CURRENT_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, minInterval, maxInterval);
     }
+  }
 
-    public void readReactiveCurrentPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REACTIVE_CURRENT_PHASE_C_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, REACTIVE_CURRENT_PHASE_C_ATTRIBUTE_ID, true);
-    }
+  public static class EcosystemInformationCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1872L;
 
-    public void subscribeReactiveCurrentPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REACTIVE_CURRENT_PHASE_C_ATTRIBUTE_ID);
+    private static final long DEVICE_DIRECTORY_ATTRIBUTE_ID = 0L;
+    private static final long LOCATION_DIRECTORY_ATTRIBUTE_ID = 1L;
+    private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
+    private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
+    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
+    private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
+    private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
+    private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
 
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, REACTIVE_CURRENT_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+    public EcosystemInformationCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId, CLUSTER_ID);
     }
 
-    public void readRmsVoltagePhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_PHASE_C_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_PHASE_C_ATTRIBUTE_ID, true);
+    @Override
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
     }
 
-    public void subscribeRmsVoltagePhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_PHASE_C_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+    public interface DeviceDirectoryAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.EcosystemInformationClusterEcosystemDeviceStruct> value);
     }
 
-    public void readRmsVoltageMinPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_MIN_PHASE_C_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_MIN_PHASE_C_ATTRIBUTE_ID, true);
+    public interface LocationDirectoryAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.EcosystemInformationClusterEcosystemLocationStruct> value);
     }
 
-    public void subscribeRmsVoltageMinPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_MIN_PHASE_C_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_MIN_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+    public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
     }
 
-    public void readRmsVoltageMaxPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_MAX_PHASE_C_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_MAX_PHASE_C_ATTRIBUTE_ID, true);
+    public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
     }
 
-    public void subscribeRmsVoltageMaxPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_MAX_PHASE_C_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_MAX_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+    public interface EventListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
     }
 
-    public void readRmsCurrentPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_PHASE_C_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_CURRENT_PHASE_C_ATTRIBUTE_ID, true);
+    public interface AttributeListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
     }
 
-    public void subscribeRmsCurrentPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_PHASE_C_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_CURRENT_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+    public void readDeviceDirectoryAttribute(
+        DeviceDirectoryAttributeCallback callback) {
+      readDeviceDirectoryAttributeWithFabricFilter(callback, true);
     }
 
-    public void readRmsCurrentMinPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_MIN_PHASE_C_ATTRIBUTE_ID);
+    public void readDeviceDirectoryAttributeWithFabricFilter(
+        DeviceDirectoryAttributeCallback callback, boolean isFabricFiltered) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEVICE_DIRECTORY_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.EcosystemInformationClusterEcosystemDeviceStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, RMS_CURRENT_MIN_PHASE_C_ATTRIBUTE_ID, true);
+        }, DEVICE_DIRECTORY_ATTRIBUTE_ID, isFabricFiltered);
     }
 
-    public void subscribeRmsCurrentMinPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_MIN_PHASE_C_ATTRIBUTE_ID);
+    public void subscribeDeviceDirectoryAttribute(
+        DeviceDirectoryAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEVICE_DIRECTORY_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.EcosystemInformationClusterEcosystemDeviceStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, RMS_CURRENT_MIN_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, DEVICE_DIRECTORY_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readRmsCurrentMaxPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_MAX_PHASE_C_ATTRIBUTE_ID);
+    public void readLocationDirectoryAttribute(
+        LocationDirectoryAttributeCallback callback) {
+      readLocationDirectoryAttributeWithFabricFilter(callback, true);
+    }
 
+    public void readLocationDirectoryAttributeWithFabricFilter(
+        LocationDirectoryAttributeCallback callback, boolean isFabricFiltered) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LOCATION_DIRECTORY_ATTRIBUTE_ID);
+
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.EcosystemInformationClusterEcosystemLocationStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, RMS_CURRENT_MAX_PHASE_C_ATTRIBUTE_ID, true);
+        }, LOCATION_DIRECTORY_ATTRIBUTE_ID, isFabricFiltered);
     }
 
-    public void subscribeRmsCurrentMaxPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_CURRENT_MAX_PHASE_C_ATTRIBUTE_ID);
+    public void subscribeLocationDirectoryAttribute(
+        LocationDirectoryAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LOCATION_DIRECTORY_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.EcosystemInformationClusterEcosystemLocationStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, RMS_CURRENT_MAX_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, LOCATION_DIRECTORY_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readActivePowerPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_PHASE_C_ATTRIBUTE_ID);
+    public void readGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ACTIVE_POWER_PHASE_C_ATTRIBUTE_ID, true);
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeActivePowerPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_PHASE_C_ATTRIBUTE_ID);
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ACTIVE_POWER_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readActivePowerMinPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_MIN_PHASE_C_ATTRIBUTE_ID);
+    public void readAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ACTIVE_POWER_MIN_PHASE_C_ATTRIBUTE_ID, true);
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeActivePowerMinPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_MIN_PHASE_C_ATTRIBUTE_ID);
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ACTIVE_POWER_MIN_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readActivePowerMaxPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_MAX_PHASE_C_ATTRIBUTE_ID);
+    public void readEventListAttribute(
+        EventListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ACTIVE_POWER_MAX_PHASE_C_ATTRIBUTE_ID, true);
+        }, EVENT_LIST_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeActivePowerMaxPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_POWER_MAX_PHASE_C_ATTRIBUTE_ID);
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ACTIVE_POWER_MAX_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readReactivePowerPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REACTIVE_POWER_PHASE_C_ATTRIBUTE_ID);
+    public void readAttributeListAttribute(
+        AttributeListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, REACTIVE_POWER_PHASE_C_ATTRIBUTE_ID, true);
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeReactivePowerPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REACTIVE_POWER_PHASE_C_ATTRIBUTE_ID);
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, REACTIVE_POWER_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readApparentPowerPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, APPARENT_POWER_PHASE_C_ATTRIBUTE_ID);
+    public void readFeatureMapAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, APPARENT_POWER_PHASE_C_ATTRIBUTE_ID, true);
+        }, FEATURE_MAP_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeApparentPowerPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, APPARENT_POWER_PHASE_C_ATTRIBUTE_ID);
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, APPARENT_POWER_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, FEATURE_MAP_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readPowerFactorPhaseCAttribute(
+    public void readClusterRevisionAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, POWER_FACTOR_PHASE_C_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -62197,12 +63183,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, POWER_FACTOR_PHASE_C_ATTRIBUTE_ID, true);
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, true);
     }
 
-    public void subscribePowerFactorPhaseCAttribute(
+    public void subscribeClusterRevisionAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, POWER_FACTOR_PHASE_C_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -62210,189 +63196,169 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, POWER_FACTOR_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, minInterval, maxInterval);
     }
-
-    public void readAverageRmsVoltageMeasurementPeriodPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_VOLTAGE_MEASUREMENT_PERIOD_PHASE_C_ATTRIBUTE_ID);
+  }
 
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AVERAGE_RMS_VOLTAGE_MEASUREMENT_PERIOD_PHASE_C_ATTRIBUTE_ID, true);
-    }
+  public static class CommissionerControlCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1873L;
 
-    public void subscribeAverageRmsVoltageMeasurementPeriodPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_VOLTAGE_MEASUREMENT_PERIOD_PHASE_C_ATTRIBUTE_ID);
+    private static final long SUPPORTED_DEVICE_CATEGORIES_ATTRIBUTE_ID = 0L;
+    private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
+    private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
+    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
+    private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
+    private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
+    private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
 
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AVERAGE_RMS_VOLTAGE_MEASUREMENT_PERIOD_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+    public CommissionerControlCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId, CLUSTER_ID);
     }
 
-    public void readAverageRmsOverVoltageCounterPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_OVER_VOLTAGE_COUNTER_PHASE_C_ATTRIBUTE_ID);
+    @Override
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AVERAGE_RMS_OVER_VOLTAGE_COUNTER_PHASE_C_ATTRIBUTE_ID, true);
+    public void requestCommissioningApproval(DefaultClusterCallback callback, Long requestID, Integer vendorID, Integer productID, Optional<String> label) {
+      requestCommissioningApproval(callback, requestID, vendorID, productID, label, 0);
     }
 
-    public void subscribeAverageRmsOverVoltageCounterPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_OVER_VOLTAGE_COUNTER_PHASE_C_ATTRIBUTE_ID);
+    public void requestCommissioningApproval(DefaultClusterCallback callback, Long requestID, Integer vendorID, Integer productID, Optional<String> label, int timedInvokeTimeoutMs) {
+      final long commandId = 0L;
 
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AVERAGE_RMS_OVER_VOLTAGE_COUNTER_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long requestIDFieldID = 0L;
+      BaseTLVType requestIDtlvValue = new UIntType(requestID);
+      elements.add(new StructElement(requestIDFieldID, requestIDtlvValue));
 
-    public void readAverageRmsUnderVoltageCounterPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_UNDER_VOLTAGE_COUNTER_PHASE_C_ATTRIBUTE_ID);
+      final long vendorIDFieldID = 1L;
+      BaseTLVType vendorIDtlvValue = new UIntType(vendorID);
+      elements.add(new StructElement(vendorIDFieldID, vendorIDtlvValue));
 
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AVERAGE_RMS_UNDER_VOLTAGE_COUNTER_PHASE_C_ATTRIBUTE_ID, true);
-    }
+      final long productIDFieldID = 2L;
+      BaseTLVType productIDtlvValue = new UIntType(productID);
+      elements.add(new StructElement(productIDFieldID, productIDtlvValue));
 
-    public void subscribeAverageRmsUnderVoltageCounterPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVERAGE_RMS_UNDER_VOLTAGE_COUNTER_PHASE_C_ATTRIBUTE_ID);
+      final long labelFieldID = 3L;
+      BaseTLVType labeltlvValue = label.<BaseTLVType>map((nonOptionallabel) -> new StringType(nonOptionallabel)).orElse(new EmptyType());
+      elements.add(new StructElement(labelFieldID, labeltlvValue));
 
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
           @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, AVERAGE_RMS_UNDER_VOLTAGE_COUNTER_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void readRmsExtremeOverVoltagePeriodPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_EXTREME_OVER_VOLTAGE_PERIOD_PHASE_C_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_EXTREME_OVER_VOLTAGE_PERIOD_PHASE_C_ATTRIBUTE_ID, true);
+    public void commissionNode(ReverseOpenCommissioningWindowCallback callback, Long requestID, Integer responseTimeoutSeconds) {
+      commissionNode(callback, requestID, responseTimeoutSeconds, 0);
     }
 
-    public void subscribeRmsExtremeOverVoltagePeriodPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_EXTREME_OVER_VOLTAGE_PERIOD_PHASE_C_ATTRIBUTE_ID);
+    public void commissionNode(ReverseOpenCommissioningWindowCallback callback, Long requestID, Integer responseTimeoutSeconds, int timedInvokeTimeoutMs) {
+      final long commandId = 1L;
 
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_EXTREME_OVER_VOLTAGE_PERIOD_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long requestIDFieldID = 0L;
+      BaseTLVType requestIDtlvValue = new UIntType(requestID);
+      elements.add(new StructElement(requestIDFieldID, requestIDtlvValue));
 
-    public void readRmsExtremeUnderVoltagePeriodPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_EXTREME_UNDER_VOLTAGE_PERIOD_PHASE_C_ATTRIBUTE_ID);
+      final long responseTimeoutSecondsFieldID = 1L;
+      BaseTLVType responseTimeoutSecondstlvValue = new UIntType(responseTimeoutSeconds);
+      elements.add(new StructElement(responseTimeoutSecondsFieldID, responseTimeoutSecondstlvValue));
 
-      readAttribute(new ReportCallbackImpl(callback, path) {
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
           @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
+          public void onResponse(StructType invokeStructValue) {
+          final long commissioningTimeoutFieldID = 0L;
+          Integer commissioningTimeout = null;
+          final long PAKEPasscodeVerifierFieldID = 1L;
+          byte[] PAKEPasscodeVerifier = null;
+          final long discriminatorFieldID = 2L;
+          Integer discriminator = null;
+          final long iterationsFieldID = 3L;
+          Long iterations = null;
+          final long saltFieldID = 4L;
+          byte[] salt = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == commissioningTimeoutFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                commissioningTimeout = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == PAKEPasscodeVerifierFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                PAKEPasscodeVerifier = castingValue.value(byte[].class);
+              }
+            } else if (element.contextTagNum() == discriminatorFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                discriminator = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == iterationsFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                iterations = castingValue.value(Long.class);
+              }
+            } else if (element.contextTagNum() == saltFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                salt = castingValue.value(byte[].class);
+              }
+            }
           }
-        }, RMS_EXTREME_UNDER_VOLTAGE_PERIOD_PHASE_C_ATTRIBUTE_ID, true);
+          callback.onSuccess(commissioningTimeout, PAKEPasscodeVerifier, discriminator, iterations, salt);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
-
-    public void subscribeRmsExtremeUnderVoltagePeriodPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_EXTREME_UNDER_VOLTAGE_PERIOD_PHASE_C_ATTRIBUTE_ID);
 
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_EXTREME_UNDER_VOLTAGE_PERIOD_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+    public interface ReverseOpenCommissioningWindowCallback extends BaseClusterCallback {
+      void onSuccess(Integer commissioningTimeout, byte[] PAKEPasscodeVerifier, Integer discriminator, Long iterations, byte[] salt);
     }
 
-    public void readRmsVoltageSagPeriodPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_SAG_PERIOD_PHASE_C_ATTRIBUTE_ID);
+    public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
 
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_SAG_PERIOD_PHASE_C_ATTRIBUTE_ID, true);
+    public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
     }
 
-    public void subscribeRmsVoltageSagPeriodPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_SAG_PERIOD_PHASE_C_ATTRIBUTE_ID);
+    public interface EventListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
 
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, RMS_VOLTAGE_SAG_PERIOD_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+    public interface AttributeListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
     }
 
-    public void readRmsVoltageSwellPeriodPhaseCAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_SWELL_PERIOD_PHASE_C_ATTRIBUTE_ID);
+    public void readSupportedDeviceCategoriesAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_DEVICE_CATEGORIES_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, RMS_VOLTAGE_SWELL_PERIOD_PHASE_C_ATTRIBUTE_ID, true);
+        }, SUPPORTED_DEVICE_CATEGORIES_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeRmsVoltageSwellPeriodPhaseCAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RMS_VOLTAGE_SWELL_PERIOD_PHASE_C_ATTRIBUTE_ID);
+    public void subscribeSupportedDeviceCategoriesAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_DEVICE_CATEGORIES_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, RMS_VOLTAGE_SWELL_PERIOD_PHASE_C_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, SUPPORTED_DEVICE_CATEGORIES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -62602,7 +63568,11 @@ public class ChipClusters {
     private static final long TIMED_WRITE_BOOLEAN_ATTRIBUTE_ID = 48L;
     private static final long GENERAL_ERROR_BOOLEAN_ATTRIBUTE_ID = 49L;
     private static final long CLUSTER_ERROR_BOOLEAN_ATTRIBUTE_ID = 50L;
+    private static final long GLOBAL_ENUM_ATTRIBUTE_ID = 51L;
+    private static final long GLOBAL_STRUCT_ATTRIBUTE_ID = 52L;
     private static final long UNSUPPORTED_ATTRIBUTE_ID = 255L;
+    private static final long READ_FAILURE_CODE_ATTRIBUTE_ID = 12288L;
+    private static final long FAILURE_INT32_U_ATTRIBUTE_ID = 12289L;
     private static final long NULLABLE_BOOLEAN_ATTRIBUTE_ID = 16384L;
     private static final long NULLABLE_BITMAP8_ATTRIBUTE_ID = 16385L;
     private static final long NULLABLE_BITMAP16_ATTRIBUTE_ID = 16386L;
@@ -62637,6 +63607,8 @@ public class ChipClusters {
     private static final long NULLABLE_RANGE_RESTRICTED_INT16U_ATTRIBUTE_ID = 16424L;
     private static final long NULLABLE_RANGE_RESTRICTED_INT16S_ATTRIBUTE_ID = 16425L;
     private static final long WRITE_ONLY_INT8U_ATTRIBUTE_ID = 16426L;
+    private static final long NULLABLE_GLOBAL_ENUM_ATTRIBUTE_ID = 16435L;
+    private static final long NULLABLE_GLOBAL_STRUCT_ATTRIBUTE_ID = 16436L;
     private static final long MEI_INT8U_ATTRIBUTE_ID = 4294070017L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
@@ -63650,6 +64622,77 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void stringEchoRequest(StringEchoResponseCallback callback, byte[] payload) {
+      stringEchoRequest(callback, payload, 0);
+    }
+
+    public void stringEchoRequest(StringEchoResponseCallback callback, byte[] payload, int timedInvokeTimeoutMs) {
+      final long commandId = 24L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long payloadFieldID = 0L;
+      BaseTLVType payloadtlvValue = new ByteArrayType(payload);
+      elements.add(new StructElement(payloadFieldID, payloadtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long payloadFieldID = 0L;
+          byte[] payload = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == payloadFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                payload = castingValue.value(byte[].class);
+              }
+            }
+          }
+          callback.onSuccess(payload);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void globalEchoRequest(GlobalEchoResponseCallback callback, ChipStructs.UnitTestingClusterTestGlobalStruct field1, Integer field2) {
+      globalEchoRequest(callback, field1, field2, 0);
+    }
+
+    public void globalEchoRequest(GlobalEchoResponseCallback callback, ChipStructs.UnitTestingClusterTestGlobalStruct field1, Integer field2, int timedInvokeTimeoutMs) {
+      final long commandId = 25L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long field1FieldID = 0L;
+      BaseTLVType field1tlvValue = field1.encodeTlv();
+      elements.add(new StructElement(field1FieldID, field1tlvValue));
+
+      final long field2FieldID = 1L;
+      BaseTLVType field2tlvValue = new UIntType(field2);
+      elements.add(new StructElement(field2FieldID, field2tlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long field1FieldID = 0L;
+          ChipStructs.UnitTestingClusterTestGlobalStruct field1 = null;
+          final long field2FieldID = 1L;
+          Integer field2 = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == field1FieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+                StructType castingValue = element.value(StructType.class);
+                field1 = ChipStructs.UnitTestingClusterTestGlobalStruct.decodeTlv(castingValue);
+              }
+            } else if (element.contextTagNum() == field2FieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                field2 = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(field1, field2);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public void testDifferentVendorMeiRequest(TestDifferentVendorMeiResponseCallback callback, Integer arg1) {
       testDifferentVendorMeiRequest(callback, arg1, 0);
     }
@@ -63739,6 +64782,14 @@ public class ChipClusters {
       void onSuccess(byte[] buffer);
     }
 
+    public interface StringEchoResponseCallback extends BaseClusterCallback {
+      void onSuccess(byte[] payload);
+    }
+
+    public interface GlobalEchoResponseCallback extends BaseClusterCallback {
+      void onSuccess(ChipStructs.UnitTestingClusterTestGlobalStruct field1, Integer field2);
+    }
+
     public interface TestDifferentVendorMeiResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer arg1, Long eventNumber);
     }
@@ -63769,6 +64820,10 @@ public class ChipClusters {
 
     public interface ListFabricScopedAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.UnitTestingClusterTestFabricScoped> value);
+    }
+
+    public interface GlobalStructAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(ChipStructs.UnitTestingClusterTestGlobalStruct value);
     }
 
     public interface NullableBooleanAttributeCallback extends BaseAttributeCallback {
@@ -63901,6 +64956,14 @@ public class ChipClusters {
 
     public interface NullableRangeRestrictedInt16sAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Integer value);
+    }
+
+    public interface NullableGlobalEnumAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+    }
+
+    public interface NullableGlobalStructAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable ChipStructs.UnitTestingClusterTestGlobalStruct value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -65565,6 +66628,76 @@ public class ChipClusters {
         }, CLUSTER_ERROR_BOOLEAN_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
+    public void readGlobalEnumAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GLOBAL_ENUM_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GLOBAL_ENUM_ATTRIBUTE_ID, true);
+    }
+
+    public void writeGlobalEnumAttribute(DefaultClusterCallback callback, Integer value) {
+      writeGlobalEnumAttribute(callback, value, 0);
+    }
+
+    public void writeGlobalEnumAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), GLOBAL_ENUM_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeGlobalEnumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GLOBAL_ENUM_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GLOBAL_ENUM_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readGlobalStructAttribute(
+        GlobalStructAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GLOBAL_STRUCT_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.UnitTestingClusterTestGlobalStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GLOBAL_STRUCT_ATTRIBUTE_ID, true);
+    }
+
+    public void writeGlobalStructAttribute(DefaultClusterCallback callback, ChipStructs.UnitTestingClusterTestGlobalStruct value) {
+      writeGlobalStructAttribute(callback, value, 0);
+    }
+
+    public void writeGlobalStructAttribute(DefaultClusterCallback callback, ChipStructs.UnitTestingClusterTestGlobalStruct value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = value.encodeTlv();
+      writeAttribute(new WriteAttributesCallbackImpl(callback), GLOBAL_STRUCT_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeGlobalStructAttribute(
+        GlobalStructAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GLOBAL_STRUCT_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.UnitTestingClusterTestGlobalStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GLOBAL_STRUCT_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
     public void readUnsupportedAttribute(
         BooleanAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNSUPPORTED_ATTRIBUTE_ID);
@@ -65598,6 +66731,76 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, UNSUPPORTED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readReadFailureCodeAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, READ_FAILURE_CODE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, READ_FAILURE_CODE_ATTRIBUTE_ID, true);
+    }
+
+    public void writeReadFailureCodeAttribute(DefaultClusterCallback callback, Integer value) {
+      writeReadFailureCodeAttribute(callback, value, 0);
+    }
+
+    public void writeReadFailureCodeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), READ_FAILURE_CODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeReadFailureCodeAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, READ_FAILURE_CODE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, READ_FAILURE_CODE_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readFailureInt32UAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FAILURE_INT32_U_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FAILURE_INT32_U_ATTRIBUTE_ID, true);
+    }
+
+    public void writeFailureInt32UAttribute(DefaultClusterCallback callback, Long value) {
+      writeFailureInt32UAttribute(callback, value, 0);
+    }
+
+    public void writeFailureInt32UAttribute(DefaultClusterCallback callback, Long value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), FAILURE_INT32_U_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeFailureInt32UAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FAILURE_INT32_U_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FAILURE_INT32_U_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readNullableBooleanAttribute(
@@ -66788,6 +67991,76 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, WRITE_ONLY_INT8U_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readNullableGlobalEnumAttribute(
+        NullableGlobalEnumAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NULLABLE_GLOBAL_ENUM_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, NULLABLE_GLOBAL_ENUM_ATTRIBUTE_ID, true);
+    }
+
+    public void writeNullableGlobalEnumAttribute(DefaultClusterCallback callback, Integer value) {
+      writeNullableGlobalEnumAttribute(callback, value, 0);
+    }
+
+    public void writeNullableGlobalEnumAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
+      writeAttribute(new WriteAttributesCallbackImpl(callback), NULLABLE_GLOBAL_ENUM_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeNullableGlobalEnumAttribute(
+        NullableGlobalEnumAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NULLABLE_GLOBAL_ENUM_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, NULLABLE_GLOBAL_ENUM_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readNullableGlobalStructAttribute(
+        NullableGlobalStructAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NULLABLE_GLOBAL_STRUCT_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable ChipStructs.UnitTestingClusterTestGlobalStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, NULLABLE_GLOBAL_STRUCT_ATTRIBUTE_ID, true);
+    }
+
+    public void writeNullableGlobalStructAttribute(DefaultClusterCallback callback, ChipStructs.UnitTestingClusterTestGlobalStruct value) {
+      writeNullableGlobalStructAttribute(callback, value, 0);
+    }
+
+    public void writeNullableGlobalStructAttribute(DefaultClusterCallback callback, ChipStructs.UnitTestingClusterTestGlobalStruct value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = value != null ? value.encodeTlv() : new NullType();
+      writeAttribute(new WriteAttributesCallbackImpl(callback), NULLABLE_GLOBAL_STRUCT_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeNullableGlobalStructAttribute(
+        NullableGlobalStructAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NULLABLE_GLOBAL_STRUCT_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable ChipStructs.UnitTestingClusterTestGlobalStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, NULLABLE_GLOBAL_STRUCT_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readMeiInt8uAttribute(

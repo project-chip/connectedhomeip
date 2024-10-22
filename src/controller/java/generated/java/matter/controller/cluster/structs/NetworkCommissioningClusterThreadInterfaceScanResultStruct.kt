@@ -30,7 +30,7 @@ class NetworkCommissioningClusterThreadInterfaceScanResultStruct(
   val version: UByte,
   val extendedAddress: ByteArray,
   val rssi: Byte,
-  val lqi: UByte
+  val lqi: UByte,
 ) {
   override fun toString(): String = buildString {
     append("NetworkCommissioningClusterThreadInterfaceScanResultStruct {\n")
@@ -72,7 +72,7 @@ class NetworkCommissioningClusterThreadInterfaceScanResultStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): NetworkCommissioningClusterThreadInterfaceScanResultStruct {
       tlvReader.enterStructure(tlvTag)
       val panId = tlvReader.getUShort(ContextSpecificTag(TAG_PAN_ID))
@@ -94,7 +94,7 @@ class NetworkCommissioningClusterThreadInterfaceScanResultStruct(
         version,
         extendedAddress,
         rssi,
-        lqi
+        lqi,
       )
     }
   }

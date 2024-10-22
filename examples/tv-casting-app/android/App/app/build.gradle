@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.chip.casting"
-        minSdk 24
+        minSdk 26
         targetSdk 30
         versionCode 1
         versionName "1.0"
@@ -47,6 +47,8 @@ android {
             java.srcDirs = [
                     'src/main/java',
                     'src/main/jni',
+                    'src/compat/java',
+                    'src/compat/jni',
             ]
 
             // uncomment this code to debug

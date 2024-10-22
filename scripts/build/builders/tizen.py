@@ -39,11 +39,6 @@ class TizenApp(Enum):
         'examples/all-clusters-app/tizen',
         ('chip-all-clusters-app',
          'chip-all-clusters-app.map'))
-    ALL_CLUSTERS_MINIMAL = App(
-        'chip-all-clusters-minimal-app',
-        'examples/all-clusters-minimal-app/tizen',
-        ('chip-all-clusters-minimal-app',
-         'chip-all-clusters-minimal-app.map'))
     LIGHT = App(
         'chip-lighting-app',
         'examples/lighting-app/tizen',
@@ -117,6 +112,10 @@ class TizenBuilder(GnBuilder):
 
         if app == TizenApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
+            # Tizen test driver creates ISO image with all unit test files. So,
+            # it uses twice as much space as regular build. Due to CI storage
+            # limitations, we need to strip debug symbols from executables.
+            self.extra_gn_options.append('strip_symbols=true')
             self.build_command = 'check'
 
         if not enable_ble:

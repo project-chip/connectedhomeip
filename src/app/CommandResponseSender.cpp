@@ -132,10 +132,10 @@ void CommandResponseSender::DispatchCommand(CommandHandlerImpl & apCommandObj, c
     mpCommandHandlerCallback->DispatchCommand(apCommandObj, aCommandPath, apPayload);
 }
 
-Status CommandResponseSender::CommandExists(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status CommandResponseSender::ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request)
 {
-    VerifyOrReturnValue(mpCommandHandlerCallback, Protocols::InteractionModel::Status::UnsupportedCommand);
-    return mpCommandHandlerCallback->CommandExists(aCommandPath);
+    VerifyOrReturnValue(mpCommandHandlerCallback, Protocols::InteractionModel::Status::Failure);
+    return mpCommandHandlerCallback->ValidateCommandCanBeDispatched(request);
 }
 
 CHIP_ERROR CommandResponseSender::SendCommandResponse()
@@ -224,6 +224,22 @@ void CommandResponseSender::OnInvokeCommandRequest(Messaging::ExchangeContext * 
         // finished sending data. Closing must be deferred until the CommandHandler::OnDone callback.
         MoveToState(State::ErrorSentDelayCloseUntilOnDone);
     }
+}
+
+size_t CommandResponseSender::GetCommandResponseMaxBufferSize()
+{
+    if (!mExchangeCtx || !mExchangeCtx->HasSessionHandle())
+    {
+        ChipLogError(DataManagement, "Session not available. Unable to infer session-specific buffer capacities.");
+        return kMaxSecureSduLengthBytes;
+    }
+
+    if (mExchangeCtx->GetSessionHandle()->AllowsLargePayload())
+    {
+        return kMaxLargeSecureSduLengthBytes;
+    }
+
+    return kMaxSecureSduLengthBytes;
 }
 
 #if CHIP_WITH_NLFAULTINJECTION

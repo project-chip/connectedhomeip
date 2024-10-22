@@ -64,7 +64,7 @@ public:
     void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
 
-    Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
+    Protocols::InteractionModel::Status ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request) override;
 
     /**
      * Gets the inner exchange context object, without ownership.
@@ -123,6 +123,8 @@ public:
     }
 
     void ResponseDropped() override { mReportResponseDropped = true; }
+
+    size_t GetCommandResponseMaxBufferSize() override;
 
     /*
      * Main entrypoint for this class to handle an invoke request.

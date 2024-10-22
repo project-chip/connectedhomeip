@@ -18,11 +18,14 @@
 #import <Foundation/Foundation.h>
 #import <Matter/Matter.h>
 
+#import "MTRDeviceClusterData.h"
+#import "MTRDeviceDataValueDictionary.h"
+#import "MTRDevice_Internal.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Declarations for internal methods
 
-@class MTRDeviceClusterData;
 // MTRDeviceControllerDataStore.h includes C++ header, and so we need to declare the methods separately
 @protocol MTRDeviceControllerDataStoreAttributeStoreMethods
 - (nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)getStoredClusterDataForNodeID:(NSNumber *)nodeID;
@@ -47,9 +50,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDevice (Test)
 - (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther;
-- (MTRDeviceClusterData *)_getClusterDataForPath:(MTRClusterPath *)path;
-- (BOOL)_clusterHasBeenPersisted:(MTRClusterPath *)path;
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
+- (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
 @end
 
 #pragma mark - Declarations for items compiled only for DEBUG configuration
@@ -57,6 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 #ifdef DEBUG
 @interface MTRDeviceController (TestDebug)
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
+- (NSUInteger)unitTestDelegateCount;
 @end
 
 @interface MTRBaseDevice (TestDebug)
@@ -78,6 +81,12 @@ NS_ASSUME_NONNULL_BEGIN
           reportToPersistenceDelayMaxMultiplier:(double)reportToPersistenceDelayMaxMultiplier
     deviceReportingExcessivelyIntervalThreshold:(NSTimeInterval)deviceReportingExcessivelyIntervalThreshold;
 - (void)unitTestSetMostRecentReportTimes:(NSMutableArray<NSDate *> *)mostRecentReportTimes;
+- (NSUInteger)unitTestNonnullDelegateCount;
+- (void)unitTestResetSubscription;
+- (MTRDeviceClusterData *)unitTestGetClusterDataForPath:(MTRClusterPath *)path;
+- (NSSet<MTRClusterPath *> *)unitTestGetPersistedClusters;
+- (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;
+- (NSUInteger)unitTestAttributeCount;
 @end
 #endif
 

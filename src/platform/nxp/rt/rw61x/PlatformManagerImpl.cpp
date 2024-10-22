@@ -50,6 +50,8 @@
 #endif
 
 extern "C" void BOARD_InitHardware(void);
+extern "C" void otPlatSetResetFunction(void (*fp)(void));
+extern "C" void initiateResetInIdle(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 
@@ -110,7 +112,6 @@ void PlatformManagerImpl::HardwareInit(void)
 CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
 {
     status_t status;
-    hal_rng_status_t rngStatus;
     CHIP_ERROR chipRes = CHIP_NO_ERROR;
 
     status = CRYPTO_InitHardware();
@@ -194,9 +195,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = ServiceInit();
     SuccessOrExit(err);
 
-#ifdef SPINEL_INTERFACE_RPMSG
-    otPlatRadioInitSpinelInterface();
-#endif /* SPINEL_INTERFACE_RPMSG */
     PLATFORM_InitOt();
     /*
      * Initialize the RCP here: the WiFi initialization requires to enable/disable
@@ -205,10 +203,12 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
      */
     otPlatLogInit();
     otPlatRadioInit();
+    otPlatSetResetFunction(initiateResetInIdle);
+    otPlatRandomInit();
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    osError = os_setup_idle_function(chip::DeviceLayer::PlatformManagerImpl::IdleHook);
+    osError = OSA_SetupIdleFunction(chip::DeviceLayer::PlatformManagerImpl::IdleHook);
     if (osError != WM_SUCCESS)
     {
         ChipLogError(DeviceLayer, "Failed to setup idle function");
@@ -305,6 +305,22 @@ void PlatformManagerImpl::ScheduleResetInIdle(void)
 bool PlatformManagerImpl::GetResetInIdleValue(void)
 {
     return resetInIdle;
+}
+
+extern "C" void initiateResetInIdle(void)
+{
+    PlatformMgr().Shutdown();
+    PlatformMgrImpl().ScheduleResetInIdle();
+}
+
+extern "C" void scheduleResetInIdle(void)
+{
+    PlatformMgrImpl().ScheduleResetInIdle();
+}
+
+extern "C" bool getResetInIdleValue(void)
+{
+    return PlatformMgrImpl().GetResetInIdleValue();
 }
 
 void PlatformManagerImpl::StopBLEConnectivity(void) {}

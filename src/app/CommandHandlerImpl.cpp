@@ -19,8 +19,10 @@
 
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/RequiredPrivilege.h>
 #include <app/StatusResponse.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPConfig.h>
@@ -30,6 +32,7 @@
 #include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
 #include <platform/LockTracker.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <protocols/secure_channel/Constants.h>
 
 namespace chip {
@@ -65,7 +68,9 @@ CHIP_ERROR CommandHandlerImpl::AllocateBuffer()
     {
         mCommandMessageWriter.Reset();
 
-        System::PacketBufferHandle commandPacket = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+        const size_t commandBufferMaxSize = mpResponder->GetCommandResponseMaxBufferSize();
+        auto commandPacket                = System::PacketBufferHandle::New(commandBufferMaxSize);
+
         VerifyOrReturnError(!commandPacket.IsNull(), CHIP_ERROR_NO_MEMORY);
 
         mCommandMessageWriter.Init(std::move(commandPacket));
@@ -319,6 +324,7 @@ void CommandHandlerImpl::InvalidateHandles()
     {
         handle->Invalidate();
     }
+    mpHandleList.Clear();
 }
 
 void CommandHandlerImpl::IncrementHoldOff(Handle * apHandle)
@@ -385,51 +391,16 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
     {
-        Status commandExists = mpCallback->CommandExists(concretePath);
-        if (commandExists != Status::Success)
+        DataModel::InvokeRequest request;
+
+        request.path              = concretePath;
+        request.subjectDescriptor = GetSubjectDescriptor();
+        request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
+
+        Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
+        if (preCheckStatus != Status::Success)
         {
-            ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%x",
-                          ChipLogValueMEI(concretePath.mCommandId), ChipLogValueMEI(concretePath.mClusterId),
-                          concretePath.mEndpointId);
-            return FallibleAddStatus(concretePath, commandExists) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
-        }
-    }
-
-    {
-        Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
-        Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
-        Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
-        err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
-        if (err != CHIP_NO_ERROR)
-        {
-            if (err != CHIP_ERROR_ACCESS_DENIED)
-            {
-                return FallibleAddStatus(concretePath, Status::Failure) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
-            }
-            // TODO: when wildcard invokes are supported, handle them to discard rather than fail with status
-            return FallibleAddStatus(concretePath, Status::UnsupportedAccess) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
-        }
-    }
-
-    if (CommandNeedsTimedInvoke(concretePath.mClusterId, concretePath.mCommandId) && !IsTimedInvoke())
-    {
-        // TODO: when wildcard invokes are supported, discard a
-        // wildcard-expanded path instead of returning a status.
-        return FallibleAddStatus(concretePath, Status::NeedsTimedInteraction) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
-    }
-
-    if (CommandIsFabricScoped(concretePath.mClusterId, concretePath.mCommandId))
-    {
-        // SPEC: Else if the command in the path is fabric-scoped and there is no accessing fabric,
-        // a CommandStatusIB SHALL be generated with the UNSUPPORTED_ACCESS Status Code.
-
-        // Fabric-scoped commands are not allowed before a specific accessing fabric is available.
-        // This is mostly just during a PASE session before AddNOC.
-        if (GetAccessingFabricIndex() == kUndefinedFabricIndex)
-        {
-            // TODO: when wildcard invokes are supported, discard a
-            // wildcard-expanded path instead of returning a status.
-            return FallibleAddStatus(concretePath, Status::UnsupportedAccess) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
+            return FallibleAddStatus(concretePath, preCheckStatus) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
         }
     }
 
@@ -507,11 +478,19 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     // once up front and discard all the paths at once.  Ordering with respect
     // to ACL and command presence checks does not matter, because the behavior
     // is the same for all of them: ignore the path.
+#if !CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+
+    // Without data model interface, we can query individual commands.
+    // Data model interface queries commands by a full path so we need endpointID as well.
+    //
+    // Since this is a performance update and group commands are never timed,
+    // missing this should not be that noticeable.
     if (CommandNeedsTimedInvoke(clusterId, commandId))
     {
         // Group commands are never timed.
         return Status::Success;
     }
+#endif
 
     // No check for `CommandIsFabricScoped` unlike in `ProcessCommandDataIB()` since group commands
     // always have an accessing fabric, by definition.
@@ -533,27 +512,21 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
 
         const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
 
-        if (mpCallback->CommandExists(concretePath) != Status::Success)
         {
-            ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%x",
-                          ChipLogValueMEI(commandId), ChipLogValueMEI(clusterId), mapping.endpoint_id);
+            DataModel::InvokeRequest request;
 
-            continue;
-        }
+            request.path              = concretePath;
+            request.subjectDescriptor = GetSubjectDescriptor();
+            request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
 
-        {
-            Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
-            Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
-            Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
-            err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
-            if (err != CHIP_NO_ERROR)
+            Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
+            if (preCheckStatus != Status::Success)
             {
-                // NOTE: an expected error is CHIP_ERROR_ACCESS_DENIED, but there could be other unexpected errors;
-                // therefore, keep processing subsequent commands, and if any errors continue, those subsequent
-                // commands will likewise fail.
+                // Command failed for a specific path, but keep trying the rest of the paths.
                 continue;
             }
         }
+
         if ((err = DataModelCallbacks::GetInstance()->PreCommandReceived(concretePath, GetSubjectDescriptor())) == CHIP_NO_ERROR)
         {
             TLV::TLVReader dataReader(commandDataReader);
@@ -592,11 +565,11 @@ CHIP_ERROR CommandHandlerImpl::AddStatusInternal(const ConcreteCommandPath & aCo
     return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddStatusInternal(aCommandPath, aStatus); });
 }
 
-void CommandHandlerImpl::AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
-                                   const char * context)
+void CommandHandlerImpl::AddStatus(const ConcreteCommandPath & aCommandPath,
+                                   const Protocols::InteractionModel::ClusterStatusCode & status, const char * context)
 {
 
-    CHIP_ERROR error = FallibleAddStatus(aCommandPath, aStatus, context);
+    CHIP_ERROR error = FallibleAddStatus(aCommandPath, status, context);
 
     if (error != CHIP_NO_ERROR)
     {
@@ -610,33 +583,37 @@ void CommandHandlerImpl::AddStatus(const ConcreteCommandPath & aCommandPath, con
     }
 }
 
-CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & path, const Protocols::InteractionModel::Status status,
+CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & path,
+                                                 const Protocols::InteractionModel::ClusterStatusCode & status,
                                                  const char * context)
 {
-    if (status != Status::Success)
+    if (!status.IsSuccess())
     {
         if (context == nullptr)
         {
             context = "no additional context";
         }
 
-        ChipLogError(DataManagement,
-                     "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus " (%s)",
-                     path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
-                     ChipLogValueIMStatus(status), context);
+        if (status.HasClusterSpecificCode())
+        {
+            ChipLogError(DataManagement,
+                         "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus
+                         " ClusterSpecificCode=%u (%s)",
+                         path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
+                         ChipLogValueIMStatus(status.GetStatus()), static_cast<unsigned>(status.GetClusterSpecificCode().Value()),
+                         context);
+        }
+        else
+        {
+            ChipLogError(DataManagement,
+                         "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus
+                         " (%s)",
+                         path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
+                         ChipLogValueIMStatus(status.GetStatus()), context);
+        }
     }
 
-    return AddStatusInternal(path, StatusIB(status));
-}
-
-CHIP_ERROR CommandHandlerImpl::AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
-{
-    return AddStatusInternal(aCommandPath, StatusIB(Status::Success, aClusterStatus));
-}
-
-CHIP_ERROR CommandHandlerImpl::AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
-{
-    return AddStatusInternal(aCommandPath, StatusIB(Status::Failure, aClusterStatus));
+    return AddStatusInternal(path, StatusIB{ status });
 }
 
 CHIP_ERROR CommandHandlerImpl::PrepareInvokeResponseCommand(const ConcreteCommandPath & aResponseCommandPath,
