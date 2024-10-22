@@ -94,7 +94,8 @@ class TC_OPCREDS_3_4(MatterBaseTest):
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id, cluster=opcreds,
             attribute=opcreds.Attributes.TrustedRootCertificates)
-        asserts.assert_equal(len(trusted_root_list_original), 1, "Unexpected number of entries in the TrustedRootCertificates table")
+        asserts.assert_equal(len(trusted_root_list_original), 1,
+                             "Unexpected number of entries in the TrustedRootCertificates table")
 
         self.step(4)
         cmd = opcreds.Commands.UpdateNOC(NOCValue=noc_original, ICACValue=icac_original)
