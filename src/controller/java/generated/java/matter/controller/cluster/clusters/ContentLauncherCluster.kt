@@ -190,8 +190,8 @@ class ContentLauncherCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_CONTENT_U_R_L_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_CONTENT_U_R_L_REQ), contentURL)
+    val TAG_CONTENT_URL_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_CONTENT_URL_REQ), contentURL)
 
     val TAG_DISPLAY_STRING_REQ: Int = 1
     displayString?.let { tlvWriter.put(ContextSpecificTag(TAG_DISPLAY_STRING_REQ), displayString) }

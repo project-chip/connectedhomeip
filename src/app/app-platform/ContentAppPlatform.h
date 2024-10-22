@@ -165,7 +165,7 @@ public:
     std::set<NodeId> GetNodeIdsForContentApp(uint16_t vendorId, uint16_t productId);
 
     // returns set of connected nodes for a given allowed vendor id
-    std::set<NodeId> GetNodeIdsForAllowVendorId(uint16_t vendorId);
+    std::set<NodeId> GetNodeIdsForAllowedVendorId(uint16_t vendorId);
 
     // store node id for content app after commissioning
     // node id can be used later on to update ACL
@@ -188,6 +188,8 @@ public:
      * @param[in] targetVendorId  Vendor ID for the target device.
      * @param[in] targetProductId Product ID for the target device.
      * @param[in] localNodeId     The NodeId for the local device.
+     * @param[in] rotatingId      The rotating account ID to handle account login.
+     * @param[in] passcode        The passcode to handle account login.
      * @param[in] bindings        Any additional bindings to include. This may include current bindings.
      * @param[in] successCb       The function to be called on success of adding the binding.
      * @param[in] failureCb       The function to be called on failure of adding the binding.
@@ -195,7 +197,7 @@ public:
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR ManageClientAccess(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle, uint16_t targetVendorId,
-                                  uint16_t targetProductId, NodeId localNodeId,
+                                  uint16_t targetProductId, NodeId localNodeId, chip::CharSpan rotatingId, uint32_t passcode,
                                   std::vector<app::Clusters::Binding::Structs::TargetStruct::Type> bindings,
                                   Controller::WriteResponseSuccessCallback successCb,
                                   Controller::WriteResponseFailureCallback failureCb);

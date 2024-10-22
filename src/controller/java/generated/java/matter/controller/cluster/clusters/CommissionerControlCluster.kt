@@ -92,9 +92,9 @@ class CommissionerControlCluster(
   }
 
   suspend fun requestCommissioningApproval(
-    requestId: ULong,
-    vendorId: UShort,
-    productId: UShort,
+    requestID: ULong,
+    vendorID: UShort,
+    productID: UShort,
     label: String?,
     timedInvokeTimeout: Duration? = null,
   ) {
@@ -104,13 +104,13 @@ class CommissionerControlCluster(
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_REQUEST_ID_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_REQUEST_ID_REQ), requestId)
+    tlvWriter.put(ContextSpecificTag(TAG_REQUEST_ID_REQ), requestID)
 
     val TAG_VENDOR_ID_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_VENDOR_ID_REQ), vendorId)
+    tlvWriter.put(ContextSpecificTag(TAG_VENDOR_ID_REQ), vendorID)
 
     val TAG_PRODUCT_ID_REQ: Int = 2
-    tlvWriter.put(ContextSpecificTag(TAG_PRODUCT_ID_REQ), productId)
+    tlvWriter.put(ContextSpecificTag(TAG_PRODUCT_ID_REQ), productID)
 
     val TAG_LABEL_REQ: Int = 3
     label?.let { tlvWriter.put(ContextSpecificTag(TAG_LABEL_REQ), label) }
@@ -128,10 +128,8 @@ class CommissionerControlCluster(
   }
 
   suspend fun commissionNode(
-    requestId: ULong,
+    requestID: ULong,
     responseTimeoutSeconds: UShort,
-    ipAddress: ByteArray?,
-    port: UShort?,
     timedInvokeTimeout: Duration? = null,
   ): ReverseOpenCommissioningWindow {
     val commandId: UInt = 1u
@@ -140,16 +138,10 @@ class CommissionerControlCluster(
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_REQUEST_ID_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_REQUEST_ID_REQ), requestId)
+    tlvWriter.put(ContextSpecificTag(TAG_REQUEST_ID_REQ), requestID)
 
     val TAG_RESPONSE_TIMEOUT_SECONDS_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_RESPONSE_TIMEOUT_SECONDS_REQ), responseTimeoutSeconds)
-
-    val TAG_IP_ADDRESS_REQ: Int = 2
-    ipAddress?.let { tlvWriter.put(ContextSpecificTag(TAG_IP_ADDRESS_REQ), ipAddress) }
-
-    val TAG_PORT_REQ: Int = 3
-    port?.let { tlvWriter.put(ContextSpecificTag(TAG_PORT_REQ), port) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -167,7 +159,7 @@ class CommissionerControlCluster(
     val TAG_COMMISSIONING_TIMEOUT: Int = 0
     var commissioningTimeout_decoded: UShort? = null
 
-    val TAG_P_A_K_E_PASSCODE_VERIFIER: Int = 1
+    val TAG_PAKE_PASSCODE_VERIFIER: Int = 1
     var PAKEPasscodeVerifier_decoded: ByteArray? = null
 
     val TAG_DISCRIMINATOR: Int = 2
@@ -186,7 +178,7 @@ class CommissionerControlCluster(
         commissioningTimeout_decoded = tlvReader.getUShort(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_P_A_K_E_PASSCODE_VERIFIER)) {
+      if (tag == ContextSpecificTag(TAG_PAKE_PASSCODE_VERIFIER)) {
         PAKEPasscodeVerifier_decoded = tlvReader.getByteArray(tag)
       }
 

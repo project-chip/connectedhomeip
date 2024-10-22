@@ -157,7 +157,7 @@ typedef void (*OnDeviceConnectionRetry)(void * context, const ScopedNodeId & pee
 class DLL_EXPORT OperationalSessionSetup : public SessionEstablishmentDelegate, public AddressResolve::NodeListener
 {
 public:
-    struct ConnnectionFailureInfo
+    struct ConnectionFailureInfo
     {
         const ScopedNodeId peerId;
         CHIP_ERROR error;
@@ -170,12 +170,12 @@ public:
         Optional<System::Clock::Milliseconds16> requestedBusyDelay;
 #endif // CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
 
-        ConnnectionFailureInfo(const ScopedNodeId & peer, CHIP_ERROR err, SessionEstablishmentStage stage) :
+        ConnectionFailureInfo(const ScopedNodeId & peer, CHIP_ERROR err, SessionEstablishmentStage stage) :
             peerId(peer), error(err), sessionStage(stage)
         {}
     };
 
-    using OnSetupFailure = void (*)(void * context, const ConnnectionFailureInfo & failureInfo);
+    using OnSetupFailure = void (*)(void * context, const ConnectionFailureInfo & failureInfo);
 
     ~OperationalSessionSetup() override;
 

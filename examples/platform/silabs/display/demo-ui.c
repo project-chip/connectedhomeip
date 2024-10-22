@@ -25,6 +25,7 @@
 #include "glib.h"
 #include "sl_component_catalog.h"
 #include "sl_memlcd.h"
+#include <app/icd/server/ICDServerConfig.h>
 #if SL_WIFI && !SLI_SI91X_MCU_INTERFACE
 #include "spi_multiplex.h"
 #endif // SL_WIFI && !SLI_SI91X_MCU_INTERFACE
@@ -106,9 +107,12 @@ void demoUIInit(GLIB_Context_t * context)
 sl_status_t updateDisplay(void)
 {
     sl_status_t status = SL_STATUS_OK;
-#if SLI_SI91X_MCU_INTERFACE && SL_ICD_ENABLED && DISPLAY_ENABLED
+
+#if SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER
+    // In sleep, memlcd will not be retained so re-initialize MEMLCD interface after sleep wakeup
     sl_memlcd_post_wakeup_init();
-#endif // SLI_SI91X_MCU_INTERFACE && SL_ICD_ENABLED && DISPLAY_ENABLED
+#endif // SLI_SI91X_MCU_INTERFACE && SL_ICD_ENABLED && CHIP_CONFIG_ENABLE_ICD_SERVER
+
 #if SL_LCDCTRL_MUX
     status = sl_wfx_host_pre_lcd_spi_transfer();
     if (status != SL_STATUS_OK)
@@ -122,6 +126,12 @@ sl_status_t updateDisplay(void)
     if (status != SL_STATUS_OK)
         return status;
 #endif // SL_LCDCTRL_MUX
+
+#if SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER
+    // MEMLCD is not a UULP component and not available in sleep so powering down before sleep and need to be re-initialized after
+    // sleep-wakeup
+    sl_memlcd_power_on(NULL, false);
+#endif // SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER
 
     return SL_STATUS_OK;
 }
@@ -157,6 +167,5 @@ void demoUIClearMainScreen(uint8_t * name)
 {
     GLIB_clear(&glibContext);
     demoUIDisplayHeader((char *) name);
-    demoUIDisplayApp(false);
     demoUIDisplayProtocols();
 }

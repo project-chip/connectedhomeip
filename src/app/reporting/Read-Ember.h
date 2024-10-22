@@ -18,18 +18,24 @@
 
 #include <access/SubjectDescriptor.h>
 #include <app/AttributeEncodeState.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/MessageDef/AttributeReportIBs.h>
-#include <app/data-model-interface/DataModel.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/Provider.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
 namespace reporting {
 namespace EmberImpl {
 
-CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
-                               bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
-                               const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState);
+DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel,
+                                                  const Access::SubjectDescriptor & subjectDescriptor, bool isFabricFiltered,
+                                                  AttributeReportIBs::Builder & reportBuilder,
+                                                  const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState);
+
+bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion);
 
 } // namespace EmberImpl
 } // namespace reporting

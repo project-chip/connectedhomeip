@@ -180,7 +180,7 @@ tests:
 
     - label:
           "Step 4b: After 10 seconds, TH reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.C01.Rsp && LVL.S.A0000
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
@@ -199,7 +199,7 @@ tests:
     - label:
           "Step 4c: After another 10 seconds, TH reads CurrentLevel attribute
           from DUT"
-      PICS: LVL.S.C01.Rsp && LVL.S.A0000
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
@@ -218,7 +218,7 @@ tests:
     - label:
           "Step 4d: After another 10 seconds, TH reads CurrentLevel attribute
           from DUT"
-      PICS: LVL.S.C01.Rsp && LVL.S.A0000
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:

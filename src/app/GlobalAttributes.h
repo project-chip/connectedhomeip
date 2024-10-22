@@ -32,13 +32,23 @@ namespace app {
 constexpr AttributeId GlobalAttributesNotInMetadata[] = {
     Clusters::Globals::Attributes::GeneratedCommandList::Id,
     Clusters::Globals::Attributes::AcceptedCommandList::Id,
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-    Clusters::Globals::Attributes::EventList::Id,
-#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     Clusters::Globals::Attributes::AttributeList::Id,
 };
 
 static_assert(ArrayIsSorted(GlobalAttributesNotInMetadata), "Array of global attribute ids must be sorted");
+
+inline bool IsSupportedGlobalAttributeNotInMetadata(AttributeId attributeId)
+{
+    for (auto & attr : GlobalAttributesNotInMetadata)
+    {
+        if (attr == attributeId)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 } // namespace app
 } // namespace chip

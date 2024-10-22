@@ -25,6 +25,9 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <string.h>
+#ifdef OTA_ENCRYPTION_ENABLE
+#include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
+#endif // OTA_ENCRYPTION_ENABLE
 
 using namespace chip::Credentials;
 
@@ -75,7 +78,7 @@ CHIP_ERROR DecodeTotal(Encoding::Buffer & reader, uint16_t & total)
     ReturnErrorOnFailure(reader.Get(sz));
     total     = (0xffff == sz) ? sizeof(uint16_t) : sz;
     reader.in = reader.begin + total;
-    ReturnErrorCodeIf(reader.in > reader.end, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(reader.in <= reader.end, CHIP_ERROR_INTERNAL);
     return CHIP_NO_ERROR;
 }
 
@@ -115,7 +118,7 @@ CHIP_ERROR Set(uint16_t id, Encoding::Buffer & in)
     {
         // New entry
         size_t temp_total = found.offset;
-        ReturnErrorCodeIf(temp_total + in.Size() > kPageSize, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(temp_total + in.Size() <= kPageSize, CHIP_ERROR_INVALID_ARGUMENT);
         // Copy entry
         ReturnErrorOnFailure(in.Get(page + temp_total, in.Size()));
         // Update total
@@ -135,7 +138,7 @@ CHIP_ERROR Set(uint16_t id, Encoding::Buffer & in)
         {
             // Size change, move to the end
             uint16_t temp_total = total - found.encoded_size;
-            ReturnErrorCodeIf(temp_total + in.Size() > kPageSize, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(temp_total + in.Size() <= kPageSize, CHIP_ERROR_INVALID_ARGUMENT);
             // Remove the entry
             memmove(page + found.offset, page + found.offset + found.encoded_size, temp_total);
             // Add the entry
@@ -290,12 +293,6 @@ CHIP_ERROR Storage::Commit()
         MSC_WriteWord((uint32_t *) Flash::sReadOnlyPage, Flash::sTemporaryPage, kPageSize);
 #endif // SLI_SI91X_MCU_INTERFACE
     }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR Storage::GetBaseAddress(uint32_t & value)
-{
-    value = (uint32_t) Flash::sReadOnlyPage;
     return CHIP_NO_ERROR;
 }
 
@@ -672,6 +669,18 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
 // Other
 //
 
+CHIP_ERROR Storage::SetCredentialsBaseAddress(uint32_t addr)
+{
+    Flash::sReadOnlyPage = (uint8_t *) addr;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Storage::GetCredentialsBaseAddress(uint32_t & addr)
+{
+    addr = (uint32_t) Flash::sReadOnlyPage;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR Storage::SetProvisionVersion(const char * value, size_t size)
 {
     return Flash::Set(Parameters::ID::kVersion, value, size);
@@ -708,7 +717,7 @@ CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
-#endif
+#endif // OTA_ENCRYPTION_ENABLE
 
 CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {

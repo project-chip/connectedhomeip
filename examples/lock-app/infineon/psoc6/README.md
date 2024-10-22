@@ -33,10 +33,11 @@ will then join the network.
 
 ## Building
 
--   [Modustoolbox Software](https://www.cypress.com/products/modustoolbox)
+-   Download and install
+    [Modustoolbox Software v3.2](https://www.infineon.com/modustoolbox)
 
-    Refer to `integrations/docker/images/chip-build-infineon/Dockerfile` or
-    `scripts/examples/gn_psoc6_example.sh` for downloading the Software and
+    Refer to `integrations/docker/images/stage-2/chip-build-infineon/Dockerfile`
+    or `scripts/examples/gn_psoc6_example.sh` for downloading the Software and
     related tools.
 
 -   Install some additional tools (likely already present for Matter
@@ -45,7 +46,7 @@ will then join the network.
     python3-pip
 
 -   Supported hardware:
-    [CY8CKIT-062S2-43012](https://www.cypress.com/CY8CKIT-062S2-43012)
+    [CY8CKIT-062S2-43012](https://www.infineon.com/CY8CKIT-062S2-43012)
 
 *   Build the example application:
 
@@ -66,11 +67,12 @@ more instructions_
 
 -   Put CY8CKIT-062S2-43012 board on KitProg3 CMSIS-DAP Mode by pressing the
     `MODE SELECT` button. `KITPROG3 STATUS` LED is ON confirms board is in
-    proper mode.
+    proper mode. (Modustoolbox Software needs to be installed)
 
 -   On the command line:
 
           $ cd ~/connectedhomeip
+          $ export CY_TOOLS_PATHS=<Modustoolbox install location>/tools_3.2
           $ python3 out/infineon-psoc6-lock/chip-psoc6-lock-example.flash.py
 
 ## Commissioning and cluster control
@@ -116,12 +118,12 @@ commands. These power cycle the BlueTooth hardware and disable BR/EDR mode.
 
 ### Cluster control
 
--   After successful commissioning, use the OnOff cluster command to toggle
-    device between On or Off states.
+-   After successful commissioning, use the doorlock cluster command to toggle
+    device between lock or Unlock states.
 
-    `$ ./out/debug/chip-tool onoff on 1234 1`
+    `$ ./out/debug/chip-tool doorlock lock-door 1234 1 --timedInteractionTimeoutMs 100`
 
-    `$ ./out/debug/chip-tool onoff off 1234 1`
+    `$ ./out/debug/chip-tool doorlock unlock-door 1234 1 --timedInteractionTimeoutMs 100`
 
 -   Cluster OnOff can also be done using the `USER_BTN1` button on the board.
     This button is configured with `APP_LOCK_BUTTON` in `include/AppConfig.h`.
@@ -173,7 +175,7 @@ cloud, giving every IoT device its own unique identity.
 
 For the description of OPTIGA™ Trust M Provisioning with test DAC generation and
 PAI and CD storage, please refer to
-[Infineon OPTIGA™ Trust M Provisioning](../../../../docs/guides/infineon_trustm_provisioning.md)
+[Infineon OPTIGA™ Trust M Provisioning](../../../../docs/platforms/infineon/infineon_trustm_provisioning.md)
 
 After completing OPTIGA™ Trust M Provisioning, proceed to
 [Flashing the Application](#flashing-the-application) section to continue with
@@ -183,4 +185,4 @@ subsequent steps.
 
 For the description of Software Update process with infineon PSoC6 example
 applications see
-[Infineon PSoC6 OTA Software Update](../../../../docs/guides/infineon_psoc6_software_update.md)
+[Infineon PSoC6 OTA Software Update](../../../../docs/platforms/infineon/infineon_psoc6_software_update.md)

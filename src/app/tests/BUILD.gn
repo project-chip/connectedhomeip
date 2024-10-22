@@ -140,12 +140,28 @@ source_set("operational-state-test-srcs") {
 }
 
 source_set("thread-border-router-management-test-srcs") {
-  sources = [ "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.cpp" ]
+  sources = [
+    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.cpp",
+    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.h",
+    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
+  ]
 
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+source_set("ecosystem-information-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/ecosystem-information-server/ecosystem-information-server.cpp",
+    "${chip_root}/src/app/clusters/ecosystem-information-server/ecosystem-information-server.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",
   ]
 }
@@ -190,12 +206,15 @@ chip_test_suite("tests") {
     "TestBasicCommandPathRegistry.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
+    "TestCheckInHandler.cpp",
+    "TestCommandHandlerInterfaceRegistry.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
     "TestConcreteAttributePath.cpp",
     "TestDataModelSerialization.cpp",
     "TestDefaultOTARequestorStorage.cpp",
     "TestDefaultThreadNetworkDirectoryStorage.cpp",
+    "TestEcosystemInformationCluster.cpp",
     "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
@@ -223,14 +242,17 @@ chip_test_suite("tests") {
   public_deps = [
     ":app-test-stubs",
     ":binding-test-srcs",
+    ":ecosystem-information-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
     ":power-cluster-test-srcs",
     ":thread-network-directory-test-srcs",
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
-    "${chip_root}/src/app/codegen-data-model:instance-header",
+    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/data-model-provider/tests:encode-decode",
+    "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",

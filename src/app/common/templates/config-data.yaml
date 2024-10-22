@@ -24,6 +24,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Scenes Management
     - RVC Run Mode
     - RVC Clean Mode
+    - Service Area
     - Dishwasher Mode
     - Laundry Washer Mode
     - Oven Mode
@@ -71,6 +72,7 @@ ClustersWithAttributeChangedFunctions:
     - Pump Configuration and Control
     - Window Covering
     - Fan Control
+    - Thermostat
 
 ClustersWithShutdownFunctions:
     - Barrier Control
@@ -80,6 +82,7 @@ ClustersWithShutdownFunctions:
     - Color Control
     - Sample MEI
     - Scenes Management
+    - Thermostat
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock

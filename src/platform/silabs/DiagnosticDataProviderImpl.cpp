@@ -28,10 +28,11 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #endif
-#include "FreeRTOS.h"
 #include "sl_memory_manager.h"
+#include <cmsis_os2.h>
 #include <inet/InetInterface.h>
 #include <lib/support/CHIPMemString.h>
+#include <sl_cmsis_os2_common.h>
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
@@ -82,31 +83,24 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
 {
-    /* Obtain all available task information */
-    TaskStatus_t * taskStatusArray;
     ThreadMetrics * head = nullptr;
-    uint32_t arraySize, x, dummy;
 
-    arraySize = uxTaskGetNumberOfTasks();
+    uint32_t threadCount         = osThreadGetCount();
+    osThreadId_t * threadIdTable = static_cast<osThreadId_t *>(chip::Platform::MemoryCalloc(threadCount, sizeof(osThreadId_t)));
 
-    taskStatusArray = static_cast<TaskStatus_t *>(chip::Platform::MemoryCalloc(arraySize, sizeof(TaskStatus_t)));
-
-    if (taskStatusArray != NULL)
+    if (threadIdTable != nullptr)
     {
-        /* Generate raw status information about each task. */
-        arraySize = uxTaskGetSystemState(taskStatusArray, arraySize, &dummy);
-        /* For each populated position in the taskStatusArray array,
-           format the raw data as human readable ASCII data. */
-
-        for (x = 0; x < arraySize; x++)
+        osThreadEnumerate(threadIdTable, threadCount);
+        for (uint8_t tIdIndex = 0; tIdIndex < threadCount; tIdIndex++)
         {
+            osThreadId_t tId       = threadIdTable[tIdIndex];
             ThreadMetrics * thread = new ThreadMetrics();
             if (thread)
             {
-                Platform::CopyString(thread->NameBuf, taskStatusArray[x].pcTaskName);
+                thread->id = tIdIndex;
+                thread->stackFreeMinimum.Emplace(osThreadGetStackSpace(tId));
+                Platform::CopyString(thread->NameBuf, osThreadGetName(tId));
                 thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
-                thread->id = taskStatusArray[x].xTaskNumber;
-                thread->stackFreeMinimum.Emplace(taskStatusArray[x].usStackHighWaterMark);
 
                 /* Unsupported metrics */
                 // thread->stackSize
@@ -119,7 +113,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
 
         *threadMetricsOut = head;
         /* The array is no longer needed, free the memory it consumes. */
-        chip::Platform::MemoryFree(taskStatusArray);
+        chip::Platform::MemoryFree(threadIdTable);
     }
 
     return CHIP_NO_ERROR;

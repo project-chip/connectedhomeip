@@ -1,0 +1,199 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
+import("//build_overrides/openthread.gni")
+
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
+
+import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/platform/device.gni")
+
+declare_args() {
+  chip_software_version = 0
+  chip_simple_hash_verification = 0
+
+  # Setup discriminator as argument
+  setup_discriminator = 3840
+}
+
+if (chip_pw_tokenizer_logging) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_tokenizer/database.gni")
+}
+
+assert(current_os == "freertos")
+
+k32w0_platform_dir = "${nxp_sdk_matter_support_root}/examples/platform/k32w0"
+
+k32w0_sdk("sdk") {
+  sources = [
+    "${k32w0_platform_dir}/app/project_include/OpenThreadConfig.h",
+    "include/CHIPProjectConfig.h",
+    "include/FreeRTOSConfig.h",
+    "main/include/app_config.h",
+  ]
+
+  public_deps =
+      [ "${chip_root}/third_party/openthread/platforms:libopenthread-platform" ]
+
+  include_dirs = [
+    "main/include",
+    "main",
+    "include",
+    "${k32w0_platform_dir}/app/project_include",
+    "${k32w0_platform_dir}/app/support",
+    "${k32w0_platform_dir}/util/include",
+    "${k32w0_platform_dir}/common",
+  ]
+
+  defines = []
+  if (is_debug) {
+    defines += [ "BUILD_RELEASE=0" ]
+  } else {
+    defines += [ "BUILD_RELEASE=1" ]
+  }
+
+  if (chip_software_version != 0) {
+    defines += [
+      "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${chip_software_version}",
+    ]
+  }
+
+  defines += [
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+  ]
+}
+
+k32w0_executable("light_app") {
+  output_name = "chip-k32w0x-light-example"
+
+  defines = []
+
+  sources = [
+    "${k32w0_platform_dir}/util/DefaultTestEventTriggerDelegate.cpp",
+    "${k32w0_platform_dir}/util/LEDWidget.cpp",
+    "${k32w0_platform_dir}/util/include/LEDWidget.h",
+    "main/AppTask.cpp",
+    "main/LightingManager.cpp",
+    "main/ZclCallbacks.cpp",
+    "main/include/AppEvent.h",
+    "main/include/AppTask.h",
+    "main/include/LightingManager.h",
+    "main/main.cpp",
+  ]
+
+  if (chip_with_factory_data == 1 && use_custom_factory_provider == 1) {
+    sources += [
+      "${k32w0_platform_dir}/common/CustomFactoryDataProvider.cpp",
+      "${k32w0_platform_dir}/common/CustomFactoryDataProvider.h",
+    ]
+
+    defines += [ "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1" ]
+  }
+
+  deps = [
+    ":sdk",
+    "${chip_root}/examples/common/QRCode",
+    "${chip_root}/examples/lighting-app/nxp/zap/",
+    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/platform:syscalls_stub",
+    "${chip_root}/src/platform/logging:default",
+    "${chip_root}/third_party/mbedtls:mbedtls",
+    "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",
+  ]
+
+  defines += [ "CONNECTIVITY_MANAGER_THREAD_DEVICE_TYPE=ConnectivityManager::kThreadDeviceType_MinimalEndDevice" ]
+
+  deps += [
+    "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+    "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  ldscript = "${k32w0_platform_dir}/app/ldscripts/chip-k32w0x-linker.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [
+    "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,-print-memory-usage",
+  ]
+
+  if (chip_enable_ota_requestor) {
+    ldflags += [
+      "-Wl,--defsym",
+      "-Wl,__app_load_address__=0x4000",
+      "-Wl,--defsym",
+      "-Wl,__app_stated_size__=0x99200",
+    ]
+  }
+
+  output_dir = root_out_dir
+}
+
+if (chip_pw_tokenizer_logging) {
+  pw_tokenizer_database("light_app.database") {
+    database = "$root_build_dir/chip-k32w0x-light-example-database.bin"
+    create = "binary"
+    deps = [ ":light_app" ]
+    optional_paths = [ "$root_build_dir/chip-k32w0x-light-example" ]
+  }
+}
+
+group("k32w0") {
+  deps = [
+    ":binsign",
+    ":light_app",
+  ]
+
+  if (chip_enable_ota_requestor) {
+    deps += [ "${k32w0_platform_dir}/ssbl:ssbl" ]
+  }
+
+  if (chip_pw_tokenizer_logging) {
+    deps += [ ":light_app.database" ]
+  }
+}
+
+action("binsign") {
+  deps = [ ":light_app" ]
+  script = "${k32w0_platform_dir}/scripts/sign-outdir.py"
+  output_name = "bignsign.log"
+  outputs = [ "${root_build_dir}/${output_name}" ]
+
+  args = [
+    "--sdk-root",
+    rebase_path(k32w0_sdk_root),
+  ]
+
+  if (chip_simple_hash_verification == 1) {
+    args += [ "--simple-hash" ]
+  }
+
+  if (chip_enable_ota_requestor) {
+    args += [ "--ota-enabled" ]
+  }
+}
+
+group("default") {
+  deps = [ ":k32w0" ]
+}

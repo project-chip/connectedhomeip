@@ -17,25 +17,21 @@
 #include <app/reporting/Read-DataModel.h>
 
 #include <app/AppConfig.h>
-#include <app/data-model-interface/DataModel.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/util/MatterCallbacks.h>
+#include <optional>
 
 namespace chip {
 namespace app {
 namespace reporting {
 namespace DataModelImpl {
-namespace {
 
-bool IsOutOfSpaceError(CHIP_ERROR err)
-{
-    return (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL);
-}
-
-} // namespace
-
-CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
-                               bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
-                               const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
+DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel,
+                                                  const Access::SubjectDescriptor & subjectDescriptor, bool isFabricFiltered,
+                                                  AttributeReportIBs::Builder & reportBuilder,
+                                                  const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
 {
     // Odd ifdef is to only do this if the `Read-Check` does not do it already.
 #if !CHIP_CONFIG_USE_EMBER_DATA_MODEL
@@ -45,17 +41,17 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
                                                           DataModelCallbacks::OperationOrder::Pre, path);
 #endif // !CHIP_CONFIG_USE_EMBER_DATA_MODEL
 
-    InteractionModel::ReadAttributeRequest readRequest;
+    DataModel::ReadAttributeRequest readRequest;
 
     if (isFabricFiltered)
     {
-        readRequest.readFlags.Set(InteractionModel::ReadFlags::kFabricFiltered);
+        readRequest.readFlags.Set(DataModel::ReadFlags::kFabricFiltered);
     }
     readRequest.subjectDescriptor = subjectDescriptor;
     readRequest.path              = path;
 
     DataVersion version = 0;
-    if (std::optional<InteractionModel::ClusterInfo> clusterInfo = dataModel->GetClusterInfo(path); clusterInfo.has_value())
+    if (std::optional<DataModel::ClusterInfo> clusterInfo = dataModel->GetClusterInfo(path); clusterInfo.has_value())
     {
         version = clusterInfo->dataVersion;
     }
@@ -68,9 +64,10 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
     reportBuilder.Checkpoint(checkpoint);
 
     AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
-    CHIP_ERROR err = dataModel->ReadAttribute(readRequest, attributeValueEncoder);
 
-    if (err == CHIP_NO_ERROR)
+    DataModel::ActionReturnStatus status = dataModel->ReadAttribute(readRequest, attributeValueEncoder);
+
+    if (status.IsSuccess())
     {
         // Odd ifdef is to only do this if the `Read-Check` does not do it already.
 #if !CHIP_CONFIG_USE_EMBER_DATA_MODEL
@@ -82,12 +79,12 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
         DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
                                                               DataModelCallbacks::OperationOrder::Post, path);
 #endif // !CHIP_CONFIG_USE_EMBER_DATA_MODEL
-        return CHIP_NO_ERROR;
+        return status;
     }
 
     // Encoder state is relevant for errors in case they are retryable.
     //
-    // Generally only IsOutOfSpaceError(err) would be retryable, however we save the state
+    // Generally only out of space encoding errors would be retryable, however we save the state
     // for all errors in case this is information that is useful (retry or error position).
     if (encoderState != nullptr)
     {
@@ -97,11 +94,23 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
     // Out of space errors may be chunked data, reporting those cases would be very confusing
     // as they are not fully errors. Report only others (which presumably are not recoverable
     // and will be sent to the client as well).
-    if (!IsOutOfSpaceError(err))
+    if (!status.IsOutOfSpaceEncodingResponse())
     {
-        ChipLogError(DataManagement, "Failed to read attribute: %" CHIP_ERROR_FORMAT, err.Format());
+        DataModel::ActionReturnStatus::StringStorage storage;
+        ChipLogError(DataManagement, "Failed to read attribute: %s", status.c_str(storage));
     }
-    return err;
+    return status;
+}
+
+bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion)
+{
+    std::optional<DataModel::ClusterInfo> info = dataModel->GetClusterInfo(path);
+    if (!info.has_value())
+    {
+        return false;
+    }
+
+    return (info->dataVersion == dataVersion);
 }
 
 } // namespace DataModelImpl

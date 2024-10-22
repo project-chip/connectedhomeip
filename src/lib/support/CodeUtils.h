@@ -29,6 +29,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/support/ObjectDump.h>
 #include <lib/support/VerificationMacrosNoLogging.h>
 #include <lib/support/logging/TextOnlyLogging.h>
 
@@ -129,30 +130,6 @@
  */
 
 #include <nlassert.h>
-
-namespace chip {
-
-// Generic min() and max() functions
-//
-template <typename _T>
-constexpr inline const _T & min(const _T & a, const _T & b)
-{
-    if (b < a)
-        return b;
-
-    return a;
-}
-
-template <typename _T>
-constexpr inline const _T & max(const _T & a, const _T & b)
-{
-    if (a < b)
-        return b;
-
-    return a;
-}
-
-} // namespace chip
 
 /**
  *  @def ReturnErrorOnFailure(expr)
@@ -335,31 +312,6 @@ constexpr inline const _T & max(const _T & a, const _T & b)
         }                                                                                                                          \
     } while (false)
 #endif // CHIP_CONFIG_ERROR_SOURCE
-
-/**
- *  @def ReturnErrorCodeIf(expr, code)
- *
- *  @brief
- *    Returns a specified error code if expression evaluates to true
- *
- *  Example usage:
- *
- *  @code
- *    ReturnErrorCodeIf(state == kInitialized, CHIP_NO_ERROR);
- *    ReturnErrorCodeIf(state == kInitialized, CHIP_ERROR_INCORRECT_STATE);
- *  @endcode
- *
- *  @param[in]  expr        A Boolean expression to be evaluated.
- *  @param[in]  code        A value to return if @a expr is false.
- */
-#define ReturnErrorCodeIf(expr, code)                                                                                              \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (expr)                                                                                                                  \
-        {                                                                                                                          \
-            return code;                                                                                                           \
-        }                                                                                                                          \
-    } while (false)
 
 /**
  *  @def SuccessOrExit(error)
@@ -545,6 +497,21 @@ inline void chipDie(void)
     nlABORT_ACTION(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDie(aCondition) VerifyOrDieWithoutLogging(aCondition)
+#endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+
+/**
+ * @def VerifyOrDieWithObject(aCondition, aObject)
+ *
+ * Like VerifyOrDie(), but calls DumpObjectToLog()
+ * on the provided object on failure before aborting
+ * if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE is enabled.
+ */
+#if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+#define VerifyOrDieWithObject(aCondition, aObject)                                                                                 \
+    nlABORT_ACTION(aCondition, ::chip::DumpObjectToLog(aObject);                                                                   \
+                   ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
+#else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+#define VerifyOrDieWithObject(aCondition, aObject) VerifyOrDieWithoutLogging(aCondition)
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 
 /**

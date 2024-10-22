@@ -33,6 +33,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
 
 set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash)
 
+set(CHIP_DATA_MODEL_INTERFACE "disabled" CACHE STRING "Data model interface option to use: enabled or disabled")
+
 if(NOT "${IDF_TARGET}" STREQUAL "esp32h2")
     list(APPEND CHIP_REQUIRE_COMPONENTS mdns)
 endif()
@@ -64,6 +66,12 @@ macro(chip_gn_arg_bool arg boolean)
     endif()
 endmacro()
 
+if ("${CHIP_DATA_MODEL_INTERFACE}" STREQUAL "enabled")
+    chip_gn_arg_append("chip_use_data_model_interface" "\"enabled\"")
+else()
+    chip_gn_arg_append("chip_use_data_model_interface" "\"disabled\"")
+endif()
+
 # ESP-IDF lets user set software version string by two ways:
 # 1. Project's CMakeLists.txt file and 2. Config option
 # It depends on CONFIG_APP_PROJECT_VER_FROM_CONFIG option
@@ -87,25 +95,25 @@ if (CONFIG_CHIP_CONFIG_IM_PRETTY_PRINT)
 endif()
 
 # Config the chip log level by IDF menuconfig
-if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 1)
+if (CONFIG_CHIP_LOG_DEFAULT_LEVEL GREATER_EQUAL 1)
     chip_gn_arg_bool  ("chip_error_logging" "true")
 else()
     chip_gn_arg_bool  ("chip_error_logging" "false")
 endif()
 
-if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 3)
+if (CONFIG_CHIP_LOG_DEFAULT_LEVEL GREATER_EQUAL 3)
     chip_gn_arg_bool  ("chip_progress_logging" "true")
 else()
     chip_gn_arg_bool  ("chip_progress_logging" "false")
 endif()
 
-if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 4)
+if (CONFIG_CHIP_LOG_DEFAULT_LEVEL GREATER_EQUAL 4)
     chip_gn_arg_bool  ("chip_detail_logging" "true")
 else()
     chip_gn_arg_bool  ("chip_detail_logging" "false")
 endif()
 
-if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 5)
+if (CONFIG_CHIP_LOG_DEFAULT_LEVEL GREATER_EQUAL 5)
     chip_gn_arg_bool  ("chip_automation_logging" "true")
 else()
     chip_gn_arg_bool  ("chip_automation_logging" "false")
@@ -135,9 +143,6 @@ endif()
 
 if(CONFIG_ENABLE_ICD_SERVER)
     chip_gn_arg_append("chip_enable_icd_server"               "true")
-    if(CONFIG_ICD_ENFORCE_SIT_SLOW_POLL_LIMIT)
-        chip_gn_arg_append("icd_enforce_sit_slow_poll_limit"               "true")
-    endif()
     if(CONFIG_ICD_REPORT_ON_ACTIVE_MODE)
         chip_gn_arg_append("chip_icd_report_on_active_mode"               "true")
     endif()
@@ -313,10 +318,6 @@ if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
 endif()
 
-if (CONFIG_ENABLE_MATTER_EVENT_LIST)
-    chip_gn_arg_append  ("enable_eventlist_attribute" "true")
-endif()
-
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
 
@@ -467,6 +468,13 @@ if(NOT CONFIG_USE_MINIMAL_MDNS)
     endif()
 endif()
 
+if(CONFIG_OPENTHREAD_BORDER_ROUTER)
+    idf_component_get_property(rcp_update_lib espressif__esp_rcp_update COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${rcp_update_lib}>)
+    idf_component_get_property(serial_flasher_lib espressif__esp-serial-flasher COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${serial_flasher_lib}>)
+endif()
+
 if (CONFIG_ENABLE_ENCRYPTED_OTA)
     idf_component_get_property(esp_encrypted_img_lib espressif__esp_encrypted_img COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${esp_encrypted_img_lib}>)
@@ -476,6 +484,12 @@ endif()
 if (NOT EXECUTABLE_COMPONENT_NAME)
   set(EXECUTABLE_COMPONENT_NAME "main")
 endif()
+
+if (CONFIG_ENABLE_DELTA_OTA)
+    idf_component_get_property(esp_delta_ota_lib espressif__esp_delta_ota COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${esp_delta_ota_lib}>)
+endif()
+
 idf_component_get_property(main_lib ${EXECUTABLE_COMPONENT_NAME} COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
 

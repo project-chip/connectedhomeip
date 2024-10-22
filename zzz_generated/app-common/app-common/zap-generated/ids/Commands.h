@@ -300,6 +300,14 @@ namespace CommissioningCompleteResponse {
 static constexpr CommandId Id = 0x00000005;
 } // namespace CommissioningCompleteResponse
 
+namespace SetTCAcknowledgements {
+static constexpr CommandId Id = 0x00000006;
+} // namespace SetTCAcknowledgements
+
+namespace SetTCAcknowledgementsResponse {
+static constexpr CommandId Id = 0x00000007;
+} // namespace SetTCAcknowledgementsResponse
+
 } // namespace Commands
 } // namespace GeneralCommissioning
 
@@ -1273,38 +1281,24 @@ static constexpr CommandId Id = 0x00000008;
 } // namespace Commands
 } // namespace WindowCovering
 
-namespace BarrierControl {
-namespace Commands {
-
-namespace BarrierControlGoToPercent {
-static constexpr CommandId Id = 0x00000000;
-} // namespace BarrierControlGoToPercent
-
-namespace BarrierControlStop {
-static constexpr CommandId Id = 0x00000001;
-} // namespace BarrierControlStop
-
-} // namespace Commands
-} // namespace BarrierControl
-
 namespace ServiceArea {
 namespace Commands {
 
-namespace SelectLocations {
+namespace SelectAreas {
 static constexpr CommandId Id = 0x00000000;
-} // namespace SelectLocations
+} // namespace SelectAreas
 
-namespace SelectLocationsResponse {
+namespace SelectAreasResponse {
 static constexpr CommandId Id = 0x00000001;
-} // namespace SelectLocationsResponse
+} // namespace SelectAreasResponse
 
-namespace SkipCurrentLocation {
+namespace SkipArea {
 static constexpr CommandId Id = 0x00000002;
-} // namespace SkipCurrentLocation
+} // namespace SkipArea
 
-namespace SkipCurrentLocationResponse {
+namespace SkipAreaResponse {
 static constexpr CommandId Id = 0x00000003;
-} // namespace SkipCurrentLocationResponse
+} // namespace SkipAreaResponse
 
 } // namespace Commands
 } // namespace ServiceArea
@@ -1340,17 +1334,13 @@ namespace SetActivePresetRequest {
 static constexpr CommandId Id = 0x00000006;
 } // namespace SetActivePresetRequest
 
-namespace StartPresetsSchedulesEditRequest {
-static constexpr CommandId Id = 0x00000007;
-} // namespace StartPresetsSchedulesEditRequest
+namespace AtomicResponse {
+static constexpr CommandId Id = 0x000000FD;
+} // namespace AtomicResponse
 
-namespace CancelPresetsSchedulesEditRequest {
-static constexpr CommandId Id = 0x00000008;
-} // namespace CancelPresetsSchedulesEditRequest
-
-namespace CommitPresetsSchedulesRequest {
-static constexpr CommandId Id = 0x00000009;
-} // namespace CommitPresetsSchedulesRequest
+namespace AtomicRequest {
+static constexpr CommandId Id = 0x000000FE;
+} // namespace AtomicRequest
 
 } // namespace Commands
 } // namespace Thermostat
@@ -1813,6 +1803,176 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace ContentAppObserver
 
+namespace ZoneManagement {
+namespace Commands {
+
+namespace CreateTwoDCartesianZone {
+static constexpr CommandId Id = 0x00000000;
+} // namespace CreateTwoDCartesianZone
+
+namespace CreateTwoDCartesianZoneResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace CreateTwoDCartesianZoneResponse
+
+namespace UpdateTwoDCartesianZone {
+static constexpr CommandId Id = 0x00000002;
+} // namespace UpdateTwoDCartesianZone
+
+namespace GetTwoDCartesianZone {
+static constexpr CommandId Id = 0x00000003;
+} // namespace GetTwoDCartesianZone
+
+namespace GetTwoDCartesianZoneResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace GetTwoDCartesianZoneResponse
+
+namespace RemoveZone {
+static constexpr CommandId Id = 0x00000005;
+} // namespace RemoveZone
+
+} // namespace Commands
+} // namespace ZoneManagement
+
+namespace CameraAvStreamManagement {
+namespace Commands {
+
+namespace AudioStreamAllocate {
+static constexpr CommandId Id = 0x00000000;
+} // namespace AudioStreamAllocate
+
+namespace AudioStreamAllocateResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace AudioStreamAllocateResponse
+
+namespace AudioStreamDeallocate {
+static constexpr CommandId Id = 0x00000002;
+} // namespace AudioStreamDeallocate
+
+namespace VideoStreamAllocate {
+static constexpr CommandId Id = 0x00000003;
+} // namespace VideoStreamAllocate
+
+namespace VideoStreamAllocateResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace VideoStreamAllocateResponse
+
+namespace VideoStreamModify {
+static constexpr CommandId Id = 0x00000005;
+} // namespace VideoStreamModify
+
+namespace VideoStreamDeallocate {
+static constexpr CommandId Id = 0x00000006;
+} // namespace VideoStreamDeallocate
+
+namespace SnapshotStreamAllocate {
+static constexpr CommandId Id = 0x00000007;
+} // namespace SnapshotStreamAllocate
+
+namespace SnapshotStreamAllocateResponse {
+static constexpr CommandId Id = 0x00000008;
+} // namespace SnapshotStreamAllocateResponse
+
+namespace SnapshotStreamDeallocate {
+static constexpr CommandId Id = 0x00000009;
+} // namespace SnapshotStreamDeallocate
+
+namespace SetStreamPriorities {
+static constexpr CommandId Id = 0x0000000A;
+} // namespace SetStreamPriorities
+
+namespace CaptureSnapshot {
+static constexpr CommandId Id = 0x0000000B;
+} // namespace CaptureSnapshot
+
+namespace CaptureSnapshotResponse {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace CaptureSnapshotResponse
+
+namespace SetViewport {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace SetViewport
+
+namespace SetImageRotation {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace SetImageRotation
+
+namespace SetImageFlipHorizontal {
+static constexpr CommandId Id = 0x0000000F;
+} // namespace SetImageFlipHorizontal
+
+namespace SetImageFlipVertical {
+static constexpr CommandId Id = 0x00000010;
+} // namespace SetImageFlipVertical
+
+} // namespace Commands
+} // namespace CameraAvStreamManagement
+
+namespace WebRTCTransportProvider {
+namespace Commands {
+
+namespace SolicitOffer {
+static constexpr CommandId Id = 0x00000001;
+} // namespace SolicitOffer
+
+namespace SolicitOfferResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace SolicitOfferResponse
+
+namespace ProvideOffer {
+static constexpr CommandId Id = 0x00000003;
+} // namespace ProvideOffer
+
+namespace ProvideOfferResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace ProvideOfferResponse
+
+namespace ProvideAnswer {
+static constexpr CommandId Id = 0x00000005;
+} // namespace ProvideAnswer
+
+namespace ProvideICECandidate {
+static constexpr CommandId Id = 0x00000006;
+} // namespace ProvideICECandidate
+
+namespace EndSession {
+static constexpr CommandId Id = 0x00000007;
+} // namespace EndSession
+
+} // namespace Commands
+} // namespace WebRTCTransportProvider
+
+namespace WebRTCTransportRequestor {
+namespace Commands {
+
+namespace Offer {
+static constexpr CommandId Id = 0x00000001;
+} // namespace Offer
+
+namespace Answer {
+static constexpr CommandId Id = 0x00000002;
+} // namespace Answer
+
+namespace ICECandidate {
+static constexpr CommandId Id = 0x00000003;
+} // namespace ICECandidate
+
+namespace End {
+static constexpr CommandId Id = 0x00000004;
+} // namespace End
+
+} // namespace Commands
+} // namespace WebRTCTransportRequestor
+
+namespace Chime {
+namespace Commands {
+
+namespace PlayChimeSound {
+static constexpr CommandId Id = 0x00000000;
+} // namespace PlayChimeSound
+
+} // namespace Commands
+} // namespace Chime
+
 namespace CommissionerControl {
 namespace Commands {
 
@@ -1830,28 +1990,6 @@ static constexpr CommandId Id = 0x00000002;
 
 } // namespace Commands
 } // namespace CommissionerControl
-
-namespace ElectricalMeasurement {
-namespace Commands {
-
-namespace GetProfileInfoResponseCommand {
-static constexpr CommandId Id = 0x00000000;
-} // namespace GetProfileInfoResponseCommand
-
-namespace GetProfileInfoCommand {
-static constexpr CommandId Id = 0x00000000;
-} // namespace GetProfileInfoCommand
-
-namespace GetMeasurementProfileResponseCommand {
-static constexpr CommandId Id = 0x00000001;
-} // namespace GetMeasurementProfileResponseCommand
-
-namespace GetMeasurementProfileCommand {
-static constexpr CommandId Id = 0x00000001;
-} // namespace GetMeasurementProfileCommand
-
-} // namespace Commands
-} // namespace ElectricalMeasurement
 
 namespace UnitTesting {
 namespace Commands {
@@ -1972,6 +2110,10 @@ namespace TestEnumsRequest {
 static constexpr CommandId Id = 0x0000000E;
 } // namespace TestEnumsRequest
 
+namespace GlobalEchoResponse {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace GlobalEchoResponse
+
 namespace TestNullableOptionalRequest {
 static constexpr CommandId Id = 0x0000000F;
 } // namespace TestNullableOptionalRequest
@@ -2011,6 +2153,10 @@ static constexpr CommandId Id = 0x00000017;
 namespace StringEchoRequest {
 static constexpr CommandId Id = 0x00000018;
 } // namespace StringEchoRequest
+
+namespace GlobalEchoRequest {
+static constexpr CommandId Id = 0x00000019;
+} // namespace GlobalEchoRequest
 
 namespace TestDifferentVendorMeiRequest {
 static constexpr CommandId Id = 0xFFF200AA;

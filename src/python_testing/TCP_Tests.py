@@ -15,25 +15,33 @@
 #    limitations under the License.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 #
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
 class TCP_Tests(MatterBaseTest):
 
+    # TCP Connection Establishment
     @async_test_body
-    async def test_TCPConnectionEstablishment(self):
+    async def test_TC_SC_8_1(self):
 
         try:
             device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
@@ -43,8 +51,9 @@ class TCP_Tests(MatterBaseTest):
         asserts.assert_equal(device.isSessionOverTCPConnection, True, "Session does not have associated TCP connection")
         asserts.assert_equal(device.isActiveSession, True, "Large Payload Session should be active over TCP connection")
 
+    # Large Payload Session Establishment
     @async_test_body
-    async def test_LargePayloadSessionEstablishment(self):
+    async def test_TC_SC_8_2(self):
 
         try:
             device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
@@ -53,8 +62,9 @@ class TCP_Tests(MatterBaseTest):
             asserts.fail("Unable to establish a CASE session over TCP to the device")
         asserts.assert_equal(device.sessionAllowsLargePayload, True, "Session does not have associated TCP connection")
 
+    # Session Inactive After TCP Disconnect
     @async_test_body
-    async def test_SessionInactiveAfterTCPDisconnect(self):
+    async def test_TC_SC_8_3(self):
 
         try:
             device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
@@ -67,8 +77,9 @@ class TCP_Tests(MatterBaseTest):
         asserts.assert_equal(device.isActiveSession, False,
                              "Large Payload Session should not be active after TCP connection closure")
 
+    # TCP Connect, Disconnect, Then Connect Again
     @async_test_body
-    async def test_TCPConnectDisconnectThenConnectAgain(self):
+    async def test_TC_SC_8_4(self):
 
         try:
             device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
@@ -90,8 +101,9 @@ class TCP_Tests(MatterBaseTest):
         asserts.assert_equal(device.isSessionOverTCPConnection, True, "Session does not have associated TCP connection")
         asserts.assert_equal(device.isActiveSession, True, "Large Payload Session should be active over TCP connection")
 
+    # OnOff Cluster Toggle Command Over TCP Session
     @async_test_body
-    async def test_OnOffToggleCommandOverTCPSession(self):
+    async def test_TC_SC_8_5(self):
 
         try:
             device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
@@ -109,8 +121,9 @@ class TCP_Tests(MatterBaseTest):
         except InteractionModelError:
             asserts.fail("Unexpected error returned by DUT")
 
+    # WildCard Read Over TCP Session
     @async_test_body
-    async def test_WildCardReadOverTCPSession(self):
+    async def test_TC_SC_8_6(self):
 
         try:
             device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
@@ -126,8 +139,9 @@ class TCP_Tests(MatterBaseTest):
         except InteractionModelError:
             asserts.fail("Unexpected error returned by DUT")
 
+    # Use TCP Session If Available For MRP Interaction
     @async_test_body
-    async def test_UseTCPSessionIfAvailableForMRPInteraction(self):
+    async def test_TC_SC_8_7(self):
 
         try:
             device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,

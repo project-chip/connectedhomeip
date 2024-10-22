@@ -24,6 +24,7 @@
 #include "StatusIB.h"
 
 #include "MessageDefHelper.h"
+#include "protocols/interaction_model/StatusCode.h"
 
 #include <inttypes.h>
 #include <stdarg.h>
@@ -149,31 +150,6 @@ CHIP_ERROR StatusIB::ToChipError() const
     return ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(mStatus));
 }
 
-void StatusIB::InitFromChipError(CHIP_ERROR aError)
-{
-    if (aError.IsPart(ChipError::SdkPart::kIMClusterStatus))
-    {
-        mStatus        = Status::Failure;
-        mClusterStatus = MakeOptional(aError.GetSdkCode());
-        return;
-    }
-
-    mClusterStatus = NullOptional;
-    if (aError == CHIP_NO_ERROR)
-    {
-        mStatus = Status::Success;
-        return;
-    }
-
-    if (aError.IsPart(ChipError::SdkPart::kIMGlobalStatus))
-    {
-        mStatus = static_cast<Status>(aError.GetSdkCode());
-        return;
-    }
-
-    mStatus = Status::Failure;
-}
-
 namespace {
 bool FormatStatusIBError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
@@ -192,7 +168,7 @@ bool FormatStatusIBError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     // formatted string, as long as we account for the possible string formats.
     constexpr size_t statusNameMaxLength =
 #define CHIP_IM_STATUS_CODE(name, spec_name, value)                                                                                \
-        max(sizeof(#spec_name),
+        std::max(sizeof(#spec_name),
 #include <protocols/interaction_model/StatusCodeList.h>
 #undef CHIP_IM_STATUS_CODE
         static_cast<size_t>(0)
@@ -201,11 +177,10 @@ bool FormatStatusIBError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 #include <protocols/interaction_model/StatusCodeList.h>
 #undef CHIP_IM_STATUS_CODE
         ;
-    constexpr size_t formattedSize = max(sizeof(generalFormat) + statusNameMaxLength, sizeof(clusterFormat));
+    constexpr size_t formattedSize = std::max(sizeof(generalFormat) + statusNameMaxLength, sizeof(clusterFormat));
     char formattedString[formattedSize];
 
-    StatusIB status;
-    status.InitFromChipError(err);
+    StatusIB status(err);
     if (status.mClusterStatus.HasValue())
     {
         snprintf(formattedString, formattedSize, clusterFormat, status.mClusterStatus.Value());

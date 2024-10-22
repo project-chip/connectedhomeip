@@ -17,6 +17,7 @@
 #include <app/reporting/Read-Ember.h>
 
 #include <app/AppConfig.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/util/MatterCallbacks.h>
 #include <app/util/ember-compatibility-functions.h>
 
@@ -25,9 +26,10 @@ namespace app {
 namespace reporting {
 namespace EmberImpl {
 
-CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
-                               bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
-                               const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
+DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel,
+                                                  const Access::SubjectDescriptor & subjectDescriptor, bool isFabricFiltered,
+                                                  AttributeReportIBs::Builder & reportBuilder,
+                                                  const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
 {
     // Odd ifdef is to only do this if the `Read-Check` does not do it already.
 #if !CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
@@ -47,6 +49,11 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
 #endif // !CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 
     return CHIP_NO_ERROR;
+}
+
+bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion)
+{
+    return IsClusterDataVersionEqual(path, dataVersion);
 }
 
 } // namespace EmberImpl

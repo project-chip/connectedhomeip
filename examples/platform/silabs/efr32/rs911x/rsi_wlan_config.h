@@ -20,6 +20,10 @@
 
 #include "rsi_wlan_defines.h"
 
+#if (SL_MATTER_GN_BUILD == 0)
+#include "sl_matter_wifi_config.h"
+#endif // SL_MATTER_GN_BUILD
+
 //! Enable feature
 #define RSI_ENABLE 1
 //! Disable feature

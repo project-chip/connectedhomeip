@@ -190,6 +190,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    ThreadStackMgr().ErasePersistentInfo();
+#endif
+
     err = BLConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {

@@ -31,6 +31,7 @@
 
 #include <errno.h>
 
+#include <filesystem>
 #include <sstream>
 #include <string>
 
@@ -461,8 +462,16 @@ void JsonBackend::CloseFile()
 CHIP_ERROR JsonBackend::OpenFile(const char * path)
 {
     CloseFile();
-    mOutputFile.open(path, std::ios_base::out);
 
+    std::error_code ec;
+    std::filesystem::path filePath(path);
+    // Create directories if they don't exist
+    if (!std::filesystem::create_directories(filePath.remove_filename(), ec))
+    {
+        return CHIP_ERROR_POSIX(ec.value());
+    }
+
+    mOutputFile.open(path, std::ios_base::out);
     if (!mOutputFile)
     {
         return CHIP_ERROR_POSIX(errno);

@@ -66,6 +66,11 @@ Davis, CA 95616, USA
     <clusterId id="0x0059" name="Dishwasher Mode"/>
   </clusterIds>
   <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="DISHM" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
+      <disallowConform/>
+    </feature>
+  </features>
   <dataTypes>
     <struct name="ModeOptionStruct">
       <field id="0" name="Label">
@@ -80,11 +85,6 @@ Davis, CA 95616, USA
       </field>
     </struct>
   </dataTypes>
-  <features>
-    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster is disallowed for this cluster">
-      <disallowConform/>
-    </feature>
-  </features>
   <attributes>
     <attribute id="0x0000" name="SupportedModes">
       <mandatoryConform/>

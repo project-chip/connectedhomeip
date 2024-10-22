@@ -148,8 +148,8 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
         (memcmp(netif->hwaddr, dst_mac, netif->hwaddr_len) != 0))
     {
 #ifdef WIFI_DEBUG_ENABLED
-        ChipLogProgress(DeviceLayer, "%s: DROP, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x",
-                        __func__,
+        ChipLogProgress(DeviceLayer,
+                        "lwip_input: DROP, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x",
 
                         dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
 
@@ -172,7 +172,7 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
         }
 #ifdef WIFI_DEBUG_ENABLED
         ChipLogProgress(DeviceLayer,
-                        "%s: ACCEPT %ld, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
+                        "lwip_input: ACCEPT %ld, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x",
                         bufferoffset,
 
                         dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],

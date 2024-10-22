@@ -91,7 +91,8 @@ defined:
     ### For Linux host example:
 
     ```
-    ./scripts/examples/gn_build_example.sh examples/fabric-bridge-app/linux out/debug/standalone chip_config_network_layer_ble=false 'import("//with_pw_rpc.gni")'
+    source scripts/activate.sh
+    ./scripts/build/build_examples.py --target linux-x64-fabric-bridge-rpc-no-ble build
     ```
 
     ### For Raspberry Pi 4 example:
@@ -127,13 +128,6 @@ defined:
 
     ```
     scp ./fabric-bridge-app ubuntu@xxx.xxx.xxx.xxx:/home/ubuntu
-    ```
-
--   To delete generated executable, libraries and object files use:
-
-    ```sh
-    cd ~/connectedhomeip/examples/fabric-bridge-app/linux
-    rm -rf out/
     ```
 
 ## Running the Complete Example on Ubuntu

@@ -229,9 +229,9 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
             wifi_config_t wifiConfig;
             memset(&wifiConfig, 0, sizeof(wifiConfig));
             memcpy(wifiConfig.sta.ssid, CHIP_DEVICE_CONFIG_DEFAULT_STA_SSID,
-                   min(strlen(CHIP_DEVICE_CONFIG_DEFAULT_STA_SSID), sizeof(wifiConfig.sta.ssid)));
+                   std::min(strlen(CHIP_DEVICE_CONFIG_DEFAULT_STA_SSID), sizeof(wifiConfig.sta.ssid)));
             memcpy(wifiConfig.sta.password, CHIP_DEVICE_CONFIG_DEFAULT_STA_PASSWORD,
-                   min(strlen(CHIP_DEVICE_CONFIG_DEFAULT_STA_PASSWORD), sizeof(wifiConfig.sta.password)));
+                   std::min(strlen(CHIP_DEVICE_CONFIG_DEFAULT_STA_PASSWORD), sizeof(wifiConfig.sta.password)));
             wifiConfig.sta.security = CHIP_DEVICE_CONFIG_DEFAULT_STA_SECURITY;
             err                     = Internal::PSOC6Utils::p6_wifi_set_config(WIFI_IF_STA, &wifiConfig);
             SuccessOrExit(err);

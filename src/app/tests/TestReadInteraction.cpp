@@ -15,16 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include <type_traits>
-
 #include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/InteractionModelEngine.h>
 #include <app/InteractionModelHelper.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/EventDataIB.h>
-#include <app/codegen-data-model/Instance.h>
+#include <app/codegen-data-model-provider/Instance.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
@@ -51,7 +48,7 @@ uint8_t gDebugEventBuffer[128];
 uint8_t gInfoEventBuffer[128];
 uint8_t gCritEventBuffer[128];
 chip::app::CircularEventBuffer gCircularEventBuffer[3];
-chip::ClusterId kTestClusterId          = 6;
+chip::ClusterId kTestClusterId          = 6; // OnOff, but not used as OnOff directly
 chip::ClusterId kTestEventClusterId     = chip::Test::MockClusterId(1);
 chip::ClusterId kInvalidTestClusterId   = 7;
 chip::EndpointId kTestEndpointId        = 1;
@@ -70,6 +67,65 @@ static chip::System::Clock::Internal::MockClock gMockClock;
 static chip::System::Clock::ClockBase * gRealClock;
 static chip::app::reporting::ReportSchedulerImpl * gReportScheduler;
 static bool sUsingSubSync = false;
+
+const chip::Test::MockNodeConfig & TestMockNodeConfig()
+{
+    using namespace chip::app;
+    using namespace chip::app::Clusters::Globals::Attributes;
+    using namespace chip::Test;
+
+    // clang-format off
+    static const chip::Test::MockNodeConfig config({
+        MockEndpointConfig(kTestEndpointId, {
+            MockClusterConfig(kTestClusterId, {
+                ClusterRevision::Id, FeatureMap::Id,
+                1,
+                2, // treated as a list
+            }),
+            MockClusterConfig(kInvalidTestClusterId, {
+                ClusterRevision::Id, FeatureMap::Id,
+                1,
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint1, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }, {
+                MockEventId(1), MockEventId(2),
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint2, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2),
+            }),
+            MockClusterConfig(MockClusterId(3), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
+            }),
+        }),
+        MockEndpointConfig(chip::Test::kMockEndpoint3, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3), MockAttributeId(4),
+            }),
+            MockClusterConfig(MockClusterId(3), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+            MockClusterConfig(MockClusterId(4), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+        }),
+    });
+    // clang-format on
+    return config;
+}
 
 class TestEventGenerator : public chip::app::EventLoggingDelegate
 {
@@ -259,7 +315,7 @@ public:
         AppContext::TearDownTestSuite();
     }
 
-    void SetUp()
+    void SetUp() override
     {
         const chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
@@ -272,11 +328,14 @@ public:
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
-        mOldModel = InteractionModelEngine::GetInstance()->SetDataModel(&TestImCustomDataModel::Instance());
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+        chip::Test::SetVersionTo(chip::Test::kTestDataVersion1);
     }
-    void TearDown()
+    void TearDown() override
     {
-        InteractionModelEngine::GetInstance()->SetDataModel(mOldModel);
+        chip::Test::ResetMockNodeConfig();
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::app::EventManagement::DestroyEventManagement();
         AppContext::TearDown();
     }
@@ -284,6 +343,7 @@ public:
     void TestReadClient();
     void TestReadUnexpectedSubscriptionId();
     void TestReadHandler();
+    void TestReadHandlerSetMaxReportingInterval();
     void TestReadClientGenerateAttributePathList();
     void TestReadClientGenerateInvalidAttributePathList();
     void TestReadClientInvalidReport();
@@ -331,7 +391,7 @@ public:
 protected:
     chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
     static bool sSyncScheduler;
-    chip::app::InteractionModel::DataModel * mOldModel = nullptr;
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
 bool TestReadInteraction::sSyncScheduler = false;
@@ -474,7 +534,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandler)
     {
         Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
         ReadHandler readHandler(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
-                                CodegenDataModelInstance());
+                                CodegenDataModelProviderInstance());
 
         GenerateReportData(reportDatabuf, ReportType::kValid, false /* aSuppressResponse*/);
         EXPECT_EQ(readHandler.SendReportData(std::move(reportDatabuf), false), CHIP_ERROR_INCORRECT_STATE);
@@ -506,6 +566,115 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandler)
 
     engine->Shutdown();
 
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandlerSetMaxReportingInterval)
+{
+    System::PacketBufferTLVWriter writer;
+    System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    SubscribeRequestMessage::Builder subscribeRequestBuilder;
+
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
+
+    uint16_t kIntervalInfMinInterval = 119;
+    uint16_t kMinInterval            = 120;
+    uint16_t kMaxIntervalCeiling     = 500;
+
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
+
+    {
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+
+        // Configure ReadHandler
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
+                                CodegenDataModelProviderInstance());
+
+        writer.Init(std::move(subscribeRequestbuf));
+        EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.KeepSubscriptions(true);
+        EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.MinIntervalFloorSeconds(kMinInterval);
+        EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.MaxIntervalCeilingSeconds(kMaxIntervalCeiling);
+        EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
+
+        AttributePathIBs::Builder & attributePathListBuilder = subscribeRequestBuilder.CreateAttributeRequests();
+        EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
+
+        AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
+        EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
+
+        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
+
+        attributePathListBuilder.EndOfAttributePathIBs();
+        EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
+
+        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
+
+        EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(&subscribeRequestbuf), CHIP_NO_ERROR);
+
+        EXPECT_EQ(readHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf)), CHIP_NO_ERROR);
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        // When an ICD build, the default behavior is to select the IdleModeDuration as MaxInterval
+        kMaxIntervalCeiling = readHandler.GetPublisherSelectedIntervalLimit();
+#endif
+        // Try to change the MaxInterval while ReadHandler is active
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(340), CHIP_ERROR_INCORRECT_STATE);
+
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(kMaxIntervalCeiling, maxInterval);
+        // Set ReadHandler to Idle to allow MaxInterval changes
+        readHandler.MoveToState(ReadHandler::HandlerState::Idle);
+
+        // TC1: MaxInterval < MinIntervalFloor
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(kIntervalInfMinInterval), CHIP_ERROR_INVALID_ARGUMENT);
+
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(kMaxIntervalCeiling, maxInterval);
+
+        // TC2: MaxInterval == MinIntervalFloor
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(kMinInterval), CHIP_NO_ERROR);
+
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(kMinInterval, maxInterval);
+
+        // TC3: Minterval < MaxInterval < max(GetPublisherSelectedIntervalLimit(), mSubscriberRequestedMaxInterval)
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(kMaxIntervalCeiling), CHIP_NO_ERROR);
+
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(kMaxIntervalCeiling, maxInterval);
+
+        // TC4: MaxInterval == Subscriber Requested Max Interval
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(readHandler.GetSubscriberRequestedMaxInterval()), CHIP_NO_ERROR);
+
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(readHandler.GetSubscriberRequestedMaxInterval(), maxInterval);
+
+        // TC4: MaxInterval == GetPublisherSelectedIntervalLimit()
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(readHandler.GetPublisherSelectedIntervalLimit()), CHIP_NO_ERROR);
+
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(readHandler.GetPublisherSelectedIntervalLimit(), maxInterval);
+
+        // TC5: MaxInterval >  max(GetPublisherSelectedIntervalLimit(), mSubscriberRequestedMaxInterval)
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(std::numeric_limits<uint16_t>::max()), CHIP_ERROR_INVALID_ARGUMENT);
+
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(readHandler.GetPublisherSelectedIntervalLimit(), maxInterval);
+    }
+
+    engine->Shutdown();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -630,7 +799,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandlerInvalidAttributePath)
     {
         Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
         ReadHandler readHandler(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
-                                CodegenDataModelInstance());
+                                CodegenDataModelProviderInstance());
 
         GenerateReportData(reportDatabuf, ReportType::kValid, false /* aSuppressResponse*/);
         EXPECT_EQ(readHandler.SendReportData(std::move(reportDatabuf), false), CHIP_ERROR_INCORRECT_STATE);
@@ -1356,7 +1525,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestProcessSubscribeRequest)
 
     {
         ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
-                                CodegenDataModelInstance());
+                                CodegenDataModelProviderInstance());
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -1416,7 +1585,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestSupMaxInt
 
     {
         ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
-                                CodegenDataModelInstance());
+                                CodegenDataModelProviderInstance());
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -1458,6 +1627,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestSupMaxInt
 
         EXPECT_EQ(minInterval, kMinInterval);
         EXPECT_EQ(maxInterval, idleModeDuration);
+        EXPECT_EQ(kMaxIntervalCeiling, readHandler.GetSubscriberRequestedMaxInterval());
     }
     engine->Shutdown();
 
@@ -1483,7 +1653,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestInfMaxInt
 
     {
         ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
-                                CodegenDataModelInstance());
+                                CodegenDataModelProviderInstance());
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -1525,6 +1695,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestInfMaxInt
 
         EXPECT_EQ(minInterval, kMinInterval);
         EXPECT_EQ(maxInterval, idleModeDuration);
+        EXPECT_EQ(kMaxIntervalCeiling, readHandler.GetSubscriberRequestedMaxInterval());
     }
     engine->Shutdown();
 
@@ -1550,7 +1721,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestSupMinInt
 
     {
         ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
-                                CodegenDataModelInstance());
+                                CodegenDataModelProviderInstance());
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -1592,6 +1763,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestSupMinInt
 
         EXPECT_EQ(minInterval, kMinInterval);
         EXPECT_EQ(maxInterval, (2 * idleModeDuration));
+        EXPECT_EQ(kMaxIntervalCeiling, readHandler.GetSubscriberRequestedMaxInterval());
     }
     engine->Shutdown();
 
@@ -1617,7 +1789,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestMaxMinInt
 
     {
         ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
-                                CodegenDataModelInstance());
+                                CodegenDataModelProviderInstance());
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -1657,6 +1829,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestMaxMinInt
 
         EXPECT_EQ(minInterval, kMinInterval);
         EXPECT_EQ(maxInterval, kMaxIntervalCeiling);
+        EXPECT_EQ(kMaxIntervalCeiling, readHandler.GetSubscriberRequestedMaxInterval());
     }
     engine->Shutdown();
 
@@ -1682,7 +1855,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestInvalidId
 
     {
         ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
-                                CodegenDataModelInstance());
+                                CodegenDataModelProviderInstance());
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -1722,6 +1895,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestInvalidId
 
         EXPECT_EQ(minInterval, kMinInterval);
         EXPECT_EQ(maxInterval, kMaxIntervalCeiling);
+        EXPECT_EQ(kMaxIntervalCeiling, readHandler.GetSubscriberRequestedMaxInterval());
     }
     engine->Shutdown();
 
@@ -1900,6 +2074,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeRoundtrip)
         uint16_t minInterval;
         uint16_t maxInterval;
         delegate.mpReadHandler->GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(readPrepareParams.mMaxIntervalCeilingSeconds, delegate.mpReadHandler->GetSubscriberRequestedMaxInterval());
 
         // Test empty report
         // Advance monotonic timestamp for min interval to elapse
@@ -1969,6 +2144,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeEarlyReport)
         uint16_t minInterval;
         uint16_t maxInterval;
         delegate.mpReadHandler->GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(readPrepareParams.mMaxIntervalCeilingSeconds, delegate.mpReadHandler->GetSubscriberRequestedMaxInterval());
 
         EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 1u);
 
@@ -2330,6 +2506,10 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeUrgentWildcardEvent)
 
 TEST_F(TestReadInteraction, TestSubscribeWildcard)
 {
+    // This test in particular is completely tied to the DefaultMockConfig in the mock
+    // attribute storage, so reset to that (figuring out chunking location is extra hard to
+    // maintain)
+    chip::Test::ResetMockNodeConfig();
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
@@ -2367,9 +2547,8 @@ TEST_F(TestReadInteraction, TestSubscribeWildcard)
 
         EXPECT_TRUE(delegate.mGotReport);
 
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        // Mock attribute storage in src/app/util/mock/attribute-storage.cpp
-        // has the following items
+        // Mock attribute storage that is reset and resides in src/app/util/mock/attribute-storage.cpp
+        // has the following items:
         // - Endpoint 0xFFFE
         //    - cluster 0xFFF1'FC01 (2 attributes)
         //    - cluster 0xFFF1'FC02 (3 attributes)
@@ -2395,18 +2574,7 @@ TEST_F(TestReadInteraction, TestSubscribeWildcard)
         // 0xFFFC::0xFFF1'FC02::0xFFF1'0004 is chunked.  For each of the two instances of that attribute
         // in the response, there will be one AttributeDataIB for the start of the list (which will include
         // some number of 256-byte elements), then one AttributeDataIB for each of the remaining elements.
-        //
-        // When EventList is enabled, for the first report for the list attribute we receive three
-        // of its items in the initial list, then the remaining items.  For the second report we
-        // receive 2 items in the initial list followed by the remaining items.
-        constexpr size_t kExpectedAttributeResponse = 29 * 2 + (kMockAttribute4ListLength - 3) + (kMockAttribute4ListLength - 2);
-#else
-        // When EventList is not enabled, the packet boundaries shift and for the first
-        // report for the list attribute we receive four of its items in the initial list,
-        // then additional items.  For the second report we receive 4 items in
-        // the initial list followed by additional items.
         constexpr size_t kExpectedAttributeResponse = 29 * 2 + (kMockAttribute4ListLength - 4) + (kMockAttribute4ListLength - 4);
-#endif
         EXPECT_EQ((unsigned) delegate.mNumAttributeResponse, kExpectedAttributeResponse);
         EXPECT_EQ(delegate.mNumArrayItems, 12);
         EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 1u);
@@ -2709,6 +2877,7 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestSubscribeInvalidAttributePathRoundt
         uint16_t minInterval;
         uint16_t maxInterval;
         delegate.mpReadHandler->GetReportingIntervals(minInterval, maxInterval);
+        EXPECT_EQ(readPrepareParams.mMaxIntervalCeilingSeconds, delegate.mpReadHandler->GetSubscriberRequestedMaxInterval());
 
         // Advance monotonic timestamp for min interval to elapse
         gMockClock.AdvanceMonotonic(System::Clock::Seconds16(maxInterval));

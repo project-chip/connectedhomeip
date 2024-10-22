@@ -1,18 +1,22 @@
-# `Bouffalo Lab`
+# Matter `Bouffalo Lab` Lighting Example
 
 This example functions as a light bulb device type, with on/off and level
 capabilities and uses a test Vendor ID (VID) and a Product ID (PID)
 of **0x8005**.
 
-The steps were verified on `Bouffalo Lab` BL602 and BL706 development board.
+Current supported boards:
+
+-   `BL602DK`
+-   `BL706DK`
+-   `BL704LDK`
+
+Legacy supported boards:
 
 -   `BL602-IoT-Matter-V1`, [here](https://www.amazon.com/dp/B0B9ZVGXD8) to
     purchase.
 -   `BL602-NIGHT-LIGHT`
 -   `XT-ZB6-DevKit`
 -   `BL706-NIGHT-LIGHT`
--   `BL706DK`
--   `BL704LDK`
 
 > Warning: Changing the VID/PID may cause compilation problems, we recommend
 > leaving it as the default while using this example.
@@ -20,10 +24,6 @@ The steps were verified on `Bouffalo Lab` BL602 and BL706 development board.
 ## BL602
 
 BL602/BL604 is combo chip-set for Wi-Fi 802.11b/g/n and BLE 5.0 base-band/MAC.
-
-### BL602-IoT-Matter-V1
-
-<img src="../../platform/bouffalolab/doc/chart/BL602-IoT-Matter_V1.png" style="zoom:25%;" />
 
 ## BL70x
 
@@ -35,16 +35,34 @@ BL70x is combo chip-set for BLE and IEEE 802.15.4/ZigBee/Thread.
     general name.
 
 BL70x has fully certified with all Thread 1.3 features, included Thread `SSED`
-and Thread Border Router with `DUA manager`.
+and Thread Border Router.
 
-### `XT-ZB6-DevKit`
+## Solutions introduction
 
-<img src="../../platform/bouffalolab/doc/chart/bl706_dev_board.jpg" style="zoom:23%;" />
+`Bouffalo Lab` has full connectives support for Matter Applications.
+
+-   Wi-Fi 4/6 application, we have
+    -   BL602, Wi-Fi 4 application.
+    -   BL706 + BL602, Wi-Fi 4 application. BL602 runs as a normal WLAN
+        transceiver; TCP/IP stack runs as BL706 side. We recommend this solution
+        is for Openthread Border Router application and Matter ZigBee bridge.
+        -   Openthread Border Router application, please refer to Openthread
+            Border Router application
+        -   Matter ZigBee Bridge application, please contact `Bouffalo Lab` for
+            support.
+-   Thread application, we have
+    -   B70X
+-   Ethernet application, we have
+    -   BL706. It supports single Matter application, and also Openthread Border
+        Router application and Matter ZigBee bridge
+        -   Openthread Border Router application, please refer to Openthread
+            Border Router application
+        -   Matter ZigBee application, please contact `Bouffalo Lab` for
+            support.
 
 ## Initial setup
 
-The following steps in this document were validated on Ubuntu 18.04/20.04 and
-Mac OS.
+The following steps in this document were validated on Ubuntu 20.04.
 
 -   Install dependencies as specified in the **connectedhomeip** repository:
     [Building Matter](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md).
@@ -58,77 +76,71 @@ Mac OS.
     source ./scripts/activate.sh -p bouffalolab
     ```
 
-    > After environment setup `Bouffalo Lab` flash tool, `bflb-iot-tool`,
-    > imports under this environment. If not, please try
-    > `scripts/bootstrap.sh -p bouffalolab` for matter environment update.
-
 -   Setup build environment for `Bouffalo Lab` SoC
 
-    Run `setup.sh` to install `Bouffalo Lab` SDK to /opt/bouffalolab_sdk
-
     ```
-    cd third_party/bouffalolab/repo
-    sudo bash scripts/setup.sh
+    ./integrations/docker/images/stage-2/chip-build-bouffalolab/setup.sh
     ```
 
-    Please execute following command to export `BOUFFALOLAB_SDK_ROOT` before
-    building.
+    Script `setpu.sh` requires to select install path, and please execute
+    following command to export `BOUFFALOLAB_SDK_ROOT` before building.
 
     ```
-    export BOUFFALOLAB_SDK_ROOT=/opt/bouffalolab_sdk
+    export BOUFFALOLAB_SDK_ROOT="Your install path"
     ```
 
 ## Build CHIP Lighting App example
 
-The following steps take examples for `BL602-IoT-Matter-V1` BL602 board,
-`BL706DK` BL706 board, and `BL704LDK` BL704L board .
+The following steps take examples for `BL602DK`, `BL704LDK` and `BL706DK`.
 
 -   Build lighting app with UART baudrate 2000000
 
     ```
-    ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light build
-    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light build
-    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-ethernet build
-    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-wifi build
+    ./scripts/build/build_examples.py --target bouffalolab-bl602dk-light build
+    ./scripts/build/build_examples.py --target bouffalolab-bl616dk-light-wifi build
     ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-light build
-    ```
-
--   Build lighting app with UART baudrate 115200
-
-    ```
-    ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light-115200 build
-    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-light-115200 build
-    ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-light-light-115200 build
+    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light build
     ```
 
 -   Build lighting app with RPC enabled and UART baudrate 115200.
 
     ```
-    ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light-rpc build
-    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-light-rpc build
-    ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-light-light-rpc build
+    ./scripts/build/build_examples.py --target bouffalolab-bl602dk-light-light-rpc-115200 build
+    ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-light-light-rpc-115200 build
+    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-light-rpc-115200 build
     ```
 
 ### Build options with build_examples.py
 
--   `-shell`, enable UART command line
--   `-115200`, set UART baudrate to 115200 for log and command line
+-   `-wifi`, specifies to use Wi-Fi for Matter application.
+
+    -   BL602 uses Wi-Fi by default. `-wifi` could be elided.
+    -   BL702 needs it to specify to use BL706 + BL602 for Wi-Fi.
+
+-   `-thread`, specifies to use Thread for Matter application.
+
+    -   BL70X uses Thread by default. `-thread` could be elided.
+
+-   `-ethernet`, specifies to use Ethernet for Matter application.
+
+    -   BL706 needs it to specify to use Ethernet.
+
+-   `-littlefs`, specifies to use `littlefs` for flash access.
+-   `-easyflash`, specifies to use `easyflash` for flash access.
+    -   for platform BL602/BL70X, it is necessary to specify one of `-easyflash`
+        and `-littlefs`.
+-   `-mfd`, enable Matter factory data feature, which load factory data from
+    `MFD` partition
+    -   Please refer to
+        [Bouffalo Lab Matter factory data guide](../../../docs/platforms/bouffalolab/matter_factory_data.md)
+        or contact to `Bouffalo Lab` for support.
+-   `-shell`, enable command line
 -   `-rpc`, enable Pigweed RPC feature
+-   `-115200`, set UART baudrate to 115200 for log and command line
 -   `-cdc`, enable USB CDC feature, only support for BL706, and can't work with
     Ethernet Board
 -   `-resetCnt`, enable feature to do factory reset when continues power cycle
     is greater than 3
--   `-mfd`, enable Matter factory data feature, which load factory data from
-    `DTS` region and `MFD` partition
-    -   Please contact to `Bouffalo Lab` for Matter factory data support.
--   `-mfdtest`, enable Matter factory data module, but only load factory data
-    from `FactoryDataProvider.cpp` file.
--   `-wifi`, to specify that connectivity Wi-Fi is enabled for Matter
-    application.
--   `-ethernet`, to specify that connectivity Ethernet is enabled for Matter
-    application.
--   `-thread`, to specify that connectivity Thread is enabled for Matter
-    application.
 -   `-mot`, to specify to use openthread stack under
     `third_party/openthread/repo`
     -   Without `-mot` specified, Matter Thread will use openthread stack under
@@ -147,12 +159,6 @@ The following steps take examples for `BL602-IoT-Matter-V1` BL602 board,
     -   `chip-bl702-lighting-example.flash.py` for BL702
     -   `chip-bl702l-lighting-example.flash.py` for BL702L
 
-    > Note 1, `*.flash.py` should be ran under Matter build environment; if
-    > python module `bflb_iot_tool` is not found, please try to do
-    > `source scripts/bootstrap.sh` or install as
-    > `pip3 install bflb-iot-tool`.<br> Note 2, different build options will
-    > generate different output folder.
-
     Download operation steps as below, please check `help` option of script for
     more detail.
 
@@ -167,44 +173,24 @@ The following steps take examples for `BL602-IoT-Matter-V1` BL602 board,
     -   Type following command for image download. Please set serial port
         accordingly, here we use /dev/ttyACM0 as a serial port example.
 
-        -   `bl602-iot-matter-v1`, `bl706dk` and `bl704ldk` without additional
-            build options
+        -   `BL602DK`, `BL704LDK` and `BL706DK`.
 
             ```shell
-            ./out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0
-            ./out/bouffalolab-bl706dk-light/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0
-            ./out/bouffalolab-bl704ldk-light/chip-bl702l-lighting-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl602dk-light-littlefs/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl616dk-light-wifi/chip-bl616dk-lighting-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl704ldk-light-littlefs/chip-bl702l-lighting-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl706dk-light-littlefs/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0
             ```
 
-        -   `bl706dk` with 115200 baudrate setting
+        -   To wipe out flash and download image, please append `--erase`
+            option. Take BL602DK as example.
 
             ```shell
-            ./out/bouffalolab-bl706dk-light-115200/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0
-            ```
-
-        -   To wipe out flash and download image, please append `--erase` to the
-            above command.
-
-            ```shell
-            ./out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0 --erase
-            ./out/bouffalolab-bl706dk-light-115200/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0 --erase
-            ./out/bouffalolab-bl704ldk-light/chip-bl702l-lighting-example.flash.py --port /dev/ttyACM0 --erase
+            ./out/bouffalolab-bl602dk-light/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0 --erase
             ```
 
             > Note, better to append --erase option to download image for BL602
             > develop board at first time.
-
--   Using `Bouffalo Lab` GUI flash tool `BLDevCube`, please download on
-    [this page](https://dev.bouffalolab.com/download).
-    -   Hold BOOT pin and reset chip, put the board in download mode.
-    -   Select `DTS` file;
-    -   Select Partition Table under
-        `examples/platform/bouffalolab/bl602/flash_config` or
-        `examples/platform/bouffalolab/bl702/flash_config`
-    -   Select Firmware Bin;
-    -   Select Chip Erase if need;
-    -   Choose Target COM port.
-    -   Then click Create & Download.
 
 ## Run the example
 
@@ -225,15 +211,16 @@ The following steps take examples for `BL602-IoT-Matter-V1` BL602 board,
 
 ## Test Commission and Control with chip-tool
 
-Please follow [chip_tool_guide](../../../docs/guides/chip_tool_guide.md) and
-[guide](../../chip-tool/README.md) to build and use chip-tool for test.
+Please follow
+[chip_tool_guide](../../../docs/development_controllers/chip-tool/chip_tool_guide.md)
+and [guide](../../chip-tool/README.md) to build and use chip-tool for test.
 
 ### Prerequisite for Thread Protocol
 
 Thread wireless protocol runs on BL706, which needs a Thread border router to
 connect Thread network to Wi-Fi/Ethernet network. Please follow this
-[guide](../../../docs/guides/openthread_border_router_pi.md) to setup a
-raspberry Pi border router.
+[guide](../../../docs/platforms/openthread/openthread_border_router_pi.md) to
+setup a raspberry Pi border router.
 
 After Thread border router setup, please type following command on Thread border
 router to get Thread network credential.
@@ -249,13 +236,13 @@ sudo ot-ctl dataset active -x
 -   Enter build out folder of chip-tool and running the following command to do
     BLE commission
 
-    -   BL602
+    -   Wi-Fi
 
         ```shell
         ./chip-tool pairing ble-wifi <node_id> <wifi_ssid> <wifi_passwd> 20202021 3840
         ```
 
-    -   BL706
+    -   Thread
 
         ```shell
         ./chip-tool pairing ble-thread <node_id> hex:<thread_operational_dataset> 20202021 3840
@@ -308,34 +295,26 @@ After successful commissioning, cluster commands available to control the board.
 Please take [guide](../../ota-provider-app/linux/README.md) for more detail on
 ota-provider-app build and usage.
 
-### Create the Matter OTA image with Bouffalolab OTA `bin.xz.hash` format image
+### Create the Matter OTA image
 
--   `Bouffalo Lab` OTA `bin.xz.hash` format image
+`Bouffalo Lab` Matter OTA image contains two parts:
 
-    -   Build `Bouffalo Lab` OTA image as following execution using python
-        script `*.flash.py` under firmware build out folder,
-        `shell ./<output_firmware_name>.flash.py --build` After script executed,
-        a folder `ota_images` and an image `FW_OTA.bin.xz.hash` will be
-        generated. `FW_OTA.bin.xz.hash` is compressed with hash verification for
-        build out firmware.
+-   `Bouffalo Lab` OTA bootable image:
+    -   Add boot parameters, signature/encryption if specified
+    -   And specify whether image has be compressed.
+-   Add Matter recognition header by
+    [ota_image_tool.py](../../../docs/platforms/openthread/openthread_border_router_pi.md).
 
-    -   `bin.xz.hash` image
+Script `*.flash.py` builds `Bouffalo Lab` bootable image and call
+[ota_image_tool.py](../../../docs/platforms/openthread/openthread_border_router_pi.md)
+to add Matter recognition header. Take `BL602DK` as example.
 
-        After compile done, the build script will call
-        `<output_firmware_name>.flash.py` to generate `Bouffalo Lab` OTA format
-        image as above, and put it under out folder with name likes
-        `<output_firmware_name>.bin.xz.hash`
+```shell
+./out/bouffalolab-bl602dk-light/chip-bl602-lighting-example.flash.py --build-ota --vendor-id <vendor id> --product-id <product id> --version <version> --version-str <version string> --digest-algorithm <digest algorithm>
+```
 
-*   Build Matter `*.ota` OTA image with `Bouffalo Lab` OTA image under
-    **connectedhomeip** repo folder
-
-    ```shell
-    $ ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 10 -vs "1.0" -da sha256 <FW_OTA.bin.xz.hash> lighting-app.ota
-
-    ```
-
-    > lighting-app.ota should have greater software version which is defined by
-    > macro `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION` in CHIPProjectConfig.h
+> lighting-app.ota should have greater software version which is defined by
+> macro `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION` in CHIPProjectConfig.h
 
 ### Start ota-provider-app
 
