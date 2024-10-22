@@ -123,7 +123,7 @@ inline constexpr int64_t MaxSignedValue(unsigned ByteSize)
     {
         return std::numeric_limits<int64_t>::max();
     }
-    return (1LL << (8 * ByteSize)) - 1;
+    return (1LL << (8 * ByteSize - 1)) - 1;
 }
 
 inline constexpr int64_t MinSignedValue(unsigned ByteSize)

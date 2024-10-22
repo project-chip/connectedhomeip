@@ -58,6 +58,10 @@
 
 static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribeLatency";
 
+// Not static, because these are public API.
+NSString * const MTRPreviousDataKey = @"previousData";
+NSString * const MTRDataVersionKey = @"dataVersion";
+
 // allow readwrite access to superclass properties
 @interface MTRDevice_Concrete ()
 

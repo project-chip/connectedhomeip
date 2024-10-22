@@ -117,14 +117,19 @@ void DeviceManager::RemoveSyncedDevice(NodeId nodeId)
                     ChipLogValueX64(device->GetNodeId()), device->GetEndpointId());
 }
 
-void DeviceManager::OpenDeviceCommissioningWindow(NodeId nodeId, uint32_t iterations, uint16_t commissioningTimeoutSec,
+void DeviceManager::OpenDeviceCommissioningWindow(ScopedNodeId scopedNodeId, uint32_t iterations, uint16_t commissioningTimeoutSec,
                                                   uint16_t discriminator, const ByteSpan & salt, const ByteSpan & verifier)
 {
-    ChipLogProgress(NotSpecified, "Opening commissioning window for Node ID: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    // PairingManager isn't currently capable of OpenCommissioningWindow on a device of a fabric that it doesn't have
+    // the controller for. Currently no implementation need this functionality, but should they need it they will hit
+    // the verify or die below and it will be the responsiblity of whoever requires that functionality to implement.
+    VerifyOrDie(PairingManager::Instance().CurrentCommissioner().GetFabricIndex() == scopedNodeId.GetFabricIndex());
+    ChipLogProgress(NotSpecified, "Opening commissioning window for Node ID: " ChipLogFormatX64,
+                    ChipLogValueX64(scopedNodeId.GetNodeId()));
 
     // Open the commissioning window of a device within its own fabric.
-    CHIP_ERROR err = PairingManager::Instance().OpenCommissioningWindow(nodeId, kRootEndpointId, commissioningTimeoutSec,
-                                                                        iterations, discriminator, salt, verifier);
+    CHIP_ERROR err = PairingManager::Instance().OpenCommissioningWindow(
+        scopedNodeId.GetNodeId(), kRootEndpointId, commissioningTimeoutSec, iterations, discriminator, salt, verifier);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to open commissioning window: %s", ErrorStr(err));
@@ -412,7 +417,8 @@ void DeviceManager::HandleReverseOpenCommissioningWindow(TLV::TLVReader & data)
     ChipLogProgress(NotSpecified, "  PAKEPasscodeVerifier size: %lu", value.PAKEPasscodeVerifier.size());
     ChipLogProgress(NotSpecified, "  salt size: %lu", value.salt.size());
 
-    OpenDeviceCommissioningWindow(mLocalBridgeNodeId, value.iterations, value.commissioningTimeout, value.discriminator,
+    ScopedNodeId scopedNodeId(mLocalBridgeNodeId, PairingManager::Instance().CurrentCommissioner().GetFabricIndex());
+    OpenDeviceCommissioningWindow(scopedNodeId, value.iterations, value.commissioningTimeout, value.discriminator,
                                   ByteSpan(value.salt.data(), value.salt.size()),
                                   ByteSpan(value.PAKEPasscodeVerifier.data(), value.PAKEPasscodeVerifier.size()));
 }
