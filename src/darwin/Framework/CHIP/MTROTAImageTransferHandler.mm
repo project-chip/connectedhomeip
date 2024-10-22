@@ -53,6 +53,8 @@ MTROTAImageTransferHandlerWrapper * mOTAImageTransferHandlerWrapper;
 
 MTROTAImageTransferHandler::MTROTAImageTransferHandler()
 {
+    assertChipStackLockedByCurrentThread();
+
     MTROTAUnsolicitedBDXMessageHandler::GetInstance()->OnDelegateCreated(this);
     mOTAImageTransferHandlerWrapper = [[MTROTAImageTransferHandlerWrapper alloc] initWithMTROTAImageTransferHandler:this];
 }
@@ -106,25 +108,25 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(TransferSession::O
     auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
     VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
-   MTROTAImageTransferHandlerWrapper * __weak weakWrapper =  mOTAImageTransferHandlerWrapper;
+    MTROTAImageTransferHandlerWrapper * __weak weakWrapper =  mOTAImageTransferHandlerWrapper;
 
     auto completionHandler = ^(NSError * _Nullable error) {
 
-        // Check if the OTA image transfer handler is still valid. If not, return from the completion handler.
-        MTROTAImageTransferHandlerWrapper * strongWrapper = weakWrapper;
-        if (!strongWrapper || !strongWrapper.otaImageTransferHandler)
-        {
-            return;
-        }
         [controller
             asyncDispatchToMatterQueue:^() {
                 assertChipStackLockedByCurrentThread();
+
+                // Check if the OTA image transfer handler is still valid. If not, return from the completion handler.
+                MTROTAImageTransferHandlerWrapper * strongWrapper = weakWrapper;
+                if (!strongWrapper || !strongWrapper.otaImageTransferHandler)
+                {
+                    return;
+                }
 
                 if (error != nil) {
                     CHIP_ERROR err = [MTRError errorToCHIPErrorCode:error];
                     LogErrorOnFailure(err);
                     OnTransferSessionEnd(event);
-                    AsyncResponder::NotifyEventHandled(event, err);
                     return;
                 }
 
@@ -149,14 +151,14 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(TransferSession::O
     auto nodeId = @(mNodeId.Value());
 
     auto strongDelegate = mDelegate;
-    auto delagateQueue = mDelegateNotificationQueue;
-    if (strongDelegate == nil || delagateQueue == nil) {
+    auto delegateQueue = mDelegateNotificationQueue;
+    if (strongDelegate == nil || delegateQueue == nil) {
         LogErrorOnFailure(CHIP_ERROR_INCORRECT_STATE);
         AsyncResponder::NotifyEventHandled(event, CHIP_ERROR_INCORRECT_STATE);
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    dispatch_async(delagateQueue, ^{
+    dispatch_async(delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector
                             (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]) {
             [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
@@ -194,8 +196,8 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionEnd(TransferSession::Out
     auto nodeId = @(mNodeId.Value());
 
     auto strongDelegate = mDelegate;
-    auto delagateQueue = mDelegateNotificationQueue;
-    if (strongDelegate == nil || delagateQueue == nil) {
+    auto delegateQueue = mDelegateNotificationQueue;
+    if (strongDelegate == nil || delegateQueue == nil) {
         error = CHIP_ERROR_INCORRECT_STATE;
         LogErrorOnFailure(error);
         AsyncResponder::NotifyEventHandled(event, error);
@@ -203,7 +205,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionEnd(TransferSession::Out
     }
 
     if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionEndForNodeID:controller:error:)]) {
-        dispatch_async(delagateQueue, ^{
+        dispatch_async(delegateQueue, ^{
             [strongDelegate handleBDXTransferSessionEndForNodeID:nodeId
                                                       controller:controller
                                                            error:[MTRError errorForCHIPErrorCode:error]];
@@ -231,20 +233,20 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(TransferSession::OutputEvent
     auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
     VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
-   MTROTAImageTransferHandlerWrapper * __weak weakWrapper =  mOTAImageTransferHandlerWrapper;
+    MTROTAImageTransferHandlerWrapper * __weak weakWrapper =  mOTAImageTransferHandlerWrapper;
 
     auto completionHandler = ^(NSData * _Nullable data, BOOL isEOF) {
-
-        // Check if the OTA image transfer handler is still valid. If not, return from the completion handler.
-        MTROTAImageTransferHandlerWrapper * strongWrapper = weakWrapper;
-        if (!strongWrapper || !strongWrapper.otaImageTransferHandler)
-        {
-            return;
-        }
 
         [controller
             asyncDispatchToMatterQueue:^() {
                 assertChipStackLockedByCurrentThread();
+
+                // Check if the OTA image transfer handler is still valid. If not, return from the completion handler.
+                MTROTAImageTransferHandlerWrapper * strongWrapper = weakWrapper;
+                if (!strongWrapper || !strongWrapper.otaImageTransferHandler)
+                {
+                    return;
+                }
 
                 if (data == nil) {
                     AsyncResponder::NotifyEventHandled(event, CHIP_ERROR_INCORRECT_STATE);
@@ -270,14 +272,14 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(TransferSession::OutputEvent
     auto nodeId = @(mNodeId.Value());
 
     auto strongDelegate = mDelegate;
-    auto delagateQueue = mDelegateNotificationQueue;
-    if (strongDelegate == nil || delagateQueue == nil) {
+    auto delegateQueue = mDelegateNotificationQueue;
+    if (strongDelegate == nil || delegateQueue == nil) {
         LogErrorOnFailure(CHIP_ERROR_INCORRECT_STATE);
         AsyncResponder::NotifyEventHandled(event, CHIP_ERROR_INCORRECT_STATE);
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    dispatch_async(delagateQueue, ^{
+    dispatch_async(delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(handleBDXQueryForNodeID:
                                                                       controller:blockSize:blockIndex:bytesToSkip:completion:)]) {
             [strongDelegate handleBDXQueryForNodeID:nodeId

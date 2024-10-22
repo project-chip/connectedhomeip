@@ -46,6 +46,8 @@ CHIP_ERROR AsyncTransferFacilitator::Init(System::Layer * layer, Messaging::Exch
     mSystemLayer = layer;
     mExchange.Grab(exchangeCtx);
     mTimeout = timeout;
+    mProcessingOutputEvents = false;
+    mDestroySelf = false;
     return CHIP_NO_ERROR;
 }
 
@@ -90,13 +92,7 @@ void AsyncTransferFacilitator::ProcessOutputEvents()
             // since we want the message to be sent before we clean up.
             if (outEvent.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
             {
-                VerifyOrReturn(mSystemLayer != nullptr);
-                mSystemLayer->ScheduleWork(
-                    [](auto * systemLayer, auto * appState) -> void {
-                        auto * _this = static_cast<AsyncTransferFacilitator *>(appState);
-                        _this->DestroySelf();
-                    },
-                    this);
+                DestroySelf();
                 return;
             }
         }
@@ -106,7 +102,14 @@ void AsyncTransferFacilitator::ProcessOutputEvents()
         }
         mTransfer.GetNextAction(outEvent);
     }
+
     mProcessingOutputEvents = false;
+
+    // If the mDestroySelf is set in NotifyEventHandled, we need to call DestroySelf() after processing all pending output events.
+    if (mDestroySelf)
+    {
+        DestroySelf();
+    }
 }
 
 CHIP_ERROR AsyncTransferFacilitator::SendMessage(const TransferSession::MessageTypeData msgTypeData,
@@ -184,8 +187,10 @@ void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEvent & eve
         event.EventType == TransferSession::OutputEventType::kTransferTimeout ||
         event.EventType == TransferSession::OutputEventType::kStatusReceived)
     {
-        DestroySelf();
-        return;
+
+        // Set the mDestroySelf flag to true so that when ProcessOutputEvents finishes processing all pending events, it
+        // will call DestroySelf() to clean up.
+        mDestroySelf = true;
     }
 
     // If there was an error handling the output event, this should notify the tranfer object to abort transfer so it can send a

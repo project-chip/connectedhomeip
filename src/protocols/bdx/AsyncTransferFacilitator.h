@@ -76,6 +76,8 @@ protected:
     // The transfer session coresponding to this AsyncTransferFacilitator object.
     TransferSession mTransfer;
 
+    bool mDestroySelf = false;
+
 private:
     bool mProcessingOutputEvents = false;
 
@@ -121,6 +123,7 @@ public:
      * Every call to HandleTransferSessionOutput must result in a call to NotifyEventHandled.  The call
      * to NotifyEventHandled may happen before HandleTransferSessionOutput returns, or may happen
      * later, asynchronously.
+     * Note: This API is allowed to destroy the AsyncResponder before the call returns.
      *
      * @param[in] event The OutputEvent that was handled by the subclass.
      * @param[in] status The error code that occured when handling the event if an error occurs. Otherwise CHIP_NO_ERROR.

@@ -127,7 +127,7 @@ void MTROTAUnsolicitedBDXMessageHandler::OnDelegateCreated(void * imageTransferH
 {
     assertChipStackLockedByCurrentThread();
 
-    // TODO: #36181 - Store the imageTransferHandler in the set of MTROTAImageTransferHandler objects.
+    // TODO: #36181 - Store the imageTransferHandler in a set of MTROTAImageTransferHandler objects.
     mOTAImageTransferHandler = static_cast<MTROTAImageTransferHandler *>(imageTransferHandler);
     MTROTAUnsolicitedBDXMessageHandler::IncrementNumberOfDelegates();
 }
