@@ -128,11 +128,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeIdentifyID) attributeID:@(MTRAttributeIDTypeClusterIdentifyAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeIdentifyID) attributeID:@(MTRAttributeIDTypeClusterIdentifyAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeIdentifyID) attributeID:@(MTRAttributeIDTypeClusterIdentifyAttributeAttributeListID) params:params];
@@ -350,11 +345,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupsID) attributeID:@(MTRAttributeIDTypeClusterGroupsAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupsID) attributeID:@(MTRAttributeIDTypeClusterGroupsAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -675,11 +665,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOnOffID) attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOnOffID) attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -1156,11 +1141,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeAttributeListID) params:params];
@@ -1244,11 +1224,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePulseWidthModulationID) attributeID:@(MTRAttributeIDTypeClusterPulseWidthModulationAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePulseWidthModulationID) attributeID:@(MTRAttributeIDTypeClusterPulseWidthModulationAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePulseWidthModulationID) attributeID:@(MTRAttributeIDTypeClusterPulseWidthModulationAttributeAttributeListID) params:params];
@@ -1301,11 +1276,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -1364,11 +1334,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBindingID) attributeID:@(MTRAttributeIDTypeClusterBindingAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBindingID) attributeID:@(MTRAttributeIDTypeClusterBindingAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -1491,11 +1456,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAccessControlID) attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAccessControlID) attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -1887,11 +1847,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeActionsID) attributeID:@(MTRAttributeIDTypeClusterActionsAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeActionsID) attributeID:@(MTRAttributeIDTypeClusterActionsAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeActionsID) attributeID:@(MTRAttributeIDTypeClusterActionsAttributeAttributeListID) params:params];
@@ -2169,11 +2124,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBasicInformationID) attributeID:@(MTRAttributeIDTypeClusterBasicInformationAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBasicInformationID) attributeID:@(MTRAttributeIDTypeClusterBasicInformationAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBasicInformationID) attributeID:@(MTRAttributeIDTypeClusterBasicInformationAttributeAttributeListID) params:params];
@@ -2304,11 +2254,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOTASoftwareUpdateProviderID) attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOTASoftwareUpdateProviderID) attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOTASoftwareUpdateProviderID) attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeAttributeListID) params:params];
@@ -2428,11 +2373,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID) attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID) attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID) attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeAttributeListID) params:params];
@@ -2511,11 +2451,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLocalizationConfigurationID) attributeID:@(MTRAttributeIDTypeClusterLocalizationConfigurationAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLocalizationConfigurationID) attributeID:@(MTRAttributeIDTypeClusterLocalizationConfigurationAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLocalizationConfigurationID) attributeID:@(MTRAttributeIDTypeClusterLocalizationConfigurationAttributeAttributeListID) params:params];
@@ -2591,11 +2526,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTimeFormatLocalizationID) attributeID:@(MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTimeFormatLocalizationID) attributeID:@(MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTimeFormatLocalizationID) attributeID:@(MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeAttributeListID) params:params];
@@ -2650,11 +2580,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeUnitLocalizationID) attributeID:@(MTRAttributeIDTypeClusterUnitLocalizationAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeUnitLocalizationID) attributeID:@(MTRAttributeIDTypeClusterUnitLocalizationAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeUnitLocalizationID) attributeID:@(MTRAttributeIDTypeClusterUnitLocalizationAttributeAttributeListID) params:params];
@@ -2696,11 +2621,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePowerSourceConfigurationID) attributeID:@(MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePowerSourceConfigurationID) attributeID:@(MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -2899,11 +2819,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePowerSourceID) attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePowerSourceID) attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -3115,11 +3030,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGeneralCommissioningID) attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGeneralCommissioningID) attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -3447,11 +3357,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeNetworkCommissioningID) attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeNetworkCommissioningID) attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeNetworkCommissioningID) attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeAttributeListID) params:params];
@@ -3563,11 +3468,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDiagnosticLogsID) attributeID:@(MTRAttributeIDTypeClusterDiagnosticLogsAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDiagnosticLogsID) attributeID:@(MTRAttributeIDTypeClusterDiagnosticLogsAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -3746,11 +3646,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAttributeListID) params:params];
@@ -3847,11 +3742,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSoftwareDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSoftwareDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -4247,11 +4137,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAttributeListID) params:params];
@@ -4403,11 +4288,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeAttributeListID) params:params];
@@ -4537,11 +4417,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEthernetNetworkDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEthernetNetworkDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -4791,11 +4666,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTimeSynchronizationID) attributeID:@(MTRAttributeIDTypeClusterTimeSynchronizationAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTimeSynchronizationID) attributeID:@(MTRAttributeIDTypeClusterTimeSynchronizationAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTimeSynchronizationID) attributeID:@(MTRAttributeIDTypeClusterTimeSynchronizationAttributeAttributeListID) params:params];
@@ -4948,11 +4818,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBridgedDeviceBasicInformationID) attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBridgedDeviceBasicInformationID) attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBridgedDeviceBasicInformationID) attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeAttributeListID) params:params];
@@ -5006,11 +4871,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSwitchID) attributeID:@(MTRAttributeIDTypeClusterSwitchAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSwitchID) attributeID:@(MTRAttributeIDTypeClusterSwitchAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -5158,11 +5018,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAdministratorCommissioningID) attributeID:@(MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAdministratorCommissioningID) attributeID:@(MTRAttributeIDTypeClusterAdministratorCommissioningAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -5468,11 +5323,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOperationalCredentialsID) attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOperationalCredentialsID) attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOperationalCredentialsID) attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeAttributeListID) params:params];
@@ -5715,11 +5565,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupKeyManagementID) attributeID:@(MTRAttributeIDTypeClusterGroupKeyManagementAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupKeyManagementID) attributeID:@(MTRAttributeIDTypeClusterGroupKeyManagementAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupKeyManagementID) attributeID:@(MTRAttributeIDTypeClusterGroupKeyManagementAttributeAttributeListID) params:params];
@@ -5789,11 +5634,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeFixedLabelID) attributeID:@(MTRAttributeIDTypeClusterFixedLabelAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeFixedLabelID) attributeID:@(MTRAttributeIDTypeClusterFixedLabelAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeFixedLabelID) attributeID:@(MTRAttributeIDTypeClusterFixedLabelAttributeAttributeListID) params:params];
@@ -5848,11 +5688,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeUserLabelID) attributeID:@(MTRAttributeIDTypeClusterUserLabelAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeUserLabelID) attributeID:@(MTRAttributeIDTypeClusterUserLabelAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeUserLabelID) attributeID:@(MTRAttributeIDTypeClusterUserLabelAttributeAttributeListID) params:params];
@@ -5894,11 +5729,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBooleanStateID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBooleanStateID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -6070,11 +5900,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeICDManagementID) attributeID:@(MTRAttributeIDTypeClusterICDManagementAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeICDManagementID) attributeID:@(MTRAttributeIDTypeClusterICDManagementAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeICDManagementID) attributeID:@(MTRAttributeIDTypeClusterICDManagementAttributeAttributeListID) params:params];
@@ -6229,11 +6054,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTimerID) attributeID:@(MTRAttributeIDTypeClusterTimerAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTimerID) attributeID:@(MTRAttributeIDTypeClusterTimerAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -6419,11 +6239,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOvenCavityOperationalStateID) attributeID:@(MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOvenCavityOperationalStateID) attributeID:@(MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOvenCavityOperationalStateID) attributeID:@(MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeAttributeListID) params:params];
@@ -6522,11 +6337,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOvenModeID) attributeID:@(MTRAttributeIDTypeClusterOvenModeAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOvenModeID) attributeID:@(MTRAttributeIDTypeClusterOvenModeAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOvenModeID) attributeID:@(MTRAttributeIDTypeClusterOvenModeAttributeAttributeListID) params:params];
@@ -6575,11 +6385,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLaundryDryerControlsID) attributeID:@(MTRAttributeIDTypeClusterLaundryDryerControlsAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLaundryDryerControlsID) attributeID:@(MTRAttributeIDTypeClusterLaundryDryerControlsAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -6688,11 +6493,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeModeSelectID) attributeID:@(MTRAttributeIDTypeClusterModeSelectAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeModeSelectID) attributeID:@(MTRAttributeIDTypeClusterModeSelectAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -6807,11 +6607,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLaundryWasherModeID) attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLaundryWasherModeID) attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLaundryWasherModeID) attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeAttributeAttributeListID) params:params];
@@ -6910,11 +6705,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetModeID) attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetModeID) attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetModeID) attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeAttributeListID) params:params];
@@ -6986,11 +6776,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLaundryWasherControlsID) attributeID:@(MTRAttributeIDTypeClusterLaundryWasherControlsAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLaundryWasherControlsID) attributeID:@(MTRAttributeIDTypeClusterLaundryWasherControlsAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLaundryWasherControlsID) attributeID:@(MTRAttributeIDTypeClusterLaundryWasherControlsAttributeAttributeListID) params:params];
@@ -7057,11 +6842,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRVCRunModeID) attributeID:@(MTRAttributeIDTypeClusterRVCRunModeAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRVCRunModeID) attributeID:@(MTRAttributeIDTypeClusterRVCRunModeAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRVCRunModeID) attributeID:@(MTRAttributeIDTypeClusterRVCRunModeAttributeAttributeListID) params:params];
@@ -7126,11 +6906,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRVCCleanModeID) attributeID:@(MTRAttributeIDTypeClusterRVCCleanModeAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRVCCleanModeID) attributeID:@(MTRAttributeIDTypeClusterRVCCleanModeAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -7223,11 +6998,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTemperatureControlID) attributeID:@(MTRAttributeIDTypeClusterTemperatureControlAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTemperatureControlID) attributeID:@(MTRAttributeIDTypeClusterTemperatureControlAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTemperatureControlID) attributeID:@(MTRAttributeIDTypeClusterTemperatureControlAttributeAttributeListID) params:params];
@@ -7270,11 +7040,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID) attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID) attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -7375,11 +7140,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDishwasherModeID) attributeID:@(MTRAttributeIDTypeClusterDishwasherModeAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDishwasherModeID) attributeID:@(MTRAttributeIDTypeClusterDishwasherModeAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDishwasherModeID) attributeID:@(MTRAttributeIDTypeClusterDishwasherModeAttributeAttributeListID) params:params];
@@ -7412,11 +7172,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAirQualityID) attributeID:@(MTRAttributeIDTypeClusterAirQualityAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAirQualityID) attributeID:@(MTRAttributeIDTypeClusterAirQualityAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -7555,11 +7310,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeCOAlarmID) attributeID:@(MTRAttributeIDTypeClusterSmokeCOAlarmAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeCOAlarmID) attributeID:@(MTRAttributeIDTypeClusterSmokeCOAlarmAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeCOAlarmID) attributeID:@(MTRAttributeIDTypeClusterSmokeCOAlarmAttributeAttributeListID) params:params];
@@ -7663,11 +7413,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDishwasherAlarmID) attributeID:@(MTRAttributeIDTypeClusterDishwasherAlarmAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDishwasherAlarmID) attributeID:@(MTRAttributeIDTypeClusterDishwasherAlarmAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDishwasherAlarmID) attributeID:@(MTRAttributeIDTypeClusterDishwasherAlarmAttributeAttributeListID) params:params];
@@ -7705,11 +7450,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMicrowaveOvenModeID) attributeID:@(MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMicrowaveOvenModeID) attributeID:@(MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -7842,11 +7582,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMicrowaveOvenControlID) attributeID:@(MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMicrowaveOvenControlID) attributeID:@(MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -8032,11 +7767,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOperationalStateID) attributeID:@(MTRAttributeIDTypeClusterOperationalStateAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOperationalStateID) attributeID:@(MTRAttributeIDTypeClusterOperationalStateAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOperationalStateID) attributeID:@(MTRAttributeIDTypeClusterOperationalStateAttributeAttributeListID) params:params];
@@ -8187,11 +7917,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRVCOperationalStateID) attributeID:@(MTRAttributeIDTypeClusterRVCOperationalStateAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRVCOperationalStateID) attributeID:@(MTRAttributeIDTypeClusterRVCOperationalStateAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -8454,11 +8179,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeScenesManagementID) attributeID:@(MTRAttributeIDTypeClusterScenesManagementAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeScenesManagementID) attributeID:@(MTRAttributeIDTypeClusterScenesManagementAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeScenesManagementID) attributeID:@(MTRAttributeIDTypeClusterScenesManagementAttributeAttributeListID) params:params];
@@ -8560,11 +8280,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHEPAFilterMonitoringID) attributeID:@(MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHEPAFilterMonitoringID) attributeID:@(MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHEPAFilterMonitoringID) attributeID:@(MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeAttributeListID) params:params];
@@ -8664,11 +8379,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeActivatedCarbonFilterMonitoringID) attributeID:@(MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeActivatedCarbonFilterMonitoringID) attributeID:@(MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -8803,11 +8513,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBooleanStateConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBooleanStateConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -8978,11 +8683,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeValveConfigurationAndControlID) attributeID:@(MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeValveConfigurationAndControlID) attributeID:@(MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeValveConfigurationAndControlID) attributeID:@(MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAttributeListID) params:params];
@@ -9107,11 +8807,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeElectricalPowerMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeElectricalPowerMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeElectricalPowerMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeAttributeListID) params:params];
@@ -9169,11 +8864,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeElectricalEnergyMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeElectricalEnergyMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -9291,11 +8981,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterManagementID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterManagementAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterManagementID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterManagementAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -9528,11 +9213,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeAttributeListID) params:params];
@@ -9624,11 +9304,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -9926,11 +9601,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDeviceEnergyManagementID) attributeID:@(MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDeviceEnergyManagementID) attributeID:@(MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -10336,11 +10006,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyEVSEID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyEVSEID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyEVSEID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEAttributeAttributeListID) params:params];
@@ -10417,11 +10082,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyPreferenceID) attributeID:@(MTRAttributeIDTypeClusterEnergyPreferenceAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyPreferenceID) attributeID:@(MTRAttributeIDTypeClusterEnergyPreferenceAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyPreferenceID) attributeID:@(MTRAttributeIDTypeClusterEnergyPreferenceAttributeAttributeListID) params:params];
@@ -10459,11 +10119,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePowerTopologyID) attributeID:@(MTRAttributeIDTypeClusterPowerTopologyAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePowerTopologyID) attributeID:@(MTRAttributeIDTypeClusterPowerTopologyAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -10522,38 +10177,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyEVSEModeID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEModeAttributeCurrentModeID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeStartUpModeWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyEVSEModeID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEModeAttributeStartUpModeID) params:params];
-}
-
-- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeStartUpModeWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyEVSEModeID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEModeAttributeStartUpModeID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeOnModeWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyEVSEModeID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEModeAttributeOnModeID) params:params];
-}
-
-- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeOnModeWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyEVSEModeID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEModeAttributeOnModeID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyEVSEModeID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEModeAttributeGeneratedCommandListID) params:params];
@@ -10562,11 +10185,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyEVSEModeID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEModeAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyEVSEModeID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEModeAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -10625,38 +10243,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeCurrentModeID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeStartUpModeWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeStartUpModeID) params:params];
-}
-
-- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeStartUpModeWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeStartUpModeID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeOnModeWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeOnModeID) params:params];
-}
-
-- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeOnModeWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeOnModeID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeGeneratedCommandListID) params:params];
@@ -10665,11 +10251,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -10728,38 +10309,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDeviceEnergyManagementModeID) attributeID:@(MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeCurrentModeID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeStartUpModeWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDeviceEnergyManagementModeID) attributeID:@(MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeStartUpModeID) params:params];
-}
-
-- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeStartUpModeWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDeviceEnergyManagementModeID) attributeID:@(MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeStartUpModeID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeOnModeWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDeviceEnergyManagementModeID) attributeID:@(MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeOnModeID) params:params];
-}
-
-- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeOnModeWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDeviceEnergyManagementModeID) attributeID:@(MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeOnModeID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDeviceEnergyManagementModeID) attributeID:@(MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeGeneratedCommandListID) params:params];
@@ -10768,11 +10317,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDeviceEnergyManagementModeID) attributeID:@(MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDeviceEnergyManagementModeID) attributeID:@(MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -11840,11 +11384,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAttributeListID) params:params];
@@ -12313,11 +11852,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWindowCoveringID) attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWindowCoveringID) attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWindowCoveringID) attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeAttributeListID) params:params];
@@ -12485,11 +12019,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeServiceAreaID) attributeID:@(MTRAttributeIDTypeClusterServiceAreaAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeServiceAreaID) attributeID:@(MTRAttributeIDTypeClusterServiceAreaAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -12678,11 +12207,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID) attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID) attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -13535,11 +13059,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeAttributeListID) params:params];
@@ -13769,11 +13288,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeFanControlID) attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeFanControlID) attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeFanControlID) attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeAttributeListID) params:params];
@@ -13858,11 +13372,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatUserInterfaceConfigurationID) attributeID:@(MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatUserInterfaceConfigurationID) attributeID:@(MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -14819,11 +14328,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeAttributeListID) params:params];
@@ -15137,11 +14641,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBallastConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBallastConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBallastConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeAttributeListID) params:params];
@@ -15217,11 +14716,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeIlluminanceMeasurementID) attributeID:@(MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeIlluminanceMeasurementID) attributeID:@(MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeIlluminanceMeasurementID) attributeID:@(MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeAttributeListID) params:params];
@@ -15278,11 +14772,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTemperatureMeasurementID) attributeID:@(MTRAttributeIDTypeClusterTemperatureMeasurementAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTemperatureMeasurementID) attributeID:@(MTRAttributeIDTypeClusterTemperatureMeasurementAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -15368,11 +14857,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePressureMeasurementID) attributeID:@(MTRAttributeIDTypeClusterPressureMeasurementAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePressureMeasurementID) attributeID:@(MTRAttributeIDTypeClusterPressureMeasurementAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePressureMeasurementID) attributeID:@(MTRAttributeIDTypeClusterPressureMeasurementAttributeAttributeListID) params:params];
@@ -15431,11 +14915,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeFlowMeasurementID) attributeID:@(MTRAttributeIDTypeClusterFlowMeasurementAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeFlowMeasurementID) attributeID:@(MTRAttributeIDTypeClusterFlowMeasurementAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeFlowMeasurementID) attributeID:@(MTRAttributeIDTypeClusterFlowMeasurementAttributeAttributeListID) params:params];
@@ -15492,11 +14971,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRelativeHumidityMeasurementID) attributeID:@(MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRelativeHumidityMeasurementID) attributeID:@(MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -15717,11 +15191,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOccupancySensingID) attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOccupancySensingID) attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOccupancySensingID) attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeAttributeListID) params:params];
@@ -15851,11 +15320,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeAttributeListID) params:params];
@@ -15938,11 +15402,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -16029,11 +15488,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeAttributeListID) params:params];
@@ -16116,11 +15570,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -16207,11 +15656,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeAttributeListID) params:params];
@@ -16294,11 +15738,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -16385,11 +15824,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeAttributeListID) params:params];
@@ -16472,11 +15906,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -16563,11 +15992,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeAttributeListID) params:params];
@@ -16652,11 +16076,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeAttributeListID) params:params];
@@ -16725,11 +16144,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWiFiNetworkManagementID) attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWiFiNetworkManagementID) attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -16907,11 +16321,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadBorderRouterManagementID) attributeID:@(MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadBorderRouterManagementID) attributeID:@(MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadBorderRouterManagementID) attributeID:@(MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeAttributeListID) params:params];
@@ -17054,11 +16463,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadNetworkDirectoryID) attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadNetworkDirectoryID) attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadNetworkDirectoryID) attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeAttributeListID) params:params];
@@ -17096,11 +16500,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWakeOnLANID) attributeID:@(MTRAttributeIDTypeClusterWakeOnLANAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWakeOnLANID) attributeID:@(MTRAttributeIDTypeClusterWakeOnLANAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -17324,11 +16723,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeChannelID) attributeID:@(MTRAttributeIDTypeClusterChannelAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeChannelID) attributeID:@(MTRAttributeIDTypeClusterChannelAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeChannelID) attributeID:@(MTRAttributeIDTypeClusterChannelAttributeAttributeListID) params:params];
@@ -17420,11 +16814,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTargetNavigatorID) attributeID:@(MTRAttributeIDTypeClusterTargetNavigatorAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTargetNavigatorID) attributeID:@(MTRAttributeIDTypeClusterTargetNavigatorAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -17942,11 +17331,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMediaPlaybackID) attributeID:@(MTRAttributeIDTypeClusterMediaPlaybackAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMediaPlaybackID) attributeID:@(MTRAttributeIDTypeClusterMediaPlaybackAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMediaPlaybackID) attributeID:@(MTRAttributeIDTypeClusterMediaPlaybackAttributeAttributeListID) params:params];
@@ -18231,11 +17615,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMediaInputID) attributeID:@(MTRAttributeIDTypeClusterMediaInputAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMediaInputID) attributeID:@(MTRAttributeIDTypeClusterMediaInputAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMediaInputID) attributeID:@(MTRAttributeIDTypeClusterMediaInputAttributeAttributeListID) params:params];
@@ -18333,11 +17712,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLowPowerID) attributeID:@(MTRAttributeIDTypeClusterLowPowerAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLowPowerID) attributeID:@(MTRAttributeIDTypeClusterLowPowerAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLowPowerID) attributeID:@(MTRAttributeIDTypeClusterLowPowerAttributeAttributeListID) params:params];
@@ -18410,11 +17784,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeKeypadInputID) attributeID:@(MTRAttributeIDTypeClusterKeypadInputAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeKeypadInputID) attributeID:@(MTRAttributeIDTypeClusterKeypadInputAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -18538,11 +17907,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeContentLauncherID) attributeID:@(MTRAttributeIDTypeClusterContentLauncherAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeContentLauncherID) attributeID:@(MTRAttributeIDTypeClusterContentLauncherAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeContentLauncherID) attributeID:@(MTRAttributeIDTypeClusterContentLauncherAttributeAttributeListID) params:params];
@@ -18659,11 +18023,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAudioOutputID) attributeID:@(MTRAttributeIDTypeClusterAudioOutputAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAudioOutputID) attributeID:@(MTRAttributeIDTypeClusterAudioOutputAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -18828,11 +18187,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeApplicationLauncherID) attributeID:@(MTRAttributeIDTypeClusterApplicationLauncherAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeApplicationLauncherID) attributeID:@(MTRAttributeIDTypeClusterApplicationLauncherAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeApplicationLauncherID) attributeID:@(MTRAttributeIDTypeClusterApplicationLauncherAttributeAttributeListID) params:params];
@@ -18933,11 +18287,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeApplicationBasicID) attributeID:@(MTRAttributeIDTypeClusterApplicationBasicAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeApplicationBasicID) attributeID:@(MTRAttributeIDTypeClusterApplicationBasicAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -19070,11 +18419,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAccountLoginID) attributeID:@(MTRAttributeIDTypeClusterAccountLoginAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAccountLoginID) attributeID:@(MTRAttributeIDTypeClusterAccountLoginAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -19471,11 +18815,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeContentControlID) attributeID:@(MTRAttributeIDTypeClusterContentControlAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeContentControlID) attributeID:@(MTRAttributeIDTypeClusterContentControlAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeContentControlID) attributeID:@(MTRAttributeIDTypeClusterContentControlAttributeAttributeListID) params:params];
@@ -19530,11 +18869,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeContentAppObserverID) attributeID:@(MTRAttributeIDTypeClusterContentAppObserverAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeContentAppObserverID) attributeID:@(MTRAttributeIDTypeClusterContentAppObserverAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -19718,11 +19052,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -20593,11 +19922,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAttributeListID) params:params];
@@ -20767,11 +20091,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWebRTCTransportProviderID) attributeID:@(MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWebRTCTransportProviderID) attributeID:@(MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWebRTCTransportProviderID) attributeID:@(MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeAttributeListID) params:params];
@@ -20914,11 +20233,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWebRTCTransportRequestorID) attributeID:@(MTRAttributeIDTypeClusterWebRTCTransportRequestorAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWebRTCTransportRequestorID) attributeID:@(MTRAttributeIDTypeClusterWebRTCTransportRequestorAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWebRTCTransportRequestorID) attributeID:@(MTRAttributeIDTypeClusterWebRTCTransportRequestorAttributeAttributeListID) params:params];
@@ -21016,11 +20330,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeChimeID) attributeID:@(MTRAttributeIDTypeClusterChimeAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeChimeID) attributeID:@(MTRAttributeIDTypeClusterChimeAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeChimeID) attributeID:@(MTRAttributeIDTypeClusterChimeAttributeAttributeListID) params:params];
@@ -21058,11 +20367,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -21151,11 +20455,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommissionerControlID) attributeID:@(MTRAttributeIDTypeClusterCommissionerControlAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommissionerControlID) attributeID:@(MTRAttributeIDTypeClusterCommissionerControlAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
@@ -23358,11 +22657,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(MTRAttributeIDTypeClusterUnitTestingAttributeAcceptedCommandListID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(MTRAttributeIDTypeClusterUnitTestingAttributeEventListID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(MTRAttributeIDTypeClusterUnitTestingAttributeAttributeListID) params:params];
@@ -23680,11 +22974,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSampleMEIID) attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSampleMEIID) attributeID:@(MTRAttributeIDTypeClusterSampleMEIAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params

@@ -327,6 +327,7 @@ MTR_DIRECT_MEMBERS
                           error:(NSError * __autoreleasing *)error
 {
     [self _assertCurrentQueueIsNotMatterQueue];
+    [self _maybeLogBacktrace:@"Controller Factory Start"];
 
     __block CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     dispatch_sync(_chipWorkQueue, ^{
@@ -418,6 +419,7 @@ MTR_DIRECT_MEMBERS
 - (void)stopControllerFactory
 {
     [self _assertCurrentQueueIsNotMatterQueue];
+    [self _maybeLogBacktrace:@"Controller Factory Stop"];
 
     for (MTRDeviceController * controller in [_controllers copy]) {
         [controller shutdown];
@@ -1243,6 +1245,13 @@ MTR_DIRECT_MEMBERS
     }
 
     return systemState->Fabrics();
+}
+
+- (void)_maybeLogBacktrace:(NSString *)message
+{
+    @autoreleasepool {
+        MTR_LOG("[%@]: %@", message, [NSThread callStackSymbols]);
+    }
 }
 
 @end

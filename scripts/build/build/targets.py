@@ -133,6 +133,7 @@ def BuildHostTarget():
         TargetPart('bridge', app=HostApp.BRIDGE),
         TargetPart('fabric-admin', app=HostApp.FABRIC_ADMIN).OnlyIfRe("-rpc"),
         TargetPart('fabric-bridge', app=HostApp.FABRIC_BRIDGE).OnlyIfRe("-rpc"),
+        TargetPart('fabric-sync', app=HostApp.FABRIC_SYNC),
         TargetPart('tests', app=HostApp.TESTS),
         TargetPart('chip-cert', app=HostApp.CERT_TOOL),
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
