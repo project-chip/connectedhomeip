@@ -115,12 +115,11 @@ constexpr osThreadAttr_t kBleTaskAttr = { .name       = "rsi_ble",
 
 void rsi_ble_add_matter_service(void)
 {
-    uuid_t custom_service                                   = { RSI_BLE_MATTER_CUSTOM_SERVICE_UUID };
-    custom_service.size                                     = RSI_BLE_MATTER_CUSTOM_SERVICE_SIZE;
-    custom_service.val.val16                                = RSI_BLE_MATTER_CUSTOM_SERVICE_VALUE_16;
+    constexpr uuid_t custom_service                                   = { .size = RSI_BLE_MATTER_CUSTOM_SERVICE_SIZE,
+                                                                        .val      = { .val16 = RSI_BLE_MATTER_CUSTOM_SERVICE_VALUE_16 } };
     uint8_t data[RSI_BLE_MATTER_CUSTOM_SERVICE_DATA_LENGTH] = { RSI_BLE_MATTER_CUSTOM_SERVICE_DATA };
 
-    const uuid_t custom_characteristic_RX = { .size     = RSI_BLE_CUSTOM_CHARACTERISTIC_RX_SIZE,
+    constexpr uuid_t custom_characteristic_RX = { .size     = RSI_BLE_CUSTOM_CHARACTERISTIC_RX_SIZE,
                                               .reserved = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_RESERVED },
                                               .val      = {
                                                        .val128 = { .data1 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_1 },
@@ -144,7 +143,7 @@ void rsi_ble_add_matter_service(void)
         RSI_BLE_ATT_PROPERTY_WRITE | RSI_BLE_ATT_PROPERTY_READ, // Set read, write, write without response
         data, sizeof(data), ATT_REC_IN_HOST);
 
-    const uuid_t custom_characteristic_TX = { .size     = RSI_BLE_CUSTOM_CHARACTERISTIC_TX_SIZE,
+    constexpr uuid_t custom_characteristic_TX = { .size     = RSI_BLE_CUSTOM_CHARACTERISTIC_TX_SIZE,
                                               .reserved = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_RESERVED },
                                               .val      = {
                                                        .val128 = { .data1 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_1 },
