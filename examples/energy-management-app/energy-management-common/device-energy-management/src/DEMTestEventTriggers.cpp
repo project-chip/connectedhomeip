@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <DEMDelegate.h>
+#include <DEMInit.h>
 #include <DeviceEnergyManagementDelegateImpl.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 

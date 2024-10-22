@@ -43,6 +43,7 @@
 #include "nvs_flash.h"
 #include "shell_extension/launch.h"
 #include "shell_extension/openthread_cli_register.h"
+#include <EnergyManagementAppCmdLineOptions.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -80,6 +81,7 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters::WaterHeaterManagement;
+using namespace chip::app::Clusters::DeviceEnergyManagement;
 
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_start");
@@ -146,6 +148,15 @@ chip::BitMask<Feature> GetFeatureMapFromCmdLine()
     return sFeatureMap;
 }
 
+EndpointId GetMainAppEndpointId()
+{
+#if defined(CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)
+    return kWaterHeaterEndpoint;
+#else
+    return kEvseEndpoint;
+#endif
+}
+
 } // namespace DeviceEnergyManagement
 } // namespace Clusters
 } // namespace app
@@ -160,11 +171,12 @@ void ApplicationInit()
 {
     ESP_LOGD(TAG, "Energy Management App: ApplicationInit()");
 #if CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
-    EvseApplicationInit();
+
+    EvseApplicationInit(kEvseEndpoint);
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-    FullWhmApplicationInit();
+    FullWhmApplicationInit(kWaterHeaterEndpoint);
 #endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
 }
 

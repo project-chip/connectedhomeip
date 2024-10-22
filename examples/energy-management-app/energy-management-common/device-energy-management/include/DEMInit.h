@@ -18,20 +18,12 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <lib/support/BitMask.h>
+#include <DeviceEnergyManagementDelegateImpl.h>
+#include <DeviceEnergyManagementManager.h>
+#include <lib/core/CHIPError.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace DeviceEnergyManagement {
-constexpr EndpointId kEvseEndpoint        = 1;
-constexpr EndpointId kWaterHeaterEndpoint = 2;
+CHIP_ERROR DeviceEnergyManagementInit(chip::EndpointId endpointId);
+CHIP_ERROR DeviceEnergyManagementShutdown();
 
-EndpointId GetMainAppEndpointId();
-chip::BitMask<Feature> GetFeatureMapFromCmdLine();
-
-} // namespace DeviceEnergyManagement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+chip::app::Clusters::DeviceEnergyManagement::DeviceEnergyManagementDelegate * GetDEMDelegate();
+chip::app::Clusters::DeviceEnergyManagementManager * GetDEMInstance();

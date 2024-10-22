@@ -46,6 +46,7 @@
 
 #include <lib/support/CodeUtils.h>
 
+#include <EnergyManagementAppCmdLineOptions.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
@@ -123,6 +124,15 @@ chip::BitMask<Feature> GetFeatureMapFromCmdLine()
     return sFeatureMap;
 }
 
+EndpointId GetMainAppEndpointId()
+{
+#if defined(SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)
+    return kWaterHeaterEndpoint;
+#else
+    return kEvseEndpoint;
+#endif
+}
+
 } // namespace DeviceEnergyManagement
 } // namespace Clusters
 } // namespace app
@@ -137,13 +147,13 @@ void ApplicationInit()
 #if SL_MATTER_CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
     SILABS_LOG("energy-management-example EVSE starting. featureMap 0x%08lx", DeviceEnergyManagement::sFeatureMap.Raw());
 
-    EvseApplicationInit();
+    EvseApplicationInit(kEvseEndpoint);
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #if SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
     SILABS_LOG("energy-management-example WaterHeater starting. featureMap 0x%08lx", DeviceEnergyManagement::sFeatureMap.Raw());
 
-    FullWhmApplicationInit();
+    FullWhmApplicationInit(kWaterHeaterEndpoint);
 #endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
     SILABS_LOG("==================================================");
 

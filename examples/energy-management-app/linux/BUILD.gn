@@ -35,6 +35,7 @@ config("includes") {
 executable("chip-energy-management-app") {
   sources = [
     "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DEMInit.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DEMTestEventTriggers.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp",
@@ -48,6 +49,7 @@ executable("chip-energy-management-app") {
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseTargetsStore.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/energy-evse-mode.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/ElectricalSensorInit.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/EnergyReportingEventTriggers.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/FakeReadings.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/PowerTopologyDelegate.cpp",

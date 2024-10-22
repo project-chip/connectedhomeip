@@ -21,6 +21,7 @@
 #include <DeviceEnergyManagementDelegateImpl.h>
 #include <DeviceEnergyManagementManager.h>
 #include <ElectricalPowerMeasurementDelegate.h>
+#include <ElectricalSensorInit.h>
 #include <PowerTopologyDelegate.h>
 #include <WhmManufacturer.h>
 #include <device-energy-management-modes.h>
@@ -36,7 +37,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 
-#include <DEMDelegate.h>
+#include <DEMInit.h>
 #include <EnergyEvseMain.h>
 #include <WhmMain.h>
 
@@ -45,26 +46,26 @@ namespace app {
 namespace Clusters {
 namespace WaterHeaterManagement {
 
-void FullWhmApplicationInit()
+void FullWhmApplicationInit(EndpointId endpointId)
 {
-    ReturnOnFailure(WhmApplicationInit());
+    ReturnOnFailure(WhmApplicationInit(endpointId));
 
-    if (DeviceEnergyManagementInit() != CHIP_NO_ERROR)
+    if (DeviceEnergyManagementInit(endpointId) != CHIP_NO_ERROR)
     {
         WhmApplicationShutdown();
         return;
     }
 
-    if (EnergyMeterInit() != CHIP_NO_ERROR)
+    if (ElectricalPowerMeasurementInit(endpointId) != CHIP_NO_ERROR)
     {
         DeviceEnergyManagementShutdown();
         WhmApplicationShutdown();
         return;
     }
 
-    if (PowerTopologyInit() != CHIP_NO_ERROR)
+    if (PowerTopologyInit(endpointId) != CHIP_NO_ERROR)
     {
-        EnergyMeterShutdown();
+        ElectricalPowerMeasurementShutdown();
         DeviceEnergyManagementShutdown();
         WhmApplicationShutdown();
         return;
@@ -86,9 +87,9 @@ void FullWhmApplicationShutdown()
     ChipLogDetail(AppServer, "Energy Management App (WaterHeater): ApplicationShutdown()");
 
     /* Shutdown in reverse order that they were created */
-    PowerTopologyShutdown();          /* Free the PowerTopology */
-    EnergyMeterShutdown();            /* Free the Energy Meter */
-    DeviceEnergyManagementShutdown(); /* Free the DEM */
+    PowerTopologyShutdown();              /* Free the PowerTopology */
+    ElectricalPowerMeasurementShutdown(); /* Free the Energy Meter */
+    DeviceEnergyManagementShutdown();     /* Free the DEM */
     WhmApplicationShutdown();
 
     Clusters::DeviceEnergyManagementMode::Shutdown();
