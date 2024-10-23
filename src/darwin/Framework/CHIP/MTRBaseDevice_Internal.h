@@ -18,6 +18,8 @@
 #import "MTRBaseDevice.h"
 #import <Foundation/Foundation.h>
 
+#import "MTRDeviceDataValueDictionary.h"
+
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
@@ -257,6 +259,6 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
 // TLV Data with an anonymous tag.  This method assumes the encoding of the
 // value fits in a single UDP MTU; for lists this method might need to be used
 // on each list item separately.
-NSData * _Nullable MTREncodeTLVFromDataValueDictionary(NSDictionary<NSString *, id> * value, NSError * __autoreleasing * error);
+NSData * _Nullable MTREncodeTLVFromDataValueDictionary(MTRDeviceDataValueDictionary value, NSError * __autoreleasing * error);
 
 NS_ASSUME_NONNULL_END
