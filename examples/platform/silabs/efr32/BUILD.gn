@@ -123,6 +123,22 @@ source_set("openthread_core_config_efr32_chip_examples") {
   }
 }
 
+source_set("matter-shell") {
+  defines = [ "ENABLE_CHIP_SHELL" ]
+
+  sources = [ "${silabs_common_plat_dir}/MatterShell.cpp" ]
+  include_dirs = [
+    ".",
+    "${silabs_common_plat_dir}",
+  ]
+
+  public_deps = [
+    "${chip_root}/examples/shell/shell_common:shell_common",
+    "${chip_root}/src/lib/shell:shell",
+    "${chip_root}/src/lib/shell:shell_core",
+  ]
+}
+
 config("efr32-common-config") {
   defines = [ "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_sec}" ]
 
@@ -276,7 +292,7 @@ source_set("efr32-common") {
   }
 
   if (chip_build_libshell) {
-    deps += [ "${silabs_common_plat_dir}/shell:matter" ]
+    deps += [ ":matter-shell" ]
 
     if (chip_enable_icd_server) {
       deps += [ "${silabs_common_plat_dir}/shell:icd" ]
