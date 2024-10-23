@@ -396,8 +396,8 @@ public:
      * Create a buffer reader from a given byte span.
      *
      * @param buffer The octet buffer byte span from which to read.  The caller must ensure
-     *               that the buffer outlives the reader.  The buffer's ByteSpan .data() pointer
-     *               is is nullptr, length is automatically overridden to zero, to avoid accesses.
+     *               that the buffer outlives the reader.  If the buffer's ByteSpan .data() pointer
+     *               is nullptr, length is automatically overridden to zero, to avoid accesses.
      */
     Reader(const ByteSpan & buffer) : Reader(buffer.data(), buffer.size()) {}
 
