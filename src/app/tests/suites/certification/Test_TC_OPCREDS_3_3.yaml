@@ -745,31 +745,31 @@ tests:
           from TH"
       PICS: OPCREDS.C.A0004
       verification: |
-         ./chip-tool operationalcredentials read trusted-root-certificates 1 0
+          ./chip-tool operationalcredentials read trusted-root-certificates 1 0
 
-          On TH(all-clusters-app), Verify that TH receives read TrustedRootCertificates from DUT successfully.
-          [1720690787.895] [2401:2401] [EM] Handling via exchange: 45935r, Delegate: 0xaaaaab219368
-          [1720690787.895] [2401:2401] [IM] Received Read request
-          [1720690787.895] [2401:2401] [DMG] ReadRequestMessage =
-          [1720690787.895] [2401:2401] [DMG] {
-          [1720690787.895] [2401:2401] [DMG]         AttributePathIBs =
-          [1720690787.895] [2401:2401] [DMG]         [
-          [1720690787.895] [2401:2401] [DMG]                 AttributePathIB =
-          [1720690787.895] [2401:2401] [DMG]                 {
-          [1720690787.895] [2401:2401] [DMG]                         Endpoint = 0x0,
-          [1720690787.895] [2401:2401] [DMG]                         Cluster = 0x3e,
-          [1720690787.895] [2401:2401] [DMG]                         Attribute = 0x0000_0004,
-          [1720690787.895] [2401:2401] [DMG]                 }
-          [1720690787.896] [2401:2401] [DMG]
-          [1720690787.896] [2401:2401] [DMG]         ],
-          [1720690787.896] [2401:2401] [DMG]
-          [1720690787.896] [2401:2401] [DMG]         isFabricFiltered = true,
-          [1720690787.896] [2401:2401] [DMG]         InteractionModelRevision = 11
-          [1720690787.896] [2401:2401] [DMG] },
-          [1720690787.896] [2401:2401] [DMG] IM RH moving to [CanStartReporting]
-          [1720690787.896] [2401:2401] [DMG] Building Reports for ReadHandler with LastReportGeneration = 0x0000000000000000 DirtyGeneration = 0x0000000000000000
-          [1720690787.896] [2401:2401] [DMG] <RE:Run> Cluster 3e, Attribute 4 is dirty
-          [1720690787.896] [2401:2401] [DMG] Reading attribute: Cluster=0x0000_003E Endpoint=0 AttributeId=0x0000_0004 (expanded=0)
+           On TH(all-clusters-app), Verify that TH receives read TrustedRootCertificates from DUT successfully.
+           [1720690787.895] [2401:2401] [EM] Handling via exchange: 45935r, Delegate: 0xaaaaab219368
+           [1720690787.895] [2401:2401] [IM] Received Read request
+           [1720690787.895] [2401:2401] [DMG] ReadRequestMessage =
+           [1720690787.895] [2401:2401] [DMG] {
+           [1720690787.895] [2401:2401] [DMG]         AttributePathIBs =
+           [1720690787.895] [2401:2401] [DMG]         [
+           [1720690787.895] [2401:2401] [DMG]                 AttributePathIB =
+           [1720690787.895] [2401:2401] [DMG]                 {
+           [1720690787.895] [2401:2401] [DMG]                         Endpoint = 0x0,
+           [1720690787.895] [2401:2401] [DMG]                         Cluster = 0x3e,
+           [1720690787.895] [2401:2401] [DMG]                         Attribute = 0x0000_0004,
+           [1720690787.895] [2401:2401] [DMG]                 }
+           [1720690787.896] [2401:2401] [DMG]
+           [1720690787.896] [2401:2401] [DMG]         ],
+           [1720690787.896] [2401:2401] [DMG]
+           [1720690787.896] [2401:2401] [DMG]         isFabricFiltered = true,
+           [1720690787.896] [2401:2401] [DMG]         InteractionModelRevision = 11
+           [1720690787.896] [2401:2401] [DMG] },
+           [1720690787.896] [2401:2401] [DMG] IM RH moving to [CanStartReporting]
+           [1720690787.896] [2401:2401] [DMG] Building Reports for ReadHandler with LastReportGeneration = 0x0000000000000000 DirtyGeneration = 0x0000000000000000
+           [1720690787.896] [2401:2401] [DMG] <RE:Run> Cluster 3e, Attribute 4 is dirty
+           [1720690787.896] [2401:2401] [DMG] Reading attribute: Cluster=0x0000_003E Endpoint=0 AttributeId=0x0000_0004 (expanded=0)
       disabled: true
 
     - label:
