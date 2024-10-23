@@ -176,6 +176,13 @@ MTR_DIRECT_MEMBERS
 - (void)devicePrivateInternalStateChanged:(MTRDevice *)device internalState:(NSDictionary *)state;
 @end
 
+// Returns whether a data-value dictionary is well-formed (in the sense that all
+// the types of the objects inside are as expected, so it's actually a valid
+// representation of some TLV).  Implemented in MTRBaseDevice.mm because that's
+// where the pieces needed to implement it are, but declared here so our tests
+// can see it.
+MTR_EXTERN MTR_TESTABLE BOOL MTRDataValueDictionaryIsWellFormed(MTRDeviceDataValueDictionary value);
+
 #pragma mark - Constants
 
 static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
