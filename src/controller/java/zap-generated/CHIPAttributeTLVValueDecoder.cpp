@@ -40112,8 +40112,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::MaxPreRollBufferSize::Id: {
-            using TypeInfo = Attributes::MaxPreRollBufferSize::TypeInfo;
+        case Attributes::MaxContentBufferSize::Id: {
+            using TypeInfo = Attributes::MaxContentBufferSize::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

@@ -5613,7 +5613,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::RateDistortionTradeOffPoints::Id: {
         return YES;
     }
-    case Attributes::MaxPreRollBufferSize::Id: {
+    case Attributes::MaxContentBufferSize::Id: {
         return YES;
     }
     case Attributes::MicrophoneCapabilities::Id: {
