@@ -193,7 +193,7 @@ CHIP_ERROR EmberAttributeBuffer::DecodeSignedInteger(chip::TLV::TLVReader & read
             // Value is in [min, max] RANGE
             ((value >= info.minValue) && (value <= info.maxValue))
             // Nullable values reserve a specific value to mean NULL
-            && !(mIsNullable && (value == SignedMinValueToNullValue(info.minValue)));
+            && !(mIsNullable && (value == NumericLimits::SignedMinValueToNullValue(info.minValue)));
 
         VerifyOrReturnError(valid, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
