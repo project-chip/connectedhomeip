@@ -16,8 +16,6 @@ name: Data model directory checks
 
 on:
   pull_request:
-permissions:
-  contents: read
 
 jobs:
   check-data_model-updates:
@@ -29,7 +27,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
       - name: Check for changes to master data_model directory without a SHA update
         run: |
           python3 scripts/dm_xml_ci_change_enforcement.py data_model/master
