@@ -156,7 +156,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         expected_descriptor_attributes = ClusterObjects.ALL_ATTRIBUTES[Clusters.Objects.Descriptor.id]
         # Event List is not supposed to be present -- see https://github.com/project-chip/connectedhomeip/pull/34997
         # Therefore, the test is adjusted to remove EventList from expected attributes
-        expected_descriptor_attributes.pop(65530, None) # 65530 = EventList
+        expected_descriptor_attributes.pop(65530, None)  # 65530 = EventList
         asserts.assert_equal(set(returned_attributes), set(expected_descriptor_attributes.values()))
 
         # Step 3
