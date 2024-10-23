@@ -343,9 +343,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     if (GetFabricTable().FabricCount() != 0)
     {
+#if CONFIG_NETWORK_LAYER_BLE
         // The device is already commissioned, proactively disable BLE advertisement.
         ChipLogProgress(AppServer, "Fabric already commissioned. Disabling BLE advertisement");
-#if CONFIG_NETWORK_LAYER_BLE
         chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
 #endif
     }

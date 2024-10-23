@@ -31,7 +31,11 @@ limitations under the License.
     <attribute side="server" code="0x00" define="ACTIVE_LOCALE" type="char_string" length="35" writable="true" optional="false">
       <description>ActiveLocale</description>
       <access op="write" privilege="manage"/>
+      <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x01" define="SUPPORTED_LOCALES" type="array" entryType="char_string" length="254" writable="false" optional="false">SupportedLocales</attribute>
+    <attribute side="server" code="0x01" define="SUPPORTED_LOCALES" type="array" entryType="char_string" length="254">
+      <description>SupportedLocales</description>
+      <mandatoryConform/>
+    </attribute>
   </cluster>
 </configurator>

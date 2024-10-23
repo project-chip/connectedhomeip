@@ -88,6 +88,7 @@ constexpr MTRDeviceTypeData knownDeviceTypes[] = {
     { 0x00000309, MTRDeviceTypeClass::Simple, "Heat Pump" },
     { 0x0000050C, MTRDeviceTypeClass::Simple, "EVSE" },
     { 0x0000050D, MTRDeviceTypeClass::Simple, "Device Energy Management" },
+    { 0x0000050F, MTRDeviceTypeClass::Simple, "Water Heater" },
     { 0x00000510, MTRDeviceTypeClass::Utility, "Electrical Sensor" },
     { 0x00000840, MTRDeviceTypeClass::Simple, "Control Bridge" },
     { 0x00000850, MTRDeviceTypeClass::Simple, "On/Off Sensor" },
