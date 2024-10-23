@@ -20,8 +20,8 @@ product_considerations/index
 testing/index
 tips_and_troubleshooting/index
 tools/index
+zap_and_codegen/index
 BUG_REPORT
-code_generation
 upgrading
 issue_triage
 ```
