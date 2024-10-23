@@ -59,6 +59,7 @@ static_library("shell") {
              chip_device_platform == "SiWx917") {
     sources += [
       # Temporary workaround to prevent a circular dependecy while restructuring the silabs shell files
+      # Due to some odd dependency issue, we need the source file and the include_dir for the build to pass.
       "${chip_root}/examples/platform/silabs/shell/MatterShell.h",
       "MainLoopSilabs.cpp",
       "streamer_silabs.cpp",
