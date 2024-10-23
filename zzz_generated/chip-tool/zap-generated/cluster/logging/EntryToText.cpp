@@ -4181,8 +4181,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MinViewport";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::RateDistortionTradeOffPoints::Id:
             return "RateDistortionTradeOffPoints";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxPreRollBufferSize::Id:
-            return "MaxPreRollBufferSize";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxContentBufferSize::Id:
+            return "MaxContentBufferSize";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::MicrophoneCapabilities::Id:
             return "MicrophoneCapabilities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::SpeakerCapabilities::Id:

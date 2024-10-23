@@ -13732,7 +13732,7 @@ private:
 | * NightVisionCapable                                                | 0x0003 |
 | * MinViewport                                                       | 0x0004 |
 | * RateDistortionTradeOffPoints                                      | 0x0005 |
-| * MaxPreRollBufferSize                                              | 0x0006 |
+| * MaxContentBufferSize                                              | 0x0006 |
 | * MicrophoneCapabilities                                            | 0x0007 |
 | * SpeakerCapabilities                                               | 0x0008 |
 | * TwoWayTalkSupport                                                 | 0x0009 |
@@ -26925,7 +26925,7 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "min-viewport", Attributes::MinViewport::Id, credsIssuerConfig),                   //
         make_unique<ReadAttribute>(Id, "rate-distortion-trade-off-points", Attributes::RateDistortionTradeOffPoints::Id,
                                    credsIssuerConfig),                                                                           //
-        make_unique<ReadAttribute>(Id, "max-pre-roll-buffer-size", Attributes::MaxPreRollBufferSize::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "max-content-buffer-size", Attributes::MaxContentBufferSize::Id, credsIssuerConfig),      //
         make_unique<ReadAttribute>(Id, "microphone-capabilities", Attributes::MicrophoneCapabilities::Id, credsIssuerConfig),    //
         make_unique<ReadAttribute>(Id, "speaker-capabilities", Attributes::SpeakerCapabilities::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "two-way-talk-support", Attributes::TwoWayTalkSupport::Id, credsIssuerConfig),            //
@@ -26993,7 +26993,7 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
             const chip::app::Clusters::CameraAvStreamManagement::Structs::RateDistortionTradeOffPointsStruct::Type>>>(
             Id, "rate-distortion-trade-off-points", Attributes::RateDistortionTradeOffPoints::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<uint32_t>>(Id, "max-pre-roll-buffer-size", 0, UINT32_MAX, Attributes::MaxPreRollBufferSize::Id,
+        make_unique<WriteAttribute<uint32_t>>(Id, "max-content-buffer-size", 0, UINT32_MAX, Attributes::MaxContentBufferSize::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::Clusters::CameraAvStreamManagement::Structs::AudioCapabilitiesStruct::Type>>(
             Id, "microphone-capabilities", Attributes::MicrophoneCapabilities::Id, WriteCommandType::kForceWrite,
@@ -27114,8 +27114,8 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<SubscribeAttribute>(Id, "night-vision-capable", Attributes::NightVisionCapable::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "min-viewport", Attributes::MinViewport::Id, credsIssuerConfig),                   //
         make_unique<SubscribeAttribute>(Id, "rate-distortion-trade-off-points", Attributes::RateDistortionTradeOffPoints::Id,
-                                        credsIssuerConfig),                                                                       //
-        make_unique<SubscribeAttribute>(Id, "max-pre-roll-buffer-size", Attributes::MaxPreRollBufferSize::Id, credsIssuerConfig), //
+                                        credsIssuerConfig),                                                                      //
+        make_unique<SubscribeAttribute>(Id, "max-content-buffer-size", Attributes::MaxContentBufferSize::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "microphone-capabilities", Attributes::MicrophoneCapabilities::Id,
                                         credsIssuerConfig),                                                                  //
         make_unique<SubscribeAttribute>(Id, "speaker-capabilities", Attributes::SpeakerCapabilities::Id, credsIssuerConfig), //

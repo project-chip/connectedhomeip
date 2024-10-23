@@ -9527,7 +9527,7 @@ provisional cluster ZoneManagement = 1360 {
 }
 
 /** The Camera AV Stream Management cluster is used to allow clients to manage, control, and configure various audio, video, and snapshot streams on a camera. */
-cluster CameraAvStreamManagement = 1361 {
+provisional cluster CameraAvStreamManagement = 1361 {
   revision 1;
 
   enum AudioCodecEnum : enum8 {
@@ -9695,7 +9695,7 @@ cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional boolean nightVisionCapable = 3;
   readonly attribute optional VideoResolutionStruct minViewport = 4;
   readonly attribute optional RateDistortionTradeOffPointsStruct rateDistortionTradeOffPoints[] = 5;
-  readonly attribute optional int32u maxPreRollBufferSize = 6;
+  readonly attribute optional int32u maxContentBufferSize = 6;
   readonly attribute optional AudioCapabilitiesStruct microphoneCapabilities = 7;
   readonly attribute optional AudioCapabilitiesStruct speakerCapabilities = 8;
   readonly attribute optional TwoWayTalkSupportTypeEnum twoWayTalkSupport = 9;

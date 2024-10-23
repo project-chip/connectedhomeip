@@ -18513,10 +18513,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RateDistortionTradeOffPoints", 1, value);
         }
-        case CameraAvStreamManagement::Attributes::MaxPreRollBufferSize::Id: {
+        case CameraAvStreamManagement::Attributes::MaxContentBufferSize::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MaxPreRollBufferSize", 1, value);
+            return DataModelLogger::LogValue("MaxContentBufferSize", 1, value);
         }
         case CameraAvStreamManagement::Attributes::MicrophoneCapabilities::Id: {
             chip::app::Clusters::CameraAvStreamManagement::Structs::AudioCapabilitiesStruct::DecodableType value;
