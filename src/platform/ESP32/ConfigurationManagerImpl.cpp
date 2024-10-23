@@ -36,7 +36,9 @@
 #include "esp_mac.h"
 #endif
 #include "esp_ota_ops.h"
+#ifndef CONFIG_IDF_TARGET_ESP32P4
 #include "esp_phy_init.h"
+#endif
 #include "esp_wifi.h"
 #include "nvs.h"
 #include "nvs_flash.h"
@@ -265,7 +267,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
 
     return err;
 #else
-    location       = static_cast<uint8_t>(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
+    location = static_cast<uint8_t>(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
     return CHIP_NO_ERROR;
 #endif // CONFIG_ENABLE_ESP32_LOCATIONCAPABILITY
 }
