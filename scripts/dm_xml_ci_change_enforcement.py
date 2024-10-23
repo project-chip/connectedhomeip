@@ -27,7 +27,7 @@ def check_dm_directory(dir):
     device_types = os.path.join(dir, 'device_types')
     if not os.path.isdir(clusters) or not os.path.isdir(device_types):
         print(f"Invalid data model directory {dir}")
-        return 1
+        sys.exit(1)
 
     # We are operating in a VM, and although there is a checkout, it is working in a scratch directory
     # where the ownership is different than the runner.
@@ -45,9 +45,8 @@ def check_dm_directory(dir):
         return 0
 
     ret = check_dir(clusters) + check_dir(device_types)
-    print(f'returning {ret}')
-    return ret
+    sys.exit(ret)
 
 
 if __name__ == '__main__':
-    sys.exit(check_dm_directory())
+    check_dm_directory()
