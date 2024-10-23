@@ -123,7 +123,7 @@ source_set("openthread_core_config_efr32_chip_examples") {
   }
 }
 
-source_set("efr-matter-shell") {
+source_set("matter-shell") {
   if (chip_build_libshell) {
     defines = [ "ENABLE_CHIP_SHELL" ]
 
@@ -294,7 +294,11 @@ source_set("efr32-common") {
   }
 
   if (chip_build_libshell) {
-    deps += [ ":efr-matter-shell" ]
+    deps += [ ":matter-shell" ]
+
+    if (chip_enable_icd_server) {
+      public_deps += [ "${silabs_common_plat_dir}/icd:shell" ]
+    }
   }
 
   public_deps += [

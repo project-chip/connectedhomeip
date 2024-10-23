@@ -91,7 +91,7 @@ source_set("test-event-trigger") {
   ]
 }
 
-source_set("siwx917-matter-shell") {
+source_set("matter-shell") {
   if (chip_build_libshell) {
     defines = [ "ENABLE_CHIP_SHELL" ]
 
@@ -226,7 +226,11 @@ source_set("siwx917-common") {
   }
 
   if (chip_build_libshell) {
-    deps += [ ":siwx917-matter-shell" ]
+    deps += [ ":matter-shell" ]
+
+    if (chip_enable_icd_server) {
+      deps += [ "${chip_root}/examples/platform/silabs/icd:shell" ]
+    }
   }
 
   # DIC
