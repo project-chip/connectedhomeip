@@ -42,6 +42,7 @@ from chip.native import PyChipError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_CADMIN_1_19(MatterBaseTest):
     def generate_unique_random_value(self, value):
         while True:
@@ -69,7 +70,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
             TestStep(6, "TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.",
                      "Verify this is equal to max_fabrics"),
             TestStep(
-                    7, "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration", "{resDutSuccess}"),
+                7, "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration", "{resDutSuccess}"),
             TestStep(8, "TH creates a controller on a new fabric and commissions DUT_CE using that controller",
                      "Verify DUT_CE responds with NOCResponse with a StatusCode field value of TableFull(5)"),
             TestStep(9, "Repeat the following steps (9a and 9b) for each controller (TH_CRn) created by this test"),
@@ -138,7 +139,8 @@ class TC_CADMIN_1_19(MatterBaseTest):
         self.step(8)
         # TH creates a controller on a new fabric and commissions DUT_CE using that controller
         fids_ca_dir[current_fabrics + 1] = self.certificate_authority_manager.NewCertificateAuthority()
-        fids_fa_dir[current_fabrics + 1] = fids_ca_dir[current_fabrics + 1].NewFabricAdmin(vendorId=0xFFF1, fabricId=current_fabrics + 1)
+        fids_fa_dir[current_fabrics + 1] = fids_ca_dir[current_fabrics +
+                                                       1].NewFabricAdmin(vendorId=0xFFF1, fabricId=current_fabrics + 1)
         try:
             fids[current_fabrics + 1] = fids_fa_dir[current_fabrics + 1].NewController(nodeId=current_fabrics + 1)
             await fids[current_fabrics + 1].CommissionOnNetwork(
@@ -153,7 +155,6 @@ class TC_CADMIN_1_19(MatterBaseTest):
             asserts.assert_equal(e.err,  0x0000000B,
                                  "Expected to return table is full since max number of fabrics has been created already")
 
-        
         self.step(9)
         for thc in fids.keys():
             # Make sure that current test step is 11 (9 + 2 since 5a and 5b test steps included in count), resets here after each loop
