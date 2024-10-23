@@ -741,7 +741,11 @@ tests:
       disabled: true
 
     - label:
-          ./chip-tool operationalcredentials read trusted-root-certificates 1 0
+          "Step 15: Trigger the DUT to read TrustedRootCertificates attribute
+          from TH"
+      PICS: OPCREDS.C.A0004
+      verification: |
+         ./chip-tool operationalcredentials read trusted-root-certificates 1 0
 
           On TH(all-clusters-app), Verify that TH receives read TrustedRootCertificates from DUT successfully.
           [1720690787.895] [2401:2401] [EM] Handling via exchange: 45935r, Delegate: 0xaaaaab219368
