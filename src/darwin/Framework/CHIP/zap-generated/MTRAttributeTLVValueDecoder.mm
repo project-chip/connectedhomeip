@@ -16999,8 +16999,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
         }
         return value;
     }
-    case Attributes::MaxPreRollBufferSize::Id: {
-        using TypeInfo = Attributes::MaxPreRollBufferSize::TypeInfo;
+    case Attributes::MaxContentBufferSize::Id: {
+        using TypeInfo = Attributes::MaxContentBufferSize::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

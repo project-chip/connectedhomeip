@@ -30138,8 +30138,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, minViewport);
     case Attributes::RateDistortionTradeOffPoints::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, rateDistortionTradeOffPoints);
-    case Attributes::MaxPreRollBufferSize::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxPreRollBufferSize);
+    case Attributes::MaxContentBufferSize::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, maxContentBufferSize);
     case Attributes::MicrophoneCapabilities::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, microphoneCapabilities);
     case Attributes::SpeakerCapabilities::TypeInfo::GetAttributeId():
