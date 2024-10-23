@@ -55,10 +55,12 @@ void SilabsBleWrapper::rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu)
  */
 void SilabsBleWrapper::rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t * rsi_ble_write)
 {
-    SilabsBleWrapper::BleEvent_t bleEvent;
-    bleEvent.eventType          = BleEventType::RSI_BLE_GATT_WRITE_EVENT;
-    bleEvent.eventData.event_id = event_id;
-    memcpy(&bleEvent.eventData.rsi_ble_write, rsi_ble_write, sizeof(rsi_ble_event_write_t));
+    SilabsBleWrapper::BleEvent_t bleEvent = { .eventType = BleEventType::RSI_BLE_GATT_WRITE_EVENT,
+                                              .eventData = { 
+                                                .connectionHandle = 1,
+                                                .event_id = event_id,
+                                                .rsi_ble_write = *rsi_ble_write
+                                            } };
     BLEMgrImpl().BlePostEvent(&bleEvent);
 }
 
