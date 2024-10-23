@@ -39,11 +39,6 @@ class TizenApp(Enum):
         'examples/all-clusters-app/tizen',
         ('chip-all-clusters-app',
          'chip-all-clusters-app.map'))
-    ALL_CLUSTERS_MINIMAL = App(
-        'chip-all-clusters-minimal-app',
-        'examples/all-clusters-minimal-app/tizen',
-        ('chip-all-clusters-minimal-app',
-         'chip-all-clusters-minimal-app.map'))
     LIGHT = App(
         'chip-lighting-app',
         'examples/lighting-app/tizen',

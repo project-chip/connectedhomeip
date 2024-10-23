@@ -18,7 +18,7 @@ import("${chip_root}/src/platform/silabs/efr32/args.gni")
 
 silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
-app_data_model = "${chip_root}/examples/lock-app/lock-common"
+app_data_model = "${chip_root}/examples/lock-app/silabs/data_model:silabs-lock"
 chip_enable_ota_requestor = true
 chip_enable_openthread = true
 

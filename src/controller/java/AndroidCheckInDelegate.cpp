@@ -92,8 +92,8 @@ RefreshKeySender * AndroidCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
                           jniICDHmacKey)
 
         jmethodID onKeyRefreshNeededMethodID = nullptr;
-        err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDelegate.ObjectRef(), "onKeyRefreshNeeded", "(JJJJJ[B[B)V",
-                                                            &onKeyRefreshNeededMethodID);
+        err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDelegate.ObjectRef(), "onKeyRefreshNeeded",
+                                                            "(JJJJJ[B[B)[B", &onKeyRefreshNeededMethodID);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                             ChipLogProgress(ICD, "onKeyRefreshNeeded - FindMethod is failed! : %" CHIP_ERROR_FORMAT, err.Format()));
 
@@ -120,6 +120,12 @@ RefreshKeySender * AndroidCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(ICD, "Generation of new key failed: %" CHIP_ERROR_FORMAT, err.Format());
+            return nullptr;
+        }
+        err = newKey.SetLength(newKey.Capacity());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(ICD, "Fail to set new key length with error: %" CHIP_ERROR_FORMAT, err.Format());
             return nullptr;
         }
     }

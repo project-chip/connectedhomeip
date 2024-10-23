@@ -12,6 +12,7 @@ struct PairingConstants {
     static let onboardingPayload = "MT:-24J0AFN00KA0648G00"
     static let deviceID = 0x12344321
     static let timeoutInSeconds : UInt16 = 3
+    static let pairingTimeoutInSeconds : UInt16 = 60
 }
 
 class MTRSwiftPairingTestControllerDelegate : NSObject, MTRDeviceControllerDelegate {
@@ -96,7 +97,7 @@ class MTRSwiftPairingTests : XCTestCase {
             return
         }
 
-        wait(for: [expectation], timeout: TimeInterval(PairingConstants.timeoutInSeconds))
+        wait(for: [expectation], timeout: TimeInterval(PairingConstants.pairingTimeoutInSeconds))
 
         ResetCommissionee(MTRBaseDevice(nodeID: PairingConstants.deviceID as NSNumber, controller: controller), DispatchQueue.main, self, PairingConstants.timeoutInSeconds)
 

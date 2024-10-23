@@ -71,12 +71,15 @@ public:
     {
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
 
+        __auto_type * endpoint = @(endpointId);
+        __auto_type * cluster = @(clusterId);
+        __auto_type * command = @(commandId);
         while (repeatCount--) {
-            [device invokeCommandWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
-                                      clusterID:[NSNumber numberWithUnsignedInteger:clusterId]
-                                      commandID:[NSNumber numberWithUnsignedInteger:commandId]
+            [device invokeCommandWithEndpointID:endpoint
+                                      clusterID:cluster
+                                      commandID:command
                                   commandFields:commandFields
                              timedInvokeTimeout:mTimedInteractionTimeoutMs.HasValue()
                                  ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()]
@@ -88,6 +91,9 @@ public:
                                          if (error != nil) {
                                              mError = error;
                                              LogNSError("Error", error);
+                                             RemoteDataModelLogger::LogCommandErrorAsJSON(endpoint, cluster, command, error);
+                                         } else {
+                                             RemoteDataModelLogger::LogCommandAsJSON(endpoint, cluster, command, values);
                                          }
                                          if (responsesNeeded == 0) {
                                              SetCommandExitStatus(mError);

@@ -39,9 +39,9 @@
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
-#import "MTRDeviceControllerXPCParameters.h"
 #import "MTRDeviceController_Concrete.h"
 #import "MTRDeviceController_XPC.h"
+#import "MTRDeviceDataValueDictionary.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRDevice_XPC_Internal.h"
@@ -50,7 +50,6 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
-#import "MTROperationalCredentialsDelegate.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "MTRServerEndpoint_Internal.h"
@@ -85,10 +84,8 @@
 
 @synthesize _internalState;
 
-- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController_XPC *)controller
 {
-    // TODO: Verify that this is a valid MTRDeviceController_XPC?
-
     if (self = [super initForSubclassesWithNodeID:nodeID controller:controller]) {
         // Nothing else to do, all set.
     }
@@ -203,13 +200,13 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(deviceCachePrimed, BOOL, NO, getDeviceCacheP
 MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedStartTime, NSDate * _Nullable, nil, getEstimatedStartTimeWithReply)
 MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedSubscriptionLatency, NSNumber * _Nullable, nil, getEstimatedSubscriptionLatencyWithReply)
 
-typedef NSDictionary<NSString *, id> * _Nullable readAttributeResponseType;
+typedef NSDictionary<NSString *, id> * _Nullable ReadAttributeResponseType;
 MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributeWithEndpointID
                                      : (NSNumber *) endpointID clusterID
                                      : (NSNumber *) clusterID attributeID
                                      : (NSNumber *) attributeID params
                                      : (MTRReadParams * _Nullable) params,
-                                     readAttributeResponseType,
+                                     ReadAttributeResponseType,
                                      nil,
                                      readAttributeWithEndpointID
                                      : endpointID clusterID
@@ -231,10 +228,18 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID
                                      : expectedValueInterval timedWriteTimeout
                                      : timeout)
 
+typedef NSArray<NSDictionary<NSString *, id> *> * ReadAttributePathsResponseType;
+MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
+                                     : (NSArray<MTRAttributeRequestPath *> *) attributePaths,
+                                     ReadAttributePathsResponseType,
+                                     [NSArray array], // Default return value
+                                     readAttributePaths
+                                     : attributePaths withReply)
+
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
                            commandID:(NSNumber *)commandID
-                       commandFields:(id)commandFields
+                       commandFields:(MTRDeviceDataValueDictionary)commandFields
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
                expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                   timedInvokeTimeout:(NSNumber * _Nullable)timeout
@@ -244,23 +249,63 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID
 {
     NSXPCConnection * xpcConnection = [(MTRDeviceController_XPC *) [self deviceController] xpcConnection];
 
-    [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-        MTR_LOG_ERROR("Error: %@", error);
-    }] deviceController:[[self deviceController] uniqueIdentifier]
-                             nodeID:[self nodeID]
-        invokeCommandWithEndpointID:endpointID
-                          clusterID:clusterID
-                          commandID:commandID
-                      commandFields:commandFields
-                     expectedValues:expectedValues
-              expectedValueInterval:expectedValueInterval
-                 timedInvokeTimeout:timeout
-        serverSideProcessingTimeout:serverSideProcessingTimeout
-                         completion:completion];
+    @try {
+        [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+            MTR_LOG_ERROR("Invoke error: %@", error);
+            completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+        }] deviceController:[[self deviceController] uniqueIdentifier]
+                                 nodeID:[self nodeID]
+            invokeCommandWithEndpointID:endpointID
+                              clusterID:clusterID
+                              commandID:commandID
+                          commandFields:commandFields
+                         expectedValues:expectedValues
+                  expectedValueInterval:expectedValueInterval
+                     timedInvokeTimeout:timeout
+            serverSideProcessingTimeout:serverSideProcessingTimeout
+                             completion:completion];
+    } @catch (NSException * exception) {
+        MTR_LOG_ERROR("Exception sending XPC message: %@", exception);
+        completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+    }
+}
+
+- (void)downloadLogOfType:(MTRDiagnosticLogType)type
+                  timeout:(NSTimeInterval)timeout
+                    queue:(dispatch_queue_t)queue
+               completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+{
+    NSXPCConnection * xpcConnection = [(MTRDeviceController_XPC *) [self deviceController] xpcConnection];
+
+    @try {
+        [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+            MTR_LOG_ERROR("Error: %@", error);
+            dispatch_async(queue, ^{
+                completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+            });
+        }] deviceController:[[self deviceController] uniqueIdentifier]
+                       nodeID:[self nodeID]
+            downloadLogOfType:type
+                      timeout:timeout
+                   completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+                       dispatch_async(queue, ^{
+                           completion(url, error);
+                           if (url) {
+                               [[NSFileManager defaultManager] removeItemAtPath:url.path error:nil];
+                           }
+                       });
+                   }];
+    } @catch (NSException * exception) {
+        MTR_LOG_ERROR("Exception sending XPC messsage: %@", exception);
+        dispatch_async(queue, ^{
+            completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+        });
+    }
 }
 
 // Not Supported via XPC
 //- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode discriminator:(NSNumber *)discriminator duration:(NSNumber *)duration completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
+//- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID openCommissioningWindowWithDiscriminator:(NSNumber *)discriminator duration:(NSNumber *)duration completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
 
 // Not Supported via XPC
 // - (oneway void)downloadLogOfType:(MTRDiagnosticLogType)type nodeID:(NSNumber *)nodeID timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;

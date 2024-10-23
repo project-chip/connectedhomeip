@@ -51,7 +51,6 @@ public:
     ///////////////////////////////////////////////////////////////
     void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data,
                          const chip::app::StatusIB & status) override;
-    void OnReportEnd() override;
     void OnError(CHIP_ERROR error) override;
     void OnDone(chip::app::ReadClient * apReadClient) override;
 

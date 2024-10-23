@@ -1,4 +1,4 @@
-# New Clusters & Device Types
+# Implementing New Clusters & Device Types
 
 The goal of new cluster and device type development is to
 

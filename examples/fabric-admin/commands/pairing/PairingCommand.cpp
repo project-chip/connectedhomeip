@@ -30,7 +30,6 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
-#include <setup_payload/SetupPayload.h>
 
 #include <string>
 
@@ -40,28 +39,6 @@
 
 using namespace ::chip;
 using namespace ::chip::Controller;
-
-namespace {
-
-CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload)
-{
-    VerifyOrReturnValue(setUpCode, CHIP_ERROR_INVALID_ARGUMENT);
-    bool isQRCode = strncmp(setUpCode, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
-    if (isQRCode)
-    {
-        ReturnErrorOnFailure(QRCodeSetupPayloadParser(setUpCode).populatePayload(payload));
-        VerifyOrReturnError(payload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
-    }
-    else
-    {
-        ReturnErrorOnFailure(ManualSetupPayloadParser(setUpCode).populatePayload(payload));
-        VerifyOrReturnError(payload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-} // namespace
 
 CHIP_ERROR PairingCommand::RunCommand()
 {
@@ -128,7 +105,10 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 {
     auto params = CommissioningParameters();
     params.SetSkipCommissioningComplete(mSkipCommissioningComplete.ValueOr(false));
-    params.SetDeviceAttestationDelegate(this);
+    if (mBypassAttestationVerifier.ValueOr(false))
+    {
+        params.SetDeviceAttestationDelegate(this);
+    }
 
     switch (mNetworkType)
     {
@@ -169,7 +149,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 
         if (!mICDSymmetricKey.HasValue())
         {
-            chip::Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey));
+            Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey));
             mICDSymmetricKey.SetValue(ByteSpan(mRandomGeneratedICDSymmetricKey));
         }
         if (!mICDCheckInNodeId.HasValue())
@@ -296,7 +276,7 @@ CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndexWithCode(NodeId remoteId, uin
         // There is no device with this index that has some resolution data. This could simply
         // be because the device is a ble device. In this case let's fall back to looking for
         // a device with this index and some RendezvousParameters.
-        chip::SetupPayload payload;
+        SetupPayload payload;
         bool isQRCode = strncmp(mOnboardingPayload, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
         if (isQRCode)
         {
@@ -336,21 +316,21 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
     Dnssd::DiscoveryFilter filter(mFilterType);
     switch (mFilterType)
     {
-    case chip::Dnssd::DiscoveryFilterType::kNone:
+    case Dnssd::DiscoveryFilterType::kNone:
         break;
-    case chip::Dnssd::DiscoveryFilterType::kShortDiscriminator:
-    case chip::Dnssd::DiscoveryFilterType::kLongDiscriminator:
-    case chip::Dnssd::DiscoveryFilterType::kCompressedFabricId:
-    case chip::Dnssd::DiscoveryFilterType::kVendorId:
-    case chip::Dnssd::DiscoveryFilterType::kDeviceType:
+    case Dnssd::DiscoveryFilterType::kShortDiscriminator:
+    case Dnssd::DiscoveryFilterType::kLongDiscriminator:
+    case Dnssd::DiscoveryFilterType::kCompressedFabricId:
+    case Dnssd::DiscoveryFilterType::kVendorId:
+    case Dnssd::DiscoveryFilterType::kDeviceType:
         filter.code = mDiscoveryFilterCode;
         break;
-    case chip::Dnssd::DiscoveryFilterType::kCommissioningMode:
+    case Dnssd::DiscoveryFilterType::kCommissioningMode:
         break;
-    case chip::Dnssd::DiscoveryFilterType::kCommissioner:
+    case Dnssd::DiscoveryFilterType::kCommissioner:
         filter.code = 1;
         break;
-    case chip::Dnssd::DiscoveryFilterType::kInstanceName:
+    case Dnssd::DiscoveryFilterType::kInstanceName:
         filter.code         = 0;
         filter.instanceName = mDiscoveryFilterInstanceName;
         break;
@@ -442,12 +422,6 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
         ChipLogProgress(NotSpecified, "Device commissioning Failure: %s", ErrorStr(err));
     }
 
-    if (mCommissioningDelegate)
-    {
-        mCommissioningDelegate->OnCommissioningComplete(nodeId, err);
-        this->UnregisterCommissioningDelegate();
-    }
-
     SetCommandExitStatus(err);
 }
 
@@ -480,10 +454,10 @@ void PairingCommand::OnReadCommissioningInfo(const Controller::ReadCommissioning
 
 void PairingCommand::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icdCounter)
 {
-    char icdSymmetricKeyHex[chip::Crypto::kAES_CCM128_Key_Length * 2 + 1];
+    char icdSymmetricKeyHex[Crypto::kAES_CCM128_Key_Length * 2 + 1];
 
-    chip::Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
-                               sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
+    Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
+                         sizeof(icdSymmetricKeyHex), Encoding::HexFlags::kNullTerminate);
 
     app::ICDClientInfo clientInfo;
     clientInfo.peer_node         = nodeId;
@@ -521,7 +495,7 @@ void PairingCommand::OnICDStayActiveComplete(ScopedNodeId deviceId, uint32_t pro
                     ChipLogValueX64(deviceId.GetNodeId()), promisedActiveDuration);
 }
 
-void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData)
+void PairingCommand::OnDiscoveredDevice(const Dnssd::CommissionNodeData & nodeData)
 {
     // Ignore nodes with closed commissioning window
     VerifyOrReturn(nodeData.commissioningMode != 0);
@@ -529,7 +503,7 @@ void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & 
     auto & resolutionData = nodeData;
 
     const uint16_t port = resolutionData.port;
-    char buf[chip::Inet::IPAddress::kMaxStringLength];
+    char buf[Inet::IPAddress::kMaxStringLength];
     resolutionData.ipAddress[0].ToString(buf);
     ChipLogProgress(NotSpecified, "Discovered Device: %s:%u", buf, port);
 
@@ -566,9 +540,9 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
         fprintf(stderr, "Device with Node ID: 0x%lx has been successfully removed.\n", nodeId);
 
 #if defined(PW_RPC_ENABLED)
-        chip::app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(command->CurrentCommissioner().GetFabricIndex(),
-                                                                                nodeId);
-        RemoveSynchronizedDevice(nodeId);
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(command->CurrentCommissioner().GetFabricIndex(), nodeId);
+        ScopedNodeId scopedNodeId(nodeId, command->CurrentCommissioner().GetFabricIndex());
+        RemoveSynchronizedDevice(scopedNodeId);
 #endif
     }
     else
@@ -576,94 +550,22 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
         ChipLogProgress(NotSpecified, "Device unpair Failure: " ChipLogFormatX64 " %s", ChipLogValueX64(nodeId), ErrorStr(err));
     }
 
-    PairingDelegate * pairingDelegate = command->GetPairingDelegate();
-    if (pairingDelegate)
-    {
-        pairingDelegate->OnDeviceRemoved(nodeId, err);
-        command->UnregisterPairingDelegate();
-    }
-
     command->SetCommandExitStatus(err);
 }
 
-chip::Optional<uint16_t> PairingCommand::FailSafeExpiryTimeoutSecs() const
+Optional<uint16_t> PairingCommand::FailSafeExpiryTimeoutSecs() const
 {
     // No manual input, so do not need to extend.
-    return chip::Optional<uint16_t>();
+    return Optional<uint16_t>();
 }
 
-bool PairingCommand::ShouldWaitAfterDeviceAttestation()
+void PairingCommand::OnDeviceAttestationCompleted(Controller::DeviceCommissioner * deviceCommissioner, DeviceProxy * device,
+                                                  const Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
+                                                  Credentials::AttestationVerificationResult attestationResult)
 {
-    // If there is a vendor ID and product ID, request OnDeviceAttestationCompleted().
-    // Currently this is added in the case that the example is performing reverse commissioning,
-    // but it would be an improvement to store that explicitly.
-    // TODO: Issue #35297 - [Fabric Sync] Improve where we get VID and PID when validating CCTRL CommissionNode command
-    SetupPayload payload;
-    CHIP_ERROR err = GetPayload(mOnboardingPayload, payload);
-    return err == CHIP_NO_ERROR && (payload.vendorID != 0 || payload.productID != 0);
-}
-
-void PairingCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner,
-                                                  chip::DeviceProxy * device,
-                                                  const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
-                                                  chip::Credentials::AttestationVerificationResult attestationResult)
-{
-    SetupPayload payload;
-    CHIP_ERROR parse_error = GetPayload(mOnboardingPayload, payload);
-    if (parse_error == CHIP_NO_ERROR && (payload.vendorID != 0 || payload.productID != 0))
-    {
-        if (payload.vendorID == 0 || payload.productID == 0)
-        {
-            ChipLogProgress(NotSpecified,
-                            "Failed validation: vendorID or productID must not be 0."
-                            "Requested VID: %u, Requested PID: %u.",
-                            payload.vendorID, payload.productID);
-            deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
-                device, chip::Credentials::AttestationVerificationResult::kInvalidArgument);
-            return;
-        }
-
-        if (payload.vendorID != info.BasicInformationVendorId() || payload.productID != info.BasicInformationProductId())
-        {
-            ChipLogProgress(NotSpecified,
-                            "Failed validation of vendorID or productID."
-                            "Requested VID: %u, Requested PID: %u,"
-                            "Detected VID: %u, Detected PID %u.",
-                            payload.vendorID, payload.productID, info.BasicInformationVendorId(), info.BasicInformationProductId());
-            deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
-                device,
-                payload.vendorID == info.BasicInformationVendorId()
-                    ? chip::Credentials::AttestationVerificationResult::kDacProductIdMismatch
-                    : chip::Credentials::AttestationVerificationResult::kDacVendorIdMismatch);
-            return;
-        }
-
-        // NOTE: This will log errors even if the attestion was successful.
-        auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(device, attestationResult);
-        if (CHIP_NO_ERROR != err)
-        {
-            SetCommandExitStatus(err);
-        }
-        return;
-    }
-
-    // OnDeviceAttestationCompleted() is called if ShouldWaitAfterDeviceAttestation() returns true
-    // or if there is an attestation error. The conditions for ShouldWaitAfterDeviceAttestation() have
-    // already been checked, so the call to OnDeviceAttestationCompleted() was an error.
-    if (mBypassAttestationVerifier.ValueOr(false))
-    {
-        // Bypass attestation verification, continue with success
-        auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
-            device, chip::Credentials::AttestationVerificationResult::kSuccess);
-        if (CHIP_NO_ERROR != err)
-        {
-            SetCommandExitStatus(err);
-        }
-        return;
-    }
-
-    // Don't bypass attestation, continue with error.
-    auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(device, attestationResult);
+    // Bypass attestation verification, continue with success
+    auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
+        device, Credentials::AttestationVerificationResult::kSuccess);
     if (CHIP_NO_ERROR != err)
     {
         SetCommandExitStatus(err);

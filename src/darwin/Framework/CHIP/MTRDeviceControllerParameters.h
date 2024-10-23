@@ -166,7 +166,7 @@ MTR_NEWLY_AVAILABLE
 /**
  * A controller created from this way will connect to a remote instance of an MTRDeviceController loaded in an XPC Service
  *
- * @param xpcConnectionBlock The XPC Connection block that will return an NSXPCConnection to the indended listener.
+ * @param xpcConnectionBlock The XPC Connection block that will return an NSXPCConnection to the intended listener.
  *
  * @param uniqueIdentifier The unique id to assign to the controller.
  *
