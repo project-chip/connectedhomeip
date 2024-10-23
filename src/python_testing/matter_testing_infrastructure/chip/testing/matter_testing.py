@@ -919,6 +919,9 @@ class TestStep:
     expectation: str = ""
     is_commissioning: bool = False
 
+    def __str__(self):
+        return f'{self.test_plan_number}: {self.description}\tExpected outcome: {self.expectation}'
+
 
 @dataclass
 class TestInfo:
@@ -1325,7 +1328,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 if not trace:
                     return no_stack_trace
 
-                if isinstance(exception, signals.TestError):
+                if isinstance(exception, signals.TestError) or isinstance(exception, signals.TestFailure):
                     # Exception gets raised by the mobly framework, so the proximal error is one line back in the stack trace
                     assert_candidates = [idx for idx, line in enumerate(trace) if "asserts" in line and "asserts.py" not in line]
                     if not assert_candidates:
@@ -1343,6 +1346,9 @@ class MatterBaseTest(base_test.BaseTestClass):
                 return probable_error.strip(), trace[file_candidates[-1]].strip()
 
             probable_error, probable_file = extract_error_text()
+            test_steps = self.get_defined_test_steps(self.current_test_info.name)
+            test_step = str(test_steps[self.current_step_index-1]
+                            ) if test_steps is not None else 'UNKNOWN - no test steps provided in test script'
             logging.error(textwrap.dedent(f"""
 
                                           ******************************************************************
@@ -1353,8 +1359,12 @@ class MatterBaseTest(base_test.BaseTestClass):
                                           * {probable_file}
                                           * {probable_error}
                                           *
+                                          * Test step:
+                                          *     {test_step}
+                                          *
+                                          * Endpoint: {self.matter_test_config.endpoint}
+                                          *
                                           *******************************************************************
-
                                           """))
 
     def on_pass(self, record):
