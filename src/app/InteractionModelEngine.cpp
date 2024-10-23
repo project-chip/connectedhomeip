@@ -756,8 +756,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             {
                 TLV::TLVReader pathReader;
                 attributePathListParser.GetReader(&pathReader);
-                ReturnErrorCodeIf(TLV::Utilities::Count(pathReader, requestedAttributePathCount, false) != CHIP_NO_ERROR,
-                                  Status::InvalidAction);
+                VerifyOrReturnError(TLV::Utilities::Count(pathReader, requestedAttributePathCount, false) == CHIP_NO_ERROR,
+                                    Status::InvalidAction);
             }
             else if (err != CHIP_ERROR_END_OF_TLV)
             {
@@ -769,8 +769,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             {
                 TLV::TLVReader pathReader;
                 eventpathListParser.GetReader(&pathReader);
-                ReturnErrorCodeIf(TLV::Utilities::Count(pathReader, requestedEventPathCount, false) != CHIP_NO_ERROR,
-                                  Status::InvalidAction);
+                VerifyOrReturnError(TLV::Utilities::Count(pathReader, requestedEventPathCount, false) == CHIP_NO_ERROR,
+                                    Status::InvalidAction);
             }
             else if (err != CHIP_ERROR_END_OF_TLV)
             {
@@ -1507,20 +1507,14 @@ bool InteractionModelEngine::IsExistentAttributePath(const ConcreteAttributePath
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 #if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-
-    bool providerResult = GetDataModelProvider()
-                              ->GetAttributeInfo(ConcreteAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId))
-                              .has_value();
+    bool providerResult = GetDataModelProvider()->GetAttributeInfo(path).has_value();
 
     bool emberResult = emberAfContainsAttribute(path.mEndpointId, path.mClusterId, path.mAttributeId);
 
     // Ensure that Provider interface and ember are IDENTICAL in attribute location (i.e. "check" mode)
     VerifyOrDie(providerResult == emberResult);
 #endif
-
-    return GetDataModelProvider()
-        ->GetAttributeInfo(ConcreteAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId))
-        .has_value();
+    return GetDataModelProvider()->GetAttributeInfo(path).has_value();
 #else
     return emberAfContainsAttribute(path.mEndpointId, path.mClusterId, path.mAttributeId);
 #endif
@@ -1929,7 +1923,7 @@ uint16_t InteractionModelEngine::GetMinGuaranteedSubscriptionsPerFabric() const
     return UINT16_MAX;
 #else
     return static_cast<uint16_t>(
-        min(GetReadHandlerPoolCapacityForSubscriptions() / GetConfigMaxFabrics(), static_cast<size_t>(UINT16_MAX)));
+        std::min(GetReadHandlerPoolCapacityForSubscriptions() / GetConfigMaxFabrics(), static_cast<size_t>(UINT16_MAX)));
 #endif
 }
 
@@ -1988,9 +1982,9 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
 CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
 {
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    ReturnErrorCodeIf(!mpSubscriptionResumptionStorage, CHIP_NO_ERROR);
+    VerifyOrReturnError(mpSubscriptionResumptionStorage, CHIP_NO_ERROR);
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
-    ReturnErrorCodeIf(mSubscriptionResumptionScheduled, CHIP_NO_ERROR);
+    VerifyOrReturnError(!mSubscriptionResumptionScheduled, CHIP_NO_ERROR);
 #endif
 
     // To avoid the case of a reboot loop causing rapid traffic generation / power consumption, subscription resumption should make

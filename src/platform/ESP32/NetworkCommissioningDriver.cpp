@@ -143,7 +143,7 @@ CHIP_ERROR ESPWiFiDriver::RevertConfiguration()
     size_t credentialsLen = 0;
 
     CHIP_ERROR error = PersistedStorage::KeyValueStoreMgr().Get(kWiFiSSIDKeyName, network.ssid, sizeof(network.ssid), &ssidLen);
-    ReturnErrorCodeIf(error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
+    VerifyOrReturnError(error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
     VerifyOrExit(CanCastTo<uint8_t>(ssidLen), error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, network.credentials, sizeof(network.credentials),
                                                           &credentialsLen) == CHIP_NO_ERROR,

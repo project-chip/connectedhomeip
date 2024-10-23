@@ -585,9 +585,9 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         # TODO: Do we really need the expression as a string? We can evaluate this in code very easily
         logging.info(f'\t\t**** Skipping: {name}')
 
-    def step_start(self, name: str, endpoint: int | None = None):
-        # TODO: The way I'm calling this, the name already includes the step number, but it seems like it might be good to separate these
-        logging.info(f'\t\t***** Test Step {name} started with endpoint {endpoint} ')
+    def step_start(self, name: str):
+        # The way I'm calling this, the name is already includes the step number, but it seems like it might be good to separate these
+        logging.info(f'\t\t***** Test Step {name}')
 
     def step_success(self, logger, logs, duration: int, request):
         pass
@@ -916,7 +916,6 @@ def hex_from_bytes(b: bytes) -> str:
 class TestStep:
     test_plan_number: typing.Union[int, str]
     description: str
-    endpoint: int | None = None
     expectation: str = ""
     is_commissioning: bool = False
 
@@ -1284,9 +1283,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         test_event_enabled = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=full_attr)
         asserts.assert_equal(test_event_enabled, True, "TestEventTriggersEnabled is False")
 
-    def print_step(self, stepnum: typing.Union[int, str], title: str, endpoint: int | None = None) -> None:
-        endpoint_info = f" with endpoint {endpoint}" if endpoint is not None else ""
-        logging.info(f'***** Test Step {stepnum} : {title}{endpoint_info}')
+    def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
+        logging.info(f'***** Test Step {stepnum} : {title}')
 
     def record_error(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.ERROR, problem, spec_location))
@@ -1429,8 +1427,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             # TODO: I very much do not want to have people passing in strings here. Do we really need the expression
             #       as a string? Does it get used by the TH?
             self.runner_hook.step_skipped(name=str(num), expression="")
-        else:
-            logging.info(f'**** Skipping: {num}')
+        logging.info(f'**** Skipping: {num}')
         self.step_skipped = True
 
     def skip_step(self, step):
@@ -1456,7 +1453,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         for step in remaining:
             self.skip_step(step.test_plan_number)
 
-    def step(self, step: typing.Union[int, str], endpoint: Optional[int] = None):
+    def step(self, step: typing.Union[int, str]):
         test_name = self.current_test_info.name
         steps = self.get_test_steps(test_name)
 
@@ -1465,6 +1462,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             asserts.fail(f'Unexpected test step: {step} - steps not called in order, or step does not exist')
 
         current_step = steps[self.current_step_index]
+        self.print_step(step, current_step.description)
+
         if self.runner_hook:
             # If we've reached the next step with no assertion and the step wasn't skipped, it passed
             if not self.step_skipped and self.current_step_index != 0:
@@ -1472,18 +1471,12 @@ class MatterBaseTest(base_test.BaseTestClass):
                 step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
                 self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
-            current_step.endpoint = endpoint
-
             # TODO: it seems like the step start should take a number and a name
             name = f'{step} : {current_step.description}'
-
-            self.print_step(step, current_step.description, endpoint)
-            self.runner_hook.step_start(name=name, endpoint=current_step.endpoint)
-        else:
-            self.print_step(step, current_step.description)
+            self.runner_hook.step_start(name=name)
 
         self.step_start_time = datetime.now(tz=timezone.utc)
-        self.current_step_index += 1
+        self.current_step_index = self.current_step_index + 1
         self.step_skipped = False
 
     def get_setup_payload_info(self) -> List[SetupPayloadInfo]:

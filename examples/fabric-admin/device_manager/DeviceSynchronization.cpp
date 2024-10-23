@@ -239,23 +239,23 @@ void DeviceSynchronizer::GetUniqueId()
     auto remoteBridgeNodeId               = DeviceMgr().GetRemoteBridgeNodeId();
     EndpointId remoteEndpointIdOfInterest = device->GetEndpointId();
 
-    ChipLogDetail(NotSpecified, "Attempting to get UniqueId from remote Fabric Sync Aggregator") CHIP_ERROR err =
-        mUniqueIdGetter.GetUniqueId(
-            [this](std::optional<CharSpan> aUniqueId) {
-                if (aUniqueId.has_value())
-                {
+    ChipLogDetail(NotSpecified, "Attempting to get UniqueId from remote Fabric Sync Aggregator");
+    CHIP_ERROR err = mUniqueIdGetter.GetUniqueId(
+        [this](std::optional<CharSpan> aUniqueId) {
+            if (aUniqueId.has_value())
+            {
 #if defined(PW_RPC_ENABLED)
-                    this->mCurrentDeviceData.has_unique_id = true;
-                    memcpy(this->mCurrentDeviceData.unique_id, aUniqueId.value().data(), aUniqueId.value().size());
+                this->mCurrentDeviceData.has_unique_id = true;
+                memcpy(this->mCurrentDeviceData.unique_id, aUniqueId.value().data(), aUniqueId.value().size());
 #endif
-                }
-                else
-                {
-                    ChipLogError(NotSpecified, "We expected to get UniqueId from remote Fabric Sync Aggregator, but failed");
-                }
-                this->SynchronizationCompleteAddDevice();
-            },
-            *mController, remoteBridgeNodeId, remoteEndpointIdOfInterest);
+            }
+            else
+            {
+                ChipLogError(NotSpecified, "We expected to get UniqueId from remote Fabric Sync Aggregator, but failed");
+            }
+            this->SynchronizationCompleteAddDevice();
+        },
+        *mController, remoteBridgeNodeId, remoteEndpointIdOfInterest);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -277,11 +277,16 @@ void DeviceSynchronizer::SynchronizationCompleteAddDevice()
     if (!mCurrentDeviceData.is_icd)
     {
         VerifyOrDie(mController);
-        // TODO(#35333) Figure out how we should recover in this circumstance.
-        CHIP_ERROR err = DeviceSubscriptionManager::Instance().StartSubscription(*mController, mNodeId);
+        ScopedNodeId scopedNodeId(mNodeId, mController->GetFabricIndex());
+        CHIP_ERROR err = DeviceSubscriptionManager::Instance().StartSubscription(*mController, scopedNodeId);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(NotSpecified, "Failed start subscription to NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
+            chip_rpc_ReachabilityChanged reachabilityChanged;
+            reachabilityChanged.has_id       = true;
+            reachabilityChanged.id           = mCurrentDeviceData.id;
+            reachabilityChanged.reachability = false;
+            DeviceReachableChanged(reachabilityChanged);
         }
     }
 #endif

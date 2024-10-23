@@ -21,6 +21,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import chip.clusters as Clusters
+from chip.clusters.Types import Nullable
 
 
 @dataclass
@@ -143,12 +144,16 @@ def create_device_type_list_for_root(direct_children, endpoint_dict: dict[int, A
 
 
 def cmp_tag_list(a: Clusters.Descriptor.Structs.SemanticTagStruct, b: Clusters.Descriptor.Structs.SemanticTagStruct):
+    if type(a.mfgCode) != type(b.mfgCode):
+        return -1 if type(a.mfgCode) is Nullable else 1
     if a.mfgCode != b.mfgCode:
         return -1 if a.mfgCode < b.mfgCode else 1
     if a.namespaceID != b.namespaceID:
         return -1 if a.namespaceID < b.namespaceID else 1
     if a.tag != b.tag:
         return -1 if a.tag < b.tag else 1
+    if type(a.label) != type(b.label):
+        return -1 if type(a.label) is Nullable or a.label is None else 1
     if a.label != b.label:
         return -1 if a.label < b.label else 1
     return 0
