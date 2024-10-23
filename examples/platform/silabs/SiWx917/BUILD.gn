@@ -230,7 +230,6 @@ source_set("siwx917-common") {
       deps += [ "${silabs_common_plat_dir}/shell:icd" ]
     }
   }
-  }
 
   # DIC
   if (enable_dic) {
