@@ -29,11 +29,13 @@ using chip::Protocols::InteractionModel::Status;
 
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
-CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { CharSpan("Low", 3), CharSpan("Medium", 6),
-                                                                              CharSpan("High", 4) };
+CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { "Low"_span, "Medium"_span, "High"_span };
+// uint8_t kLevelCount = ArraySize(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions);
+
 const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints
     [MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
-        EndpointPair(1, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions, 3) // Options for Endpoint 1
+        EndpointPair(1, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions,
+            ArraySize(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions)) // Supported level options for endPoint 1
     };
 
 uint8_t AppSupportedTemperatureLevelsDelegate::Size()

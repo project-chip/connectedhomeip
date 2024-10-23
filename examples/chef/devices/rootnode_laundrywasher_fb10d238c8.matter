@@ -1748,9 +1748,8 @@ endpoint 1 {
     ram      attribute onOff default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 6;
 
     handle command Off;
@@ -1785,8 +1784,8 @@ endpoint 1 {
 
   server cluster LaundryWasherControls {
     callback attribute spinSpeeds;
-    ram      attribute spinSpeedCurrent;
-    ram      attribute numberOfRinses;
+    ram      attribute spinSpeedCurrent default = 1;
+    ram      attribute numberOfRinses default = 1;
     callback attribute supportedRinses;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -1800,7 +1799,6 @@ endpoint 1 {
     callback attribute supportedTemperatureLevels;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;

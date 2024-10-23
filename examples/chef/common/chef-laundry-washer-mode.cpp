@@ -107,7 +107,7 @@ chip::Protocols::InteractionModel::Status chefLaundryWasherModeWriteCallback(chi
     switch (attributeId)
     {
     case chip::app::Clusters::LaundryWasherMode::Attributes::CurrentMode::Id: {
-        uint8_t m = static_cast<uint8_t>(buffer[0]);
+        uint8_t m = buffer[0];
         ret       = gLaundryWasherModeInstance->UpdateCurrentMode(m);
         if (chip::Protocols::InteractionModel::Status::Success != ret)
         {

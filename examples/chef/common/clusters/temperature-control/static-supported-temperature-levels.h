@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@
 
 #pragma once
 
-// #endif // MATTER_DM_PLUGIN_WASHER_SERVER
+
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
 #include <app/util/config.h>
 
@@ -26,10 +26,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace TemperatureControl {
-
-/**
- * This implementation statically defines the options.
- */
 
 class AppSupportedTemperatureLevelsDelegate : public SupportedTemperatureLevelsIteratorDelegate
 {
@@ -42,8 +38,6 @@ class AppSupportedTemperatureLevelsDelegate : public SupportedTemperatureLevelsI
         EndpointPair(EndpointId aEndpointId, CharSpan * aTemperatureLevels, uint8_t aSize) :
             mEndpointId(aEndpointId), mTemperatureLevels(aTemperatureLevels), mSize(aSize)
         {}
-
-        ~EndpointPair() {}
     };
 
     static CharSpan temperatureLevelOptions[3];
@@ -62,4 +56,3 @@ public:
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-// #endif // MATTER_DM_PLUGIN_WASHER_SERVER
