@@ -271,8 +271,8 @@ TEST(TestEmberAttributeBuffer, TestEncodeUnsignedTypes)
         EXPECT_TRUE(tester.TryEncode<uint32_t>(0xFFFFFF, { 0xFF, 0xFF, 0xFF }).IsSuccess());
 
         // Out of range
-        EXPECT_EQ(tester.TryEncode<uint32_t>(0x1000000, { 0 }), CHIP_ERROR_INVALID_ARGUMENT);
-        EXPECT_EQ(tester.TryEncode<uint32_t>(0xFF000000, { 0 }), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(tester.TryEncode<uint32_t>(0x1000000, { 0 }), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        EXPECT_EQ(tester.TryEncode<uint32_t>(0xFF000000, { 0 }), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
     {
         EncodeTester tester(CreateFakeMeta(ZCL_INT24U_ATTRIBUTE_TYPE, true /* nullable */));
@@ -281,9 +281,9 @@ TEST(TestEmberAttributeBuffer, TestEncodeUnsignedTypes)
         EXPECT_TRUE(tester.TryEncode<DataModel::Nullable<uint32_t>>(DataModel::NullNullable, { 0xFF, 0xFF, 0xFF }).IsSuccess());
 
         // Out of range
-        EXPECT_EQ(tester.TryEncode<uint32_t>(0x1000000, { 0 }), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(tester.TryEncode<uint32_t>(0x1000000, { 0 }), CHIP_IM_GLOBAL_STATUS(ConstraintError));
         // cannot encode null equivalent value
-        EXPECT_EQ(tester.TryEncode<uint32_t>(0xFFFFFF, { 0x56, 0x34, 0x12 }), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(tester.TryEncode<uint32_t>(0xFFFFFF, { 0x56, 0x34, 0x12 }), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
 
     {
@@ -295,9 +295,9 @@ TEST(TestEmberAttributeBuffer, TestEncodeUnsignedTypes)
             tester.TryEncode<DataModel::Nullable<uint64_t>>(DataModel::NullNullable, { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }).IsSuccess());
 
         // Out of range
-        EXPECT_EQ(tester.TryEncode<uint64_t>(0x10011001100, { 0 }), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(tester.TryEncode<uint64_t>(0x10011001100, { 0 }), CHIP_IM_GLOBAL_STATUS(ConstraintError));
         // cannot encode null equivalent value
-        EXPECT_EQ(tester.TryEncode<uint64_t>(0xFFFFFFFFFF, { 0 }), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(tester.TryEncode<uint64_t>(0xFFFFFFFFFF, { 0 }), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
 
     // Double-check tests, not as exhaustive, to cover all other unsigned values and get
@@ -376,9 +376,9 @@ TEST(TestEmberAttributeBuffer, TestEncodeSignedTypes)
         EXPECT_TRUE(tester.TryEncode<int32_t>(-1234, { 0x2E, 0xFB, 0xFF }).IsSuccess());
 
         // Out of range
-        EXPECT_EQ(tester.TryEncode<int32_t>(0x1000000, { 0 }), CHIP_ERROR_INVALID_ARGUMENT);
-        EXPECT_EQ(tester.TryEncode<int32_t>(0x0F000000, { 0 }), CHIP_ERROR_INVALID_ARGUMENT);
-        EXPECT_EQ(tester.TryEncode<int32_t>(-0x1000000, { 0 }), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(tester.TryEncode<int32_t>(0x1000000, { 0 }), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        EXPECT_EQ(tester.TryEncode<int32_t>(0x0F000000, { 0 }), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        EXPECT_EQ(tester.TryEncode<int32_t>(-0x1000000, { 0 }), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
     {
         EncodeTester tester(CreateFakeMeta(ZCL_INT24S_ATTRIBUTE_TYPE, true /* nullable */));
@@ -392,14 +392,14 @@ TEST(TestEmberAttributeBuffer, TestEncodeSignedTypes)
         EXPECT_TRUE(tester.TryEncode<DataModel::Nullable<uint32_t>>(DataModel::NullNullable, { 0x00, 0x00, 0x80 }).IsSuccess());
 
         // Out of range
-        EXPECT_EQ(tester.TryEncode<int32_t>(0x1000000, { 0 }), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(tester.TryEncode<int32_t>(0x1000000, { 0 }), CHIP_IM_GLOBAL_STATUS(ConstraintError));
         // cannot encode null equivalent value - this is the minimum negative value
         // for 24-bit
-        EXPECT_EQ(tester.TryEncode<int32_t>(-(1 << 24) - 1, { 0x56, 0x34, 0x12 }), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(tester.TryEncode<int32_t>(-(1 << 24) - 1, { 0x56, 0x34, 0x12 }), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         // Out of range for signed - these are unsigned values that are larger
-        EXPECT_EQ(tester.TryEncode<int32_t>(0xFFFFFF, { 0x56, 0x34, 0x12 }), CHIP_ERROR_INVALID_ARGUMENT);
-        EXPECT_EQ(tester.TryEncode<int32_t>(0x800000, { 0x56, 0x34, 0x12 }), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(tester.TryEncode<int32_t>(0xFFFFFF, { 0x56, 0x34, 0x12 }), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        EXPECT_EQ(tester.TryEncode<int32_t>(0x800000, { 0x56, 0x34, 0x12 }), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
 
     {
@@ -421,11 +421,11 @@ TEST(TestEmberAttributeBuffer, TestEncodeSignedTypes)
             tester.TryEncode<DataModel::Nullable<uint64_t>>(DataModel::NullNullable, { 0x00, 0x00, 0x00, 0x00, 0x80 }).IsSuccess());
 
         // Out of range
-        EXPECT_EQ(tester.TryEncode<int64_t>(0x10011001100, { 0 }), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(tester.TryEncode<int64_t>(0x10011001100, { 0 }), CHIP_IM_GLOBAL_STATUS(ConstraintError));
         // cannot encode null equivalent value
-        EXPECT_EQ(tester.TryEncode<int64_t>(-(1LL << 40) - 1, { 0 }), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(tester.TryEncode<int64_t>(-(1LL << 40) - 1, { 0 }), CHIP_IM_GLOBAL_STATUS(ConstraintError));
         // negative out of range
-        EXPECT_EQ(tester.TryEncode<int64_t>(-0x10000000000, { 0 }), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(tester.TryEncode<int64_t>(-0x10000000000, { 0 }), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
 
     // Double-check tests, not as exhaustive, to cover all other unsigned values and get

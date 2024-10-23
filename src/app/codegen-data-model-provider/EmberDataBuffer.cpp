@@ -142,29 +142,6 @@ constexpr SignedDecodeInfo GetSignedDecodeInfo(EmberAfAttributeType type)
     chipDie();
 }
 
-static constexpr bool IsOddIntegerSize(unsigned byteCount)
-{
-    // All these conditions seem to result in the same code size:
-    // - (byteCount > 2) && (byteCount != 4) && (byteCount != 8) OR
-    // - (byteCount == 6) || ((byteCount & 0x1) != 0)
-    //
-    // So ended up keeping the "readable" one
-    return (byteCount == 3) || (byteCount == 5) || (byteCount == 6) || (byteCount == 7);
-}
-
-// This is an odd workaround for legacy. Errors SHOULD be always ConstraintError
-// however in practice old ember code returns INVALID_ARGUMENT for odd sized integers
-//
-// TODO: This should ALWAYS return ConstraintError (and method should not exist ...)
-CHIP_ERROR OutOfRangeError(unsigned byteCount)
-{
-    if (IsOddIntegerSize(byteCount))
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-}
-
 } // namespace
 
 CHIP_ERROR EmberAttributeBuffer::DecodeUnsignedInteger(chip::TLV::TLVReader & reader, EndianWriter & writer)
@@ -186,7 +163,7 @@ CHIP_ERROR EmberAttributeBuffer::DecodeUnsignedInteger(chip::TLV::TLVReader & re
         VerifyOrReturnError(mIsNullable // ::max() on the type is used as the NULL flag
                                 ? (value < info.maxValue)
                                 : (value <= info.maxValue),
-                            OutOfRangeError(info.byteCount));
+                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
 
     writer.EndianPut(value, info.byteCount);
@@ -214,7 +191,7 @@ CHIP_ERROR EmberAttributeBuffer::DecodeSignedInteger(chip::TLV::TLVReader & read
         //   - NON-NULLABLE:  [minValue, MaxValue]
         bool valid = (value <= info.maxValue) && (mIsNullable ? (value > info.minValue) : (value >= info.minValue));
 
-        VerifyOrReturnError(valid, OutOfRangeError(info.byteCount));
+        VerifyOrReturnError(valid, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
     writer.EndianPutSigned(value, info.byteCount);
     return CHIP_NO_ERROR;
