@@ -373,14 +373,16 @@ Davis, CA 95616, USA
       <field id="1" name="GroupIdentifierFrom" type="group-id">
         <mandatoryConform/>
       </field>
-      <field id="2" name="SceneIdentifierFrom" type="max 254">
+      <field id="2" name="SceneIdentifierFrom" type="uint8">
         <mandatoryConform/>
+        <constraint type="max" value="254"/>
       </field>
       <field id="3" name="GroupIdentifierTo" type="group-id">
         <mandatoryConform/>
       </field>
-      <field id="4" name="SceneIdentifierTo" type="max 254">
+      <field id="4" name="SceneIdentifierTo" type="uint8">
         <mandatoryConform/>
+        <constraint type="max" value="254"/>
       </field>
     </command>
     <command id="0x40" name="CopySceneResponse" direction="responseFromServer">

@@ -3888,7 +3888,6 @@ endpoint 1 {
     callback attribute activeMessageIDs;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
@@ -4041,7 +4040,6 @@ endpoint 1 {
     ram      attribute blockUnrated;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 28;
     ram      attribute clusterRevision default = 2;
@@ -4128,7 +4126,6 @@ endpoint 3 {
     callback attribute binding;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -4272,7 +4269,6 @@ endpoint 3 {
     ram      attribute blockUnrated;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 28;
     ram      attribute clusterRevision default = 1;

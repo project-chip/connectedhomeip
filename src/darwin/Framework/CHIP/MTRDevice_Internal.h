@@ -22,6 +22,7 @@
 
 #import "MTRAsyncWorkQueue.h"
 #import "MTRDefines_Internal.h"
+#import "MTRDeviceDataValueDictionary.h"
 #import "MTRDeviceStorageBehaviorConfiguration_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -164,12 +165,23 @@ MTR_DIRECT_MEMBERS
 - (void)controllerSuspended;
 - (void)controllerResumed;
 
+// Methods for comparing attribute data values.
+- (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)one isEqualToDataValue:(MTRDeviceDataValueDictionary)theOther;
+- (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)observed satisfiesValueExpectation:(MTRDeviceDataValueDictionary)expected;
+
 @end
 
 #pragma mark - MTRDevice internal state monitoring
 @protocol MTRDeviceInternalStateDelegate
 - (void)devicePrivateInternalStateChanged:(MTRDevice *)device internalState:(NSDictionary *)state;
 @end
+
+// Returns whether a data-value dictionary is well-formed (in the sense that all
+// the types of the objects inside are as expected, so it's actually a valid
+// representation of some TLV).  Implemented in MTRBaseDevice.mm because that's
+// where the pieces needed to implement it are, but declared here so our tests
+// can see it.
+MTR_EXTERN MTR_TESTABLE BOOL MTRDataValueDictionaryIsWellFormed(MTRDeviceDataValueDictionary value);
 
 #pragma mark - Constants
 

@@ -158,6 +158,14 @@ class NxpApp(Enum):
         return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName(os_env))
 
 
+class NxpLogLevel(Enum):
+    DEFAULT = auto()  # default everything
+    ALL = auto()  # enable all logging
+    PROGRESS = auto()  # progress and above
+    ERROR = auto()  # error and above
+    NONE = auto()  # no chip_logging at all
+
+
 class NxpBuilder(GnBuilder):
 
     def __init__(self,
@@ -187,7 +195,9 @@ class NxpBuilder(GnBuilder):
                  disable_pairing_autostart: bool = False,
                  iw416_transceiver: bool = False,
                  w8801_transceiver: bool = False,
-                 iwx12_transceiver: bool = False):
+                 iwx12_transceiver: bool = False,
+                 log_level: NxpLogLevel = NxpLogLevel.DEFAULT,
+                 ):
         super(NxpBuilder, self).__init__(
             root=app.BuildRoot(root, board, os_env),
             runner=runner)
@@ -217,12 +227,16 @@ class NxpBuilder(GnBuilder):
         self.iw416_transceiver = iw416_transceiver
         self.w8801_transceiver = w8801_transceiver
         self.iwx12_transceiver = iwx12_transceiver
+        if self.low_power and log_level != NxpLogLevel.NONE:
+            logging.warning("Switching log level to 'NONE' for low power build")
+            log_level = NxpLogLevel.NONE
+        self.log_level = log_level
 
     def GnBuildArgs(self):
         args = []
 
         if self.low_power:
-            args.append('chip_with_low_power=1 chip_logging=false')
+            args.append('chip_with_low_power=1')
             if self.board == NxpBoard.K32W0:
                 args.append('chip_pw_tokenizer_logging=false chip_with_OM15082=0')
 
@@ -243,6 +257,31 @@ class NxpBuilder(GnBuilder):
 
         if self.enable_rotating_id:
             args.append('chip_enable_rotating_device_id=1 chip_enable_additional_data_advertising=1')
+
+        if self.log_level == NxpLogLevel.DEFAULT:
+            pass
+        elif self.log_level == NxpLogLevel.ALL:
+            args.append("chip_logging=true")
+            args.append("chip_error_logging=true")
+            args.append("chip_progress_logging=true")
+            args.append("chip_detail_logging=true")
+            args.append("chip_automation_logging=true")
+        elif self.log_level == NxpLogLevel.PROGRESS:
+            args.append("chip_logging=true")
+            args.append("chip_error_logging=true")
+            args.append("chip_progress_logging=true")
+            args.append("chip_detail_logging=false")
+            args.append("chip_automation_logging=false")
+        elif self.log_level == NxpLogLevel.ERROR:
+            args.append("chip_logging=true")
+            args.append("chip_error_logging=true")
+            args.append("chip_progress_logging=false")
+            args.append("chip_detail_logging=false")
+            args.append("chip_automation_logging=false")
+        elif self.log_level == NxpLogLevel.NONE:
+            args.append("chip_logging=false")
+        else:
+            raise Exception("Unknown log level: %r", self.log_level)
 
         if self.has_sw_version_2:
             args.append('nxp_software_version=2')
