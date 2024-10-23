@@ -1889,6 +1889,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // BEGIN DRAGON: This is used by the XPC Server to inject reports into local cache and broadcast them
 - (void)_injectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
 {
+    if (!MTRInputIsStructurallyValid(attributeReport, @"attribute-report")) {
+        return;
+    }
+
     [_deviceController asyncDispatchToMatterQueue:^{
         MTR_LOG("%@ injected attribute report (%p) %@", self, attributeReport, attributeReport);
         [self _handleReportBegin];
@@ -1901,6 +1905,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_injectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
+    if (!MTRInputIsStructurallyValid(eventReport, @"event-report")) {
+        return;
+    }
+
     //    [_deviceController asyncDispatchToMatterQueue:^{ // TODO: This wasn't used previously, not sure why, so keeping it here for thought, but preserving existing behavior
     dispatch_async(self.queue, ^{
         [self _handleEventReport:eventReport];

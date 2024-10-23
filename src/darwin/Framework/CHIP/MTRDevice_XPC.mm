@@ -136,6 +136,10 @@
 // required methods for MTRDeviceDelegates
 - (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state
 {
+    if (!MTRInputIsStructurallyValid(nodeID, NSNumber.class)) {
+        return;
+    }
+
     MTR_LOG("%s", __PRETTY_FUNCTION__);
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self stateChanged:state];
@@ -144,6 +148,10 @@
 
 - (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
+    if (!MTRInputIsStructurallyValid(nodeID, NSNumber.class) || !MTRInputIsStructurallyValid(attributeReport, MTRInputStructureAttributeReport)) {
+        return;
+    }
+
     MTR_LOG("%s", __PRETTY_FUNCTION__);
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self receivedAttributeReport:attributeReport];
@@ -152,6 +160,10 @@
 
 - (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
+    if (!MTRInputIsStructurallyValid(nodeID, NSNumber.class) || !MTRInputIsStructurallyValid(eventReport, MTRInputStructureEventReport)) {
+        return;
+    }
+
     MTR_LOG("%s", __PRETTY_FUNCTION__);
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self receivedEventReport:eventReport];
@@ -161,6 +173,10 @@
 // optional methods for MTRDeviceDelegates - check for implementation before calling
 - (oneway void)deviceBecameActive:(NSNumber *)nodeID
 {
+    if (!MTRInputIsStructurallyValid(nodeID, NSNumber.class)) {
+        return;
+    }
+
     MTR_LOG("%s", __PRETTY_FUNCTION__);
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
@@ -171,6 +187,10 @@
 
 - (oneway void)deviceCachePrimed:(NSNumber *)nodeID
 {
+    if (!MTRInputIsStructurallyValid(nodeID, NSNumber.class)) {
+        return;
+    }
+
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceCachePrimed:)]) {
             [delegate deviceCachePrimed:self];
@@ -180,6 +200,10 @@
 
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID
 {
+    if (!MTRInputIsStructurallyValid(nodeID, NSNumber.class)) {
+        return;
+    }
+
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceConfigurationChanged:)]) {
             [delegate deviceConfigurationChanged:self];
@@ -189,11 +213,35 @@
 
 - (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary
 {
+    if (!MTRInputIsStructurallyValid(nodeID, NSNumber.class) ||
+        // Check always-present properties.
+        !MTRInputIsStructurallyValid(dictionary, @{
+            kMTRDeviceInternalPropertyDeviceState : NSNumber.class,
+            kMTRDeviceInternalPropertyLastSubscriptionAttemptWait : NSNumber.class,
+        })) {
+        return;
+    }
+
+    // There are several optional keys, all of which are NSNumber-valued.
+    for (NSString * key in @[ kMTRDeviceInternalPropertyKeyVendorID, kMTRDeviceInternalPropertyKeyProductID, kMTRDeviceInternalPropertyNetworkFeatures, kMTRDeviceInternalPropertyMostRecentReportTime, kMTRDeviceInternalPropertyLastSubscriptionFailureTime ]) {
+        id value = dictionary[key];
+        if (!value) {
+            continue;
+        }
+        if (!MTRInputIsStructurallyValid(value, NSNumber.class)) {
+            MTR_LOG_ERROR("%@ device:internalStateUpdated: handed state with invalid value for \"%@\": %@", self, key, value);
+            return;
+        }
+    }
+
     [self _setInternalState:dictionary];
     MTR_LOG("%@ internal state updated", self);
 }
 
 #pragma mark - Remote Commands
+
+// TODO: Figure out how to validate the return values for the various
+// MTR_DEVICE_*_XPC macros below.
 
 MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(state, MTRDeviceState, MTRDeviceStateUnknown, getStateWithReply)
 MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(deviceCachePrimed, BOOL, NO, getDeviceCachePrimedWithReply)
@@ -263,7 +311,34 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
                   expectedValueInterval:expectedValueInterval
                      timedInvokeTimeout:timeout
             serverSideProcessingTimeout:serverSideProcessingTimeout
-                             completion:completion];
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 if (values == nil && error == nil) {
+                                     MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) without values or error", self, endpointID, clusterID, commandID);
+                                     completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+                                     return;
+                                 }
+
+                                 if (error != nil && !MTRInputIsStructurallyValid(error, NSError.class)) {
+                                     MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) that has invalid error object: %@", self, endpointID, clusterID, commandID, error);
+                                     completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+                                     return;
+                                 }
+
+                                 if (values != nil && !MTRInputIsStructurallyValid(values, MTRInputStructureInvokeResponse)) {
+                                     MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) that has invalid data: %@", self, clusterID, commandID, values, values);
+                                     completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+                                     return;
+                                 }
+
+                                 if (values != nil && error != nil) {
+                                     MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) with both values and error: %@, %@", self, endpointID, clusterID, commandID, values, error);
+                                     // Just propagate through the error.
+                                     completion(nil, error);
+                                     return;
+                                 }
+
+                                 completion(values, error);
+                             }];
     } @catch (NSException * exception) {
         MTR_LOG_ERROR("Exception sending XPC message: %@", exception);
         completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);

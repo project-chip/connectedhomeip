@@ -183,6 +183,31 @@ MTR_DIRECT_MEMBERS
 // can see it.
 MTR_EXTERN MTR_TESTABLE BOOL MTRDataValueDictionaryIsWellFormed(MTRDeviceDataValueDictionary value);
 
+// Checks whether the input's structure corresponds to the expected structure,
+// using the following rules:
+//
+// 1) If structure is MTRInputStructureDataValue, checks that input is a
+//    well-formed data-value.
+// 2) If structure is the MTRInputStructureAttributeReport, checks that input is
+//    a well-formed array of response-values representing attribute reports.
+// 3) If structure is MTRInputStructureEventReport, checks that input is a
+//    well-formed array of response-values representing attribute reports.
+// 4) If the structure is MTRInputStructureInvokeResponse, checks that the input is
+//    a well-formed array of a single response-value representing an invoke response.
+// 5) If structure is a dictionary, checks that its keys are all present in
+//    the input, and have values that match the structure of the provided values.
+// 6) If structure is an array, that array is expected to contain a single
+//    element, which is the structure expected from the array elements.  Using
+//    multiple elements in structure will return NO, to allow adding new
+//    functionality here in the future as needed.
+// 7) If structure is a Class object, checks that the input's class matches that.
+// 8) In all other cases returns NO for now, until we decide on what
+//    semantics those structures should have.
+//
+// For example a structure of @{ @"abc": NSNumber.class } will check that input is
+// a dictionary, that it has "abc" as a key, and that the value is an NSNumber.
+MTR_EXTERN MTR_TESTABLE BOOL MTRInputIsStructurallyValid(id input, id structure);
+
 #pragma mark - Constants
 
 static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
@@ -199,5 +224,11 @@ static NSString * const kMTRDeviceInternalPropertyDeviceState = @"MTRDeviceInter
 static NSString * const kMTRDeviceInternalPropertyLastSubscriptionAttemptWait = @"kMTRDeviceInternalPropertyLastSubscriptionAttemptWait";
 static NSString * const kMTRDeviceInternalPropertyMostRecentReportTime = @"MTRDeviceInternalPropertyMostRecentReportTime";
 static NSString * const kMTRDeviceInternalPropertyLastSubscriptionFailureTime = @"MTRDeviceInternalPropertyLastSubscriptionFailureTime";
+
+// Constants used by MTRInputIsStructurallyValid
+static NSString * const MTRInputStructureDataValue = @"data-value";
+static NSString * const MTRInputStructureAttributeReport = @"attribute-report";
+static NSString * const MTRInputStructureEventReport = @"event-report";
+static NSString * const MTRInputStructureInvokeResponse = @"invoke-response";
 
 NS_ASSUME_NONNULL_END

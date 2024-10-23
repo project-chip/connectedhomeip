@@ -5187,6 +5187,378 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }
 }
 
+- (void)test042_StructuralValidityChecker
+{
+    __auto_type * testData = @[
+        @{
+            @"input" : @ {
+                MTRTypeKey : MTRSignedIntegerValueType,
+                MTRValueKey : @(-5),
+            },
+            @"structure" : MTRInputStructureDataValue,
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @(5),
+            @"structure" : NSNumber.class,
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @("abc"),
+            @"structure" : NSNumber.class,
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @("abc"),
+            @"structure" : NSString.class,
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @("abc"),
+                @("def"),
+            ],
+            @"structure" : @[ NSString.class ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @("abc"),
+                @(5),
+            ],
+            @"structure" : @[ NSString.class ],
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                @"a" : @(5),
+                @"b" : @("def"),
+            },
+            @"structure" : @ {
+                @"a" : NSNumber.class,
+                @"b" : NSString.class,
+            },
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                @"a" : @(5),
+            },
+            @"structure" : @ {
+                @"a" : NSNumber.class,
+                @"b" : NSString.class,
+            },
+            // Validation for "b" fails.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @ {
+                @"a" : @(5),
+                @"b" : @("def"),
+                @"c" : [NSData data],
+            },
+            @"structure" : @ {
+                @"a" : NSNumber.class,
+                @"b" : NSString.class,
+            },
+            // Extra keys in input are OK, if we are not planning to touch them.
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                MTRDataKey : @ {
+                    MTRTypeKey : MTRBooleanValueType,
+                    MTRValueKey : @(YES),
+                },
+            },
+            @"structure" : @ {
+                MTRAttributePathKey : MTRAttributePath.class,
+                MTRDataKey : MTRInputStructureDataValue
+            },
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @ {
+                MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                MTRDataKey : @ {
+                    MTRTypeKey : MTRBooleanValueType,
+                    MTRValueKey : @(YES),
+                },
+            },
+            @"structure" : @ {
+                MTREventPathKey : MTREventPath.class,
+                MTRDataKey : MTRInputStructureDataValue
+            },
+            // No MTREventPathKey in input.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @(YES),
+                    },
+                },
+            ],
+            @"structure" : MTRInputStructureAttributeReport,
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @(YES),
+                    },
+                },
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(1)],
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                },
+            ],
+            @"structure" : MTRInputStructureAttributeReport,
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                },
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(1)],
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                },
+            ],
+            @"structure" : MTRInputStructureAttributeReport,
+            // Missing error or data
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            @"structure" : MTRInputStructureEventReport,
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+                    MTREventTimestampDateKey : [NSDate now],
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            @"structure" : MTRInputStructureEventReport,
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeSystemUpTime),
+                    MTREventSystemUpTimeKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            @"structure" : MTRInputStructureEventReport,
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+                    MTREventTimestampDateKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            @"structure" : MTRInputStructureEventReport,
+            // Wrong date type
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @("abc"),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeSystemUpTime),
+                    MTREventSystemUpTimeKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            @"structure" : MTRInputStructureEventReport,
+            // Wrong type of EventNumber
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @("abc"),
+                    MTREventTimeTypeKey : @(MTREventTimeTypeSystemUpTime),
+                    MTREventSystemUpTimeKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            @"structure" : MTRInputStructureEventReport,
+            // Wrong type of EventPriority
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(6) eventID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // No fields
+                    },
+                    MTREventNumberKey : @(5),
+                    MTREventPriorityKey : @(MTREventPriorityInfo),
+                    MTREventTimeTypeKey : @("abc"),
+                    MTREventSystemUpTimeKey : @(5),
+                    MTREventIsHistoricalKey : @(NO),
+                },
+            ],
+            @"structure" : MTRInputStructureEventReport,
+            // Wrong type of EventTimeType
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[ @(5) ],
+            @"structure" : MTRInputStructureEventReport,
+            // Wrong type of data entirely.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                },
+            ],
+            @"structure" : MTRInputStructureInvokeResponse,
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                },
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                },
+            ],
+            @"structure" : MTRInputStructureInvokeResponse,
+            // Multiple responses
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                },
+            ],
+            @"structure" : MTRInputStructureInvokeResponse,
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // Empty structure, valid
+                    },
+                },
+            ],
+            @"structure" : MTRInputStructureInvokeResponse,
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[], // Empty structure, valid
+                    },
+                    MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil],
+                },
+            ],
+            @"structure" : MTRInputStructureInvokeResponse,
+            // Having both data and error not valid.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(5),
+                    },
+                },
+            ],
+            @"structure" : MTRInputStructureInvokeResponse,
+            // Data is not a struct.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0) clusterID:@(6) commandID:@(0)],
+                    MTRDataKey : @(6),
+                },
+            ],
+            @"structure" : MTRInputStructureInvokeResponse,
+            // Data is not a data-value at all..
+            @"valid" : @(NO),
+        },
+    ];
+
+    for (NSDictionary * test in testData) {
+        XCTAssertEqual(MTRInputIsStructurallyValid(test[@"input"], test[@"structure"]), [test[@"valid"] boolValue],
+            "input: %@, structure: %@", test[@"input"], test[@"structure"]);
+    }
+}
+
 @end
 
 @interface MTRDeviceEncoderTests : XCTestCase
