@@ -88,7 +88,7 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Destroy()
 {
     psa_status_t status = psa_destroy_key(GetKeyId());
 
-    ReturnErrorCodeIf(status == PSA_ERROR_INVALID_HANDLE, CHIP_ERROR_INVALID_FABRIC_INDEX);
+    VerifyOrReturnError(status != PSA_ERROR_INVALID_HANDLE, CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;

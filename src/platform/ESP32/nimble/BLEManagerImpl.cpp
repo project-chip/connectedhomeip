@@ -1563,7 +1563,7 @@ void BLEManagerImpl::HandleC3CharRead(struct ble_gatt_char_context * param)
                                                                          additionalDataFields);
     SuccessOrExit(err);
 
-    os_mbuf_append(param->ctxt->om, bufferHandle->Start(), bufferHandle->DataLength());
+    os_mbuf_append(param->ctxt->om, bufferHandle->Start(), static_cast<uint16_t>(bufferHandle->DataLength()));
 
 exit:
     if (err != CHIP_NO_ERROR)

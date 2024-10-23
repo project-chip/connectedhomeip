@@ -23,19 +23,6 @@ class TestMetadataReader(unittest.TestCase):
 
     test_file_content = '''
     # === BEGIN CI TEST ARGUMENTS ===
-    # test-runner-runs: run1
-    # test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-    # test-runner-run/run1/app-args: --discriminator 1234 --trace-to json:${TRACE_APP}.json
-    # test-runner-run/run1/script-args: --commissioning-method on-network --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-    # test-runner-run/run1/factoryreset: True
-    # test-runner-run/run1/quiet: True
-    # === END CI TEST ARGUMENTS ===
-
-    # test-runner-run/run1/quiet: False
-    '''
-
-    test_file_content_yaml = '''
-    # === BEGIN CI TEST ARGUMENTS ===
     # test-runner-runs:
     #  run1:
     #   app: ${ALL_CLUSTERS_APP}
@@ -44,7 +31,7 @@ class TestMetadataReader(unittest.TestCase):
     #    --commissioning-method on-network
     #    --trace-to json:${TRACE_TEST_JSON}.json
     #    --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-    #   factoryreset: true
+    #   factory-reset: true
     #   quiet: true
     # === END CI TEST ARGUMENTS ===
     '''
@@ -64,7 +51,7 @@ class TestMetadataReader(unittest.TestCase):
         app_args="--discriminator 1234 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json",
         run="run1",
         app="out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app",
-        factoryreset=True,
+        factory_reset=True,
         quiet=True
     )
 
@@ -77,15 +64,6 @@ class TestMetadataReader(unittest.TestCase):
     def test_run_arg_generation(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             test_file = self.generate_temp_file(temp_dir, self.test_file_content)
-            env_file = self.generate_temp_file(temp_dir, self.env_file_content)
-
-            reader = MetadataReader(env_file)
-            self.expected_metadata.py_script_path = test_file
-            self.assertEqual(self.expected_metadata, reader.parse_script(test_file)[0])
-
-    def test_run_arg_generation_yaml(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            test_file = self.generate_temp_file(temp_dir, self.test_file_content_yaml)
             env_file = self.generate_temp_file(temp_dir, self.env_file_content)
 
             reader = MetadataReader(env_file)

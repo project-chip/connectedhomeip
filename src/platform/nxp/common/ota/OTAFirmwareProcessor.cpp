@@ -26,16 +26,16 @@ namespace chip {
 
 CHIP_ERROR OTAFirmwareProcessor::Init()
 {
-    ReturnErrorCodeIf(mCallbackProcessDescriptor == nullptr, CHIP_ERROR_OTA_PROCESSOR_CB_NOT_REGISTERED);
+    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_ERROR_OTA_PROCESSOR_CB_NOT_REGISTERED);
     mAccumulator.Init(sizeof(Descriptor));
 
-    ReturnErrorCodeIf(gOtaSuccess_c != OTA_SelectExternalStoragePartition(), CHIP_ERROR_OTA_PROCESSOR_EXTERNAL_STORAGE);
+    VerifyOrReturnError(gOtaSuccess_c == OTA_SelectExternalStoragePartition(), CHIP_ERROR_OTA_PROCESSOR_EXTERNAL_STORAGE);
 
     otaResult_t ota_status;
     ota_status = OTA_ServiceInit(&mPostedOperationsStorage[0], NB_PENDING_TRANSACTIONS * TRANSACTION_SZ);
 
-    ReturnErrorCodeIf(ota_status != gOtaSuccess_c, CHIP_ERROR_OTA_PROCESSOR_CLIENT_INIT);
-    ReturnErrorCodeIf(gOtaSuccess_c != OTA_StartImage(mLength - sizeof(Descriptor)), CHIP_ERROR_OTA_PROCESSOR_START_IMAGE);
+    VerifyOrReturnError(ota_status == gOtaSuccess_c, CHIP_ERROR_OTA_PROCESSOR_CLIENT_INIT);
+    VerifyOrReturnError(gOtaSuccess_c == OTA_StartImage(mLength - sizeof(Descriptor)), CHIP_ERROR_OTA_PROCESSOR_START_IMAGE);
 
     return CHIP_NO_ERROR;
 }

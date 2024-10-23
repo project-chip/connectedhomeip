@@ -146,7 +146,7 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(const ScopedNodeId & peerId, Trans
 {
     ReturnErrorOnFailure(mConfig.sessionInitParams.Validate());
     auto optionalSessionHandle = FindExistingSession(peerId, transportPayloadCapability);
-    ReturnErrorCodeIf(!optionalSessionHandle.HasValue(), CHIP_ERROR_NOT_CONNECTED);
+    VerifyOrReturnError(optionalSessionHandle.HasValue(), CHIP_ERROR_NOT_CONNECTED);
     addr = optionalSessionHandle.Value()->AsSecureSession()->GetPeerAddress();
     return CHIP_NO_ERROR;
 }

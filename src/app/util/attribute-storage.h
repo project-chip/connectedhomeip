@@ -281,6 +281,7 @@ const EmberAfCluster * emberAfGetNthCluster(chip::EndpointId endpoint, uint8_t n
 // Retrieve the device type list associated with a specific endpoint.
 //
 chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpoint, CHIP_ERROR & err);
+chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsigned endpointIndex, CHIP_ERROR & err);
 
 //
 // Override the device type list current associated with an endpoint with a user-provided list. The buffers backing
@@ -310,6 +311,14 @@ void emberAfAttributeChanged(chip::EndpointId endpoint, chip::ClusterId clusterI
 /// Schedules reporting engine to consider the endpoint dirty, however does NOT increase/alter
 /// any cluster data versions.
 void emberAfEndpointChanged(chip::EndpointId endpoint, chip::app::AttributesChangedListener * listener);
+
+/// Maintains a increasing index of structural changes within ember
+/// that determine if existing "indexes" and metadata pointers within ember
+/// are still valid or not.
+///
+/// Changes to metadata structure (e.g. endpoint enable/disable and dynamic endpoint changes)
+/// are reflected in this generation count changing.
+unsigned emberAfMetadataStructureGeneration();
 
 namespace chip {
 namespace app {

@@ -40,6 +40,7 @@ import sys
 import tempfile
 import threading
 import traceback
+from pathlib import Path
 
 import click
 import coloredlogs
@@ -92,20 +93,19 @@ class ClangTidyEntry:
         #
         # However that seems to potentially disable a lot, so for now just filter out the
         # offending argument
-        command_items = [arg for arg in command_items if arg not in {'-c', '-S'}]
+        command_items = [arg for arg in command_items if arg not in {"-c", "-S"}]
 
         # Allow gcc/g++ invocations to also be tidied - arguments should be
         # compatible and on darwin gcc/g++ is actually a symlink to clang
-        if compiler in ['clang++', 'clang', 'gcc', 'g++']:
+        if compiler in ["clang++", "clang", "gcc", "g++"]:
             self.valid = True
             self.clang_arguments = command_items[1:]
         else:
-            logging.warning(
-                "Cannot tidy %s - not a clang compile command", self.file)
+            logging.warning("Cannot tidy %s - not a clang compile command", self.file)
             return
 
-        if compiler in ['gcc', 'g++'] and gcc_sysroot:
-            self.clang_arguments.insert(0, '--sysroot='+gcc_sysroot)
+        if compiler in ["gcc", "g++"] and gcc_sysroot:
+            self.clang_arguments.insert(0, "--sysroot=" + gcc_sysroot)
 
     @property
     def full_path(self):
@@ -122,8 +122,12 @@ class ClangTidyEntry:
     def Check(self):
         logging.debug("Running tidy on %s from %s", self.file, self.directory)
         try:
-            cmd = ["clang-tidy", self.file] + \
-                self.tidy_arguments + ["--"] + self.clang_arguments
+            cmd = (
+                ["clang-tidy", self.file]
+                + self.tidy_arguments
+                + ["--"]
+                + self.clang_arguments
+            )
             logging.debug("Executing: %r" % cmd)
 
             proc = subprocess.Popen(
@@ -156,7 +160,7 @@ class ClangTidyEntry:
                     "Use -system-headers to display errors from system headers as well.",
                 ]
 
-                for line in err.decode('utf-8').split('\n'):
+                for line in err.decode("utf-8").split("\n"):
                     line = line.strip()
 
                     if any(map(lambda s: s in line, skip_strings)):
@@ -165,7 +169,7 @@ class ClangTidyEntry:
                     if not line:
                         continue  # no empty lines
 
-                    logging.warning('TIDY %s: %s', self.file, line)
+                    logging.warning("TIDY %s: %s", self.file, line)
 
             if proc.returncode != 0:
                 if proc.returncode < 0:
@@ -203,18 +207,20 @@ class TidyState:
 
 
 def find_darwin_gcc_sysroot():
-    for line in subprocess.check_output('xcodebuild -sdk -version'.split()).decode('utf8').split('\n'):
-        if not line.startswith('Path: '):
+    for line in subprocess.check_output(
+        "xcodebuild -sdk -version".split(), text=True
+    ).splitlines():
+        if not line.startswith("Path: "):
             continue
-        path = line[line.find(': ')+2:]
-        if '/MacOSX.platform/' not in path:
+        path = line[line.find(": ") + 2:]
+        if "/MacOSX.platform/" not in path:
             continue
         logging.info("Found %s" % path)
         return path
 
     # A hard-coded value that works on default installations
     logging.warning("Using default platform sdk path. This may be incorrect.")
-    return '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk'
+    return "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
 
 
 class ClangTidyRunner:
@@ -228,13 +234,12 @@ class ClangTidyRunner:
         self.gcc_sysroot = None
         self.file_names_to_check = set()
 
-        if sys.platform == 'darwin':
+        if sys.platform == "darwin":
             # Darwin gcc invocation will auto select a system root, however clang requires an explicit path since
             # we are using the built-in pigweed clang-tidy.
-            logging.info(
-                'Searching for a MacOS system root for gcc invocations...')
+            logging.info("Searching for a MacOS system root for gcc invocations...")
             self.gcc_sysroot = find_darwin_gcc_sysroot()
-            logging.info('  Chose: %s' % self.gcc_sysroot)
+            logging.info("  Chose: %s" % self.gcc_sysroot)
 
     def AddDatabase(self, compile_commands_json):
         database = json.load(open(compile_commands_json))
@@ -245,7 +250,7 @@ class ClangTidyRunner:
                 continue
 
             if item.file in self.file_names_to_check:
-                logging.info('Ignoring additional request for checking %s', item.file)
+                logging.info("Ignoring additional request for checking %s", item.file)
                 continue
 
             self.file_names_to_check.add(item.file)
@@ -270,12 +275,12 @@ class ClangTidyRunner:
                 # Allow all diagnostics for distinct paths to be applied
                 # at once but never again for future paths
                 for d in diagnostics:
-                    if d['DiagnosticMessage']['FilePath'] not in already_seen:
+                    if d["DiagnosticMessage"]["FilePath"] not in already_seen:
                         all_diagnostics.append(d)
 
                 # in the future assume these files were already processed
                 for d in diagnostics:
-                    already_seen.add(d['DiagnosticMessage']['FilePath'])
+                    already_seen.add(d["DiagnosticMessage"]["FilePath"])
 
             if all_diagnostics:
                 with open(self.fixes_file, "w") as out:
@@ -304,8 +309,7 @@ class ClangTidyRunner:
         for idx, e in enumerate(self.entries):
             e.ExportFixesTo(
                 os.path.join(
-                    self.fixes_temporary_file_dir.name, "fixes%d.yaml" % (
-                        idx + 1,)
+                    self.fixes_temporary_file_dir.name, "fixes%d.yaml" % (idx + 1,)
                 )
             )
 
@@ -407,6 +411,12 @@ __LOG_LEVELS__ = {
     type=str,
     help="Checks to run (passed in to clang-tidy). If not set the .clang-tidy file is used.",
 )
+@click.option(
+    "--file-list-file",
+    default=None,
+    type=click.Path(exists=True),
+    help="When provided, only tidy files that match files mentioned in this file.",
+)
 @click.pass_context
 def main(
     context,
@@ -417,6 +427,7 @@ def main(
     no_log_timestamps,
     export_fixes,
     checks,
+    file_list_file,
 ):
     log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
     if no_log_timestamps:
@@ -451,6 +462,14 @@ def main(
     if file_exclude_regex:
         r = re.compile(file_exclude_regex)
         runner.FilterEntries(lambda e: not r.search(e.file))
+
+    if file_list_file:
+        acceptable = set()
+        with open(file_list_file, "rt") as f:
+            for file_name in f.readlines():
+                acceptable.add(Path(file_name.strip()).resolve().as_posix())
+
+        runner.FilterEntries(lambda e: e.full_path in acceptable)
 
     if export_fixes:
         runner.ExportFixesTo(export_fixes)
@@ -492,4 +511,4 @@ def cmd_fix(context):
 
 
 if __name__ == "__main__":
-    main(auto_envvar_prefix='CHIP')
+    main(auto_envvar_prefix="CHIP")
