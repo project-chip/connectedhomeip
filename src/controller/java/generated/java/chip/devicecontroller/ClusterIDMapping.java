@@ -17079,7 +17079,7 @@ public class ClusterIDMapping {
             NightVisionCapable(3L),
             MinViewport(4L),
             RateDistortionTradeOffPoints(5L),
-            MaxPreRollBufferSize(6L),
+            MaxContentBufferSize(6L),
             MicrophoneCapabilities(7L),
             SpeakerCapabilities(8L),
             TwoWayTalkSupport(9L),

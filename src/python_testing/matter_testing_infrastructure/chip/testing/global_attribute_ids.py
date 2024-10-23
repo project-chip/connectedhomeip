@@ -61,6 +61,15 @@ class AttributeIdType(Enum):
     kManufacturer = auto(),
     kTest = auto(),
 
+
+class CommandIdType(Enum):
+    kInvalid = auto()
+    kStandardGlobal = auto(),
+    kScopedNonGlobal = auto(),
+    kManufacturer = auto(),
+    kTest = auto(),
+
+
 # ID helper classes - this allows us to use the values from the prefix and suffix table directly
 # because the class handles the non-inclusive range.
 
@@ -92,6 +101,9 @@ CLUSTER_ID_STANDARD_RANGE_SUFFIX = SuffixIdRange(0x0000, 0x7FFF)
 CLUSTER_ID_MANUFACTURER_RANGE_SUFFIX = SuffixIdRange(0xFC00, 0xFFFE)
 ATTRIBUTE_ID_GLOBAL_RANGE_SUFFIX = SuffixIdRange(0xF000, 0xFFFE)
 ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX = SuffixIdRange(0x0000, 0x4FFF)
+COMMAND_ID_GLOBAL_STANDARD_SUFFIX = SuffixIdRange(0x00E0, 0x00FF)
+COMMAND_ID_NON_GLOBAL_SCOPED_SUFFIX = SuffixIdRange(0x0000, 0x00DF)
+COMMAND_ID_SUFFIX = SuffixIdRange(0x0000, 0x00FF)
 
 
 def device_type_id_type(id: int) -> DeviceTypeIdType:
@@ -144,4 +156,23 @@ def is_valid_attribute_id(id_type: AttributeIdType, allow_test: bool = False):
     valid = [AttributeIdType.kStandardGlobal, AttributeIdType.kStandardNonGlobal, AttributeIdType.kManufacturer]
     if allow_test:
         valid.append(AttributeIdType.kTest)
+    return id_type in valid
+
+
+def command_id_type(id: int) -> CommandIdType:
+    if id in STANDARD_PREFIX and id in COMMAND_ID_GLOBAL_STANDARD_SUFFIX:
+        return CommandIdType.kStandardGlobal
+    if id in STANDARD_PREFIX and id in COMMAND_ID_NON_GLOBAL_SCOPED_SUFFIX:
+        return CommandIdType.kScopedNonGlobal
+    if id in MANUFACTURER_PREFIX and id in COMMAND_ID_SUFFIX:
+        return CommandIdType.kManufacturer
+    if id in TEST_PREFIX and id in COMMAND_ID_SUFFIX:
+        return CommandIdType.kTest
+    return CommandIdType.kInvalid
+
+
+def is_valid_command_id(id_type: CommandIdType, allow_test: bool = False):
+    valid = [CommandIdType.kStandardGlobal, CommandIdType.kScopedNonGlobal, CommandIdType.kManufacturer]
+    if allow_test:
+        valid.append(CommandIdType.kTest)
     return id_type in valid

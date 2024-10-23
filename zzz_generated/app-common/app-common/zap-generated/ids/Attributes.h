@@ -6890,9 +6890,9 @@ namespace RateDistortionTradeOffPoints {
 static constexpr AttributeId Id = 0x00000005;
 } // namespace RateDistortionTradeOffPoints
 
-namespace MaxPreRollBufferSize {
+namespace MaxContentBufferSize {
 static constexpr AttributeId Id = 0x00000006;
-} // namespace MaxPreRollBufferSize
+} // namespace MaxContentBufferSize
 
 namespace MicrophoneCapabilities {
 static constexpr AttributeId Id = 0x00000007;

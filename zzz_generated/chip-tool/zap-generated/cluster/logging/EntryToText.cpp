@@ -4181,8 +4181,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MinViewport";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::RateDistortionTradeOffPoints::Id:
             return "RateDistortionTradeOffPoints";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxPreRollBufferSize::Id:
-            return "MaxPreRollBufferSize";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxContentBufferSize::Id:
+            return "MaxContentBufferSize";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::MicrophoneCapabilities::Id:
             return "MicrophoneCapabilities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::SpeakerCapabilities::Id:
@@ -6495,6 +6495,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "EVSE";
     case 0x0000050D:
         return "Device Energy Management";
+    case 0x0000050F:
+        return "Water Heater";
     case 0x00000510:
         return "Electrical Sensor";
     case 0x00000840:

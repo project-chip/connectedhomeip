@@ -539,6 +539,8 @@
     return NO;
 }
 
+#pragma mark - Suspend/resume management
+
 - (void)controllerSuspended
 {
     // Nothing to do for now.
@@ -547,6 +549,166 @@
 - (void)controllerResumed
 {
     // Nothing to do for now.
+}
+
+#pragma mark - Value comparisons
+
+- (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)one isEqualToDataValue:(MTRDeviceDataValueDictionary)theOther
+{
+    // Sanity check for nil cases
+    if (!one && !theOther) {
+        MTR_LOG_ERROR("%@ attribute data-value comparison does not expect comparing two nil dictionaries", self);
+        return YES;
+    }
+    if (!one || !theOther) {
+        // Comparing against nil is expected, and should return NO quietly
+        return NO;
+    }
+
+    // Attribute data-value dictionaries are equal if type and value are equal, and specifically, this should return true if values are both nil
+    return [one[MTRTypeKey] isEqual:theOther[MTRTypeKey]] && ((one[MTRValueKey] == theOther[MTRValueKey]) || [one[MTRValueKey] isEqual:theOther[MTRValueKey]]);
+}
+
+// _attributeDataValue:satisfiesExpectedDataValue: checks whether the newly
+// received attribute data value satisfies the expectation we have.
+//
+// For now, a value is considered to satisfy the expectation if it's equal to
+// the expected value, though we allow the fields of structs to be in a
+// different order than expected: while in theory the spec does require a
+// specific ordering for struct fields, in practice we should not force certain
+// API consumers to deal with knowing what that ordering is.
+//
+// Things to consider for future:
+//
+// 1) Should a value that has _extra_ fields in a struct compared to the expected
+//    value be considered as satisfying the expectation?  Arguably, yes.
+//
+// 2) Should lists actually enforce order (as now), or should they allow
+//    reordering entries?
+//
+// 3) For fabric-scoped lists, should we have a way to check for just "our
+//    fabric's" entries?
+- (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)observed satisfiesValueExpectation:(MTRDeviceDataValueDictionary)expected
+{
+    // Sanity check for nil cases (which really should not happen!)
+    if (!observed && !expected) {
+        MTR_LOG_ERROR("%@ observed to expected attribute data-value comparison does not expect comparing two nil dictionaries", self);
+        return YES;
+    }
+
+    if (!observed || !expected) {
+        // Again, not expected here.  But clearly the expectation is not really
+        // satisfied, in some sense.
+        MTR_LOG_ERROR("@ observed to expected attribute data-value comparison does not expect a nil %s", observed ? "expected" : "observed");
+        return NO;
+    }
+
+    if (![observed[MTRTypeKey] isEqual:expected[MTRTypeKey]]) {
+        // Different types, does not satisfy expectation.
+        return NO;
+    }
+
+    if ([MTRArrayValueType isEqual:expected[MTRTypeKey]]) {
+        // For array-values, check that sizes are same and entries satisfy expectations.
+        if (![observed[MTRValueKey] isKindOfClass:NSArray.class] || ![expected[MTRValueKey] isKindOfClass:NSArray.class]) {
+            // Malformed data, just claim expectation is not satisfied.
+            MTR_LOG_ERROR("%@ at least one of observed and expected value is not an NSArrray: %@, %@", self, observed, expected);
+            return NO;
+        }
+
+        NSArray<NSDictionary<NSString *, MTRDeviceDataValueDictionary> *> * observedArray = observed[MTRValueKey];
+        NSArray<NSDictionary<NSString *, MTRDeviceDataValueDictionary> *> * expectedArray = expected[MTRValueKey];
+
+        if (observedArray.count != expectedArray.count) {
+            return NO;
+        }
+
+        for (NSUInteger i = 0; i < observedArray.count; ++i) {
+            NSDictionary<NSString *, MTRDeviceDataValueDictionary> * observedEntry = observedArray[i];
+            NSDictionary<NSString *, MTRDeviceDataValueDictionary> * expectedEntry = expectedArray[i];
+
+            if (![observedEntry isKindOfClass:NSDictionary.class] || ![expectedEntry isKindOfClass:NSDictionary.class]) {
+                MTR_LOG_ERROR("%@ expected or observed array-value contains entries that are not NSDictionary: %@, %@", self, observedEntry, expectedEntry);
+                return NO;
+            }
+
+            if (![self _attributeDataValue:observedEntry[MTRDataKey] satisfiesValueExpectation:expectedEntry[MTRDataKey]]) {
+                return NO;
+            }
+        }
+
+        return YES;
+    }
+
+    if (![MTRStructureValueType isEqual:expected[MTRTypeKey]]) {
+        // For everything except arrays and structs, expectation is satisfied
+        // exactly when the values are equal.
+        return [self _attributeDataValue:observed isEqualToDataValue:expected];
+    }
+
+    // Now we have two structure-values.  Make sure they have the same number of fields
+    // in them.
+    if (![observed[MTRValueKey] isKindOfClass:NSArray.class] || ![expected[MTRValueKey] isKindOfClass:NSArray.class]) {
+        // Malformed data, just claim not equivalent.
+        MTR_LOG_ERROR("%@ at least one of observed and expected value is not an NSArrray: %@, %@", self, observed, expected);
+        return NO;
+    }
+
+    NSArray<NSDictionary<NSString *, id> *> * observedArray = observed[MTRValueKey];
+    NSArray<NSDictionary<NSString *, id> *> * expectedArray = expected[MTRValueKey];
+
+    if (observedArray.count != expectedArray.count) {
+        return NO;
+    }
+
+    for (NSDictionary<NSString *, id> * expectedField in expectedArray) {
+        if (![expectedField[MTRContextTagKey] isKindOfClass:NSNumber.class] || ![expectedField[MTRDataKey] isKindOfClass:NSDictionary.class]) {
+            MTR_LOG_ERROR("%@ expected structure-value contains invalid field %@", self, expectedField);
+            return NO;
+        }
+
+        NSNumber * expectedContextTag = expectedField[MTRContextTagKey];
+
+        // Make sure it's present in the other array.  In practice, these are
+        // pretty small arrays, so the O(N^2) behavior here is ok.
+        BOOL found = NO;
+        for (NSDictionary<NSString *, id> * observedField in observedArray) {
+            if (![observedField[MTRContextTagKey] isKindOfClass:NSNumber.class] || ![observedField[MTRDataKey] isKindOfClass:NSDictionary.class]) {
+                MTR_LOG_ERROR("%@ observed structure-value contains invalid field %@", self, observedField);
+                return NO;
+            }
+
+            NSNumber * observedContextTag = observedField[MTRContextTagKey];
+            if ([expectedContextTag isEqual:observedContextTag]) {
+                found = YES;
+
+                // Compare the data.
+                if (![self _attributeDataValue:observedField[MTRDataKey] satisfiesValueExpectation:expectedField[MTRDataKey]]) {
+                    return NO;
+                }
+
+                // Found a match for the context tag, stop looking.
+                break;
+            }
+        }
+
+        if (!found) {
+            // Context tag present in expected but not observed.
+            return NO;
+        }
+    }
+
+    // All entries in the first field array matched entries in the second field
+    // array.  Since the lengths are equal, the two arrays must match, as long
+    // as all the context tags listed are distinct.  If someone produces invalid
+    // TLV with the same context tag set in it multiple times, this method could
+    // claim two structure-values are equivalent when the first has two fields
+    // with context tag N and the second has a field with context tag N and
+    // another field with context tag M.  That should be ok, in practice, but if
+    // we discover it's not we will need a better algorithm here.  It's not
+    // clear what "equivalent" should mean for such malformed TLV, expecially if
+    // the same context tag maps to different values in one of the structs.
+    return YES;
 }
 
 @end
