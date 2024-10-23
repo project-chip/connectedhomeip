@@ -310,11 +310,9 @@ CHIP_ERROR BaseApplication::Init()
 #endif // ENABLE_WSTK_LEDS
 
 #ifdef ENABLE_CHIP_SHELL
-
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     ICDCommands::RegisterCommands();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-
 #endif // ENABLE_CHIP_SHELL
 
 #ifdef PERFORMANCE_TEST_ENABLED
