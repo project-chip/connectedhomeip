@@ -285,6 +285,17 @@ MTRBaseDevice * CHIPCommandBridge::BaseDeviceWithNodeId(chip::NodeId nodeId)
         ?: [MTRBaseDevice deviceWithNodeID:@(nodeId) controller:controller];
 }
 
+MTRDevice * CHIPCommandBridge::DeviceWithNodeId(chip::NodeId nodeId)
+{
+    __auto_type * controller = CurrentCommissioner();
+    VerifyOrReturnValue(nil != controller, nil);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(nodeId) controller:controller];
+    VerifyOrReturnValue(nil != device, nil);
+
+    return device;
+}
+
 void CHIPCommandBridge::StopCommissioners()
 {
     for (auto & pair : mControllers) {

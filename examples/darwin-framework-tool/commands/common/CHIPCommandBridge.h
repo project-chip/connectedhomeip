@@ -97,6 +97,10 @@ protected:
     // Will utilize an existing PASE connection if the device is being commissioned.
     MTRBaseDevice * BaseDeviceWithNodeId(chip::NodeId nodeId);
 
+    // Returns the MTRDevice for the specified node ID.
+    // Will utilize an existing PASE connection if the device is being commissioned.
+    MTRDevice * DeviceWithNodeId(chip::NodeId nodeId);
+
     // Will log the given string and given error (as progress if success, error
     // if failure).
     void LogNSError(const char * logString, NSError * error);

@@ -47,6 +47,8 @@ public:
 
     ~WriteAttribute() {}
 
+    using ModelCommand::SendCommand;
+
     CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         id value;
