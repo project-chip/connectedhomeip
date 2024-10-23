@@ -1415,7 +1415,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.mark_current_step_skipped()
         return pics_condition
 
-    def attributes_guard(self, attribute_condition: bool):
+    async def attributes_guard(self, attribute_condition: bool):
         """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
            returns False using attributes against attributes_list, otherwise returns True.
            For example can be used to check if a test step should be run:
