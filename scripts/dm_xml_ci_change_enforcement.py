@@ -35,7 +35,7 @@ def check_dm_directory(dir):
     subprocess.run("git config --global --add safe.directory '*'", shell=True)
 
     def check_dir(dir):
-        cmd = f'git diff HEAD^..HEAD --name-only -- {clusters}'
+        cmd = f'git diff HEAD^..HEAD --name-only -- {dir}'
         output = subprocess.check_output(cmd, shell=True).decode().splitlines()
         if output and 'spec_sha' not in output:
             print(f'Data model directory {dir} had changes to the following files without a corresponding update to the spec SHA')
@@ -44,7 +44,9 @@ def check_dm_directory(dir):
             return 1
         return 0
 
-    return check_dir(clusters) + check_dir(device_types)
+    ret = check_dir(clusters) + check_dir(device_types)
+    print(f'returning {ret}')
+    return ret
 
 
 if __name__ == '__main__':
