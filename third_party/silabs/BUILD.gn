@@ -206,7 +206,9 @@ if (wifi_soc != true) {  # CCP board
           "${openthread_root}/src/core/mac/mac_frame.cpp",
           "${openthread_root}/src/core/mac/sub_mac.cpp",
           "${openthread_root}/src/core/thread/mle.cpp",
-          "${sl_ot_platform_abstraction}/efr32/radio.c",
+
+          # Temporary file until the files in the SI SDK is fixed
+          "${sdk_support_root}/protocol/openthread/platform-abstraction/efr32/radio.c",
         ]
 
         include_dirs = [ "${sl_ot_platform_abstraction}/include" ]
