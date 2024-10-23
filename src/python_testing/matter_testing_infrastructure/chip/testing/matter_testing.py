@@ -1428,9 +1428,10 @@ class MatterBaseTest(base_test.BaseTestClass):
               if self.attribute_guard(condition2_needs_to_be_false_to_skip_step):
                   # skip step 2 if condition not met
            """
-        if not attribute_condition:
+        attr_condition = await asyncio.wait_for(should_run_test_on_endpoint(self, has_attribute(attribute_condition)), timeout=60)
+        if not attr_condition:
             self.mark_current_step_skipped()
-        return attribute_condition
+        return attr_condition
 
     def mark_current_step_skipped(self):
         try:
