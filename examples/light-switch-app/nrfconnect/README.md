@@ -638,7 +638,7 @@ same Matter network.
 To perform the unicast binding process, complete the following steps:
 
 1.  Build the CHIP Tool according to the steps from the
-    [CHIP Tool user guide](../../../docs/development_controllers/chip-tool/chip_tool_guide.md#building-and-running-the-chip-tool).
+    [CHIP Tool user guide](../../../docs/development_controllers/chip-tool/chip_tool_guide.md#building-from-source).
 2.  Go to the CHIP Tool build directory.
 3.  Add an ACL to the development kit that is programmed with the
     [Lighting Application Example](../../lighting-app/nrfconnect/README.md) by
@@ -690,7 +690,7 @@ same Matter network.
 To perform the unicast binding process, complete the following steps:
 
 1.  Build the CHIP Tool according to the steps from the
-    [CHIP Tool user guide](../../../docs/development_controllers/chip-tool/chip_tool_guide.md#building-and-running-the-chip-tool).
+    [CHIP Tool user guide](../../../docs/development_controllers/chip-tool/chip_tool_guide.md#building-from-source).
 2.  Go to the CHIP Tool build directory.
 
 3.  Add the light switch device to the multicast group by running the following
