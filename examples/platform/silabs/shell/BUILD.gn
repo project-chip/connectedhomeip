@@ -17,26 +17,34 @@ import("//build_overrides/efr32_sdk.gni")
 import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
-# This is necessary since the BUILD.gn for both platforms are still split
-shell_dependency_path = "${chip_root}/examples/platform/silabs/efr32"
-if (use_SiWx917) {
-  shell_dependency_path = "${chip_root}/examples/platform/silabs/SiWx917"
-}
-
 config("shell-config") {
+  defines = [ "ENABLE_CHIP_SHELL" ]
+
   include_dirs = [ "." ]
 }
 
-source_set("shell") {
+# Common Matter Shell fines Silabs sample apps.
+# This source_set needs to be added as a dependency to all sources_sets that implement shell commands
+source_set("matter") {
+  sources = [
+    "MatterShell.cpp",
+    "MatterShell.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/examples/shell/shell_common:shell_common",
+    "${chip_root}/src/lib/shell:shell",
+    "${chip_root}/src/lib/shell:shell_core",
+  ]
+
+  public_configs = [ ":shell-config" ]
+}
+
+source_set("icd") {
   sources = [
     "ICDShellCommands.cpp",
     "ICDShellCommands.h",
   ]
 
-  deps = [
-    "${chip_root}/src/app/icd/server:icd-server-config",
-    "${shell_dependency_path}:matter-shell",
-  ]
-
-  public_configs = [ ":shell-config" ]
+  deps = [ ":matter" ]
 }
