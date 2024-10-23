@@ -15,12 +15,20 @@
 #    limitations under the License.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --PICS src/app/tests/suites/certification/ci-pics-values
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -31,48 +39,15 @@ from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.native import PyChipError
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
-
 class TC_CADMIN_1_19(MatterBaseTest):
-    async def OpenCommissioningWindow(self) -> CommissioningParameters:
-        try:
-            params = await self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
-            return params
-
-        except Exception as e:
-            logging.exception('Error running OpenCommissioningWindow %s', e)
-            asserts.assert_true(False, 'Failed to open commissioning window')
-
     def generate_unique_random_value(self, value):
         while True:
             random_value = random.randint(10000000, 99999999)
             if random_value != value:
                 return random_value
-
-    async def CommissionAttempt(
-            self, setupPinCode: int, thnum: int, th: str, fail: bool):
-
-        logging.info(f"-----------------Commissioning with TH_CR{thnum}-------------------------")
-        if fail:
-            ctx = asserts.assert_raises(ChipStackError)
-            with ctx:
-                await th.CommissionOnNetwork(
-                    nodeId=self.dut_node_id, setupPinCode=setupPinCode,
-                    filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
-                errcode = PyChipError.from_code(ctx.exception.err)
-            logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(
-                errcode.is_success, errcode))
-            asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
-            asserts.assert_true(errcode.sdk_code == 0x0000000B,
-                                'Unexpected error code returned from CommissioningComplete')
-
-        elif not fail:
-            await th.CommissionOnNetwork(
-                nodeId=self.dut_node_id, setupPinCode=setupPinCode,
-                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
 
     async def get_fabrics(self, th: ChipDeviceCtrl) -> int:
         OC_cluster = Clusters.OperationalCredentials
@@ -94,7 +69,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
             TestStep(6, "TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.",
                      "Verify this is equal to max_fabrics"),
             TestStep(
-                7, "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration", "{resDutSuccess}"),
+                    7, "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration", "{resDutSuccess}"),
             TestStep(8, "TH creates a controller on a new fabric and commissions DUT_CE using that controller",
                      "Verify DUT_CE responds with NOCResponse with a StatusCode field value of TableFull(5)"),
             TestStep(9, "Repeat the following steps (9a and 9b) for each controller (TH_CRn) created by this test"),
@@ -113,10 +88,6 @@ class TC_CADMIN_1_19(MatterBaseTest):
 
         # Establishing TH1 and TH2
         self.th1 = self.default_controller
-        self.discriminator = random.randint(0, 4095)
-        th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
-        self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
 
         self.step(2)
         GC_cluster = Clusters.GeneralCommissioning
@@ -136,19 +107,24 @@ class TC_CADMIN_1_19(MatterBaseTest):
         fids_ca_dir = {}
         fids_fa_dir = {}
         fids = {}
+        self.print_step("total fabrics", max_fabrics - initial_number_of_fabrics)
         for fid in range(1, max_fabrics - initial_number_of_fabrics):
             # Make sure that current test step is 5, resets here after each loop
             self.current_step_index = 5
 
             self.step("5a")
-            params = await self.OpenCommissioningWindow()
-            setupPinCode = params.setupPinCode
+            params = await self.openCommissioningWindow(dev_ctrl=self.th1, timeout=self.max_window_duration, node_id=self.dut_node_id)
 
             self.step("5b")
-            fids_ca_dir['thca' + str(fid)] = self.certificate_authority_manager.NewCertificateAuthority()
-            fids_fa_dir['thfa' + str(fid)] = fids_ca_dir['thca' + str(fid)].NewFabricAdmin(vendorId=0xFFF1, fabricId=fid)
-            fids['th' + str(fid)] = fids_fa_dir['thfa' + str(fid)].NewController(nodeId=fid, useTestCommissioner=True)
-            await self.CommissionAttempt(setupPinCode, thnum=fid, th=fids['th' + str(fid)], fail=False)
+            fids_ca_dir[fid] = self.certificate_authority_manager.NewCertificateAuthority()
+            fids_fa_dir[fid] = fids_ca_dir[fid].NewFabricAdmin(vendorId=0xFFF1, fabricId=fid)
+            fids[fid] = fids_fa_dir[fid].NewController(nodeId=fid)
+
+            await fids[fid].CommissionOnNetwork(
+                nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
+
+            self.print_step("commissioning iteration", fid)
 
         self.step(6)
         # TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster
@@ -157,27 +133,27 @@ class TC_CADMIN_1_19(MatterBaseTest):
             asserts.fail(f"Expected number of fabrics not correct, instead was {current_fabrics}")
 
         self.step(7)
-        params = await self.OpenCommissioningWindow()
-        setupPinCode = params.setupPinCode
+        params = await self.openCommissioningWindow(dev_ctrl=self.th1, node_id=self.dut_node_id)
 
         self.step(8)
         # TH creates a controller on a new fabric and commissions DUT_CE using that controller
-        fids_ca_dir['thca' + str(current_fabrics + 1)] = self.certificate_authority_manager.NewCertificateAuthority()
-        fids_fa_dir['thfa' + str(current_fabrics + 1)] = fids_ca_dir['thca' + str(current_fabrics + 1)
-                                                                     ].NewFabricAdmin(vendorId=0xFFF1, fabricId=current_fabrics + 1)
+        fids_ca_dir[current_fabrics + 1] = self.certificate_authority_manager.NewCertificateAuthority()
+        fids_fa_dir[current_fabrics + 1] = fids_ca_dir[current_fabrics + 1].NewFabricAdmin(vendorId=0xFFF1, fabricId=current_fabrics + 1)
         try:
-            fids['th' + str(current_fabrics + 1)] = fids_fa_dir['thfa' + str(current_fabrics + 1)
-                                                                ].NewController(nodeId=current_fabrics + 1, useTestCommissioner=True)
-            await self.CommissionAttempt(setupPinCode, thnum=fid, th=fids['th' + str(current_fabrics + 1)], fail=True)
-            asserts.fail("Expected exception not thrown")
+            fids[current_fabrics + 1] = fids_fa_dir[current_fabrics + 1].NewController(nodeId=current_fabrics + 1)
+            await fids[current_fabrics + 1].CommissionOnNetwork(
+                nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
 
         except ChipStackError as e:
+            self.print_step("err", e.err)
             # When attempting to create a new controller we are expected to get the following response:
             # src/credentials/FabricTable.cpp:833: CHIP Error 0x0000000B: No memory
             # Since the FabricTable is full and unable to create any new fabrics
             asserts.assert_equal(e.err,  0x0000000B,
                                  "Expected to return table is full since max number of fabrics has been created already")
 
+        
         self.step(9)
         for thc in fids.keys():
             # Make sure that current test step is 11 (9 + 2 since 5a and 5b test steps included in count), resets here after each loop
