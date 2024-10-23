@@ -34,7 +34,8 @@ CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { "L
 
 const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints
     [MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
-        EndpointPair(1, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions,
+        EndpointPair(
+            1, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions,
             ArraySize(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions)) // Supported level options for endPoint 1
     };
 
