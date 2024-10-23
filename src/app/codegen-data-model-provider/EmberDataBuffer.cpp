@@ -160,10 +160,13 @@ CHIP_ERROR EmberAttributeBuffer::DecodeUnsignedInteger(chip::TLV::TLVReader & re
     {
         ReturnErrorOnFailure(reader.Get(value));
 
-        VerifyOrReturnError(mIsNullable // ::max() on the type is used as the NULL flag
-                                ? (value < info.maxValue)
-                                : (value <= info.maxValue),
-                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        bool valid =
+            // Value is in [0, max] RANGE
+            (value <= info.maxValue)
+            // Nullable values reserve a specific value to mean NULL
+            && !(mIsNullable && (value == NumericLimits::UnsignedMaxValueToNullValue(info.maxValue)));
+
+        VerifyOrReturnError(valid, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
 
     writer.EndianPut(value, info.byteCount);
@@ -186,10 +189,11 @@ CHIP_ERROR EmberAttributeBuffer::DecodeSignedInteger(chip::TLV::TLVReader & read
     {
         ReturnErrorOnFailure(reader.Get(value));
 
-        // NULLABLE reserves minValue for NULL, so range is:
-        //   - NULLABLE:      (minValue, MaxValue]
-        //   - NON-NULLABLE:  [minValue, MaxValue]
-        bool valid = (value <= info.maxValue) && (mIsNullable ? (value > info.minValue) : (value >= info.minValue));
+        bool valid =
+            // Value is in [min, max] RANGE
+            ((value >= info.minValue) && (value <= info.maxValue))
+            // Nullable values reserve a specific value to mean NULL
+            && !(mIsNullable && (value == SignedMinValueToNullValue(info.minValue)));
 
         VerifyOrReturnError(valid, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
