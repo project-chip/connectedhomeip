@@ -18,7 +18,7 @@ import("${chip_root}/src/app/icd/icd.gni")
 
 chip_data_model("light-switch-common") {
   if (chip_enable_icd_lit) {
-    zap_file = "lit-icd-light-switch-app.zap"
+    zap_file = "icd-lit-light-switch-app.zap"
   } else {
     zap_file = "light-switch-app.zap"
   }

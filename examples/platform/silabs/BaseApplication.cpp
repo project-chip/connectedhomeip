@@ -37,12 +37,12 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
-#if defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
 #ifdef ENABLE_CHIP_SHELL
 #include <ICDShellCommands.h>
 #endif // ENABLE_CHIP_SHELL
-#endif // defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #include <ProvisionManager.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -125,7 +125,7 @@ app::Clusters::NetworkCommissioning::Instance
 bool sIsEnabled  = false;
 bool sIsAttached = false;
 
-#if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
+#if !(CHIP_CONFIG_ENABLE_ICD_SERVER)
 bool sHaveBLEConnections = false;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
@@ -184,7 +184,7 @@ void BaseApplicationDelegate::OnCommissioningSessionStopped()
 
 void BaseApplicationDelegate::OnCommissioningWindowClosed()
 {
-#if (defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER) && SLI_SI917
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
     if (!BaseApplication::GetProvisionStatus() && !isComissioningStarted)
     {
         int32_t status = wfx_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);
@@ -311,9 +311,9 @@ CHIP_ERROR BaseApplication::Init()
 
 #ifdef ENABLE_CHIP_SHELL
 
-#if defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     ICDCommands::RegisterCommands();
-#endif // defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #endif // ENABLE_CHIP_SHELL
 
@@ -354,7 +354,7 @@ void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
     {
         // The factory reset sequence was in motion. The cancellation window expired.
         // Factory Reset the device now.
-#if defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
         StopStatusLEDTimer();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
@@ -412,7 +412,7 @@ bool BaseApplication::ActivateStatusLedPatterns()
     }
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
-#if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
+#if !(CHIP_CONFIG_ENABLE_ICD_SERVER)
     // Identify Patterns have priority over Status patterns
     if (!isPatternSet)
     {
@@ -468,7 +468,7 @@ void BaseApplication::LightEventHandler()
     // locked while these values are queried.  However we use a non-blocking
     // lock request (TryLockCHIPStack()) to avoid blocking other UI activities
     // when the CHIP task is busy (e.g. with a long crypto operation).
-#if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
+#if !(CHIP_CONFIG_ENABLE_ICD_SERVER)
     if (PlatformMgr().TryLockChipStack())
     {
 #ifdef SL_WIFI
@@ -563,7 +563,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             else
             {
                 ChipLogProgress(AppServer, "Network is already provisioned, Ble advertisement not enabled");
-#if defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
                 // Temporarily claim network activity, until we implement a "user trigger" reason for ICD wakeups.
                 PlatformMgr().ScheduleWork([](intptr_t) { ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -611,7 +611,7 @@ void BaseApplication::StartFactoryResetSequence()
     StartFunctionTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
 
     sIsFactoryResetTriggered = true;
-#if defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     StartStatusLEDTimer();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
@@ -627,7 +627,7 @@ void BaseApplication::CancelFactoryResetSequence()
 {
     CancelFunctionTimer();
 
-#if defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     StopStatusLEDTimer();
 #endif
     if (sIsFactoryResetTriggered)
@@ -664,7 +664,7 @@ void BaseApplication::OnIdentifyStart(Identify * identify)
 {
     ChipLogProgress(Zcl, "onIdentifyStart");
 
-#if defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     StartStatusLEDTimer();
 #endif
 }
@@ -673,7 +673,7 @@ void BaseApplication::OnIdentifyStop(Identify * identify)
 {
     ChipLogProgress(Zcl, "onIdentifyStop");
 
-#if defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     StopStatusLEDTimer();
 #endif
 }
@@ -683,7 +683,7 @@ void BaseApplication::OnTriggerIdentifyEffectCompleted(chip::System::Layer * sys
     ChipLogProgress(Zcl, "Trigger Identify Complete");
     sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 
-#if defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     StopStatusLEDTimer();
 #endif
 }
@@ -697,7 +697,7 @@ void BaseApplication::OnTriggerIdentifyEffect(Identify * identify)
         ChipLogDetail(AppServer, "Identify Effect Variant unsupported. Using default");
     }
 
-#if defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     StartStatusLEDTimer();
 #endif
 
@@ -766,7 +766,7 @@ void BaseApplication::UpdateLCDStatusScreen(bool withChipStackLock)
     status.connected   = enabled && attached;
     status.advertising = chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen();
     status.nbFabric    = chip::Server::GetInstance().GetFabricTable().FabricCount();
-#if defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     status.icdMode = (ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::SIT)
         ? SilabsLCD::ICDMode_e::SIT
         : SilabsLCD::ICDMode_e::LIT;
