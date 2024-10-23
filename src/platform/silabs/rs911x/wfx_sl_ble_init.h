@@ -104,15 +104,13 @@ public:
         rsi_ble_event_disconnect_t * resp_disconnect;
         rsi_ble_read_req_t * rsi_ble_read_req;
         rsi_ble_set_att_resp_t rsi_ble_event_set_att_rsp;
-        uint16_t rsi_ble_measurement_hndl;
-        uint16_t rsi_ble_gatt_server_client_config_hndl;
         uint16_t subscribed;
     };
 
     struct BleEvent_t
     {
         BleEventType eventType;
-        sl_wfx_msg_t * eventData;
+        sl_wfx_msg_t eventData;
     };
 
     // ALL Ble functions
@@ -129,7 +127,6 @@ public:
                                           uuid_t att_val_uuid);
     static void rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_type_uuid, uint8_t val_prop,
                                          uint8_t * data, uint8_t data_len, uint8_t auth_read);
-    static uint32_t rsi_ble_add_matter_service(void);
 };
 
 } // namespace Internal
