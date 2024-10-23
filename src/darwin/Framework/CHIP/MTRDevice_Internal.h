@@ -22,6 +22,7 @@
 
 #import "MTRAsyncWorkQueue.h"
 #import "MTRDefines_Internal.h"
+#import "MTRDeviceDataValueDictionary.h"
 #import "MTRDeviceStorageBehaviorConfiguration_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -163,6 +164,10 @@ MTR_DIRECT_MEMBERS
 // Hooks for controller suspend/resume.
 - (void)controllerSuspended;
 - (void)controllerResumed;
+
+// Methods for comparing attribute data values.
+- (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)one isEqualToDataValue:(MTRDeviceDataValueDictionary)theOther;
+- (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)observed satisfiesValueExpectation:(MTRDeviceDataValueDictionary)expected;
 
 @end
 
