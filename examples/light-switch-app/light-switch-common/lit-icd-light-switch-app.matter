@@ -3131,8 +3131,21 @@ endpoint 0 {
     callback attribute idleModeDuration;
     callback attribute activeModeDuration;
     callback attribute activeModeThreshold;
-    ram      attribute featureMap default = 0x0000;
+    callback attribute registeredClients;
+    callback attribute ICDCounter;
+    callback attribute clientsSupportedPerFabric;
+    ram      attribute userActiveModeTriggerHint default = 0x1115;
+    ram      attribute userActiveModeTriggerInstruction default = "Power Cycle";
+    ram      attribute operatingMode default = 0;
+    callback attribute maximumCheckInBackOff;
+    ram      attribute featureMap default = 15;
     ram      attribute clusterRevision default = 3;
+
+    handle command RegisterClient;
+    handle command RegisterClientResponse;
+    handle command UnregisterClient;
+    handle command StayActiveRequest;
+    handle command StayActiveResponse;
   }
 }
 endpoint 1 {
