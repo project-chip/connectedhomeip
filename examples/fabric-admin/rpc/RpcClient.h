@@ -88,3 +88,14 @@ CHIP_ERROR ActiveChanged(chip::ScopedNodeId scopedNodeId, uint32_t promisedActiv
  * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
  */
 CHIP_ERROR AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommissioningChanged & data);
+
+/**
+ * @brief Notify that reachachability of the bridged device has changed
+ *
+ * @param data information regarding change in reachability of the bridged device.
+ * @return CHIP_ERROR An error code indicating the success or failure of the operation.
+ * - CHIP_NO_ERROR: The RPC command was successfully processed.
+ * - CHIP_ERROR_BUSY: Another operation is currently in progress.
+ * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
+ */
+CHIP_ERROR DeviceReachableChanged(const chip_rpc_ReachabilityChanged & data);
