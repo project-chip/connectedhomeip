@@ -108,7 +108,8 @@ from chip.clusters.Attribute import ValueDecodeFailure
 from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.global_attribute_ids import AttributeIdType, ClusterIdType, GlobalAttributeIds, attribute_id_type, cluster_id_type
+from chip.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds, attribute_id_type,
+                                               cluster_id_type, command_id_type)
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
                                          async_test_body, default_matter_test_main)
 from chip.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
@@ -503,7 +504,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                     location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=bad_cmd_id)
                     vendor_id = get_vendor_id(bad_cmd_id)
                     self.record_error(self.get_test_name(
-                    ), location=location, problem=f'Command 0x{bad_cmd_id:08x} with bad prefix 0x{vendor_id:04x} in cluster 0x{cluster_id:08x}', spec_location='Manufacturer Extensible Identifier (MEI)')
+                    ), location=location, problem=f'Command 0x{bad_cmd_id:08x} with bad prefix 0x{vendor_id:04x} in cluster 0x{cluster_id:08x}' + (' (Test Vendor)' if command_id_type(bad_cmd_id) == CommandIdType.kTest else ''), spec_location='Manufacturer Extensible Identifier (MEI)')
                     success = False
 
         self.print_step(7, "Validate that none of the MEI global attribute IDs contain values outside of the allowed suffix range")
