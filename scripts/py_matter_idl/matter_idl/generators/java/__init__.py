@@ -59,7 +59,7 @@ _GLOBAL_TYPES = [
 
 
 def _UnderlyingType(field: Field, context: TypeLookupContext) -> Optional[str]:
-    actual = ParseDataType(field.data_type, context)
+    actual = ParseDataType(field.data_type, context, desugar_typedef = True)
     if isinstance(actual, (IdlEnumType, IdlBitmapType)):
         actual = actual.base_type
 
@@ -132,7 +132,7 @@ def _CppType(field: Field, context: TypeLookupContext) -> str:
     if field.data_type.name.lower() in _KNOWN_DECODABLE_TYPES:
         return _KNOWN_DECODABLE_TYPES[field.data_type.name.lower()]
 
-    actual = ParseDataType(field.data_type, context)
+    actual = ParseDataType(field.data_type, context, desugar_typedef = True)
     if isinstance(actual, BasicString):
         if actual.is_binary:
             return 'chip::ByteSpan'
@@ -278,7 +278,7 @@ def attributesWithSupportedCallback(attrs, context: TypeLookupContext):
         # Attributes will be generated for all types
         # except non-list structures
         if not attr.definition.is_list:
-            underlying = ParseDataType(attr.definition.data_type, context)
+            underlying = ParseDataType(attr.definition.data_type, context, desugar_typedef = True)
             if isinstance(underlying, IdlType):
                 continue
 
@@ -420,6 +420,10 @@ class EncodableValue:
     def is_untyped_bitmap(self):
         return self.context.is_untyped_bitmap_type(self.data_type.name)
 
+    @property
+    def is_typedef(self):
+        return self.context.is_typedef_type(self.data_type.name)
+
     def clone(self):
         return EncodableValue(self.context, self.data_type, self.attrs)
 
@@ -469,7 +473,7 @@ class EncodableValue:
 
     @property
     def boxed_java_type(self):
-        t = ParseDataType(self.data_type, self.context)
+        t = ParseDataType(self.data_type, self.context, desugar_typedef = True)
 
         if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:
@@ -506,7 +510,7 @@ class EncodableValue:
 
     @property
     def java_tlv_type(self):
-        t = ParseDataType(self.data_type, self.context)
+        t = ParseDataType(self.data_type, self.context, desugar_typedef = True)
 
         if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:
@@ -537,7 +541,8 @@ class EncodableValue:
 
     @property
     def kotlin_type(self):
-        t = ParseDataType(self.data_type, self.context)
+        # TODO: Use inline value class where possible (types not defined in java)
+        t = ParseDataType(self.data_type, self.context, desugar_typedef = True)
 
         if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:
@@ -583,7 +588,7 @@ class EncodableValue:
         if self.is_optional or self.is_list:
             raise Exception("Not a basic type: %r" % self)
 
-        t = ParseDataType(self.data_type, self.context)
+        t = ParseDataType(self.data_type, self.context, desugar_typedef = True)
 
         if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:
@@ -611,7 +616,7 @@ class EncodableValue:
         if self.is_list:
             return "Ljava/util/ArrayList;"
 
-        t = ParseDataType(self.data_type, self.context)
+        t = ParseDataType(self.data_type, self.context, desugar_typedef = True)
 
         if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:
