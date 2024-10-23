@@ -829,7 +829,6 @@ void BLEManagerImpl::HandleConnectEvent(const SilabsBleWrapper::sl_wfx_msg_t & e
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
-// TODO:: Implementation need to be done.
 void BLEManagerImpl::HandleConnectionCloseEvent(const SilabsBleWrapper::sl_wfx_msg_t & evt)
 {
     uint8_t connHandle = 1;
@@ -878,7 +877,6 @@ void BLEManagerImpl::HandleWriteEvent(const SilabsBleWrapper::sl_wfx_msg_t & evt
     }
 }
 
-// TODO:: Need to implement this
 void BLEManagerImpl::HandleTXCharCCCDWrite(const SilabsBleWrapper::sl_wfx_msg_t & evt)
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
