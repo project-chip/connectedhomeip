@@ -286,9 +286,9 @@ public:
         virtual void OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams) {}
 
         /*
-         * return the internal fatal error in callback
+         * Get the last internal fatal error in callback
          */
-        virtual CHIP_ERROR CheckInternalError() { return CHIP_NO_ERROR; }
+        virtual CHIP_ERROR GetLastError() const { return CHIP_NO_ERROR; }
     };
 
     enum class InteractionType : uint8_t
@@ -689,6 +689,6 @@ private:
 #endif
 };
 
-};     // namespace app
-};     // namespace chip
+}; // namespace app
+}; // namespace chip
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT

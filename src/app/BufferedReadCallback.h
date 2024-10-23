@@ -44,12 +44,19 @@ public:
 
 private:
     /*
-     * Retrieve the internal error in BufferedReadCallback
+     * Get the last internal fatal error in BufferedReadCallback
+     * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
+     *                              If bufferred list data is not TLV Array
+     * @retval #CHIP_ERROR_NO_MEMORY
+     *                              If an attempt to allocate an buffer failed due to lack of
+     *                              memory.
+     * @retval other                Other CHIP or platform-specific errors.
      */
-    CHIP_ERROR CheckInternalError() override { return mError; }
+    CHIP_ERROR GetLastError() const override { return mError; }
 
     /*
-     * Generates the reconsistuted TLV array from the stored individual list elements
+     * Generates the reconstituted TLV array from the stored individual list elements
      */
     CHIP_ERROR GenerateListTLV(TLV::ScopedBufferTLVReader & reader);
 

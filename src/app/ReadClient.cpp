@@ -46,8 +46,7 @@ using Status = Protocols::InteractionModel::Status;
 
 ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeManager * apExchangeMgr, Callback & apCallback,
                        InteractionType aInteractionType) :
-    mExchange(*this),
-    mpCallback(apCallback), mOnConnectedCallback(HandleDeviceConnected, this),
+    mExchange(*this), mpCallback(apCallback), mOnConnectedCallback(HandleDeviceConnected, this),
     mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {
     assertChipStackLockedByCurrentThread();
@@ -805,7 +804,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             ReturnErrorOnFailure(errorStatus.DecodeStatusIB(statusIB));
             NoteReportingData();
             mpCallback.OnAttributeData(attributePath, nullptr, statusIB);
-            ReturnErrorOnFailure(mpCallback.CheckInternalError());
+            ReturnErrorOnFailure(mpCallback.GetLastError());
         }
         else if (CHIP_END_OF_TLV == err)
         {
