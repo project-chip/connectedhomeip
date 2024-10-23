@@ -91,24 +91,6 @@ source_set("test-event-trigger") {
   ]
 }
 
-source_set("matter-shell") {
-  if (chip_build_libshell) {
-    defines = [ "ENABLE_CHIP_SHELL" ]
-
-    sources = [ "${silabs_common_plat_dir}/matter_shell.cpp" ]
-    include_dirs = [
-      ".",
-      "${silabs_common_plat_dir}",
-    ]
-
-    public_deps = [
-      "${chip_root}/examples/shell/shell_common:shell_common",
-      "${chip_root}/src/lib/shell:shell",
-      "${chip_root}/src/lib/shell:shell_core",
-    ]
-  }
-}
-
 config("siwx917-common-config") {
   defines = [ "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_sec}" ]
 
@@ -226,10 +208,10 @@ source_set("siwx917-common") {
   }
 
   if (chip_build_libshell) {
-    deps += [ ":matter-shell" ]
+    deps += [ "${silabs_common_plat_dir}/shell:matter" ]
 
     if (chip_enable_icd_server) {
-      deps += [ "${chip_root}/examples/platform/silabs/icd:shell" ]
+      deps += [ "${silabs_common_plat_dir}/shell:icd" ]
     }
   }
 
