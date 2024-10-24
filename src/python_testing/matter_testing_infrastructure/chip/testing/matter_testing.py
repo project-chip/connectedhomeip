@@ -1423,6 +1423,24 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.mark_current_step_skipped()
         return pics_condition
 
+    async def attributes_guard(self, attribute_condition: bool):
+        """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
+           returns False using attributes against attributes_list, otherwise returns True.
+           For example can be used to check if a test step should be run:
+
+              self.step("1")
+              if self.attribute_guard(condition1_needs_to_be_true_to_execute):
+                  # do the test for step 1
+
+              self.step("2")
+              if self.attribute_guard(condition2_needs_to_be_false_to_skip_step):
+                  # skip step 2 if condition not met
+           """
+        attr_condition = await asyncio.wait_for(should_run_test_on_endpoint(self, has_attribute(attribute_condition)), timeout=60)
+        if not attr_condition:
+            self.mark_current_step_skipped()
+        return attr_condition
+
     def mark_current_step_skipped(self):
         try:
             steps = self.get_test_steps(self.current_test_info.name)
