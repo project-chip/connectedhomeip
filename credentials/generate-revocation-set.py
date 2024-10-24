@@ -105,11 +105,11 @@ def get_skid(cert: x509.Certificate) -> bytes:
         return None
 
 
-def get_subject_b64(cert) -> str:
+def get_subject_b64(cert: x509.Certificate) -> str:
     return base64.b64encode(cert.subject.public_bytes()).decode('utf-8')
 
 
-def get_issuer_b64(cert) -> str:
+def get_issuer_b64(cert: x509.Certificate) -> str:
     return base64.b64encode(cert.issuer.public_bytes()).decode('utf-8')
 
 
@@ -136,7 +136,7 @@ def verify_cert(cert: x509.Certificate, root: x509.Certificate) -> bool:
     return True
 
 
-def is_self_signed_certificate(cert) -> bool:
+def is_self_signed_certificate(cert: x509.Certificate) -> bool:
     return verify_cert(cert, cert)
 
 
@@ -491,7 +491,7 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
 
             serialnumber_list.append(bytes(str('{:02X}'.format(revoked_cert.serial_number)), 'utf-8').decode('utf-8'))
 
-        # No point in creating an entry which has no revoked certificates
+        # No point in creating an entry which has no revoked serial numbers
         if len(serialnumber_list) == 0:
             continue
 
