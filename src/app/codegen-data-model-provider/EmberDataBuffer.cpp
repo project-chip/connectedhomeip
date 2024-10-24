@@ -51,6 +51,8 @@ struct UnsignedDecodeInfo
 {
     unsigned byteCount;
     uint64_t maxValue;
+
+    constexpr UnsignedDecodeInfo(unsigned bytes) : byteCount(bytes), maxValue(NumericLimits::MaxUnsignedValue(bytes)) {}
 };
 
 constexpr UnsignedDecodeInfo GetUnsignedDecodeInfo(EmberAfAttributeType type)
@@ -59,21 +61,21 @@ constexpr UnsignedDecodeInfo GetUnsignedDecodeInfo(EmberAfAttributeType type)
     switch (type)
     {
     case ZCL_INT8U_ATTRIBUTE_TYPE: // Unsigned 8-bit integer
-        return UnsignedDecodeInfo{ 1, NumericLimits::MaxUnsignedValue(1) };
+        return UnsignedDecodeInfo(1);
     case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
-        return UnsignedDecodeInfo{ 2, NumericLimits::MaxUnsignedValue(2) };
+        return UnsignedDecodeInfo(2);
     case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
-        return UnsignedDecodeInfo{ 3, NumericLimits::MaxUnsignedValue(3) };
+        return UnsignedDecodeInfo(3);
     case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
-        return UnsignedDecodeInfo{ 4, NumericLimits::MaxUnsignedValue(4) };
+        return UnsignedDecodeInfo(4);
     case ZCL_INT40U_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
-        return UnsignedDecodeInfo{ 5, NumericLimits::MaxUnsignedValue(5) };
+        return UnsignedDecodeInfo(5);
     case ZCL_INT48U_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
-        return UnsignedDecodeInfo{ 6, NumericLimits::MaxUnsignedValue(6) };
+        return UnsignedDecodeInfo(6);
     case ZCL_INT56U_ATTRIBUTE_TYPE: // Unsigned 56-bit integer
-        return UnsignedDecodeInfo{ 7, NumericLimits::MaxUnsignedValue(7) };
+        return UnsignedDecodeInfo(7);
     case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
-        return UnsignedDecodeInfo{ 8, NumericLimits::MaxUnsignedValue(8) };
+        return UnsignedDecodeInfo(8);
     }
     chipDie();
 }
@@ -83,6 +85,10 @@ struct SignedDecodeInfo
     unsigned byteCount;
     int64_t minValue;
     int64_t maxValue;
+
+    constexpr SignedDecodeInfo(unsigned bytes) :
+        byteCount(bytes), minValue(NumericLimits::MinSignedValue(bytes)), maxValue(NumericLimits::MaxSignedValue(bytes))
+    {}
 };
 
 constexpr SignedDecodeInfo GetSignedDecodeInfo(EmberAfAttributeType type)
@@ -91,53 +97,21 @@ constexpr SignedDecodeInfo GetSignedDecodeInfo(EmberAfAttributeType type)
     switch (type)
     {
     case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
-        return SignedDecodeInfo{
-            1,
-            NumericLimits::MinSignedValue(1),
-            NumericLimits::MaxSignedValue(1),
-        };
+        return SignedDecodeInfo(1);
     case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
-        return SignedDecodeInfo{
-            2,
-            NumericLimits::MinSignedValue(2),
-            NumericLimits::MaxSignedValue(2),
-        };
+        return SignedDecodeInfo(2);
     case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
-        return SignedDecodeInfo{
-            3,
-            NumericLimits::MinSignedValue(3),
-            NumericLimits::MaxSignedValue(3),
-        };
+        return SignedDecodeInfo(3);
     case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
-        return SignedDecodeInfo{
-            4,
-            NumericLimits::MinSignedValue(4),
-            NumericLimits::MaxSignedValue(4),
-        };
+        return SignedDecodeInfo(4);
     case ZCL_INT40S_ATTRIBUTE_TYPE: // Signed 40-bit integer
-        return SignedDecodeInfo{
-            5,
-            NumericLimits::MinSignedValue(5),
-            NumericLimits::MaxSignedValue(5),
-        };
+        return SignedDecodeInfo(5);
     case ZCL_INT48S_ATTRIBUTE_TYPE: // Signed 48-bit integer
-        return SignedDecodeInfo{
-            6,
-            NumericLimits::MinSignedValue(6),
-            NumericLimits::MaxSignedValue(6),
-        };
+        return SignedDecodeInfo(6);
     case ZCL_INT56S_ATTRIBUTE_TYPE: // Signed 56-bit integer
-        return SignedDecodeInfo{
-            7,
-            NumericLimits::MinSignedValue(7),
-            NumericLimits::MaxSignedValue(7),
-        };
+        return SignedDecodeInfo(7);
     case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
-        return SignedDecodeInfo{
-            8,
-            NumericLimits::MinSignedValue(8),
-            NumericLimits::MaxSignedValue(8),
-        };
+        return SignedDecodeInfo(8);
     }
     chipDie();
 }
