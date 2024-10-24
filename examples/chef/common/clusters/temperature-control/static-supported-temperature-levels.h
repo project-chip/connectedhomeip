@@ -43,7 +43,6 @@ class AppSupportedTemperatureLevelsDelegate : public SupportedTemperatureLevelsI
     static const EndpointPair supportedOptionsByEndpoints[MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 public:
-
     uint8_t Size() override;
 
     CHIP_ERROR Next(MutableCharSpan & item) override;
