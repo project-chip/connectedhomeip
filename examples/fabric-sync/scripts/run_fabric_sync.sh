@@ -56,4 +56,3 @@ echo "Removed /tmp/chip_* files and directories."
 
 # Start fabric-sync
 "$FABRIC_SYNC_PATH"
-
