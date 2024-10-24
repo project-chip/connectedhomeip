@@ -431,12 +431,13 @@ static sl_status_t wfx_rsi_init(void)
 #ifdef ENABLE_CHIP_SHELL
     // While using the matter shell with the ICD server, the GPIO 1 is used to check the UULP PIN 1 status
     // since UART doesn't act as a wakeup source in the UULP mode
-    /*Configuring the NPS GPIO 1*/
-    RSI_NPSSGPIO_SetPinMux(RTE_UULP_GPIO_1_PIN, 0);
-    /*Configure the NPSS GPIO direction to input */
-    RSI_NPSSGPIO_SetDir(RTE_UULP_GPIO_1_PIN, 1);
-    /*Enable the REN*/
-    RSI_NPSSGPIO_InputBufferEn(RTE_UULP_GPIO_1_PIN, 1);
+    /* Configuring the NPS GPIO 1 */
+    sl_si91x_gpio_set_uulp_npss_pin_mux(RTE_UULP_GPIO_1_PIN, sl_si91x_uulp_npss_mode_t.NPSS_GPIO_PIN_MUX_MODE0);
+    /* Configure the NPSS GPIO direction to input */
+    sl_si91x_gpio_set_uulp_npss_direction(RTE_UULP_GPIO_1_PIN, sl_si91x_gpio_direction_t.GPIO_INPUT);
+    /* Enable the REN */
+    sl_si91x_gpio_select_uulp_npss_receiver(RTE_UULP_GPIO_0_PIN, sl_si91x_gpio_receiver_t.GPIO_RECEIVER_EN)
+
 #endif // ENABLE_CHIP_SHELL
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 #endif /* SLI_SI91X_MCU_INTERFACE */
