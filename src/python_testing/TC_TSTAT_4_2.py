@@ -53,6 +53,8 @@ cluster = Clusters.Thermostat
 
 
 class TC_TSTAT_4_2(MatterBaseTest):
+    async def read_tstat_attribute_expect_success(self, attribute):
+        return await self.read_single_attribute_check_success(endpoint=None, cluster=cluster, attribute=attribute)
 
     def check_atomic_response(self, response: object, expected_status: Status = Status.Success,
                               expected_overall_status: Status = Status.Success,
@@ -262,9 +264,16 @@ class TC_TSTAT_4_2(MatterBaseTest):
         params = await self.default_controller.OpenCommissioningWindow(
             nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
 
+        features = await self.read_single_attribute_check_success(endpoint=None, cluster=cluster, attribute=cluster.Attributes.FeatureMap)
+        supports_presets = bool(features | cluster.Bitmaps.Feature.kPresets)
+        attribute_list = await self.read_tstat_attribute_expect_success(attribute=cluster.Attributes.AttributeList)
+        presets_attr_id = cluster.Attributes.Presets.attribute_id
+
         secondary_authority = self.certificate_authority_manager.NewCertificateAuthority()
         secondary_fabric_admin = secondary_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
         secondary_controller = secondary_fabric_admin.NewController(nodeId=112233)
+
+        accepted_cmd_list = await self.read_tstat_attribute_expect_success(attribute=cluster.Attributes.AcceptedCommandList)
 
         await secondary_controller.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
@@ -332,7 +341,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(coolSetpoint-1), endpoint_id=endpoint)
 
         self.step("2")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050")):
+        if supports_presets and presets_attr_id in attribute_list:
 
             # Read the numberOfPresets supported.
             numberOfPresetsSupported = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NumberOfPresets)
@@ -350,7 +359,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.write_presets(endpoint=endpoint, presets=current_presets, expected_status=Status.InvalidInState)
 
         self.step("3")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
@@ -385,7 +394,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 3 since there was no available preset scenario to append")
 
         self.step("4")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
@@ -420,7 +429,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 4 since there were no built-in presets")
 
         self.step("5")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             # Write to the presets attribute after removing a built in preset from the list. Remove the first entry.
             test_presets = current_presets.copy()
@@ -443,7 +452,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 5 since there were no built-in presets")
 
         self.step("6")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C06.Rsp") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             notBuiltInPresets = list(preset for preset in current_presets if preset.builtIn is False)
             if len(notBuiltInPresets) > 0:
@@ -489,7 +498,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             asserts.assert_equal(activePresetHandle, NullValue, "Active preset handle was not cleared as expected")
 
         self.step("7")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             # Write to the presets attribute after setting the builtIn flag to False for a built-in preset.
             test_presets = copy.deepcopy(current_presets)
@@ -511,7 +520,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 7 since there was no built-in presets")
 
         self.step("8")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
@@ -534,7 +543,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 8 since there was no available preset scenario to append")
 
         self.step("9")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
@@ -550,7 +559,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("10")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
@@ -575,7 +584,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 10 since there was no available preset scenario to duplicate")
 
         self.step("11")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             test_presets = copy.deepcopy(current_presets)
 
@@ -597,7 +606,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 11 since there were no presets that were not built-in")
 
         self.step("12")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             availableScenarios = list(presetType.presetScenario for presetType in presetTypes if (presetType.presetTypeFeatures & cluster.Bitmaps.PresetTypeFeaturesBitmap.kSupportsNames) == 0 and presetScenarioCounts.get(
                 presetType.presetScenario, 0) <= presetType.numberOfPresets)
@@ -627,7 +636,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 12 since there was no available preset scenario without name support")
 
         self.step("13")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
@@ -652,7 +661,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 13 since there was no available preset scenario to add")
 
         self.step("14")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
+
             await self.send_atomic_request_begin_command()
             # Send the AtomicRequest begin command from separate controller, which should receive busy
             status = await self.send_atomic_request_begin_command(dev_ctrl=secondary_controller, expected_overall_status=Status.Failure, expected_preset_status=Status.Busy)
@@ -661,7 +671,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("15")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
+
             # Send the AtomicRequest begin command from the secondary controller
             await self.send_atomic_request_begin_command()
 
@@ -671,7 +682,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("16")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             # Send the AtomicRequest begin command from the secondary controller
             await self.send_atomic_request_begin_command(dev_ctrl=secondary_controller)
