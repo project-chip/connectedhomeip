@@ -2257,7 +2257,6 @@
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(CHIP_ROOT)/third_party/jsoncpp/repo/include",
 					"$(CHIP_ROOT)/zzz_generated/darwin-framework-tool",
-					"$(CHIP_ROOT)/config/ios",
 					"$(CHIP_ROOT)/third_party/editline/repo/include",
 					"$(CHIP_ROOT)/src/include",
 					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/gen/include",
@@ -2334,7 +2333,6 @@
 					"$(CHIP_ROOT)/zzz_generated/app-common",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(CHIP_ROOT)/third_party/jsoncpp/repo/include",
-					"$(CHIP_ROOT)/config/ios",
 					"$(CHIP_ROOT)/third_party/editline/repo/include",
 					"$(CHIP_ROOT)/third_party/libwebsockets",
 					"$(CHIP_ROOT)/third_party/libwebsockets/repo/include",
@@ -2526,7 +2524,6 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(TEMP_DIR)/out/gen/include",
 					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
-					"$(CHIP_ROOT)/config/ios",
 					"$(CHIP_ROOT)/src",
 					"$(CHIP_ROOT)/src/include",
 					"$(CHIP_ROOT)/zzz_generated/",
@@ -2698,7 +2695,6 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(TEMP_DIR)/out/gen/include",
 					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
-					"$(CHIP_ROOT)/config/ios",
 					"$(CHIP_ROOT)/src",
 					"$(CHIP_ROOT)/src/include",
 					"$(CHIP_ROOT)/zzz_generated/",
