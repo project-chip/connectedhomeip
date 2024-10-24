@@ -33,7 +33,7 @@ namespace Ember {
 /// unaligned) and strings are Pascal-like (short with 1-byte length prefix or long with 2-byte length
 /// prefix).
 ///
-/// Class is to be used a one-shot:
+/// Class is to be used as a one-shot:
 ///   - create it out of metadata + data span
 ///   - call Decode (which modifies the input data span)
 class EmberAttributeBuffer
