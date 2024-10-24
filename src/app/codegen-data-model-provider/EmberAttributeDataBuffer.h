@@ -16,10 +16,12 @@
  */
 #pragma once
 
+#include "lib/core/TLVWriter.h"
 #include <app/util/attribute-metadata.h>
 #include <app/util/ember-io-storage.h>
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVTypes.h>
+#include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/Span.h>
 
@@ -39,6 +41,14 @@ namespace Ember {
 class EmberAttributeDataBuffer
 {
 public:
+#if CHIP_CONFIG_BIG_ENDIAN_TARGET
+    using EndianWriter = Encoding::BigEndian::BufferWriter;
+    using EndianReader = Encoding::BigEndian::Reader;
+#else
+    using EndianWriter = Encoding::LittleEndian::BufferWriter;
+    using EndianReader = Encoding::LittleEndian::Reader;
+#endif
+
     enum class PascalStringType
     {
         kShort,
@@ -59,12 +69,14 @@ public:
     /// modified by this call.
     CHIP_ERROR Decode(chip::TLV::TLVReader & reader);
 
+    /// Writes the data encoded in the underlying buffer into the given `writer`
+    ///
+    /// The data in the internal data buffer is assumed to be already formatted correctly
+    /// HOWEVER the size inside it will not be fully considered (i.e. encoding will use
+    /// the data encoding line integer or string sizes and NOT the databuffer max size)
+    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, TLV::Tag tag) const;
+
 private:
-#if CHIP_CONFIG_BIG_ENDIAN_TARGET
-    using EndianWriter = Encoding::BigEndian::BufferWriter;
-#else
-    using EndianWriter = Encoding::LittleEndian::BufferWriter;
-#endif
     /// Decodes the UNSIGNED integer stored in `reader` and places its content into `writer`
     /// Takes into account internal mIsNullable.
     CHIP_ERROR DecodeUnsignedInteger(chip::TLV::TLVReader & reader, EndianWriter & writer);
@@ -72,6 +84,10 @@ private:
     /// Decodes the SIGNED integer stored in `reader` and places its content into `writer`
     /// Takes into account internal mIsNullable.
     CHIP_ERROR DecodeSignedInteger(chip::TLV::TLVReader & reader, EndianWriter & writer);
+
+    /// Encodes the UNSIGNED integer into `writer`.
+    /// Takes into account internal mIsNullable.
+    CHIP_ERROR EncodeInteger(chip::TLV::TLVWriter & writer, TLV::Tag tag, EndianReader & reader) const;
 
     /// Decodes the string/byte string contained in `reader` and stores it into `writer`.
     /// String is encoded using a pascal-prefix of size `stringType`.
@@ -94,6 +110,11 @@ namespace DataModel {
 inline CHIP_ERROR Decode(TLV::TLVReader & reader, Ember::EmberAttributeDataBuffer & buffer)
 {
     return buffer.Decode(reader);
+}
+
+inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, Ember::EmberAttributeDataBuffer & buffer)
+{
+    return buffer.Encode(writer, tag);
 }
 
 } // namespace DataModel

@@ -17,14 +17,18 @@
 #include <app/codegen-data-model-provider/EmberAttributeDataBuffer.h>
 
 #include <app-common/zap-generated/attribute-type.h>
+#include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/odd-sized-integers.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>
+#include <lib/core/TLVWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/Constants.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <cstdint>
 #include <limits>
 
 namespace chip {
@@ -43,7 +47,7 @@ constexpr uint32_t MaxLength(EmberAttributeDataBuffer::PascalStringType s)
     {
         return std::numeric_limits<uint8_t>::max() - 1;
     }
-    // EmberAttributeBuffer::PascalStringType::kLong:
+    // EmberAttributeDataBuffer::PascalStringType::kLong:
     return std::numeric_limits<uint16_t>::max() - 1;
 }
 
@@ -114,6 +118,55 @@ constexpr SignedDecodeInfo GetSignedDecodeInfo(EmberAfAttributeType type)
         return SignedDecodeInfo(8);
     }
     chipDie();
+}
+
+/// Encodes the string of type stringType pointed to by `reader` into the TLV `writer`.
+/// Then encoded string will be at tag `tag` and of type `tlvType`
+CHIP_ERROR EncodeString(EmberAttributeDataBuffer::PascalStringType stringType, TLV::TLVType tlvType, TLV::TLVWriter & writer,
+                        TLV::Tag tag, EmberAttributeDataBuffer::EndianReader & reader, bool nullable)
+{
+    unsigned stringLen;
+    if (stringType == EmberAttributeDataBuffer::PascalStringType::kShort)
+    {
+        uint8_t len;
+        if (!reader.Read8(&len).IsSuccess())
+        {
+            return reader.StatusCode();
+        }
+        if (len == NumericAttributeTraits<uint8_t>::kNullValue)
+        {
+            VerifyOrReturnError(nullable, CHIP_ERROR_INVALID_ARGUMENT);
+            return writer.PutNull(tag);
+        }
+        stringLen = len;
+    }
+    else
+    {
+        uint16_t len;
+        if (!reader.Read16(&len).IsSuccess())
+        {
+            return reader.StatusCode();
+        }
+        if (len == NumericAttributeTraits<uint16_t>::kNullValue)
+        {
+            VerifyOrReturnError(nullable, CHIP_ERROR_INVALID_ARGUMENT);
+            return writer.PutNull(tag);
+        }
+        stringLen = len;
+    }
+
+    const uint8_t * data;
+    if (!reader.ZeroCopyProcessBytes(stringLen, &data).IsSuccess())
+    {
+        return reader.StatusCode();
+    }
+
+    if (tlvType == TLV::kTLVType_UTF8String)
+    {
+        return writer.PutString(tag, reinterpret_cast<const char *>(data), stringLen);
+    }
+
+    return writer.PutBytes(tag, data, stringLen);
 }
 
 } // namespace
@@ -191,6 +244,7 @@ CHIP_ERROR EmberAttributeDataBuffer::DecodeAsString(chip::TLV::TLVReader & reade
             writer.Put16(NumericAttributeTraits<uint16_t>::kNullValue);
             break;
         }
+
         return CHIP_NO_ERROR;
     }
 
@@ -319,6 +373,200 @@ CHIP_ERROR EmberAttributeDataBuffer::Decode(chip::TLV::TLVReader & reader)
 
     mDataBuffer.reduce_size(written);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EmberAttributeDataBuffer::EncodeInteger(chip::TLV::TLVWriter & writer, TLV::Tag tag, EndianReader & reader) const
+{
+    // Encodes an integer by first reading as raw bytes and then
+    // bitshift-convert
+    //
+    // This optimizes code size rather than readability at this point.
+
+    uint8_t raw_bytes[8];
+
+    bool isSigned = (mAttributeType == ZCL_INT8S_ATTRIBUTE_TYPE) //
+        || (mAttributeType == ZCL_INT16S_ATTRIBUTE_TYPE)         //
+        || (mAttributeType == ZCL_INT24S_ATTRIBUTE_TYPE)         //
+        || (mAttributeType == ZCL_INT32S_ATTRIBUTE_TYPE)         //
+        || (mAttributeType == ZCL_INT40S_ATTRIBUTE_TYPE)         //
+        || (mAttributeType == ZCL_INT48S_ATTRIBUTE_TYPE)         //
+        || (mAttributeType == ZCL_INT56S_ATTRIBUTE_TYPE)         //
+        || (mAttributeType == ZCL_INT64S_ATTRIBUTE_TYPE);
+
+    unsigned byteCount;
+    uint64_t nullValue;
+
+    if (isSigned)
+    {
+        const SignedDecodeInfo info = GetSignedDecodeInfo(mAttributeType);
+        byteCount                   = info.byteCount;
+        nullValue                   = static_cast<uint64_t>(info.minValue); // just a bit cast for easy compare
+    }
+    else
+    {
+        const UnsignedDecodeInfo info = GetUnsignedDecodeInfo(mAttributeType);
+        byteCount                     = info.byteCount;
+        nullValue                     = info.maxValue;
+    }
+
+    VerifyOrDie(sizeof(raw_bytes) >= byteCount);
+    if (!reader.ReadBytes(raw_bytes, byteCount).IsSuccess())
+    {
+        return reader.StatusCode();
+    }
+
+    // At this point, RAW_VALUE contains the actual value, need to make it "real"
+    union
+    {
+        int64_t int_value;
+        uint64_t uint_value;
+    } value;
+
+    value.uint_value = 0;
+
+#if CHIP_CONFIG_BIG_ENDIAN_TARGET
+    bool isNegative = isSigned && (raw_bytes[0] >= 0x80);
+    if (isNegative)
+    {
+        value.int_value = -1;
+    }
+    for (int i = 0; i < static_cast<int>(byteCount); i++)
+    {
+#else
+    bool isNegative = isSigned && (raw_bytes[byteCount - 1] >= 0x80);
+    if (isNegative)
+    {
+        value.int_value = -1;
+    }
+    for (int i = static_cast<int>(byteCount) - 1; i >= 0; i--)
+    {
+#endif
+        value.uint_value <<= 8;
+        value.uint_value = (value.uint_value & ~0xFFULL) | raw_bytes[i];
+    }
+
+    if (mIsNullable && (value.uint_value == nullValue))
+    {
+        // MaxValue is used for NULL setting
+        return writer.PutNull(tag);
+    }
+
+    switch (mAttributeType)
+    {
+    case ZCL_INT8U_ATTRIBUTE_TYPE: // Unsigned 8-bit integer
+        return writer.Put(tag, static_cast<uint8_t>(value.uint_value));
+    case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
+        return writer.Put(tag, static_cast<uint16_t>(value.uint_value));
+    case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
+    case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
+        return writer.Put(tag, static_cast<uint32_t>(value.uint_value));
+    case ZCL_INT40U_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
+    case ZCL_INT48U_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
+    case ZCL_INT56U_ATTRIBUTE_TYPE: // Signed 56-bit integer
+    case ZCL_INT64U_ATTRIBUTE_TYPE: // Signed 64-bit integer
+        return writer.Put(tag, static_cast<uint64_t>(value.uint_value));
+    case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
+        return writer.Put(tag, static_cast<int8_t>(value.int_value));
+    case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
+        return writer.Put(tag, static_cast<int16_t>(value.int_value));
+    case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
+    case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
+        return writer.Put(tag, static_cast<int32_t>(value.int_value));
+    default:
+        return writer.Put(tag, static_cast<int64_t>(value.int_value));
+    }
+}
+
+CHIP_ERROR EmberAttributeDataBuffer::Encode(chip::TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    EndianReader endianReader(mDataBuffer.data(), mDataBuffer.size());
+
+    switch (mAttributeType)
+    {
+    case ZCL_NO_DATA_ATTRIBUTE_TYPE: // No data
+        return writer.PutNull(tag);
+    case ZCL_BOOLEAN_ATTRIBUTE_TYPE: { // Boolean
+        uint8_t value;
+        if (!endianReader.Read8(&value).IsSuccess())
+        {
+            return endianReader.StatusCode();
+        }
+        switch (value)
+        {
+        case 0:
+        case 1:
+            return writer.PutBoolean(tag, value != 0);
+        case 0xFF:
+            return writer.PutNull(tag);
+        default:
+            // Unknown types
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+    }
+    case ZCL_INT8U_ATTRIBUTE_TYPE:  // Unsigned 8-bit integer
+    case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
+    case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
+    case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
+    case ZCL_INT40U_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
+    case ZCL_INT48U_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
+    case ZCL_INT56U_ATTRIBUTE_TYPE: // Unsigned 56-bit integer
+    case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
+    case ZCL_INT8S_ATTRIBUTE_TYPE:  // Signed 8-bit integer
+    case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
+    case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
+    case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
+    case ZCL_INT40S_ATTRIBUTE_TYPE: // Signed 40-bit integer
+    case ZCL_INT48S_ATTRIBUTE_TYPE: // Signed 48-bit integer
+    case ZCL_INT56S_ATTRIBUTE_TYPE: // Signed 56-bit integer
+    case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
+        return EncodeInteger(writer, tag, endianReader);
+    case ZCL_SINGLE_ATTRIBUTE_TYPE: { // 32-bit float
+        union
+        {
+            uint8_t raw[sizeof(float)];
+            float value;
+        } value;
+
+        if (!endianReader.ReadBytes(value.raw, sizeof(value)).IsSuccess())
+        {
+            return endianReader.StatusCode();
+        }
+        if (NumericAttributeTraits<float>::IsNullValue(value.value))
+        {
+            return writer.PutNull(tag);
+        }
+        return writer.Put(tag, value.value);
+    }
+    case ZCL_DOUBLE_ATTRIBUTE_TYPE: { // 64-bit float
+        union
+        {
+            uint8_t raw[sizeof(double)];
+            double value;
+        } value;
+
+        if (!endianReader.ReadBytes(value.raw, sizeof(value)).IsSuccess())
+        {
+            return endianReader.StatusCode();
+        }
+        if (NumericAttributeTraits<double>::IsNullValue(value.value))
+        {
+            return writer.PutNull(tag);
+        }
+        return writer.Put(tag, value.value);
+    }
+
+    case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Char string
+        return EncodeString(PascalStringType::kShort, TLV::kTLVType_UTF8String, writer, tag, endianReader, mIsNullable);
+    case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
+        return EncodeString(PascalStringType::kLong, TLV::kTLVType_UTF8String, writer, tag, endianReader, mIsNullable);
+    case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string
+        return EncodeString(PascalStringType::kShort, TLV::kTLVType_ByteString, writer, tag, endianReader, mIsNullable);
+    case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE:
+        return EncodeString(PascalStringType::kLong, TLV::kTLVType_ByteString, writer, tag, endianReader, mIsNullable);
+    default:
+        ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(mAttributeType));
+        return CHIP_IM_GLOBAL_STATUS(Failure);
+    }
 }
 
 } // namespace Ember
