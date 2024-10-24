@@ -74,7 +74,7 @@ namespace Silabs {
 namespace {
 uint8_t sButtonStates[SL_SI91x_BUTTON_COUNT] = { 0 };
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-bool btn0_pressed = false;
+bool sl_btn0_pressed = false;
 #endif /* SL_ICD_ENABLED */
 } // namespace
 
@@ -161,19 +161,19 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction)
     {
         if (btnAction == BUTTON_PRESSED)
         {
-            btn0_pressed = true;
+            sl_btn0_pressed = true;
         }
-        else if ((btnAction == BUTTON_RELEASED) && (btn0_pressed == false))
+        else if ((btnAction == BUTTON_RELEASED) && (sl_btn0_pressed == false))
         {
             // if the btn was not pressed and only a release event came, ignore it
             return;
         }
-        else if ((btnAction == BUTTON_RELEASED) && (btn0_pressed == true))
+        else if ((btnAction == BUTTON_RELEASED) && (sl_btn0_pressed == true))
         {
-            btn0_pressed = false;
+            sl_btn0_pressed = false;
         }
     }
-#endif /* SL_ICD_ENABLED */
+#endif // SL_ICD_ENABLED
     if (Silabs::GetPlatform().mButtonCallback == nullptr)
     {
         return;
