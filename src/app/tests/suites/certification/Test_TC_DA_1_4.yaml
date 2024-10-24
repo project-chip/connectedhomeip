@@ -35,7 +35,7 @@ tests:
       verification: |
           (for all steps, PIs use equivalent command on their respective platform)
           set the $CHIP_ROOT environment variable to the location of the connectedhomeip directory or if you are validating image pls send this command in apps folder (cd to the connectedhomeip directory or cd to var directory respectively), use command export CHIP_ROOT=$(pwd -P)
-          For each scenario outlined in the sheet TC-DA-1.4 test cases, perform the following actions 
+          For each scenario outlined in the sheet TC-DA-1.4 test cases, perform the following actions
           - Start the TH using the required certificate set and PID. For chip-all-clusters-app, use the command given in the chip-all-clusters app command column
           - Have the DUT commission the TH. Verify that the DUT indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface.
           - factory reset the TH
@@ -174,11 +174,10 @@ tests:
       disabled: true
 
     - label:
-          "Step 1: PAA Test Vector: Use Invalid PAA (Not Registered in the
-          DCL)."
+          "Step 1: PAA Test Vector: Use Invalid PAA (Not Registered in the DCL)."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-          please use the equivalent command on your respective platform to perform a factory reset 
+          please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -309,7 +308,7 @@ tests:
           "Step 5: CD Test Vector: The certificate_id field has wrong length."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_cert_id_len_wrong/test_case_vector.json --product-id 32768
@@ -554,16 +553,16 @@ tests:
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
           please use the equivalent command on your respective platform to perform a factory reset
-          
+
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
-          
+
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_cms_v2/test_case_vector.json --product-id 32768
-          
+
           Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
-          
+
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
-          
+
           [1693997461.745027][74710:74710] CHIP:EM: <<< [E:51312r S:62341 M:262208603 (Ack:254470721)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693997461.745033][74710:74710] CHIP:IN: (S) Sending msg 262208603 on secure session with LSID: 62341
           [1693997461.745052][74710:74710] CHIP:DMG: Command handler moving to [CommandSen]
@@ -879,8 +878,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 23: CD Test Vector: The product_id_array field has 100 PID values
-          none of which matches the PID value in DAC."
+          "Step 23: CD Test Vector: The product_id_array field has 100 PID
+          values none of which matches the PID value in DAC."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
            please use the equivalent command on your respective platform to perform a factory reset
@@ -2368,7 +2367,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 68: DAC Test Vector: Fallback VID and PID encoding example from spec: PID is not a number"
+          "Step 68: DAC Test Vector: Fallback VID and PID encoding example from
+          spec: PID is not a number"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
            please use the equivalent command on your respective platform to perform a factory reset
@@ -3449,9 +3449,9 @@ tests:
       disabled: true
 
     - label:
-          "Step 100: PAI Test Vector: Mix of Fallback and Matter OID encoding for
-          VID and PID: invalid, PID is using Matter OID then VID must also use
-          Matter OID"
+          "Step 100: PAI Test Vector: Mix of Fallback and Matter OID encoding
+          for VID and PID: invalid, PID is using Matter OID then VID must also
+          use Matter OID"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
            please use the equivalent command on your respective platform to perform a factory reset
@@ -3476,7 +3476,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 101: PAI Test Vector: Fallback VID and PID encoding example from spec: PID is not a number"
+          "Step 101: PAI Test Vector: Fallback VID and PID encoding example from
+          spec: PID is not a number"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
            please use the equivalent command on your respective platform to perform a factory reset
