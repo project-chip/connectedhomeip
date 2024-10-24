@@ -24,6 +24,8 @@ import("//build_overrides/chip.gni")
 #   CodegenDataModelProvider.h
 #   CodegenDataModelProvider_Read.cpp
 #   CodegenDataModelProvider_Write.cpp
+#   EmberAttributeDataBuffer.cpp
+#   EmberAttributeDataBuffer.h
 #   EmberMetadata.cpp
 #   EmberMetadata.h
 #   Instance.cpp
