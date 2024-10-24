@@ -420,6 +420,14 @@
         },
 
         {
+            "name": "Fabric Sync (Linux)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/debug/standalone/fabric-sync",
+            "cwd": "${workspaceFolder}"
+        },
+
+        {
             "name": "OTA Requestor App (Linux)",
             "type": "lldb",
             "request": "launch",

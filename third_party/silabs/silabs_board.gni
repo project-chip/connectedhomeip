@@ -56,6 +56,9 @@ declare_args() {
 
   # Temperature Sensor support
   sl_enable_si70xx_sensor = false
+
+  # RGB LED support
+  sl_enable_rgb_led = false
 }
 
 declare_args() {
@@ -73,7 +76,11 @@ if (silabs_board == "") {
 assert(silabs_board != "", "silabs_board must be specified")
 
 # Si917 WIFI board ----------
-if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A") {
+if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A" ||
+    silabs_board == "BRD4343A") {
+  if (silabs_board == "BRD2605A") {
+    sl_enable_rgb_led = true
+  }
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
   wifi_soc = true

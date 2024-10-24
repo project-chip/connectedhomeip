@@ -852,7 +852,7 @@ bool Engine::MergeDirtyPathsUnderSameEndpoint()
 
 CHIP_ERROR Engine::InsertPathIntoDirtySet(const AttributePathParams & aAttributePath)
 {
-    ReturnErrorCodeIf(MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
+    VerifyOrReturnError(!MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
 
     if (mGlobalDirtySet.Exhausted() && !MergeDirtyPathsUnderSameCluster() && !MergeDirtyPathsUnderSameEndpoint())
     {
@@ -862,7 +862,7 @@ CHIP_ERROR Engine::InsertPathIntoDirtySet(const AttributePathParams & aAttribute
         object->mGeneration = GetDirtySetGeneration();
     }
 
-    ReturnErrorCodeIf(MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
+    VerifyOrReturnError(!MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
     ChipLogDetail(DataManagement, "Cannot merge the new path into any existing path, create one.");
 
     auto object = mGlobalDirtySet.CreateObject();
