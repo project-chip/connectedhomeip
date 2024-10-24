@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/codegen-data-model-provider/EmberDataBuffer.h>
+#include <app/codegen-data-model-provider/EmberAttributeDataBuffer.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/util/attribute-storage-null-handling.h>
@@ -37,9 +37,9 @@ namespace {
 ///
 /// the max size value (0xFF and 0xFFFF) is reserved for NULL representation so
 /// it is not available
-constexpr uint32_t MaxLength(EmberAttributeBuffer::PascalStringType s)
+constexpr uint32_t MaxLength(EmberAttributeDataBuffer::PascalStringType s)
 {
-    if (s == EmberAttributeBuffer::PascalStringType::kShort)
+    if (s == EmberAttributeDataBuffer::PascalStringType::kShort)
     {
         return std::numeric_limits<uint8_t>::max() - 1;
     }
@@ -118,7 +118,7 @@ constexpr SignedDecodeInfo GetSignedDecodeInfo(EmberAfAttributeType type)
 
 } // namespace
 
-CHIP_ERROR EmberAttributeBuffer::DecodeUnsignedInteger(chip::TLV::TLVReader & reader, EndianWriter & writer)
+CHIP_ERROR EmberAttributeDataBuffer::DecodeUnsignedInteger(chip::TLV::TLVReader & reader, EndianWriter & writer)
 {
     UnsignedDecodeInfo info = GetUnsignedDecodeInfo(mAttributeType);
 
@@ -147,7 +147,7 @@ CHIP_ERROR EmberAttributeBuffer::DecodeUnsignedInteger(chip::TLV::TLVReader & re
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EmberAttributeBuffer::DecodeSignedInteger(chip::TLV::TLVReader & reader, EndianWriter & writer)
+CHIP_ERROR EmberAttributeDataBuffer::DecodeSignedInteger(chip::TLV::TLVReader & reader, EndianWriter & writer)
 {
     SignedDecodeInfo info = GetSignedDecodeInfo(mAttributeType);
 
@@ -175,7 +175,7 @@ CHIP_ERROR EmberAttributeBuffer::DecodeSignedInteger(chip::TLV::TLVReader & read
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EmberAttributeBuffer::DecodeAsString(chip::TLV::TLVReader & reader, PascalStringType stringType, TLV::TLVType tlvType,
+CHIP_ERROR EmberAttributeDataBuffer::DecodeAsString(chip::TLV::TLVReader & reader, PascalStringType stringType, TLV::TLVType tlvType,
                                                 EndianWriter & writer)
 {
     // Handle null first, then the actual data
@@ -218,7 +218,7 @@ CHIP_ERROR EmberAttributeBuffer::DecodeAsString(chip::TLV::TLVReader & reader, P
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EmberAttributeBuffer::Decode(chip::TLV::TLVReader & reader)
+CHIP_ERROR EmberAttributeDataBuffer::Decode(chip::TLV::TLVReader & reader)
 {
     // all methods below assume that nullable setting matches (this is to reduce code size
     // even though clarity suffers)

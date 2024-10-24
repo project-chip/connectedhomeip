@@ -21,7 +21,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/RequiredPrivilege.h>
-#include <app/codegen-data-model-provider/EmberDataBuffer.h>
+#include <app/codegen-data-model-provider/EmberAttributeDataBuffer.h>
 #include <app/codegen-data-model-provider/EmberMetadata.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/reporting/reporting.h>
@@ -224,7 +224,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 
     MutableByteSpan dataBuffer = gEmberAttributeIOBufferSpan;
     {
-        Ember::EmberAttributeBuffer emberData(*attributeMetadata, dataBuffer);
+        Ember::EmberAttributeDataBuffer emberData(*attributeMetadata, dataBuffer);
         ReturnErrorOnFailure(decoder.Decode(emberData));
     }
 

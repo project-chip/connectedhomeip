@@ -54,7 +54,7 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestCodegenModelViaMocks.cpp",
-    "TestEmberDataBuffer.cpp",
+    "TestEmberAttributeDataBuffer.cpp",
   ]
 
   cflags = [ "-Wconversion" ]

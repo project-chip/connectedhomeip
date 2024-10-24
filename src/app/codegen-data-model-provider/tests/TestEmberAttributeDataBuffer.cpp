@@ -16,7 +16,7 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/codegen-data-model-provider/EmberDataBuffer.h>
+#include <app/codegen-data-model-provider/EmberAttributeDataBuffer.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/MessageDef/AttributeDataIB.h>
@@ -113,8 +113,8 @@ public:
     EncodeResult TryEncode(const T & value, const uint8_t (&arr)[N])
     {
         ByteSpan expected(arr);
-        MutableByteSpan out_span(mEmberDataBuffer);
-        Ember::EmberAttributeBuffer buffer(mMetaData, out_span);
+        MutableByteSpan out_span(mEmberAttributeDataBuffer);
+        Ember::EmberAttributeDataBuffer buffer(mMetaData, out_span);
 
         TLVEncodedValue tlvEncoded;
         TLV::TLVReader reader = tlvEncoded.EncodeValue(value);
@@ -144,7 +144,7 @@ public:
 
 private:
     const EmberAfAttributeMetadata * mMetaData;
-    uint8_t mEmberDataBuffer[kMaxSize];
+    uint8_t mEmberAttributeDataBuffer[kMaxSize];
 };
 
 const EmberAfAttributeMetadata * CreateFakeMeta(EmberAfAttributeType type, bool nullable)
