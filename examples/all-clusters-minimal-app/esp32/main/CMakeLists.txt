@@ -94,6 +94,7 @@ set(SRC_DIRS_LIST
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/power-source-configuration-server"
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/power-source-server"
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/resource-monitoring-server"
+  "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/actions-server"
   "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/src"
 )
 
