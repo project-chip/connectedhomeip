@@ -101,6 +101,7 @@ chip::Protocols::InteractionModel::Status chefLaundryWasherModeWriteCallback(chi
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1
     VerifyOrDie(gLaundryWasherModeInstance != nullptr);
+
     chip::Protocols::InteractionModel::Status ret;
     chip::AttributeId attributeId = attributeMetadata->attributeId;
 
@@ -129,7 +130,6 @@ chip::Protocols::InteractionModel::Status chefLaundryWasherModeReadCallback(chip
                                                                             uint8_t * buffer, uint16_t maxReadLength)
 {
     VerifyOrReturnValue(maxReadLength > 0, chip::Protocols::InteractionModel::Status::ResourceExhausted);
-    buffer[0] = gLaundryWasherModeInstance->GetCurrentMode();
 
     chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
     chip::AttributeId attributeId                 = attributeMetadata->attributeId;
