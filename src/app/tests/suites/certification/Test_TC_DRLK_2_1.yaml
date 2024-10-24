@@ -194,9 +194,7 @@ tests:
           value: 2
 
     - label: "Step 1j: Simulate a not fully locked scenario on the DUT."
-      PICS:
-          DRLK.S.A0000 && DRLK.S.M.SimulateNotFullyLocked &&
-          PICS_USER_PROMPT
+      PICS: DRLK.S.A0000 && DRLK.S.M.SimulateNotFullyLocked && PICS_USER_PROMPT
       verification: |
           vendor will give instructions on how to simulate if applicable and if that is possible, then send the below command to read the lock state attribute.
 
