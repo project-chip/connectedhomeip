@@ -24,12 +24,16 @@
 #include <PowerTopologyDelegate.h>
 #include <lib/core/CHIPError.h>
 
+constexpr chip::EndpointId kEvseEndpoint        = 1;
+constexpr chip::EndpointId kWaterHeaterEndpoint = 2;
+
+chip::EndpointId GetMainAppEndpointId();
+
 void EvseApplicationInit(chip::EndpointId endpointId);
 void EvseApplicationShutdown();
 
 void WaterHeaterApplicationInit(chip::EndpointId endpointId);
 void WaterHeaterApplicationShutdown();
 
-// The DEM Delegate is used for the TestEventTriggers which are functions called outside of a class/init context
-// thus have no simple way to inject this dependency, so use the Getter here.
+// The DEM Delegate is used for the TestEventTriggers
 chip::app::Clusters::DeviceEnergyManagement::DeviceEnergyManagementDelegate * GetDEMDelegate();

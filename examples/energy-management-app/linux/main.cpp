@@ -79,15 +79,15 @@ chip::BitMask<Feature> GetFeatureMapFromCmdLine()
     return sFeatureMap;
 }
 
-EndpointId GetMainAppEndpointId()
-{
-    return eemEndpoint;
-}
-
 } // namespace DeviceEnergyManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+EndpointId GetMainAppEndpointId()
+{
+    return eemEndpoint;
+}
 
 static uint32_t ParseNumber(const char * pString)
 {

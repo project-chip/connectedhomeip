@@ -74,7 +74,7 @@
 
 namespace {
 LEDWidget sEnergyManagementLED;
-}
+} // namespace
 
 using namespace chip;
 using namespace chip::app;
@@ -120,6 +120,13 @@ chip::BitMask<Feature> GetFeatureMapFromCmdLine()
     return sFeatureMap;
 }
 
+} // namespace DeviceEnergyManagement
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+AppTask AppTask::sAppTask;
+
 EndpointId GetMainAppEndpointId()
 {
 #if defined(SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)
@@ -128,13 +135,6 @@ EndpointId GetMainAppEndpointId()
     return kEvseEndpoint;
 #endif
 }
-
-} // namespace DeviceEnergyManagement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
-AppTask AppTask::sAppTask;
 
 void ApplicationInit()
 {

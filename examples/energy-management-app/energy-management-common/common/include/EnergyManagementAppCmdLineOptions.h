@@ -25,10 +25,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
-constexpr EndpointId kEvseEndpoint        = 1;
-constexpr EndpointId kWaterHeaterEndpoint = 2;
 
-EndpointId GetMainAppEndpointId();
 chip::BitMask<Feature> GetFeatureMapFromCmdLine();
 
 } // namespace DeviceEnergyManagement

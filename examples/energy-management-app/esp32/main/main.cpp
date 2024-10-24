@@ -142,15 +142,6 @@ chip::BitMask<Feature> GetFeatureMapFromCmdLine()
     return sFeatureMap;
 }
 
-EndpointId GetMainAppEndpointId()
-{
-#if defined(CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)
-    return kWaterHeaterEndpoint;
-#else
-    return kEvseEndpoint;
-#endif
-}
-
 } // namespace DeviceEnergyManagement
 } // namespace Clusters
 } // namespace app
@@ -160,6 +151,15 @@ EndpointId GetMainAppEndpointId()
 #if defined(CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE) && defined(CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)
 #error Cannot define CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE and CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
 #endif
+
+EndpointId GetMainAppEndpointId()
+{
+#if defined(CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)
+    return kWaterHeaterEndpoint;
+#else
+    return kEvseEndpoint;
+#endif
+}
 
 void ApplicationInit()
 {

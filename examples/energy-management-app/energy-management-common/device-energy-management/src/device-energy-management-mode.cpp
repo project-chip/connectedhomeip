@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <CommonMain.h>
 #include <EnergyManagementAppCmdLineOptions.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <device-energy-management-modes.h>
