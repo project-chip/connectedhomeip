@@ -20,6 +20,7 @@
 #include <app/util/attribute-storage-null-handling.h>
 #include <lib/support/TypeTraits.h>
 
+#include <cstdint>
 #include <limits>
 
 namespace chip {
@@ -90,6 +91,59 @@ struct IntegerByteIndexing<ByteSize, false>
     static constexpr int pastHighIndex = ByteSize;
 };
 } // namespace detail
+
+namespace NumericLimits {
+
+// Generic size information for unsigned values.
+//
+// Assumes non-nullable types. Nullable types reserve one of the values as NULL (the max)
+inline constexpr uint64_t MaxUnsignedValue(unsigned ByteSize)
+{
+    if (ByteSize == 8)
+    {
+        return std::numeric_limits<uint64_t>::max();
+    }
+    return (1ULL << (8 * ByteSize)) - 1;
+}
+
+/// Readability-method to express that the maximum unsigned value is a null value
+///
+/// Our encoding states that max int value is the NULL value
+inline constexpr uint64_t UnsignedMaxValueToNullValue(uint64_t value)
+{
+    return value;
+}
+
+// Generic size information for signed values.
+//
+// Assumes non-nullable types. Nullable types reserve one of the values as NULL (the min)
+inline constexpr int64_t MaxSignedValue(unsigned ByteSize)
+{
+    if (ByteSize == 8)
+    {
+        return std::numeric_limits<int64_t>::max();
+    }
+    return (static_cast<int64_t>(1) << (8 * ByteSize - 1)) - 1;
+}
+
+inline constexpr int64_t MinSignedValue(unsigned ByteSize)
+{
+    if (ByteSize == 8)
+    {
+        return std::numeric_limits<int64_t>::min();
+    }
+    return -(static_cast<int64_t>(1) << (8 * ByteSize - 1));
+}
+
+/// Readability-method to express that the maximum signed value is a null value
+///
+/// Our encoding states that min int value is the NULL value
+inline constexpr int64_t SignedMinValueToNullValue(int64_t value)
+{
+    return value;
+}
+
+} // namespace NumericLimits
 
 template <int ByteSize, bool IsSigned, bool IsBigEndian>
 struct NumericAttributeTraits<OddSizedInteger<ByteSize, IsSigned>, IsBigEndian> : detail::IntegerByteIndexing<ByteSize, IsBigEndian>
