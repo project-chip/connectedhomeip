@@ -462,15 +462,15 @@ CHIP_ERROR EmberAttributeDataBuffer::EncodeInteger(chip::TLV::TLVWriter & writer
         return writer.Put(tag, static_cast<uint32_t>(value.uint_value));
     case ZCL_INT40U_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
     case ZCL_INT48U_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
-    case ZCL_INT56U_ATTRIBUTE_TYPE: // Unsigned 56-bit integer
-    case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
+    case ZCL_INT56U_ATTRIBUTE_TYPE: // Signed 56-bit integer
+    case ZCL_INT64U_ATTRIBUTE_TYPE: // Signed 64-bit integer
         return writer.Put(tag, static_cast<uint64_t>(value.uint_value));
-    case ZCL_INT8S_ATTRIBUTE_TYPE: // Unsigned 8-bit integer
+    case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
         return writer.Put(tag, static_cast<int8_t>(value.int_value));
-    case ZCL_INT16S_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
+    case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
         return writer.Put(tag, static_cast<int16_t>(value.int_value));
-    case ZCL_INT24S_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
-    case ZCL_INT32S_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
+    case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
+    case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
         return writer.Put(tag, static_cast<int32_t>(value.int_value));
     default:
         return writer.Put(tag, static_cast<int64_t>(value.int_value));
