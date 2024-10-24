@@ -107,6 +107,7 @@ int32_t wfx_wifi_rsi_init(void);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #if SLI_SI91X_MCU_INTERFACE
 void sl_si91x_invoke_btn_press_event();
+void sl_si91x_uart_power_requirement_handler();
 #endif // SLI_SI91X_MCU_INTERFACE
 #if SLI_SI917
 int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state);

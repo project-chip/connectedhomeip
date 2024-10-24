@@ -275,7 +275,9 @@ void sl_si91x_invoke_btn_press_event(void)
     {
         btn0_pressed = false;
     }
-
+}
+void sl_si91x_uart_power_requirement_handler(void)
+{
 #ifdef ENABLE_CHIP_SHELL
     // Checking the UULP PIN 1 status to reinit the UART and not allow the device to go to sleep
     if (RSI_NPSSGPIO_GetPin(RTE_UULP_GPIO_1_PIN))
