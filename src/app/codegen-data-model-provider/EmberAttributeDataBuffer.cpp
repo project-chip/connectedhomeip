@@ -16,14 +16,14 @@
  */
 #include <app/codegen-data-model-provider/EmberAttributeDataBuffer.h>
 
-#include <app/util/attribute-metadata.h>
-#include <lib/core/TLVTags.h>
-#include <lib/core/TLVWriter.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/odd-sized-integers.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>
+#include <lib/core/TLVWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/Constants.h>
 #include <protocols/interaction_model/StatusCode.h>
