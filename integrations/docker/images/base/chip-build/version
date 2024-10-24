@@ -1,1 +1,1 @@
-86 : [Tizen] Pass runner's path as QEMU argument
+87 : [Silabs] Delete SDK files to reduce the amount of flash consummed
