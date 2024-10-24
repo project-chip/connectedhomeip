@@ -33,7 +33,7 @@
 #endif
 
 #ifdef ENABLE_CHIP_SHELL
-#include "matter_shell.h"
+#include "MatterShell.h"
 #endif
 
 #ifdef HEAP_MONITORING

@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,14 +13,27 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/app/chip_data_model.gni")
+import("//build_overrides/efr32_sdk.gni")
 import("${chip_root}/src/app/icd/icd.gni")
+import("${chip_root}/third_party/silabs/silabs_board.gni")
 
-chip_data_model("light-switch-common") {
-  if (chip_enable_icd_lit) {
-    zap_file = "icd-lit-light-switch-app.zap"
-  } else {
-    zap_file = "light-switch-app.zap"
-  }
-  is_server = true
+# This is necessary since the BUILD.gn for both platforms are still split
+shell_dependency_path = "${chip_root}/examples/platform/silabs/efr32"
+if (use_SiWx917) {
+  shell_dependency_path = "${chip_root}/examples/platform/silabs/SiWx917"
+}
+
+config("shell-config") {
+  include_dirs = [ "." ]
+}
+
+source_set("icd") {
+  sources = [
+    "ICDShellCommands.cpp",
+    "ICDShellCommands.h",
+  ]
+
+  public_configs = [ ":shell-config" ]
+
+  deps = [ "${shell_dependency_path}:matter-shell" ]
 }

@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "matter_shell.h"
+#include "MatterShell.h"
 #include "sl_component_catalog.h"
 #include <ChipShellCollection.h>
 #include <cmsis_os2.h>

@@ -30,6 +30,7 @@ chip_enable_icd_server = true
 chip_subscription_timeout_resumption = false
 sl_use_subscription_syncing = true
 chip_enable_icd_lit = true
+chip_enable_icd_dsls = true
 
 # ICD Matter Configuration flags
 sl_idle_mode_duration_s = 3600  # 60min Idle Mode Duration
