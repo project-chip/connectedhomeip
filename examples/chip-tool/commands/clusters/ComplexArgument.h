@@ -420,7 +420,14 @@ public:
         return ComplexArgumentParser::Setup(label, *mRequest, value);
     }
 
-    void Reset() { *mRequest = T(); }
+    void Reset()
+    {
+        if (mRequest != nullptr)
+        {
+            ComplexArgumentParser::Finalize(*mRequest);
+            *mRequest = T();
+        }
+    }
 
 private:
     T * mRequest;
