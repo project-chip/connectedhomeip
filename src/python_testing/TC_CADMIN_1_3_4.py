@@ -354,7 +354,7 @@ class TC_CADMIN(MatterBaseTest):
             asserts.fail("DUT node ID from fabric does not equal DUT node ID for TH1 during commissioning")
 
         await self.th2.SendCommand(self.dut_node_id, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
-        
+
         self.step(7)
         # TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx
         th2_idx = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
@@ -363,6 +363,7 @@ class TC_CADMIN(MatterBaseTest):
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
