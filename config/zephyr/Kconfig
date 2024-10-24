@@ -583,6 +583,7 @@ config CHIP_BLE_ADVERTISING_DURATION
 
 config USE_CHIP_DATA_MODEL_INTERFACE
     bool "Use a DataModel::Provider interface for data access"
+    default y
     help
       This enables a level of indiraction in the CHIP interaction model engine in 
       accessing underlying data and executing operations such as 
