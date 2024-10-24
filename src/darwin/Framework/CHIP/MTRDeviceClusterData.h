@@ -17,7 +17,6 @@
 #import <Foundation/Foundation.h>
 
 #import "MTRDefines_Internal.h"
-#import "MTRDeviceDataValueDictionary.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

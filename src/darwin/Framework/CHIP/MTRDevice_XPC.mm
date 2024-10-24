@@ -41,7 +41,7 @@
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceController_Concrete.h"
 #import "MTRDeviceController_XPC.h"
-#import "MTRDeviceDataValueDictionary.h"
+#import "MTRDeviceDataValidation.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRDevice_XPC_Internal.h"
@@ -136,7 +136,8 @@
 // required methods for MTRDeviceDelegates
 - (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state
 {
-    if (!MTRInputIsStructurallyValid(nodeID, NSNumber.class)) {
+    if (!MTR_SAFE_CAST(nodeID, NSNumber)) {
+        MTR_LOG_ERROR("%@ invalid device:stateChanged: nodeID: %@", self, nodeID);
         return;
     }
 
@@ -146,9 +147,15 @@
     }];
 }
 
-- (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+- (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<MTRDeviceResponseValueDictionary> *)attributeReport
 {
-    if (!MTRInputIsStructurallyValid(nodeID, NSNumber.class) || !MTRInputIsStructurallyValid(attributeReport, MTRInputStructureAttributeReport)) {
+    if (!MTR_SAFE_CAST(nodeID, NSNumber)) {
+        MTR_LOG_ERROR("%@ invalid device:receivedAttributeReport: nodeID: %@", self, nodeID);
+        return;
+    }
+
+    if (!MTRAttributeReportIsWellFormed(attributeReport)) {
+        MTR_LOG_ERROR("%@ invalid device:receivedAttributeReport: attributeReport: %@", self, attributeReport);
         return;
     }
 
@@ -158,9 +165,15 @@
     }];
 }
 
-- (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
+- (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<MTRDeviceResponseValueDictionary> *)eventReport
 {
-    if (!MTRInputIsStructurallyValid(nodeID, NSNumber.class) || !MTRInputIsStructurallyValid(eventReport, MTRInputStructureEventReport)) {
+    if (!MTR_SAFE_CAST(nodeID, NSNumber)) {
+        MTR_LOG_ERROR("%@ invalid device:receivedEventReport: nodeID: %@", self, nodeID);
+        return;
+    }
+
+    if (!MTREventReportIsWellFormed(eventReport)) {
+        MTR_LOG_ERROR("%@ invalid device:receivedEventReport: eventReport: %@", self, eventReport);
         return;
     }
 
@@ -173,7 +186,8 @@
 // optional methods for MTRDeviceDelegates - check for implementation before calling
 - (oneway void)deviceBecameActive:(NSNumber *)nodeID
 {
-    if (!MTRInputIsStructurallyValid(nodeID, NSNumber.class)) {
+    if (!MTR_SAFE_CAST(nodeID, NSNumber)) {
+        MTR_LOG_ERROR("%@ invalid deviceBecameActive: nodeID: %@", self, nodeID);
         return;
     }
 
@@ -187,7 +201,8 @@
 
 - (oneway void)deviceCachePrimed:(NSNumber *)nodeID
 {
-    if (!MTRInputIsStructurallyValid(nodeID, NSNumber.class)) {
+    if (!MTR_SAFE_CAST(nodeID, NSNumber)) {
+        MTR_LOG_ERROR("%@ invalid deviceCachePrimed: nodeID: %@", self, nodeID);
         return;
     }
 
@@ -200,7 +215,8 @@
 
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID
 {
-    if (!MTRInputIsStructurallyValid(nodeID, NSNumber.class)) {
+    if (!MTR_SAFE_CAST(nodeID, NSNumber)) {
+        MTR_LOG_ERROR("%@ invalid deviceConfigurationChanged: nodeID: %@", self, nodeID);
         return;
     }
 
@@ -211,28 +227,45 @@
     }];
 }
 
+static const auto * requiredInternalStateKeys = @[ kMTRDeviceInternalPropertyDeviceState, kMTRDeviceInternalPropertyLastSubscriptionAttemptWait ];
+static const auto * optionalInternalStateKeys = @[ kMTRDeviceInternalPropertyKeyVendorID, kMTRDeviceInternalPropertyKeyProductID, kMTRDeviceInternalPropertyNetworkFeatures, kMTRDeviceInternalPropertyMostRecentReportTime, kMTRDeviceInternalPropertyLastSubscriptionFailureTime ];
+
+- (BOOL)_internalState:(NSDictionary *)dictionary hasValidValuesForKeys:(const NSArray<NSString *> *)keys valueRequired:(BOOL)required
+{
+    // All the keys are NSNumber-valued.
+    for (NSString * key in keys) {
+        id value = dictionary[key];
+        if (!value) {
+            if (required) {
+                MTR_LOG_ERROR("%@ device:internalStateUpdated: handed state with no value for \"%@\": %@", self, key, value);
+                return NO;
+            }
+
+            continue;
+        }
+        if (!MTR_SAFE_CAST(value, NSNumber)) {
+            MTR_LOG_ERROR("%@ device:internalStateUpdated: handed state with invalid value for \"%@\": %@", self, key, value);
+            return NO;
+        }
+    }
+
+    return YES;
+}
+
 - (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary
 {
-    if (!MTRInputIsStructurallyValid(nodeID, NSNumber.class) ||
-        // Check always-present properties.
-        !MTRInputIsStructurallyValid(dictionary, @{
-            kMTRDeviceInternalPropertyDeviceState : NSNumber.class,
-            kMTRDeviceInternalPropertyLastSubscriptionAttemptWait : NSNumber.class,
-        })) {
+    if (!MTR_SAFE_CAST(nodeID, NSNumber)) {
+        MTR_LOG_ERROR("%@ invalid device:internalStateUpdated: nodeID: %@", self, nodeID);
         return;
     }
 
-    // There are several optional keys, all of which are NSNumber-valued.
-    for (NSString * key in @[ kMTRDeviceInternalPropertyKeyVendorID, kMTRDeviceInternalPropertyKeyProductID, kMTRDeviceInternalPropertyNetworkFeatures, kMTRDeviceInternalPropertyMostRecentReportTime, kMTRDeviceInternalPropertyLastSubscriptionFailureTime ]) {
-        id value = dictionary[key];
-        if (!value) {
-            continue;
-        }
-        if (!MTRInputIsStructurallyValid(value, NSNumber.class)) {
-            MTR_LOG_ERROR("%@ device:internalStateUpdated: handed state with invalid value for \"%@\": %@", self, key, value);
-            return;
-        }
+    if (!MTR_SAFE_CAST(dictionary, NSDictionary)) {
+        MTR_LOG_ERROR("%@ invalid device:internalStateUpdated dictionary: %@", self, dictionary);
+        return;
     }
+
+    VerifyOrReturn([self _internalState:dictionary hasValidValuesForKeys:requiredInternalStateKeys valueRequired:YES]);
+    VerifyOrReturn([self _internalState:dictionary hasValidValuesForKeys:optionalInternalStateKeys valueRequired:NO]);
 
     [self _setInternalState:dictionary];
     MTR_LOG("%@ internal state updated", self);
@@ -318,13 +351,13 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
                                      return;
                                  }
 
-                                 if (error != nil && !MTRInputIsStructurallyValid(error, NSError.class)) {
+                                 if (error != nil && !MTR_SAFE_CAST(error, NSError)) {
                                      MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) that has invalid error object: %@", self, endpointID, clusterID, commandID, error);
                                      completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
                                      return;
                                  }
 
-                                 if (values != nil && !MTRInputIsStructurallyValid(values, MTRInputStructureInvokeResponse)) {
+                                 if (values != nil && !MTRInvokeResponseIsWellFormed(values)) {
                                      MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) that has invalid data: %@", self, clusterID, commandID, values, values);
                                      completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
                                      return;
